@@ -135,6 +135,19 @@ jobs:
           echo "Files created:"
           ls -lh component-reports/ || echo "No files created"
 
+      - name: Run enhanced component analysis
+        run: |
+          echo "Running enhanced component maturity analysis..."
+          uv run python scripts/analyze-component-maturity.py
+
+          # Verify JSON output was created
+          if [ -f "component-maturity-analysis.json" ]; then
+            echo "✓ Analysis complete! JSON file created."
+            echo "File size: $(stat -c%s component-maturity-analysis.json 2>/dev/null || stat -f%z component-maturity-analysis.json)"
+          else
+            echo "✗ WARNING: Analysis JSON not created!"
+          fi
+
       - name: Generate status report
         id: report
         run: |
@@ -144,53 +157,28 @@ jobs:
           from pathlib import Path
           from datetime import datetime
 
-          # Component functional groups
-          FUNCTIONAL_GROUPS = {
-              "Core Infrastructure": ["Neo4j", "Docker", "Carbon"],
-              "AI/Agent Systems": ["Model Management", "LLM", "Agent Orchestration", "Narrative Arc Orchestrator"],
-              "Player Experience": ["Gameplay Loop", "Character Arc Manager", "Player Experience"],
-              "Therapeutic Content": ["Narrative Coherence", "Therapeutic Systems"]
-          }
+          # Read enhanced component analysis data
+          try:
+              with open("component-maturity-analysis.json") as f:
+                  analysis_data = json.load(f)
+          except FileNotFoundError:
+              print("ERROR: component-maturity-analysis.json not found!")
+              print("The enhanced analysis script may have failed.")
+              analysis_data = {}
 
-          # Maturity stage thresholds
-          DEV_TO_STAGING_THRESHOLD = 70.0
-          STAGING_TO_PRODUCTION_THRESHOLD = 80.0
-
-          # Read coverage data
-          report_dir = Path("component-reports")
-          component_status = {}
-
-          for coverage_file in report_dir.glob("*_coverage.json"):
-              component_name = coverage_file.stem.replace("_coverage", "").replace("_", " ")
-
-              try:
-                  with open(coverage_file) as f:
-                      data = json.load(f)
-                      coverage = data["totals"]["percent_covered"]
-                      component_status[component_name] = {
-                          "coverage": coverage,
-                          "ready_for_staging": coverage >= DEV_TO_STAGING_THRESHOLD,
-                          "ready_for_production": coverage >= STAGING_TO_PRODUCTION_THRESHOLD
-                      }
-              except Exception as e:
-                  print(f"Error reading coverage for {component_name}: {e}")
-                  component_status[component_name] = {
-                      "coverage": 0.0,
-                      "ready_for_staging": False,
-                      "ready_for_production": False
+          # Flatten component data for easier access
+          all_components = {}
+          for group_name, components in analysis_data.items():
+              for component_name, component_data in components.items():
+                  all_components[component_name] = {
+                      **component_data,
+                      "functional_group": group_name
                   }
 
-          # Validation: Ensure we collected some coverage data
-          if len(component_status) == 0:
-              print("WARNING: No coverage data collected!")
-              print("This likely means pytest failed to run properly.")
-              print("Check that 'uv run pytest' is being used (not 'uvx pytest').")
-
-          # Validation: Check if all components show 0% (likely indicates pytest issue)
-          if len(component_status) > 0 and all(s["coverage"] == 0.0 for s in component_status.values()):
-              print("WARNING: All components show 0% coverage!")
-              print("This likely means pytest is running in wrong environment.")
-              print("Verify 'uv run pytest' is being used to access project dependencies.")
+          # Validation
+          if len(all_components) == 0:
+              print("WARNING: No component data found!")
+              print("Check that the analysis script ran successfully.")
 
           # Generate markdown report
           report = f"# TTA Component Status Report\n\n"
@@ -198,68 +186,173 @@ jobs:
           report += f"---\n\n"
 
           # Summary statistics
-          total_components = len(component_status)
-          ready_for_staging = sum(1 for s in component_status.values() if s["ready_for_staging"])
-          ready_for_production = sum(1 for s in component_status.values() if s["ready_for_production"])
-          avg_coverage = sum(s["coverage"] for s in component_status.values()) / total_components if total_components > 0 else 0
+          total_components = len(all_components)
+          in_production = sum(1 for c in all_components.values() if c.get("current_stage") == "Production")
+          in_staging = sum(1 for c in all_components.values() if c.get("current_stage") == "Staging")
+          in_development = sum(1 for c in all_components.values() if c.get("current_stage") == "Development")
+          ready_for_staging = sum(1 for c in all_components.values() if c.get("ready_for_staging", False) and c.get("current_stage") == "Development")
+          ready_for_production = sum(1 for c in all_components.values() if c.get("ready_for_production", False) and c.get("current_stage") == "Staging")
+
+          avg_coverage = 0
+          if total_components > 0:
+              total_cov = sum(c.get("coverage", {}).get("coverage", 0) for c in all_components.values())
+              avg_coverage = total_cov / total_components
 
           report += f"## Summary\n\n"
           report += f"| Metric | Value |\n"
           report += f"|--------|-------|\n"
           report += f"| Total Components | {total_components} |\n"
+          report += f"| In Production | {in_production} |\n"
+          report += f"| In Staging | {in_staging} |\n"
+          report += f"| In Development | {in_development} |\n"
           report += f"| Average Coverage | {avg_coverage:.1f}% |\n"
-          report += f"| Ready for Staging (≥70%) | {ready_for_staging} |\n"
-          report += f"| Ready for Production (≥80%) | {ready_for_production} |\n\n"
+          report += f"| Ready for Staging (from Dev) | {ready_for_staging} |\n"
+          report += f"| Ready for Production (from Staging) | {ready_for_production} |\n\n"
+
+          # Staging components with observation periods
+          staging_components = {name: data for name, data in all_components.items() if data.get("current_stage") == "Staging"}
+          if staging_components:
+              report += f"## Staging Components (7-Day Observation)\n\n"
+              report += f"| Component | Deployed | Days Remaining | Coverage | Blockers | Status |\n"
+              report += f"|-----------|----------|----------------|----------|----------|--------|\n"
+
+              for name, data in staging_components.items():
+                  obs = data.get("observation_period")
+                  coverage = data.get("coverage", {}).get("coverage", 0)
+                  blocker_count = data.get("blocker_count", 0)
+                  blocker_issues = data.get("blocker_issues", [])
+
+                  if obs:
+                      deployed = obs.get("deployed", "N/A")
+                      days_remaining = obs.get("days_remaining", 0)
+
+                      # Status icon
+                      if blocker_count > 0 or blocker_issues:
+                          status_icon = "⚠️ Blocked"
+                      elif days_remaining > 0:
+                          status_icon = "⏳ In Progress"
+                      else:
+                          status_icon = "✅ Complete"
+
+                      # Blocker summary
+                      if blocker_issues:
+                          blocker_text = ", ".join([b.get("issue", "") for b in blocker_issues[:2]])
+                          if len(blocker_issues) > 2:
+                              blocker_text += f" +{len(blocker_issues)-2} more"
+                      elif blocker_count > 0:
+                          blocker_text = f"{blocker_count} issues"
+                      else:
+                          blocker_text = "None"
+
+                      report += f"| {name} | {deployed} | {days_remaining} days | {coverage:.1f}% | {blocker_text} | {status_icon} |\n"
+                  else:
+                      report += f"| {name} | N/A | N/A | {coverage:.1f}% | - | ⚠️ No obs. data |\n"
+
+              report += f"\n"
 
           # Component status by functional group
-          for group, components in FUNCTIONAL_GROUPS.items():
-              report += f"## {group}\n\n"
-              report += f"| Component | Coverage | Status |\n"
-              report += f"|-----------|----------|--------|\n"
+          for group_name, components in analysis_data.items():
+              report += f"## {group_name}\n\n"
+              report += f"| Component | Stage | Coverage | Linting | Type Check | Security | Status |\n"
+              report += f"|-----------|-------|----------|---------|------------|----------|--------|\n"
 
-              for component in components:
-                  if component in component_status:
-                      status = component_status[component]
-                      coverage = status["coverage"]
+              for component_name, data in components.items():
+                  stage = data.get("current_stage", "Development")
+                  coverage = data.get("coverage", {}).get("coverage", 0)
 
-                      if status["ready_for_production"]:
-                          status_icon = "🟢 Production Ready"
-                      elif status["ready_for_staging"]:
-                          status_icon = "🟡 Staging Ready"
-                      else:
-                          status_icon = "🔴 Development"
+                  # Code quality status
+                  quality = data.get("quality", {})
+                  linting = quality.get("linting", {})
+                  type_check = quality.get("type_checking", {})
+                  security = quality.get("security", {})
 
-                      report += f"| {component} | {coverage:.1f}% | {status_icon} |\n"
+                  lint_icon = "✅" if linting.get("passed", False) else f"❌ {linting.get('issues', 0)}"
+                  type_icon = "✅" if type_check.get("passed", False) else "❌"
+                  sec_icon = "✅" if security.get("passed", False) else "❌"
+
+                  # Overall status
+                  if data.get("ready_for_production", False):
+                      status_icon = "🟢 Ready for Prod"
+                  elif data.get("ready_for_staging", False) and stage == "Development":
+                      status_icon = "🟡 Ready for Staging"
+                  elif stage == "Staging":
+                      status_icon = "🟡 In Staging"
+                  elif stage == "Production":
+                      status_icon = "🟢 Production"
                   else:
-                      report += f"| {component} | N/A | ⚪ No Data |\n"
+                      status_icon = "🔴 Development"
+
+                  report += f"| {component_name} | {stage} | {coverage:.1f}% | {lint_icon} | {type_icon} | {sec_icon} | {status_icon} |\n"
 
               report += f"\n"
 
           # Promotion recommendations
           report += f"## Promotion Recommendations\n\n"
 
-          staging_candidates = [c for c, s in component_status.items() if s["ready_for_staging"] and not s["ready_for_production"]]
-          production_candidates = [c for c, s in component_status.items() if s["ready_for_production"]]
+          # Ready for production (from staging)
+          production_candidates = [(name, data) for name, data in all_components.items()
+                                   if data.get("ready_for_production", False) and data.get("current_stage") == "Staging"]
 
           if production_candidates:
               report += f"### Ready for Production\n\n"
-              for component in production_candidates:
-                  report += f"- ✅ **{component}** ({component_status[component]['coverage']:.1f}% coverage)\n"
+              for name, data in production_candidates:
+                  coverage = data.get("coverage", {}).get("coverage", 0)
+                  obs = data.get("observation_period", {})
+                  obs_status = "✅ Complete" if obs and obs.get("complete", False) else "⏳ In progress"
+                  report += f"- ✅ **{name}** ({coverage:.1f}% coverage, observation: {obs_status})\n"
               report += f"\n"
+
+          # Ready for staging (from development)
+          staging_candidates = [(name, data) for name, data in all_components.items()
+                                if data.get("ready_for_staging", False) and data.get("current_stage") == "Development"]
 
           if staging_candidates:
               report += f"### Ready for Staging\n\n"
-              for component in staging_candidates:
-                  report += f"- ✅ **{component}** ({component_status[component]['coverage']:.1f}% coverage)\n"
+              for name, data in staging_candidates:
+                  coverage = data.get("coverage", {}).get("coverage", 0)
+                  report += f"- ✅ **{name}** ({coverage:.1f}% coverage, all checks passing)\n"
               report += f"\n"
 
-          needs_work = [c for c, s in component_status.items() if not s["ready_for_staging"]]
+          # Components with blockers
+          blocked_components = [(name, data) for name, data in all_components.items()
+                                if data.get("blocker_count", 0) > 0 or data.get("blocker_issues", [])]
+
+          if blocked_components:
+              report += f"### Active Blockers\n\n"
+              for name, data in blocked_components:
+                  stage = data.get("current_stage", "Development")
+                  blockers = data.get("blockers", [])
+                  blocker_issues = data.get("blocker_issues", [])
+
+                  report += f"#### {name} ({stage})\n\n"
+
+                  # Automated blockers
+                  for blocker in blockers:
+                      report += f"- ❌ {blocker.get('description', 'Unknown blocker')}\n"
+
+                  # Issue-based blockers
+                  for issue in blocker_issues:
+                      issue_num = issue.get("issue", "")
+                      desc = issue.get("description", "See issue for details")
+                      report += f"- ⚠️ **{issue_num}**: {desc}\n"
+
+                  report += f"\n"
+
+          # Needs work (development components not ready)
+          needs_work = [(name, data) for name, data in all_components.items()
+                        if not data.get("ready_for_staging", False) and data.get("current_stage") == "Development"]
+
           if needs_work:
-              report += f"### Needs Work (< 70% coverage)\n\n"
-              for component in needs_work:
-                  coverage = component_status[component]['coverage']
-                  gap = DEV_TO_STAGING_THRESHOLD - coverage
-                  report += f"- ⚠️ **{component}** ({coverage:.1f}% coverage, {gap:.1f}% gap)\n"
+              report += f"### Needs Work (Development)\n\n"
+              for name, data in needs_work:
+                  coverage = data.get("coverage", {}).get("coverage", 0)
+                  gap = 70.0 - coverage if coverage < 70 else 0
+                  blocker_count = data.get("blocker_count", 0)
+
+                  if gap > 0:
+                      report += f"- ⚠️ **{name}** ({coverage:.1f}% coverage, {gap:.1f}% gap, {blocker_count} blockers)\n"
+                  else:
+                      report += f"- ⚠️ **{name}** ({coverage:.1f}% coverage, {blocker_count} blockers)\n"
               report += f"\n"
 
           # Save report
@@ -271,6 +364,9 @@ jobs:
           # Set output for GitHub Actions
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               f.write(f"total_components={total_components}\n")
+              f.write(f"in_production={in_production}\n")
+              f.write(f"in_staging={in_staging}\n")
+              f.write(f"in_development={in_development}\n")
               f.write(f"ready_for_staging={ready_for_staging}\n")
               f.write(f"ready_for_production={ready_for_production}\n")
               f.write(f"avg_coverage={avg_coverage:.1f}\n")

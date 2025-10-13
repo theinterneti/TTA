@@ -34,6 +34,13 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Sync dependencies
+        run: |
+          # Sync project dependencies + dev group (includes pytest)
+          uv sync
+          echo "Verifying pytest installation..."
+          uv pip list | grep pytest
+
       - name: Parse promotion request
         id: parse
         uses: actions/github-script@v7
@@ -124,9 +131,11 @@ jobs:
         run: |
           echo "Running unit tests for ${{ steps.parse.outputs.component }}..."
 
-          # Run tests with coverage
+          # Run tests with coverage (using project environment)
+          # CRITICAL: Use 'uv run pytest' not 'uvx pytest' to access project dependencies
+          # Using 'uvx pytest' causes false 0% coverage readings due to isolated environment
           if [ -f "${{ steps.component_path.outputs.test_path }}" ]; then
-            uvx pytest ${{ steps.component_path.outputs.test_path }} \
+            uv run pytest ${{ steps.component_path.outputs.test_path }} \
               --cov=${{ steps.component_path.outputs.path }} \
               --cov-report=term \
               --cov-report=json \
