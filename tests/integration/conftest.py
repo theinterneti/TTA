@@ -6,12 +6,13 @@ that run against the staging environment with correct ports and credentials.
 """
 
 import os
+from typing import Any
+
 import pytest
 import pytest_asyncio
-from typing import Dict, Any
 
 
-def get_staging_config() -> Dict[str, Any]:
+def get_staging_config() -> dict[str, Any]:
     """
     Get staging environment configuration.
 
@@ -29,12 +30,16 @@ def get_staging_config() -> Dict[str, Any]:
             "neo4j": {
                 "uri": "bolt://localhost:7688",
                 "user": "neo4j",
-                "password": os.environ.get("NEO4J_STAGING_PASSWORD", "staging_neo4j_secure_pass_2024"),
+                "password": os.environ.get(
+                    "NEO4J_STAGING_PASSWORD", "staging_neo4j_secure_pass_2024"
+                ),
             },
             "redis": {
                 "host": "localhost",
                 "port": 6380,
-                "password": os.environ.get("REDIS_STAGING_PASSWORD", "staging_redis_secure_pass_2024"),
+                "password": os.environ.get(
+                    "REDIS_STAGING_PASSWORD", "staging_redis_secure_pass_2024"
+                ),
                 "db": 0,
             },
             "postgres": {
@@ -42,7 +47,9 @@ def get_staging_config() -> Dict[str, Any]:
                 "port": 5433,
                 "database": "tta_staging",
                 "user": "tta_user",
-                "password": os.environ.get("POSTGRES_STAGING_PASSWORD", "staging_postgres_secure_pass_2024"),
+                "password": os.environ.get(
+                    "POSTGRES_STAGING_PASSWORD", "staging_postgres_secure_pass_2024"
+                ),
             },
             "api": {
                 "base_url": "http://localhost:3004",
@@ -53,36 +60,35 @@ def get_staging_config() -> Dict[str, Any]:
                 "base_url": "http://localhost:3000",
             },
         }
-    else:
-        # Development/test environment (default ports)
-        return {
-            "neo4j": {
-                "uri": "bolt://localhost:7687",
-                "user": "neo4j",
-                "password": "test_password",
-            },
-            "redis": {
-                "host": "localhost",
-                "port": 6379,
-                "password": None,
-                "db": 1,  # Use test database
-            },
-            "postgres": {
-                "host": "localhost",
-                "port": 5432,
-                "database": "tta_test",
-                "user": "tta_user",
-                "password": "test_password",
-            },
-            "api": {
-                "base_url": "http://localhost:8080",
-                "health_endpoint": "/health",
-                "api_prefix": "/api/v1",
-            },
-            "frontend": {
-                "base_url": "http://localhost:3000",
-            },
-        }
+    # Development/test environment (default ports)
+    return {
+        "neo4j": {
+            "uri": "bolt://localhost:7687",
+            "user": "neo4j",
+            "password": "test_password",
+        },
+        "redis": {
+            "host": "localhost",
+            "port": 6379,
+            "password": None,
+            "db": 1,  # Use test database
+        },
+        "postgres": {
+            "host": "localhost",
+            "port": 5432,
+            "database": "tta_test",
+            "user": "tta_user",
+            "password": "test_password",
+        },
+        "api": {
+            "base_url": "http://localhost:8080",
+            "health_endpoint": "/health",
+            "api_prefix": "/api/v1",
+        },
+        "frontend": {
+            "base_url": "http://localhost:3000",
+        },
+    }
 
 
 @pytest.fixture(scope="session")
@@ -120,8 +126,10 @@ async def redis_client(redis_config):
     """Provide Redis client for integration tests."""
     import redis.asyncio as aioredis
 
-    redis_url = f"redis://{redis_config['host']}:{redis_config['port']}/{redis_config['db']}"
-    if redis_config.get('password'):
+    redis_url = (
+        f"redis://{redis_config['host']}:{redis_config['port']}/{redis_config['db']}"
+    )
+    if redis_config.get("password"):
         redis_url = f"redis://:{redis_config['password']}@{redis_config['host']}:{redis_config['port']}/{redis_config['db']}"
 
     client = aioredis.from_url(redis_url, decode_responses=True)
@@ -138,8 +146,7 @@ async def neo4j_driver(neo4j_config):
     from neo4j import AsyncGraphDatabase
 
     driver = AsyncGraphDatabase.driver(
-        neo4j_config["uri"],
-        auth=(neo4j_config["user"], neo4j_config["password"])
+        neo4j_config["uri"], auth=(neo4j_config["user"], neo4j_config["password"])
     )
 
     yield driver

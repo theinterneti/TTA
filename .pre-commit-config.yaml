@@ -143,5 +143,10 @@ exclude: |
     templates/.*\.json|
     .*\.k8s/.*\.yaml|
     scripts/manual_mutation_test\.py|
-    scripts/setup_mutants_env\.py
+    scripts/setup_mutants_env\.py|
+    tests/contract/.*|
+    tests/contracts/.*|
+    tests/integration/.*|
+    tests/unit/.*|
+    tests/performance/.*
   )$

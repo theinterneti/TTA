@@ -1,0 +1,117 @@
+# Mutation Testing Configuration for TTA Model Management
+#
+# This configuration file controls how mutmut performs mutation testing
+# on the Model Management component.
+#
+# Usage:
+#   uvx mutmut run --paths-to-mutate=src/components/model_management
+#   uvx mutmut results
+#   uvx mutmut show
+#   uvx mutmut html
+
+[mutmut]
+# Paths to mutate - targeting critical service modules
+# Phase 3: Focus on service logic for comprehensive mutation testing
+paths_to_mutate = "src/components/model_management/services/model_selector.py,src/components/model_management/services/fallback_handler.py,src/components/model_management/services/performance_monitor.py"
+
+# Don't create backup files
+backup = false
+
+# Test runner command
+# Use property-based tests and unit tests for comprehensive coverage
+# -x: Stop on first failure (faster feedback)
+# -q: Quiet output
+# --tb=no: No traceback (faster)
+runner = "uv run pytest tests/unit/model_management/services/ -x -q --tb=no -p no:warnings"
+
+# Directory containing tests
+tests_dir = "tests/unit/model_management"
+
+# Dictionary synonyms (for better mutation detection)
+dict_synonyms = "Struct, NamedStruct"
+
+# Exclude patterns (regex)
+# Exclude test files, migrations, and generated code
+exclude_patterns = [
+    "test_.*\\.py$",
+    ".*_test\\.py$",
+    "__pycache__",
+    "migrations/",
+]
+
+# Mutation operators to use (default: all)
+# Available operators:
+#   - number: Mutate numbers (e.g., 0 -> 1, 1 -> 0, 2 -> 3)
+#   - string: Mutate strings (e.g., "foo" -> "XXfooXX")
+#   - operator: Mutate operators (e.g., + -> -, == -> !=)
+#   - keyword: Mutate keywords (e.g., True -> False, None -> "")
+# operators = ["number", "string", "operator", "keyword"]
+
+# Timeout for each mutation test (seconds)
+# If a test takes longer than this, it's considered a timeout
+# timeout = 60
+
+# Number of parallel workers (default: 1)
+# Set to number of CPU cores for faster execution
+# workers = 4
+
+# Cache directory for mutation results
+# cache_dir = ".mutmut_cache"
+
+# ============================================================================
+# MUTATION TESTING BEST PRACTICES
+# ============================================================================
+#
+# 1. Run mutation tests weekly in CI/CD (too slow for PR checks)
+# 2. Focus on critical code first (model selection, fallback, security)
+# 3. Investigate all surviving mutations
+# 4. Document acceptable survivors (e.g., logging code)
+# 5. Track mutation score over time
+#
+# Target Mutation Scores:
+# - Overall: 90%
+# - Critical paths: 100%
+# - Security-critical code: 100%
+#
+# ============================================================================
+# INTERPRETING RESULTS
+# ============================================================================
+#
+# Mutation Score = (Killed Mutations / Total Mutations) * 100
+#
+# 90-100%: Excellent test suite
+# 80-90%:  Good test suite
+# 70-80%:  Adequate test suite
+# < 70%:   Weak test suite, needs improvement
+#
+# Surviving Mutations:
+# - Review each surviving mutation
+# - Add tests to kill the mutation
+# - Or document why mutation is acceptable
+#
+# ============================================================================
+# COMMON COMMANDS
+# ============================================================================
+#
+# Run mutation tests:
+#   uvx mutmut run --paths-to-mutate=src/components/model_management
+#
+# Show results summary:
+#   uvx mutmut results
+#
+# Show surviving mutations:
+#   uvx mutmut show
+#
+# Generate HTML report:
+#   uvx mutmut html
+#
+# Apply a specific mutation for debugging:
+#   uvx mutmut apply 42
+#
+# Run on specific file:
+#   uvx mutmut run --paths-to-mutate=src/components/model_management/services/model_selector.py
+#
+# Use faster test runner:
+#   uvx mutmut run --runner="pytest -x --tb=line"
+#
+# ============================================================================
