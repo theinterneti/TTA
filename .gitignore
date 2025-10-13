@@ -73,6 +73,31 @@ verification-results.txt
 playwright-report/
 test-results/
 
+# Mutation testing artifacts
+mutants/
+session.sqlite
+session-*.sqlite
+*-mutation-report.html
+mutation-report.html
+cosmic-ray.toml
+cosmic-ray-*.toml
+setup.cfg
+
+# Coverage detailed outputs
+coverage_full_output.txt
+*_coverage_full.json
+*_coverage_final.json
+test_*_coverage.json
+narrative_arc_coverage*.json
+
+# Linting and validation outputs
+linting_issues_before.txt
+ruff_errors_grouped.txt
+*_errors_grouped.txt
+
+# Staging-specific test results
+test-results-staging/
+
 # -------------------------------------------------
 # 5) Tool caches (linters/type checkers/etc.)
 # -------------------------------------------------
@@ -228,6 +253,12 @@ huggingface-cache/
 /staging_*.py
 /start_phase3_services.py
 
+# Artifacts directory (test scripts with development-only code)
+/artifacts/
+
+# Obsolete subdirectories (legacy configs and old code)
+/obsolete/
+
 # Root-level shell scripts (development utilities)
 # Keep scripts in scripts/ directory for production use
 /*.sh
@@ -264,6 +295,9 @@ PYRIGHT_BASELINE_*.txt
 /quick-validation.spec.ts
 /tsconfig.json
 
+# Test mock node_modules (contains invalid JSON configs)
+/tests/e2e/mocks/node_modules/
+
 # -------------------------------------------------
 # 18) Staging and environment-specific directories
 # -------------------------------------------------
@@ -287,6 +321,12 @@ archive/
 /*_FIX.md
 /*_IMPROVEMENTS.md
 /*_OPTIMIZATION.md
+/*_DELIVERABLES.md
+/*_READY.md
+/VALIDATION_*.md
+/FINAL_*.md
+/GITHUB_*.md
+/NARRATIVE_*.md
 
 # -------------------------------------------------
 # 20) Cypher query files and Redis config (root level)
