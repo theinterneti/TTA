@@ -1,82 +1,96 @@
 # Top 3 Priority Components for Staging Promotion
 
-**Last Updated**: 2025-10-13
+**Last Updated**: 2025-10-13 (CORRECTED)
 **Planning Horizon**: Next 2 weeks (2025-10-14 to 2025-10-27)
+
+---
+
+## ⚠️ CORRECTION NOTICE
+
+**Previous Version Error**: This document previously stated Narrative Arc Orchestrator had 70.3% coverage. This was **INCORRECT** based on unverified/outdated data.
+
+**Verified Current Coverage** (per GitHub Issue #42): **42.9%**
+
+The priorities have been **reordered** to reflect accurate data and component readiness.
 
 ---
 
 ## Executive Summary
 
-Based on the comprehensive component maturity assessment, the following 3 components are prioritized for staging promotion over the next 2 weeks:
+Based on the comprehensive component maturity assessment with **CORRECTED** coverage data, the following 3 components are prioritized for staging promotion over the next 2 weeks:
 
 | Priority | Component | Coverage | Effort | Target Date | Status |
 |----------|-----------|----------|--------|-------------|--------|
-| **P0** | Narrative Arc Orchestrator | 70.3% ✅ | 1-2 days | 2025-10-15 | 🟡 Ready (after blockers) |
+| **P0** | **Carbon** | **70.6% ✅** | **Immediate** | **2025-10-14** | **🟢 READY NOW** |
 | **P1** | Model Management | 100% ✅ | 2-3 days | 2025-10-17 | 🔴 Code quality issues |
 | **P1** | Gameplay Loop | 100% ✅ | 2-3 days | 2025-10-17 | 🔴 Code quality issues |
 
-**Total Estimated Effort**: 5-8 days
+**Total Estimated Effort**: 2-3 days (Carbon ready immediately)
 **Expected Outcome**: 3 additional components in staging by 2025-10-17
 
 ---
 
-## Priority 1: Narrative Arc Orchestrator ⭐
+## Priority 1: Carbon ⭐ **READY NOW**
 
 ### Status
-🟡 **READY FOR STAGING** (after blocker resolution)
+🟢 **READY FOR IMMEDIATE STAGING PROMOTION**
 
 ### Why This Component First?
-- ✅ Already exceeds 70% coverage threshold (70.3%)
-- ✅ All blockers are fixable within 1-2 days
-- ✅ No architectural or design issues
+- ✅ **Already exceeds 70% coverage threshold (70.6%)**
+- ✅ **ZERO blockers** - all quality checks passing
+- ✅ No code changes required
+- ✅ Immediate deployment possible
 - ✅ Quick win to validate promotion workflow
 - ✅ Low risk (no external dependencies)
 
 ### Current Metrics
-- **Test Coverage**: 70.3% (exceeds 70% requirement by 0.3%)
+- **Test Coverage**: 70.6% ✅ (exceeds 70% requirement by 0.6%)
 - **Tests Passing**: ✅ All passing
 - **Core Features**: ✅ Complete
+- **Linting**: ✅ 0 issues
+- **Type Checking**: ✅ Passing
 - **Security**: ✅ Passing
+- **Documentation**: ✅ README exists
 
-### Blockers (3 total)
-1. ❌ **150 linting issues** (2-3 hours to fix)
-2. ❌ **21 type checking errors** (3-4 hours to fix)
-3. ❌ **Missing README** (1-2 hours to create)
+### Blockers
+**NONE** ✅ - Component is ready for immediate promotion
 
 ### Action Plan
-**Script**: `scripts/promote-narrative-arc-orchestrator.sh`
-**Tracking**: `docs/component-promotion/NARRATIVE_ARC_ORCHESTRATOR_BLOCKERS.md`
-**Promotion Issue**: #45
+**Timeline**: Can be promoted **TODAY** (2025-10-14)
 
-**Timeline**:
-- **Day 1 (2025-10-14)**: Fix linting + type checking (5-7 hours)
-- **Day 2 (2025-10-15)**: Create README, validate, deploy (3-4 hours)
-
-**Commands**:
+**Steps**:
 ```bash
-# Run automated promotion script
-./scripts/promote-narrative-arc-orchestrator.sh
+# 1. Verify current status (should all pass)
+uvx ruff check src/components/carbon_component.py
+uvx pyright src/components/carbon_component.py
+uvx bandit -r src/components/carbon_component.py -ll
+uv run pytest tests/ --cov=src/components/carbon_component.py
 
-# Or run phases individually
-./scripts/promote-narrative-arc-orchestrator.sh --phase 1  # Linting
-./scripts/promote-narrative-arc-orchestrator.sh --phase 2  # Type checking
-./scripts/promote-narrative-arc-orchestrator.sh --phase 3  # README
-./scripts/promote-narrative-arc-orchestrator.sh --phase 4  # Validate
+# 2. Create promotion issue
+gh issue create \
+  --title "Promote Carbon Component to Staging" \
+  --label "component-promotion,P0" \
+  --body "Carbon component meets all staging criteria (70.6% coverage, all checks passing, zero blockers)"
+
+# 3. Deploy to staging
+./scripts/deploy-staging.sh --component carbon
+
+# 4. Begin 7-day observation period
+# Monitor metrics, integration tests, performance
 ```
 
 ### Success Criteria
-- ✅ All linting issues resolved (0 errors)
-- ✅ All type checking errors resolved (0 errors)
-- ✅ README created with all required sections
-- ✅ Test coverage maintained at ≥70%
-- ✅ All tests passing
+- ✅ All quality checks verified passing
+- ✅ Promotion issue created
 - ✅ Deployed to staging environment
+- ✅ 7-day observation period initiated
+- ✅ Monitoring dashboards configured
 
 ### Next Steps After Promotion
-1. Monitor staging deployment for 7 days
-2. Run integration tests
+1. Monitor staging deployment for 7 days (until 2025-10-21)
+2. Run integration tests daily
 3. Collect performance metrics
-4. Consider production promotion after observation period
+4. Consider production promotion after successful observation period
 
 ---
 
@@ -97,10 +111,9 @@ Based on the comprehensive component maturity assessment, the following 3 compon
 - **Core Features**: ✅ Complete
 - **Security**: ⚠️ Medium severity issue (B615)
 
-### Blockers (3 total)
-1. ❌ **665 linting issues**
-2. ❌ **Type checking errors**
-3. ❌ **Security: B615** (Hugging Face unsafe download)
+### Blockers (2 total)
+1. ❌ **664 linting issues**
+2. ❌ **Security: B615** (Hugging Face unsafe download)
 
 ### Action Plan
 **Estimated Effort**: 2-3 days
@@ -187,7 +200,7 @@ uv run pytest tests/test_model_management_component.py --cov=src/components/mode
 - **Security**: ✅ Passing
 
 ### Blockers (3 total)
-1. ❌ **1,247 linting issues** (Issue #22)
+1. ❌ **1,250 linting issues** (Issue #22)
 2. ❌ **Type checking errors**
 3. ❌ **Missing README**
 
@@ -242,7 +255,7 @@ uv run pytest tests/test_gameplay_loop_component.py --cov=src/components/gamepla
 ```
 
 ### Success Criteria
-- ✅ All 1,247 linting issues resolved (0 errors)
+- ✅ All 1,250 linting issues resolved (0 errors)
 - ✅ All type checking errors resolved (0 errors)
 - ✅ README created with all required sections
 - ✅ Test coverage maintained at 100%
@@ -263,28 +276,30 @@ uv run pytest tests/test_gameplay_loop_component.py --cov=src/components/gamepla
 ### Week 1: 2025-10-14 to 2025-10-20
 
 **Monday 2025-10-14**
-- ✅ Narrative Arc Orchestrator: Fix linting + type checking
+- ✅ Carbon: Verify readiness, create promotion issue, deploy to staging
+- ✅ Begin 7-day observation period for Carbon
 
 **Tuesday 2025-10-15**
-- ✅ Narrative Arc Orchestrator: Create README, validate, deploy to staging
-- ✅ Model Management: Begin linting fixes
+- ✅ Monitor Carbon staging deployment
+- ✅ Model Management: Begin linting fixes (664 issues)
 
 **Wednesday 2025-10-16**
-- ✅ Model Management: Complete linting, begin type checking
-- ✅ Gameplay Loop: Begin linting fixes
+- ✅ Model Management: Complete linting, address security issue (B615)
+- ✅ Gameplay Loop: Begin linting fixes (1,250 issues)
 
 **Thursday 2025-10-17**
-- ✅ Model Management: Complete type checking, fix security issue
+- ✅ Model Management: Validate and deploy to staging
 - ✅ Gameplay Loop: Continue linting fixes
 
 **Friday 2025-10-18**
-- ✅ Model Management: Validate and deploy to staging
 - ✅ Gameplay Loop: Complete linting, begin type checking
+- ✅ Monitor Carbon and Model Management in staging
 
 ### Week 2: 2025-10-21 to 2025-10-27
 
 **Monday 2025-10-21**
 - ✅ Gameplay Loop: Complete type checking, create README
+- ✅ Carbon: Complete 7-day observation (ready for production consideration)
 
 **Tuesday 2025-10-22**
 - ✅ Gameplay Loop: Validate and deploy to staging
@@ -292,6 +307,7 @@ uv run pytest tests/test_gameplay_loop_component.py --cov=src/components/gamepla
 
 **Wednesday-Friday 2025-10-23 to 2025-10-25**
 - ✅ Continue monitoring staging deployments
+- ✅ Begin work on Narrative Arc Orchestrator test coverage improvement
 - ✅ Begin work on next priority components (LLM, Docker, Player Experience)
 
 ---
@@ -337,6 +353,47 @@ uv run pytest tests/test_gameplay_loop_component.py --cov=src/components/gamepla
 
 ---
 
-**Last Updated**: 2025-10-13
+## Appendix: Narrative Arc Orchestrator Status
+
+**Previous Priority**: P0 (INCORRECT - based on false 70.3% coverage data)
+**Current Priority**: P2 (CORRECTED - based on verified 42.9% coverage)
+
+### Why Deprioritized?
+
+**Actual Coverage**: 42.9% (verified via GitHub Issue #42)
+**Coverage Gap**: 27.1% (need to reach 70% threshold)
+**Estimated Effort**: 1-2 weeks of focused test development
+
+### Test Coverage Improvement Plan
+
+**Priority Areas**:
+1. **scale_manager.py** (currently 53.39%)
+   - Add tests for event creation logic (lines 119-133)
+   - Add tests for scale window calculations (lines 184-202)
+   - Add tests for conflict resolution (lines 207-224)
+   - Add tests for async initialization (lines 245-252)
+   - **Estimated gain**: +10-12%
+
+2. **impact_analysis.py** (currently 53.44%)
+   - Add tests for null checks and edge cases
+   - Add tests for error handling paths
+   - **Estimated gain**: +8-10%
+
+3. **causal_graph.py** (currently 42.86%)
+   - Add tests for graph validation (lines 25-29)
+   - Add tests for cycle detection (line 16)
+   - **Estimated gain**: +5-7%
+
+**Target Completion**: 2025-10-27 (not 2025-10-15 as previously stated)
+
+### Quality Checks (Already Passing)
+- ✅ Linting: 0 issues
+- ✅ Type checking: Passing
+- ✅ Security: Passing
+- ✅ Documentation: README exists
+
+---
+
+**Last Updated**: 2025-10-13 (CORRECTED)
 **Next Review**: 2025-10-14
 **Maintained By**: @theinterneti

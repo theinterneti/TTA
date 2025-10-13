@@ -20,9 +20,10 @@
 
 | Priority | Component | Current Stage | Target Stage | Coverage | Blockers | ETA |
 |----------|-----------|---------------|--------------|----------|----------|-----|
-| **P0** | Narrative Arc Orchestrator | Development | Staging | 70.3% | 3 (fixable) | 2025-10-15 |
+| **P0** | Carbon | Development | Staging | 70.6% | 0 | 2025-10-14 (READY NOW) |
 | **P1** | Model Management | Development | Staging | 100% | Code quality | 2025-10-17 |
 | **P1** | Gameplay Loop | Development | Staging | 100% | Code quality | 2025-10-17 |
+| **P2** | Narrative Arc Orchestrator | Development | Staging | 42.9% | Coverage +27.1% | 2025-10-27 |
 | **P2** | LLM Component | Development | Staging | 28.2% | Coverage +41.8% | 2025-10-20 |
 | **P2** | Docker Component | Development | Staging | 20.1% | Coverage +49.9% | 2025-10-22 |
 | **P2** | Player Experience | Development | Staging | 17.3% | Coverage +52.7% | 2025-10-22 |
@@ -58,49 +59,71 @@
 
 ### 🟡 READY FOR STAGING (1 component)
 
-#### 4. Narrative Arc Orchestrator ⭐ **TOP PRIORITY**
-- **Status**: 🟡 Development → Staging (ready after blocker resolution)
-- **Coverage**: 70.3% ✅ (exceeds 70% threshold)
-- **Promotion Issue**: #45 (created 2025-10-13)
-- **Blockers**:
-  - ❌ 150 linting issues (2-3 hours to fix)
-  - ❌ 21 type checking errors (3-4 hours to fix)
-  - ❌ Missing README (1-2 hours to create)
-- **Estimated Effort**: 1-2 days
-- **Target Deployment**: 2025-10-15
-- **Priority**: P0 (Quick win)
-- **Action Plan**: `scripts/promote-narrative-arc-orchestrator.sh`
-- **Blocker Tracking**: `docs/component-promotion/NARRATIVE_ARC_ORCHESTRATOR_BLOCKERS.md`
+#### 4. Carbon ⭐ **TOP PRIORITY - READY NOW**
+- **Status**: 🟡 Development → Staging (READY FOR IMMEDIATE PROMOTION)
+- **Coverage**: 70.6% ✅ (exceeds 70% threshold)
+- **Promotion Issue**: To be created
+- **Blockers**: **NONE** ✅
+- **Estimated Effort**: Immediate (verification only)
+- **Target Deployment**: 2025-10-14 (TODAY)
+- **Priority**: P0 (Ready now, zero blockers)
+- **Quality Checks**:
+  - ✅ Linting: 0 issues
+  - ✅ Type checking: Passing
+  - ✅ Security: Passing
+  - ✅ Documentation: README exists
 
 ---
 
-### 🔴 DEVELOPMENT (8 components)
+---
 
-#### 5. Model Management
+### 🔴 DEVELOPMENT (9 components)
+
+#### 5. Narrative Arc Orchestrator
+- **Status**: 🔴 Development
+- **Coverage**: 42.9% ❌ (27.1% gap to 70% threshold)
+- **Promotion Issue**: #45 (created 2025-10-13)
+- **Blockers**:
+  - ❌ Test coverage (42.9%) below 70% threshold (gap: 27.1%)
+- **Gap to Staging**: Test coverage improvement required
+- **Estimated Effort**: 1-2 weeks (40-80 hours of test development)
+- **Priority**: P2 (Requires significant test coverage work)
+- **Target Staging**: 2025-10-27
+- **Quality Checks**:
+  - ✅ Linting: 0 issues
+  - ✅ Type checking: Passing
+  - ✅ Security: Passing
+  - ✅ Documentation: README exists
+- **Coverage Improvement Plan**:
+  - scale_manager.py: Add tests for event creation, scale windows, conflict resolution (+10-12%)
+  - impact_analysis.py: Add tests for null checks, edge cases, error handling (+8-10%)
+  - causal_graph.py: Add tests for graph validation, cycle detection (+5-7%)
+- **Note**: Previous documentation incorrectly stated 70.3% coverage. Actual verified coverage is 42.9% per GitHub Issue #42.
+
+#### 6. Model Management
 - **Status**: 🔴 Development
 - **Coverage**: 100% ✅
 - **Blockers**:
-  - ❌ 665 linting issues
-  - ❌ Type checking errors
+  - ❌ 664 linting issues
   - ❌ Security: Medium severity (B615 - Hugging Face unsafe download)
 - **Gap to Staging**: Code quality only
 - **Estimated Effort**: 2-3 days
 - **Priority**: P1
 - **Target Staging**: 2025-10-17
 
-#### 6. Gameplay Loop
+#### 7. Gameplay Loop
 - **Status**: 🔴 Development
 - **Coverage**: 100% ✅
 - **Blockers**:
-  - ❌ 1,247 linting issues (Issue #22)
+  - ❌ 1,250 linting issues (Issue #22)
   - ❌ Type checking errors
   - ❌ Missing README
 - **Gap to Staging**: Code quality only
 - **Estimated Effort**: 2-3 days
-- **Priority**: P0 (Critical for player experience)
+- **Priority**: P1 (Critical for player experience)
 - **Target Staging**: 2025-10-17
 
-#### 7. LLM Component
+#### 8. LLM Component
 - **Status**: 🔴 Development
 - **Coverage**: 28.2%
 - **Gap to 70%**: +41.8%
@@ -111,7 +134,7 @@
 - **Priority**: P2
 - **Target Staging**: 2025-10-20
 
-#### 8. Docker Component
+#### 9. Docker Component
 - **Status**: 🔴 Development
 - **Coverage**: 20.1%
 - **Gap to 70%**: +49.9%
@@ -123,7 +146,7 @@
 - **Priority**: P2
 - **Target Staging**: 2025-10-22
 
-#### 9. Player Experience
+#### 10. Player Experience
 - **Status**: 🔴 Development
 - **Coverage**: 17.3%
 - **Gap to 70%**: +52.7%
@@ -135,7 +158,7 @@
 - **Priority**: P1
 - **Target Staging**: 2025-10-22
 
-#### 10. Agent Orchestration
+#### 11. Agent Orchestration
 - **Status**: 🔴 Development
 - **Coverage**: 2.0%
 - **Gap to 70%**: +68.0%
@@ -148,7 +171,7 @@
 - **Priority**: P1 (Core system)
 - **Target Staging**: 2025-11-03
 
-#### 11. Character Arc Manager
+#### 12. Character Arc Manager
 - **Status**: 🔴 Development
 - **Coverage**: 0%
 - **Gap to 70%**: +70%
@@ -161,7 +184,7 @@
 - **Priority**: P2
 - **Target Staging**: 2025-10-27
 
-#### 12. Therapeutic Systems
+#### 13. Therapeutic Systems
 - **Status**: 🔴 Development
 - **Coverage**: 0%
 - **Gap to 70%**: +70%
@@ -179,18 +202,18 @@
 
 ### Week of 2025-10-14 (This Week)
 
-**Target**: Narrative Arc Orchestrator → Staging
+**Target**: Carbon → Staging (READY NOW)
 
-- **Mon 2025-10-14**: Fix linting + type checking (Narrative Arc Orchestrator)
-- **Tue 2025-10-15**: Create README, validate, deploy to staging
-- **Wed 2025-10-16**: Monitor staging deployment
-- **Thu 2025-10-17**: Begin Model Management promotion prep
-- **Fri 2025-10-18**: Begin Gameplay Loop promotion prep
+- **Mon 2025-10-14**: Verify Carbon readiness, create promotion issue, deploy to staging
+- **Tue 2025-10-15**: Monitor Carbon staging deployment, begin Model Management linting fixes
+- **Wed 2025-10-16**: Continue Model Management code quality work
+- **Thu 2025-10-17**: Begin Gameplay Loop promotion prep
+- **Fri 2025-10-18**: Continue code quality improvements
 
 **Deliverables**:
-- ✅ Narrative Arc Orchestrator in staging
+- ✅ Carbon in staging (7-day observation period started)
 - ✅ Promotion workflow validated
-- ✅ Model Management blockers identified
+- ✅ Model Management code quality fixes in progress
 
 ---
 
@@ -213,19 +236,19 @@
 
 ### Week of 2025-10-28 (Following Week)
 
-**Target**: LLM + Docker + Player Experience → Staging
+**Target**: Narrative Arc Orchestrator → Staging (after test coverage work)
 
-- **Mon 2025-10-28**: Complete LLM Component coverage
-- **Tue 2025-10-29**: Complete Docker Component coverage
-- **Wed 2025-10-30**: Complete Player Experience coverage
-- **Thu 2025-10-31**: Deploy all three to staging
+- **Mon 2025-10-28**: Complete Narrative Arc Orchestrator test coverage work
+- **Tue 2025-10-29**: Verify 70%+ coverage achieved, validate all checks
+- **Wed 2025-10-30**: Deploy Narrative Arc Orchestrator to staging
+- **Thu 2025-10-31**: Begin LLM/Docker/Player Experience coverage work
 - **Fri 2025-11-01**: Monitor staging deployments
 
 **Deliverables**:
-- ✅ LLM Component in staging
-- ✅ Docker Component in staging
-- ✅ Player Experience in staging
-- ✅ 9/12 components in staging
+- ✅ Narrative Arc Orchestrator in staging (after reaching 70% coverage)
+- ✅ Carbon completes 7-day observation (ready for production consideration)
+- ✅ Model Management and Gameplay Loop stable in staging
+- ✅ 6/12 components in staging
 
 ---
 
@@ -233,51 +256,59 @@
 
 ### Immediate (This Week)
 
-1. ✅ **Narrative Arc Orchestrator Promotion** (Issue #45)
-   - Fix 150 linting issues
-   - Fix 21 type checking errors
-   - Create README
-   - Deploy to staging by 2025-10-15
+1. ✅ **Carbon Promotion** (READY NOW)
+   - Verify all quality checks passing
+   - Create promotion issue
+   - Deploy to staging by 2025-10-14
+   - Begin 7-day observation period
 
 2. **Model Management Preparation**
    - Create promotion issue
-   - Document blockers
+   - Begin linting fixes (664 issues)
+   - Address security issue (B615)
    - Create action plan
 
 3. **Gameplay Loop Preparation**
    - Create promotion issue
-   - Document blockers (Issue #22)
+   - Begin linting fixes (1,250 issues - Issue #22)
    - Create action plan
+
+4. **Narrative Arc Orchestrator Test Coverage**
+   - Create detailed test plan for 27.1% coverage gap
+   - Begin test development work
+   - Target: 70%+ coverage by 2025-10-27
 
 ### Short-term (Next 2 Weeks)
 
 1. **Model Management → Staging**
-   - Fix 665 linting issues
-   - Fix type errors
+   - Fix 664 linting issues
    - Address security issue (B615)
-   - Deploy to staging
+   - Deploy to staging by 2025-10-17
 
 2. **Gameplay Loop → Staging**
-   - Fix 1,247 linting issues
+   - Fix 1,250 linting issues
    - Fix type errors
    - Create README
-   - Deploy to staging
+   - Deploy to staging by 2025-10-17
 
-3. **LLM Component Coverage**
-   - Increase coverage from 28.2% to 70%
-   - Fix 14 linting issues
+3. **Narrative Arc Orchestrator Coverage Improvement**
+   - Increase coverage from 42.9% to 70%+ (27.1% gap)
+   - Focus on scale_manager.py, impact_analysis.py, causal_graph.py
+   - Target completion: 2025-10-27
 
 ### Medium-term (Next Month)
 
 1. **Complete Staging Promotions**
-   - Docker Component → Staging
-   - Player Experience → Staging
-   - Character Arc Manager → Staging
+   - Narrative Arc Orchestrator → Staging (after coverage improvement)
+   - LLM Component → Staging (after coverage improvement)
+   - Docker Component → Staging (after coverage improvement)
+   - Player Experience → Staging (after coverage improvement)
 
 2. **Begin Production Promotions**
-   - Carbon → Production (after 7-day observation)
-   - Neo4j → Production (after 7-day observation)
-   - Narrative Coherence → Production (after code quality fixes)
+   - Carbon → Production (after 7-day observation - 2025-10-21)
+   - Narrative Coherence → Production (already in staging)
+   - Model Management → Production (after 7-day observation)
+   - Gameplay Loop → Production (after 7-day observation)
 
 3. **Agent Orchestration & Therapeutic Systems**
    - Major test coverage work
@@ -313,6 +344,18 @@
 - **Promotion Guide**: `docs/development/COMPONENT_PROMOTION_GUIDE.md`
 - **Status Report**: Issue #42
 - **Promotion Issues**: #24, #25, #43, #44, #45
+
+---
+
+## Correction Notice
+
+**IMPORTANT**: Previous versions of this document incorrectly stated that Narrative Arc Orchestrator had 70.3% test coverage. This figure was based on outdated/unverified data from 2025-10-09.
+
+**Verified Current Coverage** (per GitHub Issue #42, 2025-10-13 21:15 UTC): **42.9%**
+
+The component requires an additional **27.1% coverage** to meet the 70% staging promotion threshold. This correction has been applied throughout this document and related planning materials.
+
+**Source of Truth**: GitHub Issue #42 (automated daily updates) and component-maturity-analysis.json
 
 ---
 
