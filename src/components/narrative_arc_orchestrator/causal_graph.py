@@ -13,9 +13,11 @@ def add_edge(graph: dict[str, set[str]], src: str, dst: str) -> None:
 def detect_simple_cycles(graph: dict[str, set[str]]) -> list[str]:
     issues: list[str] = []
     for src, dsts in graph.items():
-        for dst in dsts:
-            if dst in graph and src in graph[dst]:
-                issues.append(f"Cycle between {src} and {dst}")
+        issues.extend(
+            f"Cycle between {src} and {dst}"
+            for dst in dsts
+            if dst in graph and src in graph[dst]
+        )
     return issues
 
 

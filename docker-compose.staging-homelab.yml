@@ -237,15 +237,18 @@ services:
       context: ./src/player_experience/frontend
       dockerfile: Dockerfile.staging
       args:
-        VITE_API_BASE_URL: http://localhost:8081
-        VITE_WS_URL: ws://localhost:8081
-        VITE_ENVIRONMENT: staging
+        # Use host-mapped port for browser access (client-side SPA runs in browser, not container)
+        # Browser cannot resolve Docker network hostnames like 'player-api-staging'
+        REACT_APP_API_URL: http://localhost:8081
+        REACT_APP_WS_URL: ws://localhost:8081
+        REACT_APP_ENVIRONMENT: staging
         CACHE_BUST: ${CACHE_BUST:-$(date +%s)}  # Cache-busting with timestamp
     container_name: tta-staging-player-frontend
     ports:
       - "3001:3000"  # Different port for staging
     environment:
       - NODE_ENV=development
+      # Note: REACT_APP_ variables are baked in at build time, these are for runtime reference only
       - REACT_APP_API_URL=http://localhost:8081
       - REACT_APP_WS_URL=ws://localhost:8081
       - REACT_APP_ENVIRONMENT=staging

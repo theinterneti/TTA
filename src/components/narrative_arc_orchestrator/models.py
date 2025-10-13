@@ -32,7 +32,7 @@ class PlayerChoice:
 class NarrativeResponse:
     content: str
     response_type: str = "narrative"
-    choices: list[dict[str, Any]] = None
+    choices: list[dict[str, Any]] | None = None
     metadata: dict[str, Any] | None = None
     timestamp: datetime | None = None
 
@@ -88,6 +88,7 @@ class ScaleConflict:
     summary: str
     affected_events: list[str] = field(default_factory=list)
     resolution_priority: int = 1
+    severity: float = 0.5
     metadata: dict[str, Any] = field(default_factory=dict)
 
 

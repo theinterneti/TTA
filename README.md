@@ -6,6 +6,7 @@
 [![Code Quality](https://github.com/theinterneti/TTA/workflows/Code%20Quality/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/code-quality.yml)
 [![Security Scan](https://github.com/theinterneti/TTA/workflows/Security%20Scan/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/security-scan.yml)
 [![E2E Tests](https://github.com/theinterneti/TTA/workflows/E2E%20Tests/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/e2e-tests.yml)
+[![Mutation Testing](https://github.com/theinterneti/TTA/workflows/Mutation%20Testing/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/mutation-testing.yml)
 
 **AI-powered therapeutic text adventure platform combining evidence-based mental health support with engaging interactive storytelling**
 
@@ -444,6 +445,35 @@ python tests/comprehensive_battery/run_comprehensive_tests.py \
 - ✅ Real-time monitoring dashboard
 - ✅ Comprehensive reporting (JSON, HTML, CSV, TXT)
 - ✅ Parallel execution support
+
+### Mutation Testing
+
+TTA uses mutation testing to ensure test quality for critical Model Management services:
+
+```bash
+# Run mutation tests for all services
+./scripts/run-mutation-tests.sh
+
+# Run for specific service
+./scripts/run-mutation-tests.sh model-selector
+./scripts/run-mutation-tests.sh fallback-handler
+./scripts/run-mutation-tests.sh performance-monitor
+
+# Set custom threshold
+./scripts/run-mutation-tests.sh -t 90 --all
+```
+
+**Current Mutation Scores:**
+- **ModelSelector**: 100% (534/534 mutations killed) 🏆
+- **FallbackHandler**: 100% (352/352 mutations killed) 🏆
+- **PerformanceMonitor**: 100% (519/519 mutations killed) 🏆
+
+**Automated Testing:**
+- Runs weekly (Sunday 2 AM UTC)
+- Fails if mutation score drops below 85%
+- Reports available as GitHub Actions artifacts
+
+📖 See [Mutation Testing CI/CD Guide](docs/testing/MUTATION_TESTING_CICD_GUIDE.md) for details
 
 ### CI/CD Testing
 

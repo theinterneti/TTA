@@ -123,15 +123,15 @@ test.describe('Complete User Journey - Staging Environment', () => {
     console.log('\n📍 Phase 3: Character Creation');
 
     await test.step('User navigates to character creation', async () => {
-      // Click on character creation button
-      const createCharacterBtn = page.locator('button:has-text("Create Character"), button:has-text("New Character"), a:has-text("Create Character")').first();
+      // Click on the primary "Create First Character" / "Manage Characters" button
+      const createCharacterBtn = page.locator('[data-testid="dashboard-manage-characters-button"]');
 
       if (await createCharacterBtn.isVisible()) {
         await createCharacterBtn.click();
         await page.waitForLoadState('networkidle');
         console.log('  ✓ Navigated to character creation');
       } else {
-        console.log('  ℹ Character may already exist, skipping creation');
+        console.log('  ℹ Character button not found, skipping creation');
       }
     });
 

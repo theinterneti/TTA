@@ -390,7 +390,7 @@ class ModelSelector(IModelSelector):
             average_quality = total_score / count
 
             # Bonus based on quality (0-2 points)
-            quality_bonus = max(0, (average_quality - 5.0) / 5.0 * 2.0)
+            quality_bonus = max(0, (average_quality - 5.0) / 5.0 + 2.0)
 
             # Reliability bonus based on success rate
             success_rates = [

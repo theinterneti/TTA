@@ -7,18 +7,18 @@
 FROM node:18-alpine as builder
 
 # Build arguments
-ARG VITE_API_BASE_URL=http://localhost:8081
-ARG VITE_WS_URL=ws://localhost:8081
-ARG VITE_ENVIRONMENT=staging
+ARG REACT_APP_API_URL=http://localhost:8081
+ARG REACT_APP_WS_URL=ws://localhost:8081
+ARG REACT_APP_ENVIRONMENT=staging
 ARG BUILD_DATE
 ARG VERSION
 ARG GIT_COMMIT
 
 # Set build environment variables
 ENV NODE_ENV=staging \
-    VITE_API_BASE_URL=${VITE_API_BASE_URL} \
-    VITE_WS_URL=${VITE_WS_URL} \
-    VITE_ENVIRONMENT=${VITE_ENVIRONMENT} \
+    REACT_APP_API_URL=${REACT_APP_API_URL} \
+    REACT_APP_WS_URL=${REACT_APP_WS_URL} \
+    REACT_APP_ENVIRONMENT=${REACT_APP_ENVIRONMENT} \
     BUILD_DATE=${BUILD_DATE} \
     VERSION=${VERSION} \
     GIT_COMMIT=${GIT_COMMIT}
@@ -204,8 +204,8 @@ echo "Git Commit: \$GIT_COMMIT"
 cat > /usr/share/nginx/html/config.js << EOL
 window.TTA_CONFIG = {
   environment: '\$ENVIRONMENT',
-  apiBaseUrl: '\$VITE_API_BASE_URL',
-  wsUrl: '\$VITE_WS_URL',
+  apiBaseUrl: '\$REACT_APP_API_URL',
+  wsUrl: '\$REACT_APP_WS_URL',
   buildDate: '\$BUILD_DATE',
   version: '\$VERSION',
   gitCommit: '\$GIT_COMMIT',
@@ -251,15 +251,15 @@ CMD ["nginx", "-g", "daemon off;"]
 FROM node:18-alpine as development
 
 # Development arguments
-ARG VITE_API_BASE_URL=http://localhost:8081
-ARG VITE_WS_URL=ws://localhost:8081
-ARG VITE_ENVIRONMENT=staging
+ARG REACT_APP_API_URL=http://localhost:8081
+ARG REACT_APP_WS_URL=ws://localhost:8081
+ARG REACT_APP_ENVIRONMENT=staging
 
 # Set development environment variables
 ENV NODE_ENV=development \
-    VITE_API_BASE_URL=${VITE_API_BASE_URL} \
-    VITE_WS_URL=${VITE_WS_URL} \
-    VITE_ENVIRONMENT=${VITE_ENVIRONMENT}
+    REACT_APP_API_URL=${REACT_APP_API_URL} \
+    REACT_APP_WS_URL=${REACT_APP_WS_URL} \
+    REACT_APP_ENVIRONMENT=${REACT_APP_ENVIRONMENT}
 
 # Install system dependencies
 RUN apk add --no-cache \

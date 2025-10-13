@@ -22,7 +22,7 @@ def build_simple_resolution(conflict: ScaleConflict) -> Resolution:
     )
 
 
-def apply_resolution(resolution: Resolution) -> None:
+def apply_resolution(_resolution: Resolution) -> None:
     # Placeholder for applying the resolution in the system
     return None
 

@@ -55,9 +55,9 @@ try:
     current_policy = asyncio.get_event_loop_policy()
     if not isinstance(current_policy, _RobustEventLoopPolicy):
         asyncio.set_event_loop_policy(_RobustEventLoopPolicy())
-except Exception:
-    # If setting a policy fails, silently continue; tests that use asyncio.run(...) will manage loops
-    pass
+except Exception as e:
+    # If setting a policy fails, log and continue; tests that use asyncio.run(...) will manage loops
+    logger.debug("Failed to set event loop policy: %s", e)
 
 
 class ScaleManager:
@@ -188,7 +188,11 @@ class ScaleManager:
             NarrativeScale.EPIC_TERM: 0.1,
         }
         base = 0.5
-        choice_type = choice.metadata.get("choice_type", "dialogue")
+        choice_type = (
+            choice.metadata.get("choice_type", "dialogue")
+            if choice.metadata
+            else "dialogue"
+        )
         if choice_type == "major_decision":
             base *= 1.5
         elif choice_type == "character_interaction":
@@ -213,9 +217,9 @@ class ScaleManager:
             )
         elif scale == NarrativeScale.EPIC_TERM:
             elements.extend(["generational_legacy", "world_history", "cultural_impact"])
-        if "character_name" in choice.metadata:
+        if choice.metadata and "character_name" in choice.metadata:
             elements.append(f"character_{choice.metadata['character_name']}")
-        if "location" in choice.metadata:
+        if choice.metadata and "location" in choice.metadata:
             elements.append(f"location_{choice.metadata['location']}")
         return elements
 

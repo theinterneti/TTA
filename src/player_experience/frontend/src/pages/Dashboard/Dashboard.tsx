@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { fetchCharacters } from '../../store/slices/characterSlice';
 import { fetchPlayerDashboard } from '../../store/slices/playerSlice';
 import { RootState } from '../../store/store';
 
@@ -8,19 +9,22 @@ const Dashboard: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { profile, dashboard, isLoading } = useSelector((state: RootState) => state.player);
-  const { characters } = useSelector((state: RootState) => state.character);
+  const { characters, isLoading: charactersLoading } = useSelector((state: RootState) => state.character);
 
   useEffect(() => {
     if (profile?.player_id) {
       dispatch(fetchPlayerDashboard(profile.player_id) as any);
+      dispatch(fetchCharacters(profile.player_id) as any);
     }
   }, [dispatch, profile?.player_id]);
 
-  if (isLoading) {
+  if (isLoading || charactersLoading) {
     return (
       <div data-testid="dashboard-loading" className="flex items-center justify-center h-64">
         <div className="spinner"></div>
-        <span className="ml-2 text-gray-600">Loading dashboard...</span>
+        <span className="ml-2 text-gray-600">
+          {isLoading ? 'Loading dashboard...' : 'Loading characters...'}
+        </span>
       </div>
     );
   }
@@ -147,8 +151,9 @@ const Dashboard: React.FC = () => {
             className="btn-secondary text-center py-4"
             onClick={() => navigate('/chat')}
             disabled={characters.length === 0}
+            title={characters.length === 0 ? 'Create a character first to start a session' : 'Continue your last session'}
           >
-            {characters.length === 0 ? 'Create Character First' : 'Continue Last Session'}
+            Continue Last Session
           </button>
           <button
             data-testid="dashboard-view-analytics-button"
