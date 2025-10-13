@@ -141,5 +141,7 @@ exclude: |
     tta/prod/src/utils/neo4j_utils\.py|
     validate_live_databases\.py|
     templates/.*\.json|
-    .*\.k8s/.*\.yaml
+    .*\.k8s/.*\.yaml|
+    scripts/manual_mutation_test\.py|
+    scripts/setup_mutants_env\.py
   )$
