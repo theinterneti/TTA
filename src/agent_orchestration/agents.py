@@ -391,6 +391,17 @@ class AgentRegistry:
         self._last_restart_ts: dict[tuple[str, str], float] = {}
         self._restart_backoff_s: float = 5.0
 
+        # Restart policy configuration
+        self._restart_policy: dict[str, Any] = {
+            "max_attempts_window": 5,
+            "window_seconds": 60.0,
+            "backoff_factor": 2.0,
+            "backoff_max": 60.0,
+            "circuit_breaker_failures": 3,
+        }
+        self._restart_history: dict[tuple[str, str], list[float]] = {}
+        self._circuit_open: dict[tuple[str, str], bool] = {}
+
         # Optional restart callback supplied by component for concrete restarts
         self._restart_cb: Callable[[Agent], Awaitable[bool]] | None = None
         self._fallback_map: dict[tuple[str, str], tuple[str, str]] = {}

@@ -169,7 +169,7 @@ class RedisSessionManager:
 
         # Track session for user
         user_id = user_data.get("id", "unknown")
-        await self.redis.sadd(self._user_sessions_key(user_id), session_id)
+        await self.redis.sadd(self._user_sessions_key(user_id), session_id)  # type: ignore[misc]
 
         logger.info(
             f"Created session {session_id} for user {user_id} via {auth_method}"
@@ -228,7 +228,7 @@ class RedisSessionManager:
         session = await self.get_session(session_id)
         if session:
             user_id = session.user_data.get("id", "unknown")
-            await self.redis.srem(self._user_sessions_key(user_id), session_id)
+            await self.redis.srem(self._user_sessions_key(user_id), session_id)  # type: ignore[misc]
 
         # Delete session
         key = self._session_key(session_id)
@@ -248,7 +248,7 @@ class RedisSessionManager:
             List of session IDs
         """
         key = self._user_sessions_key(user_id)
-        session_ids = await self.redis.smembers(key)
+        session_ids = await self.redis.smembers(key)  # type: ignore[misc]
         return [sid.decode() if isinstance(sid, bytes) else sid for sid in session_ids]
 
     async def delete_user_sessions(self, user_id: str) -> int:

@@ -303,13 +303,13 @@ class AutoDiscoveryManager:
         capability_mappings = {
             AgentType.INPUT_PROCESSOR: [
                 AgentCapability(
-                    capability_type=CapabilityType.INPUT_PROCESSING,
+                    type=CapabilityType.INPUT_PROCESSING,
                     name="text_analysis",
                     version="1.0.0",
                     description="Text input processing and analysis",
                 ),
                 AgentCapability(
-                    capability_type=CapabilityType.SAFETY_VALIDATION,
+                    type=CapabilityType.SAFETY_VALIDATION,
                     name="content_safety",
                     version="1.0.0",
                     description="Content safety validation",
@@ -317,13 +317,13 @@ class AutoDiscoveryManager:
             ],
             AgentType.WORLD_BUILDER: [
                 AgentCapability(
-                    capability_type=CapabilityType.WORLD_MANAGEMENT,
+                    type=CapabilityType.WORLD_MANAGEMENT,
                     name="world_state_management",
                     version="1.0.0",
                     description="World state management and persistence",
                 ),
                 AgentCapability(
-                    capability_type=CapabilityType.CONTEXT_MANAGEMENT,
+                    type=CapabilityType.CONTEXT_MANAGEMENT,
                     name="context_integration",
                     version="1.0.0",
                     description="Context integration and management",
@@ -331,13 +331,13 @@ class AutoDiscoveryManager:
             ],
             AgentType.NARRATIVE_GENERATOR: [
                 AgentCapability(
-                    capability_type=CapabilityType.CONTENT_GENERATION,
+                    type=CapabilityType.CONTENT_GENERATION,
                     name="narrative_generation",
                     version="1.0.0",
                     description="Narrative content generation",
                 ),
                 AgentCapability(
-                    capability_type=CapabilityType.THERAPEUTIC_CONTENT,
+                    type=CapabilityType.THERAPEUTIC_CONTENT,
                     name="therapeutic_narrative",
                     version="1.0.0",
                     description="Therapeutic narrative generation",

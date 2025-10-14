@@ -63,9 +63,9 @@ class RedisAgentRegistry(AgentRegistry):
         self._enable_events = enable_events
         self._event_publisher = event_publisher
         self._event_channel_prefix = f"{self._pfx}:events"
-        self._agent_status_cache: dict[str, dict[str, Any]] = (
-            {}
-        )  # Track previous status for change detection
+        self._agent_status_cache: dict[
+            str, dict[str, Any]
+        ] = {}  # Track previous status for change detection
 
         # Capability matching
         self._capability_matcher = CapabilityMatcher()
@@ -776,3 +776,91 @@ class RedisAgentRegistry(AgentRegistry):
                 "orphaned_capabilities": 0,
                 "capability_coverage": 0.0,
             }
+
+    # ---- Diagnostic Methods ----
+    async def get_all_agents(self) -> dict[str, dict[str, Any]]:
+        """
+        Get all registered agents with their information.
+
+        Returns:
+            Dictionary mapping agent_id to agent_info
+        """
+        try:
+            agents_list = await self.list_registered()
+            result = {}
+
+            for agent_data in agents_list:
+                # Extract agent_id from the data
+                agent_id_data = agent_data.get("agent_id")
+                if isinstance(agent_id_data, dict):
+                    # Construct agent_id string from type and instance
+                    agent_type = agent_id_data.get("type", "unknown")
+                    agent_instance = agent_id_data.get("instance", "default")
+                    agent_id = f"{agent_type}:{agent_instance}"
+                else:
+                    agent_id = str(agent_id_data) if agent_id_data else "unknown"
+
+                result[agent_id] = {
+                    "agent_type": agent_id_data.get("type") if isinstance(agent_id_data, dict) else None,
+                    "instance": agent_id_data.get("instance") if isinstance(agent_id_data, dict) else None,
+                    "name": agent_data.get("name"),
+                    "status": agent_data.get("status"),
+                    "alive": agent_data.get("alive", False),
+                    "last_heartbeat": agent_data.get("last_heartbeat"),
+                    "capabilities": agent_data.get("capabilities"),
+                    "state": agent_data.get("state"),
+                }
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to get all agents: {e}")
+            return {}
+
+    async def get_agent_info(self, agent_id: str) -> dict[str, Any] | None:
+        """
+        Get information for a specific agent.
+
+        Args:
+            agent_id: Agent identifier in format "type:instance"
+
+        Returns:
+            Agent information dictionary or None if not found
+        """
+        try:
+            # Parse agent_id
+            parts = agent_id.split(":", 1)
+            if len(parts) != 2:
+                logger.warning(f"Invalid agent_id format: {agent_id}")
+                return None
+
+            agent_type, instance = parts
+
+            # Construct Redis key
+            key = f"{self._pfx}:agents:{agent_type}:{instance}"
+
+            # Get agent data from Redis
+            val = await self._redis.get(key)
+            if not val:
+                return None
+
+            data = json.loads(val)
+
+            # Calculate liveness
+            last = float(data.get("last_heartbeat", 0.0))
+            alive = (time.time() - last) <= self._ttl
+
+            return {
+                "agent_type": agent_type,
+                "instance": instance,
+                "name": data.get("name"),
+                "status": data.get("status"),
+                "alive": alive,
+                "last_heartbeat": last,
+                "capabilities": data.get("capabilities"),
+                "state": data.get("state"),
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to get agent info for {agent_id}: {e}")
+            return None

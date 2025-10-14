@@ -91,6 +91,9 @@ class LivingWorldsManager:
 
     async def _create_schema(self):
         """Create Neo4j schema constraints and indexes"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             # Create constraints
             constraints = [
@@ -103,7 +106,7 @@ class LivingWorldsManager:
 
             for constraint in constraints:
                 try:
-                    await session.run(constraint)
+                    await session.run(constraint)  # type: ignore[arg-type]
                 except Exception as e:
                     logger.debug(f"Constraint already exists or failed: {str(e)}")
 
@@ -117,7 +120,7 @@ class LivingWorldsManager:
 
             for index in indexes:
                 try:
-                    await session.run(index)
+                    await session.run(index)  # type: ignore[arg-type]
                 except Exception as e:
                     logger.debug(f"Index already exists or failed: {str(e)}")
 
@@ -138,6 +141,9 @@ class LivingWorldsManager:
         """
         if not self.initialized:
             await self.initialize()
+
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
 
         async with self.driver.session() as session:
             # Use primitive types only - Neo4j Browser compatible
@@ -172,18 +178,19 @@ class LivingWorldsManager:
                 character_node = record["c"]
 
                 # Cache in Redis for quick access
-                await self.redis.setex(
-                    f"character:{character_id}",
-                    3600,  # 1 hour TTL
-                    json.dumps(
-                        {
-                            "id": character_id,
-                            "name": name,
-                            "personality_traits": personality_traits,
-                            "therapeutic_role": therapeutic_role,
-                        }
-                    ),
-                )
+                if self.redis:
+                    await self.redis.setex(
+                        f"character:{character_id}",
+                        3600,  # 1 hour TTL
+                        json.dumps(
+                            {
+                                "id": character_id,
+                                "name": name,
+                                "personality_traits": personality_traits,
+                                "therapeutic_role": therapeutic_role,
+                            }
+                        ),
+                    )
 
                 logger.info(
                     f"Created character {name} ({character_id}) for patient {patient_id}"
@@ -209,6 +216,9 @@ class LivingWorldsManager:
         difficulty_level: int = 3,
     ) -> WorldNode:
         """Create a new narrative thread"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MERGE (n:NarrativeThread {id: $thread_id})
@@ -267,6 +277,9 @@ class LivingWorldsManager:
         if properties is None:
             properties = {}
 
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MATCH (source {id: $source_id})
@@ -307,6 +320,9 @@ class LivingWorldsManager:
 
     async def get_patient_world(self, patient_id: str) -> dict[str, Any]:
         """Get the complete living world for a patient"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MATCH (p:Patient {id: $patient_id})
@@ -352,6 +368,9 @@ class LivingWorldsManager:
         emotional_impact: dict[str, float],
     ):
         """Update progress on a narrative thread"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MATCH (n:NarrativeThread {id: $thread_id})
@@ -390,9 +409,10 @@ class LivingWorldsManager:
                 )
 
                 # Update Redis cache
-                await self.redis.setex(
-                    f"narrative_progress:{thread_id}",
-                    1800,  # 30 minutes TTL
+                if self.redis:
+                    await self.redis.setex(
+                        f"narrative_progress:{thread_id}",
+                        1800,  # 30 minutes TTL
                     json.dumps(
                         {
                             "progress": progress,
@@ -406,6 +426,9 @@ class LivingWorldsManager:
         self, character_id: str
     ) -> list[dict[str, Any]]:
         """Get all relationships for a character"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MATCH (c:Character {id: $character_id})
@@ -470,6 +493,9 @@ class LivingWorldsManager:
         emotional_impact: float,
     ):
         """Update character relationship strength based on interaction"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MATCH (c:Character {id: $character_id})-[r:RELATES_TO]-(p:Patient {id: $patient_id})
@@ -499,6 +525,9 @@ class LivingWorldsManager:
 
     async def _create_milestone_event(self, patient_id: str, milestone: dict[str, Any]):
         """Create a milestone event in the narrative"""
+        if not self.driver:
+            raise RuntimeError("Neo4j driver not initialized")
+
         async with self.driver.session() as session:
             query = """
             MATCH (p:Patient {id: $patient_id})

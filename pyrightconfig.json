@@ -75,7 +75,9 @@
       "root": "src",
       "pythonVersion": "3.12",
       "pythonPlatform": "Linux",
-      "extraPaths": []
+      "extraPaths": [
+        "tta/prod/src"
+      ]
     }
   ],
   "typeCheckingMode": "basic",

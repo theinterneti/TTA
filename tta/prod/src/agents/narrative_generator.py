@@ -165,6 +165,11 @@ def generate_narrative(state: AgentState) -> dict[str, str]:
     return response_dict
 
 
+# --- Alias for backward compatibility ---
+# The orchestration system expects this function name
+generate_narrative_response = generate_narrative
+
+
 # --- Example Usage (within a LangGraph workflow) ---
 # This would be part of a larger LangGraph setup, not a standalone function.
 # def nga_node(state: AgentState) -> AgentState:

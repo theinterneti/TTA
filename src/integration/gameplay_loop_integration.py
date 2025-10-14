@@ -10,9 +10,9 @@ from datetime import datetime
 from typing import Any
 
 from ..agent_orchestration.service import AgentOrchestrationService
-from ..agent_orchestration.therapeutic_safety import SafetyService
+from ..agent_orchestration.therapeutic_safety import SafetyLevel, SafetyService
 from ..components.gameplay_loop_component import GameplayLoopComponent
-from ..player_experience.api.auth import AuthenticationError, get_current_player
+from ..player_experience.api.auth import AuthenticationError, verify_token
 
 logger = logging.getLogger(__name__)
 
@@ -61,8 +61,8 @@ class GameplayLoopIntegration:
         try:
             # Authenticate user
             try:
-                user_info = await get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {
@@ -85,7 +85,7 @@ class GameplayLoopIntegration:
                     context_text
                 )
 
-                if validation_result.level.value >= 8:  # High risk level
+                if validation_result.level == SafetyLevel.BLOCKED:  # Blocked content
                     return {
                         "success": False,
                         "error": "Therapeutic context contains unsafe content",
@@ -143,8 +143,8 @@ class GameplayLoopIntegration:
         try:
             # Authenticate user
             try:
-                user_info = await get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {
@@ -186,7 +186,7 @@ class GameplayLoopIntegration:
             if not choice_result or "error" in choice_result:
                 return {
                     "success": False,
-                    "error": choice_result.get("error", "Choice processing failed"),
+                    "error": choice_result.get("error", "Choice processing failed") if choice_result else "Choice processing failed",  # type: ignore[union-attr]
                     "code": "CHOICE_ERROR",
                 }
 
@@ -198,7 +198,7 @@ class GameplayLoopIntegration:
                         scene_description
                     )
 
-                    if validation_result.level.value >= 8:  # High risk level
+                    if validation_result.level == SafetyLevel.BLOCKED:  # Blocked content
                         # Generate alternative content
                         alternative = self.safety_service.suggest_alternative(
                             validation_result.level, scene_description
@@ -250,8 +250,8 @@ class GameplayLoopIntegration:
         try:
             # Authenticate user
             try:
-                user_info = await get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {
@@ -316,8 +316,8 @@ class GameplayLoopIntegration:
         try:
             # Authenticate user
             try:
-                user_info = await get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {
@@ -388,8 +388,8 @@ class GameplayLoopIntegration:
         try:
             # Authenticate user
             try:
-                user_info = await get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {"error": "Invalid user information", "code": "AUTH_ERROR"}

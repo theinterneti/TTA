@@ -13,7 +13,9 @@ from .dynamic_agents import (
     WorldBuildingAgent,
     create_dynamic_agents,
 )
+from .ipa import IntentSchema, process_input
 from .memory import AgentMemoryEnhancer, AgentMemoryManager, MemoryEntry
+from .narrative_generator import generate_narrative, generate_narrative_response
 
 __all__ = [
     "BaseAgent",
@@ -26,4 +28,8 @@ __all__ = [
     "MemoryEntry",
     "AgentMemoryManager",
     "AgentMemoryEnhancer",
+    "IntentSchema",
+    "process_input",
+    "generate_narrative",
+    "generate_narrative_response",
 ]
