@@ -16,7 +16,7 @@ selenium==4.15.2
 webdriver-manager==4.0.1
 
 # API testing
-requests==2.31.0
+requests==2.32.4
 httpx==0.25.2
 aiohttp==3.12.14
 websockets==12.0
@@ -48,14 +48,14 @@ python-dotenv==1.0.0
 click==8.1.7
 rich==13.7.0
 tabulate==0.9.0
-jinja2==3.1.2
+jinja2==3.1.6
 
 # Image and screenshot comparison
 pillow==10.3.0
 opencv-python==4.8.1.78
 
 # Report generation
-jinja2==3.1.2
+jinja2==3.1.6
 markdown==3.5.1
 weasyprint==60.2
 
@@ -87,7 +87,7 @@ ipdb==0.13.13
 memory-profiler==0.61.0
 
 # Linting and formatting (for test code quality)
-black==23.11.0
+black==24.3.0
 isort==5.12.0
 flake8==6.1.0
 mypy==1.7.1
