@@ -45,12 +45,12 @@ class LivingWorldsManager:
         self,
         neo4j_uri: str = "bolt://localhost:7687",
         neo4j_user: str = "neo4j",
-        neo4j_password: str = "password",
+        neo4j_password: str | None = None,  # Should be provided via env var or config
         redis_url: str = "redis://localhost:6379",
     ):
         self.neo4j_uri = neo4j_uri
         self.neo4j_user = neo4j_user
-        self.neo4j_password = neo4j_password
+        self.neo4j_password = neo4j_password or "password"  # Fallback for local dev only
         self.redis_url = redis_url
 
         self.driver: AsyncDriver | None = None
@@ -413,14 +413,14 @@ class LivingWorldsManager:
                     await self.redis.setex(
                         f"narrative_progress:{thread_id}",
                         1800,  # 30 minutes TTL
-                    json.dumps(
-                        {
-                            "progress": progress,
-                            "last_updated": datetime.utcnow().isoformat(),
-                            "emotional_impact": emotional_impact,
-                        }
-                    ),
-                )
+                        json.dumps(
+                            {
+                                "progress": progress,
+                                "last_updated": datetime.utcnow().isoformat(),
+                                "emotional_impact": emotional_impact,
+                            }
+                        ),
+                    )
 
     async def get_character_relationships(
         self, character_id: str
@@ -438,16 +438,16 @@ class LivingWorldsManager:
             """
 
             result = await session.run(query, character_id=character_id)
-            relationships = []
 
-            async for record in result:
-                relationships.append(
-                    {
-                        "character": dict(record["other"]),
-                        "relationship": dict(record["r"]),
-                        "type": record["relationship_type"],
-                    }
-                )
+            # Use async list comprehension for better performance
+            relationships = [
+                {
+                    "character": dict(record["other"]),
+                    "relationship": dict(record["r"]),
+                    "type": record["relationship_type"],
+                }
+                async for record in result
+            ]
 
             return relationships
 

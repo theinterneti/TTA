@@ -8,6 +8,7 @@ agent capabilities during component startup with configurable discovery strategi
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import os
 import socket
@@ -172,10 +173,8 @@ class AutoDiscoveryManager:
         for task in [self.discovery_task, self.heartbeat_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("AutoDiscoveryManager stopped")
 
@@ -242,13 +241,12 @@ class AutoDiscoveryManager:
                 await asyncio.sleep(self.config.discovery_delay)
 
             # Validate capabilities if enabled
-            if self.config.capability_validation:
-                if not await self._validate_component_capabilities(component):
-                    component.discovery_status = DiscoveryStatus.FAILED
-                    logger.warning(
-                        f"Component capability validation failed: {component_id}"
-                    )
-                    return False
+            if self.config.capability_validation and not await self._validate_component_capabilities(component):
+                component.discovery_status = DiscoveryStatus.FAILED
+                logger.warning(
+                    f"Component capability validation failed: {component_id}"
+                )
+                return False
 
             # Register with registry
             success = await self._register_with_registry(component)
@@ -273,12 +271,11 @@ class AutoDiscoveryManager:
 
     async def _validate_component_capabilities(self, component: ComponentInfo) -> bool:
         """Validate component capabilities."""
-        if not component.capabilities:
+        if not component.capabilities and component.agent_type:
             # If no capabilities specified, try to infer from agent type
-            if component.agent_type:
-                component.capabilities = self._infer_capabilities_from_agent_type(
-                    component.agent_type
-                )
+            component.capabilities = self._infer_capabilities_from_agent_type(
+                component.agent_type
+            )
 
         # Basic validation - ensure capabilities are properly formed
         for capability in component.capabilities:
@@ -403,14 +400,13 @@ class AutoDiscoveryManager:
                         elif self.config.strategy == DiscoveryStrategy.HEARTBEAT:
                             # Will be discovered on heartbeat
                             pass
-                    elif component.discovery_status == DiscoveryStatus.FAILED:
+                    elif (
+                        component.discovery_status == DiscoveryStatus.FAILED
+                        and component.discovery_attempts < self.config.retry_attempts
+                        and current_time - (component.last_discovery_attempt or 0) > self.config.retry_delay
+                    ):
                         # Retry failed discoveries
-                        if (
-                            component.discovery_attempts < self.config.retry_attempts
-                            and current_time - (component.last_discovery_attempt or 0)
-                            > self.config.retry_delay
-                        ):
-                            await self._discover_component(component_id)
+                        await self._discover_component(component_id)
 
                 await asyncio.sleep(5.0)  # Check every 5 seconds
 

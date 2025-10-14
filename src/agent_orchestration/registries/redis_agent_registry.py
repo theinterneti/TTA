@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -110,10 +111,8 @@ class RedisAgentRegistry(AgentRegistry):
             asyncio.run(self._delete(agent_id))
 
     async def _restore_then_persist(self, agent: Agent) -> None:
-        try:
+        with contextlib.suppress(Exception):
             await self.restore_state_if_available(agent)
-        except Exception:
-            pass
         await self._persist(agent)
 
     async def _persist(self, agent: Agent) -> None:
@@ -175,7 +174,7 @@ class RedisAgentRegistry(AgentRegistry):
     async def _delete(self, agent_id: AgentId) -> None:
         key = self._key(agent_id)
         cap_key = self._capability_key(agent_id)
-        try:
+        with contextlib.suppress(Exception):
             # Remove agent data
             await self._redis.delete(key)
             await self._redis.srem(self._index_key(), key)
@@ -186,9 +185,6 @@ class RedisAgentRegistry(AgentRegistry):
 
             # Publish deregistration event
             await self._publish_agent_deregistered(agent_id)
-
-        except Exception:
-            pass
 
     # ---- Heartbeats ----
     def start_heartbeats(self) -> None:
@@ -272,8 +268,8 @@ class RedisAgentRegistry(AgentRegistry):
             # Detect and publish status changes (including heartbeat events)
             await self._detect_and_publish_status_changes(agent)
 
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to update heartbeat for agent {agent.agent_id}: {e}")
 
     async def restore_state_if_available(self, agent: Agent) -> bool:
         """If a serialized state exists in Redis for this agent, restore it.
@@ -308,7 +304,8 @@ class RedisAgentRegistry(AgentRegistry):
                     continue
                 try:
                     data = json.loads(val)
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Failed to parse agent data for key {k}: {e}")
                     continue
                 # Liveness calculation
                 last = float(data.get("last_heartbeat", 0.0))
@@ -801,8 +798,12 @@ class RedisAgentRegistry(AgentRegistry):
                     agent_id = str(agent_id_data) if agent_id_data else "unknown"
 
                 result[agent_id] = {
-                    "agent_type": agent_id_data.get("type") if isinstance(agent_id_data, dict) else None,
-                    "instance": agent_id_data.get("instance") if isinstance(agent_id_data, dict) else None,
+                    "agent_type": agent_id_data.get("type")
+                    if isinstance(agent_id_data, dict)
+                    else None,
+                    "instance": agent_id_data.get("instance")
+                    if isinstance(agent_id_data, dict)
+                    else None,
                     "name": agent_data.get("name"),
                     "status": agent_data.get("status"),
                     "alive": agent_data.get("alive", False),
