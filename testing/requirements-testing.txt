@@ -87,7 +87,7 @@ ipdb==0.13.13
 memory-profiler==0.61.0
 
 # Linting and formatting (for test code quality)
-black==23.11.0
+black==24.3.0
 isort==5.12.0
 flake8==6.1.0
 mypy==1.7.1
