@@ -6,6 +6,7 @@ state persistence and cleanup operations.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -213,10 +214,8 @@ class CircuitBreakerRegistry:
         """Stop background cleanup task."""
         if self._cleanup_task and not self._cleanup_task.done():
             self._cleanup_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._cleanup_task
-            except asyncio.CancelledError:
-                pass
             logger.info("Stopped circuit breaker cleanup task")
 
     async def _cleanup_loop(self) -> None:
@@ -277,10 +276,8 @@ class CircuitBreakerRegistry:
             last_cleanup = await self._redis.get(self._cleanup_key())
             last_cleanup_time = None
             if last_cleanup:
-                try:
+                with contextlib.suppress(ValueError, TypeError):
                     last_cleanup_time = int(last_cleanup)
-                except (ValueError, TypeError):
-                    pass
 
             return {
                 "total_circuit_breakers": len(self._circuit_breakers),

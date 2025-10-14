@@ -8,6 +8,7 @@ health, agent performance, and workflow status through WebSocket connections.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from dataclasses import dataclass, field
@@ -130,10 +131,8 @@ class RealtimeDashboardManager:
         for task in [self.update_task, self.cleanup_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("RealtimeDashboardManager stopped")
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections.abc import Awaitable, Callable
@@ -256,10 +257,8 @@ class ResourceManager:
     def stop_background_monitoring(self) -> None:
         t = self._monitoring_task
         if t:
-            try:
+            with contextlib.suppress(Exception):
                 t.cancel()
-            except Exception:
-                pass
             self._monitoring_task = None
 
     async def _monitor_loop(self, interval_seconds: int) -> None:
@@ -465,7 +464,7 @@ class ResourceManager:
             # Get all workflow circuit breakers and trigger them
             all_metrics = await self._circuit_breaker_registry.get_all_metrics()
 
-            for cb_name in all_metrics.keys():
+            for cb_name in all_metrics:
                 if cb_name.startswith("workflow:"):
                     circuit_breaker = await self._circuit_breaker_registry.get(cb_name)
                     if circuit_breaker:

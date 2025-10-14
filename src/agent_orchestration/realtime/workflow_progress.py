@@ -8,6 +8,7 @@ milestone tracking, and integration with the progressive feedback system.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections.abc import Callable
@@ -276,10 +277,8 @@ class WorkflowProgressTracker:
 
         if self._cleanup_task:
             self._cleanup_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._cleanup_task
-            except asyncio.CancelledError:
-                pass
 
         # Complete all active workflows
         for workflow_id in list(self.active_workflows.keys()):

@@ -127,10 +127,7 @@ class ChoiceValidator:
 
             # Check therapeutic value threshold
             min_therapeutic_value = rules.get("min_therapeutic_value", 0.0)
-            if choice.therapeutic_value < min_therapeutic_value:
-                return False
-
-            return True
+            return not choice.therapeutic_value < min_therapeutic_value
 
         except Exception as e:
             logger.error(f"Failed to validate choice for emotional state: {e}")

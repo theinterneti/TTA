@@ -306,7 +306,7 @@ class WorkflowEventIntegrator:
             }
 
             # Send completion event
-            duration = time.time() - start_time
+            time.time() - start_time
             completion_event = create_workflow_progress_event(
                 workflow_id=workflow_id,
                 workflow_type=workflow_type,
@@ -320,7 +320,7 @@ class WorkflowEventIntegrator:
 
         except Exception as e:
             # Send error event
-            duration = time.time() - start_time
+            time.time() - start_time
             current_step = self.active_workflows[workflow_id]["current_step"]
             total_steps = max(self.active_workflows[workflow_id]["total_steps"], 1)
             error_event = create_workflow_progress_event(
@@ -508,7 +508,7 @@ class AgentWorkflowCoordinator:
             )
 
             # Compile final result
-            final_result = {
+            return {
                 "workflow_id": workflow_id,
                 "session_id": session_id,
                 "user_input": user_input,
@@ -527,8 +527,6 @@ class AgentWorkflowCoordinator:
                     "nga": nga_result.get("source", "unknown"),
                 },
             }
-
-            return final_result
 
     async def execute_partial_workflow(
         self,

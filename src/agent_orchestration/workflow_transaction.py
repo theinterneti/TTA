@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import os
@@ -96,15 +97,11 @@ class WorkflowTransaction:
     # ---- Helpers ----
     async def _cleanup_item(self, item: CleanupItem) -> None:
         if item.kind == "redis_key":
-            try:
+            with contextlib.suppress(Exception):
                 await self._redis.delete(item.value)
-            except Exception:
-                pass
         elif item.kind == "tmp_file":
-            try:
+            with contextlib.suppress(FileNotFoundError):
                 os.unlink(item.value)
-            except FileNotFoundError:
-                pass
         except_list = {"custom"}
         if item.kind in except_list:
             # Custom cleanup types should be handled by callers; we mark done

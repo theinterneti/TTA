@@ -482,7 +482,7 @@ class CustomAPIProvider(BaseProvider):
         healthy_count = 0
         total_count = len(self._clients)
 
-        for _, client in self._clients.items():
+        for client in self._clients.values():
             try:
                 # Simple health check - try to get models
                 response = await client.get("/v1/models", timeout=5.0)

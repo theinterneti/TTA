@@ -840,7 +840,7 @@ class PersonalizationServiceManager:
     ) -> tuple[list[str], float, str]:
         """Process preference change feedback."""
         changes = feedback.content.get("preference_changes", {})
-        changes_made = [f"update_{key}" for key in changes.keys()]
+        changes_made = [f"update_{key}" for key in changes]
         confidence_score = 0.9  # High confidence for explicit preference changes
         reasoning = "Direct preference change request from player"
 

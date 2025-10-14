@@ -241,7 +241,10 @@ class AutoDiscoveryManager:
                 await asyncio.sleep(self.config.discovery_delay)
 
             # Validate capabilities if enabled
-            if self.config.capability_validation and not await self._validate_component_capabilities(component):
+            if (
+                self.config.capability_validation
+                and not await self._validate_component_capabilities(component)
+            ):
                 component.discovery_status = DiscoveryStatus.FAILED
                 logger.warning(
                     f"Component capability validation failed: {component_id}"
@@ -403,7 +406,8 @@ class AutoDiscoveryManager:
                     elif (
                         component.discovery_status == DiscoveryStatus.FAILED
                         and component.discovery_attempts < self.config.retry_attempts
-                        and current_time - (component.last_discovery_attempt or 0) > self.config.retry_delay
+                        and current_time - (component.last_discovery_attempt or 0)
+                        > self.config.retry_delay
                     ):
                         # Retry failed discoveries
                         await self._discover_component(component_id)

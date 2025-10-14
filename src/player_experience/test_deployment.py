@@ -454,7 +454,7 @@ class DeploymentValidator:
         passed_tests = sum(1 for result in self.test_results if result["success"])
         success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
 
-        summary = {
+        return {
             "environment": self.environment,
             "endpoint": self.base_url,
             "total_tests": total_tests,
@@ -465,8 +465,6 @@ class DeploymentValidator:
             "test_results": self.test_results,
             "timestamp": datetime.now().isoformat(),
         }
-
-        return summary
 
     def print_summary(self, summary: dict[str, Any]):
         """Print test summary."""

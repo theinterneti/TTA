@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import time
@@ -288,7 +289,5 @@ class StateValidator:
         return f"{self._pfx}:dlq:{at.value}:{inst}"
 
     async def _incr_metric(self, name: str, inc: int) -> None:
-        try:
+        with contextlib.suppress(Exception):
             await self._redis.hincrby(f"{self._pfx}:wf:metrics", name, int(inc))
-        except Exception:
-            pass

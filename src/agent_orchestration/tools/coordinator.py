@@ -5,6 +5,7 @@ ToolCoordinator for dynamic tool generation, validation, and sharing (Task 7.1).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import time
 from collections.abc import Awaitable, Callable
 
@@ -75,10 +76,8 @@ class ToolCoordinator:
                     return await asyncio.wait_for(res, timeout=timeout_ms / 1000.0)  # type: ignore
                 except Exception:
                     # ensure metrics failure recorded on timeout/cancel
-                    try:
+                    with contextlib.suppress(Exception):
                         get_tool_metrics().record_failure(spec.name, spec.version, 0.0)
-                    except Exception:
-                        pass
                     raise
             return await res  # type: ignore
         # Sync path: best-effort timeout using a thread
@@ -99,12 +98,10 @@ class ToolCoordinator:
             t.start()
             t.join(timeout_ms / 1000.0)
             if t.is_alive():
-                try:
+                with contextlib.suppress(Exception):
                     get_tool_metrics().record_failure(
                         spec.name, spec.version, timeout_ms
                     )
-                except Exception:
-                    pass
                 # cannot kill the thread safely; document limitation
                 raise TimeoutError(
                     f"Tool '{spec.name}:{spec.version}' execution exceeded {timeout_ms} ms"

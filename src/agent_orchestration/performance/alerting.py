@@ -8,6 +8,7 @@ performance degradation, and SLA breaches with escalation workflows.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections import defaultdict, deque
@@ -167,10 +168,8 @@ class PerformanceAlerting:
         for task in [self.escalation_task, self.cleanup_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("PerformanceAlerting stopped")
 

@@ -172,10 +172,9 @@ async def create_session(user_data: dict[str, Any], api_key: str | None = None) 
     auth_method = "oauth" if not api_key else "api_key"
     encrypted_key = encrypt_api_key(api_key) if api_key else None
 
-    session_id = await session_manager.create_session(
+    return await session_manager.create_session(
         user_data=user_data, auth_method=auth_method, encrypted_api_key=encrypted_key
     )
-    return session_id
 
 
 @router.post("/validate-key", response_model=ApiKeyValidationResponse)

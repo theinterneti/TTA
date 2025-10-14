@@ -8,6 +8,7 @@ multiple simultaneous workflows with load balancing and prioritization.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections import defaultdict, deque
@@ -286,10 +287,8 @@ class WorkflowResourceManager:
         for task in [self._monitoring_task, self._scheduling_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("WorkflowResourceManager stopped")
 

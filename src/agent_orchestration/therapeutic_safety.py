@@ -257,9 +257,8 @@ class SafetyRule:
         if not self.pattern:
             return None
         fl = 0
-        if self.flags:
-            if "i" in self.flags:
-                fl |= re.IGNORECASE
+        if self.flags and "i" in self.flags:
+            fl |= re.IGNORECASE
         return re.compile(self.pattern, fl)
 
 
@@ -1002,10 +1001,7 @@ class TherapeuticValidator:
             for ct in result.crisis_types
         ):
             return True
-        if result.level == SafetyLevel.BLOCKED and result.score < 0.2:
-            return True
-
-        return False
+        return bool(result.level == SafetyLevel.BLOCKED and result.score < 0.2)
 
     def update_configuration(self, new_config: dict[str, Any]) -> None:
         """Update the validator configuration and rebuild the engine."""
@@ -1429,10 +1425,7 @@ class CrisisInterventionManager:
             return True
 
         # Multiple crisis types present
-        if len(validation_result.crisis_types) >= 2:
-            return True
-
-        return False
+        return len(validation_result.crisis_types) >= 2
 
     def _calculate_crisis_confidence(
         self, validation_result: ValidationResult, context: dict[str, Any]
@@ -1978,14 +1971,12 @@ class EmergencyProtocolEngine:
         template = step.get("template", "")
 
         # Simple template substitution
-        response = template.format(
+        return template.format(
             user_id=context.get("user_id", "unknown"),
             session_id=context.get("session_id", "unknown"),
             crisis_type=context.get("crisis_type", "unknown"),
             timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
         )
-
-        return response
 
     def _log_protocol_event(
         self, step: dict[str, Any], context: dict[str, Any]
@@ -2427,11 +2418,9 @@ class HumanOversightEscalation:
 
         # Filter based on configuration
         enabled_channels = self.config.get("notification_channels", {})
-        channels = [
+        return [
             ch for ch in channels if enabled_channels.get(ch, {}).get("enabled", False)
         ]
-
-        return channels
 
     def _send_notification(
         self, channel: str, escalation: dict[str, Any], intervention: CrisisIntervention
@@ -2879,7 +2868,7 @@ class SafetyMonitoringDashboard:
 
     def get_crisis_dashboard(self) -> dict[str, Any]:
         """Get comprehensive crisis intervention dashboard data."""
-        dashboard = {
+        return {
             "summary": self._get_crisis_summary(),
             "active_interventions": self._get_active_interventions(),
             "recent_escalations": self._get_recent_escalations(),
@@ -2887,8 +2876,6 @@ class SafetyMonitoringDashboard:
             "performance_metrics": self._get_performance_metrics(),
             "alerts": self._get_active_alerts(),
         }
-
-        return dashboard
 
     def _get_crisis_summary(self) -> dict[str, Any]:
         """Get crisis intervention summary statistics."""

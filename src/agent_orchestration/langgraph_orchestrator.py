@@ -16,7 +16,6 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 
-from .therapeutic_safety import SafetyLevel
 from .unified_orchestrator import UnifiedAgentOrchestrator
 
 logger = logging.getLogger(__name__)
@@ -238,21 +237,17 @@ class LangGraphAgentOrchestrator:
         logger.info(f"Processing input for session {state['session_id']}")
 
         # Add processing message
-        state["messages"].append(
-            AIMessage(content="Processing your input...")
-        )
+        state["messages"].append(AIMessage(content="Processing your input..."))
 
         return state
 
-    async def _safety_check_node(
-        self, state: AgentWorkflowState
-    ) -> AgentWorkflowState:
+    async def _safety_check_node(self, state: AgentWorkflowState) -> AgentWorkflowState:
         """Perform safety validation."""
         logger.info(f"Performing safety check for session {state['session_id']}")
 
         # Use LLM for safety assessment
         safety_prompt = f"""
-        Assess the safety level of this user input: "{state['user_input']}"
+        Assess the safety level of this user input: "{state["user_input"]}"
 
         Consider:
         - Crisis indicators (self-harm, suicide ideation)
@@ -318,17 +313,15 @@ class LangGraphAgentOrchestrator:
 
         # If we already have a narrative from agents, use it
         if state["narrative_response"]:
-            state["messages"].append(
-                AIMessage(content=state["narrative_response"])
-            )
+            state["messages"].append(AIMessage(content=state["narrative_response"]))
             state["next_actions"] = ["continue", "reflect", "explore"]
             return state
 
         # Fallback: generate response using LLM
         context_summary = f"""
-        User input: {state['user_input']}
-        Intent: {state.get('ipa_result', {}).get('routing', {}).get('intent', 'unknown')}
-        World context: {json.dumps(state['world_context'], indent=2)[:200]}
+        User input: {state["user_input"]}
+        Intent: {state.get("ipa_result", {}).get("routing", {}).get("intent", "unknown")}
+        World context: {json.dumps(state["world_context"], indent=2)[:200]}
         """
 
         response_prompt = f"""
@@ -393,5 +386,4 @@ class LangGraphAgentOrchestrator:
 
         if safety_level in ["crisis", "high_risk"]:
             return "crisis"
-        else:
-            return "safe"
+        return "safe"

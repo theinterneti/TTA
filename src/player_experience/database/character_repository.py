@@ -415,7 +415,7 @@ class CharacterRepository:
             )
 
             # Reconstruct character
-            character = Character(
+            return Character(
                 character_id=node_data["character_id"],
                 player_id=node_data["player_id"],
                 name=node_data["name"],
@@ -429,8 +429,6 @@ class CharacterRepository:
                 session_count=node_data["session_count"],
                 is_active=node_data["is_active"],
             )
-
-            return character
 
         except Exception as e:
             logger.error(f"Failed to deserialize character: {e}")

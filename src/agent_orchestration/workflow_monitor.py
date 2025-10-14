@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -225,20 +226,16 @@ class WorkflowMonitor:
     def stop_background_checks(self) -> None:
         t = self._bg_task
         if t:
-            try:
+            with contextlib.suppress(Exception):
                 t.cancel()
-            except Exception:
-                pass
             self._bg_task = None
 
     # ---- Helpers ----
     async def _maybe_warn(self, rr: RunRecord, kind: str) -> None:
-        try:
+        with contextlib.suppress(Exception):
             await self._audit(
                 rr.run_id, {"ts": time.time(), "event": "early_warning", "type": kind}
             )
-        except Exception:
-            pass
 
     async def _audit(self, run_id: str, entry: dict[str, Any]) -> None:
         await self.record_rollback_audit(run_id, entry)
@@ -258,10 +255,8 @@ class WorkflowMonitor:
             return None
 
     async def _incr_metric(self, name: str, inc: int) -> None:
-        try:
+        with contextlib.suppress(Exception):
             await self._redis.hincrby(self._metrics_key(), name, int(inc))
-        except Exception:
-            pass
 
     async def metrics_snapshot(self) -> dict[str, int]:
         try:

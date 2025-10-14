@@ -264,9 +264,7 @@ class CapabilityMatcher:
         """Check if agent meets availability criteria."""
         if criteria.require_available and not cap_set.availability:
             return False
-        if cap_set.load_factor > criteria.max_load_factor:
-            return False
-        return True
+        return not cap_set.load_factor > criteria.max_load_factor
 
     def _is_exact_match(
         self, capability: AgentCapability, criteria: CapabilityMatchCriteria
@@ -278,11 +276,12 @@ class CapabilityMatcher:
             return False
         if not self._check_version_match(capability, criteria):
             return False
-        if criteria.required_inputs and not criteria.required_inputs.issubset(
-            capability.required_inputs.union(capability.optional_inputs)
-        ):
-            return False
-        return True
+        return not (
+            criteria.required_inputs
+            and not criteria.required_inputs.issubset(
+                capability.required_inputs.union(capability.optional_inputs)
+            )
+        )
 
     def _meets_basic_criteria(
         self, capability: AgentCapability, criteria: CapabilityMatchCriteria
@@ -290,11 +289,12 @@ class CapabilityMatcher:
         """Check if capability meets basic matching criteria."""
         if criteria.capability_type and capability.type != criteria.capability_type:
             return False
-        if criteria.required_inputs and not criteria.required_inputs.issubset(
-            capability.required_inputs.union(capability.optional_inputs)
-        ):
-            return False
-        return True
+        return not (
+            criteria.required_inputs
+            and not criteria.required_inputs.issubset(
+                capability.required_inputs.union(capability.optional_inputs)
+            )
+        )
 
     def _check_version_match(
         self, capability: AgentCapability, criteria: CapabilityMatchCriteria
@@ -303,9 +303,9 @@ class CapabilityMatcher:
         try:
             if criteria.min_version and capability.version < criteria.min_version:
                 return False
-            if criteria.max_version and capability.version > criteria.max_version:
-                return False
-            return True
+            return not (
+                criteria.max_version and capability.version > criteria.max_version
+            )
         except Exception:
             return True  # If version comparison fails, assume compatible
 

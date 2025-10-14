@@ -8,7 +8,6 @@ error handling, and persistence.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import uuid
@@ -376,9 +375,7 @@ class UnifiedAgentOrchestrator:
 
         return prompt
 
-    async def _handle_safety_concern(
-        self, state: OrchestrationState
-    ) -> dict[str, Any]:
+    async def _handle_safety_concern(self, state: OrchestrationState) -> dict[str, Any]:
         """Handle safety concerns detected during processing."""
         logger.warning(
             f"Safety concern in workflow {state.workflow_id}: {state.safety_level.value}"
@@ -414,7 +411,9 @@ class UnifiedAgentOrchestrator:
         try:
             key = f"orchestration:workflow:{state.workflow_id}"
             await self.redis.setex(
-                key, 3600, json.dumps(state.to_dict())  # 1 hour TTL
+                key,
+                3600,
+                json.dumps(state.to_dict()),  # 1 hour TTL
             )
 
             # Also save by session for retrieval

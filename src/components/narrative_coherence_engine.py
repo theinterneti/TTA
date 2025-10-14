@@ -713,8 +713,7 @@ class CoherenceValidator:
         )
         max_penalty = len(issues) * 1.0  # Maximum possible penalty
 
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     def _calculate_character_consistency_score(
         self, issues: list[ConsistencyIssue]
@@ -737,8 +736,7 @@ class CoherenceValidator:
             total_penalty += penalty
 
         max_penalty = len(issues) * 1.0
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     def _calculate_therapeutic_alignment_score(
         self, issues: list[ConsistencyIssue]
@@ -760,22 +758,19 @@ class CoherenceValidator:
         )
         max_penalty = len(issues) * 1.0
 
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     def _calculate_overall_consistency_score(self, result: ValidationResult) -> float:
         """Calculate overall consistency score from component scores."""
         # Weighted average of component scores
         weights = {"lore": 0.3, "character": 0.25, "causal": 0.25, "therapeutic": 0.2}
 
-        score = (
+        return (
             weights["lore"] * result.lore_compliance
             + weights["character"] * result.character_consistency
             + weights["causal"] * result.causal_consistency
             + weights["therapeutic"] * result.therapeutic_alignment
         )
-
-        return score
 
     async def _generate_corrections(self, issues: list[ConsistencyIssue]) -> list[str]:
         """Generate suggested corrections for detected issues."""
@@ -1468,8 +1463,7 @@ class CausalValidator:
             total_penalty += penalty
 
         max_penalty = len(issues) * 1.0
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     async def _generate_causal_corrections(
         self, issues: list[ConsistencyIssue]
@@ -2533,8 +2527,7 @@ class NarrativeCoherenceEngine(Component):
         if solution.solution_type == "universal":
             compatibility_bonus = 0.1
 
-        effectiveness = min(1.0, base_effectiveness + compatibility_bonus)
-        return effectiveness
+        return min(1.0, base_effectiveness + compatibility_bonus)
 
     async def _calculate_narrative_cost(
         self, solution: CreativeSolution, content_history: list[NarrativeContent]

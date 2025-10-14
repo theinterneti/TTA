@@ -116,7 +116,7 @@ class PlayerProfileRepository:
 
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
-                elif isinstance(e, AuthError) or isinstance(e, _ServiceUnavailable):
+                elif isinstance(e, (AuthError, _ServiceUnavailable)):
                     raise PlayerProfileRepositoryError(
                         f"Failed to connect to Neo4j after retries: {e}"
                     ) from e
@@ -650,7 +650,7 @@ class PlayerProfileRepository:
                 else:
                     _active_parsed = _active_raw or {}
 
-                profile = PlayerProfile(
+                return PlayerProfile(
                     player_id=player_data["player_id"],
                     username=player_data["username"],
                     email=player_data["email"],
@@ -663,8 +663,6 @@ class PlayerProfileRepository:
                     last_login=last_login_dt,
                     is_active=player_data.get("is_active", True),
                 )
-
-                return profile
 
         except Exception as e:
             logger.error(f"Error retrieving player profile {player_id}: {e}")

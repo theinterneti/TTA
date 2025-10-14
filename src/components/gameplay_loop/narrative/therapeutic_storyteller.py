@@ -198,11 +198,9 @@ class TherapeuticStoryteller:
                 return None
 
             # Adapt metaphor for emotional state and difficulty
-            adapted_metaphor = await self._adapt_metaphor(
+            return await self._adapt_metaphor(
                 base_metaphor, emotional_state, difficulty_level
             )
-
-            return adapted_metaphor
 
         except Exception as e:
             logger.error(f"Failed to create therapeutic metaphor: {e}")

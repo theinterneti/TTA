@@ -573,7 +573,7 @@ class ProgressTrackingService:
                 counts[d] += 1
                 durations[d] += max(0, s.duration_minutes)
 
-        series = ProgressVizSeries(
+        return ProgressVizSeries(
             time_buckets=bucket_keys,
             series={
                 "sessions": [counts[k] for k in bucket_keys],
@@ -581,7 +581,6 @@ class ProgressTrackingService:
             },
             meta={"period_days": days, "units": {"duration_minutes": "minutes"}},
         )
-        return series
 
     # Enhanced helper methods for therapeutic integration
 

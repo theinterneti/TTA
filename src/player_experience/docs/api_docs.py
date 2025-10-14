@@ -466,7 +466,7 @@ class APIDocumentationGenerator:
         markdown_content = self._generate_markdown_content()
 
         # Basic HTML wrapper
-        html_content = f"""
+        return f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -600,8 +600,6 @@ class APIDocumentationGenerator:
 </html>
         """
 
-        return html_content
-
     def _markdown_to_html(self, markdown: str) -> str:
         """Convert markdown to HTML (simplified implementation)."""
         # This is a very basic markdown to HTML converter
@@ -672,9 +670,7 @@ class APIDocumentationGenerator:
         # Clean up empty paragraphs
         html = re.sub(r"<p>\s*</p>", "", html)
         html = re.sub(r"<p>\s*(<h[1-6]>)", r"\1", html)
-        html = re.sub(r"(</h[1-6]>)\s*</p>", r"\1", html)
-
-        return html
+        return re.sub(r"(</h[1-6]>)\s*</p>", r"\1", html)
 
     def generate_endpoint_reference(self) -> Path:
         """Generate detailed endpoint reference."""
@@ -818,7 +814,7 @@ class APIDocumentationGenerator:
                         content.append("")
 
                         if "content" in response:
-                            for _, content_schema in response["content"].items():
+                            for content_schema in response["content"].values():
                                 if "schema" in content_schema:
                                     schema = content_schema["schema"]
                                     content.append("```json")

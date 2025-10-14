@@ -8,6 +8,7 @@ capabilities for the response time optimization engine.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import statistics
 import time
@@ -153,10 +154,8 @@ class PerformanceAnalytics:
         for task in [self._analytics_task, self._effectiveness_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("PerformanceAnalytics stopped")
 
@@ -477,9 +476,7 @@ class PerformanceAnalytics:
                             period_trends.values(),
                             key=lambda t: abs(t.change_percentage),
                             reverse=True,
-                        )[
-                            :10
-                        ]  # Top 10 most significant trends
+                        )[:10]  # Top 10 most significant trends
                     ],
                 }
 

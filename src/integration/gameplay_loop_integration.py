@@ -186,7 +186,9 @@ class GameplayLoopIntegration:
             if not choice_result or "error" in choice_result:
                 return {
                     "success": False,
-                    "error": choice_result.get("error", "Choice processing failed") if choice_result else "Choice processing failed",  # type: ignore[union-attr]
+                    "error": choice_result.get("error", "Choice processing failed")
+                    if choice_result
+                    else "Choice processing failed",  # type: ignore[union-attr]
                     "code": "CHOICE_ERROR",
                 }
 
@@ -198,7 +200,9 @@ class GameplayLoopIntegration:
                         scene_description
                     )
 
-                    if validation_result.level == SafetyLevel.BLOCKED:  # Blocked content
+                    if (
+                        validation_result.level == SafetyLevel.BLOCKED
+                    ):  # Blocked content
                         # Generate alternative content
                         alternative = self.safety_service.suggest_alternative(
                             validation_result.level, scene_description

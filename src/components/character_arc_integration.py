@@ -409,11 +409,9 @@ class RelationshipDynamicsManager:
                 return 0.5  # Neutral compatibility if data unavailable
 
             # Use development system's compatibility calculation
-            compatibility = self.character_development_system.personality_manager.calculate_personality_compatibility(
+            return self.character_development_system.personality_manager.calculate_personality_compatibility(
                 char1_state.personality_traits, char2_state.personality_traits
             )
-
-            return compatibility
 
         except Exception as e:
             logger.error(f"Error calculating relationship compatibility: {e}")

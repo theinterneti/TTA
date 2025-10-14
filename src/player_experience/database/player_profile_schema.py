@@ -113,7 +113,7 @@ class PlayerProfileSchemaManager:
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
                 # Exhausted attempts: re-raise with original exception type
-                elif isinstance(e, AuthError) or isinstance(e, _ServiceUnavailable):
+                elif isinstance(e, (AuthError, _ServiceUnavailable)):
                     raise PlayerProfileSchemaError(
                         f"Failed to connect to Neo4j after retries: {e}"
                     ) from e

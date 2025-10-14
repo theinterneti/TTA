@@ -347,7 +347,7 @@ class NarrativeComplexityAdapter:
         self, session_state: SessionState
     ) -> dict[str, Any]:
         """Analyze current session state to determine complexity needs."""
-        analysis = {
+        return {
             "emotional_state": session_state.emotional_state,
             "difficulty_level": session_state.difficulty_level,
             "session_duration": len(session_state.choice_history) * 300,  # Estimate
@@ -357,8 +357,6 @@ class NarrativeComplexityAdapter:
                 session_state
             ),
         }
-
-        return analysis
 
     async def _determine_adaptation_strategies(
         self, complexity_analysis: dict[str, Any], emotional_state: EmotionalState
@@ -461,9 +459,9 @@ class NarrativeComplexityAdapter:
         self, scene: Scene, strategy: AdaptationStrategy
     ) -> Scene:
         """Adapt cognitive load of the scene."""
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             # Simplify narrative structure and reduce information density
             content_parts = scene.narrative_content.split(". ")
@@ -484,9 +482,9 @@ class NarrativeComplexityAdapter:
         self, scene: Scene, strategy: AdaptationStrategy
     ) -> Scene:
         """Adapt emotional intensity of the scene."""
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             # Make content more calming and less emotionally challenging
             scene.emotional_tone = "deeply_calming"
@@ -511,9 +509,9 @@ class NarrativeComplexityAdapter:
         if not hasattr(scene, "choice_complexity_preference"):
             scene.choice_complexity_preference = "standard"
 
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             scene.choice_complexity_preference = "simple"
         elif strategy == AdaptationStrategy.INCREASE:
@@ -525,16 +523,16 @@ class NarrativeComplexityAdapter:
         self, scene: Scene, strategy: AdaptationStrategy
     ) -> Scene:
         """Adapt therapeutic depth of the scene."""
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             # Focus on basic therapeutic elements
             scene.therapeutic_focus = scene.therapeutic_focus[:2]  # Limit focus areas
 
-        elif (
-            strategy == AdaptationStrategy.INCREASE
-            or strategy == AdaptationStrategy.GRADUAL_INCREASE
+        elif strategy in (
+            AdaptationStrategy.INCREASE,
+            AdaptationStrategy.GRADUAL_INCREASE,
         ):
             # Add deeper therapeutic elements
             if "self_awareness" not in scene.therapeutic_focus:
@@ -546,9 +544,9 @@ class NarrativeComplexityAdapter:
         self, scene: Scene, strategy: AdaptationStrategy
     ) -> Scene:
         """Adapt narrative length."""
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             # Shorten narrative content
             sentences = scene.narrative_content.split(". ")
@@ -569,9 +567,9 @@ class NarrativeComplexityAdapter:
         self, scene: Scene, strategy: AdaptationStrategy
     ) -> Scene:
         """Adapt vocabulary complexity."""
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             # Replace complex words with simpler alternatives
             replacements = {
@@ -594,9 +592,9 @@ class NarrativeComplexityAdapter:
         self, scene: Scene, strategy: AdaptationStrategy
     ) -> Scene:
         """Adapt conceptual abstraction level."""
-        if (
-            strategy == AdaptationStrategy.SIMPLIFY
-            or strategy == AdaptationStrategy.EMERGENCY_SIMPLIFY
+        if strategy in (
+            AdaptationStrategy.SIMPLIFY,
+            AdaptationStrategy.EMERGENCY_SIMPLIFY,
         ):
             # Make concepts more concrete and tangible
             scene.narrative_content += (
@@ -788,5 +786,4 @@ class NarrativeComplexityAdapter:
         if abstract_count + concrete_count == 0:
             return 0.5  # Neutral
 
-        abstraction_ratio = abstract_count / (abstract_count + concrete_count)
-        return abstraction_ratio
+        return abstract_count / (abstract_count + concrete_count)

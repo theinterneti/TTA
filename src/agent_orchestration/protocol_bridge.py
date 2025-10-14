@@ -244,8 +244,7 @@ class MessageRouter:
                 )
 
             # Route message
-            result = await handler(message)
-            return result
+            return await handler(message)
 
         except Exception as e:
             logger.error(f"Message routing failed for {agent_type}: {e}")

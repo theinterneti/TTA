@@ -8,6 +8,7 @@ predictive scheduling, and performance optimization to achieve sub-2-second resp
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import heapq
 import logging
 import statistics
@@ -166,10 +167,8 @@ class IntelligentAgentCoordinator:
         for task in [self.scheduler_task, self.profile_update_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("IntelligentAgentCoordinator stopped")
 
@@ -443,13 +442,13 @@ class IntelligentAgentCoordinator:
 
     async def _reserve_agents(self, decision: SchedulingDecision) -> None:
         """Reserve agents for a scheduling decision."""
-        for _, agent_id in decision.selected_agents.items():
+        for agent_id in decision.selected_agents.values():
             if agent_id in self.agent_profiles:
                 self.agent_profiles[agent_id].current_load += 1
 
     async def _release_agents(self, decision: SchedulingDecision) -> None:
         """Release agents after workflow completion."""
-        for _, agent_id in decision.selected_agents.items():
+        for agent_id in decision.selected_agents.values():
             if agent_id in self.agent_profiles:
                 self.agent_profiles[agent_id].current_load = max(
                     0, self.agent_profiles[agent_id].current_load - 1

@@ -8,6 +8,7 @@ allowing multiple components to listen for and react to real-time events.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 from collections.abc import Callable
@@ -71,10 +72,8 @@ class EventSubscriber:
         # Cancel subscription task
         if self.subscription_task:
             self.subscription_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self.subscription_task
-            except asyncio.CancelledError:
-                pass
 
         # Close pubsub connection
         if self.pubsub:

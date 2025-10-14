@@ -263,13 +263,12 @@ class TherapeuticGameplayLoopController:
                 self.session_configurations.pop(session_id, None)
 
             # Return error state
-            error_session = SessionState(
+            return SessionState(
                 session_id=str(uuid4()),
                 user_id=user_id,
                 status=SessionStatus.ERROR,
                 current_phase=SessionPhase.INITIALIZATION,
             )
-            return error_session
 
     async def process_user_choice(
         self,
@@ -595,12 +594,11 @@ class TherapeuticGameplayLoopController:
         """Assess emotional safety of user input."""
         try:
             if self.emotional_safety_system:
-                safety_result = await self.emotional_safety_system.assess_crisis_risk(
+                return await self.emotional_safety_system.assess_crisis_risk(
                     user_id=session_state.user_id,
                     user_input=user_input,
                     session_context=context,
                 )
-                return safety_result
             return {"crisis_detected": False, "safety_level": "standard"}
 
         except Exception as e:
@@ -653,12 +651,11 @@ class TherapeuticGameplayLoopController:
         """Process user choice through consequence system."""
         try:
             if self.consequence_system:
-                consequence = await self.consequence_system.process_choice_consequence(
+                return await self.consequence_system.process_choice_consequence(
                     user_id=session_state.user_id,
                     choice=user_choice,
                     scenario_context=context or {},
                 )
-                return consequence
             return {
                 "consequence_text": "Your choice has been noted.",
                 "therapeutic_value": 1.0,

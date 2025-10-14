@@ -1137,10 +1137,9 @@ class CharacterArcManagerComponent(Component):
                 return True
 
             # Check emotional impact alignment
-            if any(impact > 0.3 for impact in interaction.emotional_impact.values()):
-                return True
-
-            return False
+            return bool(
+                any(impact > 0.3 for impact in interaction.emotional_impact.values())
+            )
 
         except Exception as e:
             logger.error(f"Error checking milestone contribution: {e}")
@@ -1436,10 +1435,7 @@ class CharacterArcManagerComponent(Component):
 
             # Check progress threshold
             progress = milestone.metadata.get("progress", 0.0)
-            if progress < 1.0:
-                return False
-
-            return True
+            return not progress < 1.0
 
         except Exception as e:
             logger.error(f"Error checking milestone requirements: {e}")

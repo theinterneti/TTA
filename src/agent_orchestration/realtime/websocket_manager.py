@@ -8,6 +8,7 @@ heartbeat monitoring, and event broadcasting capabilities.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -842,10 +843,8 @@ class WebSocketConnectionManager:
 
             # Restore filters
             if history.get("filters"):
-                try:
+                with contextlib.suppress(Exception):
                     connection.filters = EventFilter(**history["filters"])
-                except Exception:
-                    pass
 
             # Update connection history
             history["connection_id"] = connection.connection_id
@@ -1042,7 +1041,7 @@ class WebSocketConnectionManager:
                 "history_count": len(self.connection_history),
                 "recoverable_users": [
                     user_id
-                    for user_id in self.connection_history.keys()
+                    for user_id in self.connection_history
                     if self._can_recover_connection(user_id)
                 ],
             },
@@ -1058,9 +1057,8 @@ class WebSocketConnectionManager:
             # Check if connection should receive this event
             if await self._should_send_event_to_connection(
                 connection, event, user_filter
-            ):
-                if await self._send_to_connection(connection, event):
-                    sent_count += 1
+            ) and await self._send_to_connection(connection, event):
+                sent_count += 1
 
         return sent_count
 
@@ -1229,10 +1227,8 @@ class WebSocketConnectionManager:
 
         # Close all connections
         for connection in list(self.connections.values()):
-            try:
+            with contextlib.suppress(Exception):
                 await connection.websocket.close(code=1001, reason="server shutdown")
-            except Exception:
-                pass
 
         # Clear connections
         self.connections.clear()

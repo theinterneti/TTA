@@ -14,7 +14,14 @@ Classes:
 Example:
     ```python
     from src.orchestration import TTAConfig
-    from src.components import Neo4jComponent, LLMComponent, AppComponent, DockerComponent, CarbonComponent, PlayerExperienceComponent
+    from src.components import (
+        Neo4jComponent,
+        LLMComponent,
+        AppComponent,
+        DockerComponent,
+        CarbonComponent,
+        PlayerExperienceComponent,
+    )
 
     # Create a configuration object
     config = TTAConfig()

@@ -451,15 +451,13 @@ class ReportGenerator:
             "avg_engagement": avg_engagement,
         }
 
-        report = GeneratedReport(
+        return GeneratedReport(
             report_id=config.report_id,
             configuration=config,
             content=content,
             visualizations=visualizations,
             generated_at=datetime.utcnow(),
         )
-
-        return report
 
     async def generate_user_engagement_report(
         self, config: ReportConfiguration, data: dict[str, Any]
@@ -517,15 +515,13 @@ class ReportGenerator:
             "avg_duration": avg_duration,
         }
 
-        report = GeneratedReport(
+        return GeneratedReport(
             report_id=config.report_id,
             configuration=config,
             content=content,
             visualizations=visualizations,
             generated_at=datetime.utcnow(),
         )
-
-        return report
 
     async def generate_cohort_analysis_report(
         self, config: ReportConfiguration, data: dict[str, Any]
@@ -580,15 +576,13 @@ class ReportGenerator:
             "avg_success_rate": avg_success_rate,
         }
 
-        report = GeneratedReport(
+        return GeneratedReport(
             report_id=config.report_id,
             configuration=config,
             content=content,
             visualizations=visualizations,
             generated_at=datetime.utcnow(),
         )
-
-        return report
 
     async def generate_report(
         self, config: ReportConfiguration, data: dict[str, Any]

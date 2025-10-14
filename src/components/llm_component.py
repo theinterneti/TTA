@@ -220,7 +220,7 @@ class LLMComponent(Component):
         ] + command
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
 
-        result = safe_run(
+        return safe_run(
             full_command,
             cwd=str(self.repo_dir),
             text=True,
@@ -229,8 +229,6 @@ class LLMComponent(Component):
             check=False,
             env=env,
         )
-
-        return result
 
     def _is_llm_running(self) -> bool:
         """

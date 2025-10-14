@@ -508,11 +508,7 @@ class InputValidator:
             if f"<{tag}" in input_lower:
                 return False
 
-        for attr in dangerous_attrs:
-            if attr in input_lower:
-                return False
-
-        return True
+        return all(attr not in input_lower for attr in dangerous_attrs)
 
     def _check_url_scheme(self, url: str) -> bool:
         """Check URL scheme for safety."""
@@ -606,11 +602,7 @@ class InputValidator:
         profanity_words = ["damn", "hell", "shit", "fuck", "bitch", "ass", "bastard"]
 
         text_lower = text.lower()
-        for word in profanity_words:
-            if word in text_lower:
-                return False
-
-        return True
+        return all(word not in text_lower for word in profanity_words)
 
     def _check_path_traversal(self, path: str) -> bool:
         """Check for path traversal attacks."""

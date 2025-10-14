@@ -7,6 +7,7 @@ and therapeutic continuity maintenance during errors.
 """
 
 import asyncio
+import contextlib
 import logging
 import traceback
 from dataclasses import dataclass, field
@@ -237,10 +238,8 @@ class TherapeuticErrorRecoveryManager:
 
         if self._health_monitoring_task:
             self._health_monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._health_monitoring_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("TherapeuticErrorRecoveryManager shutdown complete")
 

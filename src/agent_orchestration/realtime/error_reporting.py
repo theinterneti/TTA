@@ -8,6 +8,7 @@ systems for agent operations and workflows.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 import traceback
@@ -136,10 +137,8 @@ class ErrorReportingManager:
         for task in [self.cleanup_task, self.escalation_task]:
             if task:
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("ErrorReportingManager stopped")
 

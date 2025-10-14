@@ -269,7 +269,9 @@ class RedisAgentRegistry(AgentRegistry):
             await self._detect_and_publish_status_changes(agent)
 
         except Exception as e:
-            logger.warning(f"Failed to update heartbeat for agent {agent.agent_id}: {e}")
+            logger.warning(
+                f"Failed to update heartbeat for agent {agent.agent_id}: {e}"
+            )
 
     async def restore_state_if_available(self, agent: Agent) -> bool:
         """If a serialized state exists in Redis for this agent, restore it.

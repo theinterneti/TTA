@@ -9,6 +9,7 @@ and LangGraphExecutor; otherwise they return stub responses.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import time
 import uuid
@@ -251,12 +252,10 @@ class WorkflowManager:
             t1 = time.time()
             duration_ms = (t1 - t0) * 1000.0
             # Record performance per agent type key
-            try:
+            with contextlib.suppress(Exception):
                 self._aggregator.record(
                     step.agent.value, duration_ms, success=(error is None)
                 )
-            except Exception:
-                pass
             result.ended_at = _utc_now()
         return result
 

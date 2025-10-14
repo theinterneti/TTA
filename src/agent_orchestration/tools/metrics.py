@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Generator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass, field
 from functools import wraps
 from typing import Any, TypeVar
@@ -101,33 +101,25 @@ def tool_execution(name: str, version: str) -> Callable[[F], F]:
                         try:
                             r = await res  # type: ignore
                             dur = (time.perf_counter() - start) * 1000.0
-                            try:
+                            with suppress(Exception):
                                 get_tool_metrics().record_success(name, version, dur)
-                            except Exception:
-                                pass
                             return r
                         except Exception:
                             dur = (time.perf_counter() - start) * 1000.0
-                            try:
+                            with suppress(Exception):
                                 get_tool_metrics().record_failure(name, version, dur)
-                            except Exception:
-                                pass
                             raise
 
                     return _awaitable()
                 # sync path
                 dur = (time.perf_counter() - start) * 1000.0
-                try:
+                with suppress(Exception):
                     get_tool_metrics().record_success(name, version, dur)
-                except Exception:
-                    pass
                 return res
             except Exception:
                 dur = (time.perf_counter() - start) * 1000.0
-                try:
+                with suppress(Exception):
                     get_tool_metrics().record_failure(name, version, dur)
-                except Exception:
-                    pass
                 raise
 
         return _wrapped  # type: ignore
@@ -141,16 +133,12 @@ def tool_exec_context(name: str, version: str) -> Generator[None, None, None]:
     try:
         yield
         dur = (time.perf_counter() - start) * 1000.0
-        try:
+        with suppress(Exception):
             get_tool_metrics().record_success(name, version, dur)
-        except Exception:
-            pass
     except Exception:
         dur = (time.perf_counter() - start) * 1000.0
-        try:
+        with suppress(Exception):
             get_tool_metrics().record_failure(name, version, dur)
-        except Exception:
-            pass
         raise
 
 

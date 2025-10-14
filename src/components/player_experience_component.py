@@ -226,7 +226,7 @@ class PlayerExperienceComponent(Component):
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
 
         # Use subprocess.run directly so unit tests patching subprocess.run can observe the call
-        result = subprocess.run(
+        return subprocess.run(
             full_command,
             cwd=str(self.player_experience_dir),
             text=True,
@@ -234,8 +234,6 @@ class PlayerExperienceComponent(Component):
             capture_output=True,
             check=False,
         )
-
-        return result
 
     def _is_api_running(self) -> bool:
         """

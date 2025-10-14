@@ -8,6 +8,7 @@ that integrates with workflow error handling and circuit breaker systems.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections.abc import Awaitable, Callable
@@ -177,10 +178,8 @@ class ResourceExhaustionDetector:
         """Stop continuous resource monitoring."""
         if self._monitoring_task and not self._monitoring_task.done():
             self._monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._monitoring_task
-            except asyncio.CancelledError:
-                pass
         logger.info("Stopped resource exhaustion monitoring")
 
     async def _monitoring_loop(self) -> None:
@@ -397,7 +396,7 @@ class ResourceExhaustionDetector:
             # Get all workflow circuit breakers
             all_metrics = await self._circuit_breaker_registry.get_all_metrics()
 
-            for cb_name in all_metrics.keys():
+            for cb_name in all_metrics:
                 if cb_name.startswith("workflow:"):
                     circuit_breaker = await self._circuit_breaker_registry.get(cb_name)
                     if circuit_breaker:

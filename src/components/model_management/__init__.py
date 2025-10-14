@@ -36,7 +36,7 @@ Example:
     # Select optimal model for task
     model = await model_manager.select_model(
         task_type="narrative_generation",
-        requirements={"max_latency_ms": 2000, "min_quality_score": 7.5}
+        requirements={"max_latency_ms": 2000, "min_quality_score": 7.5},
     )
     ```
 """

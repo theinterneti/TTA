@@ -329,6 +329,7 @@ def _normalize_privacy_settings_dict(data: dict[str, Any]) -> dict[str, Any]:
     Field(..., description="Therapeutic preferences")
     Field(..., description="Privacy settings")
     Field(..., description="Progress summary")
+    return None
 
 
 class PlayerListResponse(BaseModel):

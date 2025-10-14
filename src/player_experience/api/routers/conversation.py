@@ -587,23 +587,30 @@ async def send_message(
 
         # Analyze emotional themes
         user_lower = user_message.lower()
-        if any(
-            word in user_lower for word in ["anxious", "anxiety", "worried", "nervous"]
+        if (
+            any(
+                word in user_lower
+                for word in ["anxious", "anxiety", "worried", "nervous"]
+            )
+            and "anxiety" not in session_state["emotional_themes"]
         ):
-            if "anxiety" not in session_state["emotional_themes"]:
-                session_state["emotional_themes"].append("anxiety")
-        if any(
-            word in user_lower
-            for word in ["stressed", "stress", "overwhelmed", "pressure"]
+            session_state["emotional_themes"].append("anxiety")
+        if (
+            any(
+                word in user_lower
+                for word in ["stressed", "stress", "overwhelmed", "pressure"]
+            )
+            and "stress" not in session_state["emotional_themes"]
         ):
-            if "stress" not in session_state["emotional_themes"]:
-                session_state["emotional_themes"].append("stress")
-        if any(
-            word in user_lower
-            for word in ["sad", "sadness", "depressed", "down", "low"]
+            session_state["emotional_themes"].append("stress")
+        if (
+            any(
+                word in user_lower
+                for word in ["sad", "sadness", "depressed", "down", "low"]
+            )
+            and "depression" not in session_state["emotional_themes"]
         ):
-            if "depression" not in session_state["emotional_themes"]:
-                session_state["emotional_themes"].append("depression")
+            session_state["emotional_themes"].append("depression")
 
         # Add user message
         user_msg = ConversationMessage(

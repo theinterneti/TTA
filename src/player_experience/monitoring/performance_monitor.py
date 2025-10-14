@@ -385,9 +385,7 @@ class CacheTracker:
         )
 
         # Replace numeric IDs
-        pattern = re.sub(r"\d+", "{id}", pattern)
-
-        return pattern
+        return re.sub(r"\d+", "{id}", pattern)
 
     def get_cache_optimization_suggestions(self) -> list[dict[str, Any]]:
         """Get suggestions for cache optimization."""

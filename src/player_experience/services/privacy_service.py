@@ -270,9 +270,7 @@ class AnonymizationService:
         )
 
         # Names (do last to avoid conflicts with addresses)
-        anonymized = re.sub(r"\b[A-Z][a-z]+ [A-Z][a-z]+\b", "[NAME]", anonymized)
-
-        return anonymized
+        return re.sub(r"\b[A-Z][a-z]+ [A-Z][a-z]+\b", "[NAME]", anonymized)
 
     def k_anonymize_dataset(
         self,
@@ -601,8 +599,7 @@ class DataPrivacyService:
     def _anonymize_data_references(self, data: dict[str, Any]) -> dict[str, Any]:
         """Anonymize references to other users in exported data."""
         # Simple implementation - in production, use more sophisticated methods
-        anonymized_data = json.loads(json.dumps(data, default=str))
-        return anonymized_data
+        return json.loads(json.dumps(data, default=str))
 
     def _convert_to_csv(self, data: dict[str, Any]) -> str:
         """Convert export data to CSV format."""

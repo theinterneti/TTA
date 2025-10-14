@@ -125,7 +125,7 @@ class ImmersionManager:
             Dictionary mapping immersion dimensions to quality scores (0.0-1.0)
         """
         try:
-            quality_scores = {
+            return {
                 "sensory_richness": await self._assess_sensory_richness(scene),
                 "atmospheric_depth": await self._assess_atmospheric_depth(scene),
                 "emotional_engagement": await self._assess_emotional_engagement(scene),
@@ -135,8 +135,6 @@ class ImmersionManager:
                 "personal_relevance": await self._assess_personal_relevance(scene),
                 "continuity_strength": await self._assess_continuity_strength(scene),
             }
-
-            return quality_scores
 
         except Exception as e:
             logger.error(f"Failed to assess immersion quality: {e}")
@@ -466,7 +464,7 @@ class ImmersionManager:
         content_lower = scene.narrative_content.lower()
         total_sensory_words = 0
 
-        for _, keywords in sensory_keywords.items():
+        for keywords in sensory_keywords.values():
             sense_count = sum(1 for keyword in keywords if keyword in content_lower)
             total_sensory_words += sense_count
 

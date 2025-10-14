@@ -8,6 +8,7 @@ WebSocket event system to provide live system health dashboards.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections.abc import Callable
@@ -118,10 +119,8 @@ class MonitoringEventIntegrator:
         # Cancel monitoring task
         if self.monitoring_task:
             self.monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self.monitoring_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("Monitoring event integration stopped")
 

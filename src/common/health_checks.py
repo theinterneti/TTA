@@ -300,12 +300,11 @@ async def check_openrouter_health(api_key: str | None = None) -> HealthCheckResu
                     message="OpenRouter API accessible",
                     details={"models_available": len(data.get("data", []))},
                 )
-            else:
-                return HealthCheckResult(
-                    component="openrouter",
-                    status=HealthStatus.DEGRADED,
-                    message=f"OpenRouter API returned status {response.status_code}",
-                )
+            return HealthCheckResult(
+                component="openrouter",
+                status=HealthStatus.DEGRADED,
+                message=f"OpenRouter API returned status {response.status_code}",
+            )
     except Exception as e:
         return HealthCheckResult(
             component="openrouter",

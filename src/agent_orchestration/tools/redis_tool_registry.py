@@ -5,6 +5,7 @@ Redis-backed ToolRegistry with lifecycle management and caching (Task 7.1/7.2).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import time
 from typing import Any
@@ -33,17 +34,13 @@ class _LRU:
             ts, v = item
             if self._ttl and (time.time() - ts) > self._ttl:
                 self._data.pop(k, None)
-                try:
+                with contextlib.suppress(ValueError):
                     self._order.remove(k)
-                except ValueError:
-                    pass
                 self.misses += 1
                 return None
             # move to end
-            try:
+            with contextlib.suppress(ValueError):
                 self._order.remove(k)
-            except ValueError:
-                pass
             self._order.append(k)
             self.hits += 1
             return v
@@ -52,10 +49,8 @@ class _LRU:
         async with self._lock:
             now = time.time()
             self._data[k] = (now, v)
-            try:
+            with contextlib.suppress(ValueError):
                 self._order.remove(k)
-            except ValueError:
-                pass
             self._order.append(k)
             while len(self._order) > self._max:
                 old = self._order.pop(0)

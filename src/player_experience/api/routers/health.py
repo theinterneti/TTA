@@ -14,7 +14,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from src.common.health_checks import (
-    HealthCheckResult,
     HealthStatus,
     check_agent_orchestration_health,
     check_neo4j_health,
@@ -97,14 +96,10 @@ async def system_health(
 
     # Register checks
     if redis_client:
-        health_checker.register_check(
-            "redis", lambda: check_redis_health(redis_client)
-        )
+        health_checker.register_check("redis", lambda: check_redis_health(redis_client))
 
     if neo4j_driver:
-        health_checker.register_check(
-            "neo4j", lambda: check_neo4j_health(neo4j_driver)
-        )
+        health_checker.register_check("neo4j", lambda: check_neo4j_health(neo4j_driver))
 
     health_checker.register_check(
         "agent_orchestration", lambda: check_agent_orchestration_health()
@@ -196,11 +191,10 @@ async def readiness_probe(
     # Service is ready if all critical checks pass
     if all(critical_checks):
         return {"status": "ready"}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Service not ready",
-        )
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="Service not ready",
+    )
 
 
 @router.get("/startup")
@@ -231,8 +225,7 @@ async def startup_probe(
 
     if any(checks):  # At least one service is up
         return {"status": "started"}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Service still starting",
-        )
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="Service still starting",
+    )

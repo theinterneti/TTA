@@ -584,11 +584,9 @@ class PlayerProfileManager:
             )
 
         # Filter access log for this player
-        player_log = [
+        return [
             entry for entry in self._access_log if entry.get("player_id") == player_id
         ]
-
-        return player_log
 
     # Private helper methods
 
@@ -687,7 +685,7 @@ class PlayerProfileManager:
             return profile
 
         # Create filtered copy of profile
-        filtered_profile = PlayerProfile(
+        return PlayerProfile(
             player_id=profile.player_id,
             username=profile.username,
             email=(
@@ -717,8 +715,6 @@ class PlayerProfileManager:
             is_active=profile.is_active,
         )
 
-        return filtered_profile
-
     def _validate_profile_updates(self, updates: dict[str, Any]) -> None:
         """Validate profile update data."""
         if "username" in updates:
@@ -735,7 +731,7 @@ class PlayerProfileManager:
     ) -> PlayerProfile:
         """Apply updates to a player profile."""
         # Create a copy of the profile
-        updated_profile = PlayerProfile(
+        return PlayerProfile(
             player_id=profile.player_id,
             username=updates.get("username", profile.username),
             email=updates.get("email", profile.email),
@@ -750,8 +746,6 @@ class PlayerProfileManager:
             last_login=updates.get("last_login", profile.last_login),
             is_active=updates.get("is_active", profile.is_active),
         )
-
-        return updated_profile
 
     def _log_access(self, player_id: str, operation: str, details: str) -> None:
         """Log access for audit purposes."""

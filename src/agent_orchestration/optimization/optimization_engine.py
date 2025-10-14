@@ -8,6 +8,7 @@ parameters based on performance metrics to optimize response times.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from abc import ABC, abstractmethod
@@ -134,7 +135,7 @@ class ConservativeOptimizer(OptimizationAlgorithm):
             if v.category == ResponseTimeCategory.MESSAGE_PROCESSING
         }
 
-        for _, stat in message_stats.items():
+        for stat in message_stats.values():
             # If P95 response time is high, suggest reducing queue size or increasing timeout
             if stat.p95_duration > 5.0:  # 5 seconds threshold
                 # Look for queue size parameter
@@ -182,7 +183,7 @@ class AggressiveOptimizer(OptimizationAlgorithm):
         results = []
 
         # More aggressive timeout adjustments
-        for _, stat in stats.items():
+        for stat in stats.values():
             if stat.success_rate < 0.9:  # Less than 90% success rate
                 # Increase timeout parameters
                 timeout_params = [
@@ -241,7 +242,7 @@ class StatisticalOptimizer(OptimizationAlgorithm):
             k: v for k, v in stats.items() if v.sample_count >= self.min_samples
         }
 
-        for _, stat in high_confidence_stats.items():
+        for stat in high_confidence_stats.values():
             # Calculate coefficient of variation (CV) to assess consistency
             cv = (
                 (stat.p95_duration - stat.median_duration) / stat.median_duration
@@ -343,10 +344,8 @@ class OptimizationEngine:
 
         if self._optimization_task:
             self._optimization_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._optimization_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("OptimizationEngine stopped")
 

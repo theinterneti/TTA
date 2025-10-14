@@ -358,7 +358,7 @@ class PacingController:
         choice_count = len(session_state.choice_history)
         estimated_duration = choice_count * 300  # Rough estimate
 
-        metrics = {
+        return {
             "session_duration": estimated_duration,
             "choice_frequency": choice_count
             / max(estimated_duration / 60, 1),  # Choices per minute
@@ -369,8 +369,6 @@ class PacingController:
             "emotional_engagement": self._calculate_emotional_engagement(session_state),
             "narrative_momentum": self._calculate_narrative_momentum(session_state),
         }
-
-        return metrics
 
     async def _assess_fatigue_level(self, session_state: SessionState) -> float:
         """Assess current fatigue level (0.0-1.0)."""
@@ -586,7 +584,7 @@ class PacingController:
         self, scene: Scene, strategy: PacingStrategy
     ) -> Scene:
         """Adjust cognitive load pacing."""
-        if strategy == PacingStrategy.DECELERATE or strategy == PacingStrategy.PAUSE:
+        if strategy in (PacingStrategy.DECELERATE, PacingStrategy.PAUSE):
             # Simplify content
             sentences = scene.narrative_content.split(". ")
             if len(sentences) > 4:

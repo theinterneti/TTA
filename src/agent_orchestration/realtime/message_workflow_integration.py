@@ -47,9 +47,9 @@ class WorkflowAwareMessageCoordinator:
         self.workflow_agents: dict[str, set[AgentId]] = {}  # workflow_id -> agent_ids
 
         # Message processing callbacks
-        self.message_callbacks: dict[str, set[Callable]] = (
-            {}
-        )  # workflow_id -> callbacks
+        self.message_callbacks: dict[
+            str, set[Callable]
+        ] = {}  # workflow_id -> callbacks
 
         logger.info("WorkflowAwareMessageCoordinator initialized")
 

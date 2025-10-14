@@ -200,19 +200,16 @@ class FallbackHandler(IFallbackHandler):
                 if model.context_length < requirements.context_length_needed:
                     continue
 
-            if requirements.required_capabilities:
-                if not all(
-                    cap in model.capabilities
-                    for cap in requirements.required_capabilities
-                ):
-                    continue
+            if requirements.required_capabilities and not all(
+                cap in model.capabilities for cap in requirements.required_capabilities
+            ):
+                continue
 
             if (
                 requirements.therapeutic_safety_required
                 and model.therapeutic_safety_score
-            ):
-                if model.therapeutic_safety_score < 7.0:  # Minimum safety threshold
-                    continue
+            ) and model.therapeutic_safety_score < 7.0:  # Minimum safety threshold
+                continue
 
             compatible_models.append(model)
 

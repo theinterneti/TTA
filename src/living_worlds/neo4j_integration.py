@@ -50,7 +50,9 @@ class LivingWorldsManager:
     ):
         self.neo4j_uri = neo4j_uri
         self.neo4j_user = neo4j_user
-        self.neo4j_password = neo4j_password or "password"  # Fallback for local dev only
+        self.neo4j_password = (
+            neo4j_password or "password"
+        )  # Fallback for local dev only
         self.redis_url = redis_url
 
         self.driver: AsyncDriver | None = None
@@ -440,7 +442,7 @@ class LivingWorldsManager:
             result = await session.run(query, character_id=character_id)
 
             # Use async list comprehension for better performance
-            relationships = [
+            return [
                 {
                     "character": dict(record["other"]),
                     "relationship": dict(record["r"]),
@@ -448,8 +450,6 @@ class LivingWorldsManager:
                 }
                 async for record in result
             ]
-
-            return relationships
 
     async def evolve_world(self, patient_id: str, session_data: dict[str, Any]):
         """Evolve the living world based on patient interactions"""

@@ -13,7 +13,7 @@ import statistics
 import time
 from collections import defaultdict, deque
 from collections.abc import Callable
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -160,10 +160,8 @@ class ResponseTimeMonitor:
         for task in [self.cleanup_task, self.analysis_task]:
             if task:
                 task.cancel()
-                try:
+                with suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         logger.info("ResponseTimeMonitor stopped")
 

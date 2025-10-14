@@ -19,6 +19,7 @@ Keys (per agent instance):
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -122,16 +123,12 @@ class RedisMessageCoordinator(MessageCoordinator):
                 self._sched_key(recipient, int(message.priority)), {payload: score}
             )
             # Metrics: mark successful delivery
-            try:
+            with contextlib.suppress(Exception):
                 self.metrics.inc_delivered_ok(1)
-            except Exception:
-                pass
             return MessageResult(message_id=message.message_id, delivered=True)
         except Exception as e:
-            try:
+            with contextlib.suppress(Exception):
                 self.metrics.inc_delivered_error(1)
-            except Exception:
-                pass
             return MessageResult(
                 message_id=message.message_id, delivered=False, error=str(e)
             )
@@ -160,10 +157,8 @@ class RedisMessageCoordinator(MessageCoordinator):
             except Exception:
                 pass
 
-        try:
+        with contextlib.suppress(Exception):
             asyncio.get_running_loop().create_task(_store())
-        except Exception:
-            pass
         return MessageSubscription(
             subscription_id=sub_id, agent_id=agent_id, message_types=message_types
         )
@@ -197,14 +192,13 @@ class RedisMessageCoordinator(MessageCoordinator):
             )
             # Return wrapper
             qmsg_dict = json.loads(payload)
-            rm = ReceivedMessage(
+            return ReceivedMessage(
                 token=token,
                 queue_message=QueueMessage(**qmsg_dict),
                 visibility_deadline=datetime.fromtimestamp(
                     deadline / 1_000_000, tz=timezone.utc
                 ).isoformat(),
             )
-            return rm
         return None
 
     async def ack(self, agent_id: AgentId, token: str) -> bool:
@@ -214,10 +208,8 @@ class RedisMessageCoordinator(MessageCoordinator):
         await self._redis.zrem(self._reserved_deadlines(agent_id), token)
         if payload:
             # Remove one occurrence from audit list
-            try:
+            with contextlib.suppress(Exception):
                 await self._redis.lrem(self._queue_key(agent_id), 1, payload)
-            except Exception:
-                pass
             return True
         return False
 
@@ -250,12 +242,10 @@ class RedisMessageCoordinator(MessageCoordinator):
                 or qm.delivery_attempts > self._retry_attempts
             ):
                 await self._redis.rpush(self._dlq_key(agent_id), updated)
-                try:
+                with contextlib.suppress(Exception):
                     self.metrics.inc_permanent(1)
-                except Exception:
-                    pass
                 # Alert/notify: administrator visibility for persistent failures
-                try:
+                with contextlib.suppress(Exception):
                     logger.error(
                         "DLQ enqueue for %s:%s message_id=%s attempts=%s error=%s",
                         agent_id.type.value,
@@ -264,8 +254,6 @@ class RedisMessageCoordinator(MessageCoordinator):
                         qm.delivery_attempts,
                         error,
                     )
-                except Exception:
-                    pass
                 # Also remove the latest audit copy to avoid duplication
                 await self._redis.lrem(self._queue_key(agent_id), 1, updated)
                 return True
@@ -354,10 +342,8 @@ class RedisMessageCoordinator(MessageCoordinator):
 
         if per_agent_counts:
             for agent_key, count in per_agent_counts.items():
-                try:
+                with contextlib.suppress(Exception):
                     logger.info("Recovered %s messages for agent %s", count, agent_key)
-                except Exception:
-                    pass
         return recovered_total
 
     async def configure(

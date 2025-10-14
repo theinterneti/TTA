@@ -8,6 +8,7 @@ for all system components to enable performance optimization.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import statistics
 import time
@@ -174,10 +175,8 @@ class ResponseTimeCollector:
 
         if self._cleanup_task:
             self._cleanup_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._cleanup_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("ResponseTimeCollector stopped")
 
@@ -465,7 +464,7 @@ class ResponseTimeCollector:
             "active_timings": len(
                 [
                     k
-                    for k in self.active_timings.keys()
+                    for k in self.active_timings
                     if not k.endswith(("_metadata", "_category", "_operation"))
                 ]
             ),
