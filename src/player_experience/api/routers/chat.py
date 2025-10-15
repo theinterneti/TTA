@@ -727,7 +727,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                     ok, conflicts = psm.update_therapeutic_settings(player_id, settings)
 
                     # Persist change to the active character's therapeutic profile if session/context available
-                    try:
+                    with contextlib.suppress(Exception):
                         sess = await sim.get_active_session(player_id)
                         if sess and getattr(sess, "character_id", None):
                             # Use the same repository instance as REST by going through the characters router dependency
@@ -756,9 +756,6 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                 cmanager.update_character_therapeutic_profile(
                                     sess.character_id, updated_profile
                                 )
-                    except Exception as _e:
-                        # Non-fatal; continue to respond
-                        pass
 
                     text = (
                         "Settings updated successfully"

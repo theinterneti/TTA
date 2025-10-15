@@ -12,6 +12,7 @@ Classes:
     NarrativeStatus: Status information about current narrative state
 """
 
+import contextlib
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -2338,11 +2339,9 @@ class NarrativeArcOrchestratorComponent(Component):
 
 
 # Facade re-exports: prefer extracted implementations
-try:
+with contextlib.suppress(Exception):
     from .narrative_arc_orchestrator.scale_manager import (
         ScaleManager as _ExtractedScaleManager,
     )
 
     ScaleManager = _ExtractedScaleManager  # type: ignore
-except Exception:
-    pass

@@ -44,6 +44,8 @@ Example:
     ```
 """
 
+import contextlib
+
 from .agent_orchestration_component import AgentOrchestrationComponent
 from .app_component import AppComponent
 from .carbon_component import CarbonComponent
@@ -68,7 +70,7 @@ __all__ = [
 
 
 # Ensure a default asyncio event loop exists for tests that call get_event_loop directly
-try:
+with contextlib.suppress(Exception):
     import asyncio
 
     try:
@@ -76,5 +78,3 @@ try:
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-except Exception:
-    pass

@@ -328,7 +328,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """Handle unexpected exceptions."""
         # Log and include a minimal detail for easier test debugging
-        try:
+        with contextlib.suppress(Exception):
             import logging
 
             logging.getLogger(__name__).error("Unhandled exception", exc_info=exc)
@@ -344,8 +344,6 @@ def register_exception_handlers(app: FastAPI) -> None:
                     "request_headers": dict(request.headers),
                 },
             )
-        except Exception:
-            pass
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={

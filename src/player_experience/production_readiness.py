@@ -7,6 +7,7 @@ deployment verification.
 """
 
 import asyncio
+import contextlib
 import json
 import time
 from dataclasses import dataclass, field
@@ -769,7 +770,7 @@ class ProductionReadinessValidator:
             async with aiohttp.ClientSession() as session:
                 responses = []
                 for _ in range(20):  # Make 20 rapid requests
-                    try:
+                    with contextlib.suppress(Exception):
                         async with session.get(f"{self.base_url}/health") as response:
                             responses.append(
                                 {
@@ -777,8 +778,6 @@ class ProductionReadinessValidator:
                                     "headers": dict(response.headers),
                                 }
                             )
-                    except Exception:
-                        pass
 
                 # Check for rate limit headers or 429 responses
                 has_rate_limit_headers = any(
@@ -972,14 +971,12 @@ class ProductionReadinessValidator:
 
             async with aiohttp.ClientSession() as session:
                 for endpoint in health_endpoints:
-                    try:
+                    with contextlib.suppress(Exception):
                         async with session.get(
                             f"{self.base_url}{endpoint}"
                         ) as response:
                             if response.status == 200:
                                 available_endpoints.append(endpoint)
-                    except Exception:
-                        pass
 
             return {
                 "available": len(available_endpoints) > 0,

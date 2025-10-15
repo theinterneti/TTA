@@ -355,15 +355,13 @@ class OllamaProvider(BaseProvider):
 
             # Add GPU support if available
             device_requests = []
-            try:
+            with contextlib.suppress(Exception):
                 # Check if NVIDIA runtime is available
                 runtime_info = self._docker_client.info()
                 if "nvidia" in runtime_info.get("Runtimes", {}):
                     device_requests = [
                         docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]])
                     ]
-            except Exception:
-                pass
 
             # Type ignore for docker-py API compatibility (restart_policy dict format)
             container = self._docker_client.containers.run(

@@ -179,7 +179,7 @@ def get_player_manager() -> PlayerProfileManager:
     # Prefer Neo4j repository if configured
     use_neo4j = os.getenv("TTA_USE_NEO4J", "0") == "1"
     if use_neo4j:
-        try:
+        with contextlib.suppress(Exception):
             from ...database.player_profile_repository import PlayerProfileRepository
             from ...managers.player_profile_manager import create_player_profile_manager
             from ..config import get_settings
@@ -192,8 +192,6 @@ def get_player_manager() -> PlayerProfileManager:
             )
             repository.connect()
             return create_player_profile_manager(repository)
-        except Exception:
-            pass
 
     # Fallback to in-memory repository for testing/development
     from ...managers.player_profile_manager import create_player_profile_manager

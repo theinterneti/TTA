@@ -320,18 +320,12 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         ):
             authorization = request.headers.get("Authorization")
             if authorization:
-                try:
+                with contextlib.suppress(ValueError):
                     scheme, token = authorization.split(" ", 1)
                     if scheme.lower() == "bearer" and token:
-                        try:
+                        with contextlib.suppress(AuthenticationError):
                             token_data = verify_token(token)
                             request.state.current_player = token_data
-                        except AuthenticationError:
-                            # Ignore invalid token for this public endpoint; proceed unauthenticated
-                            pass
-                except ValueError:
-                    # Malformed Authorization header; ignore for public endpoint
-                    pass
             return await call_next(request)
 
         # Get authorization header
@@ -424,7 +418,7 @@ class CrisisDetectionMiddleware(BaseHTTPMiddleware):
 
         # For POST/PUT requests, check body content
         if request.method in ["POST", "PUT", "PATCH"]:
-            try:
+            with contextlib.suppress(Exception):
                 # This is a simplified check - in production, you'd want more sophisticated analysis
                 body = await request.body()
                 if body:
@@ -446,10 +440,6 @@ class CrisisDetectionMiddleware(BaseHTTPMiddleware):
                     request.scope,
                     receive=receive,
                 )
-
-            except Exception:
-                # If we can't read the body, continue normally
-                pass
 
         # Process request
         response = await call_next(request)

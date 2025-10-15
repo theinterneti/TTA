@@ -242,7 +242,7 @@ class ResourceManager:
 
     # ---- Monitoring loop ----
     def start_background_monitoring(self, interval_seconds: int = 30) -> None:
-        try:
+        with contextlib.suppress(Exception):
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 self._monitoring_task = loop.create_task(
@@ -251,8 +251,6 @@ class ResourceManager:
             else:
                 # In synchronous contexts, run one iteration
                 loop.run_until_complete(self.monitor_usage())
-        except Exception:
-            pass
 
     def stop_background_monitoring(self) -> None:
         t = self._monitoring_task
@@ -328,7 +326,7 @@ class ResourceManager:
 
     def _augment_with_gpu(self, usage: ResourceUsage) -> None:
         # Attempt torch.cuda first
-        try:
+        with contextlib.suppress(Exception):
             import torch  # type: ignore
 
             if hasattr(torch, "cuda") and torch.cuda.is_available():
@@ -345,10 +343,8 @@ class ResourceManager:
                     pct = (used / total * 100.0) if total else 0.0
                     usage.gpu_utilization.append(float(pct))
                 return
-        except Exception:
-            pass
         # Try pynvml
-        try:
+        with contextlib.suppress(Exception):
             import pynvml  # type: ignore
 
             pynvml.nvmlInit()
@@ -364,10 +360,8 @@ class ResourceManager:
                 usage.gpu_utilization.append(float(pct))
             pynvml.nvmlShutdown()
             return
-        except Exception:
-            pass
         # Try GPUtil
-        try:
+        with contextlib.suppress(Exception):
             import GPUtil  # type: ignore
 
             gpus = GPUtil.getGPUs()
@@ -381,14 +375,12 @@ class ResourceManager:
                     usage.gpu_memory_used_bytes.append(used)
                     pct = (used / total * 100.0) if total else 0.0
                     usage.gpu_utilization.append(float(pct))
-        except Exception:
-            pass
 
     def _evaluate_gpu_request(
         self, req: ResourceRequirements
     ) -> tuple[int | None, int]:
         # Best-effort: grant on device 0 if enough headroom by fraction
-        try:
+        with contextlib.suppress(Exception):
             import torch  # type: ignore
 
             if hasattr(torch, "cuda") and torch.cuda.is_available():
@@ -403,8 +395,6 @@ class ResourceManager:
                     return None, 0
                 grant = want if want else int(headroom)
                 return 0, grant
-        except Exception:
-            pass
         # No GPU info available
         if req.gpu_memory_bytes:
             return None, 0

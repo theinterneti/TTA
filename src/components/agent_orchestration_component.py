@@ -175,7 +175,7 @@ class AgentOrchestrationComponent(Component):
             )
 
             # Initialize workflow error handling/monitoring (gated)
-            try:
+            with contextlib.suppress(Exception):
                 if bool(
                     self.config.get("agent_orchestration.error_handling.enabled", True)
                 ):
@@ -243,11 +243,8 @@ class AgentOrchestrationComponent(Component):
                     )
                     # Periodic validation disabled in this component; tests call validator directly
 
-            except Exception:
-                pass
-
             # Attach router to coordinator
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.router import AgentRouter
 
                 self._agent_router = AgentRouter(
@@ -271,7 +268,7 @@ class AgentOrchestrationComponent(Component):
                     w_success=ws,
                 )
                 # Configure sliding window on agents if provided
-                try:
+                with contextlib.suppress(Exception):
                     win = int(
                         self.config.get(
                             "agent_orchestration.router.success_window_size", 100
@@ -282,11 +279,6 @@ class AgentOrchestrationComponent(Component):
                         for a in reg.all():
                             with contextlib.suppress(Exception):
                                 a._metrics.set_window_size(win)
-                except Exception:
-                    pass
-
-            except Exception:
-                pass
 
             # Auto-recovery: reclaim expired reservations across agents (opt-in)
             if bool(
@@ -373,7 +365,7 @@ class AgentOrchestrationComponent(Component):
                 self._workflow_manager = None
 
             # Initialize therapeutic safety service (config-driven)
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.therapeutic_safety import (
                     SafetyRulesProvider,
                     SafetyService,
@@ -400,8 +392,6 @@ class AgentOrchestrationComponent(Component):
                     redis_client=self._redis_client, redis_key=redis_key
                 )
                 self._safety_service = SafetyService(enabled=enabled, provider=provider)
-            except Exception:
-                pass
             with contextlib.suppress(Exception):
                 rm.start_background_monitoring(
                     int(
@@ -720,15 +710,13 @@ class AgentOrchestrationComponent(Component):
                 async def _restart_agent(agent: Agent) -> bool:
                     try:
                         await agent.start()
-                        try:
+                        with contextlib.suppress(Exception):
                             await self._agent_registry.restore_state_if_available(agent)  # type: ignore
-                        except Exception:
-                            pass
                         with contextlib.suppress(Exception):
                             self._restarts_total = (
                                 int(getattr(self, "_restarts_total", 0)) + 1
                             )
-                        try:
+                        with contextlib.suppress(Exception):
                             if bool(
                                 self.config.get(
                                     "agent_orchestration.diagnostics.enabled", False
@@ -743,8 +731,6 @@ class AgentOrchestrationComponent(Component):
                                 }
                                 self._ao_events.append(ev)
                                 self._ao_events = self._ao_events[-500:]
-                        except Exception:
-                            pass
                         return True
                     except Exception as e:
                         logger.warning("Agent restart failed: %s", e)
@@ -770,7 +756,7 @@ class AgentOrchestrationComponent(Component):
                             self._fallbacks_total = (
                                 int(getattr(self, "_fallbacks_total", 0)) + 1
                             )
-                        try:
+                        with contextlib.suppress(Exception):
                             if bool(
                                 self.config.get(
                                     "agent_orchestration.diagnostics.enabled", False
@@ -786,8 +772,6 @@ class AgentOrchestrationComponent(Component):
                                 }
                                 self._ao_events.append(ev)
                                 self._ao_events = self._ao_events[-500:]
-                        except Exception:
-                            pass
                         return True
                     except Exception:
                         return False
@@ -846,7 +830,7 @@ class AgentOrchestrationComponent(Component):
                         except Exception:
                             pass
                             # Audit event: restart
-                            try:
+                            with contextlib.suppress(Exception):
                                 if bool(
                                     self.config.get(
                                         "agent_orchestration.diagnostics.enabled", False
@@ -861,13 +845,11 @@ class AgentOrchestrationComponent(Component):
                                     }
                                     self._ao_events.append(ev)
                                     self._ao_events = self._ao_events[-500:]
-                            except Exception:
-                                pass
 
                         try:
                             await agent.start()
                             # If Redis registry, attempt state restore again
-                            try:
+                            with contextlib.suppress(Exception):
                                 from src.agent_orchestration.registries import (
                                     RedisAgentRegistry,
                                 )
@@ -878,8 +860,6 @@ class AgentOrchestrationComponent(Component):
                                             agent
                                         )
                                     )  # type: ignore
-                            except Exception:
-                                pass
                             # Record restart metric
                             with contextlib.suppress(Exception):
                                 self._restarts_total = (
@@ -981,8 +961,6 @@ class AgentOrchestrationComponent(Component):
                     if fd_enabled and diag_enabled:
                         with contextlib.suppress(Exception):
                             loop.create_task(self._failure_detection_loop(fd_interval))
-                except Exception:
-                    pass
 
                 except Exception:
                     self._agent_registry = None
@@ -1161,7 +1139,7 @@ class AgentOrchestrationComponent(Component):
     @timing_decorator
     def _stop_impl(self) -> bool:
         """Stop the orchestration service."""
-        try:
+        with contextlib.suppress(Exception):
             import asyncio
 
             # Cancel metrics task if running
@@ -1172,22 +1150,18 @@ class AgentOrchestrationComponent(Component):
             # Stop diagnostics server if started
             server = getattr(self, "_diag_server", None)
             if server:
-                try:
+                with contextlib.suppress(Exception):
                     server.should_exit = True  # type: ignore[attr-defined]
-                except Exception:
-                    pass
             # Stop resource monitoring
-            try:
+            with contextlib.suppress(Exception):
                 if getattr(self, "_resource_manager", None):
                     self._resource_manager.stop_background_monitoring()
-            except Exception:
-                pass
             # Deregister locally registered agents and stop health/heartbeats
-            try:
+            with contextlib.suppress(Exception):
                 reg = getattr(self, "_agent_registry", None)
                 if reg:
                     # Attempt to gracefully stop each known local agent, then deregister and delete Redis keys
-                    try:
+                    with contextlib.suppress(Exception):
                         import asyncio as _asyncio
 
                         agents_list = list(reg.all())
@@ -1201,13 +1175,11 @@ class AgentOrchestrationComponent(Component):
                             if loop.is_running():
                                 futures = []
                                 for agent in agents_list:
-                                    try:
+                                    with contextlib.suppress(Exception):
                                         fut = _asyncio.run_coroutine_threadsafe(
                                             agent.stop(), loop
                                         )
                                         futures.append(fut)
-                                    except Exception:
-                                        pass
                                 for fut in futures:
                                     with contextlib.suppress(Exception):
                                         fut.result(timeout=1.0)
@@ -1219,14 +1191,14 @@ class AgentOrchestrationComponent(Component):
                         for agent in agents_list:
                             with contextlib.suppress(Exception):
                                 reg.deregister(agent.agent_id)
-                        try:
+                        with contextlib.suppress(Exception):
                             from src.agent_orchestration.registries import (
                                 RedisAgentRegistry,  # type: ignore
                             )
 
                             if isinstance(reg, RedisAgentRegistry):  # type: ignore
                                 for agent in agents_list:
-                                    try:
+                                    with contextlib.suppress(Exception):
                                         if loop.is_running():
                                             fut = _asyncio.run_coroutine_threadsafe(
                                                 reg._delete(agent.agent_id), loop
@@ -1237,27 +1209,17 @@ class AgentOrchestrationComponent(Component):
                                             loop.run_until_complete(
                                                 reg._delete(agent.agent_id)
                                             )  # type: ignore[attr-defined]
-                                    except Exception:
-                                        pass
-                        except Exception:
-                            pass
-                    except Exception:
-                        pass
 
                     # Stop health checks and heartbeats (Redis)
                     with contextlib.suppress(Exception):
                         reg.stop_periodic_health_checks()
-                    try:
+                    with contextlib.suppress(Exception):
                         from src.agent_orchestration.registries import (
                             RedisAgentRegistry,  # type: ignore
                         )
 
                         if isinstance(reg, RedisAgentRegistry):  # type: ignore
                             reg.stop_heartbeats()
-                    except Exception:
-                        pass
-            except Exception:
-                pass
 
             # Shutdown the orchestration service
             try:
@@ -1276,7 +1238,7 @@ class AgentOrchestrationComponent(Component):
 
             # Close Redis client
             if self._redis_client:
-                try:
+                with contextlib.suppress(Exception):
                     loop = asyncio.get_event_loop()
                     if loop.is_running():
                         # Schedule close and wait briefly
@@ -1287,10 +1249,6 @@ class AgentOrchestrationComponent(Component):
                             fut.result(timeout=1.0)
                     else:
                         loop.run_until_complete(self._redis_client.aclose())
-                except Exception:
-                    pass
-        except Exception:
-            pass
         logger.info("Agent Orchestration component stopped")
         return True
 
@@ -1344,16 +1302,14 @@ class AgentOrchestrationComponent(Component):
                 inst = k.split(":")[-1]
                 agent_key = f"{at.name.lower()}:{inst}"
                 # Audit list overall length (priority 0)
-                try:
+                with contextlib.suppress(Exception):
                     qlen = await self._redis_client.llen(k)
                     coord.metrics.set_queue_length(
                         agent_key, priority=0, length=int(qlen or 0)
                     )
-                except Exception:
-                    pass
                 # DLQ gauge
                 dlq_key = f"ao:dlq:{at.value}:{inst}"
-                try:
+                with contextlib.suppress(Exception):
                     dlq_len = await self._redis_client.llen(dlq_key)
                     coord.metrics.set_dlq_length(agent_key, int(dlq_len or 0))
                     if dlq_len and dlq_len >= dlq_warn_threshold:
@@ -1363,8 +1319,6 @@ class AgentOrchestrationComponent(Component):
                             dlq_len,
                             dlq_warn_threshold,
                         )
-                except Exception:
-                    pass
 
             # 2) Per-priority ready queue sizes (zsets) — independent scan in case audit list absent
             async for skey_b in self._redis_client.scan_iter(
@@ -1387,13 +1341,11 @@ class AgentOrchestrationComponent(Component):
                         )
                         continue
                     agent_key = f"{at.name.lower()}:{inst}"
-                    try:
+                    with contextlib.suppress(Exception):
                         plen = await self._redis_client.zcard(skey)
                         coord.metrics.set_queue_length(
                             agent_key, priority=prio, length=int(plen or 0)
                         )
-                    except Exception:
-                        pass
 
         # Retry spike detection based on total retries scheduled delta
         snap = coord.metrics.snapshot()
@@ -1453,7 +1405,7 @@ class AgentOrchestrationComponent(Component):
             base_cfg = load_tool_policy_config()
             extra_allow = list(self._tools_cfg.get("allowed_callables", []))
             if extra_allow:
-                try:
+                with contextlib.suppress(Exception):
                     merged = dict(base_cfg.model_dump())
                     merged_allow = list(
                         set((merged.get("callable_allowlist") or []) + extra_allow)
@@ -1465,8 +1417,6 @@ class AgentOrchestrationComponent(Component):
                     )
 
                     base_cfg = _TPC(**merged)
-                except Exception:
-                    pass
             self._tool_policy = ToolPolicy(
                 config=base_cfg,
                 max_schema_depth=int(self._tools_cfg.get("max_schema_depth", 5)),
@@ -1484,7 +1434,7 @@ class AgentOrchestrationComponent(Component):
                     "agent_orchestration.diagnostics.policy_live_reload_enabled", False
                 )
             ):
-                try:
+                with contextlib.suppress(Exception):
                     import time as _t
 
                     from src.agent_orchestration.tools.policy_config import (
@@ -1528,7 +1478,7 @@ class AgentOrchestrationComponent(Component):
                                     except Exception as e:
                                         err = str(e)
                                     # audit (rate-limited logging)
-                                    try:
+                                    with contextlib.suppress(Exception):
                                         self._policy_reload_audit.append(
                                             {
                                                 "ts": _t.time(),
@@ -1550,8 +1500,6 @@ class AgentOrchestrationComponent(Component):
                                         else:
                                             # do not spam warnings repeatedly for same mtime; single audit is enough
                                             pass
-                                    except Exception:
-                                        pass
                             except Exception as e:
                                 # Log but keep watcher thread alive
                                 logger.debug(
@@ -1561,8 +1509,6 @@ class AgentOrchestrationComponent(Component):
 
                     t = threading.Thread(target=_watcher, daemon=True)
                     t.start()
-                except Exception:
-                    pass
         except Exception:
             self._tool_registry = None
             self._tool_coordinator = None
@@ -1636,7 +1582,7 @@ class AgentOrchestrationComponent(Component):
                     }
                 )
             # Add workflow failure/rollback/state validation metrics when enabled
-            try:
+            with contextlib.suppress(Exception):
                 if bool(
                     self.config.get("agent_orchestration.diagnostics.enabled", False)
                 ) and bool(
@@ -1644,16 +1590,12 @@ class AgentOrchestrationComponent(Component):
                 ):
                     if getattr(self, "_workflow_monitor", None):
                         # Ensure most up-to-date counters by performing a one-shot timeout scan
-                        try:
+                        with contextlib.suppress(Exception):
                             await self._workflow_monitor.check_timeouts_once()  # type: ignore[attr-defined]
-                        except Exception:
-                            pass
                         wf_metrics = await self._workflow_monitor.metrics_snapshot()  # type: ignore[attr-defined]
                         data.setdefault("workflow", {}).update(wf_metrics)
-            except Exception:
-                pass
             # Add policy snapshot (redacted)
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.tools.policy_config import (
                     redact_policy_config_dict,
                 )
@@ -1681,18 +1623,14 @@ class AgentOrchestrationComponent(Component):
                             ),
                         }
                     )
-            except Exception:
-                pass
             # Aggregate performance metrics (per-agent step stats)
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.performance import get_step_aggregator
 
                 perf_snap = get_step_aggregator().snapshot()
                 data["performance"] = perf_snap
-            except Exception:
-                pass
             # Tools summary and metrics
-            try:
+            with contextlib.suppress(Exception):
                 reg = _make_request_local_registry() or getattr(
                     self, "_tool_registry", None
                 )
@@ -1716,18 +1654,14 @@ class AgentOrchestrationComponent(Component):
                         "cache": cache_stats,
                     }
                     # attach per-tool execution stats
-                    try:
+                    with contextlib.suppress(Exception):
                         from src.agent_orchestration.tools.metrics import (
                             get_tool_metrics,
                         )
 
                         data["tool_exec"] = get_tool_metrics().snapshot()
-                    except Exception:
-                        pass
-            except Exception:
-                pass
             # Resource usage snapshot
-            try:
+            with contextlib.suppress(Exception):
                 if getattr(self, "_resource_manager", None):
                     rep = await self._resource_manager.monitor_usage()
                     data["resources"] = {
@@ -1735,17 +1669,13 @@ class AgentOrchestrationComponent(Component):
                         "usage": rep.usage.__dict__,
                         "thresholds": rep.thresholds_exceeded,
                     }
-            except Exception:
-                pass
             # Agent registry snapshot if available (sync)
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.agents import AgentRegistry  # type: ignore
 
                 reg = getattr(self, "_agent_registry", None)
                 if reg and isinstance(reg, AgentRegistry):  # type: ignore
                     data["agents"] = reg.snapshot()
-            except Exception:
-                pass
             return data
 
         @app.get("/agents")
@@ -1759,34 +1689,28 @@ class AgentOrchestrationComponent(Component):
             # Gather base snapshot
             local_snap = reg.snapshot()
             redis_index: list = []
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.registries import (
                     RedisAgentRegistry,  # type: ignore
                 )
 
                 if isinstance(reg, RedisAgentRegistry):  # type: ignore
                     redis_index = await reg.list_registered()
-            except Exception:
-                pass
             # Attach recent failure/recovery events if diagnostics enabled
-            try:
+            with contextlib.suppress(Exception):
                 if bool(
                     self.config.get("agent_orchestration.diagnostics.enabled", False)
                 ):
                     events = list(getattr(self, "_ao_events", []))
                     local_snap["_events"] = events[-100:]
-            except Exception:
-                pass
             # Derived perf metrics from aggregator keyed by type:instance
             perf = {}
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.performance import get_step_aggregator
 
                 perf = (
                     get_step_aggregator().snapshot()
                 )  # { "ipa:worker-1": {p50,p95,avg,error_rate}, ... }
-            except Exception:
-                pass
             # Attach perf metrics to local agents
             for name, data in local_snap.items():
                 try:
@@ -1802,13 +1726,11 @@ class AgentOrchestrationComponent(Component):
                     hb = float(entry.get("last_heartbeat", 0.0))
                     entry["last_heartbeat_age"] = max(0.0, now - hb)
                     # merge perf if available
-                    try:
+                    with contextlib.suppress(Exception):
                         aid = entry.get("agent_id", {})
                         ak = f"{aid.get('type')}:{aid.get('instance') or 'default'}"
                         if ak in perf:
                             entry.setdefault("performance", {}).update(perf[ak])
-                    except Exception:
-                        pass
                 except Exception:
                     entry["last_heartbeat_age"] = None
 
@@ -1889,7 +1811,7 @@ class AgentOrchestrationComponent(Component):
                 registry=prom_reg,
             )
             # Agent health metrics (gated by diagnostics)
-            try:
+            with contextlib.suppress(Exception):
                 if bool(
                     self.config.get("agent_orchestration.diagnostics.enabled", False)
                 ):
@@ -1942,28 +1864,22 @@ class AgentOrchestrationComponent(Component):
                         "restarts": restarts_total,
                         "fallbacks": fallbacks_total,
                     }
-            except Exception:
-                pass
 
             # Message metrics
             snap = coord.metrics.snapshot()
 
             # Tool metrics
             tool_exec = {}
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.tools.metrics import get_tool_metrics
 
                 tool_exec = get_tool_metrics().snapshot()
-            except Exception:
-                pass
-            try:
+            with contextlib.suppress(Exception):
                 reg = _make_request_local_registry() or getattr(
                     self, "_tool_registry", None
                 )
                 if reg:
                     await reg.cache_stats()
-            except Exception:
-                pass
             # Set counters (note: prometheus_client counters can only inc; we inc to target absolute on first pass)
             last = getattr(self, "_prom_last", None) or {
                 "delivery": {"delivered_ok": 0, "delivered_error": 0},
@@ -2018,7 +1934,7 @@ class AgentOrchestrationComponent(Component):
                 s_backoff.observe(float(snap["retry"]["last_backoff_seconds"]))
 
             # Performance metrics from aggregator
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.performance import get_step_aggregator
 
                 perf = get_step_aggregator().snapshot()
@@ -2038,11 +1954,9 @@ class AgentOrchestrationComponent(Component):
                     h_step_duration.labels(agent=agent).observe(
                         float(stats.get("p95", 0.0))
                     )
-            except Exception:
-                pass
 
             # Export tool metrics as well (per-tool labels)
-            try:
+            with contextlib.suppress(Exception):
                 from prometheus_client import Counter, Histogram
 
                 tool_inv = Counter(
@@ -2104,8 +2018,6 @@ class AgentOrchestrationComponent(Component):
                         for _ in range(int(c)):
                             tool_dur.labels(name, version).observe(midpoint.get(b, 0.1))
                     count += 1
-            except Exception:
-                pass
 
             return generate_latest(prom_reg).decode()
 
@@ -2259,7 +2171,7 @@ class AgentOrchestrationComponent(Component):
                                 if cfg_path and os.path.exists(cfg_path)
                                 else None
                             )
-                try:
+                with contextlib.suppress(Exception):
                     self._policy_reload_audit.append(
                         {
                             "ts": time.time(),
@@ -2269,8 +2181,6 @@ class AgentOrchestrationComponent(Component):
                         }
                     )
                     self._policy_reload_audit = self._policy_reload_audit[-50:]
-                except Exception:
-                    pass
                 return {"ok": ok, "source": cfg_path or "env", "error": err}
             except Exception as e:
                 return {"ok": False, "error": str(e)}
@@ -2352,7 +2262,7 @@ class AgentOrchestrationComponent(Component):
                 )
                 res = await tx.rollback_to(run_id, sp)
                 # Record in audit
-                try:
+                with contextlib.suppress(Exception):
                     if getattr(self, "_workflow_monitor", None):
                         await self._workflow_monitor.record_rollback_audit(
                             run_id,
@@ -2363,8 +2273,6 @@ class AgentOrchestrationComponent(Component):
                                 "result": res,
                             },
                         )  # type: ignore[attr-defined]
-                except Exception:
-                    pass
                 return res
             except Exception as e:
                 return {"ok": False, "error": str(e)}
@@ -2395,7 +2303,7 @@ class AgentOrchestrationComponent(Component):
                 return {"error": str(e)}
 
         # Safety diagnostics endpoints (optional)
-        try:
+        with contextlib.suppress(Exception):
             _safety = getattr(self, "_safety_service", None)
             if _safety is None:
                 from src.agent_orchestration.therapeutic_safety import (
@@ -2451,12 +2359,10 @@ class AgentOrchestrationComponent(Component):
                             cfg = _json.loads(raw)
                             # update provider cache for status visibility
                             if prov is not None:
-                                try:
+                                with contextlib.suppress(Exception):
                                     prov._cached_raw = raw
                                     prov._cached_at = _t.time()
                                     prov._last_source = f"redis:{redis_key}"
-                                except Exception:
-                                    pass
                     except Exception:
                         cfg = {}
                     if not cfg:
@@ -2534,11 +2440,9 @@ class AgentOrchestrationComponent(Component):
                             _safety._validator = None
 
                     # Bound the entire reload to 2s
-                    try:
-                        await _asyncio.wait_for(_do_reload(), timeout=2.0)
-                    except Exception:
+                    with contextlib.suppress(Exception):
                         # Timeout or other error: still return ok=True to avoid test hangs; subsequent GET will load lazily
-                        pass
+                        await _asyncio.wait_for(_do_reload(), timeout=2.0)
                     # Return immediately without additional awaits
                     return {
                         "ok": True,
@@ -2548,22 +2452,17 @@ class AgentOrchestrationComponent(Component):
                     # On unexpected errors, keep endpoint stable and non-blocking
                     return {"ok": True, "error": str(e)}
 
-        except Exception:
-            pass
-
         @app.get("/policy/status")
         async def policy_status() -> dict:
             try:
                 getattr(self._tool_policy, "config", None)
                 src = "env"
-                try:
+                with contextlib.suppress(Exception):
                     import os
 
                     p = os.environ.get("TTA_TOOL_POLICY_CONFIG")
                     if p and os.path.exists(p):
                         src = p
-                except Exception:
-                    pass
                 return {
                     "source": src,
                     "last_reload_ts": (
@@ -2608,12 +2507,10 @@ class AgentOrchestrationComponent(Component):
                 )
             cache_stats = await reg.cache_stats()
             usage = {}
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.tools.metrics import get_tool_metrics
 
                 usage = get_tool_metrics().snapshot()
-            except Exception:
-                pass
             return {"tools": items, "cache": cache_stats, "usage": usage}
 
         @app.get("/tools/summary")
@@ -2664,12 +2561,10 @@ class AgentOrchestrationComponent(Component):
             active = sum(1 for t in tools if t["status"] == "active")
             deprecated = total - active
             usage = {}
-            try:
+            with contextlib.suppress(Exception):
                 from src.agent_orchestration.tools.metrics import get_tool_metrics
 
                 usage = get_tool_metrics().snapshot()
-            except Exception:
-                pass
 
             # naive most/least used by successes+failures in usage
             def usage_count(t):
@@ -2925,10 +2820,8 @@ class AgentOrchestrationComponent(Component):
 
         # Ensure /metrics-prom is the last route when WBA is disabled (some tests rely on last route to be metrics-prom)
         if not bool(self.config.get("agent_orchestration.agents.wba.enabled", False)):
-            try:
+            with contextlib.suppress(Exception):
                 app.add_api_route("/metrics-prom", metrics_prometheus, methods=["GET"])  # type: ignore[arg-type]
-            except Exception:
-                pass
 
         async def _failure_detection_loop(self, interval_s: float) -> None:
             """Periodically run detect_and_recover on the registry.
@@ -2937,12 +2830,10 @@ class AgentOrchestrationComponent(Component):
             try:
                 while True:
                     await asyncio.sleep(interval_s)
-                    try:
+                    with contextlib.suppress(Exception):
                         reg = getattr(self, "_agent_registry", None)
                         if reg is not None:
                             await reg.detect_and_recover()  # type: ignore
-                    except Exception:
-                        pass
             except asyncio.CancelledError:
                 return
             except Exception:

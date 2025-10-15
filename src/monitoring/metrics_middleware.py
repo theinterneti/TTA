@@ -270,37 +270,21 @@ def detect_monitoring_environment() -> dict:
     }
 
     # Check Prometheus client
-    try:
-        import prometheus_client
-
+    with contextlib.suppress(ImportError):
         environment["prometheus_available"] = True
-    except ImportError:
-        pass
 
     # Check psutil for system metrics
-    try:
-        import psutil
-
+    with contextlib.suppress(ImportError):
         environment["psutil_available"] = True
-    except ImportError:
-        pass
 
     # Check Redis availability
-    try:
-        import redis
-
+    with contextlib.suppress(ImportError):
         # Could add actual connection test here
         environment["redis_available"] = True
-    except ImportError:
-        pass
 
     # Check Neo4j availability
-    try:
-        import neo4j
-
+    with contextlib.suppress(ImportError):
         environment["neo4j_available"] = True
-    except ImportError:
-        pass
 
     return environment
 
@@ -368,7 +352,7 @@ def get_monitoring_status() -> dict:
             status.update(mock_env.get_status())
         else:
             # Try to check real monitoring services
-            try:
+            with contextlib.suppress(Exception):
                 import requests
 
                 # Check Prometheus
@@ -378,7 +362,5 @@ def get_monitoring_status() -> dict:
                 # Check Grafana
                 response = requests.get("http://localhost:3000/api/health", timeout=2)
                 status["grafana_available"] = response.status_code == 200
-            except Exception:
-                pass
 
     return status

@@ -31,14 +31,12 @@ class StateValidator:
         repaired = 0
         errors = 0
         # First try a coordinator-driven recovery for robust token handling
-        try:
+        with contextlib.suppress(Exception):
             from .coordinators import RedisMessageCoordinator
 
             coord = RedisMessageCoordinator(self._redis, key_prefix=self._pfx)
             recovered = await coord.recover_pending(None)
             repaired += int(recovered or 0)
-        except Exception:
-            pass
         # Then perform targeted scans to handle orphans and any remaining edge cases
         now_us = int(time.time() * 1_000_000)
         passes = (now_us, None)
@@ -57,7 +55,7 @@ class StateValidator:
                     k = key.decode() if isinstance(key, (bytes, bytearray)) else key
                     instances.add(k.split(":")[-1])
                 # Also union with KEYS results (robustness in tests/small envs)
-                try:
+                with contextlib.suppress(Exception):
                     klist = await self._redis.keys(
                         f"{self._pfx}:reserved_deadlines:{at.value}:*"
                     )
@@ -70,13 +68,11 @@ class StateValidator:
                     for kk in klist2 or []:
                         k = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
                         instances.add(k.split(":")[-1])
-                except Exception:
-                    pass
                 # Process each discovered instance
                 for inst in instances:
                     dkey = f"{self._pfx}:reserved_deadlines:{at.value}:{inst}"
                     # First, ask the coordinator to perform recovery for this specific instance (robust and atomic)
-                    try:
+                    with contextlib.suppress(Exception):
                         from .coordinators import RedisMessageCoordinator
                         from .models import AgentId
 
@@ -86,8 +82,6 @@ class StateValidator:
                         repaired += int(
                             await coord.recover_pending(AgentId(type=at, instance=inst))
                         )
-                    except Exception:
-                        pass
                     # Run up to two passes to be robust to immediate writes
                     for _, cutoff in enumerate(passes):
                         cut = (
@@ -100,7 +94,7 @@ class StateValidator:
                         )
                         # Also consider tokens from reserved hash with missing or past deadlines (robust against timing)
                         extra_tokens: list = []
-                        try:
+                        with contextlib.suppress(Exception):
                             htokens = await self._redis.hkeys(self._res_hash(at, inst))
                             for ht in htokens or []:
                                 htok = (
@@ -114,8 +108,6 @@ class StateValidator:
                                     dscore = None
                                 if dscore is None or float(dscore) <= float(cut):
                                     extra_tokens.append(htok)
-                        except Exception:
-                            pass
                         # Merge and de-duplicate tokens
                         tokens_set = set()
                         for tb in zr_tokens or []:
@@ -165,7 +157,7 @@ class StateValidator:
                                 errors += 1
                                 await self._incr_metric("state_validation_errors", 1)
             # Final fallback: brute-force over reserved hashes regardless of earlier results
-            try:
+            with contextlib.suppress(Exception):
                 now2 = int(time.time() * 1_000_000)
                 for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
                     klist = await self._redis.keys(f"{self._pfx}:reserved:{at.value}:*")
@@ -214,12 +206,10 @@ class StateValidator:
                                     tok,
                                 )
                                 repaired += 1
-            except Exception:
-                pass
         except Exception:
             logger.debug("StateValidator.validate_and_repair error", exc_info=True)
         # Last-chance repair using raw bytes to avoid encoding mismatches
-        try:
+        with contextlib.suppress(Exception):
             if repaired == 0:
                 now3 = int(time.time() * 1_000_000)
                 klist = await self._redis.keys(f"{self._pfx}:reserved_deadlines:*")
@@ -274,8 +264,6 @@ class StateValidator:
                         )
                         await self._redis.zrem(dkey, tok_field)
                         repaired += 1
-        except Exception:
-            pass
         return {"repaired": repaired, "errors": errors}
 
     # ---- Helpers ----

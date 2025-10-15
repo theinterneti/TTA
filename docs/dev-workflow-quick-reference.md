@@ -407,6 +407,7 @@ git commit -m "Your message"
 
 ## Additional Resources
 
+- **Exception Handling Guidelines:** `docs/development/exception-handling-guidelines.md`
 - **Full Audit Report:** `docs/tooling-optimization-summary.md`
 - **Ruff Documentation:** https://docs.astral.sh/ruff/
 - **UV Documentation:** https://docs.astral.sh/uv/

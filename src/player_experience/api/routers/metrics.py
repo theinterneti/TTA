@@ -5,6 +5,8 @@ Provides both legacy metrics and new Prometheus metrics endpoints.
 
 from __future__ import annotations
 
+import contextlib
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from starlette.responses import PlainTextResponse
 
@@ -30,15 +32,12 @@ router = APIRouter()
 
 def _metrics_allowed() -> None:
     # Only allow when debug/testing is enabled; import settings at runtime to honor test overrides
-    try:
+    with contextlib.suppress(Exception):
         from ..config import get_settings
 
         current_settings = get_settings()
         if not getattr(current_settings, "debug", False):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    except Exception:
-        # If settings can't be loaded, allow metrics in staging/production for monitoring
-        pass
 
 
 @router.get("/metrics", dependencies=[Depends(_metrics_allowed)])

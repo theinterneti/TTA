@@ -5,6 +5,7 @@ This module provides REST endpoints for player profile CRUD operations
 with authentication, authorization, and comprehensive API documentation.
 """
 
+import contextlib
 import os
 from typing import Any
 
@@ -40,7 +41,7 @@ def get_player_manager() -> PlayerProfileManager:
     # Prefer in-memory repository by default to avoid external DB dependency in tests
     use_neo4j = os.getenv("TTA_USE_NEO4J", "0") == "1"
     if use_neo4j:
-        try:
+        with contextlib.suppress(Exception):
             from ..config import get_settings
 
             settings = get_settings()
@@ -51,8 +52,6 @@ def get_player_manager() -> PlayerProfileManager:
             )
             repository.connect()
             return create_player_profile_manager(repository)
-        except Exception:
-            pass
     # Fallback to in-memory repository
 
     class _InMemoryRepo:

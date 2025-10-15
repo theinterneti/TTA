@@ -554,11 +554,9 @@ class WebSocketConnectionManager:
             event_types = data.get("event_types", [])
 
             for event_type_str in event_types:
-                try:
+                with contextlib.suppress(ValueError):
                     event_type = EventType(event_type_str)
                     connection.subscriptions.discard(event_type)
-                except ValueError:
-                    pass
 
             # Send confirmation
             await self._send_to_connection(
@@ -835,11 +833,9 @@ class WebSocketConnectionManager:
             # Restore subscriptions
             if history.get("subscriptions"):
                 for event_type_str in history["subscriptions"]:
-                    try:
+                    with contextlib.suppress(ValueError):
                         event_type = EventType(event_type_str)
                         connection.subscriptions.add(event_type)
-                    except ValueError:
-                        pass
 
             # Restore filters
             if history.get("filters"):
@@ -969,14 +965,12 @@ class WebSocketConnectionManager:
 
                 # Remove stale connections
                 for connection_id in stale_connections:
-                    try:
+                    with contextlib.suppress(Exception):
                         connection = self.connections.get(connection_id)
                         if connection:
                             await connection.websocket.close(
                                 code=1001, reason="timeout"
                             )
-                    except Exception:
-                        pass
                     await self._remove_connection(connection_id)
 
                 if stale_connections:

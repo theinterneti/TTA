@@ -483,13 +483,11 @@ class CustomAPIProvider(BaseProvider):
         total_count = len(self._clients)
 
         for client in self._clients.values():
-            try:
+            with contextlib.suppress(Exception):
                 # Simple health check - try to get models
                 response = await client.get("/v1/models", timeout=5.0)
                 if response.status_code == 200:
                     healthy_count += 1
-            except Exception:
-                pass
 
         # Consider healthy if at least half of providers are working
         return healthy_count >= (total_count / 2) if total_count > 0 else False

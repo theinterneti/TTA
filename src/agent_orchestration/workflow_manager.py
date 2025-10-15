@@ -286,7 +286,7 @@ class WorkflowManager:
         # Compose response using context, history, and graph metadata
         # Aggregate safety findings from step results (if present)
         agg_safety: dict[str, Any] = {"level": "safe", "findings": [], "by_step": []}
-        try:
+        with contextlib.suppress(Exception):
             for step_result in run_state.history:
                 if "safety" in step_result.result:
                     agg_safety["by_step"].append(step_result.result["safety"])
@@ -295,8 +295,6 @@ class WorkflowManager:
                         agg_safety["findings"].extend(
                             step_result.result["safety"].get("findings", [])
                         )
-        except Exception:
-            pass
 
         return WorkflowOrchestrationResponse(
             response_text=f"Workflow '{run_state.workflow_name}' completed successfully",

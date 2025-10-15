@@ -3372,10 +3372,8 @@ class SafetyRulesProvider:
     async def get_config(self) -> dict[str, Any]:
         now = time.time()
         if self._cached_raw is not None and (now - self._cached_at) < self._ttl:
-            try:
+            with contextlib.suppress(Exception):
                 return json.loads(self._cached_raw)
-            except Exception:
-                pass
         # Try Redis first
         cfg: dict[str, Any] | None = None
         raw: str | None = None
@@ -3512,13 +3510,11 @@ def get_global_safety_service() -> SafetyService:
                 enabled=False, provider=SafetyRulesProvider(redis_client=None)
             )
     elif not _global_safety_locked:
-        try:
+        with contextlib.suppress(Exception):
             enabled = str(
                 os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")
             ).lower() in ("1", "true", "yes")
             _global_safety_service.set_enabled(enabled)
-        except Exception:
-            pass
 
     return _global_safety_service
 

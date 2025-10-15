@@ -15,6 +15,7 @@ Classes:
     CausalValidator: Validator for cause-and-effect relationships
 """
 
+import contextlib
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -3319,7 +3320,7 @@ class NarrativeCoherenceEngine(Component):
 
 
 # Facade re-exports: prefer extracted implementations
-try:
+with contextlib.suppress(Exception):  # pragma: no cover
     from .narrative_coherence.causal_validator import (
         CausalValidator as _ExtractedCausalValidator,
     )
@@ -3333,6 +3334,4 @@ try:
     CoherenceValidator = _ExtractedCoherenceValidator  # type: ignore
     ContradictionDetector = _ExtractedContradictionDetector  # type: ignore
     CausalValidator = _ExtractedCausalValidator  # type: ignore
-except Exception:  # pragma: no cover
     # If extracted modules are unavailable, fall back to in-file definitions
-    pass
