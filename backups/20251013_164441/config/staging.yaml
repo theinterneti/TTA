@@ -1,0 +1,64 @@
+# TTA Staging Environment Configuration
+# Carbon Component Settings
+
+carbon:
+  # Output directory for emissions tracking data
+  output_dir: "logs/staging/codecarbon"
+
+  # Project name for emissions tracking
+  project_name: "TTA-Staging"
+
+  # Logging level (debug, info, warning, error)
+  log_level: "info"
+
+  # Measurement interval in seconds
+  measurement_interval: 15
+
+  # Enable/disable carbon tracking
+  enabled: true
+
+# Staging environment settings
+environment:
+  name: "staging"
+  debug: false
+  log_level: "info"
+
+# Database settings (for future components)
+database:
+  # Neo4j staging configuration
+  neo4j:
+    uri: "bolt://localhost:7687"
+    user: "neo4j"
+    password: "${NEO4J_PASSWORD}"
+    database: "tta-staging"
+
+  # Redis staging configuration
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 1 # Use db 1 for staging (db 0 for production)
+    password: "${REDIS_PASSWORD}"
+
+# Monitoring settings
+monitoring:
+  enabled: true
+  health_check_interval: 60 # seconds
+  metrics_port: 9090
+
+  # Carbon-specific monitoring
+  carbon:
+    track_emissions: true
+    alert_on_high_emissions: true
+    emissions_threshold_kg: 1.0 # Alert if emissions exceed 1kg CO2eq
+
+# Logging settings
+logging:
+  level: "info"
+  format: "json"
+  output_dir: "logs/staging"
+
+  # Component-specific logging
+  components:
+    carbon:
+      level: "info"
+      file: "logs/staging/carbon.log"

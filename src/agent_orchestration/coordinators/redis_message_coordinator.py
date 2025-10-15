@@ -149,13 +149,11 @@ class RedisMessageCoordinator(MessageCoordinator):
         sub_id = f"sub_{uuid.uuid4().hex[:12]}"
 
         async def _store():
-            try:
+            with contextlib.suppress(Exception):
                 if message_types:
                     await self._redis.sadd(
                         self._subs_key(agent_id), *[mt.value for mt in message_types]
                     )
-            except Exception:
-                pass
 
         with contextlib.suppress(Exception):
             asyncio.get_running_loop().create_task(_store())
@@ -268,11 +266,9 @@ class RedisMessageCoordinator(MessageCoordinator):
             await self._redis.zadd(
                 self._sched_key(agent_id, int(qm.priority)), {updated: score}
             )
-            try:
+            with contextlib.suppress(Exception):
                 self.metrics.inc_retries_scheduled(1, last_backoff_seconds=delay)
                 self.metrics.inc_nacks(1)
-            except Exception:
-                pass
             return True
         except Exception:
             # If we cannot parse, dead-letter to avoid poison-pill loops

@@ -5,6 +5,7 @@ This module provides data access layer for player profiles,
 handling CRUD operations and data persistence in Neo4j.
 """
 
+import contextlib
 import json
 import logging
 import uuid
@@ -106,11 +107,9 @@ class PlayerProfileRepository:
                 logger.debug(
                     f"Neo4j connect attempt {attempt + 1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
                 )
-                try:
+                with contextlib.suppress(Exception):
                     if self.driver:
                         self.driver.close()
-                except Exception:
-                    pass
                 self.driver = None
                 import time as _t
 
@@ -130,11 +129,9 @@ class PlayerProfileRepository:
                     logger.debug(
                         f"Neo4j connect attempt {attempt + 1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
                     )
-                    try:
+                    with contextlib.suppress(Exception):
                         if self.driver:
                             self.driver.close()
-                    except Exception:
-                        pass
                     self.driver = None
                     import time as _t
 
@@ -589,12 +586,10 @@ class PlayerProfileRepository:
                         # Neo4j temporal objects often expose to_native()
                         conv = getattr(val, "to_native", None)
                         if callable(conv):
-                            try:
+                            with contextlib.suppress(Exception):
                                 result = conv()
                                 if isinstance(result, datetime):
                                     return result
-                            except Exception:
-                                pass
                         if isinstance(val, str):
                             try:
                                 return datetime.fromisoformat(val)
@@ -620,12 +615,10 @@ class PlayerProfileRepository:
                         return val
                     conv = getattr(val, "to_native", None)
                     if callable(conv):
-                        try:
+                        with contextlib.suppress(Exception):
                             result = conv()
                             if isinstance(result, datetime):
                                 return result
-                        except Exception:
-                            pass
                     if isinstance(val, str):
                         try:
                             return datetime.fromisoformat(val)

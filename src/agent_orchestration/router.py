@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import time
 from typing import Any
@@ -142,15 +143,13 @@ class AgentRouter:
         candidates = []
         try:
             for a in self._registry.all():
-                try:
+                with contextlib.suppress(Exception):
                     if (
                         a.agent_id.type == agent_type
                         and a._running
                         and (not exclude_degraded or not a._degraded)
                     ):
                         candidates.append(a)
-                except Exception:
-                    continue
         except Exception:
             return None
         if not candidates:
@@ -170,7 +169,7 @@ class AgentRouter:
         """Return an AgentId with instance resolved to a healthy one when possible.
         Honors explicit instance when healthy; otherwise picks another healthy instance of the same type.
         """
-        try:
+        with contextlib.suppress(Exception):
             if recipient.instance:
                 for a in self._registry.all():
                     if (
@@ -180,8 +179,6 @@ class AgentRouter:
                         if a._running and (not exclude_degraded or not a._degraded):
                             return recipient
                         break
-        except Exception:
-            pass
         resolved = await self.resolve_healthy_instance(
             recipient.type, exclude_degraded=exclude_degraded
         )
@@ -247,7 +244,7 @@ class AgentRouter:
                 )
                 if show_all_candidates and a.agent_id.type == agent_type:
                     # Include excluded candidate in candidates with marking
-                    try:
+                    with contextlib.suppress(Exception):
                         q = await self._measure_queue_length(a)
                         h = await self._measure_heartbeat_age(a)
                         s = self._measure_success_rate(a)
@@ -262,8 +259,6 @@ class AgentRouter:
                                 "exclusion_reason": reason,
                             }
                         )
-                    except Exception:
-                        pass
             else:
                 candidates.append(a)
         out["summary"]["excluded_count"] = len(out["excluded"])

@@ -145,10 +145,8 @@ class WorkflowMonitor:
             raw = await self._redis.lrange(self._audit_key(run_id), 0, -1)
             out: list[dict[str, Any]] = []
             for b in raw or []:
-                try:
+                with contextlib.suppress(Exception):
                     out.append(json.loads(b if isinstance(b, str) else b.decode()))
-                except Exception:
-                    continue
             return out
         except Exception:
             return []
@@ -216,12 +214,10 @@ class WorkflowMonitor:
         return transitioned
 
     def start_background_checks(self, interval_s: float = 1.0) -> None:
-        try:
+        with contextlib.suppress(Exception):
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 self._bg_task = loop.create_task(self._bg_loop(interval_s))
-        except Exception:
-            pass
 
     def stop_background_checks(self) -> None:
         t = self._bg_task
