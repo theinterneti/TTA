@@ -205,7 +205,10 @@ class RedisToolRegistry:
                 continue
             try:
                 data = json.loads(raw)
-            except Exception:
+            except Exception as e:
+                logger.debug(
+                    f"Skipping tool {nm}:{ver}: failed to parse JSON - {type(e).__name__}: {e}"
+                )
                 continue
             last = float(data.get("last_used_at", 0.0))
             status = data.get("status", ToolStatus.ACTIVE.value)

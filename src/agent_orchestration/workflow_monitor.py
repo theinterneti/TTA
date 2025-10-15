@@ -167,7 +167,10 @@ class WorkflowMonitor:
                     rr = self._from_dump(
                         json.loads(data if isinstance(data, str) else data.decode())
                     )
-                except Exception:
+                except Exception as e:
+                    logger.debug(
+                        f"Skipping workflow record {k}: failed to parse JSON - {type(e).__name__}: {e}"
+                    )
                     continue
                 if rr.status not in ("running",):
                     continue

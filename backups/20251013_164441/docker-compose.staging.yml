@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   shared-components:
     build:
@@ -6,38 +6,38 @@ services:
       dockerfile: Dockerfile.staging
     # container_name removed for compatibility with deploy.replicas
     ports:
-    - 3001:3000
+      - 3001:3000
     environment:
-    - NODE_ENV=staging
-    - VITE_API_BASE_URL=https://api-staging.tta-platform.com
-    - VITE_SENTRY_DSN=${SENTRY_DSN}
-    - VITE_ANALYTICS_ENABLED=true
+      - NODE_ENV=staging
+      - VITE_API_BASE_URL=https://api-staging.tta-platform.com
+      - VITE_SENTRY_DSN=${SENTRY_DSN}
+      - VITE_ANALYTICS_ENABLED=true
     volumes:
-    - ./web-interfaces/shared:/app
-    - /app/node_modules
+      - ./web-interfaces/shared:/app
+      - /app/node_modules
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       replicas: 2
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:3000/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3000/health
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
     read_only: true
   patient-interface:
     build:
@@ -45,45 +45,45 @@ services:
       dockerfile: Dockerfile.staging
     # container_name removed for compatibility with deploy.replicas
     ports:
-    - 3002:3000
+      - 3002:3000
     environment:
-    - NODE_ENV=staging
-    - VITE_API_BASE_URL=https://api-staging.tta-platform.com
-    - VITE_SHARED_COMPONENTS_URL=https://shared-staging.tta-platform.com
-    - VITE_FEATURE_AI_NARRATIVE=true
-    - VITE_FEATURE_LIVING_WORLDS=true
-    - VITE_FEATURE_CRISIS_SUPPORT=true
-    - VITE_SENTRY_DSN=${SENTRY_DSN}
-    - VITE_HOTJAR_ID=${HOTJAR_ID}
+      - NODE_ENV=staging
+      - VITE_API_BASE_URL=https://api-staging.tta-platform.com
+      - VITE_SHARED_COMPONENTS_URL=https://shared-staging.tta-platform.com
+      - VITE_FEATURE_AI_NARRATIVE=true
+      - VITE_FEATURE_LIVING_WORLDS=true
+      - VITE_FEATURE_CRISIS_SUPPORT=true
+      - VITE_SENTRY_DSN=${SENTRY_DSN}
+      - VITE_HOTJAR_ID=${HOTJAR_ID}
     volumes:
-    - ./web-interfaces/patient-interface:/app
-    - /app/node_modules
+      - ./web-interfaces/patient-interface:/app
+      - /app/node_modules
     depends_on:
-    - shared-components
-    - patient-api
+      - shared-components
+      - patient-api
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       replicas: 3
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:3000/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3000/health
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
     read_only: true
   clinical-dashboard:
     build:
@@ -91,43 +91,43 @@ services:
       dockerfile: Dockerfile.staging
     # container_name removed for compatibility with deploy.replicas
     ports:
-    - 3003:3000
+      - 3003:3000
     environment:
-    - NODE_ENV=staging
-    - VITE_API_BASE_URL=https://api-staging.tta-platform.com
-    - VITE_SHARED_COMPONENTS_URL=https://shared-staging.tta-platform.com
-    - VITE_FEATURE_REAL_TIME_MONITORING=true
-    - VITE_FEATURE_CRISIS_ALERTS=true
-    - VITE_FEATURE_PREDICTIVE_ANALYTICS=false
-    - VITE_SENTRY_DSN=${SENTRY_DSN}
+      - NODE_ENV=staging
+      - VITE_API_BASE_URL=https://api-staging.tta-platform.com
+      - VITE_SHARED_COMPONENTS_URL=https://shared-staging.tta-platform.com
+      - VITE_FEATURE_REAL_TIME_MONITORING=true
+      - VITE_FEATURE_CRISIS_ALERTS=true
+      - VITE_FEATURE_PREDICTIVE_ANALYTICS=false
+      - VITE_SENTRY_DSN=${SENTRY_DSN}
     volumes:
-    - ./web-interfaces/clinical-dashboard:/app
-    - /app/node_modules
+      - ./web-interfaces/clinical-dashboard:/app
+      - /app/node_modules
     depends_on:
-    - shared-components
-    - clinical-api
+      - shared-components
+      - clinical-api
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       replicas: 2
       resources:
         limits:
-          cpus: '0.75'
+          cpus: "0.75"
           memory: 768M
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:3000/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3000/health
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
     read_only: true
   patient-api:
     build:
@@ -135,426 +135,427 @@ services:
       dockerfile: Dockerfile.patient-api.staging
     # container_name removed for compatibility with deploy.replicas
     ports:
-    - 8001:8000
+      - 8001:8000
     environment:
-    - PYTHONPATH=/app
-    - ENVIRONMENT=staging
-    - DATABASE_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-primary:5432/tta_staging_db
-    - DATABASE_REPLICA_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-replica:5432/tta_staging_db
-    - REDIS_URL=redis://redis-cluster:6379
-    - NEO4J_URI=bolt://neo4j-cluster:7687
-    - NEO4J_USER=neo4j
-    - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-    - OPENAI_API_KEY=${OPENAI_API_KEY}
-    - SENTRY_DSN=${SENTRY_DSN}
-    - LOG_LEVEL=INFO
-    - FEATURE_AI_NARRATIVE=true
-    - FEATURE_LIVING_WORLDS=true
-    - FEATURE_PERFORMANCE_MONITORING=true
+      - PYTHONPATH=/app
+      - ENVIRONMENT=staging
+      - DATABASE_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-primary:5432/tta_staging_db
+      - DATABASE_REPLICA_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-replica:5432/tta_staging_db
+      - REDIS_URL=redis://redis-cluster:6379
+      - NEO4J_URI=bolt://neo4j-cluster:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - LOG_LEVEL=INFO
+      - FEATURE_AI_NARRATIVE=true
+      - FEATURE_LIVING_WORLDS=true
+      - FEATURE_PERFORMANCE_MONITORING=true
     volumes:
-    - ./src:/app/src
-    - ./pyproject.toml:/app/pyproject.toml
-    - ./logs:/app/logs
+      - ./src:/app/src
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./logs:/app/logs
     depends_on:
-    - postgres-primary
-    - redis-cluster
-    - neo4j-cluster
+      - postgres-primary
+      - redis-cluster
+      - neo4j-cluster
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       replicas: 3
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:8000/api/patient/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/api/patient/health
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   clinical-api:
     build:
       context: .
       dockerfile: Dockerfile.clinical-api.staging
     # container_name removed for compatibility with deploy.replicas
     ports:
-    - 8002:8000
+      - 8002:8000
     environment:
-    - PYTHONPATH=/app
-    - ENVIRONMENT=staging
-    - DATABASE_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-primary:5432/tta_staging_db
-    - DATABASE_REPLICA_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-replica:5432/tta_staging_db
-    - REDIS_URL=redis://redis-cluster:6379
-    - NEO4J_URI=bolt://neo4j-cluster:7687
-    - NEO4J_USER=neo4j
-    - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-    - SENTRY_DSN=${SENTRY_DSN}
-    - LOG_LEVEL=INFO
-    - FEATURE_REAL_TIME_MONITORING=true
-    - FEATURE_ADVANCED_ANALYTICS=false
+      - PYTHONPATH=/app
+      - ENVIRONMENT=staging
+      - DATABASE_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-primary:5432/tta_staging_db
+      - DATABASE_REPLICA_URL=postgresql://tta_user:${DB_PASSWORD}@postgres-replica:5432/tta_staging_db
+      - REDIS_URL=redis://redis-cluster:6379
+      - NEO4J_URI=bolt://neo4j-cluster:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - LOG_LEVEL=INFO
+      - FEATURE_REAL_TIME_MONITORING=true
+      - FEATURE_ADVANCED_ANALYTICS=false
     volumes:
-    - ./src:/app/src
-    - ./pyproject.toml:/app/pyproject.toml
-    - ./logs:/app/logs
+      - ./src:/app/src
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./logs:/app/logs
     depends_on:
-    - postgres-primary
-    - redis-cluster
-    - neo4j-cluster
+      - postgres-primary
+      - redis-cluster
+      - neo4j-cluster
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       replicas: 2
       resources:
         limits:
-          cpus: '0.75'
+          cpus: "0.75"
           memory: 768M
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:8000/api/clinical/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/api/clinical/health
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   langgraph-service:
     build:
       context: .
       dockerfile: Dockerfile.langgraph.staging
     # container_name removed for compatibility with deploy.replicas
     ports:
-    - 8005:8000
+      - 8005:8000
     environment:
-    - PYTHONPATH=/app
-    - ENVIRONMENT=staging
-    - REDIS_URL=redis://redis-cluster:6379
-    - OPENAI_API_KEY=${OPENAI_API_KEY}
-    - MODEL_NAME=gpt-4-turbo-preview
-    - SENTRY_DSN=${SENTRY_DSN}
-    - LOG_LEVEL=INFO
-    - MAX_CONCURRENT_WORKFLOWS=50
-    - WORKFLOW_TIMEOUT=300
+      - PYTHONPATH=/app
+      - ENVIRONMENT=staging
+      - REDIS_URL=redis://redis-cluster:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MODEL_NAME=gpt-4-turbo-preview
+      - SENTRY_DSN=${SENTRY_DSN}
+      - LOG_LEVEL=INFO
+      - MAX_CONCURRENT_WORKFLOWS=50
+      - WORKFLOW_TIMEOUT=300
     volumes:
-    - ./src:/app/src
-    - ./pyproject.toml:/app/pyproject.toml
-    - ./logs:/app/logs
+      - ./src:/app/src
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./logs:/app/logs
     depends_on:
-    - redis-cluster
+      - redis-cluster
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       replicas: 2
       resources:
         limits:
-          cpus: '1.5'
+          cpus: "1.5"
           memory: 2G
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 1G
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:8000/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/health
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   postgres-primary:
     image: postgres:15-alpine
     container_name: tta-postgres-primary-staging
     ports:
-    - 5432:5432
+      - 5432:5432
     environment:
-    - POSTGRES_DB=tta_staging_db
-    - POSTGRES_USER=tta_user
-    - POSTGRES_PASSWORD=${DB_PASSWORD}
-    - POSTGRES_REPLICATION_USER=replicator
-    - POSTGRES_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
+      - POSTGRES_DB=tta_staging_db
+      - POSTGRES_USER=tta_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
     volumes:
-    - postgres_primary_data:/var/lib/postgresql/data
-    - ./scripts/init_staging_db.sql:/docker-entrypoint-initdb.d/init_db.sql
-    - ./scripts/postgresql.conf:/etc/postgresql/postgresql.conf
+      - postgres_primary_data:/var/lib/postgresql/data
+      - ./scripts/init_staging_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./scripts/postgresql.conf:/etc/postgresql/postgresql.conf
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '2.0'
+          cpus: "2.0"
           memory: 4G
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
     healthcheck:
       test:
-      - CMD-SHELL
-      - pg_isready -U tta_user -d tta_staging_db
+        - CMD-SHELL
+        - pg_isready -U tta_user -d tta_staging_db
       interval: 30s
       timeout: 10s
       retries: 5
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   postgres-replica:
     image: postgres:15-alpine
     container_name: tta-postgres-replica-staging
     ports:
-    - 5433:5432
+      - 5433:5432
     environment:
-    - POSTGRES_DB=tta_staging_db
-    - POSTGRES_USER=tta_user
-    - POSTGRES_PASSWORD=${DB_PASSWORD}
-    - PGUSER=postgres
+      - POSTGRES_DB=tta_staging_db
+      - POSTGRES_USER=tta_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGUSER=postgres
     volumes:
-    - postgres_replica_data:/var/lib/postgresql/data
-    - ./scripts/setup_replica.sh:/docker-entrypoint-initdb.d/setup_replica.sh
+      - postgres_replica_data:/var/lib/postgresql/data
+      - ./scripts/setup_replica.sh:/docker-entrypoint-initdb.d/setup_replica.sh
     depends_on:
-    - postgres-primary
+      - postgres-primary
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   redis-cluster:
     image: redis:7-alpine
     container_name: tta-redis-cluster-staging
     ports:
-    - 6379:6379
-    command: 'redis-server  --appendonly yes  --maxmemory 1gb  --maxmemory-policy
+      - 6379:6379
+    command:
+      "redis-server  --appendonly yes  --maxmemory 1gb  --maxmemory-policy
       allkeys-lru --save 900 1 --save 300 10 --save 60 10000
 
-      '
+      "
     volumes:
-    - redis_cluster_data:/data
-    - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_cluster_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
     healthcheck:
       test:
-      - CMD
-      - redis-cli
-      - ping
+        - CMD
+        - redis-cli
+        - ping
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   neo4j-cluster:
     image: neo4j:5.15-enterprise
     container_name: tta-neo4j-cluster-staging
     ports:
-    - 7474:7474
-    - 7687:7687
+      - 7474:7474
+      - 7687:7687
     environment:
-    - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
-    - NEO4J_PLUGINS=["apoc", "graph-data-science"]
-    - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
-    - NEO4J_dbms_memory_heap_initial__size=1G
-    - NEO4J_dbms_memory_heap_max__size=4G
-    - NEO4J_dbms_memory_pagecache_size=2G
-    - NEO4J_dbms_connector_bolt_listen__address=0.0.0.0:7687
-    - NEO4J_dbms_connector_http_listen__address=0.0.0.0:7474
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_memory_heap_initial__size=1G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_memory_pagecache_size=2G
+      - NEO4J_dbms_connector_bolt_listen__address=0.0.0.0:7687
+      - NEO4J_dbms_connector_http_listen__address=0.0.0.0:7474
     volumes:
-    - neo4j_cluster_data:/data
-    - neo4j_cluster_logs:/logs
-    - neo4j_cluster_import:/var/lib/neo4j/import
-    - neo4j_cluster_plugins:/plugins
-    - ./config/neo4j.conf:/var/lib/neo4j/conf/neo4j.conf
+      - neo4j_cluster_data:/data
+      - neo4j_cluster_logs:/logs
+      - neo4j_cluster_import:/var/lib/neo4j/import
+      - neo4j_cluster_plugins:/plugins
+      - ./config/neo4j.conf:/var/lib/neo4j/conf/neo4j.conf
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '2.0'
+          cpus: "2.0"
           memory: 6G
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 3G
     healthcheck:
       test:
-      - CMD
-      - cypher-shell
-      - -u
-      - neo4j
-      - -p
-      - ${NEO4J_PASSWORD}
-      - RETURN 1
+        - CMD
+        - cypher-shell
+        - -u
+        - neo4j
+        - -p
+        - ${NEO4J_PASSWORD}
+        - RETURN 1
       interval: 30s
       timeout: 10s
       retries: 5
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   nginx:
     image: nginx:alpine
     container_name: tta-nginx-staging
     ports:
-    - 80:80
-    - 443:443
+      - 80:80
+      - 443:443
     volumes:
-    - ./nginx/nginx.staging.conf:/etc/nginx/nginx.conf
-    - ./nginx/ssl:/etc/nginx/ssl
-    - ./nginx/logs:/var/log/nginx
+      - ./nginx/nginx.staging.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
     depends_on:
-    - patient-interface
-    - clinical-dashboard
-    - patient-api
-    - clinical-api
+      - patient-interface
+      - clinical-dashboard
+      - patient-api
+      - clinical-api
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 256M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 128M
     healthcheck:
       test:
-      - CMD
-      - wget
-      - --quiet
-      - --tries=1
-      - --spider
-      - http://localhost/health
+        - CMD
+        - wget
+        - --quiet
+        - --tries=1
+        - --spider
+        - http://localhost/health
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   prometheus:
     image: prom/prometheus:latest
     container_name: tta-prometheus-staging
     ports:
-    - 9090:9090
+      - 9090:9090
     volumes:
-    - ./monitoring/prometheus.staging.yml:/etc/prometheus/prometheus.yml
-    - ./monitoring/rules:/etc/prometheus/rules
-    - prometheus_staging_data:/prometheus
+      - ./monitoring/prometheus.staging.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/rules:/etc/prometheus/rules
+      - prometheus_staging_data:/prometheus
     command:
-    - --config.file=/etc/prometheus/prometheus.yml
-    - --storage.tsdb.path=/prometheus
-    - --web.console.libraries=/etc/prometheus/console_libraries
-    - --web.console.templates=/etc/prometheus/consoles
-    - --web.enable-lifecycle
-    - --storage.tsdb.retention.time=30d
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+      - --storage.tsdb.retention.time=30d
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   grafana:
     image: grafana/grafana:latest
     container_name: tta-grafana-staging
     ports:
-    - 3000:3000
+      - 3000:3000
     environment:
-    - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-    - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
-    - GF_SERVER_ROOT_URL=https://monitoring-staging.tta-platform.com
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+      - GF_SERVER_ROOT_URL=https://monitoring-staging.tta-platform.com
     volumes:
-    - grafana_staging_data:/var/lib/grafana
-    - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-    - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - grafana_staging_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
     depends_on:
-    - prometheus
+      - prometheus
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 256M
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     container_name: tta-elasticsearch-staging
     environment:
-    - discovery.type=single-node
-    - xpack.security.enabled=false
-    - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
     volumes:
-    - elasticsearch_staging_data:/usr/share/elasticsearch/data
+      - elasticsearch_staging_data:/usr/share/elasticsearch/data
     networks:
-    - tta-staging-network
+      - tta-staging-network
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.0
     container_name: tta-logstash-staging
     volumes:
-    - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline
-    - ./logs:/usr/share/logstash/logs
+      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logs:/usr/share/logstash/logs
     depends_on:
-    - elasticsearch
+      - elasticsearch
     networks:
-    - tta-staging-network
+      - tta-staging-network
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   kibana:
     image: docker.elastic.co/kibana/kibana:8.11.0
     container_name: tta-kibana-staging
     ports:
-    - 5601:5601
+      - 5601:5601
     environment:
-    - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     depends_on:
-    - elasticsearch
+      - elasticsearch
     networks:
-    - tta-staging-network
+      - tta-staging-network
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
     read_only: true
 volumes:
   postgres_primary_data: null
@@ -572,4 +573,4 @@ networks:
     driver: bridge
     ipam:
       config:
-      - subnet: 172.21.0.0/16
+        - subnet: 172.21.0.0/16

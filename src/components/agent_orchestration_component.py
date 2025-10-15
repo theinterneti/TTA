@@ -1381,7 +1381,10 @@ class AgentOrchestrationComponent(Component):
                     inst = parts[3]
                     try:
                         prio = int(parts[5])
-                    except Exception:
+                    except Exception as e:
+                        logger.debug(
+                            f"Skipping queue key {skey}: invalid priority format - {type(e).__name__}"
+                        )
                         continue
                     agent_key = f"{at.name.lower()}:{inst}"
                     try:
@@ -1549,8 +1552,11 @@ class AgentOrchestrationComponent(Component):
                                             pass
                                     except Exception:
                                         pass
-                            except Exception:
-                                # swallow to keep thread alive
+                            except Exception as e:
+                                # Log but keep watcher thread alive
+                                logger.debug(
+                                    f"Policy watcher iteration error: {type(e).__name__}: {e}"
+                                )
                                 continue
 
                     t = threading.Thread(target=_watcher, daemon=True)

@@ -233,7 +233,10 @@ class StateValidator:
                     # Resolve AgentType from value string
                     try:
                         at = AgentType(at_val)
-                    except Exception:
+                    except Exception as e:
+                        logger.debug(
+                            f"Skipping deadline key {dkey}: invalid agent type '{at_val}' - {type(e).__name__}"
+                        )
                         continue
                     tokens = await self._redis.zrangebyscore(dkey, min=-1, max=now3)
                     if not tokens:

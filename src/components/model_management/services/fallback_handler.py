@@ -314,7 +314,10 @@ class FallbackHandler(IFallbackHandler):
                     if any(m.model_id == model_id for m in models):
                         provider_name = prov_name
                         break
-                except Exception:
+                except Exception as e:
+                    logger.debug(
+                        f"Skipping provider {prov_name} during model lookup: {type(e).__name__}: {e}"
+                    )
                     continue
 
             if not provider_name:

@@ -37,10 +37,10 @@ FAILED_TESTS=0
 run_test() {
     local test_name="$1"
     local test_command="$2"
-    
+
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     info "Test $TOTAL_TESTS: $test_name"
-    
+
     if eval "$test_command" > /dev/null 2>&1; then
         log "✓ PASSED: $test_name"
         PASSED_TESTS=$((PASSED_TESTS + 1))
@@ -150,4 +150,3 @@ else
     echo ""
     exit 1
 fi
-
