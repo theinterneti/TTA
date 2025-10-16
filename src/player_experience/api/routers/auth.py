@@ -8,7 +8,6 @@ token management, multi-factor authentication, and role-based access control.
 import contextlib
 import logging
 import os
-import urllib.parse
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -177,7 +176,6 @@ def get_player_manager() -> PlayerProfileManager:
 
     Uses the same repository pattern as the players router to ensure consistency.
     """
-    import os
 
     # Prefer Neo4j repository if configured
     use_neo4j = os.getenv("TTA_USE_NEO4J", "0") == "1"
@@ -446,7 +444,9 @@ async def login(
                         error_category=autocreation_error_category,
                     )
                 except Exception as metrics_error:
-                    logger.debug(f"Failed to record auto-creation metrics: {metrics_error}")
+                    logger.debug(
+                        f"Failed to record auto-creation metrics: {metrics_error}"
+                    )
 
         # Create session
         session_id = auth_service.create_session(user, client_ip, user_agent)

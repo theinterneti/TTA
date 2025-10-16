@@ -18,7 +18,9 @@ try:
     from neo4j import Driver, GraphDatabase, Result, Session
     from neo4j.exceptions import ClientError, ServiceUnavailable
 except ImportError:
-    logger.warning("Warning: neo4j package not installed. Install with: pip install neo4j")
+    logger.warning(
+        "Warning: neo4j package not installed. Install with: pip install neo4j"
+    )
     GraphDatabase = None
     Driver = None
     Session = None
