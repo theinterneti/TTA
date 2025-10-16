@@ -53,11 +53,21 @@ class WebSocketService {
     const token = secureStorage.getToken()!; // Safe to use ! after validation
     this.currentSessionId = sessionId || null;
 
-    // Convert HTTP URL to WebSocket URL with fallback
-    const apiUrl = process.env.REACT_APP_API_URL ||
-                   process.env.VITE_API_BASE_URL ||
-                   'http://localhost:8080';
-    const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws/chat';
+    // Use explicit WebSocket URL if available, otherwise convert HTTP URL to WebSocket URL
+    let wsUrl: string;
+
+    // Priority: REACT_APP_WS_URL > VITE_WS_URL > convert API URL
+    if (process.env.REACT_APP_WS_URL) {
+      wsUrl = process.env.REACT_APP_WS_URL + '/ws/chat';
+    } else if (process.env.VITE_WS_URL) {
+      wsUrl = process.env.VITE_WS_URL + '/ws/chat';
+    } else {
+      // Fallback: convert HTTP API URL to WebSocket URL
+      const apiUrl = process.env.REACT_APP_API_URL ||
+                     process.env.VITE_API_BASE_URL ||
+                     'http://localhost:8080';
+      wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws/chat';
+    }
 
     console.log('WebSocket connecting to:', wsUrl); // Debug log
 

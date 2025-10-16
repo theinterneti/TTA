@@ -16,13 +16,27 @@ Ensure that users can **intuitively use the staging environment with ZERO instru
 
 ```
 tests/e2e-staging/
-├── complete-user-journey.staging.spec.ts  # Main end-to-end test
+├── helpers/
+│   ├── staging-config.ts                  # Centralized configuration
+│   └── test-helpers.ts                    # Common test utilities
+├── page-objects/
+│   ├── BasePage.ts                        # Base page object
+│   ├── LoginPage.ts                       # Login page interactions
+│   └── DashboardPage.ts                   # Dashboard interactions
+├── 01-authentication.staging.spec.ts      # Authentication tests
+├── 02-ui-functionality.staging.spec.ts    # UI/UX tests
+├── 03-integration.staging.spec.ts         # Integration tests
+├── 04-error-handling.staging.spec.ts      # Error handling tests
+├── 05-responsive.staging.spec.ts          # Responsive design tests
+├── 06-accessibility.staging.spec.ts       # Accessibility tests
+├── complete-user-journey.staging.spec.ts  # Complete user journey
 ├── global-setup.ts                        # Environment validation
 ├── global-teardown.ts                     # Cleanup
 └── README.md                              # This file
 
 playwright.staging.config.ts               # Staging-specific config
 scripts/
+├── install-playwright-browsers.sh         # Browser installation
 ├── validate-staging-environment.sh        # Pre-test validation
 └── run-staging-tests.sh                   # Test runner
 ```
@@ -46,7 +60,17 @@ docker-compose -f docker-compose.staging-homelab.yml ps
 ./scripts/validate-staging-environment.sh
 ```
 
-### 3. Run Tests
+### 3. Install Browsers
+
+```bash
+# Install Chromium, Firefox, and WebKit
+npm run browsers:install
+
+# Or manually
+npx playwright install chromium firefox webkit
+```
+
+### 4. Run Tests
 
 ```bash
 # Run all staging tests
@@ -60,54 +84,112 @@ docker-compose -f docker-compose.staging-homelab.yml ps
 
 # Run in debug mode
 ./scripts/run-staging-tests.sh --debug
+
+# Run specific test suites
+npm run test:staging:auth          # Authentication tests
+npm run test:staging:ui-func       # UI/UX functionality tests
+npm run test:staging:integration   # Integration tests
+npm run test:staging:errors        # Error handling tests
+npm run test:staging:responsive    # Responsive design tests
+npm run test:staging:a11y          # Accessibility tests
+
+# Run on specific browsers
+npm run test:staging:chromium      # Chromium only
+npm run test:staging:firefox       # Firefox only
+npm run test:staging:webkit        # WebKit only
 ```
 
 ## 📊 Test Coverage
 
-### Complete User Journey Test
+### 1. Authentication Tests (`01-authentication.staging.spec.ts`)
 
-**File:** `complete-user-journey.staging.spec.ts`
+**Coverage:**
+- Login page display and functionality
+- Successful login with demo credentials
+- Error handling for invalid credentials
+- Empty form validation
+- Session persistence after refresh
+- Session persistence across navigation
+- Logout functionality
+- OAuth flow (when enabled)
+- Network error handling
+
+### 2. UI/UX Functionality Tests (`02-ui-functionality.staging.spec.ts`)
+
+**Coverage:**
+- Intuitive navigation menu
+- Smooth page transitions
+- Working buttons with clear labels
+- Accessible form inputs
+- Loading states
+- Clear error messages
+- Zero-instruction usability
+- Feature discoverability
+- Responsive behavior across viewports
+
+### 3. Integration Tests (`03-integration.staging.spec.ts`)
+
+**Coverage:**
+- API health checks
+- API communication
+- API error handling
+- Redis session persistence
+- Session sharing across tabs
+- User data persistence
+- Real-time chat updates
+- Data consistency across operations
+- WebSocket connections (when applicable)
+
+### 4. Error Handling Tests (`04-error-handling.staging.spec.ts`)
+
+**Coverage:**
+- Offline mode handling
+- Slow network handling
+- Form validation
+- Special character handling
+- Expired session handling
+- 404 error handling
+- 500 error handling
+- Rapid click handling
+- Browser back button
+- Page refresh during operations
+- Error recovery
+
+### 5. Responsive Design Tests (`05-responsive.staging.spec.ts`)
+
+**Coverage:**
+- Mobile viewport (375x667)
+- Tablet viewport (768x1024)
+- Desktop viewport (1920x1080)
+- Touch interactions
+- Viewport transitions
+- Orientation changes
+- Text readability
+- Touch target sizes
+- Scrolling behavior
+
+### 6. Accessibility Tests (`06-accessibility.staging.spec.ts`)
+
+**Coverage:**
+- WCAG compliance
+- Keyboard navigation
+- ARIA labels
+- Focus management
+- Screen reader support
+- Semantic HTML
+- Heading hierarchy
+- Color contrast
+- Alternative text for images
+
+### 7. Complete User Journey Test (`complete-user-journey.staging.spec.ts`)
 
 **Phases:**
 1. **Landing & Authentication**
-   - Application loads correctly
-   - Sign-in option is visible and discoverable
-   - OAuth flow works (or demo credentials)
-   - Authentication succeeds
-
 2. **Dashboard & Orientation**
-   - Dashboard loads with welcoming content
-   - Clear next steps are visible
-   - Navigation is intuitive
-
 3. **Character Creation**
-   - Character creation form is accessible
-   - Form is intuitive and easy to fill
-   - Character saves successfully
-
 4. **World Selection**
-   - Available worlds are displayed
-   - World selection is clear
-   - World loads successfully
-
 5. **Gameplay / Chat Interface**
-   - Chat interface loads
-   - Initial story content appears
-   - User can send messages
-   - AI responds appropriately
-
 6. **Data Persistence**
-   - Session persists on page refresh
-   - Character data is saved
-   - Story progress is maintained
-
-### Error Handling Test
-
-Validates graceful error handling:
-- Network errors
-- API failures
-- Invalid inputs
-- Session timeouts
 
 ## 🔧 Configuration
 

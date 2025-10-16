@@ -5,8 +5,8 @@
  * Integrates with secure storage and Redux store to maintain application state.
  */
 
-import { authAPI } from '../services/api';
-import { setUser } from '../store/slices/authSlice';
+import { authAPI, openRouterAuthAPI } from '../services/api';
+import { setUser, setAuthenticated, setLoading } from '../store/slices/authSlice';
 import { loadConversationHistory } from '../store/slices/chatSlice';
 import { store } from '../store/store';
 import secureStorage, { sessionManager } from './secureStorage';
@@ -27,6 +27,10 @@ let restorationInProgress = false;
 // Track authentication retry attempts
 let authRetryCount = 0;
 const MAX_AUTH_RETRIES = 3;
+
+// Track if session restoration has been attempted
+let sessionRestorationAttempted = false;
+let sessionRestorationPromise: Promise<SessionRestorationResult> | null = null;
 
 /**
  * Restore complete application session
@@ -100,6 +104,30 @@ async function restoreAuthentication(): Promise<boolean> {
 
     authRetryCount++;
 
+    // First, check if there's a valid session cookie on the backend
+    // This is important for session persistence after page refresh
+    try {
+      const statusResponse = await openRouterAuthAPI.getAuthStatus();
+
+      if (statusResponse && statusResponse.authenticated && statusResponse.user) {
+        console.info('Session restored from backend cookie');
+        // Update Redux store with user info and mark as authenticated
+        store.dispatch(setAuthenticated({ user: statusResponse.user, isAuthenticated: true }));
+
+        // Also update sessionManager to ensure isAuthenticated is true in initial state
+        sessionManager.setSession({
+          sessionId: `session_${Date.now()}`,
+          userId: statusResponse.user.user_id || statusResponse.user.id,
+          lastActivity: Date.now(),
+        });
+
+        authRetryCount = 0; // Reset on success
+        return true;
+      }
+    } catch (statusError) {
+      console.debug('Backend session check failed, trying token-based auth:', statusError);
+    }
+
     // Check if we have a valid token
     const token = secureStorage.getToken();
 
@@ -114,8 +142,16 @@ async function restoreAuthentication(): Promise<boolean> {
       const response = await authAPI.verifyToken(token);
 
       if (response && response.user) {
-        // Update Redux store with user info
-        store.dispatch(setUser(response.user));
+        // Update Redux store with user info and mark as authenticated
+        store.dispatch(setAuthenticated({ user: response.user, isAuthenticated: true }));
+
+        // Also update sessionManager to ensure isAuthenticated is true in initial state
+        sessionManager.setSession({
+          sessionId: `session_${Date.now()}`,
+          userId: response.user.user_id || response.user.id,
+          lastActivity: Date.now(),
+        });
+
         console.info('Authentication restored successfully');
         authRetryCount = 0; // Reset on success
         return true;
@@ -135,7 +171,14 @@ async function restoreAuthentication(): Promise<boolean> {
             );
 
             if (refreshResponse.user) {
-              store.dispatch(setUser(refreshResponse.user));
+              store.dispatch(setAuthenticated({ user: refreshResponse.user, isAuthenticated: true }));
+
+              // Also update sessionManager
+              sessionManager.setSession({
+                sessionId: `session_${Date.now()}`,
+                userId: refreshResponse.user.user_id || refreshResponse.user.id,
+                lastActivity: Date.now(),
+              });
             }
 
             console.info('Token refreshed successfully');
@@ -265,13 +308,48 @@ export function clearSessionState(): void {
  * Initialize session restoration on app load
  */
 export function initializeSessionRestoration(): void {
+  console.info('🔄 Initializing session restoration...');
+
+  // Log to window for debugging in tests
+  (window as any).__SESSION_RESTORATION_LOG__ = {
+    initialized: true,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Set isLoading=true to show loading state while restoring session
+  // This ensures ProtectedRoute waits for session restoration before checking authentication
+  store.dispatch(setLoading(true));
+
   // Restore session on app load
-  restoreSession().then((result) => {
+  sessionRestorationPromise = restoreSession().then((result) => {
+    sessionRestorationAttempted = true;
+    console.info('✅ Session restoration completed:', result);
+    (window as any).__SESSION_RESTORATION_LOG__ = {
+      ...((window as any).__SESSION_RESTORATION_LOG__ || {}),
+      completed: true,
+      result,
+      timestamp: new Date().toISOString(),
+    };
     if (result.success) {
       console.info('Session restored successfully:', result.restored);
     } else {
       console.info('Session restoration incomplete:', result.restored, result.errors);
     }
+    // Set isLoading=false after restoration completes
+    store.dispatch(setLoading(false));
+    return result;
+  }).catch((error) => {
+    sessionRestorationAttempted = true;
+    console.error('❌ Session restoration error:', error);
+    (window as any).__SESSION_RESTORATION_LOG__ = {
+      ...((window as any).__SESSION_RESTORATION_LOG__ || {}),
+      failed: true,
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    };
+    // Set isLoading=false even on error
+    store.dispatch(setLoading(false));
+    return { success: false, restored: [], errors: [error.message] };
   });
 
   // Save session state before page unload
@@ -290,4 +368,17 @@ export function initializeSessionRestoration(): void {
   setInterval(() => {
     saveSessionState();
   }, 30000);
+}
+
+/**
+ * Wait for session restoration to complete
+ * This is useful for components that need to wait for session restoration before rendering
+ */
+export async function waitForSessionRestoration(): Promise<SessionRestorationResult> {
+  if (sessionRestorationPromise) {
+    return sessionRestorationPromise;
+  }
+
+  // If restoration hasn't started yet, return a resolved promise
+  return { success: false, restored: [], errors: ['Session restoration not initialized'] };
 }

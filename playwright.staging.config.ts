@@ -93,21 +93,44 @@ export default defineConfig({
       },
     },
 
-    // Uncomment for cross-browser testing
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
+    },
+
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
+    },
 
     // Mobile testing
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
+    },
+
+    {
+      name: 'mobile-safari',
+      use: {
+        ...devices['iPhone 12'],
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
+    },
+
+    // Tablet testing
+    {
+      name: 'tablet',
+      use: {
+        ...devices['iPad Pro'],
         permissions: ['clipboard-read', 'clipboard-write'],
       },
     },

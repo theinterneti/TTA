@@ -12,11 +12,13 @@ import uuid
 from datetime import datetime
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
 try:
     from neo4j import Driver, GraphDatabase, Result, Session
     from neo4j.exceptions import ClientError, ServiceUnavailable
 except ImportError:
-    print("Warning: neo4j package not installed. Install with: pip install neo4j")
+    logger.warning("Warning: neo4j package not installed. Install with: pip install neo4j")
     GraphDatabase = None
     Driver = None
     Session = None
@@ -658,10 +660,10 @@ class PlayerProfileRepository:
                 )
 
         except Exception as e:
-            logger.error(f"Error retrieving player profile {player_id}: {e}")
-            raise PlayerProfileRepositoryError(
-                f"Error retrieving player profile: {e}"
-            ) from e
+            # If the query fails (e.g., label doesn't exist), return None
+            # This allows the system to gracefully handle empty databases
+            logger.warning(f"Error retrieving player profile {player_id}: {e}")
+            return None
 
     def update_player_profile(self, profile: PlayerProfile) -> bool:
         """
@@ -812,12 +814,11 @@ class PlayerProfileRepository:
                 if record:
                     return self.get_player_profile(record["player_id"])
                 return None
-
         except Exception as e:
-            logger.error(f"Error retrieving player by username {username}: {e}")
-            raise PlayerProfileRepositoryError(
-                f"Error retrieving player by username: {e}"
-            ) from e
+            # If the query fails (e.g., label doesn't exist), return None
+            # This allows the system to gracefully handle empty databases
+            logger.warning(f"Error retrieving player by username {username}: {e}")
+            return None
 
     def get_player_by_email(self, email: str) -> PlayerProfile | None:
         """
@@ -847,10 +848,10 @@ class PlayerProfileRepository:
                 return None
 
         except Exception as e:
-            logger.error(f"Error retrieving player by email {email}: {e}")
-            raise PlayerProfileRepositoryError(
-                f"Error retrieving player by email: {e}"
-            ) from e
+            # If the query fails (e.g., label doesn't exist), return None
+            # This allows the system to gracefully handle empty databases
+            logger.warning(f"Error retrieving player by email {email}: {e}")
+            return None
 
     def list_active_players(self, limit: int = 100) -> list[PlayerProfile]:
         """

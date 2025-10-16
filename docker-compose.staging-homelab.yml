@@ -104,11 +104,11 @@ services:
       - tta-staging
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -u neo4j -p $${NEO4J_STAGING_PASSWORD:-staging_neo4j_secure_pass} 'RETURN 1' || exit 1"]
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p staging_neo4j_secure_pass_2024 'RETURN 1' || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     labels:
       - "com.tta.service=neo4j"
       - "com.tta.environment=staging"

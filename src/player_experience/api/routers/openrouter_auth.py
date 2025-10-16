@@ -192,13 +192,16 @@ async def validate_api_key(
             )
 
             # Set secure session cookie
+            # secure=False for localhost/staging (HTTP), secure=True for production (HTTPS)
+            is_production = os.getenv("ENVIRONMENT", "development") == "production"
             response.set_cookie(
                 key="openrouter_session_id",
                 value=session_id,
                 httponly=True,
-                secure=True,  # Use HTTPS in production
+                secure=is_production,  # Only require HTTPS in production
                 samesite="lax",
                 max_age=86400,  # 24 hours
+                path="/",  # Ensure cookie is sent for all paths
             )
 
         return ApiKeyValidationResponse(
@@ -332,13 +335,16 @@ async def oauth_callback(request: OAuthCallbackRequest, response: Response):
             session_id = await create_session(user_info)
 
             # Set secure session cookie
+            # secure=False for localhost/staging (HTTP), secure=True for production (HTTPS)
+            is_production = os.getenv("ENVIRONMENT", "development") == "production"
             response.set_cookie(
                 key="openrouter_session_id",
                 value=session_id,
                 httponly=True,
-                secure=True,
+                secure=is_production,  # Only require HTTPS in production
                 samesite="lax",
-                max_age=86400,
+                max_age=86400,  # 24 hours
+                path="/",  # Ensure cookie is sent for all paths
             )
 
             # Clean up OAuth state from Redis

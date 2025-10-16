@@ -86,19 +86,28 @@ class PlayerProfileManager:
             PrivacyViolationError: If privacy requirements are not met
         """
         try:
+            logger.info(
+                f"📝 Creating player profile for username={username}, email={email}"
+            )
+
             # Validate input data
+            logger.debug(f"  Validating username: {username}")
             self._validate_username(username)
+            logger.debug(f"  Validating email: {email}")
             self._validate_email(email)
 
             # Check for existing username/email
+            logger.debug(f"  Checking if username exists: {username}")
             if self.repository.username_exists(username):
                 raise PlayerProfileManagerError(f"Username '{username}' already exists")
 
+            logger.debug(f"  Checking if email exists: {email}")
             if self.repository.email_exists(email):
                 raise PlayerProfileManagerError(f"Email '{email}' already exists")
 
             # Generate unique player ID (allow external override for E2E determinism)
             player_id = player_id or self._generate_player_id()
+            logger.debug(f"  Generated player_id: {player_id}")
 
             # Use defaults if not provided
             if therapeutic_preferences is None:
@@ -108,9 +117,11 @@ class PlayerProfileManager:
                 privacy_settings = PrivacySettings()
 
             # Validate privacy settings compliance
+            logger.debug("  Validating privacy compliance")
             self._validate_privacy_compliance(privacy_settings)
 
             # Create player profile
+            logger.debug("  Creating PlayerProfile object")
             profile = PlayerProfile(
                 player_id=player_id,
                 username=username,
@@ -122,6 +133,7 @@ class PlayerProfileManager:
             )
 
             # Store in repository
+            logger.debug("  Storing profile in repository")
             success = self.repository.create_player_profile(profile)
             if not success:
                 raise PlayerProfileManagerError(
@@ -131,16 +143,22 @@ class PlayerProfileManager:
             # Log access for audit
             self._log_access(player_id, "CREATE", "Player profile created")
 
-            logger.info(f"Created player profile: {player_id} (username: {username})")
+            logger.info(
+                f"✅ Created player profile: {player_id} (username: {username})"
+            )
             return profile
 
         except PlayerProfileRepositoryError as e:
-            logger.error(f"Repository error creating player profile: {e}")
+            logger.error(
+                f"❌ Repository error creating player profile: {e}", exc_info=True
+            )
             raise PlayerProfileManagerError(
                 f"Failed to create player profile: {e}"
             ) from e
         except Exception as e:
-            logger.error(f"Unexpected error creating player profile: {e}")
+            logger.error(
+                f"❌ Unexpected error creating player profile: {e}", exc_info=True
+            )
             raise PlayerProfileManagerError(
                 f"Unexpected error creating player profile: {e}"
             ) from e
@@ -162,10 +180,19 @@ class PlayerProfileManager:
             DataAccessRestrictedError: If access is restricted by privacy settings
         """
         try:
+            logger.debug(
+                f"🔍 Getting player profile for player_id={player_id}, accessor_id={accessor_id}"
+            )
+
             # Retrieve profile from repository
             profile = self.repository.get_player_profile(player_id)
             if not profile:
+                logger.debug(
+                    f"✓ Player profile not found for player_id={player_id} (returning None)"
+                )
                 return None
+
+            logger.debug(f"✓ Retrieved player profile for player_id={player_id}")
 
             # Check data access restrictions
             self._check_data_access_permissions(profile, accessor_id)
@@ -178,18 +205,28 @@ class PlayerProfileManager:
                 player_id, "READ", f"Profile accessed by {accessor_id or 'system'}"
             )
 
+            logger.debug(
+                f"✓ Successfully retrieved and filtered player profile for player_id={player_id}"
+            )
             return filtered_profile
 
         except PlayerProfileRepositoryError as e:
-            logger.error(f"Repository error retrieving player profile {player_id}: {e}")
+            logger.error(
+                f"❌ Repository error retrieving player profile {player_id}: {e}",
+                exc_info=True,
+            )
             raise PlayerProfileManagerError(
                 f"Failed to retrieve player profile: {e}"
             ) from e
         except DataAccessRestrictedError:
             # Re-raise privacy violations
+            logger.warning(f"⚠️ Data access restricted for player_id={player_id}")
             raise
         except Exception as e:
-            logger.error(f"Unexpected error retrieving player profile {player_id}: {e}")
+            logger.error(
+                f"❌ Unexpected error retrieving player profile {player_id}: {e}",
+                exc_info=True,
+            )
             raise PlayerProfileManagerError(
                 f"Unexpected error retrieving player profile: {e}"
             ) from e
