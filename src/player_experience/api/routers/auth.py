@@ -390,20 +390,20 @@ async def login(
         autocreation_error_category = None
 
         try:
-            logger.info(
-                f"🔍 Checking if player profile exists for user_id={user.user_id}"
+            logger.debug(
+                f"Checking if player profile exists for user_id={user.user_id}"
             )
             # Check if player profile already exists
             existing_profile = player_manager.get_player_profile(user.user_id)
             if existing_profile:
                 player_id = existing_profile.player_id
-                logger.info(f"✓ Found existing player profile: {player_id}")
+                logger.debug(f"Found existing player profile: {player_id}")
             else:
                 # Create new player profile for first-time login
                 import time
 
                 autocreation_start_time = time.time()
-                logger.info(f"📝 Creating new player profile for user {user.username}")
+                logger.debug(f"Creating new player profile for user {user.username}")
 
                 new_profile = player_manager.create_player_profile(
                     username=user.username,
@@ -412,21 +412,21 @@ async def login(
                 )
                 player_id = new_profile.player_id
                 autocreation_success = True
-                logger.info(
-                    f"✅ Auto-created player profile for user {user.username} (player_id: {player_id})"
+                logger.debug(
+                    f"Auto-created player profile for user {user.username} (player_id: {player_id})"
                 )
         except PlayerProfileManagerError as profile_error:
             # Log error but don't block login - player_id will default to user_id
             autocreation_error_category = "profile_manager_error"
             logger.error(
-                f"⚠️ Failed to auto-create player profile for {user.username}: {profile_error}",
+                f"Failed to auto-create player profile for {user.username}: {profile_error}",
                 exc_info=True,
             )
             # Continue with login using user_id as player_id
         except Exception as e:
             autocreation_error_category = "unexpected_error"
             logger.error(
-                f"⚠️ Unexpected error during player profile auto-creation: {e}",
+                f"Unexpected error during player profile auto-creation: {e}",
                 exc_info=True,
             )
         finally:
@@ -486,7 +486,7 @@ async def login(
 
         try:
             redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            logger.info(f"🔄 Attempting to create Redis session with URL: {redis_url}")
+            logger.debug(f"Attempting to create Redis session with URL: {redis_url}")
             redis_client = aioredis.from_url(redis_url, decode_responses=True)
             session_manager = RedisSessionManager(redis_client)
 
@@ -500,15 +500,15 @@ async def login(
             }
 
             # Create session in Redis
-            logger.info(f"📝 Creating Redis session for user: {user.user_id}")
+            logger.debug(f"Creating Redis session for user: {user.user_id}")
             redis_session_id = await session_manager.create_session(
                 user_data=user_data, auth_method="standard"
             )
-            logger.info(f"✅ Redis session created: {redis_session_id}")
+            logger.debug(f"Redis session created: {redis_session_id}")
 
             # Set secure session cookie for session persistence
             is_production = os.getenv("ENVIRONMENT", "development") == "production"
-            logger.info(f"🍪 Setting session cookie (secure={is_production})")
+            logger.debug(f"Setting session cookie (secure={is_production})")
             response.set_cookie(
                 key="openrouter_session_id",
                 value=redis_session_id,
@@ -518,9 +518,9 @@ async def login(
                 max_age=86400,  # 24 hours
                 path="/",  # Ensure cookie is sent for all paths
             )
-            logger.info("✅ Session cookie set successfully")
+            logger.debug("Session cookie set successfully")
         except Exception as e:
-            logger.error(f"❌ Failed to create Redis session: {e}", exc_info=True)
+            logger.error(f"Failed to create Redis session: {e}", exc_info=True)
             # Continue without Redis session - the JWT token will still work
 
         return LoginResponse(
@@ -548,7 +548,7 @@ async def login(
         # Preserve explicitly raised HTTP errors
         raise e from e
     except Exception as e:
-        logger.error(f"❌ Login endpoint error: {e}", exc_info=True)
+        logger.error(f"Login endpoint error: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Login failed: {str(e)}",
