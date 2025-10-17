@@ -5,6 +5,7 @@ This module provides various middleware components for security, logging,
 rate limiting, and authentication with integrated monitoring and security features.
 """
 
+import contextlib
 import time
 import uuid
 from collections import defaultdict, deque
@@ -282,6 +283,8 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/register",
+        "/api/v1/openrouter/auth/status",  # Session status check (uses session cookie)
+        "/api/v1/openrouter/auth/token",  # Get token from session (uses session cookie)
         "/api/v1/gameplay/health",  # Gameplay health check endpoint
         "/api/v1/health/",  # System health check
         "/api/v1/health/redis",  # Redis health check
