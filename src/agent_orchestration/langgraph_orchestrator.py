@@ -9,12 +9,15 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from typing import Any, TypedDict
 
 import redis.asyncio as aioredis
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
+
+from src.ai_components.prompts import PromptRegistry
 
 from .unified_orchestrator import UnifiedAgentOrchestrator
 
@@ -95,6 +98,9 @@ class LangGraphAgentOrchestrator:
         # Workflows
         self.workflow: StateGraph | None = None
         self.initialized = False
+
+        # Initialize prompt registry
+        self.prompt_registry = PromptRegistry()
 
     async def initialize(self):
         """Initialize the orchestrator and create workflows."""
@@ -242,34 +248,44 @@ class LangGraphAgentOrchestrator:
         return state
 
     async def _safety_check_node(self, state: AgentWorkflowState) -> AgentWorkflowState:
-        """Perform safety validation."""
+        """Perform safety validation using versioned prompts."""
         logger.info(f"Performing safety check for session {state['session_id']}")
 
-        # Use LLM for safety assessment
-        safety_prompt = f"""
-        Assess the safety level of this user input: "{state["user_input"]}"
-
-        Consider:
-        - Crisis indicators (self-harm, suicide ideation)
-        - Distress level
-        - Need for immediate intervention
-
-        Respond with JSON:
-        {{
-            "safety_level": "safe|concern|high_risk|crisis",
-            "reasoning": "brief explanation",
-            "recommended_action": "continue|support|crisis_intervention"
-        }}
-        """
-
+        # Use prompt registry for safety assessment
+        start_time = time.time()
         try:
+            safety_prompt = self.prompt_registry.render_prompt(
+                "safety_check", user_input=state["user_input"]
+            )
+
             response = await self.llm.ainvoke([SystemMessage(content=safety_prompt)])
+            latency_ms = (time.time() - start_time) * 1000
+
+            # Parse response
             assessment = json.loads(response.content)
             state["safety_level"] = assessment["safety_level"]
+
+            # Record metrics
+            self.prompt_registry.record_metrics(
+                "safety_check",
+                tokens=len(response.content.split()),  # Approximate
+                latency_ms=latency_ms,
+                cost_usd=0.0002,  # Approximate based on model
+                quality_score=8.5 if assessment["safety_level"] in ["safe", "concern"] else 7.0,
+            )
 
         except Exception as e:
             logger.error(f"Safety check error: {e}")
             state["safety_level"] = "safe"  # Default to safe on error
+
+            # Record error
+            self.prompt_registry.record_metrics(
+                "safety_check",
+                tokens=0,
+                latency_ms=(time.time() - start_time) * 1000,
+                cost_usd=0.0,
+                error=True,
+            )
 
         return state
 
@@ -317,30 +333,36 @@ class LangGraphAgentOrchestrator:
             state["next_actions"] = ["continue", "reflect", "explore"]
             return state
 
-        # Fallback: generate response using LLM
-        context_summary = f"""
-        User input: {state["user_input"]}
-        Intent: {state.get("ipa_result", {}).get("routing", {}).get("intent", "unknown")}
-        World context: {json.dumps(state["world_context"], indent=2)[:200]}
-        """
-
-        response_prompt = f"""
-        Generate a therapeutic narrative response based on:
-
-        {context_summary}
-
-        The response should:
-        - Acknowledge the user's input
-        - Provide engaging narrative
-        - Maintain therapeutic tone
-        - Encourage continued engagement
-        """
-
+        # Fallback: generate response using LLM with versioned prompts
+        start_time = time.time()
         try:
+            # Prepare context
+            intent = state.get("ipa_result", {}).get("routing", {}).get("intent", "unknown")
+            world_context = json.dumps(state["world_context"], indent=2)[:200]
+
+            # Use prompt registry for narrative generation
+            response_prompt = self.prompt_registry.render_prompt(
+                "narrative_generation",
+                user_input=state["user_input"],
+                intent=intent,
+                world_context=world_context,
+            )
+
             response = await self.llm.ainvoke([SystemMessage(content=response_prompt)])
+            latency_ms = (time.time() - start_time) * 1000
+
             state["narrative_response"] = response.content
             state["messages"].append(AIMessage(content=response.content))
             state["next_actions"] = ["continue", "reflect"]
+
+            # Record metrics
+            self.prompt_registry.record_metrics(
+                "narrative_generation",
+                tokens=len(response.content.split()),  # Approximate
+                latency_ms=latency_ms,
+                cost_usd=0.0005,  # Approximate based on model
+                quality_score=8.0,  # Default quality score
+            )
 
         except Exception as e:
             logger.error(f"Response generation error: {e}")
@@ -348,6 +370,15 @@ class LangGraphAgentOrchestrator:
                 "Thank you for sharing. How would you like to proceed?"
             )
             state["messages"].append(AIMessage(content=state["narrative_response"]))
+
+            # Record error
+            self.prompt_registry.record_metrics(
+                "narrative_generation",
+                tokens=0,
+                latency_ms=(time.time() - start_time) * 1000,
+                cost_usd=0.0,
+                error=True,
+            )
 
         return state
 
