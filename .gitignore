@@ -355,3 +355,33 @@ gha-creds-*.json
 
 # GitHub Actions credentials (generated during workflow runs)
 gha-creds-*.json
+
+# -------------------------------------------------
+# 23) Local AI development artifacts
+# -------------------------------------------------
+# Augment AI personal configuration
+.augment/chatmodes/
+.augment/instructions/
+.augment/memory/
+.augment/workflows/
+.augment/rules/ai-context-management.md
+.augment/rules/gemini-cli-sub-agent.md
+.augment/rules/integrated-workflow.md
+.augment/rules/use-serena-tools.md
+
+# Serena AI configuration
+.serena/
+
+# Development metrics and reports (generated)
+.metrics/
+workflow_report_*.json
+coverage_*.json
+test-results-*.json
+
+# E2E visual testing artifacts (generated)
+tests/e2e-staging/visual-baselines/
+tests/e2e-staging/visual-diffs/
+tests/e2e-staging/*-snapshots/
+
+# Experimental GitHub workflows (not production-ready)
+.github/workflows/gemini-*.yml
