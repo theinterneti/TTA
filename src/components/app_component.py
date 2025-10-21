@@ -1,10 +1,10 @@
 """
-App Component
+App Component.
 
 This module provides a component for managing the TTA.prototype app.
 
 Classes:
-    AppComponent: Component for managing the TTA.prototype app
+    AppComponent: Component for managing the TTA.prototype app.
 
 Example:
     ```python
@@ -26,7 +26,7 @@ Example:
 """
 
 import logging
-import subprocess
+import subprocess  # nosec B404  # subprocess usage is safe and necessary for Docker Compose operations
 import time
 from pathlib import Path
 from typing import Any

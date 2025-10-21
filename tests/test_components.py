@@ -22,8 +22,9 @@ from unittest.mock import patch
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.components import CarbonComponent, DockerComponent
+from src.components import AppComponent, CarbonComponent, DockerComponent
 from src.orchestration import TTAConfig
+from src.orchestration.component import ComponentStatus
 
 
 class TestComponents(unittest.TestCase):
@@ -281,6 +282,185 @@ class TestComponents(unittest.TestCase):
             # The decorated function should still be callable
             self.assertTrue(
                 callable(test_func), "Decorated function should be callable"
+            )
+
+    # ========== App Component Tests ==========
+
+    def test_app_component_init(self):
+        """Test App component initialization."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        self.assertEqual(app.name, "tta.prototype_app")
+        self.assertEqual(app.port, 8501)
+        self.assertIsNotNone(app.root_dir)
+        self.assertIsNotNone(app.repo_dir)
+
+    def test_app_stop_not_running(self):
+        """Test App component stop when not running."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        with patch.object(app, "_is_app_running", return_value=False):
+            result = app.stop()
+            self.assertTrue(
+                result, "App component should stop successfully when not running"
+            )
+
+    def test_app_stop_success(self):
+        """Test App component successful stop."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Set component status to RUNNING so stop() will call _stop_impl()
+        app.status = ComponentStatus.RUNNING
+
+        # Mock _is_app_running to return True initially, then False after stop
+        with (
+            patch.object(app, "_is_app_running", side_effect=[True, False]),
+            patch.object(app, "_run_docker_compose") as mock_docker,
+        ):
+            # Mock successful docker-compose stop
+            mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+            mock_docker.return_value = mock_result
+
+            result = app.stop()
+            self.assertTrue(result, "App component should stop successfully")
+            mock_docker.assert_called_once_with(["stop", "app"])
+
+    def test_app_stop_timeout(self):
+        """Test App component stop timeout."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Set component status to RUNNING
+        app.status = ComponentStatus.RUNNING
+
+        # Mock _is_app_running to always return True (simulating timeout)
+        with (
+            patch.object(app, "_is_app_running", return_value=True),
+            patch.object(app, "_run_docker_compose") as mock_docker,
+        ):
+            # Mock successful docker-compose stop command
+            mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+            mock_docker.return_value = mock_result
+
+            result = app.stop()
+            self.assertFalse(result, "App component should fail to stop due to timeout")
+
+    def test_app_stop_error(self):
+        """Test App component stop error handling."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Set component status to RUNNING
+        app.status = ComponentStatus.RUNNING
+
+        # Mock _is_app_running to return True (so it tries to stop)
+        # Mock _run_docker_compose to raise an exception
+        with (
+            patch.object(app, "_is_app_running", return_value=True),
+            patch.object(
+                app, "_run_docker_compose", side_effect=Exception("Docker error")
+            ),
+        ):
+            result = app.stop()
+            self.assertFalse(
+                result, "App component should fail to stop due to exception"
+            )
+
+    def test_app_start_already_running(self):
+        """Test App component start when already running."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Mock config to have the required key
+        with (
+            patch.object(app.config, "get", return_value=8501),
+            patch.object(app, "_is_app_running", return_value=True),
+        ):
+            result = app._start_impl()
+            self.assertTrue(
+                result, "App component should return True when already running"
+            )
+
+    def test_app_start_success(self):
+        """Test App component successful start."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Mock config to have the required key
+        with (
+            patch.object(app.config, "get", return_value=8501),
+            patch.object(app, "_is_app_running", side_effect=[False, True]),
+            patch.object(app, "_run_docker_compose") as mock_docker,
+        ):
+            # Mock successful docker-compose up
+            mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+            mock_docker.return_value = mock_result
+
+            result = app._start_impl()
+            self.assertTrue(result, "App component should start successfully")
+            mock_docker.assert_called_once_with(["up", "-d", "app"])
+
+    def test_app_start_timeout(self):
+        """Test App component start timeout."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Mock config to have the required key
+        with (
+            patch.object(app.config, "get", return_value=8501),
+            patch.object(app, "_is_app_running", return_value=False),
+            patch.object(app, "_run_docker_compose") as mock_docker,
+        ):
+            # Mock successful docker-compose up command
+            mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+            mock_docker.return_value = mock_result
+
+            result = app._start_impl()
+            self.assertFalse(
+                result, "App component should fail to start due to timeout"
+            )
+
+    def test_app_start_docker_error(self):
+        """Test App component Docker Compose failure."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Mock config to have the required key
+        with (
+            patch.object(app.config, "get", return_value=8501),
+            patch.object(app, "_is_app_running", return_value=False),
+            patch.object(app, "_run_docker_compose") as mock_docker,
+        ):
+            # Mock failed docker-compose up
+            mock_result = type(
+                "obj", (object,), {"returncode": 1, "stderr": "Docker error"}
+            )()
+            mock_docker.return_value = mock_result
+
+            result = app._start_impl()
+            self.assertFalse(
+                result, "App component should fail to start due to Docker error"
+            )
+
+    def test_app_start_exception(self):
+        """Test App component start exception handling."""
+        config = TTAConfig()
+        app = AppComponent(config)
+
+        # Mock config to have the required key
+        with (
+            patch.object(app.config, "get", return_value=8501),
+            patch.object(app, "_is_app_running", return_value=False),
+            patch.object(
+                app, "_run_docker_compose", side_effect=Exception("Docker error")
+            ),
+        ):
+            result = app._start_impl()
+            self.assertFalse(
+                result, "App component should fail to start due to exception"
             )
 
 
