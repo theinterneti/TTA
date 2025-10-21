@@ -1,22 +1,26 @@
 # Carbon Component Maturity Status
 
-**Current Stage**: **Staging** 🎉
-**Last Updated**: 2025-10-08
+**Current Stage**: **Development** ⚠️
+**Last Updated**: 2025-10-21 (AUTO-UPDATED)
 **Owner**: theinterneti
 **Functional Group**: Core Infrastructure
-**Promoted**: 2025-10-08 (Development → Staging)
+**Status**: DEMOTED (Staging → Development) - Metrics regression detected
 
 ---
 
-## 🎉 Status: PROMOTED TO STAGING!
+## ⚠️ Status: DEMOTED TO DEVELOPMENT
 
-**Promotion Request**: [Issue #24](https://github.com/theinterneti/TTA/issues/24) ✅ APPROVED
+**Reason**: Automated metrics collection revealed significant regression from documented state.
 
-This component has **successfully been promoted to Staging** after completing all maturity criteria!
+**Previous Status** (2025-10-08):
+- Documented Coverage: 73.2%
+- Stage: Staging
 
-**Current Coverage**: **73.2%** ✅
-**Target Coverage**: 70%
-**Above Threshold**: +3.2%
+**Current Status** (2025-10-21):
+- **Actual Coverage**: **42.2%** ❌
+- **Target Coverage**: 70%
+- **Below Threshold**: -27.8%
+- **Stage**: Development
 
 ---
 
@@ -36,31 +40,40 @@ This component has **successfully been promoted to Staging** after completing al
 
 ## Maturity Criteria
 
+<!-- AUTO-GENERATED: DO NOT EDIT BELOW THIS LINE -->
 ### Development → Staging
 
-- [x] Core features complete ✅
-- [x] Unit tests passing (≥70% coverage) - **Currently 73.2%** ✅
+- [ ] Core features complete ⚠️ (needs validation)
+- [ ] Unit tests passing (≥70% coverage) - **Currently 42.2%** ❌
 - [x] API documented ✅
-- [x] Passes security scan (bandit) ✅
-- [x] Passes type checking (pyright) ✅
-- [x] Passes linting (ruff) ✅
+- [x] Passes security scan (bandit) - **0 issues** ✅
+- [x] Passes type checking (pyright) - **0 errors** ✅
+- [ ] Passes linting (ruff) - **1 violation** ❌
 - [x] Component README ✅
 
-**Status**: 7/7 criteria met ✅
+**Status**: 4/7 criteria met ❌
 
-**Promotion Request**: [Issue #24](https://github.com/theinterneti/TTA/issues/24)
+**Blocking Issues**:
+- ❌ Test coverage below 70% threshold (42.2% vs 70% required)
+- ❌ 1 linting violation (E902 - syntax error)
+- ⚠️ Core features need validation
 
-**Completed Blockers**:
-- ✅ [Issue #19](https://github.com/theinterneti/TTA/issues/19): Added 2 tests (coverage: 69.7% → 73.2%)
-- ✅ [Issue #20](https://github.com/theinterneti/TTA/issues/20): Fixed all linting and type errors
+**Previous Promotion** (2025-10-08):
+- [Issue #24](https://github.com/theinterneti/TTA/issues/24) - REVOKED due to metrics regression
 
 ---
 
 ## Test Coverage
 
-**Current**: 73.2% ✅
+<!-- AUTO-GENERATED SECTION -->
+**Current**: 42.2% ❌
 **Target**: 70%
-**Above Threshold**: +3.2%
+**Below Threshold**: -27.8%
+**Last Updated**: 2025-10-21
+
+**Coverage Details**:
+- Lines Covered: 44/97
+- Missing Lines: 53 lines not covered
 
 **Test File**: `tests/test_components.py`
 
@@ -71,74 +84,88 @@ This component has **successfully been promoted to Staging** after completing al
 - Decorator functionality (`test_carbon_decorator`)
 - Graceful degradation (`test_carbon_without_codecarbon`)
 
+**Action Required**: Add tests to cover missing 53 lines (need +27.8% coverage)
+
+<!-- END AUTO-GENERATED -->
+
 ---
 
 ## Code Quality Status
 
+<!-- AUTO-GENERATED SECTION -->
+
 ### Linting (ruff)
 
-**Status**: ✅ **PASSING**
-**Issues**: 0
-**Last Check**: 2025-10-08
+**Status**: ❌ **FAILING**
+**Issues**: 1 violation
+**Last Check**: 2025-10-21
 
-**Fixes Applied**:
-- Replaced `os.makedirs()` with `Path.mkdir()`
-- Replaced `open()` with `Path.write_text()`
-- Removed unnecessary variable assignment
-- Removed unused `os` import
+**Violations**:
+- E902: Syntax error (1 occurrence)
+
+**Action Required**: Fix syntax error
 
 ### Type Checking (pyright)
 
 **Status**: ✅ **PASSING**
-**Issues**: 0
-**Last Check**: 2025-10-08
-
-**Fixes Applied**:
-- Changed `CODECARBON_AVAILABLE` to `codecarbon_available` (constant redefinition)
-- Fixed TypeVar usage in `track_function()` signature
+**Issues**: 0 errors, 0 warnings
+**Last Check**: 2025-10-21
 
 ### Security Scan (bandit)
 
 **Status**: ✅ **PASSING**
 **Issues**: 0
-**Last Check**: 2025-10-08
+**Last Check**: 2025-10-21
+
+<!-- END AUTO-GENERATED -->
 
 ---
 
 ## Next Steps
 
-**Status**: ✅ **PROMOTED TO STAGING**
+<!-- MANUAL SECTION -->
 
-### Completed Work (2025-10-08)
+**Status**: ⚠️ **REQUIRES REMEDIATION**
 
-**Morning**:
-1. ✅ Added 2 tests (coverage: 69.7% → 73.2%)
-2. ✅ Verified coverage above 70% threshold
+### Required Work to Return to Staging
 
-**Afternoon**:
-3. ✅ Fixed all linting issues (69 → 0)
-4. ✅ Fixed all type checking errors (2 → 0)
-5. ✅ Verified all checks pass
+**Priority 1: Fix Linting Violation**
+1. Identify and fix E902 syntax error
+2. Run `uvx ruff check src/components/carbon_component.py`
+3. Verify 0 violations
 
-**End of Day**:
-6. ✅ Created promotion request ([Issue #24](https://github.com/theinterneti/TTA/issues/24))
-7. ✅ **Promotion approved and executed**
+**Priority 2: Increase Test Coverage (42.2% → 70%)**
+1. Analyze missing 53 lines of code
+2. Write tests to cover critical paths:
+   - Error handling in `_start_impl()`
+   - `_stop_impl()` lifecycle
+   - `track_function()` with various inputs
+   - `get_emissions_report()` edge cases
+   - `get_carbon_decorator()` functionality
+3. Target: Add 8-10 new test cases
+4. Verify coverage ≥70% with automated metrics
 
-**Total Effort**: ~2 hours (as estimated)
+**Priority 3: Validate Core Features**
+1. Manual testing of carbon tracking functionality
+2. Verify codecarbon integration works
+3. Test emissions reporting
+4. Document any limitations
 
-**Impact**:
-- ✅ First component to staging
-- ✅ Validates entire workflow
-- ✅ Builds momentum for remaining P0 components
+**Estimated Effort**: 6-8 hours
+- Linting fix: 0.5 hours
+- Test coverage expansion: 5-6 hours
+- Feature validation: 0.5-1 hour
 
-### Staging Deployment
+### Previous Work (2025-10-08) - INVALIDATED
 
-**Next Actions**:
-1. Deploy to staging environment
-2. Configure staging-specific settings
-3. Set up monitoring and health checks
-4. Validate functionality in staging
-5. Document staging deployment process
+**Note**: Previous promotion to staging was based on incorrect metrics. Automated metrics collection (2025-10-21) revealed actual coverage is 42.2%, not 73.2% as documented.
+
+**Lessons Learned**:
+- Manual metrics tracking is error-prone
+- Automated metrics collection is now mandatory
+- MATURITY.md files must be auto-updated
+
+<!-- END MANUAL SECTION -->
 
 ---
 
@@ -175,40 +202,53 @@ echo "✅ All checks passed!"
 
 ## Promotion History
 
+<!-- MANUAL SECTION -->
+
 ### Promotions
 
-- ✅ **2025-10-08**: **Development → Staging** ([Issue #24](https://github.com/theinterneti/TTA/issues/24))
-  - All maturity criteria met (7/7)
-  - Test coverage: 73.2% (above 70% threshold)
-  - Code quality: 0 linting errors, 0 type errors
-  - Security: 0 issues
-  - First component promoted to staging!
+- ❌ **2025-10-08**: **Development → Staging** ([Issue #24](https://github.com/theinterneti/TTA/issues/24)) - **REVOKED**
+  - Documented metrics: 73.2% coverage, 0 linting errors
+  - **Actual metrics** (discovered 2025-10-21): 42.2% coverage, 1 linting error
+  - **Reason for revocation**: Metrics were manually maintained and became stale
+  - **Action taken**: Implemented automated metrics collection system
 
 ### Promotion Requests
 
 - **2025-10-08**: Promotion request created ([Issue #24](https://github.com/theinterneti/TTA/issues/24))
-- **2025-10-08**: Component identified as P0 (quick win)
-- **2025-10-08**: All maturity criteria met
-- **2025-10-08**: Promotion approved and executed
+- **2025-10-08**: Promotion approved based on incorrect metrics
+- **2025-10-21**: Promotion revoked after automated metrics revealed regression
 
 ### Demotions
 
-None
+- **2025-10-21**: **Staging → Development**
+  - Reason: Automated metrics collection revealed 42.2% coverage (vs 73.2% documented)
+  - Blocking issues: Coverage below 70%, 1 linting violation
+  - Action: Implement automated MATURITY.md updates to prevent future discrepancies
+
+<!-- END MANUAL SECTION -->
 
 ---
 
 ## Related Documentation
 
+<!-- MANUAL SECTION -->
+
 - Component README: `src/components/README.md`
+- Maturity Automation: `scripts/maturity/ARCHITECTURE.md`
+- Metrics Collector: `scripts/maturity/metrics_collector.py`
 - Corrected Assessment: `docs/development/COMPONENT_MATURITY_ASSESSMENT_CORRECTED.md`
 - Correction Issue: [#18](https://github.com/theinterneti/TTA/issues/18)
-- Test Coverage Blocker: [#19](https://github.com/theinterneti/TTA/issues/19) ✅ CLOSED
-- Code Quality Blocker: [#20](https://github.com/theinterneti/TTA/issues/20) ✅ CLOSED
-- **Promotion Request**: [#24](https://github.com/theinterneti/TTA/issues/24) ✅ **APPROVED**
+- Test Coverage Blocker: [#19](https://github.com/theinterneti/TTA/issues/19) - REOPENED
+- Code Quality Blocker: [#20](https://github.com/theinterneti/TTA/issues/20) - REOPENED
+- **Promotion Request**: [#24](https://github.com/theinterneti/TTA/issues/24) - **REVOKED**
+
+<!-- END MANUAL SECTION -->
 
 ---
 
-**Last Updated**: 2025-10-08
-**Last Updated By**: theinterneti
-**Current Stage**: **Staging** 🎉
-**Status**: ✅ Promoted to Staging
+<!-- AUTO-GENERATED FOOTER -->
+**Last Updated**: 2025-10-21 (AUTO-UPDATED)
+**Last Updated By**: Automated Metrics System
+**Current Stage**: **Development** ⚠️
+**Status**: Requires remediation (42.2% coverage, 1 linting violation)
+<!-- END AUTO-GENERATED -->
