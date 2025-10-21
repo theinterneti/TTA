@@ -1,113 +1,200 @@
-site_name: TTA Documentation
-site_url: https://your-org.github.io/tta/
-repo_url: https://github.com/your-org/tta
-repo_name: your-org/tta
+site_name: TTA - Therapeutic Text Adventure
+site_description: Documentation for the TTA monorepo and reusable packages
+site_author: TTA Development Team
+site_url: https://theinterneti.github.io/TTA/
+
+repo_name: theinterneti/TTA
+repo_url: https://github.com/theinterneti/TTA
+edit_uri: edit/main/docs/
 
 theme:
   name: material
-  custom_dir: docs/overrides # For custom CSS/JS if needed
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - search.suggest
-    - search.highlight
-    - content.tabs.link
-    - content.code.annotate
-    - content.code.copy
   palette:
-    - scheme: default
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       primary: indigo
-      accent: indigo
-    - scheme: slate
+      accent: blue
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-      primary: blue
-      accent: blue
-  font:
-    text: Roboto
-    code: Roboto Mono
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
   icon:
-    logo: material/book-open-page-variant
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/your-org/tta
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/your-org
-
-nav:
-  - Home: README.md
-  - Getting Started:
-    - Installation: docs/getting-started/installation.md
-    - Configuration: docs/getting-started/configuration.md
-  - Architecture:
-    - Overview: docs/architecture/overview.md
-    - Components: docs/architecture/components.md
-  - API Reference: docs/api-reference.md
-  - Contributing: CONTRIBUTING.md
-  - Changelog: CHANGELOG.md
-  - Security: SECURITY.md
-  - Additional Documentation:
-    - 'Documentation/':
-      - 'Documentation/LOGOUT_CHANGES_DETAILED.md'
-      - 'Documentation/LOGOUT_COMPLETION_SUMMARY.txt'
-      - 'Documentation/LOGOUT_DOCUMENTATION_INDEX.md'
-      - 'Documentation/LOGOUT_IMPLEMENTATION_CHECKLIST.md'
-      - 'Documentation/README_E2E_VALIDATION.md'
-      - 'Documentation/TESTING_DATABASE_SETUP.md'
-      - 'Documentation/UI_UX_ENHANCEMENT_RECOMMENDATIONS.md'
-      - 'Documentation/ACCURATE_P0_COMPONENT_STATUS.md'
-      - 'Documentation/ADVANCED_TESTING_GETTING_STARTED.md'
-      - 'Documentation/CARBON_STAGING_PROMOTION.md'
-      - 'Documentation/CHARACTER_CREATION_FORM_RESTORATION.md'
-      - 'Documentation/COMPONENT_MATURITY_ANALYSIS_SUMMARY.md.OUTDATED'
-      - 'Documentation/COMPONENT_MATURITY_REANALYSIS.md'
-      - 'Documentation/DEPLOYMENT_STATUS_UPDATED.md'
-      - 'Documentation/DEPLOYMENT_STATUS.md'
-      - 'Documentation/E2E_TESTING_CHECKLIST.md'
-      - 'Documentation/E2E_TESTING_COMPREHENSIVE_IMPLEMENTATION.md'
-      - 'Documentation/E2E_VALIDATION_ISSUES_AND_FIXES.md'
-      - 'Documentation/GIT_COMMIT_STRATEGY.md'
-      - 'Documentation/NEXT_STEPS_WORKFLOW_TESTING.md'
-      - 'Documentation/PHASE_2_ROOT_CAUSE_ANALYSIS.md'
-      - 'Documentation/PHASE_3_COMPLETION_STATUS.md'
-      - 'Documentation/SECURITY_FINDINGS_ACCEPTED_RISKS.md'
-      - 'Documentation/TEST_FIXES_PROGRESS.md'
-      - 'Documentation/TEST_RESULTS_BASELINE.md'
+      link: https://github.com/theinterneti/TTA
+  version:
+    provider: mike
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Help us improve by
+            <a href="https://github.com/theinterneti/TTA/issues/new" target="_blank" rel="noopener">opening an issue</a>.
 
 plugins:
-  - search
-  - awesome-pages # For automatic page discovery in subdirectories
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - mermaid2:
+      version: 10.6.1
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            [
+              packages/tta-ai-framework/src,
+              packages/tta-narrative-engine/src,
+              src,
+            ]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            group_by_category: true
+            show_category_heading: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
 
 markdown_extensions:
+  - abbr
   - admonition
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.critic
-  - pymdownx.caret
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.tilde
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
   - attr_list
+  - def_list
+  - footnotes
   - md_in_html
+  - tables
   - toc:
       permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
 
 extra_css:
   - stylesheets/extra.css
 
-# Customization for Material for MkDocs
-# For example, to add a custom favicon:
-# extra_javascript:
-#   - javascripts/extra.js
-# extra_css:
-#   - stylesheets/extra.css
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+      - Configuration: getting-started/configuration.md
+
+  - Packages:
+      - Overview: packages/overview.md
+      - TTA AI Framework:
+          - Introduction: packages/tta-ai-framework/index.md
+          - Orchestration: packages/tta-ai-framework/orchestration.md
+          - Model Management: packages/tta-ai-framework/models.md
+          - Prompt Registry: packages/tta-ai-framework/prompts.md
+          - API Reference: packages/tta-ai-framework/api.md
+      - TTA Narrative Engine:
+          - Introduction: packages/tta-narrative-engine/index.md
+          - Scene Generation: packages/tta-narrative-engine/generation.md
+          - Narrative Orchestration: packages/tta-narrative-engine/orchestration.md
+          - Coherence Validation: packages/tta-narrative-engine/coherence.md
+          - API Reference: packages/tta-narrative-engine/api.md
+
+  - TTA Application:
+      - Overview: application/overview.md
+      - Architecture: application/architecture.md
+      - Player Experience: application/player-experience.md
+      - Therapeutic Systems: application/therapeutic-systems.md
+      - API Gateway: application/api-gateway.md
+
+  - Development:
+      - Component Maturity: development/component-maturity.md
+      - Testing Strategy: development/testing.md
+      - Contributing: development/contributing.md
+      - Code Style: development/code-style.md
+      - CI/CD: development/cicd.md
+
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Dependency Graph: architecture/dependency-graph.md
+      - Database Design: architecture/database.md
+      - Agent Orchestration: architecture/agent-orchestration.md
+      - Agentic Primitives: architecture/agentic-primitives-quick-reference.md
+
+  - Deployment:
+      - Overview: deployment/overview.md
+      - Development: deployment/development.md
+      - Staging: deployment/staging.md
+      - Production: deployment/production.md
+
+  - API Reference:
+      - TTA AI Framework: api/tta-ai-framework.md
+      - TTA Narrative Engine: api/tta-narrative-engine.md
+      - TTA Application: api/tta-application.md
+
+copyright: Copyright &copy; 2024 TTA Development Team
