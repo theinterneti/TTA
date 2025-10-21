@@ -385,3 +385,5 @@ tests/e2e-staging/*-snapshots/
 
 # Experimental GitHub workflows (not production-ready)
 .github/workflows/gemini-*.yml
+# MkDocs build output
+site/
