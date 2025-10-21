@@ -21,9 +21,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from src.agent_orchestration.models import AgentType
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.workflow_manager import WorkflowManager
+from tta_ai.orchestration.models import AgentType
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.workflow_manager import WorkflowManager
 from src.ai_components.langgraph_integration import TherapeuticWorkflowManager
 
 logger = logging.getLogger(__name__)

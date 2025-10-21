@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.unified_orchestrator import (
+from tta_ai.orchestration.unified_orchestrator import (
     OrchestrationPhase,
     OrchestrationState,
     UnifiedAgentOrchestrator,
@@ -198,7 +198,7 @@ class TestUnifiedAgentOrchestrator:
     async def test_safety_concern_handling(self, orchestrator):
         """Test handling of safety concerns."""
         # Mock safety service to return blocked (high risk)
-        from src.agent_orchestration.therapeutic_safety import (
+        from tta_ai.orchestration.therapeutic_safety import (
             SafetyLevel,
             ValidationResult,
         )

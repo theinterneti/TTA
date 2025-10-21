@@ -8,14 +8,14 @@ and edge cases.
 
 import pytest
 
-from src.components.narrative_arc_orchestrator.impact_analysis import (
+from tta_narrative.orchestration.impact_analysis import (
     assess_therapeutic_alignment,
     calculate_base_magnitude,
     calculate_causal_strength,
     calculate_confidence_score,
     identify_affected_elements,
 )
-from src.components.narrative_arc_orchestrator.models import (
+from tta_narrative.orchestration.models import (
     NarrativeScale,
     PlayerChoice,
 )

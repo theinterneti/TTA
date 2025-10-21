@@ -33,10 +33,10 @@ agent_orchestration_available: bool
 therapeutic_safety_available: bool
 
 try:
-    from src.agent_orchestration.realtime.agent_event_integration import (
+    from tta_ai.orchestration.realtime.agent_event_integration import (
         get_agent_event_integrator,
     )
-    from src.agent_orchestration.therapeutic_safety import (
+    from tta_ai.orchestration.therapeutic_safety import (
         CrisisInterventionManager,
         SafetyLevel,
         get_global_safety_service,

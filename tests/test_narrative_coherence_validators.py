@@ -12,11 +12,11 @@ from datetime import datetime
 
 import pytest
 
-from src.components.narrative_coherence.coherence_validator import CoherenceValidator
-from src.components.narrative_coherence.contradiction_detector import (
+from tta_narrative.coherence.coherence_validator import CoherenceValidator
+from tta_narrative.coherence.contradiction_detector import (
     ContradictionDetector,
 )
-from src.components.narrative_coherence.models import (
+from tta_narrative.coherence.models import (
     ConsistencyIssue,
     ConsistencyIssueType,
     LoreEntry,

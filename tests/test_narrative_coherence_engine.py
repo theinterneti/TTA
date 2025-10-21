@@ -48,7 +48,7 @@ class Contradiction:
 def test_narrative_coherence_engine_imports():
     """Test that the narrative coherence engine can be imported."""
     try:
-        from src.components.narrative_coherence_engine import (
+        from tta_narrative.coherence_engine import (
             ConsistencyIssue,
             Contradiction,
             NarrativeContent,

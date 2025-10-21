@@ -9,15 +9,15 @@ import asyncio
 
 import pytest
 
-from src.agent_orchestration.circuit_breaker import (
+from tta_ai.orchestration.circuit_breaker import (
     CircuitBreaker,
     CircuitBreakerConfig,
     CircuitBreakerOpenError,
     CircuitBreakerState,
 )
-from src.agent_orchestration.circuit_breaker_metrics import get_circuit_breaker_metrics
-from src.agent_orchestration.circuit_breaker_registry import CircuitBreakerRegistry
-from src.agent_orchestration.resource_exhaustion_detector import (
+from tta_ai.orchestration.circuit_breaker_metrics import get_circuit_breaker_metrics
+from tta_ai.orchestration.circuit_breaker_registry import CircuitBreakerRegistry
+from tta_ai.orchestration.resource_exhaustion_detector import (
     ResourceExhaustionDetector,
     ResourceExhaustionEvent,
     ResourceThresholds,

@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pytest
 
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisType,
     TherapeuticValidator,
     ValidationResult,

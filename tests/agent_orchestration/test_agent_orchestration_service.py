@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentContext,
     AgentId,
     AgentType,
@@ -19,7 +19,7 @@ from src.agent_orchestration import (
     SessionContext,
     WorkflowType,
 )
-from src.agent_orchestration.service import (
+from tta_ai.orchestration.service import (
     AgentOrchestrationService,
     ServiceError,
     TherapeuticSafetyError,

@@ -10,13 +10,13 @@ import json
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisInterventionManager,
     TherapeuticValidator,
 )

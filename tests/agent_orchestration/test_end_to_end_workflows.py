@@ -12,7 +12,7 @@ from unittest.mock import patch
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentStep,
     AgentType,
     OrchestrationRequest,
@@ -391,13 +391,13 @@ class TestMessageRoutingIntegration:
         )
 
         try:
-            from src.agent_orchestration import (
+            from tta_ai.orchestration import (
                 AgentId,
                 AgentMessage,
                 MessagePriority,
                 MessageType,
             )
-            from src.agent_orchestration.coordinators.redis_message_coordinator import (
+            from tta_ai.orchestration.coordinators.redis_message_coordinator import (
                 RedisMessageCoordinator,
             )
 

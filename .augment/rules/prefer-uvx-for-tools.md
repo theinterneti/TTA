@@ -1,3 +1,8 @@
+---
+type: "agent_requested"
+description: "Example description"
+---
+
 # AI Agent Rule: Prefer `uvx` for Tool Execution
 
 ## Rule Priority

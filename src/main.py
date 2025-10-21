@@ -365,7 +365,7 @@ def main() -> int:
             )
             return 1
         if args.admin_command == "recover":
-            from src.agent_orchestration.admin.recover import run_recovery
+            from tta_ai.orchestration.admin.recover import run_recovery
 
             try:
                 per_agent = __import__("asyncio").run(

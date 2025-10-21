@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from src.ai_components.prompts import PromptMetrics, PromptRegistry, PromptTemplate
+from tta_ai.prompts import PromptMetrics, PromptRegistry, PromptTemplate
 
 
 @pytest.fixture

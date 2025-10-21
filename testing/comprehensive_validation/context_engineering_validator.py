@@ -23,7 +23,7 @@ from enum import Enum
 from typing import Any
 
 from enhanced_preference_ai_server import EnhancedContext, PlayerPreferences
-from src.agent_orchestration.models import AgentType
+from tta_ai.orchestration.models import AgentType
 from src.components.therapeutic_systems_enhanced.therapeutic_integration_system import (
     TherapeuticIntegrationSystem,
 )

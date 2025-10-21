@@ -9,18 +9,18 @@ import asyncio
 import logging
 from typing import Any
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.config.real_agent_config import get_real_agent_config
-from src.agent_orchestration.enhanced_coordinator import (
+from tta_ai.orchestration.config.real_agent_config import get_real_agent_config
+from tta_ai.orchestration.enhanced_coordinator import (
     EnhancedRedisMessageCoordinator,
     ScalableWorkflowCoordinator,
 )
-from src.agent_orchestration.monitoring import AlertManager, get_system_monitor
-from src.agent_orchestration.profiling import AgentCoordinationProfiler
+from tta_ai.orchestration.monitoring import AlertManager, get_system_monitor
+from tta_ai.orchestration.profiling import AgentCoordinationProfiler
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

@@ -13,21 +13,21 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.models import AgentType
-from src.agent_orchestration.performance.optimization import IntelligentAgentCoordinator
-from src.agent_orchestration.performance.response_time_monitor import (
+from tta_ai.orchestration.models import AgentType
+from tta_ai.orchestration.performance.optimization import IntelligentAgentCoordinator
+from tta_ai.orchestration.performance.response_time_monitor import (
     get_response_time_monitor,
 )
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisInterventionManager,
     TherapeuticValidator,
 )

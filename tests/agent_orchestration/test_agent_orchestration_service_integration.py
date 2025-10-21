@@ -11,7 +11,7 @@ import pytest
 import pytest_asyncio
 import redis.asyncio as aioredis
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentContext,
     AgentId,
     AgentStep,
@@ -22,11 +22,11 @@ from src.agent_orchestration import (
     WorkflowDefinition,
     WorkflowType,
 )
-from src.agent_orchestration.agents import AgentRegistry
-from src.agent_orchestration.coordinators import RedisMessageCoordinator
-from src.agent_orchestration.resources import ResourceManager
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.workflow_manager import WorkflowManager
+from tta_ai.orchestration.agents import AgentRegistry
+from tta_ai.orchestration.coordinators import RedisMessageCoordinator
+from tta_ai.orchestration.resources import ResourceManager
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.workflow_manager import WorkflowManager
 
 # ============================================================================
 # Integration Test Fixtures
@@ -288,7 +288,7 @@ async def test_therapeutic_safety_integration(
         pytest.fail(f"Safe content should not raise exception: {e}")
 
     # Test unsafe content (should raise TherapeuticSafetyError)
-    from src.agent_orchestration.service import TherapeuticSafetyError
+    from tta_ai.orchestration.service import TherapeuticSafetyError
 
     with pytest.raises(TherapeuticSafetyError):
         await integration_service._validate_therapeutic_safety(
@@ -405,7 +405,7 @@ def test_workflow_manager_integration_structure():
     workflow_manager = WorkflowManager()
 
     # Test workflow registration
-    from src.agent_orchestration import (
+    from tta_ai.orchestration import (
         AgentType,
     )
 

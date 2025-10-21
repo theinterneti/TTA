@@ -10,13 +10,13 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from src.agent_orchestration.realtime.models import (
+from tta_ai.orchestration.realtime.models import (
     AgentStatus,
     AgentStatusEvent,
     EventType,
     WebSocketEvent,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnection,
     WebSocketConnectionManager,
 )

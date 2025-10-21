@@ -13,14 +13,14 @@ import pytest
 import pytest_asyncio
 from fastapi.websockets import WebSocket
 
-from src.agent_orchestration.realtime.config_manager import (
+from tta_ai.orchestration.realtime.config_manager import (
     RealtimeEnvironment,
     get_realtime_config_manager,
 )
-from src.agent_orchestration.realtime.models import (
+from tta_ai.orchestration.realtime.models import (
     AgentStatusEvent,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
 

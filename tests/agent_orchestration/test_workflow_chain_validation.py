@@ -12,16 +12,16 @@ import time
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.performance.response_time_monitor import (
+from tta_ai.orchestration.performance.response_time_monitor import (
     OperationType,
     ResponseTimeMonitor,
 )
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.realtime.agent_event_integration import (
+from tta_ai.orchestration.realtime.agent_event_integration import (
     AgentWorkflowCoordinator,
 )
 
