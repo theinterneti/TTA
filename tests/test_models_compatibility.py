@@ -1,8 +1,8 @@
-from src.components.narrative_arc_orchestrator.models import (
+from tta_narrative.orchestration.models import (
     NarrativeEvent,
     NarrativeScale,
 )
-from src.components.narrative_coherence import (
+from tta_narrative.coherence import (
     ConsistencyIssue,
     ConsistencyIssueType,
     ValidationSeverity,

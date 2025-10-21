@@ -4,8 +4,8 @@ import os
 import pytest
 from starlette.testclient import TestClient
 
-from src.agent_orchestration.tools.metrics import get_tool_metrics
-from src.agent_orchestration.tools.models import ToolSpec
+from tta_ai.orchestration.tools.metrics import get_tool_metrics
+from tta_ai.orchestration.tools.models import ToolSpec
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 

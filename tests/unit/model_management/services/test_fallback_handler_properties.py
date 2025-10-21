@@ -12,14 +12,14 @@ import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
 
-from src.components.model_management import (
+from tta_ai.models import (
     ModelInfo,
     ModelRequirements,
     ProviderType,
     TaskType,
 )
-from src.components.model_management.models import FallbackConfiguration
-from src.components.model_management.services import FallbackHandler
+from tta_ai.models.models import FallbackConfiguration
+from tta_ai.models.services import FallbackHandler
 
 # ============================================================================
 # Hypothesis Strategies

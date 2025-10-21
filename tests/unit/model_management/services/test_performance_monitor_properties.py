@@ -11,8 +11,8 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src.components.model_management.models import TaskType
-from src.components.model_management.services import PerformanceMonitor
+from tta_ai.models.models import TaskType
+from tta_ai.models.services import PerformanceMonitor
 
 # ============================================================================
 # Hypothesis Strategies

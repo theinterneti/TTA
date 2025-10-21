@@ -12,21 +12,21 @@ import time
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.models import AgentType
-from src.agent_orchestration.performance.alerting import PerformanceAlerting
-from src.agent_orchestration.performance.analytics import PerformanceAnalytics
-from src.agent_orchestration.performance.optimization import IntelligentAgentCoordinator
-from src.agent_orchestration.performance.response_time_monitor import (
+from tta_ai.orchestration.models import AgentType
+from tta_ai.orchestration.performance.alerting import PerformanceAlerting
+from tta_ai.orchestration.performance.analytics import PerformanceAnalytics
+from tta_ai.orchestration.performance.optimization import IntelligentAgentCoordinator
+from tta_ai.orchestration.performance.response_time_monitor import (
     OperationType,
     ResponseTimeMonitor,
 )
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisInterventionManager,
     TherapeuticValidator,
 )

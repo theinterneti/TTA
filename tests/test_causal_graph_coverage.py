@@ -5,7 +5,7 @@ This module contains tests specifically designed to cover previously
 untested code paths in causal_graph.py.
 """
 
-from src.components.narrative_arc_orchestrator.causal_graph import (
+from tta_narrative.orchestration.causal_graph import (
     add_edge,
     detect_simple_cycles,
     remove_weak_link,

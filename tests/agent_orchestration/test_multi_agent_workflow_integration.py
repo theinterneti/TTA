@@ -20,7 +20,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentMessage,
     AgentRegistry,
     AgentStep,

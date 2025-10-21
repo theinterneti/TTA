@@ -76,7 +76,7 @@ class AgentOrchestrationComponent(Component):
     def _validate_configuration(self):
         """Validate agent orchestration configuration using schema validation."""
         try:
-            from src.agent_orchestration.config_schema import (
+            from tta_ai.orchestration.config_schema import (
                 validate_agent_orchestration_config,
             )
 
@@ -168,7 +168,7 @@ class AgentOrchestrationComponent(Component):
             self._redis_client = aioredis.from_url(redis_url)
 
             # Defer import to avoid circulars
-            from src.agent_orchestration.coordinators import RedisMessageCoordinator
+            from tta_ai.orchestration.coordinators import RedisMessageCoordinator
 
             self._message_coordinator = RedisMessageCoordinator(
                 self._redis_client, key_prefix="ao"
@@ -179,8 +179,8 @@ class AgentOrchestrationComponent(Component):
                 if bool(
                     self.config.get("agent_orchestration.error_handling.enabled", True)
                 ):
-                    from src.agent_orchestration.state_validator import StateValidator
-                    from src.agent_orchestration.workflow_monitor import WorkflowMonitor
+                    from tta_ai.orchestration.state_validator import StateValidator
+                    from tta_ai.orchestration.workflow_monitor import WorkflowMonitor
 
                     tt = float(
                         self.config.get(
@@ -245,7 +245,7 @@ class AgentOrchestrationComponent(Component):
 
             # Attach router to coordinator
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.router import AgentRouter
+                from tta_ai.orchestration.router import AgentRouter
 
                 self._agent_router = AgentRouter(
                     self._agent_registry,
@@ -310,7 +310,7 @@ class AgentOrchestrationComponent(Component):
 
             # Initialize agent registry and start health checks if configured
             try:
-                from src.agent_orchestration.agents import AgentRegistry
+                from tta_ai.orchestration.agents import AgentRegistry
 
                 self._agent_registry = AgentRegistry()
                 health_iv = float(
@@ -323,7 +323,7 @@ class AgentOrchestrationComponent(Component):
                 self._agent_registry = None
 
             # Initialize ResourceManager and start background monitoring
-            from src.agent_orchestration.resources import ResourceManager
+            from tta_ai.orchestration.resources import ResourceManager
 
             rm = ResourceManager(
                 gpu_memory_limit_fraction=float(
@@ -356,7 +356,7 @@ class AgentOrchestrationComponent(Component):
 
             # Initialize WorkflowManager for workflow orchestration
             try:
-                from src.agent_orchestration.workflow_manager import WorkflowManager
+                from tta_ai.orchestration.workflow_manager import WorkflowManager
 
                 self._workflow_manager = WorkflowManager()
                 logger.info("WorkflowManager initialized successfully")
@@ -366,7 +366,7 @@ class AgentOrchestrationComponent(Component):
 
             # Initialize therapeutic safety service (config-driven)
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.therapeutic_safety import (
+                from tta_ai.orchestration.therapeutic_safety import (
                     SafetyRulesProvider,
                     SafetyService,
                 )
@@ -407,7 +407,7 @@ class AgentOrchestrationComponent(Component):
                 self.config.get("agent_orchestration.realtime.events.enabled", False)
             ):
                 try:
-                    from src.agent_orchestration.realtime.event_publisher import (
+                    from tta_ai.orchestration.realtime.event_publisher import (
                         EventPublisher,
                     )
 
@@ -456,7 +456,7 @@ class AgentOrchestrationComponent(Component):
                 )
             ):
                 try:
-                    from src.agent_orchestration.realtime.progressive_feedback import (
+                    from tta_ai.orchestration.realtime.progressive_feedback import (
                         ProgressiveFeedbackManager,
                     )
 
@@ -491,7 +491,7 @@ class AgentOrchestrationComponent(Component):
             self._workflow_tracker = None
             if bool(self.config.get("agent_orchestration.realtime.enabled", False)):
                 try:
-                    from src.agent_orchestration.realtime.workflow_progress import (
+                    from tta_ai.orchestration.realtime.workflow_progress import (
                         WorkflowProgressTracker,
                     )
 
@@ -519,7 +519,7 @@ class AgentOrchestrationComponent(Component):
 
             if bool(self.config.get("agent_orchestration.optimization.enabled", False)):
                 try:
-                    from src.agent_orchestration.optimization import (
+                    from tta_ai.orchestration.optimization import (
                         OptimizationEngine,
                         OptimizationStrategy,
                         PerformanceAnalytics,
@@ -614,8 +614,8 @@ class AgentOrchestrationComponent(Component):
 
             # Initialize agent registry and start health checks if configured
             try:
-                from src.agent_orchestration.agents import AgentRegistry
-                from src.agent_orchestration.registries import RedisAgentRegistry
+                from tta_ai.orchestration.agents import AgentRegistry
+                from tta_ai.orchestration.registries import RedisAgentRegistry
 
                 ttl = float(
                     self.config.get("agent_orchestration.agents.heartbeat_ttl", 30.0)
@@ -705,7 +705,7 @@ class AgentOrchestrationComponent(Component):
                     self._register_optimization_parameters()
 
                 # Configure restart and fallback callbacks for failure detection
-                from src.agent_orchestration.agents import Agent
+                from tta_ai.orchestration.agents import Agent
 
                 async def _restart_agent(agent: Agent) -> bool:
                     try:
@@ -805,7 +805,7 @@ class AgentOrchestrationComponent(Component):
             except Exception:
                 # Fallback to in-memory registry if Redis registry fails
                 try:
-                    from src.agent_orchestration.agents import AgentRegistry
+                    from tta_ai.orchestration.agents import AgentRegistry
 
                     self._agent_registry = AgentRegistry()
                     health_iv = float(
@@ -816,7 +816,7 @@ class AgentOrchestrationComponent(Component):
                     self._agent_registry.start_periodic_health_checks(health_iv)
 
                     # Configure restart callback and periodic failure detection
-                    from src.agent_orchestration.agents import (  # type: ignore
+                    from tta_ai.orchestration.agents import (  # type: ignore
                         Agent,
                         AgentRegistry,
                     )
@@ -850,7 +850,7 @@ class AgentOrchestrationComponent(Component):
                             await agent.start()
                             # If Redis registry, attempt state restore again
                             with contextlib.suppress(Exception):
-                                from src.agent_orchestration.registries import (
+                                from tta_ai.orchestration.registries import (
                                     RedisAgentRegistry,
                                 )
 
@@ -893,7 +893,7 @@ class AgentOrchestrationComponent(Component):
                         Returns True if a fallback path was found.
                         """
                         try:
-                            from src.agent_orchestration.agents import AgentRegistry
+                            from tta_ai.orchestration.agents import AgentRegistry
 
                             reg = getattr(self, "_agent_registry", None)
                             if not isinstance(reg, AgentRegistry):
@@ -983,7 +983,7 @@ class AgentOrchestrationComponent(Component):
                     import socket
                     import uuid
 
-                    from src.agent_orchestration.proxies import (
+                    from tta_ai.orchestration.proxies import (
                         InputProcessorAgentProxy,
                         NarrativeGeneratorAgentProxy,
                         WorldBuilderAgentProxy,
@@ -1080,7 +1080,7 @@ class AgentOrchestrationComponent(Component):
 
             # Initialize the main AgentOrchestrationService
             try:
-                from src.agent_orchestration.service import AgentOrchestrationService
+                from tta_ai.orchestration.service import AgentOrchestrationService
 
                 # Get therapeutic validator if available
                 therapeutic_validator = getattr(self, "_safety_service", None)
@@ -1192,7 +1192,7 @@ class AgentOrchestrationComponent(Component):
                             with contextlib.suppress(Exception):
                                 reg.deregister(agent.agent_id)
                         with contextlib.suppress(Exception):
-                            from src.agent_orchestration.registries import (
+                            from tta_ai.orchestration.registries import (
                                 RedisAgentRegistry,  # type: ignore
                             )
 
@@ -1214,7 +1214,7 @@ class AgentOrchestrationComponent(Component):
                     with contextlib.suppress(Exception):
                         reg.stop_periodic_health_checks()
                     with contextlib.suppress(Exception):
-                        from src.agent_orchestration.registries import (
+                        from tta_ai.orchestration.registries import (
                             RedisAgentRegistry,  # type: ignore
                         )
 
@@ -1276,7 +1276,7 @@ class AgentOrchestrationComponent(Component):
 
     async def _poll_queue_metrics_once(self) -> None:
         """Single-cycle polling to update metrics and run threshold checks."""
-        from src.agent_orchestration.models import AgentType
+        from tta_ai.orchestration.models import AgentType
 
         coord = self._message_coordinator
         if not coord:
@@ -1377,7 +1377,7 @@ class AgentOrchestrationComponent(Component):
             import os
             import threading
 
-            from src.agent_orchestration.tools.policy_config import (
+            from tta_ai.orchestration.tools.policy_config import (
                 load_tool_policy_config,
             )
 
@@ -1389,9 +1389,9 @@ class AgentOrchestrationComponent(Component):
                 "player_experience.api.redis_url", "redis://localhost:6379/0"
             )
             rclient = aioredis.from_url(redis_url)
-            from src.agent_orchestration.tools.coordinator import ToolCoordinator
-            from src.agent_orchestration.tools.models import ToolPolicy
-            from src.agent_orchestration.tools.redis_tool_registry import (
+            from tta_ai.orchestration.tools.coordinator import ToolCoordinator
+            from tta_ai.orchestration.tools.models import ToolPolicy
+            from tta_ai.orchestration.tools.redis_tool_registry import (
                 RedisToolRegistry,
             )
 
@@ -1412,7 +1412,7 @@ class AgentOrchestrationComponent(Component):
                     )
                     merged["callable_allowlist"] = merged_allow
                     # Reconstruct model
-                    from src.agent_orchestration.tools.policy_config import (
+                    from tta_ai.orchestration.tools.policy_config import (
                         ToolPolicyConfig as _TPC,
                     )
 
@@ -1437,10 +1437,10 @@ class AgentOrchestrationComponent(Component):
                 with contextlib.suppress(Exception):
                     import time as _t
 
-                    from src.agent_orchestration.tools.policy_config import (
+                    from tta_ai.orchestration.tools.policy_config import (
                         ToolPolicyConfig as _TPC,
                     )
-                    from src.agent_orchestration.tools.policy_config import (
+                    from tta_ai.orchestration.tools.policy_config import (
                         _load_from_file,
                         validate_tool_policy_config,
                     )
@@ -1522,7 +1522,7 @@ class AgentOrchestrationComponent(Component):
                     "player_experience.api.redis_url", "redis://localhost:6379/0"
                 )
                 rclient = aioredis.from_url(redis_url)
-                from src.agent_orchestration.tools.redis_tool_registry import (
+                from tta_ai.orchestration.tools.redis_tool_registry import (
                     RedisToolRegistry,
                 )
 
@@ -1537,8 +1537,8 @@ class AgentOrchestrationComponent(Component):
 
         # Create a shared invocation service for app usage
         try:
-            from src.agent_orchestration.tools.callable_registry import CallableRegistry
-            from src.agent_orchestration.tools.invocation_service import (
+            from tta_ai.orchestration.tools.callable_registry import CallableRegistry
+            from tta_ai.orchestration.tools.invocation_service import (
                 ToolInvocationService,
             )
 
@@ -1596,7 +1596,7 @@ class AgentOrchestrationComponent(Component):
                         data.setdefault("workflow", {}).update(wf_metrics)
             # Add policy snapshot (redacted)
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.tools.policy_config import (
+                from tta_ai.orchestration.tools.policy_config import (
                     redact_policy_config_dict,
                 )
 
@@ -1625,7 +1625,7 @@ class AgentOrchestrationComponent(Component):
                     )
             # Aggregate performance metrics (per-agent step stats)
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.performance import get_step_aggregator
+                from tta_ai.orchestration.performance import get_step_aggregator
 
                 perf_snap = get_step_aggregator().snapshot()
                 data["performance"] = perf_snap
@@ -1655,7 +1655,7 @@ class AgentOrchestrationComponent(Component):
                     }
                     # attach per-tool execution stats
                     with contextlib.suppress(Exception):
-                        from src.agent_orchestration.tools.metrics import (
+                        from tta_ai.orchestration.tools.metrics import (
                             get_tool_metrics,
                         )
 
@@ -1671,7 +1671,7 @@ class AgentOrchestrationComponent(Component):
                     }
             # Agent registry snapshot if available (sync)
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.agents import AgentRegistry  # type: ignore
+                from tta_ai.orchestration.agents import AgentRegistry  # type: ignore
 
                 reg = getattr(self, "_agent_registry", None)
                 if reg and isinstance(reg, AgentRegistry):  # type: ignore
@@ -1690,7 +1690,7 @@ class AgentOrchestrationComponent(Component):
             local_snap = reg.snapshot()
             redis_index: list = []
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.registries import (
+                from tta_ai.orchestration.registries import (
                     RedisAgentRegistry,  # type: ignore
                 )
 
@@ -1706,7 +1706,7 @@ class AgentOrchestrationComponent(Component):
             # Derived perf metrics from aggregator keyed by type:instance
             perf = {}
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.performance import get_step_aggregator
+                from tta_ai.orchestration.performance import get_step_aggregator
 
                 perf = (
                     get_step_aggregator().snapshot()
@@ -1815,7 +1815,7 @@ class AgentOrchestrationComponent(Component):
                 if bool(
                     self.config.get("agent_orchestration.diagnostics.enabled", False)
                 ):
-                    from src.agent_orchestration.agents import (
+                    from tta_ai.orchestration.agents import (
                         AgentRegistry,  # type: ignore
                     )
 
@@ -1871,7 +1871,7 @@ class AgentOrchestrationComponent(Component):
             # Tool metrics
             tool_exec = {}
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.tools.metrics import get_tool_metrics
+                from tta_ai.orchestration.tools.metrics import get_tool_metrics
 
                 tool_exec = get_tool_metrics().snapshot()
             with contextlib.suppress(Exception):
@@ -1935,7 +1935,7 @@ class AgentOrchestrationComponent(Component):
 
             # Performance metrics from aggregator
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.performance import get_step_aggregator
+                from tta_ai.orchestration.performance import get_step_aggregator
 
                 perf = get_step_aggregator().snapshot()
                 for agent, stats in perf.items():
@@ -2032,7 +2032,7 @@ class AgentOrchestrationComponent(Component):
             ):
                 return {"error": "diagnostics disabled"}
             try:
-                from src.agent_orchestration.models import AgentType
+                from tta_ai.orchestration.models import AgentType
 
                 at = None
                 try:
@@ -2084,7 +2084,7 @@ class AgentOrchestrationComponent(Component):
         @app.get("/policy")
         async def policy_snapshot() -> dict:
             try:
-                from src.agent_orchestration.tools.policy_config import (
+                from tta_ai.orchestration.tools.policy_config import (
                     redact_policy_config_dict,
                 )
 
@@ -2146,10 +2146,10 @@ class AgentOrchestrationComponent(Component):
                 import os
                 import time
 
-                from src.agent_orchestration.tools.policy_config import (
+                from tta_ai.orchestration.tools.policy_config import (
                     ToolPolicyConfig as _TPC,
                 )
-                from src.agent_orchestration.tools.policy_config import (
+                from tta_ai.orchestration.tools.policy_config import (
                     load_tool_policy_config,
                     load_tool_policy_config_from,
                 )
@@ -2202,7 +2202,7 @@ class AgentOrchestrationComponent(Component):
                     {"ok": False, "error": "unauthorized"}, status_code=401
                 )
             try:
-                from src.agent_orchestration.tools.policy_config import (
+                from tta_ai.orchestration.tools.policy_config import (
                     validate_tool_policy_config,
                 )
 
@@ -2244,7 +2244,7 @@ class AgentOrchestrationComponent(Component):
                     sp = "start"
                 import redis.asyncio as aioredis
 
-                from src.agent_orchestration.workflow_transaction import (
+                from tta_ai.orchestration.workflow_transaction import (
                     WorkflowTransaction,
                 )
 
@@ -2306,7 +2306,7 @@ class AgentOrchestrationComponent(Component):
         with contextlib.suppress(Exception):
             _safety = getattr(self, "_safety_service", None)
             if _safety is None:
-                from src.agent_orchestration.therapeutic_safety import (
+                from tta_ai.orchestration.therapeutic_safety import (
                     get_global_safety_service,
                 )
 
@@ -2508,7 +2508,7 @@ class AgentOrchestrationComponent(Component):
             cache_stats = await reg.cache_stats()
             usage = {}
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.tools.metrics import get_tool_metrics
+                from tta_ai.orchestration.tools.metrics import get_tool_metrics
 
                 usage = get_tool_metrics().snapshot()
             return {"tools": items, "cache": cache_stats, "usage": usage}
@@ -2562,7 +2562,7 @@ class AgentOrchestrationComponent(Component):
             deprecated = total - active
             usage = {}
             with contextlib.suppress(Exception):
-                from src.agent_orchestration.tools.metrics import get_tool_metrics
+                from tta_ai.orchestration.tools.metrics import get_tool_metrics
 
                 usage = get_tool_metrics().snapshot()
 
@@ -2631,10 +2631,10 @@ class AgentOrchestrationComponent(Component):
                         )
                         if reg is None:
                             return {"ok": False, "error": "tool registry unavailable"}
-                        from src.agent_orchestration.tools.coordinator import (
+                        from tta_ai.orchestration.tools.coordinator import (
                             ToolCoordinator,
                         )
-                        from src.agent_orchestration.tools.invocation_service import (
+                        from tta_ai.orchestration.tools.invocation_service import (
                             ToolInvocationService,
                         )
 
@@ -2711,8 +2711,8 @@ class AgentOrchestrationComponent(Component):
                     )
                     if not ok:
                         return {"ok": False, "error": "tool not allowed"}
-                from src.agent_orchestration.tools.coordinator import ToolCoordinator
-                from src.agent_orchestration.tools.invocation_service import (
+                from tta_ai.orchestration.tools.coordinator import ToolCoordinator
+                from tta_ai.orchestration.tools.invocation_service import (
                     ToolInvocationService,
                 )
 
@@ -2731,7 +2731,7 @@ class AgentOrchestrationComponent(Component):
                     svc.invoke_tool(name, version, args), timeout=timeout_s
                 )
                 dur_ms = int((_t.time() - started) * 1000)
-                from src.agent_orchestration.tools.metrics import get_tool_metrics
+                from tta_ai.orchestration.tools.metrics import get_tool_metrics
 
                 usage = (
                     get_tool_metrics()
@@ -2771,7 +2771,7 @@ class AgentOrchestrationComponent(Component):
         ):
             # Initialize WebSocket connection manager
             if not hasattr(self, "_ws_connection_manager"):
-                from src.agent_orchestration.realtime.websocket_manager import (
+                from tta_ai.orchestration.realtime.websocket_manager import (
                     WebSocketConnectionManager,
                 )
 

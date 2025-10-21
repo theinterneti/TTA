@@ -24,6 +24,9 @@ classifiers = [
 ]
 
 dependencies = [
+    # Workspace packages
+    "tta-ai-framework",
+    "tta-narrative-engine",
     # Core dependencies
     "numpy>=1.24.0",
     "pandas>=2.0.0",
@@ -289,6 +292,21 @@ cache-keys = [
     { file = "pyproject.toml" },
     { file = "uv.lock" },
 ]
+
+# ============================================================================
+# UV WORKSPACE CONFIGURATION
+# ============================================================================
+# Monorepo workspace configuration for managing multiple packages
+
+[tool.uv.workspace]
+members = [
+    "packages/tta-ai-framework",
+    "packages/tta-narrative-engine",
+]
+
+[tool.uv.sources]
+tta-ai-framework = { workspace = true }
+tta-narrative-engine = { workspace = true }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 

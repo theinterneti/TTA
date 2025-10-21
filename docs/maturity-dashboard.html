@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTA Component Maturity Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .summary-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-card.development { background: #fff3cd; }
+        .summary-card.staging { background: #cfe2ff; }
+        .summary-card.production { background: #d1e7dd; }
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+        }
+        .summary-card .count {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #007bff;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.development { background: #ffc107; color: #000; }
+        .badge.staging { background: #0d6efd; color: #fff; }
+        .badge.production { background: #198754; color: #fff; }
+        .status-icon {
+            font-size: 18px;
+        }
+        .blockers {
+            margin-top: 30px;
+        }
+        .blocker-item {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+        .blocker-item h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .blocker-item ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 TTA Component Maturity Dashboard</h1>
+
+        <div class="summary">
+
+            <div class="summary-card development">
+                <h3>Development</h3>
+                <div class="count">0</div>
+            </div>
+
+            <div class="summary-card staging">
+                <h3>Staging</h3>
+                <div class="count">0</div>
+            </div>
+
+            <div class="summary-card production">
+                <h3>Production</h3>
+                <div class="count">0</div>
+            </div>
+
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Package</th>
+                    <th>Stage</th>
+                    <th>Coverage</th>
+                    <th>Lint</th>
+                    <th>Type</th>
+                    <th>Blockers</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><strong>models</strong></td>
+                    <td>tta-ai-framework</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>coherence</strong></td>
+                    <td>tta-narrative-engine</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>orchestration</strong></td>
+                    <td>tta-narrative-engine</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>unknown</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>therapeutic_systems_enhanced</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>narrative_arc_orchestrator</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>neo4j</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>carbon</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>narrative_coherence</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>gameplay_loop</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+                <tr>
+                    <td><strong>model_management</strong></td>
+                    <td>tta-app</td>
+                    <td><span class="badge unknown">Unknown</span></td>
+                    <td>N/A</td>
+                    <td class="status-icon">✗</td>
+                    <td class="status-icon">✗</td>
+                    <td>0</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</body>
+</html>

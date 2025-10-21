@@ -44,7 +44,7 @@ async def test_diagnostics_gated_and_prometheus(redis_client):
 
     # Acquire coord and generate some metrics
     coord = comp._message_coordinator
-    from src.agent_orchestration import AgentId, AgentMessage, AgentType, MessageType
+    from tta_ai.orchestration import AgentId, AgentMessage, AgentType, MessageType
 
     aid = AgentId(type=AgentType.IPA, instance="promtest")
     m = AgentMessage(
@@ -86,11 +86,11 @@ async def test_admin_recover_script(redis_client):
     port = kwargs.get("port", 6379)
     db = kwargs.get("db", 0)
     url = f"redis://{host}:{port}/{db}"
-    from src.agent_orchestration import AgentId, AgentMessage, AgentType, MessageType
-    from src.agent_orchestration.admin.recover import run_recovery
+    from tta_ai.orchestration import AgentId, AgentMessage, AgentType, MessageType
+    from tta_ai.orchestration.admin.recover import run_recovery
 
     # Create a reservation to be recovered
-    from src.agent_orchestration.coordinators import RedisMessageCoordinator
+    from tta_ai.orchestration.coordinators import RedisMessageCoordinator
 
     coord = RedisMessageCoordinator(redis_client, key_prefix="ao")
     aid = AgentId(type=AgentType.IPA, instance="adminrecov")

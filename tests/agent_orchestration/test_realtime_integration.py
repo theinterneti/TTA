@@ -9,19 +9,19 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from src.agent_orchestration.realtime.event_publisher import EventPublisher
-from src.agent_orchestration.realtime.models import (
+from tta_ai.orchestration.realtime.event_publisher import EventPublisher
+from tta_ai.orchestration.realtime.models import (
     AgentStatus,
     WorkflowStatus,
     create_agent_status_event,
 )
-from src.agent_orchestration.realtime.progressive_feedback import (
+from tta_ai.orchestration.realtime.progressive_feedback import (
     ProgressiveFeedbackManager,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
-from src.agent_orchestration.realtime.workflow_progress import (
+from tta_ai.orchestration.realtime.workflow_progress import (
     WorkflowProgressTracker,
     WorkflowStage,
 )

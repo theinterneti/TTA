@@ -11,8 +11,8 @@ from typing import get_type_hints
 
 import pytest
 
-from src.components.model_management.interfaces import IModelProvider, ModelInfo
-from src.components.model_management.providers.openrouter import OpenRouterProvider
+from tta_ai.models.interfaces import IModelProvider, ModelInfo
+from tta_ai.models.providers.openrouter import OpenRouterProvider
 
 # ============================================================================
 # Contract Test Base Class
@@ -302,7 +302,7 @@ class TestProviderResponseFormats:
     async def test_model_info_has_required_fields(self):
         """Contract: ModelInfo objects have all required fields."""
         # Create a sample ModelInfo to verify structure
-        from src.components.model_management import ProviderType
+        from tta_ai.models import ProviderType
 
         model = ModelInfo(
             model_id="test-model",
@@ -335,7 +335,7 @@ class TestProviderResponseFormats:
     @pytest.mark.contract
     def test_provider_type_enum_values(self):
         """Contract: ProviderType enum has expected values."""
-        from src.components.model_management import ProviderType
+        from tta_ai.models import ProviderType
 
         expected_types = [
             "openrouter",

@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.langgraph_orchestrator import (
+from tta_ai.orchestration.langgraph_orchestrator import (
     AgentWorkflowState,
     LangGraphAgentOrchestrator,
 )

@@ -7,15 +7,15 @@ untested code paths in scale_manager.py.
 
 import pytest
 
-from src.components.narrative_arc_orchestrator.conflict_detection import (
+from tta_narrative.orchestration.conflict_detection import (
     ScaleConflict,
 )
-from src.components.narrative_arc_orchestrator.models import (
+from tta_narrative.orchestration.models import (
     NarrativeScale,
     PlayerChoice,
 )
-from src.components.narrative_arc_orchestrator.resolution_engine import Resolution
-from src.components.narrative_arc_orchestrator.scale_manager import ScaleManager
+from tta_narrative.orchestration.resolution_engine import Resolution
+from tta_narrative.orchestration.scale_manager import ScaleManager
 
 
 class TestScaleManagerConflictResolution:

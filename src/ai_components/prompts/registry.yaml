@@ -1,0 +1,29 @@
+prompts:
+  safety_check:
+    description: "Therapeutic safety validation prompt"
+    agent_type: "safety_validator"
+    active_version: "1.0.0"
+    versions:
+      - version: "1.0.0"
+        created_at: "2025-01-20"
+        status: "active"
+        performance:
+          avg_tokens: 120
+          avg_latency_ms: 650
+          quality_score: 8.7
+          cost_per_call_usd: 0.0002
+
+  narrative_generation:
+    description: "Narrative generation prompt for therapeutic responses"
+    agent_type: "narrative_generator"
+    active_version: "1.0.0"
+    versions:
+      - version: "1.0.0"
+        created_at: "2025-01-20"
+        status: "active"
+        performance:
+          avg_tokens: 250
+          avg_latency_ms: 1200
+          quality_score: 8.2
+          cost_per_call_usd: 0.0005
+

@@ -15,7 +15,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from src.agent_orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.service import AgentOrchestrationService
 from src.components.base import Component
 
 logger = logging.getLogger(__name__)

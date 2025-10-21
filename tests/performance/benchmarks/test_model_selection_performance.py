@@ -10,18 +10,18 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from src.components.model_management import (
+from tta_ai.models import (
     ModelInfo,
     ModelManagementComponent,
     ModelRequirements,
     ProviderType,
     TaskType,
 )
-from src.components.model_management.models import (
+from tta_ai.models.models import (
     FallbackConfiguration,
     ModelSelectionCriteria,
 )
-from src.components.model_management.services import FallbackHandler, ModelSelector
+from tta_ai.models.services import FallbackHandler, ModelSelector
 
 # ============================================================================
 # Fixtures

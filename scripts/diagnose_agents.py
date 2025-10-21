@@ -107,7 +107,7 @@ async def test_agent_event_integrator():
     logger.info("=" * 60)
 
     try:
-        from src.agent_orchestration.realtime.agent_event_integration import (
+        from tta_ai.orchestration.realtime.agent_event_integration import (
             get_agent_event_integrator,
         )
 
@@ -142,10 +142,10 @@ async def test_workflow_execution():
     logger.info("=" * 60)
 
     try:
-        from src.agent_orchestration.realtime.agent_event_integration import (
+        from tta_ai.orchestration.realtime.agent_event_integration import (
             AgentWorkflowCoordinator,
         )
-        from src.agent_orchestration.realtime.event_publisher import EventPublisher
+        from tta_ai.orchestration.realtime.event_publisher import EventPublisher
 
         # Create event publisher
         event_publisher = EventPublisher()

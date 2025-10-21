@@ -13,7 +13,7 @@ from unittest.mock import patch
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentStep,
     AgentType,
     InputProcessorAgentProxy,

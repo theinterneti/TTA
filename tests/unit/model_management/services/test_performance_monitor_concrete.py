@@ -10,8 +10,8 @@ from datetime import datetime
 
 import pytest
 
-from src.components.model_management.models import PerformanceMetrics
-from src.components.model_management.services import PerformanceMonitor
+from tta_ai.models.models import PerformanceMetrics
+from tta_ai.models.services import PerformanceMonitor
 
 
 @pytest.mark.unit

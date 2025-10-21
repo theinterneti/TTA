@@ -13,28 +13,28 @@ import pytest
 import pytest_asyncio
 from fastapi.websockets import WebSocket
 
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.realtime.agent_event_integration import (
+from tta_ai.orchestration.realtime.agent_event_integration import (
     AgentWorkflowCoordinator,
 )
-from src.agent_orchestration.realtime.config_manager import get_realtime_config_manager
-from src.agent_orchestration.realtime.error_reporting import (
+from tta_ai.orchestration.realtime.config_manager import get_realtime_config_manager
+from tta_ai.orchestration.realtime.error_reporting import (
     ErrorReportingManager,
     ErrorSeverity,
 )
-from src.agent_orchestration.realtime.event_publisher import EventPublisher
-from src.agent_orchestration.realtime.models import (
+from tta_ai.orchestration.realtime.event_publisher import EventPublisher
+from tta_ai.orchestration.realtime.models import (
     AgentStatus,
     AgentStatusEvent,
 )
-from src.agent_orchestration.realtime.progressive_feedback import (
+from tta_ai.orchestration.realtime.progressive_feedback import (
     ProgressiveFeedbackManager,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
 

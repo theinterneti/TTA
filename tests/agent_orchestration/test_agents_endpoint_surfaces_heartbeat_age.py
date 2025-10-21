@@ -34,7 +34,7 @@ async def test_agents_endpoint_includes_heartbeat_age(redis_client):
     reg = getattr(comp, "_agent_registry", None)
     assert reg is not None
     try:
-        from src.agent_orchestration.registries import RedisAgentRegistry
+        from tta_ai.orchestration.registries import RedisAgentRegistry
 
         if isinstance(reg, RedisAgentRegistry):
             lst = await reg.list_registered()

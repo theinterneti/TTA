@@ -10,19 +10,19 @@ import asyncio
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration.api.diagnostics import DiagnosticsAPI
-from src.agent_orchestration.capabilities.auto_discovery import (
+from tta_ai.orchestration.api.diagnostics import DiagnosticsAPI
+from tta_ai.orchestration.capabilities.auto_discovery import (
     AutoDiscoveryManager,
     DiscoveryConfig,
     DiscoveryStrategy,
 )
-from src.agent_orchestration.models import (
+from tta_ai.orchestration.models import (
     AgentCapability,
     AgentId,
     AgentType,
     CapabilityType,
 )
-from src.agent_orchestration.registries.redis_agent_registry import RedisAgentRegistry
+from tta_ai.orchestration.registries.redis_agent_registry import RedisAgentRegistry
 
 
 @pytest.mark.redis

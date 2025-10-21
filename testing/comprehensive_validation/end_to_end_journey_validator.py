@@ -23,7 +23,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from src.agent_orchestration.models import AgentType
+from tta_ai.orchestration.models import AgentType
 
 # Import TTA components
 from .context_engineering_validator import ContextEngineeringValidator

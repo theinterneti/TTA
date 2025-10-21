@@ -11,14 +11,14 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src.components.model_management import (
+from tta_ai.models import (
     ModelInfo,
     ModelRequirements,
     ProviderType,
     TaskType,
 )
-from src.components.model_management.models import ModelSelectionCriteria
-from src.components.model_management.services import ModelSelector
+from tta_ai.models.models import ModelSelectionCriteria
+from tta_ai.models.services import ModelSelector
 
 # ============================================================================
 # Hypothesis Strategies

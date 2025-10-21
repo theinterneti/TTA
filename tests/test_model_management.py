@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 import pytest_asyncio
 
-from src.components.model_management import (
+from tta_ai.models import (
     GenerationRequest,
     ModelInfo,
     ModelManagementComponent,
@@ -18,11 +18,11 @@ from src.components.model_management import (
     ProviderType,
     TaskType,
 )
-from src.components.model_management.models import (
+from tta_ai.models.models import (
     ModelSelectionCriteria,
 )
-from src.components.model_management.providers import OpenRouterProvider
-from src.components.model_management.services import HardwareDetector, ModelSelector
+from tta_ai.models.providers import OpenRouterProvider
+from tta_ai.models.services import HardwareDetector, ModelSelector
 
 
 class TestModelManagementComponent:

@@ -12,13 +12,13 @@ import time
 import pytest
 import pytest_asyncio
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.adapters import AgentAdapterFactory, RetryConfig
-from src.agent_orchestration.enhanced_coordinator import EnhancedRedisMessageCoordinator
+from tta_ai.orchestration.adapters import AgentAdapterFactory, RetryConfig
+from tta_ai.orchestration.enhanced_coordinator import EnhancedRedisMessageCoordinator
 
 
 @pytest.mark.integration
