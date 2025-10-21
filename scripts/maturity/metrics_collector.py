@@ -425,3 +425,47 @@ def collect_all_metrics(
         security=security,
         tests=tests,
     )
+
+
+def _derive_module_path(source_path: Path) -> str:
+    """
+    Convert file path to Python module path.
+
+    Examples:
+        src/components/carbon_component.py -> src.components.carbon_component
+        src/components/model_management/model_management_component.py ->
+            src.components.model_management.model_management_component
+    """
+    # Remove .py extension
+    path_str = str(source_path.with_suffix(""))
+
+    # Replace path separators with dots
+    return path_str.replace("/", ".")
+
+
+def collect_metrics_from_metadata(component_metadata) -> MetricsResult:  # noqa: ANN001
+    """
+    Collect metrics using component metadata from registry.
+
+    Args:
+        component_metadata: ComponentMetadata object from registry
+
+    Returns:
+        MetricsResult with collected metrics
+    """
+    # Derive module path from source file
+    component_path = _derive_module_path(component_metadata.source_path)
+
+    # Get test path
+    # For shared test files like tests/test_components.py, we need to specify the test function
+    # For now, use the file path and let the metrics collector handle it
+    test_path = (
+        str(component_metadata.test_path) if component_metadata.test_path else ""
+    )
+
+    # Collect metrics
+    return collect_all_metrics(
+        component_name=component_metadata.name,
+        component_path=component_path,
+        test_path=test_path,
+    )

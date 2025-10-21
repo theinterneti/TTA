@@ -378,6 +378,9 @@ workflow_report_*.json
 coverage_*.json
 test-results-*.json
 
+# Component registry cache
+scripts/registry/.component_registry.json
+
 # E2E visual testing artifacts (generated)
 tests/e2e-staging/visual-baselines/
 tests/e2e-staging/visual-diffs/
