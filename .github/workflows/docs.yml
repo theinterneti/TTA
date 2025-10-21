@@ -44,17 +44,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-docs-
 
-      - name: Install dependencies
+      - name: Install uv
         run: |
-          pip install --upgrade pip
-          pip install mkdocs-material
-          pip install mkdocs-mermaid2-plugin
-          pip install mkdocstrings[python]
-          pip install mkdocs-git-revision-date-localized-plugin
-          pip install pymdown-extensions
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Build documentation
-        run: mkdocs build
+        run: |
+          uvx --with mkdocs-material --with mkdocs-mermaid2-plugin --with 'mkdocstrings[python]' --with mkdocs-git-revision-date-localized-plugin --with pymdown-extensions mkdocs build --strict
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
