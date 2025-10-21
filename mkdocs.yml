@@ -1,0 +1,113 @@
+site_name: TTA Documentation
+site_url: https://your-org.github.io/tta/
+repo_url: https://github.com/your-org/tta
+repo_name: your-org/tta
+
+theme:
+  name: material
+  custom_dir: docs/overrides # For custom CSS/JS if needed
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+      primary: indigo
+      accent: indigo
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+      primary: blue
+      accent: blue
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    logo: material/book-open-page-variant
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-org/tta
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/your-org
+
+nav:
+  - Home: README.md
+  - Getting Started:
+    - Installation: docs/getting-started/installation.md
+    - Configuration: docs/getting-started/configuration.md
+  - Architecture:
+    - Overview: docs/architecture/overview.md
+    - Components: docs/architecture/components.md
+  - API Reference: docs/api-reference.md
+  - Contributing: CONTRIBUTING.md
+  - Changelog: CHANGELOG.md
+  - Security: SECURITY.md
+  - Additional Documentation:
+    - 'Documentation/':
+      - 'Documentation/LOGOUT_CHANGES_DETAILED.md'
+      - 'Documentation/LOGOUT_COMPLETION_SUMMARY.txt'
+      - 'Documentation/LOGOUT_DOCUMENTATION_INDEX.md'
+      - 'Documentation/LOGOUT_IMPLEMENTATION_CHECKLIST.md'
+      - 'Documentation/README_E2E_VALIDATION.md'
+      - 'Documentation/TESTING_DATABASE_SETUP.md'
+      - 'Documentation/UI_UX_ENHANCEMENT_RECOMMENDATIONS.md'
+      - 'Documentation/ACCURATE_P0_COMPONENT_STATUS.md'
+      - 'Documentation/ADVANCED_TESTING_GETTING_STARTED.md'
+      - 'Documentation/CARBON_STAGING_PROMOTION.md'
+      - 'Documentation/CHARACTER_CREATION_FORM_RESTORATION.md'
+      - 'Documentation/COMPONENT_MATURITY_ANALYSIS_SUMMARY.md.OUTDATED'
+      - 'Documentation/COMPONENT_MATURITY_REANALYSIS.md'
+      - 'Documentation/DEPLOYMENT_STATUS_UPDATED.md'
+      - 'Documentation/DEPLOYMENT_STATUS.md'
+      - 'Documentation/E2E_TESTING_CHECKLIST.md'
+      - 'Documentation/E2E_TESTING_COMPREHENSIVE_IMPLEMENTATION.md'
+      - 'Documentation/E2E_VALIDATION_ISSUES_AND_FIXES.md'
+      - 'Documentation/GIT_COMMIT_STRATEGY.md'
+      - 'Documentation/NEXT_STEPS_WORKFLOW_TESTING.md'
+      - 'Documentation/PHASE_2_ROOT_CAUSE_ANALYSIS.md'
+      - 'Documentation/PHASE_3_COMPLETION_STATUS.md'
+      - 'Documentation/SECURITY_FINDINGS_ACCEPTED_RISKS.md'
+      - 'Documentation/TEST_FIXES_PROGRESS.md'
+      - 'Documentation/TEST_RESULTS_BASELINE.md'
+
+plugins:
+  - search
+  - awesome-pages # For automatic page discovery in subdirectories
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
+
+# Customization for Material for MkDocs
+# For example, to add a custom favicon:
+# extra_javascript:
+#   - javascripts/extra.js
+# extra_css:
+#   - stylesheets/extra.css
