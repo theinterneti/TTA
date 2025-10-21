@@ -22,7 +22,9 @@ from unittest.mock import patch
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.components import AppComponent, CarbonComponent, DockerComponent
+import requests
+
+from src.components import AppComponent, CarbonComponent, DockerComponent, LLMComponent
 from src.orchestration import TTAConfig
 from src.orchestration.component import ComponentStatus
 
@@ -461,6 +463,247 @@ class TestComponents(unittest.TestCase):
             result = app._start_impl()
             self.assertFalse(
                 result, "App component should fail to start due to exception"
+            )
+
+    # ========================================================================
+    # LLM Component Tests
+    # ========================================================================
+
+    def test_llm_component_init(self):
+        """Test LLM component initialization."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Verify initialization
+        self.assertEqual(llm.repository, "tta.dev")
+        self.assertEqual(llm.model, "qwen2.5-7b-instruct")
+        self.assertEqual(llm.api_base, "http://localhost:1234/v1")
+        self.assertEqual(llm.use_gpu, False)
+        self.assertEqual(llm.name, "tta.dev_llm")
+
+    def test_llm_stop_not_running(self):
+        """Test LLM component stop when not running."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Mock _is_llm_running to return False
+        with patch.object(llm, "_is_llm_running", return_value=False):
+            # Set status to RUNNING (required for base Component.stop() to call _stop_impl)
+            llm.status = ComponentStatus.RUNNING
+            result = llm.stop()
+            self.assertTrue(
+                result, "LLM component should stop successfully when not running"
+            )
+
+    def test_llm_stop_success(self):
+        """Test LLM component successful stop."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock result object
+        mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+
+        # Mock _is_llm_running to return True then False (running -> stopped)
+        # Mock _run_docker_compose to return success
+        with (
+            patch.object(llm, "_is_llm_running", side_effect=[True, False]),
+            patch.object(llm, "_run_docker_compose", return_value=mock_result),
+        ):
+            # Set status to RUNNING
+            llm.status = ComponentStatus.RUNNING
+            result = llm.stop()
+            self.assertTrue(result, "LLM component should stop successfully")
+
+    def test_llm_stop_timeout(self):
+        """Test LLM component stop timeout."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock result object
+        mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+
+        # Mock _is_llm_running to always return True (never stops)
+        # Mock _run_docker_compose to return success
+        with (
+            patch.object(llm, "_is_llm_running", return_value=True),
+            patch.object(llm, "_run_docker_compose", return_value=mock_result),
+        ):
+            # Set status to RUNNING
+            llm.status = ComponentStatus.RUNNING
+            result = llm.stop()
+            self.assertFalse(result, "LLM component should timeout during stop")
+
+    def test_llm_stop_error(self):
+        """Test LLM component stop error handling."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock result object with error
+        mock_result = type(
+            "obj", (object,), {"returncode": 1, "stderr": "Docker error"}
+        )()
+
+        # Mock _is_llm_running to return True
+        # Mock _run_docker_compose to return error
+        with (
+            patch.object(llm, "_is_llm_running", return_value=True),
+            patch.object(llm, "_run_docker_compose", return_value=mock_result),
+        ):
+            # Set status to RUNNING
+            llm.status = ComponentStatus.RUNNING
+            result = llm.stop()
+            self.assertFalse(
+                result, "LLM component should fail to stop due to Docker error"
+            )
+
+    def test_llm_start_already_running(self):
+        """Test LLM component start when already running."""
+        config = TTAConfig()
+        # Set required config values for @require_config decorator
+        config.set("tta.dev.components.llm.model", "test-model")
+        config.set("tta.dev.components.llm.api_base", "http://test:1234/v1")
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Mock _is_llm_running to return True
+        with patch.object(llm, "_is_llm_running", return_value=True):
+            result = llm.start()
+            self.assertTrue(
+                result, "LLM component should return True when already running"
+            )
+
+    def test_llm_start_success(self):
+        """Test LLM component successful start."""
+        config = TTAConfig()
+        # Set required config values for @require_config decorator
+        config.set("tta.dev.components.llm.model", "test-model")
+        config.set("tta.dev.components.llm.api_base", "http://test:1234/v1")
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock result object
+        mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+
+        # Mock _is_llm_running to return False then True (not running -> running)
+        # Mock _run_docker_compose to return success
+        with (
+            patch.object(llm, "_is_llm_running", side_effect=[False, True]),
+            patch.object(llm, "_run_docker_compose", return_value=mock_result),
+        ):
+            result = llm.start()
+            self.assertTrue(result, "LLM component should start successfully")
+
+    def test_llm_start_timeout(self):
+        """Test LLM component start timeout."""
+        config = TTAConfig()
+        # Set required config values for @require_config decorator
+        config.set("tta.dev.components.llm.model", "test-model")
+        config.set("tta.dev.components.llm.api_base", "http://test:1234/v1")
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock result object
+        mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+
+        # Mock _is_llm_running to always return False (never starts)
+        # Mock _run_docker_compose to return success
+        with (
+            patch.object(llm, "_is_llm_running", return_value=False),
+            patch.object(llm, "_run_docker_compose", return_value=mock_result),
+        ):
+            result = llm.start()
+            self.assertFalse(result, "LLM component should timeout during start")
+
+    def test_llm_start_docker_error(self):
+        """Test LLM component start Docker Compose error."""
+        config = TTAConfig()
+        # Set required config values for @require_config decorator
+        config.set("tta.dev.components.llm.model", "test-model")
+        config.set("tta.dev.components.llm.api_base", "http://test:1234/v1")
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock result object with error
+        mock_result = type(
+            "obj", (object,), {"returncode": 1, "stderr": "Docker error"}
+        )()
+
+        # Mock _is_llm_running to return False
+        # Mock _run_docker_compose to return error
+        with (
+            patch.object(llm, "_is_llm_running", return_value=False),
+            patch.object(llm, "_run_docker_compose", return_value=mock_result),
+        ):
+            result = llm.start()
+            self.assertFalse(
+                result, "LLM component should fail to start due to Docker error"
+            )
+
+    def test_llm_start_exception(self):
+        """Test LLM component start exception handling."""
+        config = TTAConfig()
+        # Set required config values for @require_config decorator
+        config.set("tta.dev.components.llm.model", "test-model")
+        config.set("tta.dev.components.llm.api_base", "http://test:1234/v1")
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Mock _is_llm_running to raise exception
+        with patch.object(llm, "_is_llm_running", side_effect=Exception("Test error")):
+            result = llm.start()
+            self.assertFalse(
+                result, "LLM component should fail to start due to exception"
+            )
+
+    def test_llm_start_with_gpu(self):
+        """Test LLM component start with GPU profile."""
+        config = TTAConfig()
+        # Set required config values for @require_config decorator
+        config.set("tta.dev.components.llm.model", "test-model")
+        config.set("tta.dev.components.llm.api_base", "http://test:1234/v1")
+        llm = LLMComponent(config, repository="tta.dev")
+        llm.use_gpu = True  # Enable GPU
+
+        # Create mock result object
+        mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
+
+        # Mock _is_llm_running to return False then True
+        # Mock _run_docker_compose to capture the command
+        with (
+            patch.object(llm, "_is_llm_running", side_effect=[False, True]),
+            patch.object(
+                llm, "_run_docker_compose", return_value=mock_result
+            ) as mock_docker,
+        ):
+            result = llm.start()
+            self.assertTrue(result, "LLM component should start successfully with GPU")
+
+            # Verify GPU profile was added to command
+            call_args = mock_docker.call_args
+            command = call_args[0][0]  # First positional argument
+            self.assertIn("--profile", command, "GPU profile flag should be in command")
+            self.assertIn("with-gpu", command, "GPU profile value should be in command")
+
+    def test_llm_is_running_check_success(self):
+        """Test LLM health check returns True when HTTP 200."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Create mock response object
+        mock_response = type("obj", (object,), {"status_code": 200})()
+
+        # Mock requests.get to return HTTP 200
+        with patch("requests.get", return_value=mock_response):
+            result = llm._is_llm_running()
+            self.assertTrue(result, "LLM should be considered running when HTTP 200")
+
+    def test_llm_is_running_check_failure(self):
+        """Test LLM health check returns False on exception."""
+        config = TTAConfig()
+        llm = LLMComponent(config, repository="tta.dev")
+
+        # Mock requests.get to raise exception
+        with patch(
+            "requests.get", side_effect=requests.RequestException("Connection error")
+        ):
+            result = llm._is_llm_running()
+            self.assertFalse(
+                result, "LLM should be considered not running on connection error"
             )
 
 

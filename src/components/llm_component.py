@@ -1,5 +1,5 @@
 """
-LLM Component
+LLM Component.
 
 This module provides a component for managing the LLM service.
 
@@ -27,7 +27,7 @@ Example:
 
 import logging
 import os
-import subprocess
+import subprocess  # nosec B404  # subprocess usage is safe and necessary for Docker Compose operations
 import time
 from pathlib import Path
 from typing import Any
