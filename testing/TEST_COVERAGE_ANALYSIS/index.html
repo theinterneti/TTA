@@ -1,0 +1,3536 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the TTA monorepo and reusable packages">
+      
+      
+        <meta name="author" content="TTA Development Team">
+      
+      
+        <link rel="canonical" href="https://theinterneti.github.io/TTA/testing/TEST_COVERAGE_ANALYSIS/">
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+    
+    
+      
+        <title>TTA Test Coverage Analysis and Testing Strategy - TTA - Therapeutic Text Adventure</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/timeago.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tta-test-coverage-analysis-and-testing-strategy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="TTA - Therapeutic Text Adventure" class="md-header__button md-logo" aria-label="TTA - Therapeutic Text Adventure" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TTA - Therapeutic Text Adventure
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              TTA Test Coverage Analysis and Testing Strategy
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/theinterneti/TTA" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    theinterneti/TTA
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../packages/overview/" class="md-tabs__link">
+          
+  
+  
+  Packages
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../application/overview/" class="md-tabs__link">
+          
+  
+  
+  TTA Application
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/component-maturity/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/overview/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/tta-ai-framework/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="TTA - Therapeutic Text Adventure" class="md-nav__button md-logo" aria-label="TTA - Therapeutic Text Adventure" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    TTA - Therapeutic Text Adventure
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/theinterneti/TTA" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    theinterneti/TTA
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Packages
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Packages
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    TTA AI Framework
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            TTA AI Framework
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-ai-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-ai-framework/orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Orchestration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-ai-framework/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-ai-framework/prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prompt Registry
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-ai-framework/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    TTA Narrative Engine
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            TTA Narrative Engine
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-narrative-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-narrative-engine/generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scene Generation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-narrative-engine/orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Narrative Orchestration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-narrative-engine/coherence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Coherence Validation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packages/tta-narrative-engine/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    TTA Application
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            TTA Application
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/player-experience/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Player Experience
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/therapeutic-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Therapeutic Systems
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/api-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Gateway
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Development
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/component-maturity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Component Maturity
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing Strategy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/code-style/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Code Style
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/cicd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CI/CD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/dependency-graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dependency Graph
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Database Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agent-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent Orchestration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agentic-primitives-quick-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Primitives
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Deployment
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Deployment
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/staging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Staging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/production/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Production
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tta-ai-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TTA AI Framework
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tta-narrative-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TTA Narrative Engine
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tta-application/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TTA Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Executive Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Executive Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current State Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Findings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-current-test-coverage-by-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Current Test Coverage by Component
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Current Test Coverage by Component">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-story-generation-engine-narrative-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1 Story Generation Engine &amp; Narrative Logic
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-database-persistence-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.2 Database Persistence Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-api-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.3 API Endpoints
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-frontend-ui-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.4 Frontend UI Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-core-gameplay-mechanics" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.5 Core Gameplay Mechanics
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-testing-strategy-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Testing Strategy &amp; Roadmap
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Testing Strategy &amp; Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-test-type-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Test Type Definitions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-implementation-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Implementation Roadmap
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Implementation Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-critical-path-weeks-1-2-highest-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 1: Critical Path (Weeks 1-2) - HIGHEST PRIORITY
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-user-experience-validation-weeks-3-4-high-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 2: User Experience Validation (Weeks 3-4) - HIGH PRIORITY
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-robustness-scale-weeks-5-6-medium-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 3: Robustness &amp; Scale (Weeks 5-6) - MEDIUM PRIORITY
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-quality-targets-and-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Quality Targets and Success Criteria
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Quality Targets and Success Criteria">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-code-coverage-targets" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 Code Coverage Targets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-narrative-quality-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 Narrative Quality Metrics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-performance-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 Performance Benchmarks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-zero-critical-bugs-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.4 Zero Critical Bugs Policy
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cicd-integration-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. CI/CD Integration Strategy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. CI/CD Integration Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-pr-validation-fast-feedback-target-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 PR Validation (Fast Feedback - Target: &lt; 5 minutes)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-main-branch-full-validation-target-30-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Main Branch (Full Validation - Target: &lt; 30 minutes)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-nightlyscheduled-comprehensive-target-2-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 Nightly/Scheduled (Comprehensive - Target: &lt; 2 hours)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-test-maintainability-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Test Maintainability Guidelines
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Test Maintainability Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-test-structure-and-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 Test Structure and Organization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.2 Naming Conventions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-test-data-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.3 Test Data Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-assertion-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.4 Assertion Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-test-independence" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.5 Test Independence
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-sample-test-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Sample Test Templates
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Sample Test Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-unit-test-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1 Unit Test Template
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-integration-test-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2 Integration Test Template
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-e2e-test-template-playwright" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3 E2E Test Template (Playwright)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-commands-and-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Commands and Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Commands and Scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-local-test-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.1 Local Test Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-cicd-test-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.2 CI/CD Test Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-test-environment-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.3 Test Environment Setup
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-post-deployment-regression-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Post-Deployment Regression Tests
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Post-Deployment Regression Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.1 Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.2 Test Coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.3 CI/CD Integration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.4 Success Metrics
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-next-steps-and-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Next Steps and Recommendations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Next Steps and Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-actions-week-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Immediate Actions (Week 1)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-goals-weeks-2-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Short-term Goals (Weeks 2-4)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-goals-weeks-5-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Long-term Goals (Weeks 5-8)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Success Metrics
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-a-test-infrastructure-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Appendix A: Test Infrastructure Dependencies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Appendix A: Test Infrastructure Dependencies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Required Tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database Versions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cicd-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      CI/CD Requirements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-b-glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Appendix B: Glossary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="tta-test-coverage-analysis-and-testing-strategy">TTA Test Coverage Analysis and Testing Strategy<a class="headerlink" href="#tta-test-coverage-analysis-and-testing-strategy" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> 2025-10-03
+<strong>Project:</strong> TTA (Text-based Adventure) Storytelling System
+<strong>Environment:</strong> WSL2 (/dev/sdf), Solo Developer Workflow</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>This document provides a comprehensive analysis of the current test coverage for the TTA storytelling system and outlines a detailed testing strategy with prioritized implementation phases. The analysis reveals a <strong>mature testing infrastructure</strong> with 971 test functions across 123 Python test files and 20 TypeScript E2E specs, but identifies specific gaps in integration testing, frontend validation, and production readiness scenarios.</p>
+<h3 id="current-state-overview">Current State Overview<a class="headerlink" href="#current-state-overview" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Total Python Test Functions:</strong> 971+</li>
+<li><strong>Total Python Test Files:</strong> 123+</li>
+<li><strong>Total E2E Test Specs:</strong> 20</li>
+<li><strong>Post-Deployment Tests:</strong> 3 test suites (JWT validation, player profile creation, frontend deployment)</li>
+<li><strong>GitHub Actions Workflows:</strong> 8 (tests, integration, e2e, security, code-quality, simulation, comprehensive-battery, post-deployment-tests)</li>
+<li><strong>Test Infrastructure:</strong> Mature with pytest, Playwright, comprehensive test battery, simulation framework</li>
+<li><strong>Database Integration:</strong> Redis and Neo4j markers present, real database testing supported</li>
+<li><strong>CI/CD Integration:</strong> Comprehensive with PR validation, main branch full tests, scheduled runs, post-deployment validation</li>
+</ul>
+<h3 id="key-findings">Key Findings<a class="headerlink" href="#key-findings" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>Strengths:</strong>
+- Extensive unit test coverage (971 test functions)
+- Comprehensive E2E testing with Playwright (14 test suites)
+- Real database integration tests (Neo4j, Redis)
+- Mock fallback strategy for CI/CD
+- Performance and load testing infrastructure
+- Accessibility and responsive design testing
+- Visual regression testing setup</p>
+<p>⚠️ <strong>Gaps Identified:</strong>
+- Limited end-to-end user journey tests with real database persistence
+- Frontend component testing needs expansion
+- API endpoint integration tests incomplete
+- Story generation engine lacks comprehensive narrative quality tests
+- Multi-session continuity testing needs enhancement
+- Production failure scenario testing minimal</p>
+<hr />
+<h2 id="1-current-test-coverage-by-component">1. Current Test Coverage by Component<a class="headerlink" href="#1-current-test-coverage-by-component" title="Permanent link">&para;</a></h2>
+<h3 id="11-story-generation-engine-narrative-logic">1.1 Story Generation Engine &amp; Narrative Logic<a class="headerlink" href="#11-story-generation-engine-narrative-logic" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> <code>src/components/gameplay_loop/narrative/</code>, <code>src/components/narrative_coherence/</code></p>
+<p><strong>Existing Tests:</strong>
+- ✅ <code>tests/test_narrative_coherence_engine.py</code> - Narrative coherence validation
+- ✅ <code>tests/test_narrative_arc_orchestrator_component.py</code> - Arc orchestration
+- ✅ <code>testing/extended_evaluation/narrative_analysis.py</code> - Extended narrative analysis
+- ✅ <code>testing/comprehensive_validation/excellence_narrative_quality_assessor.py</code> - Quality assessment</p>
+<p><strong>Coverage Assessment:</strong> <strong>70%</strong> - Good unit test coverage, but lacks:
+- ❌ Integration tests for complete story generation flow (scene → choices → consequences → next scene)
+- ❌ Narrative quality metrics validation (coherence ≥7.5/10, consistency ≥7.5/10)
+- ❌ Multi-turn narrative coherence tests (20-50+ turns)
+- ❌ Edge cases: contradictory player choices, narrative dead-ends, pacing issues</p>
+<p><strong>Priority:</strong> <strong>HIGH</strong> - Core functionality requiring robust testing</p>
+<h3 id="12-database-persistence-layer">1.2 Database Persistence Layer<a class="headerlink" href="#12-database-persistence-layer" title="Permanent link">&para;</a></h3>
+<p><strong>Components:</strong>
+- Redis: Session management, state persistence, cache operations
+- Neo4j: Story graphs, relationship traversal, world state</p>
+<p><strong>Existing Tests:</strong>
+- ✅ <code>tests/test_redis_integration.py</code> - Redis integration
+- ✅ <code>tests/test_session_repository_redis_integration.py</code> - Session persistence
+- ✅ <code>tests/integration/test_phase2a_integration.py</code> - Neo4j living worlds
+- ✅ <code>tests/comprehensive_battery/mocks/mock_neo4j.py</code> - Mock Neo4j for CI
+- ✅ <code>tests/comprehensive_battery/mocks/mock_redis.py</code> - Mock Redis for CI</p>
+<p><strong>Coverage Assessment:</strong> <strong>75%</strong> - Good integration test coverage, but lacks:
+- ❌ Complete user journey with real database persistence validation
+- ❌ Multi-session continuity tests (save → exit → return → load)
+- ❌ Database failure recovery scenarios
+- ❌ Performance tests for large story graphs (1000+ nodes)
+- ❌ Concurrent user session isolation tests</p>
+<p><strong>Priority:</strong> <strong>CRITICAL</strong> - Data persistence is fundamental to user experience</p>
+<h3 id="13-api-endpoints">1.3 API Endpoints<a class="headerlink" href="#13-api-endpoints" title="Permanent link">&para;</a></h3>
+<p><strong>Endpoints Identified:</strong>
+- Authentication: <code>/api/v1/auth</code> (login, register, MFA, tokens)
+- Players: <code>/api/v1/players</code>
+- Characters: <code>/api/v1/characters</code> (CRUD)
+- Worlds: <code>/api/v1/worlds</code>
+- Sessions: <code>/api/v1/sessions</code>
+- Gameplay: <code>/api/v1/gameplay</code>
+- Chat: <code>/ws</code> (WebSocket)
+- Progress: <code>/api/v1</code> (progress tracking)
+- Metrics: <code>/metrics</code>, <code>/metrics-prom</code></p>
+<p><strong>Existing Tests:</strong>
+- ✅ <code>tests/test_api_integration.py</code> - API integration tests
+- ✅ <code>tests/test_character_management_api.py</code> - Character API
+- ✅ <code>tests/test_player_management_api.py</code> - Player API
+- ✅ <code>tests/test_world_management_api.py</code> - World API
+- ✅ <code>tests/test_enhanced_authentication.py</code> - Auth tests
+- ✅ <code>tests/test_websocket_chat_backend.py</code> - WebSocket tests</p>
+<p><strong>Coverage Assessment:</strong> <strong>65%</strong> - Partial coverage, gaps include:
+- ❌ Complete API endpoint test suite (all CRUD operations for all resources)
+- ❌ Authentication flow integration tests (register → login → access protected endpoint)
+- ❌ API error handling and validation tests (400, 401, 403, 404, 500 responses)
+- ❌ Rate limiting and security tests
+- ❌ WebSocket connection lifecycle tests (connect → message → disconnect → reconnect)</p>
+<p><strong>Priority:</strong> <strong>HIGH</strong> - APIs are the primary interface for frontend</p>
+<h3 id="14-frontend-ui-components">1.4 Frontend UI Components<a class="headerlink" href="#14-frontend-ui-components" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> <code>src/player_experience/frontend/src/</code></p>
+<p><strong>Existing Tests:</strong>
+- ✅ <code>tests/e2e/specs/auth.spec.ts</code> - Authentication UI
+- ✅ <code>tests/e2e/specs/dashboard.spec.ts</code> - Dashboard UI
+- ✅ <code>tests/e2e/specs/character-management.spec.ts</code> - Character UI
+- ✅ <code>tests/e2e/specs/chat.spec.ts</code> - Chat UI
+- ✅ <code>tests/e2e/specs/accessibility.spec.ts</code> - Accessibility
+- ✅ <code>tests/e2e/specs/responsive.spec.ts</code> - Responsive design
+- ✅ <code>src/player_experience/frontend/src/App.test.tsx</code> - React component tests
+- ✅ Visual regression testing setup</p>
+<p><strong>Coverage Assessment:</strong> <strong>60%</strong> - E2E tests present, but lacks:
+- ❌ Comprehensive React component unit tests (components/, pages/)
+- ❌ Redux store and state management tests
+- ❌ Service layer tests (API client, WebSocket client)
+- ❌ Hook tests (custom React hooks)
+- ❌ Error boundary and fallback UI tests
+- ❌ Form validation and submission tests</p>
+<p><strong>Priority:</strong> <strong>MEDIUM-HIGH</strong> - User-facing interface requires thorough validation</p>
+<h3 id="15-core-gameplay-mechanics">1.5 Core Gameplay Mechanics<a class="headerlink" href="#15-core-gameplay-mechanics" title="Permanent link">&para;</a></h3>
+<p><strong>Components:</strong> Choice selection, narrative progression, consequence system, difficulty adaptation</p>
+<p><strong>Existing Tests:</strong>
+- ✅ <code>tests/integration/test_core_gameplay_loop.py</code> - Core gameplay
+- ✅ <code>tests/integration/test_gameplay_loop_integration.py</code> - Gameplay integration
+- ✅ <code>tests/integration/test_gameplay_api.py</code> - Gameplay API
+- ✅ <code>tests/test_end_to_end_workflows.py</code> - E2E workflows
+- ✅ <code>tests/test_comprehensive_integration.py</code> - Comprehensive integration</p>
+<p><strong>Coverage Assessment:</strong> <strong>70%</strong> - Good coverage, but lacks:
+- ❌ Complete user journey tests (new user → story creation → 10+ turns → save → exit → return → continue)
+- ❌ Choice consequence validation (verify consequences persist and affect future narrative)
+- ❌ Adaptive difficulty testing (verify difficulty adjusts based on player performance)
+- ❌ Branching narrative tests (verify different choices lead to different outcomes)</p>
+<p><strong>Priority:</strong> <strong>HIGH</strong> - Core user experience</p>
+<hr />
+<h2 id="2-testing-strategy-roadmap">2. Testing Strategy &amp; Roadmap<a class="headerlink" href="#2-testing-strategy-roadmap" title="Permanent link">&para;</a></h2>
+<h3 id="21-test-type-definitions">2.1 Test Type Definitions<a class="headerlink" href="#21-test-type-definitions" title="Permanent link">&para;</a></h3>
+<h4 id="unit-tests">Unit Tests<a class="headerlink" href="#unit-tests" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose:</strong> Test individual functions, classes, and modules in isolation</li>
+<li><strong>Tools:</strong> pytest, unittest.mock</li>
+<li><strong>Execution:</strong> Fast (&lt; 1 minute for full suite)</li>
+<li><strong>Environment:</strong> No external dependencies (mocks for databases, APIs)</li>
+</ul>
+<h4 id="integration-tests">Integration Tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose:</strong> Test component interactions with REAL databases and services</li>
+<li><strong>Tools:</strong> pytest with --neo4j and --redis markers</li>
+<li><strong>Execution:</strong> Moderate (5-10 minutes)</li>
+<li><strong>Environment:</strong> Docker containers for Neo4j, Redis</li>
+</ul>
+<h4 id="end-to-end-tests">End-to-End Tests<a class="headerlink" href="#end-to-end-tests" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose:</strong> Test complete user journeys from frontend to backend to database</li>
+<li><strong>Tools:</strong> Playwright for frontend, pytest for backend</li>
+<li><strong>Execution:</strong> Slow (15-30 minutes)</li>
+<li><strong>Environment:</strong> Full stack (frontend, backend, databases)</li>
+</ul>
+<h4 id="performanceload-tests">Performance/Load Tests<a class="headerlink" href="#performanceload-tests" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose:</strong> Validate system performance under realistic load</li>
+<li><strong>Tools:</strong> Locust, pytest-benchmark</li>
+<li><strong>Execution:</strong> Variable (10-60 minutes)</li>
+<li><strong>Environment:</strong> Production-like configuration</li>
+</ul>
+<hr />
+<h2 id="3-implementation-roadmap">3. Implementation Roadmap<a class="headerlink" href="#3-implementation-roadmap" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-critical-path-weeks-1-2-highest-priority">Phase 1: Critical Path (Weeks 1-2) - HIGHEST PRIORITY<a class="headerlink" href="#phase-1-critical-path-weeks-1-2-highest-priority" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Ensure core functionality is bulletproof</p>
+<h4 id="11-authentication-flow-integration-tests">1.1 Authentication Flow Integration Tests<a class="headerlink" href="#11-authentication-flow-integration-tests" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/integration/test_auth_complete_flow.py</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li>Register new user → verify email → login → access protected endpoint</li>
+<li>Login with invalid credentials → verify 401 response</li>
+<li>Access protected endpoint without token → verify 401 response</li>
+<li>Token expiration and refresh flow</li>
+<li>MFA setup and verification flow</li>
+<li><strong>Success Criteria:</strong> 100% of auth endpoints tested, all edge cases covered</li>
+<li><strong>Estimated Tests:</strong> 15-20 test functions</li>
+<li><strong>Dependencies:</strong> None</li>
+</ul>
+<h4 id="12-story-creation-and-initialization">1.2 Story Creation and Initialization<a class="headerlink" href="#12-story-creation-and-initialization" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/integration/test_story_creation_flow.py</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li>Create character → select world → initialize story → verify first scene generated</li>
+<li>Verify story state persisted to Neo4j</li>
+<li>Verify session state persisted to Redis</li>
+<li>Handle story creation failures gracefully</li>
+<li><strong>Success Criteria:</strong> Story creation flow works end-to-end with real databases</li>
+<li><strong>Estimated Tests:</strong> 10-15 test functions</li>
+<li><strong>Dependencies:</strong> Neo4j, Redis running</li>
+</ul>
+<h4 id="13-database-writeread-operations">1.3 Database Write/Read Operations<a class="headerlink" href="#13-database-writeread-operations" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/integration/test_database_persistence_validation.py</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li>Write session state to Redis → read back → verify data integrity</li>
+<li>Write story graph to Neo4j → query relationships → verify structure</li>
+<li>Test concurrent writes (multiple users)</li>
+<li>Test database connection failure and recovery</li>
+<li><strong>Success Criteria:</strong> All database operations validated with real databases</li>
+<li><strong>Estimated Tests:</strong> 20-25 test functions</li>
+<li><strong>Dependencies:</strong> Neo4j, Redis running</li>
+</ul>
+<h4 id="14-core-gameplay-mechanics">1.4 Core Gameplay Mechanics<a class="headerlink" href="#14-core-gameplay-mechanics" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/integration/test_complete_gameplay_journey.py</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li>Player makes choice → verify consequence applied → verify next scene generated</li>
+<li>Multi-turn gameplay (10+ turns) → verify narrative coherence</li>
+<li>Save game state → exit → return → load state → continue playing</li>
+<li>Verify choices affect future narrative options</li>
+<li><strong>Success Criteria:</strong> Complete gameplay loop validated end-to-end</li>
+<li><strong>Estimated Tests:</strong> 15-20 test functions</li>
+<li><strong>Dependencies:</strong> Full stack running</li>
+</ul>
+<p><strong>Phase 1 Summary:</strong>
+- <strong>Total New Tests:</strong> 60-80 test functions
+- <strong>Coverage Increase:</strong> +15-20% for critical paths
+- <strong>Execution Time:</strong> ~15 minutes for full Phase 1 suite
+- <strong>CI/CD Integration:</strong> Run on every PR (with mocks) and main branch (with real databases)</p>
+<hr />
+<h3 id="phase-2-user-experience-validation-weeks-3-4-high-priority">Phase 2: User Experience Validation (Weeks 3-4) - HIGH PRIORITY<a class="headerlink" href="#phase-2-user-experience-validation-weeks-3-4-high-priority" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Validate complete user journeys and frontend functionality</p>
+<h4 id="21-complete-user-journey-e2e-tests">2.1 Complete User Journey E2E Tests<a class="headerlink" href="#21-complete-user-journey-e2e-tests" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/e2e/specs/complete-user-journey.spec.ts</code></li>
+<li><code>tests/e2e/specs/multi-session-continuity.spec.ts</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li><strong>New User Journey:</strong><ul>
+<li>Register → verify email → login → create character → select world → play 5 turns → save → logout</li>
+</ul>
+</li>
+<li><strong>Returning User Journey:</strong><ul>
+<li>Login → view dashboard → load saved game → play 5 more turns → verify narrative continuity</li>
+</ul>
+</li>
+<li><strong>Multi-Session Continuity:</strong><ul>
+<li>Session 1: Play 10 turns → save → exit</li>
+<li>Session 2: Return → load → verify state restored → play 10 more turns</li>
+<li>Verify choices from Session 1 affect Session 2 narrative</li>
+</ul>
+</li>
+<li><strong>Success Criteria:</strong> Complete user journeys work flawlessly from frontend to backend</li>
+<li><strong>Estimated Tests:</strong> 10-15 test scenarios</li>
+<li><strong>Dependencies:</strong> Full stack, Playwright</li>
+</ul>
+<h4 id="22-frontend-uiux-validation-with-playwright">2.2 Frontend UI/UX Validation with Playwright<a class="headerlink" href="#22-frontend-uiux-validation-with-playwright" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Enhance:</strong></li>
+<li><code>tests/e2e/specs/auth.spec.ts</code> - Add edge cases</li>
+<li><code>tests/e2e/specs/character-management.spec.ts</code> - Add validation tests</li>
+<li><code>tests/e2e/specs/chat.spec.ts</code> - Add WebSocket reconnection tests</li>
+<li><code>tests/e2e/specs/dashboard.spec.ts</code> - Add data loading tests</li>
+<li><strong>New Files:</strong></li>
+<li><code>tests/e2e/specs/form-validation.spec.ts</code></li>
+<li><code>tests/e2e/specs/navigation.spec.ts</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li>Form validation: Submit invalid data → verify error messages displayed</li>
+<li>Button states: Verify loading states, disabled states, success states</li>
+<li>Navigation: Verify all routes accessible, back/forward navigation works</li>
+<li>Data loading: Verify loading indicators, empty states, error states</li>
+<li>WebSocket: Connect → disconnect → reconnect → verify messages still work</li>
+<li><strong>Success Criteria:</strong> All UI interactions validated, no broken user flows</li>
+<li><strong>Estimated Tests:</strong> 30-40 test scenarios</li>
+<li><strong>Dependencies:</strong> Frontend running, mock API server</li>
+</ul>
+<h4 id="23-error-handling-and-edge-cases">2.3 Error Handling and Edge Cases<a class="headerlink" href="#23-error-handling-and-edge-cases" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/integration/test_error_scenarios.py</code></li>
+<li><code>tests/e2e/specs/error-recovery.spec.ts</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li><strong>Backend Errors:</strong><ul>
+<li>Database unavailable → verify graceful degradation</li>
+<li>API timeout → verify retry logic</li>
+<li>Invalid input → verify 400 responses with clear error messages</li>
+</ul>
+</li>
+<li><strong>Frontend Errors:</strong><ul>
+<li>Network failure → verify error message displayed</li>
+<li>Session timeout → verify redirect to login</li>
+<li>Invalid API response → verify error boundary catches it</li>
+</ul>
+</li>
+<li><strong>Recovery Scenarios:</strong><ul>
+<li>Database reconnects → verify system recovers</li>
+<li>User retries failed action → verify success</li>
+</ul>
+</li>
+<li><strong>Success Criteria:</strong> All error scenarios handled gracefully, no crashes</li>
+<li><strong>Estimated Tests:</strong> 20-25 test functions</li>
+<li><strong>Dependencies:</strong> Full stack, ability to simulate failures</li>
+</ul>
+<p><strong>Phase 2 Summary:</strong>
+- <strong>Total New Tests:</strong> 60-80 test scenarios
+- <strong>Coverage Increase:</strong> +10-15% for user experience paths
+- <strong>Execution Time:</strong> ~25 minutes for full Phase 2 suite
+- <strong>CI/CD Integration:</strong> Run on main branch and nightly</p>
+<hr />
+<h3 id="phase-3-robustness-scale-weeks-5-6-medium-priority">Phase 3: Robustness &amp; Scale (Weeks 5-6) - MEDIUM PRIORITY<a class="headerlink" href="#phase-3-robustness-scale-weeks-5-6-medium-priority" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Ensure system can handle production load and failure scenarios</p>
+<h4 id="31-performance-and-load-testing">3.1 Performance and Load Testing<a class="headerlink" href="#31-performance-and-load-testing" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/performance/test_api_performance.py</code></li>
+<li><code>tests/performance/test_database_performance.py</code></li>
+<li><code>testing/load_tests/gameplay_load_test.py</code> (enhance existing)</li>
+<li><strong>Test Scenarios:</strong></li>
+<li><strong>API Performance:</strong><ul>
+<li>Measure response times for all endpoints (target: &lt; 200ms for 95<sup>th</sup> percentile)</li>
+<li>Test with 10, 50, 100 concurrent users</li>
+<li>Identify bottlenecks</li>
+</ul>
+</li>
+<li><strong>Database Performance:</strong><ul>
+<li>Query performance for large story graphs (1000+ nodes)</li>
+<li>Redis cache hit rates</li>
+<li>Neo4j relationship traversal performance</li>
+</ul>
+</li>
+<li><strong>Load Testing:</strong><ul>
+<li>Simulate 100 concurrent users playing stories</li>
+<li>Measure system stability over 1 hour</li>
+<li>Verify no memory leaks or resource exhaustion</li>
+</ul>
+</li>
+<li><strong>Success Criteria:</strong> System handles 100 concurrent users with acceptable performance</li>
+<li><strong>Estimated Tests:</strong> 15-20 test scenarios</li>
+<li><strong>Dependencies:</strong> Production-like environment, Locust</li>
+</ul>
+<h4 id="32-failure-scenario-testing">3.2 Failure Scenario Testing<a class="headerlink" href="#32-failure-scenario-testing" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Create:</strong></li>
+<li><code>tests/integration/test_database_failure_scenarios.py</code></li>
+<li><code>tests/integration/test_service_degradation.py</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li><strong>Database Failures:</strong><ul>
+<li>Neo4j unavailable → verify fallback behavior</li>
+<li>Redis unavailable → verify session management degrades gracefully</li>
+<li>Database connection pool exhausted → verify queuing works</li>
+</ul>
+</li>
+<li><strong>Service Degradation:</strong><ul>
+<li>LLM API slow/unavailable → verify timeout and fallback</li>
+<li>High CPU/memory usage → verify system remains responsive</li>
+</ul>
+</li>
+<li><strong>Recovery:</strong><ul>
+<li>Database comes back online → verify system reconnects</li>
+<li>Failed requests → verify retry logic with exponential backoff</li>
+</ul>
+</li>
+<li><strong>Success Criteria:</strong> System degrades gracefully, no data loss</li>
+<li><strong>Estimated Tests:</strong> 15-20 test functions</li>
+<li><strong>Dependencies:</strong> Ability to simulate failures (Docker, chaos engineering tools)</li>
+</ul>
+<h4 id="33-browser-compatibility-and-responsive-design">3.3 Browser Compatibility and Responsive Design<a class="headerlink" href="#33-browser-compatibility-and-responsive-design" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Files to Enhance:</strong></li>
+<li><code>tests/e2e/specs/responsive.spec.ts</code> - Add more viewport tests</li>
+<li><strong>New Files:</strong></li>
+<li><code>tests/e2e/specs/browser-compatibility.spec.ts</code></li>
+<li><strong>Test Scenarios:</strong></li>
+<li><strong>Browser Compatibility:</strong><ul>
+<li>Test on Chrome, Firefox, Safari (via Playwright)</li>
+<li>Verify all features work across browsers</li>
+</ul>
+</li>
+<li><strong>Responsive Design:</strong><ul>
+<li>Test on desktop (1920x1080), tablet (768x1024), mobile (375x667)</li>
+<li>Verify layout adapts correctly</li>
+<li>Verify touch interactions work on mobile</li>
+</ul>
+</li>
+<li><strong>Success Criteria:</strong> UI works on all target browsers and devices</li>
+<li><strong>Estimated Tests:</strong> 20-25 test scenarios</li>
+<li><strong>Dependencies:</strong> Playwright with multiple browsers</li>
+</ul>
+<p><strong>Phase 3 Summary:</strong>
+- <strong>Total New Tests:</strong> 50-65 test scenarios
+- <strong>Coverage Increase:</strong> +10% for robustness and scale
+- <strong>Execution Time:</strong> ~45 minutes for full Phase 3 suite
+- <strong>CI/CD Integration:</strong> Run nightly and on-demand</p>
+<hr />
+<h2 id="4-quality-targets-and-success-criteria">4. Quality Targets and Success Criteria<a class="headerlink" href="#4-quality-targets-and-success-criteria" title="Permanent link">&para;</a></h2>
+<h3 id="41-code-coverage-targets">4.1 Code Coverage Targets<a class="headerlink" href="#41-code-coverage-targets" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Current Coverage</th>
+<th>Target Coverage</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authentication</td>
+<td>75%</td>
+<td>95%</td>
+<td>Critical</td>
+</tr>
+<tr>
+<td>Story Generation</td>
+<td>70%</td>
+<td>85%</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Database Layer</td>
+<td>75%</td>
+<td>90%</td>
+<td>Critical</td>
+</tr>
+<tr>
+<td>API Endpoints</td>
+<td>65%</td>
+<td>85%</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Frontend Components</td>
+<td>60%</td>
+<td>75%</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Gameplay Mechanics</td>
+<td>70%</td>
+<td>85%</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Overall</strong></td>
+<td><strong>~68%</strong></td>
+<td><strong>80%</strong></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-narrative-quality-metrics">4.2 Narrative Quality Metrics<a class="headerlink" href="#42-narrative-quality-metrics" title="Permanent link">&para;</a></h3>
+<p>Based on user testing and automated analysis:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Measurement Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Narrative Coherence</td>
+<td>≥7.5/10</td>
+<td>Automated analysis + user surveys</td>
+</tr>
+<tr>
+<td>World Consistency</td>
+<td>≥7.5/10</td>
+<td>Automated lore tracking + validation</td>
+</tr>
+<tr>
+<td>User Engagement</td>
+<td>≥7.0/10</td>
+<td>Session duration, return rate, user feedback</td>
+</tr>
+<tr>
+<td>Therapeutic Effectiveness</td>
+<td>≥7.0/10</td>
+<td>Clinical assessment (if applicable)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-performance-benchmarks">4.3 Performance Benchmarks<a class="headerlink" href="#43-performance-benchmarks" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Response Time (95<sup>th</sup> percentile)</td>
+<td>&lt; 200ms</td>
+<td>Prometheus metrics</td>
+</tr>
+<tr>
+<td>Database Query Latency</td>
+<td>&lt; 50ms</td>
+<td>Neo4j/Redis metrics</td>
+</tr>
+<tr>
+<td>Frontend Load Time (First Contentful Paint)</td>
+<td>&lt; 1.5s</td>
+<td>Lighthouse, Web Vitals</td>
+</tr>
+<tr>
+<td>WebSocket Message Latency</td>
+<td>&lt; 100ms</td>
+<td>Custom metrics</td>
+</tr>
+<tr>
+<td>Concurrent Users Supported</td>
+<td>100+</td>
+<td>Load testing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-zero-critical-bugs-policy">4.4 Zero Critical Bugs Policy<a class="headerlink" href="#44-zero-critical-bugs-policy" title="Permanent link">&para;</a></h3>
+<p><strong>Critical Bugs Defined:</strong>
+- Authentication failures (users cannot login)
+- Data loss (game state not persisted)
+- System crashes (unhandled exceptions)
+- Security vulnerabilities (XSS, SQL injection, etc.)</p>
+<p><strong>Policy:</strong> Zero critical bugs in production. All critical bugs must be fixed before release.</p>
+<hr />
+<h2 id="5-cicd-integration-strategy">5. CI/CD Integration Strategy<a class="headerlink" href="#5-cicd-integration-strategy" title="Permanent link">&para;</a></h2>
+<h3 id="51-pr-validation-fast-feedback-target-5-minutes">5.1 PR Validation (Fast Feedback - Target: &lt; 5 minutes)<a class="headerlink" href="#51-pr-validation-fast-feedback-target-5-minutes" title="Permanent link">&para;</a></h3>
+<p><strong>Triggered on:</strong> Every pull request</p>
+<p><strong>Tests to Run:</strong>
+- ✅ Unit tests (all, with mocks)
+- ✅ Linting and code quality checks (ruff, mypy, eslint)
+- ✅ Security scans (semgrep, bandit)
+- ✅ Mock-based integration tests (comprehensive test battery with mocks)</p>
+<p><strong>Configuration:</strong>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># .github/workflows/pr-validation.yml</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PR Validation</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pull_request</span><span class="p p-Indicator">]</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">jobs</span><span class="p">:</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">fast-tests</span><span class="p">:</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">astral-sh/setup-uv@v1</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv sync --all-extras --dev</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv run pytest -q --tb=short -m &quot;not neo4j and not redis&quot;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv run ruff check .</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv run mypy src/</span>
+</span></code></pre></div></p>
+<h3 id="52-main-branch-full-validation-target-30-minutes">5.2 Main Branch (Full Validation - Target: &lt; 30 minutes)<a class="headerlink" href="#52-main-branch-full-validation-target-30-minutes" title="Permanent link">&para;</a></h3>
+<p><strong>Triggered on:</strong> Push to main branch</p>
+<p><strong>Tests to Run:</strong>
+- ✅ All unit tests
+- ✅ Integration tests with REAL databases (Neo4j, Redis)
+- ✅ E2E tests (Playwright - core user journeys)
+- ✅ Performance regression checks
+- ✅ Security scans</p>
+<p><strong>Configuration:</strong>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># .github/workflows/main-branch-tests.yml (enhance existing tests.yml)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Main Branch Tests</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">on</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nt">jobs</span><span class="p">:</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">integration-tests</span><span class="p">:</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">      </span><span class="nt">neo4j</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">      </span><span class="nt">redis</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv run pytest -q --neo4j --redis --cov=src</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">e2e-tests</span><span class="p">:</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright test tests/e2e/specs/auth.spec.ts tests/e2e/specs/dashboard.spec.ts</span>
+</span></code></pre></div></p>
+<h3 id="53-nightlyscheduled-comprehensive-target-2-hours">5.3 Nightly/Scheduled (Comprehensive - Target: &lt; 2 hours)<a class="headerlink" href="#53-nightlyscheduled-comprehensive-target-2-hours" title="Permanent link">&para;</a></h3>
+<p><strong>Triggered on:</strong> Daily at 2 AM UTC</p>
+<p><strong>Tests to Run:</strong>
+- ✅ Full test suite (all tests)
+- ✅ Extended E2E tests (all Playwright specs)
+- ✅ Performance and load tests
+- ✅ Browser compatibility tests
+- ✅ Visual regression tests
+- ✅ Simulation framework tests</p>
+<p><strong>Configuration:</strong>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># .github/workflows/nightly-comprehensive.yml</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Nightly Comprehensive Tests</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">on</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">schedule</span><span class="p">:</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0</span><span class="nv"> </span><span class="s">2</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&#39;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nt">jobs</span><span class="p">:</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">comprehensive</span><span class="p">:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv run pytest --neo4j --redis --cov=src --cov-report=html</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright test --project=chromium --project=firefox --project=webkit</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python testing/load_tests/locustfile.py</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="6-test-maintainability-guidelines">6. Test Maintainability Guidelines<a class="headerlink" href="#6-test-maintainability-guidelines" title="Permanent link">&para;</a></h2>
+<h3 id="61-test-structure-and-organization">6.1 Test Structure and Organization<a class="headerlink" href="#61-test-structure-and-organization" title="Permanent link">&para;</a></h3>
+<p><strong>Directory Structure:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>tests/
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>├── unit/                    # Pure unit tests (no external dependencies)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├── integration/             # Integration tests (real databases)
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>├── e2e/                     # End-to-end tests (Playwright)
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│   ├── specs/              # Test specifications
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│   ├── page-objects/       # Page object models
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>│   ├── fixtures/           # Test fixtures and data
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>│   └── mocks/              # Mock API server
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>├── post_deployment/         # Post-deployment regression tests
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>│   ├── conftest.py         # Deployment test fixtures
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│   ├── test_jwt_token_validation.py      # Issue #2 validation
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>│   ├── test_player_profile_creation.py   # Issue #3 validation
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>│   └── test_frontend_deployment.py       # Issue #4 validation
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>├── performance/             # Performance and load tests
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>├── comprehensive_battery/   # Comprehensive test battery
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>└── conftest.py             # Shared pytest fixtures
+</span></code></pre></div></p>
+<h3 id="62-naming-conventions">6.2 Naming Conventions<a class="headerlink" href="#62-naming-conventions" title="Permanent link">&para;</a></h3>
+<p><strong>Test Files:</strong>
+- Unit tests: <code>test_&lt;module_name&gt;.py</code>
+- Integration tests: <code>test_&lt;feature&gt;_integration.py</code>
+- E2E tests: <code>&lt;feature&gt;.spec.ts</code></p>
+<p><strong>Test Functions:</strong>
+- Descriptive names: <code>test_user_can_login_with_valid_credentials()</code>
+- Use underscores for readability
+- Start with <code>test_</code> for pytest discovery</p>
+<p><strong>Test Scenarios:</strong>
+- Use <code>describe()</code> blocks in Playwright for grouping
+- Use <code>pytest.mark.parametrize</code> for data-driven tests</p>
+<h3 id="63-test-data-management">6.3 Test Data Management<a class="headerlink" href="#63-test-data-management" title="Permanent link">&para;</a></h3>
+<p><strong>Fixtures:</strong>
+- Use pytest fixtures for reusable test data
+- Store fixtures in <code>conftest.py</code> or dedicated <code>fixtures/</code> directory
+- Use factory patterns for complex test data</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_character</span><span class="p">():</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="k">return</span> <span class="n">Character</span><span class="p">(</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;test-char-1&quot;</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test Hero&quot;</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        <span class="n">player_id</span><span class="o">=</span><span class="s2">&quot;test-player-1&quot;</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="n">appearance</span><span class="o">=</span><span class="n">CharacterAppearance</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="n">background</span><span class="o">=</span><span class="n">CharacterBackground</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="p">)</span>
+</span></code></pre></div></p>
+<h3 id="64-assertion-best-practices">6.4 Assertion Best Practices<a class="headerlink" href="#64-assertion-best-practices" title="Permanent link">&para;</a></h3>
+<p><strong>Clear Assertions:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Good: Clear assertion with message</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected 200, got </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Better: Use pytest&#39;s rich assertion rewriting</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">assert</span> <span class="s2">&quot;success&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># Best: Use custom assertion helpers</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">assert_successful_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">assert_contains_keys</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">])</span>
+</span></code></pre></div></p>
+<h3 id="65-test-independence">6.5 Test Independence<a class="headerlink" href="#65-test-independence" title="Permanent link">&para;</a></h3>
+<p><strong>Principles:</strong>
+- Each test should be independent (no shared state)
+- Use setup/teardown or fixtures for test isolation
+- Avoid test interdependencies (Test A should not depend on Test B)</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">clean_database</span><span class="p">():</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean database before each test&quot;&quot;&quot;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="k">yield</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="c1"># Cleanup after test</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">redis_client</span><span class="o">.</span><span class="n">flushdb</span><span class="p">()</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">neo4j_driver</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="s2">&quot;MATCH (n) DETACH DELETE n&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="7-sample-test-templates">7. Sample Test Templates<a class="headerlink" href="#7-sample-test-templates" title="Permanent link">&para;</a></h2>
+<h3 id="71-unit-test-template">7.1 Unit Test Template<a class="headerlink" href="#71-unit-test-template" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="sd">Unit tests for &lt;module_name&gt;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="sd">Tests the &lt;component&gt; in isolation with mocked dependencies.</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComponentUnderTest</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="k">class</span><span class="w"> </span><span class="nc">TestComponentUnderTest</span><span class="p">:</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test suite for ComponentUnderTest&quot;&quot;&quot;</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">component</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Create component instance for testing&quot;&quot;&quot;</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>        <span class="k">return</span> <span class="n">ComponentUnderTest</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">})</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_method_with_valid_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that method works with valid input&quot;&quot;&quot;</span>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>        <span class="c1"># Arrange</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>        <span class="n">input_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">}</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>        <span class="c1"># Act</span>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>        <span class="c1"># Assert</span>
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>        <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>        <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;success&quot;</span>
+</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>
+</span><span id="__span-7-30"><a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_method_with_invalid_input_raises_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+</span><span id="__span-7-31"><a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that method raises error with invalid input&quot;&quot;&quot;</span>
+</span><span id="__span-7-32"><a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a>        <span class="c1"># Arrange</span>
+</span><span id="__span-7-33"><a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>        <span class="n">invalid_input</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-7-34"><a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a>
+</span><span id="__span-7-35"><a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a>        <span class="c1"># Act &amp; Assert</span>
+</span><span id="__span-7-36"><a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;Input cannot be None&quot;</span><span class="p">):</span>
+</span><span id="__span-7-37"><a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a>            <span class="n">component</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">invalid_input</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="72-integration-test-template">7.2 Integration Test Template<a class="headerlink" href="#72-integration-test-template" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="sd">Integration tests for &lt;feature&gt;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="sd">Tests the &lt;feature&gt; with real database connections.</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">neo4j</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphDatabase</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">redis</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">neo4j</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">redis</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">class</span><span class="w"> </span><span class="nc">TestFeatureIntegration</span><span class="p">:</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Integration tests for feature with real databases&quot;&quot;&quot;</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">neo4j_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Create Neo4j driver for testing&quot;&quot;&quot;</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>        <span class="n">driver</span> <span class="o">=</span> <span class="n">GraphDatabase</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>            <span class="s2">&quot;bolt://localhost:7687&quot;</span><span class="p">,</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>            <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;neo4j&quot;</span><span class="p">,</span> <span class="s2">&quot;testpassword&quot;</span><span class="p">)</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>        <span class="p">)</span>
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>        <span class="k">yield</span> <span class="n">driver</span>
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>        <span class="c1"># Cleanup</span>
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>        <span class="k">with</span> <span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;MATCH (n) DETACH DELETE n&quot;</span><span class="p">)</span>
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>        <span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>
+</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">redis_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Create Redis client for testing&quot;&quot;&quot;</span>
+</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>        <span class="n">client</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>        <span class="k">yield</span> <span class="n">client</span>
+</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>        <span class="c1"># Cleanup</span>
+</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>        <span class="n">client</span><span class="o">.</span><span class="n">flushdb</span><span class="p">()</span>
+</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>
+</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_data_persists_to_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neo4j_driver</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">):</span>
+</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that data is correctly persisted to both databases&quot;&quot;&quot;</span>
+</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>        <span class="c1"># Arrange</span>
+</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>        <span class="n">test_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="s2">&quot;test-123&quot;</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;active&quot;</span><span class="p">}</span>
+</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>
+</span><span id="__span-8-41"><a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a>        <span class="c1"># Act</span>
+</span><span id="__span-8-42"><a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a>        <span class="c1"># Write to Redis</span>
+</span><span id="__span-8-43"><a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>        <span class="n">redis_client</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;session:</span><span class="si">{</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;session_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">test_data</span><span class="p">))</span>
+</span><span id="__span-8-44"><a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a>
+</span><span id="__span-8-45"><a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a>        <span class="c1"># Write to Neo4j</span>
+</span><span id="__span-8-46"><a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a>        <span class="k">with</span> <span class="n">neo4j_driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span id="__span-8-47"><a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a>            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-8-48"><a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a>                <span class="s2">&quot;CREATE (s:Session {id: $id, state: $state})&quot;</span><span class="p">,</span>
+</span><span id="__span-8-49"><a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;session_id&#39;</span><span class="p">],</span>
+</span><span id="__span-8-50"><a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a>                <span class="n">state</span><span class="o">=</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span>
+</span><span id="__span-8-51"><a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a>            <span class="p">)</span>
+</span><span id="__span-8-52"><a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a>
+</span><span id="__span-8-53"><a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a>        <span class="c1"># Assert - Read back and verify</span>
+</span><span id="__span-8-54"><a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a>        <span class="n">redis_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">redis_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;session:</span><span class="si">{</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;session_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+</span><span id="__span-8-55"><a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a>        <span class="k">assert</span> <span class="n">redis_data</span> <span class="o">==</span> <span class="n">test_data</span>
+</span><span id="__span-8-56"><a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a>
+</span><span id="__span-8-57"><a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a>        <span class="k">with</span> <span class="n">neo4j_driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span id="__span-8-58"><a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-8-59"><a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a>                <span class="s2">&quot;MATCH (s:Session {id: $id}) RETURN s&quot;</span><span class="p">,</span>
+</span><span id="__span-8-60"><a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;session_id&#39;</span><span class="p">]</span>
+</span><span id="__span-8-61"><a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a>            <span class="p">)</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
+</span><span id="__span-8-62"><a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a>            <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;s&quot;</span><span class="p">][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;active&quot;</span>
+</span></code></pre></div>
+<h3 id="73-e2e-test-template-playwright">7.3 E2E Test Template (Playwright)<a class="headerlink" href="#73-e2e-test-template-playwright" title="Permanent link">&para;</a></h3>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cm">/**</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="cm"> * E2E tests for &lt;feature&gt;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="cm"> *</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="cm"> * Tests the complete user journey for &lt;feature&gt; from frontend to backend.</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="cm"> */</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@playwright/test&#39;</span><span class="p">;</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nx">test</span><span class="p">.</span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Feature Name&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="nx">test</span><span class="p">.</span><span class="nx">beforeEach</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="c1">// Setup: Navigate to starting page</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="nx">test</span><span class="p">(</span><span class="s1">&#39;user can complete main workflow&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="c1">// Arrange: Setup test data</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">testUser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">      </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;test@example.com&#39;</span><span class="p">,</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">      </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;TestPassword123!&#39;</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">    </span><span class="p">};</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">    </span><span class="c1">// Act: Perform user actions</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">click</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;login-button&quot;]&#39;</span><span class="p">);</span>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;email-input&quot;]&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">testUser</span><span class="p">.</span><span class="nx">email</span><span class="p">);</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;password-input&quot;]&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">testUser</span><span class="p">.</span><span class="nx">password</span><span class="p">);</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">click</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;submit-button&quot;]&#39;</span><span class="p">);</span>
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>
+</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">    </span><span class="c1">// Assert: Verify expected outcomes</span>
+</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">).</span><span class="nx">toHaveURL</span><span class="p">(</span><span class="s1">&#39;/dashboard&#39;</span><span class="p">);</span>
+</span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;welcome-message&quot;]&#39;</span><span class="p">)).</span><span class="nx">toBeVisible</span><span class="p">();</span>
+</span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;user-name&quot;]&#39;</span><span class="p">)).</span><span class="nx">toContainText</span><span class="p">(</span><span class="s1">&#39;Test User&#39;</span><span class="p">);</span>
+</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>
+</span><span id="__span-9-33"><a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="w">  </span><span class="nx">test</span><span class="p">(</span><span class="s1">&#39;displays error message on invalid input&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-34"><a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a><span class="w">    </span><span class="c1">// Act: Submit form with invalid data</span>
+</span><span id="__span-9-35"><a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">click</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;submit-button&quot;]&#39;</span><span class="p">);</span>
+</span><span id="__span-9-36"><a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>
+</span><span id="__span-9-37"><a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a><span class="w">    </span><span class="c1">// Assert: Verify error message displayed</span>
+</span><span id="__span-9-38"><a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;error-message&quot;]&#39;</span><span class="p">)).</span><span class="nx">toBeVisible</span><span class="p">();</span>
+</span><span id="__span-9-39"><a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;[data-testid=&quot;error-message&quot;]&#39;</span><span class="p">)).</span><span class="nx">toContainText</span><span class="p">(</span><span class="s1">&#39;Email is required&#39;</span><span class="p">);</span>
+</span><span id="__span-9-40"><a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-9-41"><a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a><span class="p">});</span>
+</span></code></pre></div>
+<hr />
+<h2 id="8-commands-and-scripts">8. Commands and Scripts<a class="headerlink" href="#8-commands-and-scripts" title="Permanent link">&para;</a></h2>
+<h3 id="81-local-test-execution">8.1 Local Test Execution<a class="headerlink" href="#81-local-test-execution" title="Permanent link">&para;</a></h3>
+<p><strong>Run all unit tests:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q
+</span></code></pre></div></p>
+<p><strong>Run integration tests with Neo4j:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>--neo4j
+</span></code></pre></div></p>
+<p><strong>Run integration tests with Redis:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>--redis
+</span></code></pre></div></p>
+<p><strong>Run full integration tests:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>--neo4j<span class="w"> </span>--redis
+</span></code></pre></div></p>
+<p><strong>Run with coverage:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>--cov<span class="o">=</span>src<span class="w"> </span>--cov-report<span class="o">=</span>html<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+</span></code></pre></div></p>
+<p><strong>Run specific test file:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_authentication.py<span class="w"> </span>-v
+</span></code></pre></div></p>
+<p><strong>Run E2E tests:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span>
+</span></code></pre></div></p>
+<p><strong>Run E2E tests for specific browser:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--project<span class="o">=</span>chromium
+</span></code></pre></div></p>
+<p><strong>Run specific E2E spec:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>tests/e2e/specs/auth.spec.ts
+</span></code></pre></div></p>
+<h3 id="82-cicd-test-execution">8.2 CI/CD Test Execution<a class="headerlink" href="#82-cicd-test-execution" title="Permanent link">&para;</a></h3>
+<p><strong>Comprehensive test battery (quick):</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>python<span class="w"> </span>tests/comprehensive_battery/run_comprehensive_tests.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span>--categories<span class="w"> </span>standard<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>--max-concurrent<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>--timeout<span class="w"> </span><span class="m">300</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span>--log-level<span class="w"> </span>INFO
+</span></code></pre></div></p>
+<p><strong>Comprehensive test battery (full):</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>python<span class="w"> </span>tests/comprehensive_battery/run_comprehensive_tests.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span>--all<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span>--detailed-report<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span>--metrics<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span>--output-dir<span class="w"> </span>./test-results
+</span></code></pre></div></p>
+<p><strong>Load testing:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nb">cd</span><span class="w"> </span>testing/load_tests
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>locust<span class="w"> </span>-f<span class="w"> </span>locustfile.py<span class="w"> </span>--headless<span class="w"> </span>--users<span class="w"> </span><span class="m">100</span><span class="w"> </span>--spawn-rate<span class="w"> </span><span class="m">10</span><span class="w"> </span>--run-time<span class="w"> </span>10m
+</span></code></pre></div></p>
+<h3 id="83-test-environment-setup">8.3 Test Environment Setup<a class="headerlink" href="#83-test-environment-setup" title="Permanent link">&para;</a></h3>
+<p><strong>Start test databases:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.test.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>neo4j<span class="w"> </span>redis
+</span></code></pre></div></p>
+<p><strong>Stop test databases:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.test.yml<span class="w"> </span>down<span class="w"> </span>-v
+</span></code></pre></div></p>
+<p><strong>Start full test environment:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>./scripts/start-test-environment.sh
+</span></code></pre></div></p>
+<hr />
+<h2 id="8-post-deployment-regression-tests">8. Post-Deployment Regression Tests<a class="headerlink" href="#8-post-deployment-regression-tests" title="Permanent link">&para;</a></h2>
+<h3 id="81-overview">8.1 Overview<a class="headerlink" href="#81-overview" title="Permanent link">&para;</a></h3>
+<p>Post-deployment tests are automated integration tests that run after each deployment to verify that critical bug fixes remain effective. These tests prevent regression of Issues #2, #3, and #4.</p>
+<p><strong>Location:</strong> <code>tests/post_deployment/</code></p>
+<p><strong>Execution:</strong> Automatically triggered after staging and production deployments via GitHub Actions</p>
+<p><strong>Documentation:</strong> See <a href="../POST_DEPLOYMENT_TESTING/">POST_DEPLOYMENT_TESTING.md</a> for detailed guide</p>
+<h3 id="82-test-coverage">8.2 Test Coverage<a class="headerlink" href="#82-test-coverage" title="Permanent link">&para;</a></h3>
+<h4 id="issue-2-jwt-token-validation">Issue #2: JWT Token Validation<a class="headerlink" href="#issue-2-jwt-token-validation" title="Permanent link">&para;</a></h4>
+<p><strong>File:</strong> <code>test_jwt_token_validation.py</code></p>
+<p><strong>Tests:</strong>
+- JWT tokens contain explicit <code>player_id</code> field
+- <code>player_id</code> matches expected user ID
+- Backward compatibility with <code>sub</code> field maintained
+- Token refresh preserves <code>player_id</code>
+- All required JWT fields present</p>
+<p><strong>Rationale:</strong> Prevents regression of authentication fix where JWT tokens were missing player_id field</p>
+<h4 id="issue-3-player-profile-auto-creation">Issue #3: Player Profile Auto-Creation<a class="headerlink" href="#issue-3-player-profile-auto-creation" title="Permanent link">&para;</a></h4>
+<p><strong>File:</strong> <code>test_player_profile_creation.py</code></p>
+<p><strong>Tests:</strong>
+- New user login triggers automatic player profile creation
+- Player profile persists in Neo4j database
+- Existing users don't get duplicate profiles
+- Profile creation failure doesn't block login (graceful degradation)
+- Profile accessible via API after creation</p>
+<p><strong>Rationale:</strong> Prevents regression of player profile auto-creation fix</p>
+<h4 id="issue-4-frontend-deployment-verification">Issue #4: Frontend Deployment Verification<a class="headerlink" href="#issue-4-frontend-deployment-verification" title="Permanent link">&para;</a></h4>
+<p><strong>File:</strong> <code>test_frontend_deployment.py</code></p>
+<p><strong>Tests:</strong>
+- Frontend serves fresh builds (not cached)
+- <code>index.html</code> has no-cache headers
+- Static assets have proper cache headers
+- Environment variables correctly injected
+- Frontend can communicate with backend API
+- React app properly configured</p>
+<p><strong>Rationale:</strong> Prevents regression of frontend deployment cache issues</p>
+<h3 id="83-cicd-integration">8.3 CI/CD Integration<a class="headerlink" href="#83-cicd-integration" title="Permanent link">&para;</a></h3>
+<p><strong>Staging Deployment:</strong>
+- Runs all post-deployment tests including database validation
+- Executes after health checks pass
+- Blocks deployment if tests fail</p>
+<p><strong>Production Deployment:</strong>
+- Runs post-deployment tests with <code>-m "not neo4j"</code> to skip data-creating tests
+- Executes after health checks pass
+- Alerts on failure but doesn't block deployment</p>
+<p><strong>Manual Execution:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Verify staging deployment</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>./scripts/verify-deployment.sh<span class="w"> </span>staging
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Verify production deployment</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>./scripts/verify-deployment.sh<span class="w"> </span>production
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Run specific test suite</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/post_deployment/test_jwt_token_validation.py<span class="w"> </span>-v
+</span></code></pre></div></p>
+<h3 id="84-success-metrics">8.4 Success Metrics<a class="headerlink" href="#84-success-metrics" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Execution Time:</strong> &lt; 5 minutes for full post-deployment test suite</li>
+<li><strong>Reliability:</strong> 100% pass rate when fixes are intact</li>
+<li><strong>Coverage:</strong> All 3 critical issues (JWT, player profile, frontend) validated</li>
+<li><strong>Automation:</strong> Runs automatically on every deployment</li>
+</ul>
+<hr />
+<h2 id="9-next-steps-and-recommendations">9. Next Steps and Recommendations<a class="headerlink" href="#9-next-steps-and-recommendations" title="Permanent link">&para;</a></h2>
+<h3 id="immediate-actions-week-1">Immediate Actions (Week 1)<a class="headerlink" href="#immediate-actions-week-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Review and Approve Roadmap:</strong> Stakeholder review of this testing strategy</li>
+<li><strong>Set Up Test Infrastructure:</strong> Ensure all developers can run tests locally</li>
+<li><strong>Create Test Templates:</strong> Standardize test structure across the project</li>
+<li><strong>Begin Phase 1 Implementation:</strong> Start with authentication flow tests</li>
+</ol>
+<h3 id="short-term-goals-weeks-2-4">Short-term Goals (Weeks 2-4)<a class="headerlink" href="#short-term-goals-weeks-2-4" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Complete Phase 1:</strong> All critical path tests implemented</li>
+<li><strong>Integrate with CI/CD:</strong> Ensure PR validation and main branch tests run automatically</li>
+<li><strong>Establish Quality Gates:</strong> No PR merges without passing tests</li>
+<li><strong>Begin Phase 2:</strong> Start user experience validation tests</li>
+</ol>
+<h3 id="long-term-goals-weeks-5-8">Long-term Goals (Weeks 5-8)<a class="headerlink" href="#long-term-goals-weeks-5-8" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Complete Phase 2 &amp; 3:</strong> Full test coverage achieved</li>
+<li><strong>Performance Baseline:</strong> Establish performance benchmarks</li>
+<li><strong>Continuous Monitoring:</strong> Integrate test results into developer dashboards</li>
+<li><strong>Test Maintenance:</strong> Regular review and update of tests</li>
+</ol>
+<h3 id="success-metrics">Success Metrics<a class="headerlink" href="#success-metrics" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Code Coverage:</strong> Achieve 80% overall coverage</li>
+<li><strong>Test Execution Time:</strong> Keep PR validation under 5 minutes</li>
+<li><strong>Test Reliability:</strong> &lt; 1% flaky test rate</li>
+<li><strong>Bug Detection:</strong> Catch 90%+ of bugs before production</li>
+<li><strong>Developer Satisfaction:</strong> Positive feedback on testing workflow</li>
+</ul>
+<hr />
+<h2 id="appendix-a-test-infrastructure-dependencies">Appendix A: Test Infrastructure Dependencies<a class="headerlink" href="#appendix-a-test-infrastructure-dependencies" title="Permanent link">&para;</a></h2>
+<h3 id="required-tools">Required Tools<a class="headerlink" href="#required-tools" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Python:</strong> 3.12+</li>
+<li><strong>Node.js:</strong> 18+</li>
+<li><strong>uv:</strong> Latest version (package manager)</li>
+<li><strong>Docker:</strong> For running test databases</li>
+<li><strong>Playwright:</strong> For E2E testing</li>
+<li><strong>pytest:</strong> For Python testing</li>
+<li><strong>Locust:</strong> For load testing</li>
+</ul>
+<h3 id="database-versions">Database Versions<a class="headerlink" href="#database-versions" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Neo4j:</strong> 5-community</li>
+<li><strong>Redis:</strong> 7-alpine</li>
+</ul>
+<h3 id="cicd-requirements">CI/CD Requirements<a class="headerlink" href="#cicd-requirements" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>GitHub Actions:</strong> Workflows configured</li>
+<li><strong>Secrets:</strong> Test credentials stored securely</li>
+<li><strong>Artifacts:</strong> Test results and coverage reports uploaded</li>
+</ul>
+<hr />
+<h2 id="appendix-b-glossary">Appendix B: Glossary<a class="headerlink" href="#appendix-b-glossary" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Unit Test:</strong> Test of a single function/class in isolation</li>
+<li><strong>Integration Test:</strong> Test of multiple components working together</li>
+<li><strong>E2E Test:</strong> Test of complete user journey from UI to database</li>
+<li><strong>Mock:</strong> Simulated object that mimics real behavior</li>
+<li><strong>Fixture:</strong> Reusable test data or setup code</li>
+<li><strong>Coverage:</strong> Percentage of code executed by tests</li>
+<li><strong>Flaky Test:</strong> Test that sometimes passes and sometimes fails</li>
+<li><strong>Regression Test:</strong> Test that ensures bugs don't reappear</li>
+</ul>
+<hr />
+<p><strong>Document Version:</strong> 1.0
+<strong>Last Updated:</strong> 2025-10-03
+<strong>Author:</strong> The Augster (AI Development Assistant)
+<strong>Status:</strong> Ready for Review</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="October 8, 2025 19:21:49 UTC"><span class="timeago" datetime="2025-10-08T19:21:49+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="October 8, 2025 19:21:49 UTC">2025-10-08</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="October 4, 2025 17:27:15 UTC"><span class="timeago" datetime="2025-10-04T17:27:15+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="October 4, 2025 17:27:15 UTC">2025-10-04</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback! Help us improve by <a href="https://github.com/theinterneti/TTA/issues/new" target="_blank" rel="noopener">opening an issue</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 TTA Development Team
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/theinterneti/TTA" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../../js/timeago.min.js"></script>
+      
+        <script src="../../js/timeago_mkdocs_material.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
