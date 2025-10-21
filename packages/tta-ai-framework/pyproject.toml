@@ -40,6 +40,9 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/tta_ai"]
+
 [tool.uv.sources]
 # Allow local development with other packages
 tta-narrative-engine = { workspace = true }
@@ -89,4 +92,3 @@ pythonVersion = "3.12"
 typeCheckingMode = "basic"
 reportMissingImports = true
 reportMissingTypeStubs = false
-
