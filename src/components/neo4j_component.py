@@ -26,7 +26,7 @@ Example:
 """
 
 import logging
-import subprocess
+import subprocess  # nosec B404  # subprocess usage is safe and necessary for Docker operations
 import time
 from pathlib import Path
 from typing import Any

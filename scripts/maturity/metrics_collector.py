@@ -453,19 +453,30 @@ def collect_metrics_from_metadata(component_metadata) -> MetricsResult:  # noqa:
     Returns:
         MetricsResult with collected metrics
     """
-    # Derive module path from source file
-    component_path = _derive_module_path(component_metadata.source_path)
+    # Use file path directly for linting, type checking, and security
+    # Only coverage needs module path
+    component_file_path = str(component_metadata.source_path)
+    component_module_path = _derive_module_path(component_metadata.source_path)
 
     # Get test path
-    # For shared test files like tests/test_components.py, we need to specify the test function
-    # For now, use the file path and let the metrics collector handle it
     test_path = (
         str(component_metadata.test_path) if component_metadata.test_path else ""
     )
 
-    # Collect metrics
-    return collect_all_metrics(
+    # Collect metrics individually to use correct paths
+    logger.info(f"Collecting metrics for {component_metadata.name}...")
+
+    coverage = collect_coverage(component_module_path, test_path)
+    linting = collect_linting(component_file_path)
+    type_checking = collect_type_checking(component_file_path)
+    security = collect_security(component_file_path)
+    tests = collect_test_status(test_path)
+
+    return MetricsResult(
         component_name=component_metadata.name,
-        component_path=component_path,
-        test_path=test_path,
+        coverage=coverage,
+        linting=linting,
+        type_checking=type_checking,
+        security=security,
+        tests=tests,
     )
