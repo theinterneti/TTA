@@ -346,3 +346,12 @@ gha-creds-*.json
 # Version-like directories that appear to be artifacts
 /=0.2.0
 /=0.3.0
+
+# -------------------------------------------------
+# 22) AI tooling and GitHub Actions credentials
+# -------------------------------------------------
+# Gemini CLI configuration and context
+.gemini/
+
+# GitHub Actions credentials (generated during workflow runs)
+gha-creds-*.json
