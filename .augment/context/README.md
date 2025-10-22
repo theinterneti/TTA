@@ -68,6 +68,48 @@ print(manager.get_context_summary(session_id))
 manager.save_session(session_id)
 ```
 
+### Instruction Loading
+
+The context manager automatically loads `.instructions.md` files from `.augment/instructions/` at session creation. Instructions provide AI agents with project-specific development standards, testing patterns, and component-specific conventions.
+
+```python
+from .augment.context.conversation_manager import create_tta_session
+
+# Create session with only global instructions
+manager, session_id = create_tta_session()
+
+# Create session with file-scoped instructions
+# This loads global + player-experience instructions
+manager, session_id = create_tta_session(
+    current_file="src/player_experience/service.py"
+)
+
+# Manually load instructions for a different file
+manager.load_instructions(session_id, "src/agent_orchestration/service.py")
+```
+
+**How it works:**
+1. Discovers all `.instructions.md` files in `.augment/instructions/`
+2. Parses YAML frontmatter to extract `applyTo` glob patterns
+3. Matches current file against patterns (e.g., `src/player_experience/**/*.py`)
+4. Loads matching instructions as system messages with importance scores:
+   - Global instructions (`**/*.py`): importance=0.9
+   - Scoped instructions: importance=0.8
+
+**Creating instruction files:**
+See `.augment/instructions/templates/instruction.template.md` for the template.
+
+```markdown
+---
+applyTo: "src/player_experience/**/*.py"
+description: "Player Experience component patterns"
+---
+
+# Component Instructions
+
+[Your instructions here]
+```
+
 ### Advanced Usage
 
 ```python
@@ -305,7 +347,7 @@ if context.utilization > 0.9:
     # Option 1: Start new session
     manager.save_session(session_id)
     manager, new_session_id = create_tta_session(f"{session_id}-continued")
-    
+
     # Option 2: Manual pruning
     context = manager._prune_context(context, needed_tokens=1000)
 ```
@@ -378,7 +420,6 @@ This is a Phase 1 meta-level implementation. Feedback and improvements welcome!
 
 ---
 
-**Status:** Active (Phase 1 - Meta-Level Implementation)  
-**Last Updated:** 2025-10-20  
+**Status:** Active (Phase 1 - Meta-Level Implementation)
+**Last Updated:** 2025-10-20
 **Next Review:** After 1 week of usage
-
