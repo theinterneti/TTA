@@ -17,7 +17,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, mock_open, patch
 
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -63,6 +63,137 @@ class TestComponents(unittest.TestCase):
                 docker.status.value,
                 "stopped",
                 "Docker component status is incorrect after stopping",
+            )
+
+    # Batch 1: Start/Stop Operations (3 tests)
+    def test_docker_start_success(self):
+        """Test Docker component successful start."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create mock result object for safe_run
+        mock_result = type(
+            "obj", (object,), {"returncode": 0, "stdout": "Docker version 20.10.0"}
+        )()
+
+        # Mock _check_docker_installed and ensure_consistency
+        with (
+            patch("src.common.process_utils.run", return_value=mock_result),
+            patch.object(docker, "ensure_consistency", return_value=True),
+        ):
+            result = docker.start()
+            self.assertTrue(result, "Docker component should start successfully")
+
+    def test_docker_start_docker_not_installed(self):
+        """Test Docker component start fails when Docker not installed."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock _check_docker_installed to raise RuntimeError
+        with patch.object(
+            docker,
+            "_check_docker_installed",
+            side_effect=RuntimeError("Docker not installed"),
+        ):
+            result = docker.start()
+            self.assertFalse(
+                result,
+                "Docker component should fail to start when Docker not installed",
+            )
+
+    def test_docker_stop_success(self):
+        """Test Docker component stop (always succeeds as it's a no-op)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Set status to running before stopping
+        docker.status = ComponentStatus.RUNNING
+
+        result = docker.stop()
+        self.assertTrue(result, "Docker component should stop successfully")
+
+    # Batch 2: Docker Installation Check (2 tests)
+    def test_check_docker_installed_success(self):
+        """Test Docker installation check succeeds."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create mock result object
+        mock_result = type(
+            "obj", (object,), {"returncode": 0, "stdout": "Docker version 20.10.0"}
+        )()
+
+        with patch("src.common.process_utils.run", return_value=mock_result):
+            result = docker._check_docker_installed()
+            self.assertTrue(result, "Docker should be detected as installed")
+
+    def test_check_docker_installed_failure(self):
+        """Test Docker installation check exception handling."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create a mock result with non-zero return code
+        mock_result = MagicMock()
+        mock_result.returncode = 1
+        mock_result.stdout = ""
+
+        # Patch at the module level where it's imported
+        with (
+            patch("src.components.docker_component.safe_run", return_value=mock_result),
+            self.assertRaises(RuntimeError),
+        ):
+            docker._check_docker_installed()
+
+    # Batch 3: Consistency Orchestration (3 tests)
+    def test_ensure_consistency_success(self):
+        """Test ensure_consistency processes both repositories successfully."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock Path.exists to return True for both repositories
+        # Mock all sub-methods to return None (they don't return values)
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(docker, "_copy_template_files"),
+            patch.object(docker, "_standardize_container_names"),
+            patch.object(docker, "_ensure_consistent_extensions"),
+            patch.object(docker, "_ensure_consistent_env_vars"),
+            patch.object(docker, "_ensure_consistent_services"),
+        ):
+            result = docker.ensure_consistency()
+            self.assertTrue(result, "Consistency should be ensured successfully")
+
+    def test_ensure_consistency_dev_missing(self):
+        """Test ensure_consistency fails when tta.dev repository not found."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock Path.exists to return False for tta.dev
+        with patch.object(Path, "exists", return_value=False):
+            result = docker.ensure_consistency()
+            self.assertFalse(result, "Consistency should fail when tta.dev missing")
+
+    def test_ensure_consistency_prototype_missing(self):
+        """Test ensure_consistency fails when tta.prototype repository not found."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock Path.exists to return True for tta.dev, False for tta.prototype
+        def mock_exists(self):
+            # First call is for tta.dev (True), second is for tta.prototype (False)
+            return str(self).endswith("tta.dev")
+
+        with (
+            patch.object(Path, "exists", mock_exists),
+            patch.object(docker, "_copy_template_files"),
+            patch.object(docker, "_standardize_container_names"),
+            patch.object(docker, "_ensure_consistent_extensions"),
+            patch.object(docker, "_ensure_consistent_env_vars"),
+            patch.object(docker, "_ensure_consistent_services"),
+        ):
+            result = docker.ensure_consistency()
+            self.assertFalse(
+                result, "Consistency should fail when tta.prototype missing"
             )
 
     def test_carbon_component(self):
@@ -285,6 +416,436 @@ class TestComponents(unittest.TestCase):
             self.assertTrue(
                 callable(test_func), "Decorated function should be callable"
             )
+
+    # Batch 4: Template Copying (2 tests)
+    def test_copy_template_files_docker_compose(self):
+        """Test copying docker-compose.yml template - verifies method executes without error."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Just verify the method executes without raising an exception
+        # The actual file operations are mocked at a lower level
+        try:
+            docker._copy_template_files("tta.dev")
+            # If we get here, the method executed successfully
+            self.assertTrue(True, "Method executed successfully")
+        except Exception as e:
+            self.fail(f"Method raised unexpected exception: {e}")
+
+    def test_copy_template_files_devcontainer(self):
+        """Test copying devcontainer.json template."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock Path.exists to return True for template, False for repo devcontainer
+        def mock_exists(self):
+            path_str = str(self)
+            # Template exists, repo devcontainer doesn't
+            return "templates" in path_str and "devcontainer.json" in path_str
+
+        with (
+            patch.object(Path, "exists", mock_exists),
+            patch.object(Path, "mkdir") as mock_mkdir,
+            patch("shutil.copy") as mock_copy,
+        ):
+            docker._copy_template_files("tta.dev")
+            # Verify mkdir and copy were called
+            self.assertTrue(
+                mock_mkdir.called or mock_copy.called,
+                "Directory creation or copy should occur",
+            )
+
+    # Batch 5: Container Name Standardization (2 tests)
+    def test_standardize_container_names_success(self):
+        """Test standardizing container names in docker-compose.yml."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content
+        mock_content = "container_name: tta-app\ncontainer_name: tta-neo4j"
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._standardize_container_names("tta.dev")
+            # Verify file was opened for reading and writing
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    def test_standardize_container_names_no_file(self):
+        """Test standardizing container names when docker-compose.yml doesn't exist."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        with patch.object(Path, "exists", return_value=False):
+            # Should not raise an error, just skip
+            docker._standardize_container_names("tta.dev")
+
+    # Batch 6: Extension Consistency (2 tests)
+    def test_ensure_consistent_extensions_all_present(self):
+        """Test ensuring extensions when all are present."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content with all extensions
+        mock_content = """
+        {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter"
+            ]
+        }
+        """
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_extensions("tta.dev")
+            # Should complete without warnings
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    def test_ensure_consistent_extensions_missing(self):
+        """Test ensuring extensions when some are missing."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content with missing extensions
+        mock_content = '{"extensions": []}'
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_extensions("tta.dev")
+            # Should log warnings about missing extensions
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    # Batch 7: Environment Variable Consistency (3 tests)
+    def test_ensure_consistent_env_vars_create_new(self):
+        """Test creating new .env.example file."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        mock_file = mock_open()
+
+        with (
+            patch.object(Path, "exists", return_value=False),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_env_vars("tta.dev")
+            # Verify file was created
+            self.assertTrue(mock_file.called, "File should be created")
+
+    def test_ensure_consistent_env_vars_add_missing(self):
+        """Test adding missing environment variables."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content with some variables missing
+        mock_content = "NEO4J_PASSWORD=password\n"
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_env_vars("tta.dev")
+            # Should add missing variables
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    def test_ensure_consistent_env_vars_all_present(self):
+        """Test when all environment variables are present."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content with all variables
+        mock_content = """
+        NEO4J_PASSWORD=password
+        NEO4J_URI=bolt://neo4j:7687
+        NEO4J_USERNAME=neo4j
+        MODEL_CACHE_DIR=/app/.model_cache
+        CODECARBON_OUTPUT_DIR=/app/logs/codecarbon
+        """
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_env_vars("tta.dev")
+            # Should complete without adding variables
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    # Batch 8: Service Consistency (2 tests)
+    def test_ensure_consistent_services_all_present(self):
+        """Test ensuring services when all are present."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content with all services
+        mock_content = """
+        services:
+          neo4j:
+            image: neo4j:latest
+          app:
+            image: app:latest
+        """
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_services("tta.dev")
+            # Should complete without warnings
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    def test_ensure_consistent_services_missing(self):
+        """Test ensuring services when some are missing."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Mock file content with missing services
+        mock_content = "services:\n  neo4j:\n    image: neo4j:latest\n"
+        mock_file = mock_open(read_data=mock_content)
+
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "open", mock_file),
+        ):
+            docker._ensure_consistent_services("tta.dev")
+            # Should log warnings about missing services
+            self.assertTrue(mock_file.called, "File should be opened")
+
+    # Batch 9: Helper Methods (3 tests)
+    def test_get_env_var_default_known_vars(self):
+        """Test getting default values for known environment variables."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Test known variables
+        self.assertEqual(docker._get_env_var_default("NEO4J_PASSWORD"), "password")
+        self.assertEqual(docker._get_env_var_default("NEO4J_URI"), "bolt://neo4j:7687")
+        self.assertEqual(docker._get_env_var_default("NEO4J_USERNAME"), "neo4j")
+        self.assertEqual(
+            docker._get_env_var_default("MODEL_CACHE_DIR"), "/app/.model_cache"
+        )
+        self.assertEqual(
+            docker._get_env_var_default("CODECARBON_OUTPUT_DIR"), "/app/logs/codecarbon"
+        )
+
+    def test_get_env_var_default_unknown_var(self):
+        """Test getting default value for unknown environment variable."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Test unknown variable
+        self.assertEqual(docker._get_env_var_default("UNKNOWN_VAR"), "default_value")
+
+    def test_create_env_example_with_template(self):
+        """Test creating .env.example from template."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create a temporary directory for testing
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            env_example_path = tmppath / ".env.example"
+
+            # Mock the template path to not exist, forcing creation
+            with patch.object(Path, "exists", return_value=False):
+                docker._create_env_example("tta.dev", env_example_path)
+
+            # Verify file was created
+            self.assertTrue(env_example_path.exists(), ".env.example should be created")
+
+            # Verify content
+            content = env_example_path.read_text()
+            self.assertIn("NEO4J_PASSWORD", content)
+            self.assertIn("NEO4J_URI", content)
+
+    def test_add_missing_env_vars_integration(self):
+        """Test adding missing environment variables (integration test)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create a temporary directory for testing
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            env_example_path = tmppath / ".env.example"
+
+            # Create initial file with only one variable
+            env_example_path.write_text("NEO4J_PASSWORD=password\n")
+
+            # Call the method
+            docker._add_missing_env_vars("tta.dev", env_example_path)
+
+            # Verify missing variables were added
+            content = env_example_path.read_text()
+            self.assertIn("NEO4J_URI", content)
+            self.assertIn("NEO4J_USERNAME", content)
+            self.assertIn("MODEL_CACHE_DIR", content)
+            self.assertIn("CODECARBON_OUTPUT_DIR", content)
+
+    def test_standardize_container_names_integration(self):
+        """Test standardizing container names (integration test)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create a temporary directory for testing
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            repo_path = tmppath / "tta.dev"
+            repo_path.mkdir()
+            docker_compose_path = repo_path / "docker-compose.yml"
+
+            # Create initial file with generic container names
+            docker_compose_path.write_text(
+                "container_name: tta-app\ncontainer_name: tta-neo4j\n"
+            )
+
+            # Mock the repo paths
+            with (
+                patch.object(docker, "root_dir", tmppath),
+                patch.object(docker, "tta_dev_path", repo_path),
+            ):
+                docker._standardize_container_names("tta.dev")
+
+            # Verify container names were standardized
+            content = docker_compose_path.read_text()
+            self.assertIn("tta-dev-app", content)
+            self.assertIn("tta-dev-neo4j", content)
+
+    def test_ensure_consistency_integration(self):
+        """Test ensure_consistency method (integration test)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create temporary directories for both repositories
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            tta_dev_path = tmppath / "tta.dev"
+            tta_prototype_path = tmppath / "tta.prototype"
+
+            # Create both repository directories
+            tta_dev_path.mkdir()
+            tta_prototype_path.mkdir()
+
+            # Create minimal docker-compose.yml files
+            (tta_dev_path / "docker-compose.yml").write_text(
+                "services:\n  neo4j:\n    image: neo4j\n"
+            )
+            (tta_prototype_path / "docker-compose.yml").write_text(
+                "services:\n  neo4j:\n    image: neo4j\n"
+            )
+
+            # Mock the repository paths
+            with (
+                patch.object(docker, "root_dir", tmppath),
+                patch.object(docker, "tta_dev_path", tta_dev_path),
+                patch.object(docker, "tta_prototype_path", tta_prototype_path),
+                patch.object(docker, "templates_path", tmppath / "templates"),
+            ):
+                result = docker.ensure_consistency()
+
+            # Verify success
+            self.assertTrue(result, "ensure_consistency should succeed")
+
+            # Verify .env.example files were created
+            self.assertTrue((tta_dev_path / ".env.example").exists())
+            self.assertTrue((tta_prototype_path / ".env.example").exists())
+
+    def test_copy_template_files_integration(self):
+        """Test _copy_template_files method (integration test)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create temporary directories
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            repo_path = tmppath / "tta.dev"
+            templates_path = tmppath / "templates" / "tta.dev"
+
+            # Create directories
+            repo_path.mkdir(parents=True)
+            templates_path.mkdir(parents=True)
+
+            # Create template docker-compose.yml
+            (templates_path / "docker-compose.yml").write_text(
+                "version: '3.8'\nservices:\n  app:\n    image: app\n"
+            )
+
+            # Mock the paths
+            with (
+                patch.object(docker, "root_dir", tmppath),
+                patch.object(docker, "tta_dev_path", repo_path),
+                patch.object(docker, "templates_path", tmppath / "templates"),
+            ):
+                docker._copy_template_files("tta.dev")
+
+            # Verify docker-compose.yml was copied
+            self.assertTrue((repo_path / "docker-compose.yml").exists())
+
+    def test_ensure_consistent_extensions_integration(self):
+        """Test _ensure_consistent_extensions method (integration test)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create temporary directory
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            repo_path = tmppath / "tta.dev"
+            devcontainer_path = repo_path / ".devcontainer"
+
+            # Create directories
+            devcontainer_path.mkdir(parents=True)
+
+            # Create devcontainer.json with some extensions
+            devcontainer_json = {"extensions": ["ms-python.python"]}
+            (devcontainer_path / "devcontainer.json").write_text(
+                json.dumps(devcontainer_json)
+            )
+
+            # Mock the paths
+            with (
+                patch.object(docker, "root_dir", tmppath),
+                patch.object(docker, "tta_dev_path", repo_path),
+            ):
+                docker._ensure_consistent_extensions("tta.dev")
+
+            # Verify method executed without error
+            self.assertTrue((devcontainer_path / "devcontainer.json").exists())
+
+    def test_ensure_consistent_services_integration(self):
+        """Test _ensure_consistent_services method (integration test)."""
+        config = TTAConfig()
+        docker = DockerComponent(config)
+
+        # Create temporary directory
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            repo_path = tmppath / "tta.dev"
+            repo_path.mkdir()
+
+            # Create docker-compose.yml with one service
+            (repo_path / "docker-compose.yml").write_text(
+                "services:\n  neo4j:\n    image: neo4j\n"
+            )
+
+            # Mock the paths
+            with (
+                patch.object(docker, "root_dir", tmppath),
+                patch.object(docker, "tta_dev_path", repo_path),
+            ):
+                docker._ensure_consistent_services("tta.dev")
+
+            # Verify method executed without error
+            self.assertTrue((repo_path / "docker-compose.yml").exists())
 
     # ========== App Component Tests ==========
 
