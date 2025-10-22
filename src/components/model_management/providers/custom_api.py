@@ -5,6 +5,8 @@ This module provides support for custom API providers like OpenAI, Anthropic,
 and other compatible APIs.
 """
 
+import contextlib
+import json
 import logging
 from collections.abc import AsyncGenerator
 from datetime import datetime
@@ -204,8 +206,6 @@ class CustomAPIModelInstance(BaseModelInstance):
                     break
 
                 try:
-                    import json
-
                     data = json.loads(data_str)
 
                     if "choices" in data and data["choices"]:
@@ -223,8 +223,6 @@ class CustomAPIModelInstance(BaseModelInstance):
                 data_str = line[6:]  # Remove "data: " prefix
 
                 try:
-                    import json
-
                     data = json.loads(data_str)
 
                     if data.get("type") == "content_block_delta":

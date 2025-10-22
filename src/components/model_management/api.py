@@ -11,7 +11,6 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 # TODO: Implement component_registry module
-# from src.orchestration.component_registry import get_component
 from .interfaces import TaskType
 from .model_management_component import ModelManagementComponent
 
@@ -79,7 +78,6 @@ async def get_model_management() -> ModelManagementComponent:
     # TODO: Implement component_registry module and get_component function
     # This would typically be injected from the main application
     # For now, raise an error as the registry is not implemented
-    # component = get_component("model_management")
     component = None  # Placeholder until component_registry is implemented
     if not component:
         raise HTTPException(
