@@ -326,6 +326,245 @@ class InstructionLoader:
         return relevant
 
 
+class MemoryLoader:
+    """
+    Loads and parses .memory.md files for AI context injection.
+
+    This class discovers memory files in .augment/memory/ subdirectories,
+    parses their YAML frontmatter, and matches them against current context
+    (component, tags, category) to provide relevant historical learnings.
+    """
+
+    def __init__(self, memory_dir: str = ".augment/memory"):
+        """
+        Initialize the memory loader.
+
+        Args:
+            memory_dir: Directory containing memory subdirectories
+        """
+        self.memory_dir = Path(memory_dir)
+        self._cache: dict[str, dict[str, Any]] = {}
+
+    def discover_memories(self) -> list[Path]:
+        """
+        Discover all .memory.md files in memory subdirectories.
+
+        Returns:
+            List of Path objects for memory files
+        """
+        if not self.memory_dir.exists():
+            logger.warning(f"Memory directory not found: {self.memory_dir}")
+            return []
+
+        memory_files = []
+        for subdir in self.memory_dir.iterdir():
+            if subdir.is_dir() and not subdir.name.startswith("."):
+                memory_files.extend(subdir.glob("*.memory.md"))
+
+        logger.debug(f"Discovered {len(memory_files)} memory files")
+        return memory_files
+
+    def parse_memory_file(self, file_path: Path) -> dict[str, Any] | None:  # noqa: PLR0911
+        """
+        Parse memory file and extract YAML frontmatter and content.
+
+        Args:
+            file_path: Path to memory file
+
+        Returns:
+            Dict with 'frontmatter', 'content', 'filename', 'category' keys, or None if parsing fails
+        """
+        # Check cache first
+        cache_key = str(file_path)
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+
+        if not YAML_AVAILABLE:
+            logger.warning("pyyaml not available, cannot parse memory files")
+            return None
+
+        try:
+            content = file_path.read_text(encoding="utf-8")
+
+            # Extract YAML frontmatter (between --- markers)
+            frontmatter_match = re.match(
+                r"^---\s*\n(.*?)\n---\s*\n(.*)$", content, re.DOTALL
+            )
+            if not frontmatter_match:
+                logger.warning(f"No YAML frontmatter found in {file_path.name}")
+                return None
+
+            frontmatter_text = frontmatter_match.group(1)
+            markdown_content = frontmatter_match.group(2)
+
+            # Parse YAML frontmatter
+            frontmatter = yaml.safe_load(frontmatter_text)
+            if not frontmatter:
+                logger.warning(f"Empty frontmatter in {file_path.name}")
+                return None
+
+            # Validate required fields
+            required_fields = ["category", "date", "component", "severity", "tags"]
+            for field in required_fields:
+                if field not in frontmatter:
+                    logger.warning(f"Missing '{field}' field in {file_path.name}")
+                    return None
+
+            # Determine category from parent directory
+            category = file_path.parent.name
+
+            result = {
+                "frontmatter": frontmatter,
+                "content": markdown_content.strip(),
+                "filename": file_path.name,
+                "category": category,
+            }
+
+            # Cache result
+            self._cache[cache_key] = result
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to parse memory file {file_path.name}: {e}")
+            return None
+
+    def match_memory(
+        self,
+        memory: dict[str, Any],
+        component: str | None = None,
+        tags: list[str] | None = None,
+        category: str | None = None,
+    ) -> float:
+        """
+        Calculate relevance score for a memory based on matching criteria.
+
+        Args:
+            memory: Parsed memory dict
+            component: Current component being worked on
+            tags: Current task tags
+            category: Desired memory category
+
+        Returns:
+            Relevance score (0.0 to 1.0), 0.0 if no match
+        """
+        frontmatter = memory["frontmatter"]
+        score = 0.0
+
+        # If no filters provided, give base relevance score
+        if not component and not tags and not category:
+            score = 0.5  # Base relevance when no filters
+
+        # Component match (highest priority)
+        memory_component = frontmatter.get("component", "")
+        if component and memory_component == component:
+            score += 0.5  # Exact component match
+        elif component and memory_component == "global":
+            score += 0.3  # Global memories apply to all components
+
+        # Tag match
+        memory_tags = frontmatter.get("tags", [])
+        if tags and memory_tags:
+            matching_tags = set(tags) & set(memory_tags)
+            if matching_tags:
+                # Score based on proportion of matching tags
+                tag_score = len(matching_tags) / max(len(tags), len(memory_tags))
+                score += 0.3 * tag_score
+
+        # Category match
+        if category and memory["category"] == category:
+            score += 0.2
+
+        return min(score, 1.0)  # Cap at 1.0
+
+    def calculate_importance(self, memory: dict[str, Any], relevance: float) -> float:
+        """
+        Calculate importance score for a memory based on severity, recency, and relevance.
+
+        Args:
+            memory: Parsed memory dict
+            relevance: Relevance score from match_memory()
+
+        Returns:
+            Importance score (0.0 to 1.0)
+        """
+        frontmatter = memory["frontmatter"]
+
+        # Severity scoring
+        severity_scores = {
+            "critical": 1.0,
+            "high": 0.9,
+            "medium": 0.7,
+            "low": 0.5,
+        }
+        severity = frontmatter.get("severity", "medium")
+        severity_score = severity_scores.get(severity, 0.5)
+
+        # Recency scoring (newer memories score higher)
+        try:
+            memory_date = datetime.strptime(frontmatter.get("date", ""), "%Y-%m-%d")
+            days_old = (datetime.now() - memory_date).days
+            # Decay over 180 days (6 months)
+            recency_score = max(0.0, 1.0 - (days_old / 180.0))
+        except (ValueError, TypeError):
+            recency_score = 0.5  # Default if date parsing fails
+
+        # Combine scores: relevance (50%), severity (30%), recency (20%)
+        importance = (relevance * 0.5) + (severity_score * 0.3) + (recency_score * 0.2)
+
+        return min(importance, 1.0)  # Cap at 1.0
+
+    def get_relevant_memories(
+        self,
+        component: str | None = None,
+        tags: list[str] | None = None,
+        category: str | None = None,
+        min_importance: float = 0.3,
+        max_memories: int = 10,
+    ) -> list[dict[str, Any]]:
+        """
+        Get memories relevant to the current context, sorted by importance.
+
+        Args:
+            component: Current component being worked on
+            tags: Current task tags
+            category: Desired memory category (implementation-failures, successful-patterns, architectural-decisions)
+            min_importance: Minimum importance score to include (0.0 to 1.0)
+            max_memories: Maximum number of memories to return
+
+        Returns:
+            List of memory dicts with 'frontmatter', 'content', 'filename', 'category', 'importance'
+        """
+        memory_files = self.discover_memories()
+        scored_memories = []
+
+        for file_path in memory_files:
+            parsed = self.parse_memory_file(file_path)
+            if not parsed:
+                continue
+
+            # Calculate relevance and importance
+            relevance = self.match_memory(parsed, component, tags, category)
+            if relevance == 0.0:
+                continue  # Skip irrelevant memories
+
+            importance = self.calculate_importance(parsed, relevance)
+            if importance < min_importance:
+                continue  # Skip low-importance memories
+
+            # Add importance to memory dict
+            parsed["importance"] = importance
+            scored_memories.append(parsed)
+
+        # Sort by importance (descending) and limit to max_memories
+        scored_memories.sort(key=lambda m: m["importance"], reverse=True)
+        result = scored_memories[:max_memories]
+
+        logger.debug(
+            f"Found {len(result)} relevant memories (component={component}, tags={tags}, category={category})"
+        )
+        return result
+
+
 class AIConversationContextManager:
     """
     Manages conversation context for AI-assisted development.
@@ -346,6 +585,7 @@ class AIConversationContextManager:
         max_tokens: int = 8000,
         sessions_dir: str = ".augment/context/sessions",
         instructions_dir: str = ".augment/instructions",
+        memory_dir: str = ".augment/memory",
     ):
         """
         Initialize the conversation context manager.
@@ -354,6 +594,7 @@ class AIConversationContextManager:
             max_tokens: Maximum tokens per context window
             sessions_dir: Directory to store session files
             instructions_dir: Directory containing .instructions.md files
+            memory_dir: Directory containing .memory.md files
         """
         self.max_tokens = max_tokens
         self.sessions_dir = Path(sessions_dir)
@@ -367,6 +608,9 @@ class AIConversationContextManager:
 
         # Initialize instruction loader
         self.instruction_loader = InstructionLoader(instructions_dir)
+
+        # Initialize memory loader
+        self.memory_loader = MemoryLoader(memory_dir)
 
         self.contexts: dict[str, ConversationContext] = {}
 
@@ -508,6 +752,91 @@ class AIConversationContextManager:
         logger.info(
             f"Loaded {len(instructions)} instructions for session {session_id} "
             f"(file: {current_file or 'global'})"
+        )
+
+        return context
+
+    def load_memories(
+        self,
+        session_id: str,
+        component: str | None = None,
+        tags: list[str] | None = None,
+        category: str | None = None,
+        min_importance: float = 0.3,
+        max_memories: int = 10,
+    ) -> ConversationContext:
+        """
+        Load relevant .memory.md files into session context.
+
+        This method discovers memory files in .augment/memory/ subdirectories,
+        parses their YAML frontmatter, and loads memories that match the current
+        context (component, tags, category) with importance-based scoring.
+
+        Args:
+            session_id: Session identifier
+            component: Current component being worked on (e.g., "agent-orchestration")
+            tags: Current task tags (e.g., ["testing", "pytest", "fixtures"])
+            category: Desired memory category (implementation-failures, successful-patterns, architectural-decisions)
+            min_importance: Minimum importance score to include (0.0 to 1.0)
+            max_memories: Maximum number of memories to load
+
+        Returns:
+            Updated conversation context
+
+        Example:
+            # Load all relevant memories
+            manager.load_memories(session_id)
+
+            # Load memories for specific component
+            manager.load_memories(session_id, component="agent-orchestration")
+
+            # Load only implementation failures
+            manager.load_memories(session_id, category="implementation-failures")
+
+            # Load memories with specific tags
+            manager.load_memories(session_id, tags=["testing", "pytest"])
+        """
+        context = self.contexts.get(session_id)
+        if not context:
+            context = self.create_session(session_id)
+
+        # Get relevant memories
+        memories = self.memory_loader.get_relevant_memories(
+            component=component,
+            tags=tags,
+            category=category,
+            min_importance=min_importance,
+            max_memories=max_memories,
+        )
+
+        # Add each memory as a system message
+        for memory in memories:
+            frontmatter = memory["frontmatter"]
+            content = memory["content"]
+            filename = memory["filename"]
+            importance = memory["importance"]
+
+            # Add memory as system message
+            self.add_message(
+                session_id=session_id,
+                role="system",
+                content=content,
+                importance=importance,
+                metadata={
+                    "type": "memory",
+                    "source": filename,
+                    "category": memory["category"],
+                    "component": frontmatter.get("component", ""),
+                    "severity": frontmatter.get("severity", ""),
+                    "tags": frontmatter.get("tags", []),
+                    "date": frontmatter.get("date", ""),
+                },
+                auto_prune=False,  # Don't prune memories
+            )
+
+        logger.info(
+            f"Loaded {len(memories)} memories for session {session_id} "
+            f"(component={component}, tags={tags}, category={category})"
         )
 
         return context
