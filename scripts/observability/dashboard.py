@@ -300,4 +300,3 @@ def _generate_empty_dashboard(output_file: str) -> None:
 
 if __name__ == "__main__":
     generate_dashboard()
-

@@ -50,7 +50,7 @@ export class GameplayPage extends BasePage {
   async sendMessage(message: string): Promise<void> {
     await this.fillInput(this.chatInput, message);
     await this.clickElement(this.sendButton);
-    
+
     // Wait for AI response
     await this.waitForAiResponse();
   }
@@ -75,11 +75,11 @@ export class GameplayPage extends BasePage {
   async getLatestAiResponse(): Promise<string | null> {
     const responses = this.getElements(this.aiResponse);
     const count = await responses.count();
-    
+
     if (count === 0) {
       return null;
     }
-    
+
     return await responses.nth(count - 1).textContent();
   }
 
@@ -205,4 +205,3 @@ export class GameplayPage extends BasePage {
     return Date.now() - startTime;
   }
 }
-

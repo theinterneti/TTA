@@ -1,7 +1,7 @@
 # Primitive Specification: Development Observability
 
-**Version:** 1.0  
-**Status:** Stable  
+**Version:** 1.0
+**Status:** Stable
 **Location:** `scripts/observability/dev_metrics.py`
 
 ---
@@ -365,10 +365,10 @@ def test_track_execution_success():
     @track_execution("test_operation")
     def successful_operation():
         return "success"
-    
+
     result = successful_operation()
     assert result == "success"
-    
+
     # Verify metric was saved
     collector = get_collector()
     recent = collector.get_recent_metrics(name="test_operation", limit=1)
@@ -384,14 +384,14 @@ def test_metrics_persistence():
     @track_execution("test_persistence")
     def operation():
         pass
-    
+
     operation()
-    
+
     # Verify file exists
     date_str = datetime.utcnow().strftime("%Y-%m-%d")
     metrics_file = Path(f".metrics/{date_str}.jsonl")
     assert metrics_file.exists()
-    
+
     # Verify content
     with open(metrics_file) as f:
         lines = f.readlines()
@@ -523,7 +523,6 @@ def traced_operation():
 
 ---
 
-**Status:** Stable - Ready for production use  
-**Last Updated:** 2025-10-20  
+**Status:** Stable - Ready for production use
+**Last Updated:** 2025-10-20
 **Next Review:** Before Phase 2 integration
-

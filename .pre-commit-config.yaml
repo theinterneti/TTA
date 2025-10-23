@@ -101,6 +101,16 @@ repos:
         files: ^tests/.*\.py$
         pass_filenames: true
 
+      # Custom hook: Run tests on changed files
+      - id: run-tests-on-changed-files
+        name: Run tests on changed files
+        entry: python scripts/pre-commit/run-tests-on-changed-files.py
+        language: system
+        types: [python]
+        files: ^src/.*\.py$
+        pass_filenames: true
+        stages: [commit]
+
 # Configuration for specific tools
 ci:
   autofix_commit_msg: |

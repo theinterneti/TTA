@@ -10,26 +10,27 @@ Implements stage-specific logic for the integrated workflow:
 - Production deployment
 """
 
-import subprocess
 import json
+import subprocess
+import sys
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any
-from datetime import datetime
-import sys
 
 # Add parent directories to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from scripts.primitives.error_recovery import with_retry, RetryConfig
 from scripts.observability.dev_metrics import track_execution
-from .quality_gates import run_quality_gates, QualityGateResult
+from scripts.primitives.error_recovery import RetryConfig, with_retry
+
+from .quality_gates import QualityGateResult, run_quality_gates
 
 
 @dataclass
 class StageResult:
     """Result of a workflow stage."""
-    
+
     stage_name: str
     success: bool
     outputs: dict[str, Any] = field(default_factory=dict)
@@ -37,7 +38,7 @@ class StageResult:
     warnings: list[str] = field(default_factory=list)
     execution_time_ms: float = 0.0
     quality_gates: dict[str, QualityGateResult] = field(default_factory=dict)
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
@@ -55,11 +56,11 @@ class StageResult:
 
 class SpecificationParser:
     """Parse specification documents."""
-    
+
     def __init__(self, spec_file: Path):
         """Initialize parser."""
         self.spec_file = spec_file
-    
+
     @track_execution("stage_specification_parsing")
     def parse(self) -> StageResult:
         """Parse specification file."""
@@ -70,10 +71,10 @@ class SpecificationParser:
                     success=False,
                     errors=[f"Specification file not found: {self.spec_file}"],
                 )
-            
+
             # Read specification
             content = self.spec_file.read_text()
-            
+
             # Extract key information
             # (In real implementation, use more sophisticated parsing)
             outputs = {
@@ -81,13 +82,13 @@ class SpecificationParser:
                 "content_length": len(content),
                 "parsed_at": datetime.utcnow().isoformat(),
             }
-            
+
             return StageResult(
                 stage_name="specification_parsing",
                 success=True,
                 outputs=outputs,
             )
-        
+
         except Exception as e:
             return StageResult(
                 stage_name="specification_parsing",
@@ -98,12 +99,12 @@ class SpecificationParser:
 
 class TestingStage:
     """Execute testing stage."""
-    
+
     def __init__(self, component_path: Path, config: dict[str, Any] | None = None):
         """Initialize testing stage."""
         self.component_path = component_path
         self.config = config or {}
-    
+
     @track_execution("stage_testing")
     @with_retry(RetryConfig(max_retries=3, base_delay=1.0))
     def execute(self) -> StageResult:
@@ -116,10 +117,10 @@ class TestingStage:
                 gates=gates_to_run,
                 config=self.config,
             )
-            
+
             # Check if all gates passed
             all_passed = all(gate.passed for gate in quality_gates.values())
-            
+
             # Collect outputs
             outputs = {
                 "component_path": str(self.component_path),
@@ -127,12 +128,12 @@ class TestingStage:
                 "gates_passed": [name for name, gate in quality_gates.items() if gate.passed],
                 "gates_failed": [name for name, gate in quality_gates.items() if not gate.passed],
             }
-            
+
             # Collect errors
             errors = []
             for gate in quality_gates.values():
                 errors.extend(gate.errors)
-            
+
             return StageResult(
                 stage_name="testing",
                 success=all_passed,
@@ -140,7 +141,7 @@ class TestingStage:
                 errors=errors,
                 quality_gates=quality_gates,
             )
-        
+
         except Exception as e:
             return StageResult(
                 stage_name="testing",
@@ -151,12 +152,12 @@ class TestingStage:
 
 class RefactoringStage:
     """Execute refactoring stage."""
-    
+
     def __init__(self, component_path: Path, config: dict[str, Any] | None = None):
         """Initialize refactoring stage."""
         self.component_path = component_path
         self.config = config or {}
-    
+
     @track_execution("stage_refactoring")
     def execute(self) -> StageResult:
         """Execute refactoring stage."""
@@ -168,7 +169,7 @@ class RefactoringStage:
                 gates=gates_to_run,
                 config=self.config,
             )
-            
+
             # Auto-fix linting issues if enabled
             if self.config.get("auto_fix_linting", True):
                 if "linting" in quality_gates and not quality_gates["linting"].passed:
@@ -179,10 +180,10 @@ class RefactoringStage:
                         gates=["linting"],
                         config=self.config,
                     )["linting"]
-            
+
             # Check if all gates passed
             all_passed = all(gate.passed for gate in quality_gates.values())
-            
+
             # Collect outputs
             outputs = {
                 "component_path": str(self.component_path),
@@ -191,12 +192,12 @@ class RefactoringStage:
                 "gates_failed": [name for name, gate in quality_gates.items() if not gate.passed],
                 "auto_fix_applied": self.config.get("auto_fix_linting", True),
             }
-            
+
             # Collect errors
             errors = []
             for gate in quality_gates.values():
                 errors.extend(gate.errors)
-            
+
             return StageResult(
                 stage_name="refactoring",
                 success=all_passed,
@@ -204,20 +205,20 @@ class RefactoringStage:
                 errors=errors,
                 quality_gates=quality_gates,
             )
-        
+
         except Exception as e:
             return StageResult(
                 stage_name="refactoring",
                 success=False,
                 errors=[f"Refactoring stage failed: {str(e)}"],
             )
-    
+
     def _auto_fix_linting(self):
         """Auto-fix linting issues."""
         try:
             subprocess.run(
                 [
-                    "uvx", "ruff", "check", "--fix",
+                    "uv", "run", "ruff", "check", "--fix",
                     f"src/{self.component_path.name}/",
                     f"tests/{self.component_path.name}/",
                 ],
@@ -225,10 +226,10 @@ class RefactoringStage:
                 text=True,
                 timeout=60,
             )
-            
+
             subprocess.run(
                 [
-                    "uvx", "ruff", "format",
+                    "uv", "run", "ruff", "format",
                     f"src/{self.component_path.name}/",
                     f"tests/{self.component_path.name}/",
                 ],
@@ -242,12 +243,12 @@ class RefactoringStage:
 
 class StagingDeploymentStage:
     """Execute staging deployment stage."""
-    
+
     def __init__(self, component_path: Path, config: dict[str, Any] | None = None):
         """Initialize staging deployment stage."""
         self.component_path = component_path
         self.config = config or {}
-    
+
     @track_execution("stage_staging_deployment")
     @with_retry(RetryConfig(max_retries=5, base_delay=2.0, max_delay=30.0))
     def execute(self) -> StageResult:
@@ -255,7 +256,7 @@ class StagingDeploymentStage:
         try:
             # Validate all dev→staging criteria
             validation_result = self._validate_staging_criteria()
-            
+
             if not validation_result["passed"]:
                 return StageResult(
                     stage_name="staging_deployment",
@@ -263,49 +264,49 @@ class StagingDeploymentStage:
                     errors=validation_result["errors"],
                     outputs=validation_result,
                 )
-            
+
             # Deploy to staging (placeholder - actual deployment logic would go here)
             deployment_result = self._deploy_to_staging()
-            
+
             return StageResult(
                 stage_name="staging_deployment",
                 success=deployment_result["success"],
                 outputs=deployment_result,
                 errors=deployment_result.get("errors", []),
             )
-        
+
         except Exception as e:
             return StageResult(
                 stage_name="staging_deployment",
                 success=False,
                 errors=[f"Staging deployment failed: {str(e)}"],
             )
-    
+
     def _validate_staging_criteria(self) -> dict[str, Any]:
         """Validate dev→staging promotion criteria."""
         # Run all quality gates
         quality_gates = run_quality_gates(str(self.component_path))
-        
+
         # Check coverage threshold
         coverage_gate = quality_gates.get("test_coverage")
         coverage_passed = coverage_gate and coverage_gate.passed
-        
+
         # Check all tests pass
         test_gate = quality_gates.get("test_pass_rate")
         tests_passed = test_gate and test_gate.passed
-        
+
         # Check linting
         lint_gate = quality_gates.get("linting")
         linting_passed = lint_gate and lint_gate.passed
-        
+
         # Check type checking
         type_gate = quality_gates.get("type_checking")
         typing_passed = type_gate and type_gate.passed
-        
+
         # Check security
         security_gate = quality_gates.get("security")
         security_passed = security_gate and security_gate.passed
-        
+
         all_passed = all([
             coverage_passed,
             tests_passed,
@@ -313,7 +314,7 @@ class StagingDeploymentStage:
             typing_passed,
             security_passed,
         ])
-        
+
         errors = []
         if not coverage_passed:
             errors.append("Coverage threshold not met (≥70% required)")
@@ -325,13 +326,13 @@ class StagingDeploymentStage:
             errors.append("Type checking errors detected")
         if not security_passed:
             errors.append("Security issues detected")
-        
+
         return {
             "passed": all_passed,
             "errors": errors,
             "quality_gates": {name: gate.to_dict() for name, gate in quality_gates.items()},
         }
-    
+
     def _deploy_to_staging(self) -> dict[str, Any]:
         """Deploy component to staging environment."""
         # Placeholder for actual deployment logic
@@ -340,7 +341,7 @@ class StagingDeploymentStage:
         # 2. Push to staging registry
         # 3. Update staging deployment
         # 4. Run smoke tests
-        
+
         return {
             "success": True,
             "deployment_time": datetime.utcnow().isoformat(),
@@ -351,12 +352,12 @@ class StagingDeploymentStage:
 
 class ProductionDeploymentStage:
     """Execute production deployment stage."""
-    
+
     def __init__(self, component_path: Path, config: dict[str, Any] | None = None):
         """Initialize production deployment stage."""
         self.component_path = component_path
         self.config = config or {}
-    
+
     @track_execution("stage_production_deployment")
     @with_retry(RetryConfig(max_retries=3, base_delay=5.0, max_delay=60.0))
     def execute(self) -> StageResult:
@@ -364,7 +365,7 @@ class ProductionDeploymentStage:
         try:
             # Validate all staging→production criteria
             validation_result = self._validate_production_criteria()
-            
+
             if not validation_result["passed"]:
                 return StageResult(
                     stage_name="production_deployment",
@@ -372,24 +373,24 @@ class ProductionDeploymentStage:
                     errors=validation_result["errors"],
                     outputs=validation_result,
                 )
-            
+
             # Deploy to production (placeholder)
             deployment_result = self._deploy_to_production()
-            
+
             return StageResult(
                 stage_name="production_deployment",
                 success=deployment_result["success"],
                 outputs=deployment_result,
                 errors=deployment_result.get("errors", []),
             )
-        
+
         except Exception as e:
             return StageResult(
                 stage_name="production_deployment",
                 success=False,
                 errors=[f"Production deployment failed: {str(e)}"],
             )
-    
+
     def _validate_production_criteria(self) -> dict[str, Any]:
         """Validate staging→production promotion criteria."""
         # Placeholder - would check:
@@ -398,20 +399,19 @@ class ProductionDeploymentStage:
         # - Performance meets SLAs
         # - 7-day uptime ≥99.5%
         # - Security review complete
-        
+
         return {
             "passed": True,
             "errors": [],
         }
-    
+
     def _deploy_to_production(self) -> dict[str, Any]:
         """Deploy component to production environment."""
         # Placeholder for actual deployment logic
-        
+
         return {
             "success": True,
             "deployment_time": datetime.utcnow().isoformat(),
             "environment": "production",
             "component": self.component_path.name,
         }
-

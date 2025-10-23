@@ -11,7 +11,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -621,16 +621,32 @@ class AIConversationContextManager:
         # Approximate: ~4 characters per token
         return len(text) // 4
 
-    def create_session(self, session_id: str) -> ConversationContext:
-        """Create a new conversation session."""
+    def create_session(
+        self,
+        session_id: str,
+        max_tokens: int | None = None,
+    ) -> ConversationContext:
+        """
+        Create a new conversation session.
+
+        Args:
+            session_id: Unique identifier for the session
+            max_tokens: Optional token limit for this session (defaults to manager's max_tokens)
+
+        Returns:
+            Created conversation context
+        """
         context = ConversationContext(
             session_id=session_id,
             messages=[],
-            max_tokens=self.max_tokens,
+            max_tokens=max_tokens if max_tokens is not None else self.max_tokens,
             current_tokens=0,
         )
         self.contexts[session_id] = context
-        logger.info(f"Created new session: {session_id}")
+        logger.info(
+            f"Created new session: {session_id} "
+            f"(max_tokens: {context.max_tokens})"
+        )
         return context
 
     def add_message(
@@ -667,7 +683,7 @@ class AIConversationContextManager:
         message = ConversationMessage(
             role=role,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             metadata=metadata or {},
             tokens=tokens,
             importance=importance,
@@ -729,9 +745,9 @@ class AIConversationContextManager:
 
             # Determine importance based on scope
             apply_to = frontmatter.get("applyTo", "")
-            is_global = apply_to in {"**/*.py", "**/*"} or (
-                isinstance(apply_to, list) and "**/*.py" in apply_to
-            )
+            # Normalize to list and check for global patterns
+            patterns = [apply_to] if isinstance(apply_to, str) else apply_to
+            is_global = any(p in {"**/*.py", "**/*"} for p in patterns)
             importance = 0.9 if is_global else 0.8
 
             # Add instruction as system message
@@ -844,38 +860,78 @@ class AIConversationContextManager:
     def _prune_context(
         self,
         context: ConversationContext,
-        needed_tokens: int,  # noqa: ARG002
+        needed_tokens: int,
     ) -> ConversationContext:
         """
         Prune context to make room for new message.
 
-        Strategy: Keep high-importance messages and recent messages.
+        Strategy: Keep system messages, then prioritize recent messages,
+        then high-importance messages, all while enforcing token limits.
+
+        Args:
+            context: The conversation context to prune
+            needed_tokens: Tokens needed for the new message
+
+        Returns:
+            Pruned conversation context
         """
-        # Always keep system messages
-        system_msgs = [m for m in context.messages if m.role == "system"]
+        target_tokens = context.max_tokens - needed_tokens
 
-        # Keep high-importance messages (importance > 0.8)
-        important_msgs = [
-            m for m in context.messages if m.importance > 0.8 and m.role != "system"
-        ]
+        # Phase 1: Must-keep messages (system messages)
+        must_keep = [m for m in context.messages if m.role == "system"]
+        must_keep_tokens = sum(m.tokens for m in must_keep)
 
-        # Keep most recent messages
-        recent_msgs = [
-            m
-            for m in context.messages[-5:]
-            if m not in system_msgs and m not in important_msgs
-        ]
+        # Phase 2: Separate other messages into categories
+        other_msgs = [m for m in context.messages if m.role != "system"]
 
-        # Combine and deduplicate
-        preserved = []
+        # Get recent messages (last 5)
+        recent_msgs = other_msgs[-5:] if len(other_msgs) >= 5 else other_msgs
+
+        # Get high-importance messages (importance > 0.8)
+        important_msgs = [m for m in other_msgs if m.importance > 0.8]
+
+        # Combine and deduplicate, prioritizing recent over important
+        candidates = []
         seen_ids = set()
-        for msg in system_msgs + important_msgs + recent_msgs:
+
+        # Add recent messages first
+        for msg in reversed(recent_msgs):  # Most recent first
             msg_id = id(msg)
             if msg_id not in seen_ids:
-                preserved.append(msg)
+                candidates.append(msg)
                 seen_ids.add(msg_id)
 
-        # Sort by timestamp to maintain order
+        # Add important messages
+        for msg in sorted(important_msgs, key=lambda m: m.timestamp, reverse=True):
+            msg_id = id(msg)
+            if msg_id not in seen_ids:
+                candidates.append(msg)
+                seen_ids.add(msg_id)
+
+        # Phase 3: Add messages until we hit target
+        preserved = must_keep.copy()
+        current_tokens = must_keep_tokens
+
+        for msg in candidates:
+            if current_tokens + msg.tokens <= target_tokens:
+                preserved.append(msg)
+                current_tokens += msg.tokens
+
+        # Phase 4: Edge case - if must_keep exceeds limit, keep only most recent
+        if current_tokens > context.max_tokens:
+            logger.warning(
+                f"System messages alone exceed token limit "
+                f"({must_keep_tokens} > {context.max_tokens}). "
+                f"Keeping only most recent system message."
+            )
+            if must_keep:
+                preserved = [must_keep[-1]]
+                current_tokens = preserved[0].tokens
+            else:
+                preserved = []
+                current_tokens = 0
+
+        # Sort by timestamp to maintain chronological order
         preserved.sort(key=lambda m: m.timestamp)
 
         # Update context
@@ -883,11 +939,12 @@ class AIConversationContextManager:
         old_tokens = context.current_tokens
 
         context.messages = preserved
-        context.current_tokens = sum(m.tokens for m in preserved)
+        context.current_tokens = current_tokens
 
         logger.info(
             f"Pruned context: {old_count} → {len(preserved)} messages, "
-            f"{old_tokens} → {context.current_tokens} tokens"
+            f"{old_tokens} → {current_tokens} tokens "
+            f"(target: {target_tokens}, limit: {context.max_tokens})"
         )
 
         return context
@@ -896,7 +953,7 @@ class AIConversationContextManager:
         """Get a summary of the conversation context."""
         context = self.contexts.get(session_id)
         if not context:
-            return f"No context available for session: {session_id}"
+            return f"Session not found: {session_id}"
 
         summary = f"Session: {session_id}\n"
         summary += f"Messages: {len(context.messages)}\n"
@@ -1041,7 +1098,7 @@ def create_tta_session(
         )
     """
     if session_id is None:
-        session_id = f"tta-dev-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}"
+        session_id = f"tta-dev-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
 
     manager = AIConversationContextManager()
     manager.create_session(session_id)

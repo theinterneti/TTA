@@ -1,5 +1,5 @@
 """
-Data models for the Model Management System
+Data models for the Model Management System.
 
 This module contains the core data structures used throughout the model
 management system.
@@ -51,6 +51,12 @@ class ModelConfiguration:
     api_key: str | None = None
     api_base: str | None = None
     model_path: str | None = None
+
+    # Security configuration for local models
+    # Git revision (commit hash or tag) to pin when using trust_remote_code=True
+    # This prevents arbitrary code execution from Hugging Face Hub
+    revision: str | None = None
+    trust_remote_code: bool = False
 
     # Generation parameters
     max_tokens: int = 2048
@@ -159,6 +165,13 @@ class ProviderConfiguration:
     auto_quantization: bool = True
     gpu_memory_fraction: float = 0.8
 
+    # Security settings for local models
+    # Map of model_id to trusted git revision (commit hash or tag)
+    # Required when trust_remote_code=True to prevent arbitrary code execution
+    trusted_model_revisions: dict[str, str] = field(default_factory=dict)
+    # Require revision pinning for all models with trust_remote_code=True
+    require_revision_pinning: bool = True
+
     # Ollama settings
     ollama_host: str = "localhost"
     ollama_port: int = 11434
@@ -176,9 +189,7 @@ class ProviderConfiguration:
 class ModelSelectionCriteria:
     """Criteria for model selection."""
 
-    primary_criteria: str = (
-        "cost_effectiveness"  # cost_effectiveness, performance, availability
-    )
+    primary_criteria: str = "cost_effectiveness"  # cost_effectiveness, performance, availability
     fallback_criteria: str = "availability"
 
     # Weights for selection scoring (should sum to 1.0)
@@ -234,12 +245,8 @@ class ModelManagementConfig:
     models: dict[str, ModelConfiguration] = field(default_factory=dict)
 
     # Selection and fallback
-    selection_strategy: ModelSelectionCriteria = field(
-        default_factory=ModelSelectionCriteria
-    )
-    fallback_config: FallbackConfiguration = field(
-        default_factory=FallbackConfiguration
-    )
+    selection_strategy: ModelSelectionCriteria = field(default_factory=ModelSelectionCriteria)
+    fallback_config: FallbackConfiguration = field(default_factory=FallbackConfiguration)
 
     # Monitoring and caching
     performance_monitoring_enabled: bool = True

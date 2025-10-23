@@ -90,23 +90,23 @@ export class CharacterCreationPage extends BasePage {
    */
   async createCharacterWithDefaults(): Promise<void> {
     const character = STAGING_CONFIG.testCharacters.default;
-    
+
     await this.fillCharacterName(character.name);
     await this.fillAppearance(character.appearance.description);
     await this.fillBackground(character.background.story);
-    
+
     if (character.background.personality_traits) {
       await this.selectPersonalityTraits(character.background.personality_traits);
     }
-    
+
     if (character.background.goals) {
       await this.selectTherapeuticGoals(character.background.goals);
     }
-    
+
     if (character.therapeutic_profile?.preferred_intensity) {
       await this.selectIntensity(character.therapeutic_profile.preferred_intensity);
     }
-    
+
     await this.submitForm();
   }
 
@@ -122,27 +122,27 @@ export class CharacterCreationPage extends BasePage {
     intensity?: string;
   }): Promise<void> {
     await this.fillCharacterName(data.name);
-    
+
     if (data.appearance) {
       await this.fillAppearance(data.appearance);
     }
-    
+
     if (data.background) {
       await this.fillBackground(data.background);
     }
-    
+
     if (data.traits) {
       await this.selectPersonalityTraits(data.traits);
     }
-    
+
     if (data.goals) {
       await this.selectTherapeuticGoals(data.goals);
     }
-    
+
     if (data.intensity) {
       await this.selectIntensity(data.intensity);
     }
-    
+
     await this.submitForm();
   }
 
@@ -198,4 +198,3 @@ export class CharacterCreationPage extends BasePage {
     return !(await button.isDisabled());
   }
 }
-

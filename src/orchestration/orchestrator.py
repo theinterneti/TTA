@@ -24,10 +24,8 @@ Example:
     ```
 """
 
-import importlib.util
 import logging
 import subprocess
-import sys
 from pathlib import Path
 
 from rich.console import Console
@@ -36,6 +34,7 @@ from rich.table import Table
 from src.common.process_utils import run as safe_run
 
 from .component import Component, ComponentStatus
+from .component_registry import ComponentRegistry
 from .config import TTAConfig
 from .decorators import log_entry_exit, retry, timing_decorator, validate_args
 
@@ -58,8 +57,7 @@ class TTAOrchestrator:
         config: Configuration object
         components: Dictionary of components
         root_dir: Root directory of the project
-        tta_dev_path: Path to the tta.dev repository
-        tta_prototype_path: Path to the tta.prototype repository
+        component_registry: Registry for TTA components
     """
 
     def __init__(self, config_path: str | Path | None = None):
@@ -68,20 +66,13 @@ class TTAOrchestrator:
 
         Args:
             config_path: Path to the configuration file. If None, uses default.
-
-        Raises:
-            FileNotFoundError: If a repository path does not exist.
         """
         self.config = TTAConfig(config_path)
         self.components: dict[str, Component] = {}
         self.root_dir = Path(__file__).parent.parent.parent
 
-        # Initialize paths to repositories
-        self.tta_dev_path = self.root_dir / "tta.dev"
-        self.tta_prototype_path = self.root_dir / "tta.prototype"
-
-        # Validate repository paths
-        self._validate_repositories()
+        # Initialize component registry
+        self.component_registry = ComponentRegistry(self.config, self.root_dir)
 
         # Import components
         self._import_components()
@@ -89,27 +80,6 @@ class TTAOrchestrator:
         logger.info(
             f"TTAOrchestrator initialized with {len(self.components)} components"
         )
-
-    @log_entry_exit
-    def _validate_repositories(self) -> None:
-        """
-        Validate that the repository paths exist and are properly structured.
-
-        Raises:
-            FileNotFoundError: If a repository path does not exist.
-        """
-        if not self.tta_dev_path.exists():
-            raise FileNotFoundError(
-                f"tta.dev repository not found at {self.tta_dev_path}"
-            )
-
-        if not self.tta_prototype_path.exists():
-            raise FileNotFoundError(
-                f"tta.prototype repository not found at {self.tta_prototype_path}"
-            )
-
-        logger.info(f"Found tta.dev at {self.tta_dev_path}")
-        logger.info(f"Found tta.prototype at {self.tta_prototype_path}")
 
     @log_entry_exit
     @timing_decorator
@@ -120,76 +90,25 @@ class TTAOrchestrator:
         This method imports core components that are not repository-specific.
         """
         # Import core components (like player experience)
-        TTAOrchestrator._import_core_components(self)
+
+        for component_name in self.component_registry.get_registered_component_names():
+            try:
+                component_class, dependencies = (
+                    self.component_registry.get_component_class(component_name)
+                )
+                comp = component_class(
+                    component_name, self.config, dependencies=dependencies
+                )  # Pass dependencies here
+                self.components[comp.name] = comp
+                logger.info(f"Imported component {comp.name}")
+            except Exception as e:
+                logger.error(f"Failed to import component {component_name}: {e}")
 
         logger.info(f"Imported {len(self.components)} components")
 
     def has_component(self, name: str) -> bool:
         """Return True if a component with the given name is registered."""
         return name in self.components
-
-    def _import_core_components(self) -> None:
-        """
-        Import core components that are not repository-specific.
-        """
-        # Import player experience component if enabled
-        if self.config.get("player_experience.enabled", False):
-            try:
-                from src.components.player_experience_component import (  # noqa: PLC0415
-                    PlayerExperienceComponent,
-                )
-
-                comp = PlayerExperienceComponent(self.config)
-                self.components[comp.name] = comp
-                logger.info(f"Imported core component {comp.name}")
-            except Exception as e:
-                logger.error(f"Failed to import PlayerExperienceComponent: {e}")
-
-        # Import agent orchestration component if enabled
-        if self.config.get("agent_orchestration.enabled", False):
-            try:
-                from src.components.agent_orchestration_component import (  # noqa: PLC0415
-                    AgentOrchestrationComponent,
-                )
-
-                comp = AgentOrchestrationComponent(self.config)
-                self.components[comp.name] = comp
-                logger.info(f"Imported core component {comp.name}")
-            except Exception as e:
-                logger.error(f"Failed to import AgentOrchestrationComponent: {e}")
-
-        # Import other core components (docker, carbon, gameplay_loop) if they exist and are enabled
-        try:
-            from src.components.docker_component import DockerComponent  # noqa: PLC0415
-
-            if self.config.get("docker.enabled", False):
-                comp = DockerComponent(self.config)
-                self.components[comp.name] = comp
-                logger.info(f"Imported core component {comp.name}")
-        except Exception as e:
-            logger.debug(f"DockerComponent not available: {e}")
-
-        try:
-            from src.components.carbon_component import CarbonComponent  # noqa: PLC0415
-
-            if self.config.get("carbon.enabled", False):
-                comp = CarbonComponent(self.config)
-                self.components[comp.name] = comp
-                logger.info(f"Imported core component {comp.name}")
-        except Exception as e:
-            logger.debug(f"CarbonComponent not available: {e}")
-
-        try:
-            from src.components.gameplay_loop_component import (  # noqa: PLC0415
-                GameplayLoopComponent,
-            )
-
-            if self.config.get("core_gameplay_loop.enabled", False):
-                comp = GameplayLoopComponent(self.config)
-                self.components[comp.name] = comp
-                logger.info(f"Imported core component {comp.name}")
-        except Exception as e:
-            logger.debug(f"GameplayLoopComponent not available: {e}")
 
     @log_entry_exit
     @validate_args
@@ -218,9 +137,10 @@ class TTAOrchestrator:
                 continue
 
             # Start dependency if not already running
-            if (
-                self.components[dependency].status != ComponentStatus.RUNNING
-                and not self.start_component(dependency)
+            if self.components[
+                dependency
+            ].status != ComponentStatus.RUNNING and not self.start_component(
+                dependency
             ):
                 logger.error(
                     f"Failed to start dependency {dependency} for {component_name}"
@@ -265,10 +185,9 @@ class TTAOrchestrator:
 
         # Stop dependent components first
         for dependent in dependent_components:
-            if (
-                self.components[dependent].status == ComponentStatus.RUNNING
-                and not self.stop_component(dependent)
-            ):
+            if self.components[
+                dependent
+            ].status == ComponentStatus.RUNNING and not self.stop_component(dependent):
                 logger.error(
                     f"Failed to stop dependent component {dependent} for {component_name}"
                 )
@@ -336,9 +255,10 @@ class TTAOrchestrator:
 
         # Stop components in the determined order
         for component_name in stop_order:
-            if (
-                self.components[component_name].status == ComponentStatus.RUNNING
-                and not self.stop_component(component_name)
+            if self.components[
+                component_name
+            ].status == ComponentStatus.RUNNING and not self.stop_component(
+                component_name
             ):
                 success = False
 
@@ -423,11 +343,9 @@ class TTAOrchestrator:
 
         table.add_column("Component", style="cyan")
         table.add_column("Status", style="green")
-        table.add_column("Repository", style="blue")
         table.add_column("Dependencies", style="yellow")
 
         for name, component in sorted(self.components.items()):
-            repo = "tta.dev" if "tta.dev" in name.lower() else "tta.prototype"
             status = component.status.value
             status_style = {
                 "running": "green",
@@ -442,7 +360,7 @@ class TTAOrchestrator:
             )
 
             table.add_row(
-                name, f"[{status_style}]{status}[/{status_style}]", repo, dependencies
+                name, f"[{status_style}]{status}[/{status_style}]", dependencies
             )
 
         console.print(table)
@@ -505,10 +423,11 @@ class TTAOrchestrator:
 
         if repository in ["tta.dev", "both"]:
             # Run in tta.dev
+            tta_dev_path = self.root_dir / "ai-components" / "tta.dev"
             full_command = [
                 "docker-compose",
                 "-f",
-                str(self.tta_dev_path / "docker-compose.yml"),
+                str(tta_dev_path / "docker-compose.yml"),
             ] + command
             logger.info(
                 f"Running Docker Compose command in tta.dev: {' '.join(full_command)}"
@@ -516,7 +435,7 @@ class TTAOrchestrator:
 
             result = safe_run(
                 full_command,
-                cwd=str(self.tta_dev_path),
+                cwd=str(tta_dev_path),
                 text=True,
                 timeout=180,
                 capture_output=True,
@@ -532,35 +451,7 @@ class TTAOrchestrator:
                 )
 
             results["tta.dev"] = result
-
-        if repository in ["tta.prototype", "both"]:
-            # Run in tta.prototype
-            full_command = [
-                "docker-compose",
-                "-f",
-                str(self.tta_prototype_path / "docker-compose.yml"),
-            ] + command
-            logger.info(
-                f"Running Docker Compose command in tta.prototype: {' '.join(full_command)}"
-            )
-
-            result = safe_run(
-                full_command,
-                cwd=str(self.tta_prototype_path),
-                text=True,
-                timeout=180,
-                capture_output=True,
-                check=False,
-            )
-
-            if result.returncode != 0:
-                logger.error(
-                    f"Docker Compose command failed in tta.prototype: {result.stderr}"
-                )
-                raise subprocess.SubprocessError(
-                    f"Docker Compose command failed in tta.prototype: {result.stderr}"
-                )
-
-            results["tta.prototype"] = result
+        # Removed tta.prototype as it was not found and is being refactored out.
+        # If tta.prototype functionality is needed, it should be registered as a component.
 
         return results

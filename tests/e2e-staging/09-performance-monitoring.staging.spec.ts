@@ -213,4 +213,3 @@ test.describe('Performance Monitoring', () => {
     console.log('  ✓ Rapid interactions handled without degradation');
   });
 });
-

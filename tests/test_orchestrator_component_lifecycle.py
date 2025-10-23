@@ -271,4 +271,3 @@ class TestOrchestratorComponentLifecycle:
         status = orchestrator.get_component_status("nonexistent")
 
         assert status is None
-

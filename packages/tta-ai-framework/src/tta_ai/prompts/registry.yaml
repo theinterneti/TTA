@@ -26,4 +26,3 @@ prompts:
           avg_latency_ms: 1200
           quality_score: 8.2
           cost_per_call_usd: 0.0005
-

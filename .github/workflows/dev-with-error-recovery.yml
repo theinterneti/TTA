@@ -11,22 +11,22 @@ jobs:
   quality-checks-with-recovery:
     name: Quality Checks (with Error Recovery)
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
+
       - name: Install UV
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Add UV to PATH
         run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
+
       # Install dependencies with retry (using GitHub Actions retry action)
       - name: Install dependencies (with retry)
         uses: nick-fields/retry@v2
@@ -35,7 +35,7 @@ jobs:
           max_attempts: 5
           retry_wait_seconds: 30
           command: uv sync
-      
+
       # Run linting with retry
       - name: Run linting (with retry)
         uses: nick-fields/retry@v2
@@ -43,8 +43,8 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 10
-          command: uvx ruff check src/ tests/
-      
+          command: uv run ruff check src/ tests/
+
       # Run format check with retry
       - name: Check formatting (with retry)
         uses: nick-fields/retry@v2
@@ -52,8 +52,8 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 10
-          command: uvx ruff format --check src/ tests/
-      
+          command: uv run ruff format --check src/ tests/
+
       # Run type checking with retry
       - name: Run type checking (with retry)
         uses: nick-fields/retry@v2
@@ -61,8 +61,8 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           retry_wait_seconds: 15
-          command: uvx pyright src/
-      
+          command: uv run pyright src/
+
       # Run tests with retry
       - name: Run tests (with retry)
         uses: nick-fields/retry@v2
@@ -70,28 +70,29 @@ jobs:
           timeout_minutes: 15
           max_attempts: 3
           retry_wait_seconds: 10
-          command: uvx pytest tests/ -v
-  
-  
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+          command: uv run pytest tests/ -v
+
+
   python-error-recovery-demo:
     name: Python Error Recovery Demo
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
+
       - name: Install UV
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Add UV to PATH
         run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
+
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -99,40 +100,40 @@ jobs:
           max_attempts: 5
           retry_wait_seconds: 30
           command: uv sync
-      
+
       # Run development commands using our Python wrapper with error recovery
       - name: Run quality checks (Python with error recovery)
         run: python scripts/dev_with_recovery.py quality
         continue-on-error: true
-      
+
       - name: Run tests (Python with error recovery)
         run: python scripts/dev_with_recovery.py test
         continue-on-error: true
-      
+
       # Demonstrate error classification
       - name: Test error recovery framework
         run: python scripts/primitives/example_error_recovery.py
-  
-  
+
+
   integration-with-fallback:
     name: Integration Tests with Fallback
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
+
       - name: Install UV
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Add UV to PATH
         run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
+
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -140,21 +141,22 @@ jobs:
           max_attempts: 5
           retry_wait_seconds: 30
           command: uv sync
-      
+
       # Try to run integration tests, fall back to unit tests if they fail
+      # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
       - name: Run integration tests (with fallback to unit tests)
         id: integration_tests
         run: |
-          if uvx pytest tests/integration/ -v; then
+          if uv run pytest tests/integration/ -v; then
             echo "status=success" >> $GITHUB_OUTPUT
             echo "✓ Integration tests passed"
           else
             echo "status=fallback" >> $GITHUB_OUTPUT
             echo "⚠ Integration tests failed, running unit tests as fallback"
-            uvx pytest tests/unit/ -v
+            uv run pytest tests/unit/ -v
           fi
         continue-on-error: true
-      
+
       - name: Report test status
         run: |
           if [ "${{ steps.integration_tests.outputs.status }}" = "success" ]; then
@@ -165,27 +167,27 @@ jobs:
             echo "✗ Tests failed"
             exit 1
           fi
-  
-  
+
+
   circuit-breaker-demo:
     name: Circuit Breaker Pattern Demo
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
+
       - name: Install UV
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Add UV to PATH
         run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
+
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -193,7 +195,7 @@ jobs:
           max_attempts: 5
           retry_wait_seconds: 30
           command: uv sync
-      
+
       # Demonstrate circuit breaker pattern
       - name: Test circuit breaker
         run: |
@@ -201,24 +203,24 @@ jobs:
           import sys
           sys.path.insert(0, 'scripts/primitives')
           from error_recovery import CircuitBreaker
-          
+
           # Create circuit breaker
           cb = CircuitBreaker(failure_threshold=3, recovery_timeout=5.0)
-          
+
           print('Circuit Breaker Demo:')
           print(f'Initial state: {cb.state}')
           print(f'Failure threshold: {cb.failure_threshold}')
           print(f'Recovery timeout: {cb.recovery_timeout}s')
           print('✓ Circuit breaker initialized successfully')
           "
-  
-  
+
+
   summary:
     name: Error Recovery Summary
     runs-on: ubuntu-latest
     needs: [quality-checks-with-recovery, python-error-recovery-demo, integration-with-fallback, circuit-breaker-demo]
     if: always()
-    
+
     steps:
       - name: Summary
         run: |
@@ -246,4 +248,3 @@ jobs:
           echo "1. Monitor retry rates and adjust configurations" >> $GITHUB_STEP_SUMMARY
           echo "2. Add more fallback strategies for critical operations" >> $GITHUB_STEP_SUMMARY
           echo "3. Integrate error recovery into all development scripts" >> $GITHUB_STEP_SUMMARY
-

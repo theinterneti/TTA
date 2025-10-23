@@ -306,4 +306,3 @@ class TestDecoratorCombinations:
         assert any("Entering" in msg for msg in messages)
         assert any("Exiting" in msg for msg in messages)
         assert any("seconds" in msg for msg in messages)
-

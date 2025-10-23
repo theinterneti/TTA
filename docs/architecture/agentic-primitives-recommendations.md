@@ -1,7 +1,7 @@
 # Agentic Primitives: Prioritized Recommendations for TTA
 
-**Date:** 2025-10-20  
-**Audience:** Development Team, Product Owners  
+**Date:** 2025-10-20
+**Audience:** Development Team, Product Owners
 **Priority:** High
 
 ## Executive Summary
@@ -36,7 +36,7 @@ Based on analysis of the GitHub blog post on agentic primitives and context engi
 - 20-30% reduction in token usage
 - Better context quality through intelligent pruning
 
-**Effort:** 3-5 days  
+**Effort:** 3-5 days
 **Component Maturity:** Development → Staging
 
 **Code Location:** `src/agent_orchestration/context/window_manager.py`
@@ -66,7 +66,7 @@ Based on analysis of the GitHub blog post on agentic primitives and context engi
 - Consistent error handling across all agents
 - Better user experience during failures
 
-**Effort:** 4-6 days  
+**Effort:** 4-6 days
 **Component Maturity:** Development → Staging
 
 **Code Location:** `src/agent_orchestration/recovery/error_handler.py`
@@ -96,7 +96,7 @@ Based on analysis of the GitHub blog post on agentic primitives and context engi
 - Tool performance dashboards
 - Faster debugging and optimization
 
-**Effort:** 3-4 days  
+**Effort:** 3-4 days
 **Component Maturity:** Development → Staging
 
 **Code Location:** Extend `src/agent_orchestration/tools/metrics.py`
@@ -116,7 +116,7 @@ Based on analysis of the GitHub blog post on agentic primitives and context engi
 
 **Why:** Enables more sophisticated therapeutic scenarios with coherent multi-turn interactions
 
-**Effort:** 5-7 days  
+**Effort:** 5-7 days
 **Component Maturity:** Development
 
 **Code Location:** `src/agent_orchestration/planning/`
@@ -129,7 +129,7 @@ Based on analysis of the GitHub blog post on agentic primitives and context engi
 
 **Why:** Improves prompt quality and agent performance through adaptive prompting
 
-**Effort:** 4-6 days  
+**Effort:** 4-6 days
 **Component Maturity:** Development
 
 **Code Location:** Extend `src/ai_components/prompts.py`
@@ -142,7 +142,7 @@ Based on analysis of the GitHub blog post on agentic primitives and context engi
 
 **Why:** Essential for performance optimization and debugging complex workflows
 
-**Effort:** 6-8 days  
+**Effort:** 6-8 days
 **Component Maturity:** Staging
 
 **Code Location:** `src/agent_orchestration/tracing/`
@@ -357,8 +357,7 @@ The recommended agentic primitives align closely with the GitHub blog's framewor
 
 ---
 
-**Document Status:** Ready for Review  
-**Next Review:** After team discussion  
-**Owner:** Development Team  
+**Document Status:** Ready for Review
+**Next Review:** After team discussion
+**Owner:** Development Team
 **Stakeholders:** Product, Engineering, Therapeutic Advisory
-

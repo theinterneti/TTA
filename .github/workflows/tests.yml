@@ -40,7 +40,8 @@ jobs:
         run: uv sync --group test
       - name: Run unit tests with metrics collection
         run: |
-          uvx pytest -q --tb=short \
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+          uv run pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-report=xml:coverage-unit.xml
         env:

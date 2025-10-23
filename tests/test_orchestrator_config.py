@@ -425,4 +425,3 @@ class TestTTAConfigSingleton:
         config2 = TTAConfig(config_path=config_file)
 
         assert config1 is config2
-

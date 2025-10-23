@@ -49,12 +49,12 @@ def run_linting() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         # Linting errors are permanent, not transient
         # But we still wrap in retry in case uvx itself has issues
         raise RuntimeError(f"Linting failed:\n{result.stdout}")
-    
+
     logger.info("✓ Linting passed")
     return result.stdout
 
@@ -68,10 +68,10 @@ def run_linting_fix() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Linting with auto-fix failed:\n{result.stdout}")
-    
+
     logger.info("✓ Linting fixes applied")
     return result.stdout
 
@@ -85,10 +85,10 @@ def run_formatting() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Formatting failed:\n{result.stdout}")
-    
+
     logger.info("✓ Code formatted")
     return result.stdout
 
@@ -102,10 +102,10 @@ def run_format_check() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Format check failed:\n{result.stdout}")
-    
+
     logger.info("✓ Format check passed")
     return result.stdout
 
@@ -119,10 +119,10 @@ def run_type_checking() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Type checking failed:\n{result.stdout}")
-    
+
     logger.info("✓ Type checking passed")
     return result.stdout
 
@@ -131,20 +131,20 @@ def run_type_checking() -> str:
 def run_tests(args: list[str] | None = None) -> str:
     """Run tests with retry on transient failures."""
     logger.info("Running tests...")
-    
+
     cmd = ["uvx", "pytest", "tests/"]
     if args:
         cmd.extend(args)
-    
+
     result = subprocess.run(
         cmd,
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Tests failed:\n{result.stdout}")
-    
+
     logger.info("✓ Tests passed")
     return result.stdout
 
@@ -158,10 +158,10 @@ def run_tests_with_coverage() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Tests with coverage failed:\n{result.stdout}")
-    
+
     logger.info("✓ Tests with coverage passed")
     logger.info("Coverage report: htmlcov/index.html")
     return result.stdout
@@ -176,10 +176,10 @@ def install_dependencies() -> str:
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Dependency installation failed:\n{result.stderr}")
-    
+
     logger.info("✓ Dependencies installed")
     return result.stdout
 
@@ -193,7 +193,7 @@ def cmd_quality() -> bool:
     logger.info("=" * 60)
     logger.info("Running quality checks...")
     logger.info("=" * 60)
-    
+
     try:
         run_linting()
         run_format_check()
@@ -209,7 +209,7 @@ def cmd_quality_fix() -> bool:
     logger.info("=" * 60)
     logger.info("Running quality fixes...")
     logger.info("=" * 60)
-    
+
     try:
         run_linting_fix()
         run_formatting()
@@ -225,7 +225,7 @@ def cmd_check_all() -> bool:
     logger.info("=" * 60)
     logger.info("Running full validation...")
     logger.info("=" * 60)
-    
+
     try:
         run_linting()
         run_format_check()
@@ -243,7 +243,7 @@ def cmd_dev_check() -> bool:
     logger.info("=" * 60)
     logger.info("Running quick dev check...")
     logger.info("=" * 60)
-    
+
     try:
         run_linting_fix()
         run_formatting()
@@ -260,7 +260,7 @@ def cmd_setup() -> bool:
     logger.info("=" * 60)
     logger.info("Setting up development environment...")
     logger.info("=" * 60)
-    
+
     try:
         install_dependencies()
         logger.info("\n✓ Development environment ready!\n")
@@ -289,7 +289,7 @@ Commands:
   typecheck         Run type checking
   test              Run tests
   test-cov          Run tests with coverage
-  
+
   quality           Run quality checks (lint + format-check)
   quality-fix       Run quality fixes (lint-fix + format)
   check-all         Run full validation (quality + typecheck + test)
@@ -305,9 +305,9 @@ def main() -> NoReturn:
     if len(sys.argv) < 2:
         print_usage()
         sys.exit(1)
-    
+
     command = sys.argv[1]
-    
+
     commands = {
         "lint": lambda: run_linting() and True,
         "lint-fix": lambda: run_linting_fix() and True,
@@ -322,12 +322,12 @@ def main() -> NoReturn:
         "dev-check": cmd_dev_check,
         "setup": cmd_setup,
     }
-    
+
     if command not in commands:
         logger.error(f"Unknown command: {command}")
         print_usage()
         sys.exit(1)
-    
+
     try:
         success = commands[command]()
         sys.exit(0 if success else 1)
@@ -342,4 +342,3 @@ def main() -> NoReturn:
 
 if __name__ == "__main__":
     main()
-

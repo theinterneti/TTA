@@ -43,11 +43,11 @@ export class RedisHelper {
         `http://${this.host}:${this.port}/get/session:${sessionId}`,
         { timeout: 5000 }
       );
-      
+
       if (!response.ok) {
         return null;
       }
-      
+
       return await response.json();
     } catch {
       return null;
@@ -71,11 +71,11 @@ export class RedisHelper {
         `http://${this.host}:${this.port}/get/${key}`,
         { timeout: 5000 }
       );
-      
+
       if (!response.ok) {
         return null;
       }
-      
+
       return await response.json();
     } catch {
       return null;
@@ -262,4 +262,3 @@ export async function waitForDataPersistence(
 
   return false;
 }
-

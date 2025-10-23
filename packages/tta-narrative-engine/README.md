@@ -87,4 +87,3 @@ uvx pyright packages/tta-narrative-engine/
 ## License
 
 MIT
-

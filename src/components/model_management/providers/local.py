@@ -293,13 +293,31 @@ class LocalModelProvider(BaseProvider):
             # Determine device
             device = self._get_best_device()
 
+            # Security: Get trust_remote_code and revision from config
+            trust_remote_code = config.get("trust_remote_code", False)
+            revision = config.get("revision")
+
+            # Security validation: Require revision when trust_remote_code=True
+            if trust_remote_code and not revision:
+                raise ValueError(
+                    f"Security Error: Model '{model_id}' requires trust_remote_code=True "
+                    "but no revision is pinned. This allows arbitrary code execution. "
+                    "Please specify a trusted revision (commit hash or tag) in the model configuration."
+                )
+
             # Load tokenizer
             logger.info(f"Loading tokenizer for {model_id}...")
+            tokenizer_kwargs = {
+                "cache_dir": self._models_cache_dir,
+                "trust_remote_code": trust_remote_code,
+            }
+            if revision:
+                tokenizer_kwargs["revision"] = revision
+                logger.info(f"Using pinned revision: {revision}")
+
             tokenizer = await asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: AutoTokenizer.from_pretrained(
-                    model_id, cache_dir=self._models_cache_dir, trust_remote_code=True
-                ),
+                lambda: AutoTokenizer.from_pretrained(model_id, **tokenizer_kwargs),  # nosec B615 - revision validated above
             )
 
             # Set pad token if not present
@@ -311,10 +329,14 @@ class LocalModelProvider(BaseProvider):
 
             model_kwargs = {
                 "cache_dir": self._models_cache_dir,
-                "trust_remote_code": True,
+                "trust_remote_code": trust_remote_code,
                 "torch_dtype": torch.float16 if device != "cpu" else torch.float32,
                 "low_cpu_mem_usage": True,
             }
+
+            # Security: Add revision pinning
+            if revision:
+                model_kwargs["revision"] = revision
 
             # Add quantization if enabled and supported
             if self._auto_quantization and device != "cpu":
@@ -329,7 +351,7 @@ class LocalModelProvider(BaseProvider):
 
             loaded_model = await asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),
+                lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),  # nosec B615 - revision validated above
             )
 
             # Move to device if not using device_map

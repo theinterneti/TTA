@@ -1,5 +1,5 @@
 """
-TTA Configuration
+TTA Configuration.
 
 This module provides configuration management for the TTA project.
 
@@ -210,6 +210,35 @@ class TTAConfig:
                 "track_components": True,
             },
             "environment": {"name": "development", "log_level": "info"},
+            "orchestration": {  # Add this section
+                "components": {
+                    "player_experience": {
+                        "path": "src.components.player_experience_component",
+                        "class_name": "PlayerExperienceComponent",
+                        "dependencies": ["agent_orchestration"],
+                    },
+                    "agent_orchestration": {
+                        "path": "src.components.agent_orchestration_component",
+                        "class_name": "AgentOrchestrationComponent",
+                    },
+                    "docker": {
+                        "path": "src.components.docker_component",
+                        "class_name": "DockerComponent",
+                    },
+                    "carbon": {
+                        "path": "src.components.carbon_component",
+                        "class_name": "CarbonComponent",
+                    },
+                    "gameplay_loop": {
+                        "path": "src.components.gameplay_loop_component",
+                        "class_name": "GameplayLoopComponent",
+                    },
+                    "tta_dev": {
+                        "path": "ai-components.tta_dev.src.tta_dev_component",
+                        "class_name": "TtaDevComponent",
+                    },
+                }
+            },
         }
 
     @log_entry_exit

@@ -1,7 +1,7 @@
-# Agentic Primitives - Current Session Guide
+# Archived: Agentic Primitives - Current Session Guide
 
 **Date**: 2025-10-22
-**Session**: 1.5 - Add Instruction Validation (COMPLETE ✅)
+**Session**: 1.5 - Add Instruction Validation (COMPLETE ✅) (Archived)
 **Phase**: Phase 1 - Foundation (COMPLETE ✅)
 **Actual Time**: ~2 hours
 

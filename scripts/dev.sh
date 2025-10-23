@@ -26,22 +26,22 @@ warn() {
 # Command functions
 cmd_lint() {
     info "Running Ruff linter..."
-    uvx ruff check src/ tests/
+    uv run ruff check src/ tests/
 }
 
 cmd_lint_fix() {
     info "Running Ruff linter with auto-fix..."
-    uvx ruff check --fix src/ tests/
+    uv run ruff check --fix src/ tests/
 }
 
 cmd_format() {
     info "Formatting code with Ruff..."
-    uvx ruff format src/ tests/
+    uv run ruff format src/ tests/
 }
 
 cmd_format_check() {
     info "Checking code formatting..."
-    uvx ruff format --check src/ tests/
+    uv run ruff format --check src/ tests/
 }
 
 cmd_quality() {
@@ -60,28 +60,28 @@ cmd_quality_fix() {
 
 cmd_typecheck() {
     info "Running Pyright type checker (10-100x faster than MyPy)..."
-    uvx pyright src/
+    uv run pyright src/
 }
 
 cmd_test() {
     info "Running tests..."
-    uvx pytest tests/
+    uv run pytest tests/
 }
 
 cmd_test_fast() {
     info "Running tests (fast mode: stop on first failure, run failed tests first)..."
-    uvx pytest tests/ -x --ff
+    uv run pytest tests/ -x --ff
 }
 
 cmd_test_cov() {
     info "Running tests with coverage..."
-    uvx pytest tests/ --cov=src --cov-report=html --cov-report=term
+    uv run pytest tests/ --cov=src --cov-report=html --cov-report=term
     info "Coverage report generated in htmlcov/index.html"
 }
 
 cmd_test_parallel() {
     info "Running tests in parallel..."
-    uvx pytest tests/ -n auto
+    uv run pytest tests/ -n auto
 }
 
 cmd_check_all() {

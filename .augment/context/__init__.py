@@ -32,7 +32,7 @@ from .conversation_manager import (
     ConversationMessage,
     ConversationContext,
     AIConversationContextManager,
-    
+
     # Helper function
     create_tta_session,
 )
@@ -42,10 +42,9 @@ __all__ = [
     "ConversationMessage",
     "ConversationContext",
     "AIConversationContextManager",
-    
+
     # Helper
     "create_tta_session",
 ]
 
 __version__ = "1.0.0"
-

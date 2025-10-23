@@ -302,7 +302,8 @@ class LintingGate(QualityGateValidator):
             # Run ruff check
             result = subprocess.run(
                 [
-                    "uvx",
+                    "uv",
+                    "run",
                     "ruff",
                     "check",
                     f"src/{self.component_path.name}/",
@@ -333,7 +334,7 @@ class LintingGate(QualityGateValidator):
                     "issues": issues[:10],  # First 10 issues
                 },
                 errors=[] if passed else [f"Found {len(issues)} linting issues"],
-                warnings=["Run 'uvx ruff check --fix' to auto-fix issues"]
+                warnings=["Run 'uv run ruff check --fix' to auto-fix issues"]
                 if not passed
                 else [],
             )
@@ -363,7 +364,8 @@ class TypeCheckingGate(QualityGateValidator):
             # Run pyright
             result = subprocess.run(
                 [
-                    "uvx",
+                    "uv",
+                    "run",
                     "pyright",
                     f"src/{self.component_path.name}/",
                     "--outputjson",
@@ -420,7 +422,8 @@ class SecurityGate(QualityGateValidator):
             # Run detect-secrets
             result = subprocess.run(
                 [
-                    "uvx",
+                    "uv",
+                    "run",
                     "detect-secrets",
                     "scan",
                     f"src/{self.component_path.name}/",

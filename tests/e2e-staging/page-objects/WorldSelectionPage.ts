@@ -61,14 +61,14 @@ export class WorldSelectionPage extends BasePage {
   async selectWorldByIndex(index: number): Promise<void> {
     const cards = this.getElements(this.worldCard);
     const card = cards.nth(index);
-    
+
     // Scroll into view if needed
     await card.scrollIntoViewIfNeeded();
-    
+
     // Click select button within the card
     const selectBtn = card.locator(this.selectButton).first();
     await selectBtn.click();
-    
+
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -78,17 +78,17 @@ export class WorldSelectionPage extends BasePage {
   async selectWorldByName(worldName: string): Promise<void> {
     const cards = this.getElements(this.worldCard);
     const count = await cards.count();
-    
+
     for (let i = 0; i < count; i++) {
       const card = cards.nth(i);
       const title = await card.locator(this.worldTitle).first().textContent();
-      
+
       if (title?.includes(worldName)) {
         await this.selectWorldByIndex(i);
         return;
       }
     }
-    
+
     throw new Error(`World "${worldName}" not found`);
   }
 
@@ -163,11 +163,11 @@ export class WorldSelectionPage extends BasePage {
   async expectWorldCardComplete(index: number): Promise<void> {
     const cards = this.getElements(this.worldCard);
     const card = cards.nth(index);
-    
+
     const title = await card.locator(this.worldTitle).first();
     const description = await card.locator(this.worldDescription).first();
     const selectBtn = await card.locator(this.selectButton).first();
-    
+
     await expect(title).toBeVisible();
     await expect(description).toBeVisible();
     await expect(selectBtn).toBeVisible();
@@ -180,4 +180,3 @@ export class WorldSelectionPage extends BasePage {
     await this.page.waitForSelector(this.worldCard, { state: 'visible', timeout });
   }
 }
-

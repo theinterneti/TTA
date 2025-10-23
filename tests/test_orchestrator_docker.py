@@ -257,4 +257,3 @@ class TestDockerCommands:
         call_kwargs = mock_safe_run.call_args[1]
         assert call_kwargs["capture_output"] is True
         assert call_kwargs["text"] is True
-

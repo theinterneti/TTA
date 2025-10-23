@@ -1,10 +1,10 @@
 # Component Specification: [Component Name]
 
-**Component ID:** `[component_name]`  
-**Author:** [Your Name]  
-**Created:** [YYYY-MM-DD]  
-**Last Updated:** [YYYY-MM-DD]  
-**Status:** [Draft | In Development | Staging | Production]  
+**Component ID:** `[component_name]`
+**Author:** [Your Name]
+**Created:** [YYYY-MM-DD]
+**Last Updated:** [YYYY-MM-DD]
+**Status:** [Draft | In Development | Staging | Production]
 **Target Stage:** [development | staging | production]
 
 ---
@@ -29,16 +29,16 @@
 ### Functional Requirements
 
 #### FR1: [Requirement Name]
-**Priority:** [High | Medium | Low]  
-**Description:** [Detailed description of the functional requirement]  
+**Priority:** [High | Medium | Low]
+**Description:** [Detailed description of the functional requirement]
 **Acceptance Criteria:**
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 - [ ] [Criterion 3]
 
 #### FR2: [Requirement Name]
-**Priority:** [High | Medium | Low]  
-**Description:** [Detailed description of the functional requirement]  
+**Priority:** [High | Medium | Low]
+**Description:** [Detailed description of the functional requirement]
 **Acceptance Criteria:**
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
@@ -46,8 +46,8 @@
 ### Non-Functional Requirements
 
 #### NFR1: Performance
-**Requirement:** [Specific performance requirement]  
-**Measurement:** [How performance will be measured]  
+**Requirement:** [Specific performance requirement]
+**Measurement:** [How performance will be measured]
 **Target:** [Specific target value]
 
 **Example:**
@@ -56,8 +56,8 @@
 - Database query time: p99 < 100ms
 
 #### NFR2: Reliability
-**Requirement:** [Specific reliability requirement]  
-**Measurement:** [How reliability will be measured]  
+**Requirement:** [Specific reliability requirement]
+**Measurement:** [How reliability will be measured]
 **Target:** [Specific target value]
 
 **Example:**
@@ -66,8 +66,8 @@
 - Recovery time: <5 minutes
 
 #### NFR3: Security
-**Requirement:** [Specific security requirement]  
-**Measurement:** [How security will be validated]  
+**Requirement:** [Specific security requirement]
+**Measurement:** [How security will be validated]
 **Target:** [Specific target value]
 
 **Example:**
@@ -77,8 +77,8 @@
 - Authorization enforced
 
 #### NFR4: Maintainability
-**Requirement:** [Specific maintainability requirement]  
-**Measurement:** [How maintainability will be measured]  
+**Requirement:** [Specific maintainability requirement]
+**Measurement:** [How maintainability will be measured]
 **Target:** [Specific target value]
 
 **Example:**
@@ -125,26 +125,26 @@ src/[component_name]/
 ```python
 class [ClassName]:
     """[Brief description of the class]."""
-    
+
     def __init__(self, [parameters]):
         """
         Initialize [ClassName].
-        
+
         Args:
             [param]: [Description]
         """
         pass
-    
+
     def [method_name](self, [parameters]) -> [ReturnType]:
         """
         [Brief description of the method].
-        
+
         Args:
             [param]: [Description]
-        
+
         Returns:
             [Description of return value]
-        
+
         Raises:
             [ExceptionType]: [When this exception is raised]
         """
@@ -156,13 +156,13 @@ class [ClassName]:
 def [function_name]([parameters]) -> [ReturnType]:
     """
     [Brief description of the function].
-    
+
     Args:
         [param]: [Description]
-    
+
     Returns:
         [Description of return value]
-    
+
     Raises:
         [ExceptionType]: [When this exception is raised]
     """
@@ -179,7 +179,7 @@ from typing import [Types]
 @dataclass
 class [ModelName]:
     """[Brief description of the model]."""
-    
+
     [field_name]: [Type]  # [Description]
     [field_name]: [Type]  # [Description]
 ```
@@ -192,10 +192,10 @@ from pydantic import BaseSettings
 
 class [ConfigName](BaseSettings):
     """[Brief description of the configuration]."""
-    
+
     [setting_name]: [Type] = [default]  # [Description]
     [setting_name]: [Type] = [default]  # [Description]
-    
+
     class Config:
         env_prefix = "[PREFIX]_"
 ```
@@ -205,7 +205,7 @@ class [ConfigName](BaseSettings):
 ## Implementation Plan
 
 ### Phase 1: Core Implementation
-**Duration:** [X weeks]  
+**Duration:** [X weeks]
 **Tasks:**
 - [ ] Implement core functionality
 - [ ] Create data models
@@ -214,7 +214,7 @@ class [ConfigName](BaseSettings):
 - [ ] Document public APIs
 
 ### Phase 2: Integration
-**Duration:** [X weeks]  
+**Duration:** [X weeks]
 **Tasks:**
 - [ ] Integrate with dependencies
 - [ ] Implement error handling
@@ -223,7 +223,7 @@ class [ConfigName](BaseSettings):
 - [ ] Performance testing
 
 ### Phase 3: Production Readiness
-**Duration:** [X weeks]  
+**Duration:** [X weeks]
 **Tasks:**
 - [ ] Security review
 - [ ] End-to-end testing (≥80% coverage)
@@ -236,7 +236,7 @@ class [ConfigName](BaseSettings):
 ## Testing Strategy
 
 ### Unit Tests
-**Location:** `tests/test_[component_name].py` or `tests/[component_name]/`  
+**Location:** `tests/test_[component_name].py` or `tests/[component_name]/`
 **Coverage Target:** ≥60% (development), ≥70% (staging), ≥80% (production)
 
 **Test Cases:**
@@ -247,7 +247,7 @@ class [ConfigName](BaseSettings):
 - [ ] Test data models
 
 ### Integration Tests
-**Location:** `tests/integration/test_[component_name].py`  
+**Location:** `tests/integration/test_[component_name].py`
 **Coverage Target:** All integration points
 
 **Test Cases:**
@@ -257,7 +257,7 @@ class [ConfigName](BaseSettings):
 - [ ] Test external service integration
 
 ### End-to-End Tests
-**Location:** `tests/e2e/test_[component_name].py`  
+**Location:** `tests/e2e/test_[component_name].py`
 **Coverage Target:** All user workflows
 
 **Test Cases:**
@@ -305,7 +305,7 @@ class [ConfigName](BaseSettings):
 ## Maturity Targets
 
 ### Development Stage
-**Timeline:** [X weeks]  
+**Timeline:** [X weeks]
 **Quality Gates:**
 - Test coverage: ≥60%
 - All unit tests pass
@@ -319,7 +319,7 @@ class [ConfigName](BaseSettings):
 - Documentation complete
 
 ### Staging Stage
-**Timeline:** [X weeks]  
+**Timeline:** [X weeks]
 **Quality Gates:**
 - Test coverage: ≥70%
 - All integration tests pass
@@ -332,7 +332,7 @@ class [ConfigName](BaseSettings):
 - Staging deployment successful
 
 ### Production Stage
-**Timeline:** Ongoing  
+**Timeline:** Ongoing
 **Quality Gates:**
 - Test coverage: ≥80%
 - All end-to-end tests pass
@@ -350,13 +350,13 @@ class [ConfigName](BaseSettings):
 ## Risks and Mitigations
 
 ### Risk 1: [Risk Description]
-**Probability:** [High | Medium | Low]  
-**Impact:** [High | Medium | Low]  
+**Probability:** [High | Medium | Low]
+**Impact:** [High | Medium | Low]
 **Mitigation:** [How this risk will be mitigated]
 
 ### Risk 2: [Risk Description]
-**Probability:** [High | Medium | Low]  
-**Impact:** [High | Medium | Low]  
+**Probability:** [High | Medium | Low]
+**Impact:** [High | Medium | Low]
 **Mitigation:** [How this risk will be mitigated]
 
 ---
@@ -451,4 +451,3 @@ class [ConfigName](BaseSettings):
 
 **Notes:**
 [Any additional notes or context]
-

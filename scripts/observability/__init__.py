@@ -25,10 +25,10 @@ from .dev_metrics import (
     # Core classes
     ExecutionMetric,
     DevMetricsCollector,
-    
+
     # Decorator
     track_execution,
-    
+
     # Global collector
     get_collector,
 )
@@ -42,16 +42,15 @@ __all__ = [
     # Core classes
     "ExecutionMetric",
     "DevMetricsCollector",
-    
+
     # Decorator
     "track_execution",
-    
+
     # Global collector
     "get_collector",
-    
+
     # Dashboard
     "generate_dashboard",
 ]
 
 __version__ = "1.0.0"
-

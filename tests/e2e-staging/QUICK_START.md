@@ -259,4 +259,3 @@ npm run test:staging
 ```
 
 That's it! 🎉
-

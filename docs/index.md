@@ -1,147 +1,101 @@
----
-title: TTA Documentation Home
-layout: default
----
+# TTA Project Documentation
 
-# 🎭 TTA Documentation
+## Overview
 
-**Therapeutic Text Adventure Platform - Comprehensive Documentation**
+The Therapeutic Text Adventure (TTA) project combines AI capabilities with narrative content to create therapeutic text adventures. This documentation provides comprehensive information about the project, its components, and how to use and develop for it.
 
-Welcome to the TTA (Therapeutic Text Adventure) documentation. This platform combines AI-powered interactive storytelling with evidence-based therapeutic techniques to create engaging mental health support experiences.
+## Project Structure
 
----
+The TTA project is organized into two main components:
 
-## 📚 Quick Navigation
+1. **tta.dev**: AI development framework and tools
+   - Machine learning models
+   - Technical patterns
+   - Development infrastructure
 
-### 🚀 **Getting Started**
-- [**Main README**](../README.md) - Project overview and quick start guide
-- [**Development Setup**](setup/DEVELOPMENT_SETUP.md) - Set up your development environment
-- [**Environment Setup**](setup/ENVIRONMENT_SETUP.md) - Configure environment variables
-- [**Contributing Guide**](../CONTRIBUTING.md) - How to contribute to the project
+2. **TTA.prototype**: Therapeutic content implementation
+   - Narrative content
+   - User experience
+   - Content integration
 
-### 📖 **Core Documentation**
-- [**Documentation Index**](DOCUMENTATION_INDEX.md) - Complete documentation catalog
-- [**Documentation Hub**](README.md) - Documentation organized by audience
-- [**Master Glossary**](master-glossary.md) - Terminology and definitions
-- [**Technical Specifications**](technical-specifications.md) - Authoritative technical reference
+## Documentation Structure
 
-### 🏗️ **Architecture & Design**
-- [**System Architecture**](../Documentation/architecture/README.md) - High-level system design
-- [**Architecture Diagrams**](../Documentation/architecture/README.md#architecture-diagrams) - Visual system representations
-- [**Simulation Framework**](simulation-framework-overview.md) - Framework overview
-- [**Entertainment-First Design**](entertainment-first-design.md) - Design philosophy
+This documentation is organized into the following main categories:
 
-### 🧪 **Testing & Quality**
-- [**Testing Guide**](testing/TESTING_GUIDE.md) - Comprehensive testing documentation
-- [**Testing Framework**](testing-framework.md) - Testing approach and strategy
-- [**Test Execution Matrix**](test-execution-matrix.md) - Detailed test scenarios
-- [**Manual Frontend Testing**](testing/manual_frontend_testing_guide.md) - Frontend testing guide
+### 1. [Core Documentation](core/README.md)
+- Project Overview
+- Getting Started
+- Key Concepts
+- Frequently Asked Questions
 
-### 🚢 **Deployment & Operations**
-- [**Production Deployment**](deployment/PRODUCTION_DEPLOYMENT_GUIDE.md) - Deploy to production
-- [**Staging Deployment**](deployment/STAGING_DEPLOYMENT_PLAN.md) - Staging environment setup
-- [**Operations Guide**](operations/OPERATIONAL_EXCELLENCE_REPORT.md) - Operational excellence
-- [**Monitoring Stack**](infrastructure/monitoring-stack.md) - Monitoring and observability
+### 2. [Setup & Installation](setup/README.md)
+- [Installation Guide](setup/INSTALLATION.md)
+- [Environment Variables](setup/ENVIRONMENT_VARIABLES.md)
+- [Directory Structure](setup/DIRECTORY_STRUCTURE.md)
+- [GitHub Setup](setup/GITHUB_SETUP.md)
 
-### 🔒 **Security & Compliance**
-- [**Security Guide**](../SECURITY.md) - Security policies and reporting
-- [**Security Hardening**](operations/security/SECURITY_HARDENING_REPORT.md) - Security measures
-- [**HIPAA Compliance**](clinical/THERAPEUTIC_CONTENT_OVERVIEW.md) - Healthcare compliance
+### 3. [Architecture](architecture/README.md)
+- System Architecture
+- AI Components
+- Knowledge Graph
+- Dynamic Tool System
 
-### 🏥 **Clinical & Therapeutic**
-- [**Evidence-Based Frameworks**](clinical/EVIDENCE_BASED_FRAMEWORKS.md) - CBT, DBT, ACT, Mindfulness
-- [**Clinical Consultation**](clinical/CLINICAL_CONSULTATION_FRAMEWORK.md) - Clinical oversight
-- [**Therapeutic Content**](clinical/THERAPEUTIC_CONTENT_OVERVIEW.md) - Content guidelines
+### 4. [Development](development/README.md)
+- [Contributing Guidelines](development/CONTRIBUTING.md)
+- Development Workflow
+- Coding Standards
+- Testing Guidelines
 
-### 🔌 **Integration & APIs**
-- [**GitHub Secrets Guide**](integration/GITHUB_SECRETS_GUIDE.md) - Managing secrets
-- [**Sentry Integration**](integration/SENTRY_INTEGRATION_GUIDE.md) - Error tracking
-- [**Gameplay Loop Integration**](integration/gameplay_loop_integration.md) - Game integration
+### 5. [AI Framework](ai-framework/README.md)
+- Models & Selection Strategy
+- AI Agents
+- Integration with Libraries
+- Model Evaluation
 
----
+### 6. [Therapeutic Content](therapeutic-content/README.md)
+- Content Guidelines
+- User Experience
+- Narrative Structure
+- Content Management
 
-## 👥 Documentation by Role
+### 7. [Guides & Examples](guides/README.md)
+- User Guides
+- Developer Guides
+- Code Examples
+- Tutorials
 
-### 🎮 **For Players**
-Start with the [User Journey Matrix - Players Section](user-journey-matrix.md#1-players---end-users-seeking-therapeutic-storytelling)
+### 8. [Deployment & Operations](deployment/README.md)
+- Deployment Guides
+- Docker Orchestration
+- Monitoring
+- Troubleshooting
 
-### 👨‍💻 **For Developers**
-1. [Development Setup](setup/DEVELOPMENT_SETUP.md)
-2. [Technical Specifications](technical-specifications.md)
-3. [Testing Guide](testing/TESTING_GUIDE.md)
-4. [Architecture Overview](../Documentation/architecture/README.md)
+## Component-Specific Documentation
 
-### 🏥 **For Clinical Staff**
-1. [Evidence-Based Frameworks](clinical/EVIDENCE_BASED_FRAMEWORKS.md)
-2. [Clinical Consultation Framework](clinical/CLINICAL_CONSULTATION_FRAMEWORK.md)
-3. [Therapeutic Content Overview](clinical/THERAPEUTIC_CONTENT_OVERVIEW.md)
+Each component of the TTA project has its own detailed documentation:
 
-### ⚙️ **For DevOps/Administrators**
-1. [Production Deployment Guide](deployment/PRODUCTION_DEPLOYMENT_GUIDE.md)
-2. [Operational Excellence Report](operations/OPERATIONAL_EXCELLENCE_REPORT.md)
-3. [Monitoring Stack](infrastructure/monitoring-stack.md)
-4. [Security Hardening](operations/security/SECURITY_HARDENING_REPORT.md)
+- [tta.dev Documentation](tta.dev/Documentation/README.md): AI development framework and tools
+- [TTA.prototype Documentation](TTA.prototype/Documentation/README.md): Therapeutic content implementation
 
----
+## Documentation Standards
 
-## 📊 Project Status
+1. **File Organization**
+   - Use clear, descriptive filenames
+   - Group related documents in directories
+   - Include README.md in each directory
 
-### ✅ **Completed**
-- Core therapeutic storytelling engine
-- Multi-agent AI orchestration system
-- Character management and progression
-- Real-time monitoring and analytics
-- Security hardening and HIPAA compliance
-- Comprehensive testing framework
-- CI/CD pipeline with GitHub Actions
+2. **Content Structure**
+   - Start with a clear overview
+   - Use consistent headings
+   - Include practical examples
+   - Link to related documents
 
-### 🚧 **In Progress**
-- Enhanced frontend user experience
-- Advanced therapeutic content validation
-- Performance optimization
-- Extended model support
+3. **Code Examples**
+   - Use language-specific syntax highlighting
+   - Include comments for complex code
+   - Provide complete, working examples
 
-### 📋 **Planned**
-- Mobile application
-- Clinical dashboard enhancements
-- Multi-language support
-- Advanced analytics features
-
-See [Implementation Roadmap](implementation-roadmap.md) for detailed timeline.
-
----
-
-## 🔗 Important Links
-
-- **GitHub Repository**: [theinterneti/TTA](https://github.com/theinterneti/TTA)
-- **Issue Tracker**: [GitHub Issues](https://github.com/theinterneti/TTA/issues)
-- **Pull Requests**: [GitHub PRs](https://github.com/theinterneti/TTA/pulls)
-- **CI/CD Status**: [GitHub Actions](https://github.com/theinterneti/TTA/actions)
-- **Changelog**: [CHANGELOG.md](../CHANGELOG.md)
-
----
-
-## 📝 Documentation Standards
-
-All documentation follows these principles:
-- **Clarity**: Clear, concise language appropriate for the target audience
-- **Consistency**: Established terminology and formatting standards
-- **Completeness**: Comprehensive information with examples
-- **Accuracy**: Reflects current system implementation
-- **Accessibility**: WCAG 2.1 AA standards
-
-See [Documentation Standards](README.md#documentation-standards) for details.
-
----
-
-## 🆘 Getting Help
-
-- **Technical Issues**: Check [Testing Guide](testing/TESTING_GUIDE.md) and [GitHub Issues](https://github.com/theinterneti/TTA/issues)
-- **Development Questions**: See [Development Setup](setup/DEVELOPMENT_SETUP.md) and [Contributing Guide](../CONTRIBUTING.md)
-- **Security Concerns**: Follow [Security Policy](../SECURITY.md)
-
----
-
-**Last Updated**: 2025-10-04
-**Documentation Version**: 3.0
-**System Version**: Production-ready with comprehensive monitoring and security
+4. **Updates**
+   - Keep documentation in sync with code
+   - Mark outdated sections clearly
+   - Include last update date

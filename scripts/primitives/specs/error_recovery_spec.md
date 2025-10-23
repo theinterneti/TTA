@@ -1,7 +1,7 @@
 # Primitive Specification: Error Recovery
 
-**Version:** 1.0  
-**Status:** Stable  
+**Version:** 1.0
+**Status:** Stable
 **Location:** `scripts/primitives/error_recovery.py`
 
 ---
@@ -322,7 +322,7 @@ def save_conversation_context(session_id):
 ```python
 def test_retry_success_on_second_attempt():
     call_count = 0
-    
+
     @with_retry()
     def flaky_function():
         nonlocal call_count
@@ -330,7 +330,7 @@ def test_retry_success_on_second_attempt():
         if call_count < 2:
             raise ConnectionError("Transient failure")
         return "success"
-    
+
     result = flaky_function()
     assert result == "success"
     assert call_count == 2
@@ -344,7 +344,7 @@ def test_retry_with_real_api():
     def call_api():
         response = requests.get("https://httpbin.org/status/503")
         response.raise_for_status()
-    
+
     with pytest.raises(requests.HTTPError):
         call_api()  # Should retry 3 times then fail
 ```
@@ -406,10 +406,10 @@ def traced_api_call():
 class RetryBudget:
     def __init__(self, max_retries_per_minute: int):
         self.budget = max_retries_per_minute
-    
+
     def can_retry(self) -> bool:
         return self.budget > 0
-    
+
     def consume(self):
         self.budget -= 1
 ```
@@ -438,7 +438,6 @@ class RetryBudget:
 
 ---
 
-**Status:** Stable - Ready for production use  
-**Last Updated:** 2025-10-20  
+**Status:** Stable - Ready for production use
+**Last Updated:** 2025-10-20
 **Next Review:** Before Phase 2 integration
-

@@ -43,7 +43,7 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
         const cookies = await page.context().cookies();
         const sessionCookie = cookies.find(c => c.name === 'openrouter_session_id');
         sessionIdBeforeLogout = sessionCookie?.value || null;
-        
+
         if (sessionIdBeforeLogout) {
           console.log(`  ✓ Session ID captured: ${sessionIdBeforeLogout.substring(0, 20)}...`);
         } else {
@@ -61,13 +61,13 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
       await test.step('Verify session cookie is cleared', async () => {
         const cookies = await page.context().cookies();
         const sessionCookie = cookies.find(c => c.name === 'openrouter_session_id');
-        
+
         if (!sessionCookie || !sessionCookie.value) {
           console.log('  ✓ Session cookie cleared from browser');
         } else {
           console.log(`  ⚠ Session cookie still present: ${sessionCookie.value.substring(0, 20)}...`);
         }
-        
+
         expect(!sessionCookie || !sessionCookie.value).toBeTruthy();
       });
 
@@ -106,7 +106,7 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
       await test.step('Try to access dashboard directly', async () => {
         await page.goto('/dashboard');
         await page.waitForLoadState('networkidle');
-        
+
         const currentUrl = page.url();
         expect(currentUrl).toContain('login');
         console.log('  ✓ Dashboard access redirected to login');
@@ -136,7 +136,7 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
       await test.step('Verify session cookie exists with correct flags', async () => {
         const cookies = await page.context().cookies();
         const sessionCookie = cookies.find(c => c.name === 'openrouter_session_id');
-        
+
         expect(sessionCookie).toBeDefined();
         expect(sessionCookie?.httpOnly).toBe(true);
         expect(sessionCookie?.path).toBe('/');
@@ -153,7 +153,7 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
       await test.step('Verify session cookie is cleared', async () => {
         const cookies = await page.context().cookies();
         const sessionCookie = cookies.find(c => c.name === 'openrouter_session_id');
-        
+
         expect(!sessionCookie || !sessionCookie.value).toBeTruthy();
         console.log('  ✓ Session cookie cleared successfully');
       });
@@ -169,7 +169,7 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
         const response = await page.request.post(
           `${STAGING_CONFIG.apiUrl}/api/v1/openrouter/auth/logout`
         );
-        
+
         expect(response.ok()).toBeTruthy();
         const data = await response.json();
         expect(data.message).toContain('Logged out');
@@ -225,4 +225,3 @@ test.describe('Logout Flow - Comprehensive Validation', () => {
     });
   });
 });
-

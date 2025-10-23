@@ -117,4 +117,3 @@ echo -e "1. Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)"
 echo -e "2. Navigate to http://localhost:3001"
 echo -e "3. Verify that your changes are reflected"
 echo ""
-

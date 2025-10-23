@@ -35,4 +35,3 @@ echo "  ✓ mcp-neo4j (env vars configured)"
 echo "  ✓ mcp-redis (env vars configured)"
 echo ""
 echo "Usage: gemini \"Your prompt here\""
-

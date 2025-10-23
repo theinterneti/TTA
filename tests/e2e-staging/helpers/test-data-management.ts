@@ -336,4 +336,3 @@ export async function getTestDataStatistics(): Promise<{
     return { redisKeys: 0, neo4jNodes: 0 };
   }
 }
-

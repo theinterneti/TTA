@@ -104,17 +104,18 @@ jobs:
       - name: Run linting
         run: |
           source .venv/bin/activate
-          uvx ruff check packages/tta-ai-framework/
+          uv run ruff check packages/tta-ai-framework/
 
       - name: Run type checking
         run: |
           source .venv/bin/activate
-          uvx pyright packages/tta-ai-framework/
+          uv run pyright packages/tta-ai-framework/
 
       - name: Run tests with coverage
         run: |
           source .venv/bin/activate
-          uvx pytest packages/tta-ai-framework/tests/ \
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+          uv run pytest packages/tta-ai-framework/tests/ \
             --cov=packages/tta-ai-framework/src/tta_ai \
             --cov-report=xml \
             --cov-report=term \
@@ -168,17 +169,18 @@ jobs:
       - name: Run linting
         run: |
           source .venv/bin/activate
-          uvx ruff check packages/tta-narrative-engine/
+          uv run ruff check packages/tta-narrative-engine/
 
       - name: Run type checking
         run: |
           source .venv/bin/activate
-          uvx pyright packages/tta-narrative-engine/
+          uv run pyright packages/tta-narrative-engine/
 
       - name: Run tests with coverage
         run: |
           source .venv/bin/activate
-          uvx pytest packages/tta-narrative-engine/tests/ \
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+          uv run pytest packages/tta-narrative-engine/tests/ \
             --cov=packages/tta-narrative-engine/src/tta_narrative \
             --cov-report=xml \
             --cov-report=term \
@@ -257,12 +259,12 @@ jobs:
       - name: Run linting
         run: |
           source .venv/bin/activate
-          uvx ruff check src/
+          uv run ruff check src/
 
       - name: Run type checking
         run: |
           source .venv/bin/activate
-          uvx pyright src/
+          uv run pyright src/
 
       - name: Run unit tests
         env:
@@ -272,7 +274,8 @@ jobs:
           NEO4J_PASSWORD: testpassword  # pragma: allowlist secret
         run: |
           source .venv/bin/activate
-          uvx pytest tests/unit/ \
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+          uv run pytest tests/unit/ \
             --cov=src \
             --cov-report=xml \
             --cov-report=term \
