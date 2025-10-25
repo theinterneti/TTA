@@ -168,33 +168,35 @@ github-api(
 )
 ```
 
-## When NOT to Use GitHub Tools
+## When NOT to Use GitHub API
 
-**Use `launch-process` with git commands instead when:**
+**Use our workflow tools instead:**
 
-1. **Local git operations** - Committing, pushing, rebasing
-   ```
-   ❌ Don't: GitHub API for local git operations
-   ✅ Do: launch-process(command="git commit -m 'message'", ...)
-   ```
-
-2. **File content operations** - Reading or editing files
-   ```
-   ❌ Don't: GitHub API to read file contents
-   ✅ Do: Use Serena or view tools for local files
-   ```
-
-3. **Code search in local repo** - Searching local codebase
-   ```
-   ❌ Don't: GitHub API for local code search
-   ✅ Do: codebase-retrieval("search query")
+1. **Git operations** - Use git-workflow.sh
+   ```bash
+   # ✅ Interactive workflow
+   ./git-workflow.sh
+   
+   # ✅ Or direct commands
+   ./git-workflow.sh commit    # Smart commits
+   ./git-workflow.sh pr        # Create PR
+   ./git-workflow.sh sync      # Sync with remote
    ```
 
-4. **Non-GitHub repositories** - GitLab, Bitbucket, etc.
+2. **Workflow validation** - Use github-workflow-validator.sh
+   ```bash
+   ./github-workflow-validator.sh all     # All checks
+   ./github-workflow-validator.sh syntax  # YAML validation
    ```
-   ❌ Don't: GitHub API for non-GitHub repos
-   ✅ Do: Use appropriate API or git commands
+
+3. **Environment management** - Use uv-manager.sh
+   ```bash
+   ./uv-manager.sh verify    # Verify setup
+   ./uv-manager.sh info      # Environment info
    ```
+
+4. **File operations** - Use view/edit tools for local files
+5. **Code search** - Use codebase-retrieval for local search
 
 ## Tool Selection Guide
 
@@ -234,11 +236,41 @@ Need to read file contents?
 
 ## Default Workflow
 
-1. **Always use summary parameter**: Provide clear summary of what API call will do
-2. **Use details=false by default**: Only set details=true when need all fields
-3. **Use small page sizes**: Set per_page to small values (10-20) to avoid large responses
-4. **Check rate limits**: Monitor API usage to avoid rate limiting
-5. **Verify CI status after push**: Always check CI status after pushing commits
+### Using GitHub CLI (gh) - Recommended
+Use `gh` CLI for common operations - cleaner and more reliable:
+
+```bash
+# PR operations
+gh pr create --base development --title "feat: description"
+gh pr list
+gh pr view 65
+gh pr status
+
+# Workflow operations
+gh run list
+gh run watch
+gh workflow list
+
+# Issue operations
+gh issue list
+gh issue create --title "Bug: description"
+```
+
+### Management Scripts Available
+Use our integrated workflow tools in root directory:
+
+- **git-workflow.sh**: Smart commits, branching, PR creation
+- **github-workflow-validator.sh**: Validate workflows, check runs
+- **uv-manager.sh**: Environment management
+
+### GitHub API Usage
+For API operations not covered by CLI:
+
+1. **Use summary parameter**: Clear description of API call
+2. **Use details=false**: Only use details=true when needed
+3. **Small page sizes**: Set per_page to 10-20
+4. **Check rate limits**: Monitor API usage
+5. **Verify CI after push**: Check status after commits
 
 ## Performance Considerations
 
@@ -435,8 +467,25 @@ github-api(
 
 **When NOT to use:** Local git operations (use git commands), file content (use Serena/view), non-GitHub repos
 
+## Quick Reference
+
+**Repository:** theinterneti/TTA  
+**Remote:** TTA (not origin)  
+**Main branches:** main, staging, development  
+**Python:** 3.12 with UV package manager
+
+**Workflow tools in root:**
+- git-workflow.sh - Git operations
+- github-workflow-validator.sh - Workflow validation  
+- uv-manager.sh - Environment management
+
+**Documentation:**
+- .github/GITHUB_INTEGRATION_GUIDE.md - Complete guide
+- GITHUB_QUICK_REF.md - Quick reference
+- BRANCHING_STRATEGY.md - Branch/merge strategy
+
 ---
 
 **Status:** Active
-**Last Updated:** 2025-10-22
-**Related Rules:** `Use-your-tools.md`, `integrated-workflow.md`, `ai-context-management.md`
+**Last Updated:** 2025-10-25
+**Related Rules:** `Use-your-tools.md`, `integrated-workflow.md`
