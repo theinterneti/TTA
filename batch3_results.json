@@ -1,0 +1,154 @@
+{
+  "batch": 3,
+  "timestamp": "2025-10-25T15:35:56.283964",
+  "total_submitted": 12,
+  "total_items": 12,
+  "task_ids": [
+    "e1ae8ae5-def8-476b-9186-ab0cd6d5ae66",
+    "67149d62-8ae6-43a8-9bd0-cd1ddb5eefcf",
+    "b0170f06-6468-4cc1-865e-e94a1231304d",
+    "2159700d-3eec-4bd9-946e-9634407c9531",
+    "1ea774dc-708b-4e91-a5c6-1b048b908b72",
+    "f7c93038-8895-4e6d-a84b-3168c2784267",
+    "c09658ff-8df3-4ce1-a01a-ae5d206b6053",
+    "2582ca8e-efac-483f-b8c5-aa8bd6f6b1a3",
+    "0035f8b7-2984-4abf-8b96-10a5b5f07795",
+    "6f830c03-8d57-428f-a7bc-68adc9acbd99",
+    "f23cdb66-4d5a-4e60-a9d5-8fc645bf9dad",
+    "9ae96f2c-8c6e-443e-a722-ccffb31a5778"
+  ],
+  "results": [
+    {
+      "item": {
+        "id": 19,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/therapeutic_safety.py",
+        "task": "Standardize exception handling (50+ linting issues)",
+        "complexity": "moderate"
+      },
+      "task_id": "e1ae8ae5-def8-476b-9186-ab0cd6d5ae66",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 20,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/realtime/websocket_manager.py",
+        "task": "Add error recovery patterns (30+ linting issues)",
+        "complexity": "moderate"
+      },
+      "task_id": "67149d62-8ae6-43a8-9bd0-cd1ddb5eefcf",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 21,
+        "module": "Player Experience",
+        "file": "src/player_experience/production_readiness.py",
+        "task": "Standardize error handling (40+ linting issues)",
+        "complexity": "moderate"
+      },
+      "task_id": "b0170f06-6468-4cc1-865e-e94a1231304d",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 22,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/adapters.py",
+        "task": "Fix import resolution errors + type mismatches",
+        "complexity": "complex"
+      },
+      "task_id": "2159700d-3eec-4bd9-946e-9634407c9531",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 23,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/agents.py",
+        "task": "Fix type mismatches (dict vs AgentConfig)",
+        "complexity": "moderate"
+      },
+      "task_id": "1ea774dc-708b-4e91-a5c6-1b048b908b72",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 24,
+        "module": "Player Experience",
+        "file": "src/player_experience/api/routers/auth.py",
+        "task": "Reduce cyclomatic complexity (35+ linting issues)",
+        "complexity": "moderate"
+      },
+      "task_id": "f7c93038-8895-4e6d-a84b-3168c2784267",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 25,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/openhands_integration/",
+        "task": "Extract common retry logic",
+        "complexity": "simple"
+      },
+      "task_id": "c09658ff-8df3-4ce1-a01a-ae5d206b6053",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 26,
+        "module": "Player Experience",
+        "file": "src/player_experience/api/routers/",
+        "task": "Extract common validation logic",
+        "complexity": "simple"
+      },
+      "task_id": "2582ca8e-efac-483f-b8c5-aa8bd6f6b1a3",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 27,
+        "module": "Components",
+        "file": "src/components/",
+        "task": "Extract common error handling patterns",
+        "complexity": "moderate"
+      },
+      "task_id": "0035f8b7-2984-4abf-8b96-10a5b5f07795",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 28,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/service.py",
+        "task": "Add missing type hints",
+        "complexity": "simple"
+      },
+      "task_id": "6f830c03-8d57-428f-a7bc-68adc9acbd99",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 29,
+        "module": "Player Experience",
+        "file": "src/player_experience/managers/",
+        "task": "Add missing type hints (all files)",
+        "complexity": "simple"
+      },
+      "task_id": "f23cdb66-4d5a-4e60-a9d5-8fc645bf9dad",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 30,
+        "module": "Components",
+        "file": "src/components/gameplay_loop/",
+        "task": "Add missing type hints",
+        "complexity": "simple"
+      },
+      "task_id": "9ae96f2c-8c6e-443e-a722-ccffb31a5778",
+      "status": "submitted"
+    }
+  ]
+}

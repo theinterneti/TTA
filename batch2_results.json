@@ -1,0 +1,88 @@
+{
+  "batch": 2,
+  "timestamp": "2025-10-25T15:35:35.586329",
+  "total_submitted": 6,
+  "total_items": 6,
+  "task_ids": [
+    "8966623f-2699-44d7-8779-98a07735761c",
+    "6f367fd3-51c5-4108-a15e-fa32c1ac46da",
+    "8873536c-5788-4e91-be9d-973d438a0fe8",
+    "70523a07-81da-4a73-9460-65df86181496",
+    "dbaba9f1-3c72-41d7-a228-bf4d0ca503fd",
+    "67da1d85-9a94-4437-ae56-149242dda540"
+  ],
+  "results": [
+    {
+      "item": {
+        "id": 7,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/realtime/websocket_manager.py",
+        "coverage": "5%",
+        "target": "70%",
+        "complexity": "complex"
+      },
+      "task_id": "8966623f-2699-44d7-8779-98a07735761c",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 8,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/openhands_integration/docker_client.py",
+        "coverage": "5%",
+        "target": "70%",
+        "complexity": "complex"
+      },
+      "task_id": "6f367fd3-51c5-4108-a15e-fa32c1ac46da",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 9,
+        "module": "Player Experience",
+        "file": "src/player_experience/api/routers/worlds.py",
+        "coverage": "3%",
+        "target": "70%",
+        "complexity": "moderate"
+      },
+      "task_id": "8873536c-5788-4e91-be9d-973d438a0fe8",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 10,
+        "module": "Player Experience",
+        "file": "src/player_experience/production_readiness.py",
+        "coverage": "3%",
+        "target": "70%",
+        "complexity": "complex"
+      },
+      "task_id": "70523a07-81da-4a73-9460-65df86181496",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 11,
+        "module": "Neo4j Component",
+        "file": "src/components/neo4j_integration/manager.py",
+        "coverage": "27%",
+        "target": "70%",
+        "complexity": "moderate"
+      },
+      "task_id": "dbaba9f1-3c72-41d7-a228-bf4d0ca503fd",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 12,
+        "module": "Neo4j Component",
+        "file": "src/components/neo4j_integration/query_builder.py",
+        "coverage": "27%",
+        "target": "70%",
+        "complexity": "simple"
+      },
+      "task_id": "67da1d85-9a94-4437-ae56-149242dda540",
+      "status": "submitted"
+    }
+  ]
+}

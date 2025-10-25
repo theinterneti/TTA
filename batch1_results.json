@@ -1,0 +1,88 @@
+{
+  "batch": 1,
+  "timestamp": "2025-10-25T15:35:21.464346",
+  "total_submitted": 6,
+  "total_items": 6,
+  "task_ids": [
+    "01156a76-3cae-453b-a52a-887001d34f6e",
+    "01dea1b1-9fa5-42c5-87f7-aa2b2947b81c",
+    "19529445-cb5c-491b-917c-151243abcbae",
+    "8b58ae51-a425-42ae-892c-d041b017c122",
+    "bb07bfe4-0c45-42c8-9a89-bc0025f67680",
+    "fa16ce65-218b-4fc9-9f2a-f3d3bb5fc538"
+  ],
+  "results": [
+    {
+      "item": {
+        "id": 1,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/adapters.py",
+        "coverage": "5%",
+        "target": "70%",
+        "complexity": "simple"
+      },
+      "task_id": "01156a76-3cae-453b-a52a-887001d34f6e",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 2,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/agents.py",
+        "coverage": "5%",
+        "target": "70%",
+        "complexity": "moderate"
+      },
+      "task_id": "01dea1b1-9fa5-42c5-87f7-aa2b2947b81c",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 3,
+        "module": "Agent Orchestration",
+        "file": "src/agent_orchestration/service.py",
+        "coverage": "5%",
+        "target": "70%",
+        "complexity": "moderate"
+      },
+      "task_id": "19529445-cb5c-491b-917c-151243abcbae",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 4,
+        "module": "Player Experience",
+        "file": "src/player_experience/api/routers/auth.py",
+        "coverage": "3%",
+        "target": "70%",
+        "complexity": "moderate"
+      },
+      "task_id": "8b58ae51-a425-42ae-892c-d041b017c122",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 5,
+        "module": "Player Experience",
+        "file": "src/player_experience/api/routers/characters.py",
+        "coverage": "3%",
+        "target": "70%",
+        "complexity": "moderate"
+      },
+      "task_id": "bb07bfe4-0c45-42c8-9a89-bc0025f67680",
+      "status": "submitted"
+    },
+    {
+      "item": {
+        "id": 6,
+        "module": "Player Experience",
+        "file": "src/player_experience/managers/player_experience_manager.py",
+        "coverage": "3%",
+        "target": "70%",
+        "complexity": "complex"
+      },
+      "task_id": "fa16ce65-218b-4fc9-9f2a-f3d3bb5fc538",
+      "status": "submitted"
+    }
+  ]
+}
