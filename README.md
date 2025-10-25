@@ -72,6 +72,15 @@ The Therapeutic Text Adventure (TTA) is an innovative platform that merges the e
 - **Model Flexibility**: Support for multiple LLM providers (OpenRouter, local models)
 - **RAG System**: Context-aware responses using knowledge management
 
+### 🛠️ **OpenHands Integration (Phase 6)**
+- **AI-Powered Development Automation**: Automated code generation, testing, and refactoring
+- **6 Core Components**: TaskQueue, ModelSelector, ResultValidator, MetricsCollector, ExecutionEngine, CLI
+- **Model Rotation System**: Automatic fallback strategies with 27+ free LLM models
+- **Task-Specific Optimization**: Intelligent model selection based on task requirements
+- **Quality Assurance**: Configurable validation rules and metrics tracking
+- **Production Ready**: 47 identified work items for Phase 7 execution
+- **Documentation**: Comprehensive guides for architecture, usage, and integration
+
 ### 🔒 **Security & Privacy**
 - **HIPAA Compliance**: Secure handling of therapeutic data
 - **Data Encryption**: At-rest and in-transit encryption
