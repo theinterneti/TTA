@@ -270,7 +270,9 @@ class LangGraphAgentOrchestrator:
                 tokens=len(response.content.split()),  # Approximate
                 latency_ms=latency_ms,
                 cost_usd=0.0002,  # Approximate based on model
-                quality_score=8.5 if assessment["safety_level"] in ["safe", "concern"] else 7.0,
+                quality_score=8.5
+                if assessment["safety_level"] in ["safe", "concern"]
+                else 7.0,
             )
 
         except Exception as e:
@@ -336,7 +338,9 @@ class LangGraphAgentOrchestrator:
         start_time = time.time()
         try:
             # Prepare context
-            intent = state.get("ipa_result", {}).get("routing", {}).get("intent", "unknown")
+            intent = (
+                state.get("ipa_result", {}).get("routing", {}).get("intent", "unknown")
+            )
             world_context = json.dumps(state["world_context"], indent=2)[:200]
 
             # Use prompt registry for narrative generation

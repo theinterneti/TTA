@@ -25,11 +25,11 @@ if env_path.exists():
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('batch_test_generation.log'),
-    ]
+        logging.FileHandler("batch_test_generation.log"),
+    ],
 )
 logger = logging.getLogger(__name__)
 
@@ -59,12 +59,14 @@ MODULES = [
 ]
 
 
-async def generate_for_module(module: dict, model_preset: str = "deepseek-chat") -> dict:
+async def generate_for_module(
+    module: dict, model_preset: str = "deepseek-chat"
+) -> dict:
     """Generate tests for a single module with explicit model selection."""
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info(f"Generating tests for: {module['name']}")
     logger.info(f"Model: {model_preset}")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
 
     result = {
         "module": module["name"],
@@ -97,7 +99,9 @@ async def generate_for_module(module: dict, model_preset: str = "deepseek-chat")
         )
 
         # Initialize service with explicit model
-        logger.info(f"Initializing test generation service with model: {model_preset}...")
+        logger.info(
+            f"Initializing test generation service with model: {model_preset}..."
+        )
         config = OpenHandsIntegrationConfig.from_env()
         # Override model preset to use DeepSeek (verified model with 100% success)
         config.model_preset = model_preset
@@ -115,7 +119,9 @@ async def generate_for_module(module: dict, model_preset: str = "deepseek-chat")
             "coverage_percentage": gen_result.coverage_percentage,
             "quality_score": gen_result.quality_score,
             "conventions_followed": gen_result.conventions_followed,
-            "test_file_path": str(gen_result.test_file_path) if gen_result.test_file_path else None,
+            "test_file_path": str(gen_result.test_file_path)
+            if gen_result.test_file_path
+            else None,
             "issues": gen_result.issues,
         }
 
@@ -128,21 +134,23 @@ async def generate_for_module(module: dict, model_preset: str = "deepseek-chat")
     except Exception as e:
         result["status"] = "FAILED"
         result["details"]["error"] = str(e)
-        logger.error(f"✗ Test generation failed for {module['name']}: {e}", exc_info=True)
+        logger.error(
+            f"✗ Test generation failed for {module['name']}: {e}", exc_info=True
+        )
 
     return result
 
 
 async def main():
     """Generate tests for all modules."""
-    logger.info("\n" + "╔" + "="*78 + "╗")
-    logger.info("║" + " "*78 + "║")
+    logger.info("\n" + "╔" + "=" * 78 + "╗")
+    logger.info("║" + " " * 78 + "║")
     logger.info("║" + "Batch Test Generation - Multiple Modules".center(78) + "║")
-    logger.info("║" + " "*78 + "║")
-    logger.info("╚" + "="*78 + "╝")
+    logger.info("║" + " " * 78 + "║")
+    logger.info("╚" + "=" * 78 + "╝")
 
     logger.info(f"\nGenerating tests for {len(MODULES)} modules...")
-    logger.info(f"Target coverage: 70% for each module")
+    logger.info("Target coverage: 70% for each module")
 
     results = []
     # Use DeepSeek Chat (verified model with 100% success rate)
@@ -155,15 +163,23 @@ async def main():
         results.append(result)
 
     # Summary
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("BATCH GENERATION SUMMARY")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     for result in results:
-        status_icon = "✓" if result["status"] == "SUCCESS" else "⚠" if result["status"] == "PARTIAL" else "✗"
+        status_icon = (
+            "✓"
+            if result["status"] == "SUCCESS"
+            else "⚠"
+            if result["status"] == "PARTIAL"
+            else "✗"
+        )
         logger.info(f"{status_icon} {result['module']}: {result['status']}")
         if result["details"]:
-            logger.info(f"    Coverage: {result['details'].get('coverage_percentage', 'N/A')}%")
+            logger.info(
+                f"    Coverage: {result['details'].get('coverage_percentage', 'N/A')}%"
+            )
             logger.info(f"    Quality: {result['details'].get('quality_score', 'N/A')}")
 
     # Save results
@@ -174,7 +190,9 @@ async def main():
 
     # Return exit code
     success_count = sum(1 for r in results if r["status"] == "SUCCESS")
-    logger.info(f"\nTotal: {success_count}/{len(MODULES)} modules completed successfully")
+    logger.info(
+        f"\nTotal: {success_count}/{len(MODULES)} modules completed successfully"
+    )
 
     return 0 if success_count == len(MODULES) else 1
 
@@ -182,4 +200,3 @@ async def main():
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
-

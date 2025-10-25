@@ -19,7 +19,6 @@ import asyncio
 import json
 import logging
 import os
-import sys
 import time
 from pathlib import Path
 
@@ -87,13 +86,13 @@ Requirements:
 async def test_model(model: str, task_key: str, task_data: dict) -> dict:
     """Test a single model with a task."""
     logger.info(f"Testing {model} with {task_key}...")
-    
+
     if not API_KEY:
         logger.error("OPENROUTER_API_KEY not set")
         return {"success": False, "error": "API key not set"}
-    
+
     start_time = time.time()
-    
+
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
@@ -116,17 +115,17 @@ async def test_model(model: str, task_key: str, task_data: dict) -> dict:
                     "max_tokens": task_data["max_tokens"],
                 },
             )
-            
+
             execution_time = time.time() - start_time
-            
+
             if response.status_code == 200:
                 result = response.json()
                 content = result["choices"][0]["message"]["content"]
                 usage = result.get("usage", {})
-                
+
                 # Quality assessment
                 quality_score = assess_quality(content, task_key)
-                
+
                 return {
                     "success": True,
                     "model": model,
@@ -139,15 +138,14 @@ async def test_model(model: str, task_key: str, task_data: dict) -> dict:
                     "content_length": len(content),
                     "content_preview": content[:200],
                 }
-            else:
-                return {
-                    "success": False,
-                    "model": model,
-                    "task": task_key,
-                    "error": f"HTTP {response.status_code}",
-                    "error_detail": response.text[:200],
-                }
-                
+            return {
+                "success": False,
+                "model": model,
+                "task": task_key,
+                "error": f"HTTP {response.status_code}",
+                "error_detail": response.text[:200],
+            }
+
     except Exception as e:
         return {
             "success": False,
@@ -160,64 +158,68 @@ async def test_model(model: str, task_key: str, task_data: dict) -> dict:
 def assess_quality(content: str, task_key: str) -> int:
     """Assess quality of generated content (1-5 stars)."""
     score = 3  # Default
-    
+
     # Check for code blocks
     if "```" in content or "def " in content:
         score += 1
-    
+
     # Check for docstrings
     if '"""' in content or "'''" in content:
         score += 1
-    
+
     # Check for type hints
     if "->" in content or ": " in content:
         score += 1
-    
+
     # Check for error handling
     if "try" in content or "except" in content or "raise" in content:
         score += 1
-    
+
     # Check for tests (if test task)
     if task_key == "complex":
         if "@pytest" in content or "def test_" in content:
             score += 1
-    
+
     return min(5, score)
 
 
 async def main():
     """Run comprehensive model tests."""
     logger.info("\n╔" + "=" * 78 + "╗")
-    logger.info("║" + " " * 15 + "OpenHands Free Models Comprehensive Test" + " " * 23 + "║")
+    logger.info(
+        "║" + " " * 15 + "OpenHands Free Models Comprehensive Test" + " " * 23 + "║"
+    )
     logger.info("╚" + "=" * 78 + "╝\n")
-    
+
     results = []
-    
+
     # Test each model with each task
     for model in MODELS:
         logger.info(f"\n{'=' * 80}")
         logger.info(f"Testing Model: {model}")
         logger.info(f"{'=' * 80}")
-        
+
         for task_key, task_data in TASKS.items():
             result = await test_model(model, task_key, task_data)
             results.append(result)
-            
+
             if result["success"]:
-                logger.info(f"  ✅ {task_key}: {result['execution_time']:.1f}s, "
-                           f"{result['tokens_used']} tokens, "
-                           f"Quality: {result['quality_score']}/5")
+                logger.info(
+                    f"  ✅ {task_key}: {result['execution_time']:.1f}s, "
+                    f"{result['tokens_used']} tokens, "
+                    f"Quality: {result['quality_score']}/5"
+                )
             else:
                 logger.info(f"  ❌ {task_key}: {result.get('error', 'Unknown error')}")
-            
+
             # Rate limiting - wait between requests
             await asyncio.sleep(2)
-    
+
     # Summary
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY")
     logger.info("=" * 80)
-    
+
     # Group by model
     by_model = {}
     for result in results:
@@ -225,30 +227,35 @@ async def main():
         if model not in by_model:
             by_model[model] = []
         by_model[model].append(result)
-    
+
     # Print summary by model
     for model, model_results in by_model.items():
         successful = sum(1 for r in model_results if r["success"])
         total = len(model_results)
-        avg_time = sum(r.get("execution_time", 0) for r in model_results if r["success"]) / max(1, successful)
-        avg_tokens = sum(r.get("tokens_used", 0) for r in model_results if r["success"]) / max(1, successful)
-        avg_quality = sum(r.get("quality_score", 0) for r in model_results if r["success"]) / max(1, successful)
-        
+        avg_time = sum(
+            r.get("execution_time", 0) for r in model_results if r["success"]
+        ) / max(1, successful)
+        avg_tokens = sum(
+            r.get("tokens_used", 0) for r in model_results if r["success"]
+        ) / max(1, successful)
+        avg_quality = sum(
+            r.get("quality_score", 0) for r in model_results if r["success"]
+        ) / max(1, successful)
+
         logger.info(f"\n{model}:")
         logger.info(f"  Success Rate: {successful}/{total}")
         logger.info(f"  Avg Time: {avg_time:.1f}s")
         logger.info(f"  Avg Tokens: {avg_tokens:.0f}")
         logger.info(f"  Avg Quality: {avg_quality:.1f}/5")
-    
+
     # Save results to JSON
     output_file = Path("openhands_model_test_results.json")
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
     logger.info(f"\n✅ Results saved to {output_file}")
-    
+
     logger.info("\n" + "=" * 80)
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-

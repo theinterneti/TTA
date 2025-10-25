@@ -53,11 +53,15 @@ from .config import (
 )
 from .docker_client import DockerOpenHandsClient
 from .error_recovery import OpenHandsErrorRecovery
+from .execution_engine import ExecutionEngine
 from .helpers import (
     generate_tests_for_file,
     generate_tests_for_package,
     validate_test_result,
 )
+from .metrics_collector import ExecutionMetrics, MetricsCollector, ModelMetrics
+from .model_rotation import ModelRotationManager
+from .model_selector import ModelSelector, TaskCategory, TaskRequirements
 from .models import (
     RECOVERY_STRATEGIES,
     OpenHandsErrorType,
@@ -65,6 +69,8 @@ from .models import (
     OpenHandsTaskResult,
 )
 from .proxy import OpenHandsAgentProxy
+from .result_validator import ResultValidator, ValidationResult
+from .task_queue import QueuedTask, TaskPriority, TaskQueue, TaskStatus
 from .test_generation_models import (
     TestGenerationError,
     TestTaskSpecification,
@@ -91,6 +97,21 @@ __all__ = [
     "RECOVERY_STRATEGIES",
     # Error recovery
     "OpenHandsErrorRecovery",
+    # Production system components
+    "ExecutionEngine",
+    "TaskQueue",
+    "QueuedTask",
+    "TaskStatus",
+    "TaskPriority",
+    "ModelSelector",
+    "TaskRequirements",
+    "TaskCategory",
+    "ResultValidator",
+    "ValidationResult",
+    "MetricsCollector",
+    "ExecutionMetrics",
+    "ModelMetrics",
+    "ModelRotationManager",
     # Test generation
     "UnitTestGenerationService",
     "TestTaskSpecification",
@@ -101,4 +122,3 @@ __all__ = [
     "generate_tests_for_package",
     "validate_test_result",
 ]
-

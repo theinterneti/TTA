@@ -84,7 +84,10 @@ async def test_model_with_free_suffix(model_id: str) -> dict:
                 json={
                     "model": test_model_id,
                     "messages": [
-                        {"role": "system", "content": "You are a helpful coding assistant."},
+                        {
+                            "role": "system",
+                            "content": "You are a helpful coding assistant.",
+                        },
                         {"role": "user", "content": TEST_TASK["prompt"]},
                     ],
                     "temperature": 0.7,
@@ -101,7 +104,7 @@ async def test_model_with_free_suffix(model_id: str) -> dict:
                 "success": True,
                 "time": elapsed,
             }
-        elif response.status_code == 429:
+        if response.status_code == 429:
             return {
                 "model": model_id,
                 "model_with_suffix": test_model_id,
@@ -109,7 +112,7 @@ async def test_model_with_free_suffix(model_id: str) -> dict:
                 "error": "Rate limited (HTTP 429)",
                 "time": elapsed,
             }
-        elif response.status_code == 404:
+        if response.status_code == 404:
             return {
                 "model": model_id,
                 "model_with_suffix": test_model_id,
@@ -117,14 +120,13 @@ async def test_model_with_free_suffix(model_id: str) -> dict:
                 "error": "Not found (HTTP 404)",
                 "time": elapsed,
             }
-        else:
-            return {
-                "model": model_id,
-                "model_with_suffix": test_model_id,
-                "success": False,
-                "error": f"HTTP {response.status_code}",
-                "time": elapsed,
-            }
+        return {
+            "model": model_id,
+            "model_with_suffix": test_model_id,
+            "success": False,
+            "error": f"HTTP {response.status_code}",
+            "time": elapsed,
+        }
 
     except asyncio.TimeoutError:
         return {
@@ -174,12 +176,12 @@ async def main():
             models_by_family[family] = []
         models_by_family[family].append(model_id)
 
-    print(f"📊 Models by family:")
+    print("📊 Models by family:")
     for family in sorted(models_by_family.keys()):
         print(f"  {family}: {len(models_by_family[family])} models")
 
     # Test models with :free suffix
-    print(f"\n🧪 Testing models with :free suffix...")
+    print("\n🧪 Testing models with :free suffix...")
     print("=" * 100)
 
     results = []
@@ -212,7 +214,7 @@ async def main():
     print(f"Failed: {len(failed)}")
 
     if successful:
-        print(f"\n✅ WORKING FREE MODELS:")
+        print("\n✅ WORKING FREE MODELS:")
         for model_id in sorted(successful):
             print(f"  {model_id}:free")
 
@@ -238,4 +240,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

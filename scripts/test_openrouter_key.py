@@ -45,7 +45,7 @@ try:
     print(f"Status Code: {response.status_code}")
     print(f"Response Headers: {dict(response.headers)}")
     print(f"Response Body: {response.text}")
-    
+
     if response.status_code == 200:
         print("\n✅ API key is VALID and working!")
         data = response.json()
@@ -56,7 +56,7 @@ try:
         print("   Please generate a new key at: https://openrouter.ai/keys")
     else:
         print(f"\n⚠️  Unexpected status code: {response.status_code}")
-        
+
 except Exception as e:
     print(f"\n❌ Request failed: {e}")
     sys.exit(1)
@@ -72,14 +72,14 @@ try:
     response = requests.post(url, json=payload, headers=headers, timeout=30)
     print(f"Status Code: {response.status_code}")
     print(f"Response Body: {response.text[:500]}")
-    
+
     if response.status_code == 200:
         print("\n✅ Free model works!")
     elif response.status_code == 401:
         print("\n❌ Still getting 401 with free model")
     else:
         print(f"\n⚠️  Status: {response.status_code}")
-        
+
 except Exception as e:
     print(f"\n❌ Request failed: {e}")
 
@@ -89,4 +89,3 @@ print("=" * 80)
 print("If you see 401 errors above, your API key is invalid/expired.")
 print("Generate a new key at: https://openrouter.ai/keys")
 print("Then update OPENROUTER_API_KEY in .env file")
-

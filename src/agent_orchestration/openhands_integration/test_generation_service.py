@@ -14,13 +14,11 @@ from .error_recovery import OpenHandsErrorRecovery
 from .test_error_handler import classify_error, create_retry_feedback
 from .test_file_extractor import extract_test_files_from_output
 from .test_generation_models import (
-    TestGenerationError,
     TestTaskSpecification,
     TestValidationResult,
 )
 from .test_result_validator import validate_generated_tests
 from .test_task_builder import (
-    create_package_test_generation_task,
     create_test_generation_task,
 )
 
@@ -113,7 +111,9 @@ class UnitTestGenerationService:
             >>> print(result.syntax_valid, result.tests_pass)
             True True
         """
-        logger.info(f"Generating tests for {spec.target_file} (max_iterations={max_iterations})")
+        logger.info(
+            f"Generating tests for {spec.target_file} (max_iterations={max_iterations})"
+        )
 
         # Create AI context session for tracking
         context_manager = None
@@ -197,14 +197,18 @@ class UnitTestGenerationService:
                 logger.info(f"Error classified as: {error_type}")
 
                 # Create feedback for retry
-                feedback = create_retry_feedback(error_type, spec, result, self.workspace_path)
+                feedback = create_retry_feedback(
+                    error_type, spec, result, self.workspace_path
+                )
                 task_description = f"{task_description}\n\n**Feedback from previous attempt:**\n{feedback}"
 
                 # Continue to next iteration
                 continue
 
             # Extract test files from output
-            test_files = extract_test_files_from_output(result.output, self.workspace_path)
+            test_files = extract_test_files_from_output(
+                result.output, self.workspace_path
+            )
 
             if not test_files:
                 logger.warning("No test files found in output")
@@ -225,12 +229,17 @@ class UnitTestGenerationService:
             # Track validation results (importance=0.9)
             if context_manager and session_id:
                 try:
-                    validation_status = "passed" if (
-                        validation_result.syntax_valid
-                        and validation_result.tests_pass
-                        and validation_result.coverage_percentage >= spec.coverage_threshold
-                        and validation_result.conventions_followed
-                    ) else "failed"
+                    validation_status = (
+                        "passed"
+                        if (
+                            validation_result.syntax_valid
+                            and validation_result.tests_pass
+                            and validation_result.coverage_percentage
+                            >= spec.coverage_threshold
+                            and validation_result.conventions_followed
+                        )
+                        else "failed"
+                    )
 
                     context_manager.add_message(
                         session_id=session_id,
@@ -258,7 +267,9 @@ class UnitTestGenerationService:
                 and validation_result.coverage_percentage >= spec.coverage_threshold
                 and validation_result.conventions_followed
             ):
-                logger.info(f"✓ Test generation successful (coverage: {validation_result.coverage_percentage}%)")
+                logger.info(
+                    f"✓ Test generation successful (coverage: {validation_result.coverage_percentage}%)"
+                )
 
                 # Track task completion (importance=1.0)
                 if context_manager and session_id:
@@ -287,7 +298,9 @@ class UnitTestGenerationService:
             # Validation failed - create feedback for retry
             logger.warning(f"Validation failed: {validation_result.issues}")
             feedback = self._create_feedback_task(validation_result)
-            task_description = f"{task_description}\n\n**Feedback from previous attempt:**\n{feedback}"
+            task_description = (
+                f"{task_description}\n\n**Feedback from previous attempt:**\n{feedback}"
+            )
 
         # Max iterations reached - return last validation result or create failure result
         logger.warning(f"Max iterations ({max_iterations}) reached without success")
@@ -405,9 +418,10 @@ class UnitTestGenerationService:
             feedback_parts.append("- Follow TTA testing conventions (see issues below)")
 
         if validation_result.issues:
-            issues_list = "\n".join(f"  - {issue}" for issue in validation_result.issues)
+            issues_list = "\n".join(
+                f"  - {issue}" for issue in validation_result.issues
+            )
             feedback_parts.append(f"- Address these specific issues:\n{issues_list}")
 
         feedback = "\n".join(feedback_parts)
         return f"The previous test generation had issues:\n\n{feedback}\n\nPlease fix these issues and regenerate the tests."
-

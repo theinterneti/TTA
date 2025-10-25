@@ -10,7 +10,6 @@ Tests cover:
 import sys
 import time
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -132,6 +131,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_call_success_in_closed_state(self, circuit_breaker):
         """Test successful call in CLOSED state."""
+
         async def successful_operation():
             return "success"
 
@@ -145,6 +145,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_call_failure_in_closed_state(self, circuit_breaker):
         """Test failed call in CLOSED state."""
+
         async def failing_operation():
             raise Exception("Operation failed")
 
@@ -158,6 +159,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_opens_after_threshold(self, circuit_breaker):
         """Test circuit breaker opens after failure threshold."""
+
         async def failing_operation():
             raise Exception("Operation failed")
 
@@ -272,6 +274,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_multiple_sequential_calls(self, circuit_breaker):
         """Test multiple sequential calls."""
+
         async def operation(value):
             return value * 2
 
@@ -291,4 +294,3 @@ class TestCircuitBreaker:
     def test_circuit_breaker_failure_threshold_property(self, circuit_breaker):
         """Test circuit breaker failure threshold property."""
         assert circuit_breaker.failure_threshold == 5
-

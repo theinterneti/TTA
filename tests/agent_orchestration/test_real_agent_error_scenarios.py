@@ -357,15 +357,15 @@ class TestRealAgentErrorScenarios:
         fallback_rate = fallback_count / total_requests
 
         # Should maintain reasonable success rate even under pressure
-        assert (
-            success_rate > 0.5
-        ), f"Success rate too low under resource pressure: {success_rate}"
+        assert success_rate > 0.5, (
+            f"Success rate too low under resource pressure: {success_rate}"
+        )
 
         # Should complete within reasonable time
         total_time = end_time - start_time
-        assert (
-            total_time < 60.0
-        ), f"Resource exhaustion test took too long: {total_time}s"
+        assert total_time < 60.0, (
+            f"Resource exhaustion test took too long: {total_time}s"
+        )
 
         return {
             "total_requests": total_requests,

@@ -13,7 +13,6 @@ Provides:
 from __future__ import annotations
 
 import logging
-import os
 from typing import Any
 
 from pydantic import SecretStr
@@ -89,7 +88,11 @@ class OpenHandsAgentProxy(Agent):
         # Configuration
         self.openhands_config = openhands_config or self._load_config()
         # Use config's enable_real_agent if not explicitly provided
-        self.enable_real_agent = enable_real_agent if enable_real_agent is not None else self.openhands_config.enable_real_agent
+        self.enable_real_agent = (
+            enable_real_agent
+            if enable_real_agent is not None
+            else self.openhands_config.enable_real_agent
+        )
         self.fallback_to_mock = fallback_to_mock
 
         # Real-time event integration
@@ -104,9 +107,7 @@ class OpenHandsAgentProxy(Agent):
                 enabled=event_publisher is not None,
             )
         except ImportError:
-            logger.warning(
-                "Agent event integration not available, events disabled"
-            )
+            logger.warning("Agent event integration not available, events disabled")
             self.event_integrator = None
 
         # Circuit breaker for fault tolerance
@@ -146,9 +147,7 @@ class OpenHandsAgentProxy(Agent):
                     f"Registered OpenHands proxy {self.name} with agent registry"
                 )
             except Exception as e:
-                logger.warning(
-                    f"Failed to register with agent registry: {e}"
-                )
+                logger.warning(f"Failed to register with agent registry: {e}")
 
     def _load_config(self) -> OpenHandsIntegrationConfig:
         """Load OpenHands configuration from environment."""
@@ -228,14 +227,10 @@ class OpenHandsAgentProxy(Agent):
                         data={"task": task_description, "error": str(e)},
                     )
                 except Exception as event_error:
-                    logger.warning(
-                        f"Failed to publish error event: {event_error}"
-                    )
+                    logger.warning(f"Failed to publish error event: {event_error}")
             raise
 
-    def _mock_development_task(
-        self, task_description: str
-    ) -> dict[str, Any]:
+    def _mock_development_task(self, task_description: str) -> dict[str, Any]:
         """Generate mock response for development task."""
         return {
             "success": True,
@@ -273,4 +268,3 @@ class OpenHandsAgentProxy(Agent):
             "max_context_tokens": self.openhands_config.get_model_config().context_tokens,
             "timeout_seconds": self._default_timeout_s,
         }
-

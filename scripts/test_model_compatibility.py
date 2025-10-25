@@ -19,10 +19,10 @@ import os
 # Add project root to path
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Optional
 
 from dotenv import load_dotenv
 from pydantic import SecretStr
@@ -44,6 +44,7 @@ from src.agent_orchestration.openhands_integration.config import (
 @dataclass
 class TaskDefinition:
     """Definition of a test task."""
+
     id: str
     description: str
     expected_outcome: str
@@ -55,17 +56,19 @@ class TaskDefinition:
 @dataclass
 class TestResult:
     """Result of executing a task with a model."""
+
     task_id: str
     model: str
     success: bool
     execution_time: float
     quality_score: float
     output: str
-    error: Optional[str]
+    error: str | None
     metadata: dict
 
 
 # Quality Evaluators
+
 
 def evaluate_trivial_task(output: str) -> float:
     """Evaluate Task 1: Return 'Hello, World!'"""
@@ -74,7 +77,7 @@ def evaluate_trivial_task(output: str) -> float:
         if "hello, world" in output_lower or "hello world" in output_lower:
             return 1.0  # Exact match
         return 0.8  # Contains both words
-    elif "hello" in output_lower or "world" in output_lower:
+    if "hello" in output_lower or "world" in output_lower:
         return 0.5  # Contains one word
     return 0.0  # No match
 
@@ -87,9 +90,9 @@ def evaluate_simple_task(output: str) -> float:
 
     if has_answer and has_explanation:
         return 1.0  # Correct answer + explanation
-    elif has_answer:
+    if has_answer:
         return 0.7  # Correct answer only
-    elif has_explanation:
+    if has_explanation:
         return 0.3  # Explanation only
     return 0.0  # No answer
 
@@ -99,15 +102,15 @@ def evaluate_moderate_task(output: str) -> float:
     output_lower = output.lower()
     has_function = "def " in output_lower
     has_type_hints = "->" in output or ":" in output
-    has_docstring = '"""' in output or "'''" in output or 'docstring' in output_lower
+    has_docstring = '"""' in output or "'''" in output or "docstring" in output_lower
 
     if has_function and has_type_hints and has_docstring:
         return 1.0  # All requirements met
-    elif has_function and has_type_hints:
+    if has_function and has_type_hints:
         return 0.8  # Function + type hints
-    elif has_function and has_docstring:
+    if has_function and has_docstring:
         return 0.8  # Function + docstring
-    elif has_function:
+    if has_function:
         return 0.5  # Function only
     return 0.0  # No function
 
@@ -115,15 +118,25 @@ def evaluate_moderate_task(output: str) -> float:
 def evaluate_complex_task(output: str) -> float:
     """Evaluate Task 4: Analyze code and suggest improvements"""
     output_lower = output.lower()
-    suggestion_keywords = ["type hint", "docstring", "naming", "improve", "suggest", "add", "consider"]
+    suggestion_keywords = [
+        "type hint",
+        "docstring",
+        "naming",
+        "improve",
+        "suggest",
+        "add",
+        "consider",
+    ]
 
-    suggestion_count = sum(1 for keyword in suggestion_keywords if keyword in output_lower)
+    suggestion_count = sum(
+        1 for keyword in suggestion_keywords if keyword in output_lower
+    )
 
     if suggestion_count >= 3:
         return 1.0  # Multiple specific suggestions
-    elif suggestion_count >= 1:
+    if suggestion_count >= 1:
         return 0.7  # 1-2 specific suggestions
-    elif len(output) > 50:
+    if len(output) > 50:
         return 0.4  # Generic suggestions
     return 0.0  # No suggestions
 
@@ -135,7 +148,10 @@ TASKS = [
         id="task1_trivial",
         description="Return the string 'Hello, World!'",
         expected_outcome="Agent returns exactly 'Hello, World!' or similar greeting",
-        success_criteria=["Task completes without errors", "Response contains 'Hello' and 'World'"],
+        success_criteria=[
+            "Task completes without errors",
+            "Response contains 'Hello' and 'World'",
+        ],
         timeout_seconds=60.0,
         quality_evaluator=evaluate_trivial_task,
     ),
@@ -143,7 +159,11 @@ TASKS = [
         id="task2_simple",
         description="Calculate the sum of 1+1 and explain the result",
         expected_outcome="Agent calculates 1+1=2 and provides explanation",
-        success_criteria=["Task completes without errors", "Response contains '2' or 'two'", "Response includes explanation"],
+        success_criteria=[
+            "Task completes without errors",
+            "Response contains '2' or 'two'",
+            "Response includes explanation",
+        ],
         timeout_seconds=90.0,
         quality_evaluator=evaluate_simple_task,
     ),
@@ -151,7 +171,12 @@ TASKS = [
         id="task3_moderate",
         description="Write a simple Python function that adds two numbers with type hints and a docstring",
         expected_outcome="Agent generates valid Python function with type hints and docstring",
-        success_criteria=["Task completes without errors", "Response contains Python function", "Function has type hints", "Function has docstring"],
+        success_criteria=[
+            "Task completes without errors",
+            "Response contains Python function",
+            "Function has type hints",
+            "Function has docstring",
+        ],
         timeout_seconds=120.0,
         quality_evaluator=evaluate_moderate_task,
     ),
@@ -159,7 +184,11 @@ TASKS = [
         id="task4_complex",
         description="Analyze this code snippet and suggest improvements: `def calc(a,b): return a+b`",
         expected_outcome="Agent analyzes code and suggests improvements",
-        success_criteria=["Task completes without errors", "Response identifies improvement opportunities", "Suggestions are actionable"],
+        success_criteria=[
+            "Task completes without errors",
+            "Response identifies improvement opportunities",
+            "Suggestions are actionable",
+        ],
         timeout_seconds=180.0,
         quality_evaluator=evaluate_complex_task,
     ),
@@ -219,10 +248,16 @@ class ModelTestRunner:
             metadata = {}
             if "rate limit" in error_str.lower() or "429" in error_str:
                 metadata["error_type"] = "rate_limit"
-            elif "content policy" in error_str.lower() or "moderation" in error_str.lower():
+            elif (
+                "content policy" in error_str.lower()
+                or "moderation" in error_str.lower()
+            ):
                 metadata["error_type"] = "content_moderation"
                 metadata["incompatible"] = True
-            elif "LLM Provider NOT provided" in error_str or "not a valid model ID" in error_str:
+            elif (
+                "LLM Provider NOT provided" in error_str
+                or "not a valid model ID" in error_str
+            ):
                 metadata["error_type"] = "config_error"
                 metadata["incompatible"] = True
             elif "developer instruction" in error_str.lower():
@@ -242,7 +277,9 @@ class ModelTestRunner:
                 metadata=metadata,
             )
 
-    async def test_model(self, model: str, tasks: list[TaskDefinition]) -> list[TestResult]:
+    async def test_model(
+        self, model: str, tasks: list[TaskDefinition]
+    ) -> list[TestResult]:
         """Test a model with all tasks."""
         print(f"\n🧪 Testing model: {model}")
         results = []
@@ -254,7 +291,9 @@ class ModelTestRunner:
 
             # Print result
             status = "✅" if result.success else "❌"
-            print(f"    {status} {task.id}: {result.execution_time:.1f}s, quality: {result.quality_score:.2f}")
+            print(
+                f"    {status} {task.id}: {result.execution_time:.1f}s, quality: {result.quality_score:.2f}"
+            )
             if result.error:
                 print(f"       Error: {result.error[:100]}...")
 
@@ -280,10 +319,22 @@ class ReportGenerator:
             models_metrics[model] = {
                 "total_tasks": len(model_results),
                 "successful_tasks": len(successful),
-                "success_rate": len(successful) / len(model_results) if model_results else 0.0,
-                "avg_execution_time": sum(r.execution_time for r in successful) / len(successful) if successful else 0.0,
-                "avg_quality_score": sum(r.quality_score for r in successful) / len(successful) if successful else 0.0,
-                "rate_limit_hits": sum(1 for r in model_results if r.metadata.get("error_type") == "rate_limit"),
+                "success_rate": len(successful) / len(model_results)
+                if model_results
+                else 0.0,
+                "avg_execution_time": sum(r.execution_time for r in successful)
+                / len(successful)
+                if successful
+                else 0.0,
+                "avg_quality_score": sum(r.quality_score for r in successful)
+                / len(successful)
+                if successful
+                else 0.0,
+                "rate_limit_hits": sum(
+                    1
+                    for r in model_results
+                    if r.metadata.get("error_type") == "rate_limit"
+                ),
                 "error_count": len([r for r in model_results if not r.success]),
             }
 
@@ -292,7 +343,10 @@ class ReportGenerator:
                 "date": datetime.now().isoformat(),
                 "models_tested": len(models_data),
                 "tasks_executed": len(results),
-                "overall_success_rate": sum(1 for r in results if r.success) / len(results) if results else 0.0,
+                "overall_success_rate": sum(1 for r in results if r.success)
+                / len(results)
+                if results
+                else 0.0,
             },
             "models": models_metrics,
             "tasks": [asdict(r) for r in results],
@@ -329,86 +383,116 @@ class ReportGenerator:
 
         for model, metrics in json_data["models"].items():
             success_rate = f"{metrics['success_rate']:.1%}"
-            avg_time = f"{metrics['avg_execution_time']:.1f}" if metrics['avg_execution_time'] > 0 else "-"
-            avg_quality = f"{metrics['avg_quality_score']:.2f}" if metrics['avg_quality_score'] > 0 else "-"
+            avg_time = (
+                f"{metrics['avg_execution_time']:.1f}"
+                if metrics["avg_execution_time"] > 0
+                else "-"
+            )
+            avg_quality = (
+                f"{metrics['avg_quality_score']:.2f}"
+                if metrics["avg_quality_score"] > 0
+                else "-"
+            )
 
             # Determine status
-            if metrics['success_rate'] >= 0.75:
+            if metrics["success_rate"] >= 0.75:
                 status = "✅ Working"
-            elif metrics['rate_limit_hits'] > 0:
+            elif metrics["rate_limit_hits"] > 0:
                 status = "⚠️ Rate Limited"
             else:
                 status = "❌ Not Compatible"
 
-            lines.append(f"| {model} | {success_rate} | {avg_time} | {avg_quality} | {status} |")
+            lines.append(
+                f"| {model} | {success_rate} | {avg_time} | {avg_quality} | {status} |"
+            )
 
-        lines.extend([
-            "",
-            "---",
-            "",
-            "## Detailed Results",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "---",
+                "",
+                "## Detailed Results",
+                "",
+            ]
+        )
 
         # Detailed results per model
         for model, model_results in models_data.items():
             metrics = json_data["models"][model]
 
-            lines.extend([
-                f"### {model}",
-                "",
-                f"**Performance:**",
-                f"- Success Rate: {metrics['success_rate']:.1%} ({metrics['successful_tasks']}/{metrics['total_tasks']} tasks)",
-                f"- Average Execution Time: {metrics['avg_execution_time']:.1f} seconds",
-                f"- Average Quality Score: {metrics['avg_quality_score']:.2f}/1.0",
-                f"- Rate Limit Hits: {metrics['rate_limit_hits']}",
-                f"- Errors: {metrics['error_count']}",
-                "",
-                "**Task Results:**",
-            ])
+            lines.extend(
+                [
+                    f"### {model}",
+                    "",
+                    "**Performance:**",
+                    f"- Success Rate: {metrics['success_rate']:.1%} ({metrics['successful_tasks']}/{metrics['total_tasks']} tasks)",
+                    f"- Average Execution Time: {metrics['avg_execution_time']:.1f} seconds",
+                    f"- Average Quality Score: {metrics['avg_quality_score']:.2f}/1.0",
+                    f"- Rate Limit Hits: {metrics['rate_limit_hits']}",
+                    f"- Errors: {metrics['error_count']}",
+                    "",
+                    "**Task Results:**",
+                ]
+            )
 
             for result in model_results:
                 status = "✅ Success" if result.success else "❌ Failed"
-                lines.append(f"- {result.task_id}: {status} ({result.execution_time:.1f}s, quality: {result.quality_score:.2f})")
+                lines.append(
+                    f"- {result.task_id}: {status} ({result.execution_time:.1f}s, quality: {result.quality_score:.2f})"
+                )
                 if result.error:
                     lines.append(f"  - Error: {result.error[:100]}...")
 
             lines.append("")
 
-        lines.extend([
-            "---",
-            "",
-            "## Recommendations",
-            "",
-        ])
+        lines.extend(
+            [
+                "---",
+                "",
+                "## Recommendations",
+                "",
+            ]
+        )
 
         # Find best model
-        best_model = max(json_data["models"].items(), key=lambda x: x[1]["success_rate"])
+        best_model = max(
+            json_data["models"].items(), key=lambda x: x[1]["success_rate"]
+        )
         if best_model[1]["success_rate"] > 0:
-            lines.extend([
-                f"**Recommended Model:** `{best_model[0]}`",
-                f"- Success Rate: {best_model[1]['success_rate']:.1%}",
-                f"- Average Quality: {best_model[1]['avg_quality_score']:.2f}/1.0",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"**Recommended Model:** `{best_model[0]}`",
+                    f"- Success Rate: {best_model[1]['success_rate']:.1%}",
+                    f"- Average Quality: {best_model[1]['avg_quality_score']:.2f}/1.0",
+                    "",
+                ]
+            )
 
         # List incompatible models
-        incompatible = [m for m, metrics in json_data["models"].items() if metrics["success_rate"] == 0]
+        incompatible = [
+            m
+            for m, metrics in json_data["models"].items()
+            if metrics["success_rate"] == 0
+        ]
         if incompatible:
-            lines.extend([
-                "**Incompatible Models:**",
-            ])
+            lines.extend(
+                [
+                    "**Incompatible Models:**",
+                ]
+            )
             for model in incompatible:
                 lines.append(f"- `{model}` - Not compatible with OpenHands integration")
             lines.append("")
 
-        lines.extend([
-            "---",
-            "",
-            "**Generated by:** OpenHands Model Compatibility Test Suite  ",
-            "**Script:** `scripts/test_model_compatibility.py`  ",
-            "**Design:** `docs/openhands/model-compatibility-test-suite-design.md`",
-        ])
+        lines.extend(
+            [
+                "---",
+                "",
+                "**Generated by:** OpenHands Model Compatibility Test Suite  ",
+                "**Script:** `scripts/test_model_compatibility.py`  ",
+                "**Design:** `docs/openhands/model-compatibility-test-suite-design.md`",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -443,8 +527,8 @@ def main():
 
         models = list(registry.models.keys())
         print(f"⚠️  WARNING: Testing {len(models)} models from registry")
-        print(f"   This may incur significant API costs!")
-        print(f"   Press Ctrl+C within 5 seconds to cancel...")
+        print("   This may incur significant API costs!")
+        print("   Press Ctrl+C within 5 seconds to cancel...")
         try:
             time.sleep(5)
         except KeyboardInterrupt:
@@ -466,7 +550,7 @@ def main():
     else:
         tasks = TASKS
 
-    print(f"🚀 OpenHands Model Compatibility Test Suite")
+    print("🚀 OpenHands Model Compatibility Test Suite")
     print(f"   Models: {len(models)}")
     print(f"   Tasks: {len(tasks)}")
 
@@ -480,7 +564,7 @@ def main():
     asyncio.run(run_tests())
 
     # Generate reports
-    print(f"\n📊 Generating reports...")
+    print("\n📊 Generating reports...")
     generator = ReportGenerator()
 
     # JSON report
@@ -499,12 +583,14 @@ def main():
     print(f"   ✅ Markdown report: {markdown_path}")
 
     # Print summary
-    print(f"\n📈 Summary:")
+    print("\n📈 Summary:")
     print(f"   Models tested: {json_data['test_run']['models_tested']}")
     print(f"   Tasks executed: {json_data['test_run']['tasks_executed']}")
-    print(f"   Overall success rate: {json_data['test_run']['overall_success_rate']:.1%}")
+    print(
+        f"   Overall success rate: {json_data['test_run']['overall_success_rate']:.1%}"
+    )
 
-    print(f"\n📖 View reports:")
+    print("\n📖 View reports:")
     print(f"   - JSON: {json_path}")
     print(f"   - Markdown: {markdown_path}")
 
@@ -513,4 +599,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

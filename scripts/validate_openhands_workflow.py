@@ -27,8 +27,7 @@ else:
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -64,6 +63,7 @@ async def validate_infrastructure():
         from agent_orchestration.openhands_integration.test_generation_service import (
             UnitTestGenerationService,
         )
+
         logger.info("✓ All imports successful")
     except ImportError as e:
         logger.error(f"✗ Import failed: {e}")
@@ -72,19 +72,22 @@ async def validate_infrastructure():
     # 2. Validate free model registry
     logger.info("\n[2/4] Validating free model registry...")
     try:
-        registry_path = Path(__file__).parent.parent / "src/agent_orchestration/openhands_integration/free_models_registry.yaml"
+        registry_path = (
+            Path(__file__).parent.parent
+            / "src/agent_orchestration/openhands_integration/free_models_registry.yaml"
+        )
         if not registry_path.exists():
             logger.error(f"✗ Registry file not found: {registry_path}")
             return False
 
         import yaml
+
         with open(registry_path) as f:
             registry_data = yaml.safe_load(f)
 
         models = registry_data.get("models", {})
         verified_models = [
-            m for m in models.values()
-            if m.get("compatibility_status") == "verified"
+            m for m in models.values() if m.get("compatibility_status") == "verified"
         ]
 
         logger.info(f"✓ Registry loaded: {len(models)} total models")
@@ -101,6 +104,7 @@ async def validate_infrastructure():
         # Check if retry primitives are available
         try:
             from scripts.primitives.error_recovery import RetryConfig, with_retry_async
+
             logger.info("✓ Retry primitives available")
         except ImportError:
             logger.warning("⚠ Retry primitives not available (fallback will be used)")
@@ -151,7 +155,7 @@ async def validate_target_module():
     file_size = target_file.stat().st_size
     line_count = len(target_file.read_text().splitlines())
 
-    logger.info(f"✓ File exists")
+    logger.info("✓ File exists")
     logger.info(f"✓ File size: {file_size:,} bytes")
     logger.info(f"✓ Line count: {line_count} lines")
 
@@ -176,7 +180,11 @@ async def main():
     logger.info("\n")
     logger.info("╔" + "=" * 78 + "╗")
     logger.info("║" + " " * 78 + "║")
-    logger.info("║" + "OpenHands Test Generation Workflow - Infrastructure Validation".center(78) + "║")
+    logger.info(
+        "║"
+        + "OpenHands Test Generation Workflow - Infrastructure Validation".center(78)
+        + "║"
+    )
     logger.info("║" + " " * 78 + "║")
     logger.info("╚" + "=" * 78 + "╝")
 
@@ -194,12 +202,10 @@ async def main():
     if infra_ok and target_ok:
         logger.info("\n✓ All validations passed! Ready for test generation.")
         return 0
-    else:
-        logger.error("\n✗ Some validations failed. Please fix issues before proceeding.")
-        return 1
+    logger.error("\n✗ Some validations failed. Please fix issues before proceeding.")
+    return 1
 
 
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
-

@@ -50,7 +50,9 @@ try:
     )
 except ImportError as e:
     logger.error(f"Failed to import required modules: {e}")
-    logger.error("Make sure you run this script with: uv run python scripts/validate_free_model_test_generation.py")
+    logger.error(
+        "Make sure you run this script with: uv run python scripts/validate_free_model_test_generation.py"
+    )
     sys.exit(1)
 
 # Load environment variables
@@ -66,8 +68,8 @@ async def main():
     logger.info("FREE MODEL TEST GENERATION VALIDATION")
     logger.info("=" * 80)
     logger.info(f"Start Time: {start_time}")
-    logger.info(f"Target File: src/agent_orchestration/tools/response_utils.py")
-    logger.info(f"Model: openrouter/deepseek/deepseek-chat (verified working)")
+    logger.info("Target File: src/agent_orchestration/tools/response_utils.py")
+    logger.info("Model: openrouter/deepseek/deepseek-chat (verified working)")
     logger.info(f"Output File: {output_file}")
     logger.info("=" * 80)
 
@@ -80,7 +82,7 @@ async def main():
         # ENABLE DOCKER MODE for full tool access (file creation, bash, etc.)
         config.use_docker_runtime = True
         config.docker_timeout = 600.0  # Longer timeout for Docker mode
-        logger.info(f"✓ Configuration loaded")
+        logger.info("✓ Configuration loaded")
         logger.info(f"  Model: {config.custom_model_id}")
         logger.info(f"  Workspace: {config.workspace_root}")
         logger.info(f"  Timeout: {config.default_timeout_seconds}s")
@@ -123,8 +125,8 @@ async def main():
     output_lines.append("FREE MODEL TEST GENERATION VALIDATION OUTPUT")
     output_lines.append("=" * 80)
     output_lines.append(f"Timestamp: {datetime.now()}")
-    output_lines.append(f"Model: openrouter/deepseek/deepseek-chat")
-    output_lines.append(f"Target: src/agent_orchestration/tools/response_utils.py")
+    output_lines.append("Model: openrouter/deepseek/deepseek-chat")
+    output_lines.append("Target: src/agent_orchestration/tools/response_utils.py")
     output_lines.append("=" * 80)
     output_lines.append("")
 
@@ -178,7 +180,7 @@ async def main():
     logger.info(f"Execution Time: {duration:.1f}s")
 
     if result:
-        logger.info(f"\n✓ Test generation completed")
+        logger.info("\n✓ Test generation completed")
         logger.info(f"  Syntax Valid: {'✓' if result.syntax_valid else '✗'}")
         logger.info(f"  Tests Pass: {'✓' if result.tests_pass else '✗'}")
         logger.info(f"  Coverage: {result.coverage_percentage:.1f}% (threshold: 70%)")
@@ -189,7 +191,9 @@ async def main():
             for issue in result.issues[:5]:  # Show first 5 issues
                 logger.info(f"    - {issue}")
             if len(result.issues) > 5:
-                logger.info(f"    ... and {len(result.issues) - 5} more (see output file)")
+                logger.info(
+                    f"    ... and {len(result.issues) - 5} more (see output file)"
+                )
 
         # Evaluation guidance
         logger.info("\n" + "=" * 80)
@@ -212,9 +216,13 @@ async def main():
         if result.syntax_valid and result.quality_score >= 70:
             logger.info("\n✓ PRELIMINARY ASSESSMENT: Tests appear high quality")
             logger.info("  Recommendation: Free models are viable for test generation")
-            logger.info("  Action: Fix file creation limitation (runtime configuration)")
+            logger.info(
+                "  Action: Fix file creation limitation (runtime configuration)"
+            )
         elif result.syntax_valid and result.quality_score >= 50:
-            logger.info("\n⚠ PRELIMINARY ASSESSMENT: Tests are acceptable but not great")
+            logger.info(
+                "\n⚠ PRELIMINARY ASSESSMENT: Tests are acceptable but not great"
+            )
             logger.info("  Recommendation: Consider hybrid approach")
             logger.info("  Action: Use free models for simple tasks, paid for complex")
         else:
@@ -223,12 +231,12 @@ async def main():
             logger.info("  Action: Consider paid models or redesign integration")
 
     else:
-        logger.error(f"\n✗ Test generation failed")
+        logger.error("\n✗ Test generation failed")
         logger.error(f"  Error: {error_message}")
-        logger.error(f"\n  Diagnosis needed:")
-        logger.error(f"    - Check if error is due to file creation limitation")
-        logger.error(f"    - Check if error is due to model capability")
-        logger.error(f"    - Check if error is due to integration problem")
+        logger.error("\n  Diagnosis needed:")
+        logger.error("    - Check if error is due to file creation limitation")
+        logger.error("    - Check if error is due to model capability")
+        logger.error("    - Check if error is due to integration problem")
         logger.error(f"    - Review full traceback in {output_file}")
 
     logger.info("\n" + "=" * 80)
@@ -246,4 +254,3 @@ if __name__ == "__main__":
         logger.error(f"\n\nUnexpected error: {e}")
         logger.error(traceback.format_exc())
         sys.exit(1)
-

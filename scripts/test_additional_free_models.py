@@ -103,7 +103,12 @@ def assess_quality(content: str) -> int:
 async def test_model(model: str, task_key: str, task_data: dict) -> dict:
     """Test a single model with a task."""
     if not API_KEY:
-        return {"success": False, "error": "API key not set", "model": model, "task": task_key}
+        return {
+            "success": False,
+            "error": "API key not set",
+            "model": model,
+            "task": task_key,
+        }
 
     start_time = time.time()
 
@@ -119,7 +124,10 @@ async def test_model(model: str, task_key: str, task_data: dict) -> dict:
                 json={
                     "model": model,
                     "messages": [
-                        {"role": "system", "content": "You are a helpful coding assistant."},
+                        {
+                            "role": "system",
+                            "content": "You are a helpful coding assistant.",
+                        },
                         {"role": "user", "content": task_data["prompt"]},
                     ],
                     "temperature": 0.7,
@@ -227,7 +235,9 @@ async def main():
     print("PHASE 2 EXPANSION RESULTS SUMMARY")
     print("=" * 80)
     print(f"Total Tests: {test_count}")
-    print(f"Successful: {success_count}/{test_count} ({100*success_count/test_count:.1f}%)")
+    print(
+        f"Successful: {success_count}/{test_count} ({100 * success_count / test_count:.1f}%)"
+    )
     print(f"Failed: {test_count - success_count}")
 
     # Per-model summary
@@ -236,7 +246,12 @@ async def main():
     for result in results:
         model = result["model"]
         if model not in model_stats:
-            model_stats[model] = {"success": 0, "total": 0, "times": [], "qualities": []}
+            model_stats[model] = {
+                "success": 0,
+                "total": 0,
+                "times": [],
+                "qualities": [],
+            }
         model_stats[model]["total"] += 1
         if result["success"]:
             model_stats[model]["success"] += 1
@@ -246,7 +261,11 @@ async def main():
     for model, stats in model_stats.items():
         success_rate = 100 * stats["success"] / stats["total"]
         avg_time = sum(stats["times"]) / len(stats["times"]) if stats["times"] else 0
-        avg_quality = sum(stats["qualities"]) / len(stats["qualities"]) if stats["qualities"] else 0
+        avg_quality = (
+            sum(stats["qualities"]) / len(stats["qualities"])
+            if stats["qualities"]
+            else 0
+        )
         status = "✅" if success_rate == 100 else "⚠️" if success_rate >= 66 else "❌"
         print(
             f"  {status} {model:50} | "
@@ -269,8 +288,12 @@ async def main():
                 "model_stats": {
                     model: {
                         "success_rate": stats["success"] / stats["total"],
-                        "avg_time": sum(stats["times"]) / len(stats["times"]) if stats["times"] else 0,
-                        "avg_quality": sum(stats["qualities"]) / len(stats["qualities"]) if stats["qualities"] else 0,
+                        "avg_time": sum(stats["times"]) / len(stats["times"])
+                        if stats["times"]
+                        else 0,
+                        "avg_quality": sum(stats["qualities"]) / len(stats["qualities"])
+                        if stats["qualities"]
+                        else 0,
                     }
                     for model, stats in model_stats.items()
                 },
@@ -285,4 +308,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

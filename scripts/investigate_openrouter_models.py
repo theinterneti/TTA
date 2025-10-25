@@ -79,7 +79,7 @@ def analyze_models(models):
     """Analyze available models and categorize them."""
     if not models:
         print("❌ No models returned")
-        return
+        return None
 
     print("\n" + "=" * 100)
     print("OPENROUTER AVAILABLE MODELS ANALYSIS")
@@ -115,14 +115,14 @@ def analyze_models(models):
             paid_models.append(model_id)
             model_families[family]["paid"].append(model_id)
 
-    print(f"\n📊 SUMMARY")
+    print("\n📊 SUMMARY")
     print(f"Total Models: {len(models)}")
     print(f"Free Models: {len(free_models)}")
     print(f"Paid Models: {len(paid_models)}")
     print(f"Model Families: {len(model_families)}")
 
     # Show free models by family
-    print(f"\n🆓 FREE MODELS BY FAMILY")
+    print("\n🆓 FREE MODELS BY FAMILY")
     print("=" * 100)
     for family in sorted(model_families.keys()):
         free_count = len(model_families[family]["free"])
@@ -133,7 +133,7 @@ def analyze_models(models):
                 print(f"  ✅ {model_id}")
 
     # Check which attempted models are available
-    print(f"\n🔍 ATTEMPTED MODELS STATUS")
+    print("\n🔍 ATTEMPTED MODELS STATUS")
     print("=" * 100)
     available_attempted = []
     unavailable_attempted = []
@@ -161,7 +161,7 @@ def analyze_models(models):
         print(f"  {attempted}")
 
     # Look for similar models
-    print(f"\n🔎 SIMILAR MODELS FOUND")
+    print("\n🔎 SIMILAR MODELS FOUND")
     print("=" * 100)
     for attempted in unavailable_attempted:
         attempted_base = attempted.replace(":free", "").lower()
@@ -232,4 +232,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

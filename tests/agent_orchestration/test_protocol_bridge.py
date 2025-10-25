@@ -9,9 +9,8 @@ Tests cover:
 """
 
 import sys
-from dataclasses import dataclass
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -298,4 +297,3 @@ class TestProtocolBridgeIntegration:
 
         assert len(results) == 3
         assert all(isinstance(r, MessageResult) for r in results)
-

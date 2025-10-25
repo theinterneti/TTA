@@ -24,9 +24,7 @@ class ValidationFinding:
     validation_type: ValidationType = ValidationType.KEYWORD
     confidence: float = 1.0  # 0.0 to 1.0
     crisis_type: str | None = None  # Will be CrisisType from crisis_detection
-    therapeutic_context: str | None = (
-        None  # Will be TherapeuticContext from therapeutic_scoring
-    )
+    therapeutic_context: str | None = None  # Will be TherapeuticContext from therapeutic_scoring
     sentiment_score: float | None = None  # -1.0 to 1.0
     escalation_required: bool = False
     alternative_suggested: str | None = None

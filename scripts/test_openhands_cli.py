@@ -11,11 +11,9 @@ Usage:
 """
 
 import asyncio
-import json
 import logging
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -35,23 +33,23 @@ project_root = Path(__file__).parent.parent
 def check_openhands_cli():
     """Check if OpenHands CLI is available."""
     logger.info("Checking for OpenHands CLI...")
-    
+
     try:
         result = subprocess.run(
             ["python", "-m", "openhands.core.main", "--help"],
+            check=False,
             capture_output=True,
             text=True,
             timeout=5,
         )
-        
+
         if result.returncode == 0:
             logger.info("✅ OpenHands CLI is available")
             return True
-        else:
-            logger.warning("⚠️  OpenHands CLI returned non-zero exit code")
-            logger.warning(f"   stderr: {result.stderr}")
-            return False
-            
+        logger.warning("⚠️  OpenHands CLI returned non-zero exit code")
+        logger.warning(f"   stderr: {result.stderr}")
+        return False
+
     except FileNotFoundError:
         logger.error("❌ OpenHands CLI not found")
         logger.error("   Install with: pip install openhands")
@@ -69,14 +67,14 @@ async def test_cli_simple_task():
     logger.info("\n" + "=" * 80)
     logger.info("TEST 1: Simple Task via CLI")
     logger.info("=" * 80)
-    
+
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         logger.error("❌ OPENROUTER_API_KEY not set")
         return False
-    
+
     task = "Write a Python function that returns 'Hello, World!'"
-    
+
     try:
         # Set environment variables for OpenHands
         env = os.environ.copy()
@@ -84,10 +82,10 @@ async def test_cli_simple_task():
         env["LLM_API_KEY"] = api_key
         env["LLM_BASE_URL"] = "https://openrouter.ai/api/v1"
         env["SANDBOX_VOLUMES"] = f"{project_root}:/workspace:rw"
-        
+
         logger.info(f"Task: {task}")
         logger.info("Running OpenHands CLI...")
-        
+
         result = subprocess.run(
             [
                 "python",
@@ -100,31 +98,32 @@ async def test_cli_simple_task():
                 "-i",
                 "5",  # Max iterations
             ],
+            check=False,
             capture_output=True,
             text=True,
             timeout=300,
             env=env,
             cwd=str(project_root),
         )
-        
+
         logger.info(f"Exit code: {result.returncode}")
-        
+
         if result.returncode == 0:
             logger.info("✅ Task completed successfully")
             logger.info(f"Output:\n{result.stdout}")
             return True
-        else:
-            logger.warning("⚠️  Task completed with non-zero exit code")
-            logger.info(f"stdout:\n{result.stdout}")
-            logger.info(f"stderr:\n{result.stderr}")
-            return False
-            
+        logger.warning("⚠️  Task completed with non-zero exit code")
+        logger.info(f"stdout:\n{result.stdout}")
+        logger.info(f"stderr:\n{result.stderr}")
+        return False
+
     except subprocess.TimeoutExpired:
         logger.error("❌ Task execution timed out (300s)")
         return False
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -134,24 +133,26 @@ async def test_cli_file_creation():
     logger.info("\n" + "=" * 80)
     logger.info("TEST 2: File Creation via CLI")
     logger.info("=" * 80)
-    
+
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         logger.error("❌ OPENROUTER_API_KEY not set")
         return False
-    
-    task = "Create a file named 'test_output.txt' with content 'Hello from OpenHands CLI'"
-    
+
+    task = (
+        "Create a file named 'test_output.txt' with content 'Hello from OpenHands CLI'"
+    )
+
     try:
         env = os.environ.copy()
         env["LLM_MODEL"] = "openrouter/deepseek/deepseek-chat"
         env["LLM_API_KEY"] = api_key
         env["LLM_BASE_URL"] = "https://openrouter.ai/api/v1"
         env["SANDBOX_VOLUMES"] = f"{project_root}:/workspace:rw"
-        
+
         logger.info(f"Task: {task}")
         logger.info("Running OpenHands CLI...")
-        
+
         result = subprocess.run(
             [
                 "python",
@@ -164,15 +165,16 @@ async def test_cli_file_creation():
                 "-i",
                 "5",
             ],
+            check=False,
             capture_output=True,
             text=True,
             timeout=300,
             env=env,
             cwd=str(project_root),
         )
-        
+
         logger.info(f"Exit code: {result.returncode}")
-        
+
         # Check if file was created
         test_file = project_root / "test_output.txt"
         if test_file.exists():
@@ -182,18 +184,18 @@ async def test_cli_file_creation():
             logger.info(f"Content: {content}")
             test_file.unlink()  # Clean up
             return True
-        else:
-            logger.warning("⚠️  File was not created")
-            logger.info(f"stdout:\n{result.stdout}")
-            logger.info(f"stderr:\n{result.stderr}")
-            return False
-            
+        logger.warning("⚠️  File was not created")
+        logger.info(f"stdout:\n{result.stdout}")
+        logger.info(f"stderr:\n{result.stderr}")
+        return False
+
     except subprocess.TimeoutExpired:
         logger.error("❌ Task execution timed out (300s)")
         return False
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -203,18 +205,18 @@ async def main():
     logger.info("\n╔" + "=" * 78 + "╗")
     logger.info("║" + " " * 20 + "OpenHands CLI Testing" + " " * 38 + "║")
     logger.info("╚" + "=" * 78 + "╝\n")
-    
+
     # Check if CLI is available
     if not check_openhands_cli():
         logger.error("\n❌ OpenHands CLI not available")
         logger.error("Install with: pip install openhands")
         return
-    
+
     # Run tests
     results = {}
     results["simple"] = await test_cli_simple_task()
     results["file_creation"] = await test_cli_file_creation()
-    
+
     # Summary
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY")
@@ -222,7 +224,7 @@ async def main():
     for test_name, result in results.items():
         status = "✅ PASS" if result else "❌ FAIL"
         logger.info(f"  {test_name}: {status}")
-    
+
     logger.info("\n" + "=" * 80)
     logger.info("Key Findings:")
     logger.info("=" * 80)
@@ -235,4 +237,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

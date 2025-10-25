@@ -63,17 +63,13 @@ class CrisisInterventionManager:
         protective_factors = self._identify_protective_factors(session_context)
 
         # Determine intervention type
-        intervention_type = self._determine_intervention_type(
-            crisis_level, validation_result
-        )
+        intervention_type = self._determine_intervention_type(crisis_level, validation_result)
 
         # Check for immediate risk
         immediate_risk = self._assess_immediate_risk(validation_result, crisis_level)
 
         # Calculate overall confidence
-        confidence = self._calculate_crisis_confidence(
-            validation_result, session_context
-        )
+        confidence = self._calculate_crisis_confidence(validation_result, session_context)
 
         # Convert crisis_types from strings to CrisisType enums
         crisis_types_enums = []
@@ -92,8 +88,7 @@ class CrisisInterventionManager:
             protective_factors=protective_factors,
             immediate_risk=immediate_risk,
             intervention_recommended=intervention_type,
-            escalation_required=validation_result.escalation_recommended
-            or immediate_risk,
+            escalation_required=validation_result.escalation_recommended or immediate_risk,
             assessment_timestamp=time.time(),
             context=session_context,
         )
@@ -134,9 +129,7 @@ class CrisisInterventionManager:
             # This would be injected in a real implementation
             # For now, we'll add a simple alert mechanism
             alert_severity = (
-                "critical"
-                if assessment.crisis_level == CrisisLevel.CRITICAL
-                else "high"
+                "critical" if assessment.crisis_level == CrisisLevel.CRITICAL else "high"
             )
             self.logger.warning(
                 f"CRISIS ALERT: {alert_severity.upper()} intervention {intervention_id} "
@@ -157,26 +150,17 @@ class CrisisInterventionManager:
         # Check for critical indicators - more specific criteria
         if any(ct in high_risk_types for ct in validation_result.crisis_types):
             # Critical: Very low safety score AND escalation recommended
-            if (
-                validation_result.score < 0.15
-                and validation_result.escalation_recommended
-            ):
+            if validation_result.score < 0.15 and validation_result.escalation_recommended:
                 return CrisisLevel.CRITICAL
             # High: Low safety score OR escalation recommended
-            if (
-                validation_result.score < 0.25
-                or validation_result.escalation_recommended
-            ):
+            if validation_result.score < 0.25 or validation_result.escalation_recommended:
                 return CrisisLevel.HIGH
             # Moderate: Crisis detected but not severe
             return CrisisLevel.MODERATE
 
         # Severe depression with high confidence
         if CrisisType.SEVERE_DEPRESSION in validation_result.crisis_types:
-            if (
-                validation_result.score < 0.2
-                and validation_result.escalation_recommended
-            ):
+            if validation_result.score < 0.2 and validation_result.escalation_recommended:
                 return CrisisLevel.HIGH
             return CrisisLevel.MODERATE
 
@@ -204,20 +188,13 @@ class CrisisInterventionManager:
             risk_factors.extend(["suicidal_ideation", "death_wish", "hopelessness"])
 
         if CrisisType.SELF_HARM in validation_result.crisis_types:
-            risk_factors.extend(
-                ["self_harm_behavior", "self_punishment", "coping_mechanism"]
-            )
+            risk_factors.extend(["self_harm_behavior", "self_punishment", "coping_mechanism"])
 
         if CrisisType.SEVERE_DEPRESSION in validation_result.crisis_types:
-            risk_factors.extend(
-                ["severe_depression", "worthlessness", "emotional_numbness"]
-            )
+            risk_factors.extend(["severe_depression", "worthlessness", "emotional_numbness"])
 
         # Sentiment-based risk factors
-        if (
-            validation_result.overall_sentiment
-            and validation_result.overall_sentiment < -0.7
-        ):
+        if validation_result.overall_sentiment and validation_result.overall_sentiment < -0.7:
             risk_factors.append("severe_negative_sentiment")
 
         # Context-based risk factors
@@ -291,17 +268,14 @@ class CrisisInterventionManager:
 
         # Base confidence from validation findings
         if validation_result.findings:
-            base_confidence = sum(
-                f.confidence for f in validation_result.findings
-            ) / len(validation_result.findings)
+            base_confidence = sum(f.confidence for f in validation_result.findings) / len(
+                validation_result.findings
+            )
         else:
             base_confidence = 0.5
 
         # Adjust based on sentiment
-        if (
-            validation_result.overall_sentiment
-            and validation_result.overall_sentiment < -0.5
-        ):
+        if validation_result.overall_sentiment and validation_result.overall_sentiment < -0.5:
             base_confidence += 0.1
 
         # Adjust based on therapeutic appropriateness
@@ -320,9 +294,7 @@ class CrisisInterventionManager:
 
         try:
             # Generate appropriate response based on crisis type
-            response_message = self._generate_crisis_response(
-                intervention.crisis_assessment
-            )
+            response_message = self._generate_crisis_response(intervention.crisis_assessment)
 
             # Record the action
             action = InterventionAction(
@@ -394,9 +366,7 @@ class CrisisInterventionManager:
             response_time_ms=(time.perf_counter() - start_time) * 1000,
             metadata={
                 "crisis_level": intervention.crisis_assessment.crisis_level.value,
-                "crisis_types": [
-                    ct.value for ct in intervention.crisis_assessment.crisis_types
-                ],
+                "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
                 "user_id": intervention.user_id,
                 "session_id": intervention.session_id,
             },
@@ -426,9 +396,7 @@ class CrisisInterventionManager:
             response_time_ms=(time.perf_counter() - start_time) * 1000,
             metadata={
                 "crisis_level": intervention.crisis_assessment.crisis_level.value,
-                "crisis_types": [
-                    ct.value for ct in intervention.crisis_assessment.crisis_types
-                ],
+                "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
                 "risk_factors": intervention.crisis_assessment.risk_factors,
                 "protective_factors": intervention.crisis_assessment.protective_factors,
             },
@@ -538,15 +506,11 @@ class CrisisInterventionManager:
             },
         }
 
-    def get_intervention_status(
-        self, intervention_id: str
-    ) -> CrisisIntervention | None:
+    def get_intervention_status(self, intervention_id: str) -> CrisisIntervention | None:
         """Get the status of a specific intervention."""
         return self.active_interventions.get(intervention_id)
 
-    def resolve_intervention(
-        self, intervention_id: str, resolution_notes: str = ""
-    ) -> bool:
+    def resolve_intervention(self, intervention_id: str, resolution_notes: str = "") -> bool:
         """Mark an intervention as resolved."""
         if intervention_id not in self.active_interventions:
             return False
@@ -573,17 +537,13 @@ class CrisisInterventionManager:
 
         # Crisis level distribution
         crisis_levels = {}
-        for intervention in (
-            list(self.active_interventions.values()) + self.intervention_history
-        ):
+        for intervention in list(self.active_interventions.values()) + self.intervention_history:
             level = intervention.crisis_assessment.crisis_level.value
             crisis_levels[level] = crisis_levels.get(level, 0) + 1
 
         # Crisis type distribution
         crisis_types = {}
-        for intervention in (
-            list(self.active_interventions.values()) + self.intervention_history
-        ):
+        for intervention in list(self.active_interventions.values()) + self.intervention_history:
             for crisis_type in intervention.crisis_assessment.crisis_types:
                 type_name = crisis_type.value
                 crisis_types[type_name] = crisis_types.get(type_name, 0) + 1
@@ -602,9 +562,7 @@ class CrisisInterventionManager:
 
     def _calculate_average_response_time(self) -> float:
         """Calculate average response time for interventions."""
-        all_interventions = (
-            list(self.active_interventions.values()) + self.intervention_history
-        )
+        all_interventions = list(self.active_interventions.values()) + self.intervention_history
 
         if not all_interventions:
             return 0.0

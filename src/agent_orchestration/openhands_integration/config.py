@@ -83,9 +83,7 @@ class ModelRegistry(BaseModel):
     version: str = Field(description="Registry schema version")
     last_updated: str = Field(description="Last update date (ISO format)")
     description: str = Field(description="Registry description")
-    models: dict[str, ModelRegistryEntry] = Field(
-        description="Model entries by ID"
-    )
+    models: dict[str, ModelRegistryEntry] = Field(description="Model entries by ID")
 
 
 # ============================================================================
@@ -220,7 +218,7 @@ def filter_models(
         >>> # Get only verified high-quality models
         >>> models = filter_models(
         ...     compatibility_statuses=[CompatibilityStatus.VERIFIED],
-        ...     quality_tiers=[QualityTier.HIGH]
+        ...     quality_tiers=[QualityTier.HIGH],
         ... )
     """
     # Get registry (use provided or load singleton)
@@ -276,9 +274,7 @@ def filter_models(
 
         filtered.append(model)
 
-    logger.info(
-        f"Filtered {len(filtered)} models from {len(registry.models)} total"
-    )
+    logger.info(f"Filtered {len(filtered)} models from {len(registry.models)} total")
     return filtered
 
 
@@ -323,9 +319,7 @@ def prioritize_models(models: list[ModelRegistryEntry]) -> list[str]:
     # Calculate provider diversity bonus
     provider_counts: dict[str, int] = {}
     for model in models:
-        provider_counts[model.provider] = (
-            provider_counts.get(model.provider, 0) + 1
-        )
+        provider_counts[model.provider] = provider_counts.get(model.provider, 0) + 1
 
     # Score each model
     scored_models = []
@@ -379,8 +373,7 @@ def get_fallback_model_chain(
     Example:
         >>> # Get top 5 verified models
         >>> chain = get_fallback_model_chain(
-        ...     compatibility_statuses=[CompatibilityStatus.VERIFIED],
-        ...     max_models=5
+        ...     compatibility_statuses=[CompatibilityStatus.VERIFIED], max_models=5
         ... )
         >>> # Returns: ['openrouter/deepseek/deepseek-chat', ...]
     """
@@ -505,9 +498,7 @@ class OpenHandsConfig(BaseModel):
         default_factory=lambda: Path.cwd(),
         description="Workspace directory for OpenHands execution",
     )
-    cli_mode: bool = Field(
-        default=True, description="Enable CLI mode for agent"
-    )
+    cli_mode: bool = Field(default=True, description="Enable CLI mode for agent")
     usage_id: str = Field(
         default="tta-openhands", description="Usage identifier for tracking"
     )
@@ -543,7 +534,9 @@ class OpenHandsIntegrationConfig(BaseModel):
     # Model Selection
     model_preset: Literal[
         "deepseek-v3", "mistral-small", "gemini-flash", "llama-scout", "deepseek-r1"
-    ] = Field(default="gemini-flash", description="Model preset to use (free models only)")
+    ] = Field(
+        default="gemini-flash", description="Model preset to use (free models only)"
+    )
     custom_model_id: str | None = Field(
         default=None, description="Custom model ID (overrides preset)"
     )
@@ -646,9 +639,7 @@ class OpenHandsIntegrationConfig(BaseModel):
             registry = get_model_registry()
             if registry and self.custom_model_id in registry.models:
                 entry = registry.models[self.custom_model_id]
-                logger.info(
-                    f"Found custom model in registry: {entry.display_name}"
-                )
+                logger.info(f"Found custom model in registry: {entry.display_name}")
                 return OpenHandsModelConfig(
                     model_id=entry.model_id,
                     display_name=entry.display_name,
@@ -671,9 +662,7 @@ class OpenHandsIntegrationConfig(BaseModel):
 
         # Resolve preset to model ID
         model_id = get_model_by_preset(self.model_preset)
-        logger.info(
-            f"Resolved preset '{self.model_preset}' to model ID: {model_id}"
-        )
+        logger.info(f"Resolved preset '{self.model_preset}' to model ID: {model_id}")
 
         # Try to get from registry
         registry = get_model_registry()
@@ -685,14 +674,11 @@ class OpenHandsIntegrationConfig(BaseModel):
                 display_name=entry.display_name,
                 context_tokens=entry.context_window,
                 is_free=True,
-                recommended=entry.compatibility_status
-                == CompatibilityStatus.VERIFIED,
+                recommended=entry.compatibility_status == CompatibilityStatus.VERIFIED,
             )
 
         # Fallback to FREE_MODELS
-        logger.warning(
-            f"Model {model_id} not in registry, using FREE_MODELS fallback"
-        )
+        logger.warning(f"Model {model_id} not in registry, using FREE_MODELS fallback")
         return FREE_MODELS[self.model_preset]
 
     def to_client_config(self) -> OpenHandsConfig:
@@ -763,9 +749,7 @@ class OpenHandsIntegrationConfig(BaseModel):
 
         return cls(
             api_key=SecretStr(api_key),
-            base_url=os.getenv(
-                "OPENHANDS_BASE_URL", "https://openrouter.ai/api/v1"
-            ),
+            base_url=os.getenv("OPENHANDS_BASE_URL", "https://openrouter.ai/api/v1"),
             model_preset=os.getenv("OPENHANDS_MODEL", "gemini-flash"),
             workspace_root=Path(
                 os.getenv("OPENHANDS_WORKSPACE_ROOT", "./openhands_workspace")
@@ -775,9 +759,7 @@ class OpenHandsIntegrationConfig(BaseModel):
                 "OPENHANDS_ENABLE_CIRCUIT_BREAKER", "true"
             ).lower()
             == "true",
-            enable_real_agent=os.getenv(
-                "OPENHANDS_ENABLE_REAL_AGENT", "true"
-            ).lower()
+            enable_real_agent=os.getenv("OPENHANDS_ENABLE_REAL_AGENT", "true").lower()
             == "true",
             # Docker runtime configuration
             use_docker_runtime=os.getenv(
@@ -794,4 +776,3 @@ class OpenHandsIntegrationConfig(BaseModel):
             ),
             docker_timeout=float(os.getenv("OPENHANDS_DOCKER_TIMEOUT", "600.0")),
         )
-

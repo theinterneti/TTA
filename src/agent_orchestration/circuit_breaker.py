@@ -379,6 +379,7 @@ class CircuitBreaker:
             CircuitBreakerOpenError: When circuit breaker is open
             Exception: Any exception raised by the function
         """
+
         # Create a wrapper function that calls func with the provided arguments
         async def wrapper():
             return await func(*args, **kwargs)

@@ -1,7 +1,7 @@
 # OpenHands Decision Guide & Usage Recommendations
 
-**Date:** 2025-10-25  
-**Purpose:** Quick reference for choosing optimal OpenHands configuration  
+**Date:** 2025-10-25
+**Purpose:** Quick reference for choosing optimal OpenHands configuration
 **Audience:** TTA developers and integrators
 
 ---
@@ -328,7 +328,7 @@ def call_with_retry(model, task, max_retries=3):
             wait_time = 2 ** attempt
             print(f"Rate limited. Waiting {wait_time}s...")
             time.sleep(wait_time)
-    
+
     # Fallback to different model
     return call_api("meta-llama/llama-3.3-70b-instruct", task)
 ```
@@ -422,14 +422,14 @@ async def generate_with_fallback(task: str) -> str:
         "meta-llama/llama-3.3-70b-instruct",
         "deepseek/deepseek-chat",
     ]
-    
+
     for model in models:
         try:
             return await generate_code_with_model(model, task)
         except Exception as e:
             print(f"Model {model} failed: {e}")
             continue
-    
+
     raise Exception("All models failed")
 ```
 
@@ -437,24 +437,23 @@ async def generate_with_fallback(task: str) -> str:
 
 ## FAQ
 
-**Q: Which model should I use?**  
+**Q: Which model should I use?**
 A: Start with Mistral Small for speed, switch to DeepSeek Chat if quality is insufficient.
 
-**Q: How much does it cost?**  
+**Q: How much does it cost?**
 A: All tested models are free on OpenRouter. Cost is $0.
 
-**Q: Can I use these models for production?**  
+**Q: Can I use these models for production?**
 A: Yes, all models are production-ready. Implement error handling and fallbacks.
 
-**Q: What if a model is rate limited?**  
+**Q: What if a model is rate limited?**
 A: Implement model rotation and exponential backoff (see Troubleshooting).
 
-**Q: Should I use CLI or Docker mode?**  
+**Q: Should I use CLI or Docker mode?**
 A: Use CLI mode for simplicity. Use Docker only if isolation is needed.
 
 ---
 
-**Status:** Complete  
-**Last Updated:** 2025-10-25  
+**Status:** Complete
+**Last Updated:** 2025-10-25
 **Related:** openhands-capability-matrix.md
-

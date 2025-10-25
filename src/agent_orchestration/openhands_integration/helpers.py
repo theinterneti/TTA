@@ -23,7 +23,6 @@ Example:
 
 import logging
 from pathlib import Path
-from typing import Any
 
 from .config import OpenHandsIntegrationConfig
 from .test_generation_models import TestTaskSpecification, TestValidationResult
@@ -35,7 +34,9 @@ try:
     from pathlib import Path as PathLib
 
     # Add scripts/observability to path if not already there
-    observability_path = PathLib(__file__).resolve().parents[3] / "scripts" / "observability"
+    observability_path = (
+        PathLib(__file__).resolve().parents[3] / "scripts" / "observability"
+    )
     if str(observability_path) not in sys.path:
         sys.path.insert(0, str(observability_path))
 
@@ -44,7 +45,9 @@ try:
     _OBSERVABILITY_AVAILABLE = True
 except ImportError:
     _OBSERVABILITY_AVAILABLE = False
-    logging.warning("Development observability not available, metrics tracking disabled")
+    logging.warning(
+        "Development observability not available, metrics tracking disabled"
+    )
 
 
 # Create async-compatible track_execution decorator
@@ -54,6 +57,7 @@ def track_execution_async(name: str, metadata: dict | None = None):
 
     Supports both sync and async functions.
     """
+
     def decorator(func):
         import functools
         import inspect
@@ -75,21 +79,23 @@ def track_execution_async(name: str, metadata: dict | None = None):
                 except Exception as e:
                     collector.end_execution(exec_id, status="failed", error=str(e))
                     raise
+
             return async_wrapper
-        else:
-            # Sync function
-            @functools.wraps(func)
-            def sync_wrapper(*args, **kwargs):
-                collector = get_collector()
-                exec_id = collector.start_execution(name, metadata)
-                try:
-                    result = func(*args, **kwargs)
-                    collector.end_execution(exec_id, status="success")
-                    return result
-                except Exception as e:
-                    collector.end_execution(exec_id, status="failed", error=str(e))
-                    raise
-            return sync_wrapper
+
+        # Sync function
+        @functools.wraps(func)
+        def sync_wrapper(*args, **kwargs):
+            collector = get_collector()
+            exec_id = collector.start_execution(name, metadata)
+            try:
+                result = func(*args, **kwargs)
+                collector.end_execution(exec_id, status="success")
+                return result
+            except Exception as e:
+                collector.end_execution(exec_id, status="failed", error=str(e))
+                raise
+
+        return sync_wrapper
 
     return decorator
 
@@ -102,7 +108,7 @@ logger = logging.getLogger(__name__)
     metadata={
         "type": "test_generation",
         "scope": "file",
-    }
+    },
 )
 async def generate_tests_for_file(
     file_path: str | Path,
@@ -180,20 +186,21 @@ async def generate_tests_for_file(
                 collector = get_collector()
                 # Get the most recent metric for this operation
                 recent_metrics = collector.get_recent_metrics(
-                    name="openhands_generate_tests_file",
-                    limit=1
+                    name="openhands_generate_tests_file", limit=1
                 )
                 if recent_metrics:
                     # Update the metric with additional metadata
                     metric = recent_metrics[0]
-                    metric["metadata"].update({
-                        "target_file": str(file_path),
-                        "coverage_threshold": coverage_threshold,
-                        "coverage_achieved": result.coverage_percentage,
-                        "syntax_valid": result.syntax_valid,
-                        "tests_pass": result.tests_pass,
-                        "max_iterations": max_iterations,
-                    })
+                    metric["metadata"].update(
+                        {
+                            "target_file": str(file_path),
+                            "coverage_threshold": coverage_threshold,
+                            "coverage_achieved": result.coverage_percentage,
+                            "syntax_valid": result.syntax_valid,
+                            "tests_pass": result.tests_pass,
+                            "max_iterations": max_iterations,
+                        }
+                    )
             except Exception as e:
                 logger.warning(f"Failed to update observability metrics: {e}")
 
@@ -208,7 +215,7 @@ async def generate_tests_for_file(
     metadata={
         "type": "test_generation",
         "scope": "package",
-    }
+    },
 )
 async def generate_tests_for_package(
     package_path: str | Path,
@@ -299,24 +306,31 @@ async def generate_tests_for_package(
             collector = get_collector()
             # Get the most recent metric for this operation
             recent_metrics = collector.get_recent_metrics(
-                name="openhands_generate_tests_package",
-                limit=1
+                name="openhands_generate_tests_package", limit=1
             )
             if recent_metrics:
                 # Calculate average coverage
-                avg_coverage = sum(r.coverage_percentage for r in results.values()) / len(results) if results else 0.0
+                avg_coverage = (
+                    sum(r.coverage_percentage for r in results.values()) / len(results)
+                    if results
+                    else 0.0
+                )
 
                 # Update the metric with additional metadata
                 metric = recent_metrics[0]
-                metric["metadata"].update({
-                    "package_path": str(package_path),
-                    "coverage_threshold": coverage_threshold,
-                    "total_files": len(python_files),
-                    "successful_files": successful,
-                    "failed_files": len(python_files) - successful,
-                    "success_rate": successful / len(python_files) if python_files else 0.0,
-                    "avg_coverage": avg_coverage,
-                })
+                metric["metadata"].update(
+                    {
+                        "package_path": str(package_path),
+                        "coverage_threshold": coverage_threshold,
+                        "total_files": len(python_files),
+                        "successful_files": successful,
+                        "failed_files": len(python_files) - successful,
+                        "success_rate": successful / len(python_files)
+                        if python_files
+                        else 0.0,
+                        "avg_coverage": avg_coverage,
+                    }
+                )
         except Exception as e:
             logger.warning(f"Failed to update observability metrics: {e}")
 
@@ -328,7 +342,7 @@ async def generate_tests_for_package(
     metadata={
         "type": "validation",
         "scope": "result",
-    }
+    },
 )
 def validate_test_result(
     result: TestValidationResult,
@@ -399,21 +413,22 @@ def validate_test_result(
             collector = get_collector()
             # Get the most recent metric for this operation
             recent_metrics = collector.get_recent_metrics(
-                name="openhands_validate_test_result",
-                limit=1
+                name="openhands_validate_test_result", limit=1
             )
             if recent_metrics:
                 # Update the metric with additional metadata
                 metric = recent_metrics[0]
-                metric["metadata"].update({
-                    "coverage_threshold": coverage_threshold,
-                    "coverage_achieved": result.coverage_percentage,
-                    "validation_success": success,
-                    "issue_count": len(issues),
-                    "syntax_valid": result.syntax_valid,
-                    "tests_pass": result.tests_pass,
-                    "quality_score": result.quality_score,
-                })
+                metric["metadata"].update(
+                    {
+                        "coverage_threshold": coverage_threshold,
+                        "coverage_achieved": result.coverage_percentage,
+                        "validation_success": success,
+                        "issue_count": len(issues),
+                        "syntax_valid": result.syntax_valid,
+                        "tests_pass": result.tests_pass,
+                        "quality_score": result.quality_score,
+                    }
+                )
         except Exception as e:
             logger.warning(f"Failed to update observability metrics: {e}")
 
@@ -425,4 +440,3 @@ __all__ = [
     "generate_tests_for_package",
     "validate_test_result",
 ]
-

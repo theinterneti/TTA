@@ -11,7 +11,9 @@ Usage:
 ------
 
 ```python
-from src.agent_orchestration.openhands_integration.model_rotation import ModelRotationManager
+from src.agent_orchestration.openhands_integration.model_rotation import (
+    ModelRotationManager,
+)
 
 # Create rotation manager
 rotation_manager = ModelRotationManager()
@@ -36,7 +38,6 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class RotationMetrics:
     rate_limited_requests: int = 0
     total_time: float = 0.0
     avg_time: float = 0.0
-    last_used: Optional[float] = None
+    last_used: float | None = None
     rotations_to_this_model: int = 0
 
     @property
@@ -70,7 +71,9 @@ class RotationMetrics:
         self.avg_time = self.total_time / self.total_requests
         self.last_used = time.time()
 
-    def update_failure(self, execution_time: float, is_rate_limited: bool = False) -> None:
+    def update_failure(
+        self, execution_time: float, is_rate_limited: bool = False
+    ) -> None:
         """Record failed request."""
         self.total_requests += 1
         self.failed_requests += 1
@@ -87,7 +90,7 @@ class RotationState:
 
     current_model_index: int = 0
     rotation_count: int = 0
-    last_rotation_time: Optional[float] = None
+    last_rotation_time: float | None = None
     consecutive_failures: int = 0
     circuit_breaker_open: bool = False
     metrics: dict[str, RotationMetrics] = field(default_factory=dict)
@@ -118,17 +121,28 @@ class ModelRotationManager:
     Maintains rotation order and tracks metrics for each model.
     """
 
-    # Rotation order: Primary → Fallback 1 → Fallback 2 → Fallback 3
+    # Rotation order: Primary → Fallback 1-11 (Speed Optimized)
+    # Updated from Phase 2 Expansion (2025-10-25)
+    # Previous primary: mistralai/mistral-small-3.2-24b-instruct:free (2.34s, 80% success)
+    # New primary: meta-llama/llama-3.3-8b-instruct:free (0.88s, 100% success) - 71% faster!
     DEFAULT_ROTATION_ORDER = [
-        "mistralai/mistral-small-3.2-24b-instruct:free",  # Primary (fastest)
-        "deepseek/deepseek-r1-0528-qwen3-8b:free",  # Fallback 1 (best quality)
-        "deepseek/deepseek-chat-v3.1:free",  # Fallback 2 (balanced)
-        "deepseek/deepseek-chat",  # Fallback 3 (legacy)
+        "meta-llama/llama-3.3-8b-instruct:free",  # Primary (0.88s, 100% success) ⚡
+        "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",  # Fallback 1 (1.31s)
+        "cognitivecomputations/dolphin3.0-mistral-24b:free",  # Fallback 2 (1.71s)
+        "meta-llama/llama-4-maverick:free",  # Fallback 3 (2.35s)
+        "meituan/longcat-flash-chat:free",  # Fallback 4 (3.08s)
+        "minimax/minimax-m2:free",  # Fallback 5 (4.70s)
+        "meta-llama/llama-3.3-70b-instruct:free",  # Fallback 6 (3.01s, large model)
+        "deepseek/deepseek-r1-0528-qwen3-8b:free",  # Fallback 7 (6.60s, reasoning)
+        "arliai/qwq-32b-arliai-rpr-v1:free",  # Fallback 8 (9.94s, specialized)
+        "microsoft/mai-ds-r1:free",  # Fallback 9 (12.03s, Microsoft)
+        "google/gemma-2-9b-it:free",  # Fallback 10 (15.03s, Google)
+        "deepseek/deepseek-chat-v3.1:free",  # Fallback 11 (15.69s, balanced)
     ]
 
     def __init__(
         self,
-        rotation_order: Optional[list[str]] = None,
+        rotation_order: list[str] | None = None,
         max_consecutive_failures: int = 3,
         circuit_breaker_threshold: int = 5,
     ) -> None:
@@ -173,10 +187,9 @@ class ModelRotationManager:
                 f"(rotation #{self.state.rotation_count})"
             )
             return current
-        else:
-            # Already at last model, stay there
-            logger.warning("Already at last fallback model, cannot rotate further")
-            return self.get_current_model()
+        # Already at last model, stay there
+        logger.warning("Already at last fallback model, cannot rotate further")
+        return self.get_current_model()
 
     def reset_to_primary(self) -> None:
         """Reset rotation to primary model."""
@@ -242,7 +255,13 @@ class ModelRotationManager:
         logger.info("=" * 80)
 
         for model, metrics in self.state.metrics.items():
-            status = "✅" if metrics.success_rate >= 90 else "⚠️" if metrics.success_rate >= 70 else "❌"
+            status = (
+                "✅"
+                if metrics.success_rate >= 90
+                else "⚠️"
+                if metrics.success_rate >= 70
+                else "❌"
+            )
             logger.info(
                 f"{status} {model:50} | "
                 f"Success: {metrics.successful_requests}/{metrics.total_requests} "
@@ -253,7 +272,9 @@ class ModelRotationManager:
 
         logger.info("=" * 80)
         logger.info(f"Total Rotations: {self.state.rotation_count}")
-        logger.info(f"Circuit Breaker: {'OPEN' if self.state.circuit_breaker_open else 'CLOSED'}")
+        logger.info(
+            f"Circuit Breaker: {'OPEN' if self.state.circuit_breaker_open else 'CLOSED'}"
+        )
         logger.info("=" * 80)
 
     def get_summary(self) -> dict:
@@ -276,4 +297,3 @@ class ModelRotationManager:
                 for model, m in self.state.metrics.items()
             },
         }
-

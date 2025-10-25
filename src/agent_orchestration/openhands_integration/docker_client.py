@@ -25,7 +25,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -245,9 +244,7 @@ class DockerOpenHandsClient:
                 # Kill container on timeout
                 result.kill()
                 await result.wait()
-                raise TimeoutError(
-                    f"Docker execution exceeded timeout of {timeout}s"
-                )
+                raise TimeoutError(f"Docker execution exceeded timeout of {timeout}s")
 
             # Decode output
             stdout = stdout_bytes.decode("utf-8", errors="replace")
@@ -280,4 +277,3 @@ class DockerOpenHandsClient:
         """Clean up Docker client resources (no-op for Docker mode)."""
         # Docker containers are automatically cleaned up with --rm flag
         logger.debug("Docker client cleanup (no-op - containers auto-removed)")
-

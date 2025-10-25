@@ -11,19 +11,19 @@ from .test_generation_models import TestTaskSpecification
 
 def create_test_generation_task(spec: TestTaskSpecification) -> str:
     """Create natural language task description for OpenHands.
-    
+
     Builds a comprehensive task description that includes:
     - Target file and coverage requirements
     - TTA testing conventions (uv run pytest, fixtures, markers)
     - Step-by-step instructions for test generation
     - Validation and verification steps
-    
+
     Args:
         spec: Test task specification with all parameters
-    
+
     Returns:
         Natural language task description string
-    
+
     Example:
         >>> spec = TestTaskSpecification(
         ...     target_file=Path("src/agent_orchestration/tools/client.py"),
@@ -35,14 +35,14 @@ def create_test_generation_task(spec: TestTaskSpecification) -> str:
     """
     # Determine test file path
     test_file_path = get_test_file_path(spec.target_file, spec.test_directory)
-    
+
     # Build context files section
     context_section = ""
     if spec.context_files:
         context_section = "\n**Context Files:**\n" + "\n".join(
             f"- `{f}`" for f in spec.context_files
         )
-    
+
     # Build conventions section
     conventions = {
         "command": "uv run pytest",
@@ -52,7 +52,7 @@ def create_test_generation_task(spec: TestTaskSpecification) -> str:
         "markers": "unit, integration, asyncio",
         **spec.conventions,
     }
-    
+
     task = f"""
 Generate comprehensive unit tests for `{spec.target_file}` with the following requirements:
 
@@ -63,13 +63,13 @@ Generate comprehensive unit tests for `{spec.target_file}` with the following re
 **Test Directory:** `{spec.test_directory}/`
 
 **Testing Conventions:**
-- Use `{conventions['command']}` to run tests (NOT `uvx pytest`)
-- Follow TTA's test directory structure ({conventions['directory_structure']})
-- Use pytest fixtures from `{conventions['fixtures']}`
-- Aim for {conventions['coverage_threshold']} coverage
+- Use `{conventions["command"]}` to run tests (NOT `uvx pytest`)
+- Follow TTA's test directory structure ({conventions["directory_structure"]})
+- Use pytest fixtures from `{conventions["fixtures"]}`
+- Aim for {conventions["coverage_threshold"]} coverage
 - Include unit tests for all public methods/functions
 - Include edge cases and error handling tests
-- Use appropriate markers: {conventions['markers']}
+- Use appropriate markers: {conventions["markers"]}
 {context_section}
 
 **Steps:**
@@ -77,7 +77,7 @@ Generate comprehensive unit tests for `{spec.target_file}` with the following re
 2. Review existing test patterns in `{spec.test_directory}/` directory
 3. Generate comprehensive unit tests in `{test_file_path}`
 4. Ensure tests follow TTA conventions (pytest, fixtures, markers)
-5. Run `{conventions['command']} {test_file_path} --cov={spec.target_file.parent} --cov-report=term-missing`
+5. Run `{conventions["command"]} {test_file_path} --cov={spec.target_file.parent} --cov-report=term-missing`
 6. Verify coverage ≥{spec.coverage_threshold}%
 7. Fix any failing tests or coverage gaps
 
@@ -88,13 +88,13 @@ Generate comprehensive unit tests for `{spec.target_file}` with the following re
 - Any issues encountered
 
 **Important:**
-- DO NOT use `uvx pytest` - always use `{conventions['command']}`
+- DO NOT use `uvx pytest` - always use `{conventions["command"]}`
 - Follow TTA's test directory structure exactly
 - Include docstrings for all test functions
 - Test both success and failure cases
 - Test edge cases (empty inputs, None, invalid values, etc.)
 """.strip()
-    
+
     return task
 
 
@@ -103,17 +103,17 @@ def create_package_test_generation_task(
     coverage_threshold: float = 70.0,
 ) -> str:
     """Create task for generating tests for entire package.
-    
+
     Builds a task description for generating comprehensive tests for all
     Python files in a package, following TTA conventions.
-    
+
     Args:
         package_path: Path to package directory
         coverage_threshold: Minimum coverage percentage required (default: 70.0)
-    
+
     Returns:
         Natural language task description string
-    
+
     Example:
         >>> task = create_package_test_generation_task(
         ...     Path("src/agent_orchestration/tools"),
@@ -153,7 +153,7 @@ Generate comprehensive unit tests for all files in package `{package_path}/` wit
 - Test both success and failure cases
 - Test edge cases for all functions
 """.strip()
-    
+
     return task
 
 
@@ -162,22 +162,22 @@ def get_test_file_path(
     test_directory: Path = Path("tests"),
 ) -> Path:
     """Determine test file path following TTA conventions.
-    
+
     TTA convention: tests/ directory mirrors src/ structure.
     Example: src/agent_orchestration/tools/client.py → tests/agent_orchestration/tools/test_client.py
-    
+
     Args:
         target_file: Path to file for which to generate tests
         test_directory: Base test directory (default: Path("tests"))
-    
+
     Returns:
         Path to test file following TTA conventions
-    
+
     Example:
         >>> path = get_test_file_path(Path("src/agent_orchestration/tools/client.py"))
         >>> print(path)
         tests/agent_orchestration/tools/test_client.py
-        
+
         >>> path = get_test_file_path(Path("agent_orchestration/tools/client.py"))
         >>> print(path)
         tests/agent_orchestration/tools/test_client.py
@@ -187,12 +187,11 @@ def get_test_file_path(
         relative_path = Path(*target_file.parts[1:])
     else:
         relative_path = target_file
-    
+
     # Convert to test file name (test_*.py)
     test_file_name = f"test_{relative_path.stem}.py"
-    
+
     # Construct full test path
     test_path = test_directory / relative_path.parent / test_file_name
-    
-    return test_path
 
+    return test_path

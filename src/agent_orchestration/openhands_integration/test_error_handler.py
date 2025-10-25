@@ -36,7 +36,13 @@ def classify_error(result: OpenHandsTaskResult) -> TestGenerationError:
     combined = f"{error_msg} {output}"
 
     # Rate limit errors (429, rate-limited, rate limiting)
-    if "429" in combined or "rate limit" in combined or "rate-limited" in combined or "rate limiting" in combined or "temporarily rate-limited" in combined:
+    if (
+        "429" in combined
+        or "rate limit" in combined
+        or "rate-limited" in combined
+        or "rate limiting" in combined
+        or "temporarily rate-limited" in combined
+    ):
         logger.warning(f"Rate limit error detected: {error_msg[:100]}")
         return TestGenerationError.EXECUTION_FAILURE  # Will trigger model fallback
 
@@ -240,7 +246,7 @@ The previous test generation lacked sufficient context. Please retry with these 
 Review these files to understand dependencies and usage patterns before generating tests.
 """.strip()
 
-    elif error_type == TestGenerationError.PARTIAL_GENERATION:
+    if error_type == TestGenerationError.PARTIAL_GENERATION:
         # Focus on failing tests
         failing_tests = extract_failing_tests(result.output or "")
         if failing_tests:
@@ -254,11 +260,13 @@ Please fix these failing tests and ensure all tests pass.
 """.strip()
         return "The previous test generation was incomplete. Please complete all tests and ensure they pass."
 
-    elif error_type == TestGenerationError.COVERAGE_GAP:
+    if error_type == TestGenerationError.COVERAGE_GAP:
         # Add coverage requirements
         uncovered_lines = extract_uncovered_lines(result.output or "")
         if uncovered_lines:
-            lines_list = "\n".join(f"- Lines {l}" for l in uncovered_lines[:10])  # Limit to 10
+            lines_list = "\n".join(
+                f"- Lines {l}" for l in uncovered_lines[:10]
+            )  # Limit to 10
             return f"""
 The previous test generation had insufficient coverage. These lines are not covered:
 
@@ -268,7 +276,7 @@ Please add tests to cover these lines and achieve ≥{spec.coverage_threshold}% 
 """.strip()
         return f"The previous test generation had insufficient coverage. Please add more tests to achieve ≥{spec.coverage_threshold}% coverage."
 
-    elif error_type == TestGenerationError.SYNTAX_ERROR:
+    if error_type == TestGenerationError.SYNTAX_ERROR:
         # Add syntax validation
         syntax_errors = extract_syntax_errors(result.output or "")
         if syntax_errors:
@@ -282,7 +290,7 @@ Please fix these syntax errors and ensure the test file is valid Python.
 """.strip()
         return "The previous test generation had syntax errors. Please fix them and ensure valid Python syntax."
 
-    elif error_type == TestGenerationError.TIMEOUT:
+    if error_type == TestGenerationError.TIMEOUT:
         return f"""
 The previous test generation timed out after {spec.timeout_seconds}s.
 
@@ -292,7 +300,7 @@ Please:
 3. Focus on essential test cases first
 """.strip()
 
-    elif error_type == TestGenerationError.EXECUTION_FAILURE:
+    if error_type == TestGenerationError.EXECUTION_FAILURE:
         return f"""
 The previous test generation produced tests that fail when executed.
 
@@ -303,4 +311,3 @@ Please fix the test implementation to ensure all tests pass.
 """.strip()
 
     return "The previous test generation failed. Please retry with improvements."
-

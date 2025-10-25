@@ -13,11 +13,9 @@ Usage:
 import asyncio
 import logging
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
-from pydantic import SecretStr
 
 # Configure logging
 logging.basicConfig(
@@ -36,17 +34,17 @@ async def test_sdk_with_tools():
     logger.info("=" * 80)
     logger.info("OpenHands SDK with Tools Configuration Test")
     logger.info("=" * 80)
-    
+
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         logger.error("❌ OPENROUTER_API_KEY not set")
         return False
-    
+
     try:
-        from openhands.sdk import Agent, LLM
-        
+        from openhands.sdk import LLM, Agent
+
         logger.info("✅ OpenHands SDK imported successfully")
-        
+
         # Initialize LLM
         logger.info("\n📋 Initializing LLM...")
         llm = LLM(
@@ -59,56 +57,54 @@ async def test_sdk_with_tools():
             extended_thinking_budget=0,
         )
         logger.info("✅ LLM initialized")
-        
+
         # Initialize Agent
         logger.info("\n🤖 Initializing Agent...")
         agent = Agent(llm=llm)
         logger.info("✅ Agent initialized")
-        
+
         # Check available tools
         logger.info("\n🔧 Checking available tools...")
-        if hasattr(agent, 'tools'):
+        if hasattr(agent, "tools"):
             logger.info(f"   Available tools: {agent.tools}")
-        elif hasattr(agent, 'get_tools'):
+        elif hasattr(agent, "get_tools"):
             tools = agent.get_tools()
             logger.info(f"   Available tools: {tools}")
         else:
             logger.warning("   Could not determine available tools")
-        
+
         # Create conversation
         logger.info("\n💬 Creating conversation...")
-        conversation = agent.create_conversation(
-            workspace=str(project_root)
-        )
+        conversation = agent.create_conversation(workspace=str(project_root))
         logger.info("✅ Conversation created")
-        
+
         # Test 1: Simple task
         logger.info("\n" + "=" * 80)
         logger.info("TEST 1: Simple Task")
         logger.info("=" * 80)
-        
+
         task1 = "Write a Python function that returns 'Hello, World!'"
         logger.info(f"Task: {task1}")
-        
+
         conversation.send_message(task1)
         logger.info("✅ Message sent")
-        
+
         # Note: The SDK doesn't have a built-in run() method in newer versions
         # We need to check what methods are available
-        if hasattr(conversation, 'run'):
+        if hasattr(conversation, "run"):
             logger.info("Running conversation...")
             conversation.run()
-        elif hasattr(conversation, 'execute'):
+        elif hasattr(conversation, "execute"):
             logger.info("Executing conversation...")
             conversation.execute()
         else:
             logger.warning("Could not find run/execute method on conversation")
             logger.info("Available methods:", dir(conversation))
-        
+
         logger.info("✅ Task completed")
-        
+
         return True
-        
+
     except ImportError as e:
         logger.error(f"❌ Failed to import OpenHands SDK: {e}")
         logger.error("   Install with: pip install openhands-sdk")
@@ -116,6 +112,7 @@ async def test_sdk_with_tools():
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -123,11 +120,13 @@ async def test_sdk_with_tools():
 async def main():
     """Run SDK tests."""
     logger.info("\n╔" + "=" * 78 + "╗")
-    logger.info("║" + " " * 15 + "OpenHands SDK with Tools Configuration Test" + " " * 20 + "║")
+    logger.info(
+        "║" + " " * 15 + "OpenHands SDK with Tools Configuration Test" + " " * 20 + "║"
+    )
     logger.info("╚" + "=" * 78 + "╝\n")
-    
+
     success = await test_sdk_with_tools()
-    
+
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY")
     logger.info("=" * 80)
@@ -149,4 +148,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

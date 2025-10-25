@@ -195,7 +195,9 @@ async def main():
     # Run tests
     results = []
     for i, task in enumerate(SIMPLE_TASKS, 1):
-        print(f"[{i}/{len(SIMPLE_TASKS)}] Running: {task['id']}...", end=" ", flush=True)
+        print(
+            f"[{i}/{len(SIMPLE_TASKS)}] Running: {task['id']}...", end=" ", flush=True
+        )
         result = await run_validation_test(task)
         results.append(result)
 
@@ -212,9 +214,21 @@ async def main():
     successful = sum(1 for r in results if r["success"])
     success_rate = (successful / len(results)) * 100
 
-    avg_time = sum(r["elapsed"] for r in results if r["success"]) / successful if successful > 0 else 0
-    avg_tokens = sum(r["tokens"] for r in results if r["success"]) / successful if successful > 0 else 0
-    avg_quality = sum(r["quality"] for r in results if r["success"]) / successful if successful > 0 else 0
+    avg_time = (
+        sum(r["elapsed"] for r in results if r["success"]) / successful
+        if successful > 0
+        else 0
+    )
+    avg_tokens = (
+        sum(r["tokens"] for r in results if r["success"]) / successful
+        if successful > 0
+        else 0
+    )
+    avg_quality = (
+        sum(r["quality"] for r in results if r["success"]) / successful
+        if successful > 0
+        else 0
+    )
 
     print()
     print("=" * 80)
@@ -228,14 +242,20 @@ async def main():
 
     # Validation criteria
     print("VALIDATION CRITERIA:")
-    print(f"  ✅ Success Rate > 90%: {'PASS' if success_rate >= 90 else 'FAIL'} ({success_rate:.1f}%)")
+    print(
+        f"  ✅ Success Rate > 90%: {'PASS' if success_rate >= 90 else 'FAIL'} ({success_rate:.1f}%)"
+    )
     print(f"  ✅ Avg Time < 3s: {'PASS' if avg_time < 3 else 'FAIL'} ({avg_time:.2f}s)")
-    print(f"  ✅ Avg Quality >= 4.5/5: {'PASS' if avg_quality >= 4.5 else 'FAIL'} ({avg_quality:.1f}/5)")
+    print(
+        f"  ✅ Avg Quality >= 4.5/5: {'PASS' if avg_quality >= 4.5 else 'FAIL'} ({avg_quality:.1f}/5)"
+    )
     print()
 
     # Overall result
     all_pass = success_rate >= 90 and avg_time < 3 and avg_quality >= 4.5
-    print(f"OVERALL: {'✅ PASS - Ready for Phase 2' if all_pass else '❌ FAIL - Needs investigation'}")
+    print(
+        f"OVERALL: {'✅ PASS - Ready for Phase 2' if all_pass else '❌ FAIL - Needs investigation'}"
+    )
     print()
 
     # Save results
@@ -255,9 +275,8 @@ async def main():
     with open("validation_results.json", "w") as f:
         json.dump(report, f, indent=2)
 
-    print(f"Results saved to: validation_results.json")
+    print("Results saved to: validation_results.json")
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-

@@ -209,7 +209,9 @@ class ComprehensiveDataCollector:
         session_data.completed_turns += 1
 
         # Update peak memory usage
-        session_data.peak_memory_usage_mb = max(session_data.peak_memory_usage_mb, memory_usage)
+        session_data.peak_memory_usage_mb = max(
+            session_data.peak_memory_usage_mb, memory_usage
+        )
 
         # Log turn data in real-time
         await self._log_turn_data(session_id, turn_data)

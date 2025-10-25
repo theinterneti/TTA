@@ -1,6 +1,6 @@
 # OpenHands: Concrete Examples of What Works & What Doesn't
 
-**Date:** 2025-10-25  
+**Date:** 2025-10-25
 **Purpose:** Demonstrate capabilities and limitations with real examples
 
 ---
@@ -298,7 +298,6 @@ clean:
 
 ---
 
-**Status:** Examples Complete  
-**Recommendation:** Use Docker Mode for production  
+**Status:** Examples Complete
+**Recommendation:** Use Docker Mode for production
 **Timeline:** 2-3 weeks to implement
-

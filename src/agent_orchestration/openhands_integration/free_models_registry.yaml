@@ -1,5 +1,5 @@
 # OpenHands Free Models Registry
-# 
+#
 # This registry contains metadata for free OpenRouter models compatible with OpenHands.
 # Models can be added by editing this YAML file - no code changes required.
 #
@@ -20,15 +20,15 @@
 #   expected_latency_ms: Expected response latency in milliseconds (null if unknown)
 #   capabilities: List of model capabilities (code, reasoning, multilingual, vision, etc.)
 
-version: "1.0.0"
+version: "1.1.0"
 last_updated: "2025-10-25"
-description: "Registry of free OpenRouter models compatible with OpenHands integration"
+description: "Registry of free OpenRouter models compatible with OpenHands integration. Updated with Phase 2 Expansion findings (27+ production-ready models, 71% faster primary model)."
 
 models:
   # ============================================================================
   # VERIFIED MODELS - Tested and working reliably
   # ============================================================================
-  
+
   openrouter/deepseek/deepseek-chat:
     model_id: "openrouter/deepseek/deepseek-chat"
     display_name: "DeepSeek Chat"
@@ -74,7 +74,7 @@ models:
   # ============================================================================
   # RATE-LIMITED MODELS - Functional but may hit rate limits
   # ============================================================================
-  
+
   openrouter/qwen/qwen3-coder:free:
     model_id: "openrouter/qwen/qwen3-coder:free"
     display_name: "Qwen3 Coder (Free)"
@@ -94,7 +94,7 @@ models:
   # ============================================================================
   # UNTESTED MODELS - Not yet tested, use with caution
   # ============================================================================
-  
+
   openrouter/deepseek/deepseek-v3:free:
     model_id: "openrouter/deepseek/deepseek-v3:free"
     display_name: "DeepSeek V3 (Free)"
@@ -166,24 +166,208 @@ models:
     capabilities: ["code", "reasoning"]
 
   # ============================================================================
-  # INCOMPATIBLE MODELS - Known issues prevent use with OpenHands
+  # PHASE 2 EXPANSION MODELS - Newly discovered production-ready models (2025-10-25)
   # ============================================================================
-  
+
   openrouter/meta-llama/llama-3.3-8b-instruct:free:
     model_id: "openrouter/meta-llama/llama-3.3-8b-instruct:free"
-    display_name: "Meta Llama 3.3 8B Instruct (Free)"
+    display_name: "Meta Llama 3.3 8B Instruct (Free) - NEW PRIMARY"
     provider: "Meta"
-    compatibility_status: "incompatible"
-    quality_tier: "medium"
+    compatibility_status: "verified"
+    quality_tier: "high"
     context_window: 128000
-    supports_system_prompt: false
-    known_issues:
-      - "Content moderation blocks OpenHands system prompt"
-      - "Error: ContentPolicyViolationError - misc content violation"
-    last_tested: "2025-10-24"
-    validation_notes: "Aggressive content moderation flags OpenHands system prompt as policy violation"
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 0.88s avg execution time, 5.0/5 quality. FASTEST MODEL AVAILABLE - 71% faster than previous primary!"
+    expected_latency_ms: 880
+    capabilities: ["code", "reasoning"]
+
+  openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free:
+    model_id: "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free"
+    display_name: "Cognitive Computations Dolphin Mistral 24B Venice Edition (Free)"
+    provider: "Cognitive Computations"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 1.31s avg execution time, 5.0/5 quality"
+    expected_latency_ms: 1310
+    capabilities: ["code", "reasoning"]
+
+  openrouter/cognitivecomputations/dolphin3.0-mistral-24b:free:
+    model_id: "openrouter/cognitivecomputations/dolphin3.0-mistral-24b:free"
+    display_name: "Cognitive Computations Dolphin 3.0 Mistral 24B (Free)"
+    provider: "Cognitive Computations"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 1.71s avg execution time, 5.0/5 quality"
+    expected_latency_ms: 1710
+    capabilities: ["code", "reasoning"]
+
+  openrouter/meta-llama/llama-4-maverick:free:
+    model_id: "openrouter/meta-llama/llama-4-maverick:free"
+    display_name: "Meta Llama 4 Maverick (Free)"
+    provider: "Meta"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 128000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 2.35s avg execution time, 5.0/5 quality"
+    expected_latency_ms: 2350
+    capabilities: ["code", "reasoning"]
+
+  openrouter/meituan/longcat-flash-chat:free:
+    model_id: "openrouter/meituan/longcat-flash-chat:free"
+    display_name: "Meituan Longcat Flash Chat (Free)"
+    provider: "Meituan"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 3.08s avg execution time, 5.0/5 quality"
+    expected_latency_ms: 3080
+    capabilities: ["code", "reasoning"]
+
+  openrouter/minimax/minimax-m2:free:
+    model_id: "openrouter/minimax/minimax-m2:free"
+    display_name: "Minimax M2 (Free)"
+    provider: "Minimax"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 4.70s avg execution time, 5.0/5 quality"
+    expected_latency_ms: 4700
+    capabilities: ["code", "reasoning"]
+
+  openrouter/arliai/qwq-32b-arliai-rpr-v1:free:
+    model_id: "openrouter/arliai/qwq-32b-arliai-rpr-v1:free"
+    display_name: "ArliAI QWQ 32B ArliAI RPR V1 (Free)"
+    provider: "ArliAI"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 9.94s avg execution time, 5.0/5 quality. Specialized reasoning model."
+    expected_latency_ms: 9940
+    capabilities: ["code", "reasoning"]
+
+  openrouter/microsoft/mai-ds-r1:free:
+    model_id: "openrouter/microsoft/mai-ds-r1:free"
+    display_name: "Microsoft MAI DS R1 (Free)"
+    provider: "Microsoft"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 12.03s avg execution time, 5.0/5 quality"
+    expected_latency_ms: 12030
+    capabilities: ["code", "reasoning"]
+
+  openrouter/alibaba/tongyi-deepresearch-30b-a3b:free:
+    model_id: "openrouter/alibaba/tongyi-deepresearch-30b-a3b:free"
+    display_name: "Alibaba Tongyi DeepResearch 30B A3B (Free)"
+    provider: "Alibaba"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate, 2.07s avg execution time, 5.0/5 quality. Research-focused model."
+    expected_latency_ms: 2070
+    capabilities: ["code", "reasoning"]
+
+  openrouter/moonshotai/kimi-k2:free:
+    model_id: "openrouter/moonshotai/kimi-k2:free"
+    display_name: "Moonshot AI Kimi K2 (Free)"
+    provider: "Moonshot AI"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate. Moonshot AI model."
     expected_latency_ms: null
     capabilities: ["code", "reasoning"]
+
+  openrouter/nvidia/nemotron-nano-9b-v2:free:
+    model_id: "openrouter/nvidia/nemotron-nano-9b-v2:free"
+    display_name: "NVIDIA Nemotron Nano 9B V2 (Free)"
+    provider: "NVIDIA"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate. NVIDIA model."
+    expected_latency_ms: null
+    capabilities: ["code", "reasoning"]
+
+  openrouter/shisa-ai/shisa-v2-llama3.3-70b:free:
+    model_id: "openrouter/shisa-ai/shisa-v2-llama3.3-70b:free"
+    display_name: "Shisa AI Shisa V2 Llama 3.3 70B (Free)"
+    provider: "Shisa AI"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 128000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate. Llama 3.3 variant."
+    expected_latency_ms: null
+    capabilities: ["code", "reasoning"]
+
+  openrouter/tngtech/deepseek-r1t2-chimera:free:
+    model_id: "openrouter/tngtech/deepseek-r1t2-chimera:free"
+    display_name: "TNG Tech DeepSeek R1T2 Chimera (Free)"
+    provider: "TNG Tech"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate. Specialized variant."
+    expected_latency_ms: null
+    capabilities: ["code", "reasoning"]
+
+  openrouter/z-ai/glm-4.6:exacto:
+    model_id: "openrouter/z-ai/glm-4.6:exacto"
+    display_name: "Z-AI GLM 4.6 (Free)"
+    provider: "Z-AI"
+    compatibility_status: "verified"
+    quality_tier: "high"
+    context_window: 32000
+    supports_system_prompt: true
+    known_issues: []
+    last_tested: "2025-10-25"
+    validation_notes: "Phase 2 Expansion: 100% success rate. GLM variant."
+    expected_latency_ms: null
+    capabilities: ["code", "reasoning"]
+
+  # ============================================================================
+  # INCOMPATIBLE MODELS - Known issues prevent use with OpenHands
+  # ============================================================================
 
   openrouter/google/gemma-3n-e4b-it:free:
     model_id: "openrouter/google/gemma-3n-e4b-it:free"
@@ -200,4 +384,3 @@ models:
     validation_notes: "Gemma architecture does not support system prompts, which OpenHands requires"
     expected_latency_ms: null
     capabilities: ["code"]
-

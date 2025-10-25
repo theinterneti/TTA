@@ -85,4 +85,3 @@ RECOVERY_STRATEGIES: dict[OpenHandsErrorType, list[OpenHandsRecoveryStrategy]] =
         OpenHandsRecoveryStrategy.FALLBACK_MOCK,
     ],
 }
-

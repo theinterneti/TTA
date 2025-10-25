@@ -45,9 +45,7 @@ class HumanOversightEscalation:
             "intervention_id": intervention.intervention_id,
             "escalation_type": escalation_type,
             "crisis_level": intervention.crisis_assessment.crisis_level.value,
-            "crisis_types": [
-                ct.value for ct in intervention.crisis_assessment.crisis_types
-            ],
+            "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
             "user_id": intervention.user_id,
             "session_id": intervention.session_id,
             "timestamp": time.time(),
@@ -85,18 +83,14 @@ class HumanOversightEscalation:
             "escalation_type": "emergency_services",
             "emergency_type": emergency_type,
             "crisis_level": intervention.crisis_assessment.crisis_level.value,
-            "crisis_types": [
-                ct.value for ct in intervention.crisis_assessment.crisis_types
-            ],
+            "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
             "user_id": intervention.user_id,
             "session_id": intervention.session_id,
             "timestamp": time.time(),
             "emergency_contacts": [],
             "status": "critical",
             "response_time_required": "immediate",
-            "location_info": intervention.crisis_assessment.context.get(
-                "location", "unknown"
-            )
+            "location_info": intervention.crisis_assessment.context.get("location", "unknown")
             if intervention.crisis_assessment.context
             else "unknown",
         }
@@ -126,9 +120,7 @@ class HumanOversightEscalation:
 
         for channel in channels:
             try:
-                notification_result = self._send_notification(
-                    channel, escalation, intervention
-                )
+                notification_result = self._send_notification(channel, escalation, intervention)
                 escalation["notifications_sent"].append(notification_result)
 
                 if notification_result["success"]:
@@ -157,9 +149,7 @@ class HumanOversightEscalation:
 
         # Filter based on configuration
         enabled_channels = self.config.get("notification_channels", {})
-        return [
-            ch for ch in channels if enabled_channels.get(ch, {}).get("enabled", False)
-        ]
+        return [ch for ch in channels if enabled_channels.get(ch, {}).get("enabled", False)]
 
     def _send_notification(
         self, channel: str, escalation: dict[str, Any], intervention: CrisisIntervention
@@ -226,9 +216,7 @@ class HumanOversightEscalation:
                 f"Please review and respond immediately."
             ),
             "priority": (
-                "high"
-                if escalation["crisis_level"] in ["high", "critical"]
-                else "medium"
+                "high" if escalation["crisis_level"] in ["high", "critical"] else "medium"
             ),
             "metadata": {
                 "escalation_id": escalation["escalation_id"],
@@ -257,9 +245,7 @@ class HumanOversightEscalation:
     ) -> dict[str, Any]:
         """Send SMS notification (placeholder implementation)."""
         # In a real implementation, this would send actual SMS messages
-        self.logger.warning(
-            f"SMS NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
-        )
+        self.logger.warning(f"SMS NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
         return {
             "message_id": f"sms_{escalation['escalation_id']}",
             "recipients": self.config.get("notification_channels", {})
@@ -273,9 +259,7 @@ class HumanOversightEscalation:
     ) -> dict[str, Any]:
         """Send phone notification (placeholder implementation)."""
         # In a real implementation, this would make actual phone calls
-        self.logger.critical(
-            f"PHONE NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
-        )
+        self.logger.critical(f"PHONE NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
         return {
             "message_id": f"phone_{escalation['escalation_id']}",
             "recipients": self.config.get("notification_channels", {})
@@ -289,9 +273,7 @@ class HumanOversightEscalation:
     ) -> dict[str, Any]:
         """Send dashboard notification (placeholder implementation)."""
         # In a real implementation, this would update a monitoring dashboard
-        self.logger.info(
-            f"DASHBOARD NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
-        )
+        self.logger.info(f"DASHBOARD NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
         return {
             "message_id": f"dashboard_{escalation['escalation_id']}",
             "dashboard_url": self.config.get("notification_channels", {})
@@ -305,9 +287,7 @@ class HumanOversightEscalation:
     ) -> dict[str, Any]:
         """Send pager notification (placeholder implementation)."""
         # In a real implementation, this would send to pager systems
-        self.logger.critical(
-            f"PAGER NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
-        )
+        self.logger.critical(f"PAGER NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
         return {
             "message_id": f"pager_{escalation['escalation_id']}",
             "recipients": self.config.get("notification_channels", {})
@@ -372,15 +352,11 @@ class HumanOversightEscalation:
         escalation["response_time"] = time.time()
         escalation["response_notes"] = response_notes
 
-        self.logger.info(
-            f"Escalation {escalation_id} acknowledged by {human_id}: {response_notes}"
-        )
+        self.logger.info(f"Escalation {escalation_id} acknowledged by {human_id}: {response_notes}")
 
         return True
 
-    def resolve_escalation(
-        self, escalation_id: str, resolution_notes: str = ""
-    ) -> bool:
+    def resolve_escalation(self, escalation_id: str, resolution_notes: str = "") -> bool:
         """Mark an escalation as resolved."""
         if escalation_id not in self.active_escalations:
             return False
@@ -416,15 +392,11 @@ class HumanOversightEscalation:
                 response_time = escalation["response_time"] - escalation["timestamp"]
                 response_times.append(response_time)
 
-        avg_response_time = (
-            sum(response_times) / len(response_times) if response_times else 0.0
-        )
+        avg_response_time = sum(response_times) / len(response_times) if response_times else 0.0
 
         # Escalation type distribution
         escalation_types = {}
-        for escalation in (
-            list(self.active_escalations.values()) + self.escalation_history
-        ):
+        for escalation in list(self.active_escalations.values()) + self.escalation_history:
             esc_type = escalation.get("escalation_type", "unknown")
             escalation_types[esc_type] = escalation_types.get(esc_type, 0) + 1
 

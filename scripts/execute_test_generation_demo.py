@@ -12,7 +12,6 @@ This script demonstrates the complete workflow with fallback mechanisms:
 
 import asyncio
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -29,11 +28,11 @@ else:
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('test_generation_demo.log'),
-    ]
+        logging.FileHandler("test_generation_demo.log"),
+    ],
 )
 logger = logging.getLogger(__name__)
 
@@ -70,7 +69,7 @@ async def execute_test_generation_demo():
             timeout_seconds=600.0,
         )
 
-        logger.info(f"✓ Specification created:")
+        logger.info("✓ Specification created:")
         logger.info(f"  - Target file: {spec.target_file}")
         logger.info(f"  - Coverage threshold: {spec.coverage_threshold}%")
         logger.info(f"  - Test framework: {spec.test_framework}")
@@ -85,10 +84,10 @@ async def execute_test_generation_demo():
             workspace_path=Path.cwd(),
         )
 
-        logger.info(f"✓ Configuration loaded (DEMO MODE):")
+        logger.info("✓ Configuration loaded (DEMO MODE):")
         logger.info(f"  - Model: {config.model}")
         logger.info(f"  - Workspace: {config.workspace_path}")
-        logger.info(f"  - Note: Using mock API key for demonstration")
+        logger.info("  - Note: Using mock API key for demonstration")
 
         # Initialize service
         service = UnitTestGenerationService(config)
@@ -99,9 +98,11 @@ async def execute_test_generation_demo():
         # Show model registry
         logger.info("\n  [A] Free Model Registry:")
         from agent_orchestration.openhands_integration.config import load_model_registry
+
         registry = load_model_registry()
-        verified = [m for m in registry.models.values()
-                   if m.compatibility_status == "verified"]
+        verified = [
+            m for m in registry.models.values() if m.compatibility_status == "verified"
+        ]
         logger.info(f"    ✓ Total models: {len(registry.models)}")
         logger.info(f"    ✓ Verified models: {len(verified)}")
         for model in verified[:3]:
@@ -110,14 +111,14 @@ async def execute_test_generation_demo():
         # Show error recovery
         logger.info("\n  [B] Error Recovery System:")
         logger.info(f"    ✓ Max retries: {service.config.timeout_seconds}")
-        logger.info(f"    ✓ Retry base delay: 1.0s")
-        logger.info(f"    ✓ Exponential backoff: 2.0x")
-        logger.info(f"    ✓ Circuit breaker: Available")
-        logger.info(f"    ✓ Fallback to mock: Enabled")
+        logger.info("    ✓ Retry base delay: 1.0s")
+        logger.info("    ✓ Exponential backoff: 2.0x")
+        logger.info("    ✓ Circuit breaker: Available")
+        logger.info("    ✓ Fallback to mock: Enabled")
 
         # Show client wrapper
         logger.info("\n  [C] OpenHands SDK Client Wrapper:")
-        logger.info(f"    ✓ Client type: OpenHandsClient (SDK mode)")
+        logger.info("    ✓ Client type: OpenHandsClient (SDK mode)")
         logger.info(f"    ✓ Model: {service.config.model}")
         logger.info(f"    ✓ Timeout: {service.config.timeout_seconds}s")
 
@@ -140,7 +141,7 @@ async def execute_test_generation_demo():
         logger.info("EXECUTION RESULTS (DEMONSTRATION)")
         logger.info("=" * 80)
 
-        logger.info(f"\nValidation Results:")
+        logger.info("\nValidation Results:")
         logger.info(f"  - Syntax valid: {result.syntax_valid}")
         logger.info(f"  - Tests pass: {result.tests_pass}")
         logger.info(f"  - Coverage: {result.coverage_percentage}%")
@@ -175,7 +176,9 @@ async def main():
     logger.info("\n")
     logger.info("╔" + "=" * 78 + "╗")
     logger.info("║" + " " * 78 + "║")
-    logger.info("║" + "OpenHands Test Generation - Workflow Demonstration".center(78) + "║")
+    logger.info(
+        "║" + "OpenHands Test Generation - Workflow Demonstration".center(78) + "║"
+    )
     logger.info("║" + " " * 78 + "║")
     logger.info("╚" + "=" * 78 + "╝")
 
@@ -191,4 +194,3 @@ async def main():
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
-

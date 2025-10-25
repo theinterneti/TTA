@@ -15,4 +15,3 @@ memory_enabled = true
 [core]
 workspace_base = "/tmp/openhands_test"
 cache_dir = "/tmp/openhands_cache"
-

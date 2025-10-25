@@ -20,8 +20,7 @@ from src.orchestration import TTAConfig, TTAOrchestrator
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -38,35 +37,43 @@ async def main():
 
         # Display initial configuration
         logger.info("Configuration loaded:")
-        logger.info(f"  - Core Gameplay Loop enabled: {orchestrator.config.get('core_gameplay_loop.enabled', False)}")
-        logger.info(f"  - Neo4j enabled: {orchestrator.config.get('tta.prototype.components.neo4j.enabled', False)}")
-        logger.info(f"  - Agent Orchestration enabled: {orchestrator.config.get('agent_orchestration.enabled', False)}")
+        logger.info(
+            f"  - Core Gameplay Loop enabled: {orchestrator.config.get('core_gameplay_loop.enabled', False)}"
+        )
+        logger.info(
+            f"  - Neo4j enabled: {orchestrator.config.get('tta.prototype.components.neo4j.enabled', False)}"
+        )
+        logger.info(
+            f"  - Agent Orchestration enabled: {orchestrator.config.get('agent_orchestration.enabled', False)}"
+        )
 
         # Start core infrastructure components first
         logger.info("Starting core infrastructure components...")
 
         # Start Neo4j (required for gameplay loop)
-        if orchestrator.config.get('tta.prototype.components.neo4j.enabled', False):
-            if orchestrator.start_component('tta.prototype_neo4j'):
+        if orchestrator.config.get("tta.prototype.components.neo4j.enabled", False):
+            if orchestrator.start_component("tta.prototype_neo4j"):
                 logger.info("✓ Neo4j component started successfully")
             else:
                 logger.error("✗ Failed to start Neo4j component")
                 return False
 
         # Start Agent Orchestration (optional but recommended)
-        if orchestrator.config.get('agent_orchestration.enabled', False):
-            if orchestrator.start_component('agent_orchestration'):
+        if orchestrator.config.get("agent_orchestration.enabled", False):
+            if orchestrator.start_component("agent_orchestration"):
                 logger.info("✓ Agent Orchestration component started successfully")
             else:
-                logger.warning("⚠ Agent Orchestration component failed to start (optional)")
+                logger.warning(
+                    "⚠ Agent Orchestration component failed to start (optional)"
+                )
 
         # Start Gameplay Loop component
-        if orchestrator.config.get('core_gameplay_loop.enabled', False):
-            if orchestrator.start_component('core_gameplay_loop'):
+        if orchestrator.config.get("core_gameplay_loop.enabled", False):
+            if orchestrator.start_component("core_gameplay_loop"):
                 logger.info("✓ Core Gameplay Loop component started successfully")
 
                 # Get the gameplay component for demonstration
-                gameplay_component = orchestrator.components.get('core_gameplay_loop')
+                gameplay_component = orchestrator.components.get("core_gameplay_loop")
                 if gameplay_component:
                     # Display component status
                     status_info = gameplay_component.get_status_info()
@@ -77,7 +84,7 @@ async def main():
                         integration = GameplayLoopIntegration(
                             gameplay_component=gameplay_component,
                             agent_orchestration=None,  # Would be set if available
-                            safety_service=None        # Would be set if available
+                            safety_service=None,  # Would be set if available
                         )
 
                         integration_status = integration.get_integration_status()
@@ -93,37 +100,41 @@ async def main():
             logger.warning("⚠ Core Gameplay Loop is disabled in configuration")
 
         # Start Player Experience API (includes gameplay endpoints)
-        if orchestrator.config.get('player_experience.enabled', False):
-            if orchestrator.start_component('player_experience'):
+        if orchestrator.config.get("player_experience.enabled", False):
+            if orchestrator.start_component("player_experience"):
                 logger.info("✓ Player Experience API started successfully")
                 logger.info("  - Gameplay endpoints available at /api/v1/gameplay/")
             else:
                 logger.warning("⚠ Player Experience API failed to start")
 
         # Display overall system status
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("TTA SYSTEM STATUS")
-        logger.info("="*60)
+        logger.info("=" * 60)
         orchestrator.display_status()
 
         # Display available endpoints
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("AVAILABLE ENDPOINTS")
-        logger.info("="*60)
+        logger.info("=" * 60)
 
-        if orchestrator.config.get('player_experience.enabled', False):
+        if orchestrator.config.get("player_experience.enabled", False):
             base_url = f"http://localhost:{orchestrator.config.get('player_experience.api.port', 8000)}"
             logger.info(f"Player Experience API: {base_url}")
             logger.info(f"  - Authentication: {base_url}/api/v1/auth/")
             logger.info(f"  - Gameplay Sessions: {base_url}/api/v1/gameplay/sessions")
-            logger.info(f"  - Choice Processing: {base_url}/api/v1/gameplay/sessions/{{session_id}}/choices")
+            logger.info(
+                f"  - Choice Processing: {base_url}/api/v1/gameplay/sessions/{{session_id}}/choices"
+            )
             logger.info(f"  - Health Check: {base_url}/api/v1/gameplay/health")
             logger.info(f"  - API Documentation: {base_url}/docs")
 
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("INTEGRATION COMPLETE")
-        logger.info("="*60)
-        logger.info("The TTA system is now running with Core Gameplay Loop integration.")
+        logger.info("=" * 60)
+        logger.info(
+            "The TTA system is now running with Core Gameplay Loop integration."
+        )
         logger.info("All components are properly initialized and ready for use.")
 
         # Keep the system running
@@ -158,11 +169,11 @@ def validate_configuration():
 
         # Check required configuration
         required_configs = [
-            'core_gameplay_loop.enabled',
-            'tta.prototype.components.neo4j.enabled',
-            'tta.prototype.components.neo4j.port',
-            'tta.prototype.components.neo4j.username',
-            'tta.prototype.components.neo4j.password'
+            "core_gameplay_loop.enabled",
+            "tta.prototype.components.neo4j.enabled",
+            "tta.prototype.components.neo4j.port",
+            "tta.prototype.components.neo4j.username",
+            "tta.prototype.components.neo4j.password",
         ]
 
         missing_configs = []
@@ -177,12 +188,16 @@ def validate_configuration():
             return False
 
         # Check gameplay loop specific configuration
-        if not config.get('core_gameplay_loop.enabled', False):
-            logger.error("Core Gameplay Loop is disabled. Set 'core_gameplay_loop.enabled: true' in configuration.")
+        if not config.get("core_gameplay_loop.enabled", False):
+            logger.error(
+                "Core Gameplay Loop is disabled. Set 'core_gameplay_loop.enabled: true' in configuration."
+            )
             return False
 
-        if not config.get('tta.prototype.components.neo4j.enabled', False):
-            logger.error("Neo4j is disabled. Gameplay Loop requires Neo4j for data persistence.")
+        if not config.get("tta.prototype.components.neo4j.enabled", False):
+            logger.error(
+                "Neo4j is disabled. Gameplay Loop requires Neo4j for data persistence."
+            )
             return False
 
         logger.info("✓ Configuration validation passed")
@@ -196,7 +211,9 @@ def validate_configuration():
 if __name__ == "__main__":
     # Validate configuration first
     if not validate_configuration():
-        logger.error("Configuration validation failed. Please check your configuration.")
+        logger.error(
+            "Configuration validation failed. Please check your configuration."
+        )
         sys.exit(1)
 
     # Run the main startup function

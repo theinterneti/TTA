@@ -85,9 +85,7 @@ class SafetyRuleEngine:
         with file_path.open(encoding="utf-8") as f:
             return json.load(f)
 
-    def evaluate(
-        self, text: str, context: dict[str, Any] | None = None
-    ) -> list[ValidationFinding]:
+    def evaluate(self, text: str, context: dict[str, Any] | None = None) -> list[ValidationFinding]:
         """Evaluate text against all rules with enhanced validation algorithms.
 
         This method evaluates the provided text against all configured safety rules,
@@ -110,21 +108,15 @@ class SafetyRuleEngine:
 
         for rule, rx in self._compiled:
             if rule.validation_type == ValidationType.KEYWORD:
-                findings.extend(
-                    self._evaluate_keyword_rule(rule, rx, text, sentiment_score)
-                )
+                findings.extend(self._evaluate_keyword_rule(rule, rx, text, sentiment_score))
             elif rule.validation_type == ValidationType.CRISIS_DETECTION:
                 findings.extend(
                     self._evaluate_crisis_rule(rule, rx, text, sentiment_score, context)
                 )
             elif rule.validation_type == ValidationType.THERAPEUTIC_BOUNDARY:
-                findings.extend(
-                    self._evaluate_therapeutic_rule(rule, rx, text, context)
-                )
+                findings.extend(self._evaluate_therapeutic_rule(rule, rx, text, context))
             elif rule.validation_type == ValidationType.SENTIMENT:
-                findings.extend(
-                    self._evaluate_sentiment_rule(rule, text, sentiment_score)
-                )
+                findings.extend(self._evaluate_sentiment_rule(rule, text, sentiment_score))
             elif rule.validation_type == ValidationType.CONTEXT_AWARE:
                 findings.extend(self._evaluate_context_rule(rule, rx, text, context))
 

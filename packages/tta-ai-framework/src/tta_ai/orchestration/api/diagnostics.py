@@ -107,12 +107,8 @@ class DiagnosticsAPI:
         @self.router.get("/agents", response_model=list[AgentDiagnosticInfo])
         async def get_agents_diagnostics(
             agent_type: str | None = Query(None, description="Filter by agent type"),
-            include_performance: bool = Query(
-                True, description="Include performance metrics"
-            ),
-            include_discovery: bool = Query(
-                True, description="Include discovery information"
-            ),
+            include_performance: bool = Query(True, description="Include performance metrics"),
+            include_discovery: bool = Query(True, description="Include discovery information"),
             credentials: HTTPAuthorizationCredentials | None = Depends(security),
         ):
             """Get comprehensive diagnostics for all agents."""
@@ -128,12 +124,8 @@ class DiagnosticsAPI:
         @self.router.get("/agents/{agent_id}", response_model=AgentDiagnosticInfo)
         async def get_agent_diagnostics(
             agent_id: str,
-            include_performance: bool = Query(
-                True, description="Include performance metrics"
-            ),
-            include_discovery: bool = Query(
-                True, description="Include discovery information"
-            ),
+            include_performance: bool = Query(True, description="Include performance metrics"),
+            include_discovery: bool = Query(True, description="Include discovery information"),
             credentials: HTTPAuthorizationCredentials | None = Depends(security),
         ):
             """Get diagnostics for a specific agent."""
@@ -187,9 +179,7 @@ class DiagnosticsAPI:
                 raise HTTPException(status_code=401, detail="Authentication required")
 
             if not self.auto_discovery_manager:
-                raise HTTPException(
-                    status_code=404, detail="Auto-discovery not available"
-                )
+                raise HTTPException(status_code=404, detail="Auto-discovery not available")
 
             return self.auto_discovery_manager.get_discovery_statistics()
 
@@ -225,9 +215,7 @@ class DiagnosticsAPI:
 
         except Exception as e:
             logger.error(f"Failed to get agents diagnostics: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to retrieve diagnostics"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to retrieve diagnostics") from e
 
     async def _get_agent_diagnostics(
         self,
@@ -271,9 +259,7 @@ class DiagnosticsAPI:
             health_status = await self._build_health_status(agent_id, agent_info)
 
             # Build capabilities information
-            capabilities = self._build_capabilities_info(
-                agent_info.get("capabilities", [])
-            )
+            capabilities = self._build_capabilities_info(agent_info.get("capabilities", []))
 
             # Build performance metrics
             performance_metrics = {}
@@ -308,9 +294,7 @@ class DiagnosticsAPI:
         last_heartbeat_timestamp = agent_info.get("last_heartbeat")
         last_heartbeat = None
         if last_heartbeat_timestamp:
-            last_heartbeat = datetime.fromtimestamp(
-                last_heartbeat_timestamp, tz=UTC
-            )
+            last_heartbeat = datetime.fromtimestamp(last_heartbeat_timestamp, tz=UTC)
 
         # Determine health status
         current_time = time.time()
@@ -379,12 +363,8 @@ class DiagnosticsAPI:
             performance_summary = monitor.get_performance_summary()
             performance_metrics.update(
                 {
-                    "system_performance": performance_summary.get(
-                        "overall_performance", "unknown"
-                    ),
-                    "active_operations": performance_summary.get(
-                        "active_operations", 0
-                    ),
+                    "system_performance": performance_summary.get("overall_performance", "unknown"),
+                    "active_operations": performance_summary.get("active_operations", 0),
                 }
             )
 
@@ -459,9 +439,7 @@ class DiagnosticsAPI:
 
         except Exception as e:
             logger.error(f"Failed to get system summary: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to retrieve system summary"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to retrieve system summary") from e
 
     async def _get_system_health(self) -> dict[str, Any]:
         """Get simple system health check."""

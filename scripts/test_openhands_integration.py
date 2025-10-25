@@ -23,8 +23,7 @@ import asyncio
 import logging
 import sys
 from pathlib import Path
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -218,7 +217,7 @@ async def simulate_test_generation() -> TestValidationResult:
         test_directory=Path("tests"),
         timeout_seconds=300.0,
     )
-    logger.info(f"✓ Test specification created:")
+    logger.info("✓ Test specification created:")
     logger.info(f"  - Target file: {spec.target_file}")
     logger.info(f"  - Coverage threshold: {spec.coverage_threshold}%")
     logger.info(f"  - Test directory: {spec.test_directory}")
@@ -230,7 +229,9 @@ async def simulate_test_generation() -> TestValidationResult:
 
     # Step 4: Mock OpenHandsClient.execute_task
     logger.info("\n[Step 4] Mocking OpenHands SDK (API key not available)...")
-    with patch.object(OpenHandsClient, "execute_task", new_callable=AsyncMock) as mock_execute:
+    with patch.object(
+        OpenHandsClient, "execute_task", new_callable=AsyncMock
+    ) as mock_execute:
         # Simulate successful test generation
         mock_execute.return_value = OpenHandsTaskResult(
             success=True,
@@ -264,7 +265,9 @@ async def simulate_test_generation() -> TestValidationResult:
                     coverage_percentage=85.0,
                     issues=[],
                     quality_score=90.0,
-                    test_file_path=Path("tests/agent_orchestration/tools/test_callable_registry.py"),
+                    test_file_path=Path(
+                        "tests/agent_orchestration/tools/test_callable_registry.py"
+                    ),
                 )
                 logger.info("✓ Mock configured to return successful validation")
 
@@ -273,7 +276,7 @@ async def simulate_test_generation() -> TestValidationResult:
                 result = await service.generate_tests(spec, max_iterations=5)
 
                 logger.info("✓ Test generation completed")
-                logger.info(f"\n[Results]")
+                logger.info("\n[Results]")
                 logger.info(f"  - Syntax valid: {result.syntax_valid}")
                 logger.info(f"  - Conventions followed: {result.conventions_followed}")
                 logger.info(f"  - Tests pass: {result.tests_pass}")
@@ -302,8 +305,8 @@ async def main():
         logger.info("\n" + "=" * 80)
         logger.info("SIMULATION SUMMARY")
         logger.info("=" * 80)
-        logger.info(f"✓ Test generation workflow completed successfully")
-        logger.info(f"✓ All validation checks passed")
+        logger.info("✓ Test generation workflow completed successfully")
+        logger.info("✓ All validation checks passed")
         logger.info(f"✓ Coverage threshold met: {result.coverage_percentage}% >= 70%")
         logger.info(f"✓ Quality score: {result.quality_score}/100")
         logger.info("\nNOTE: This was a simulated run using mocks.")
@@ -327,6 +330,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"FATAL ERROR: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
-

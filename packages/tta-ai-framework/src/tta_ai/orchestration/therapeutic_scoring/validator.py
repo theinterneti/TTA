@@ -23,21 +23,15 @@ class TherapeuticValidator:
         self._config = cfg
 
         # Enhanced configuration options
-        self._crisis_detection_enabled = cfg.get("crisis_detection", {}).get(
-            "enabled", True
-        )
-        self._crisis_sensitivity = cfg.get("crisis_detection", {}).get(
-            "sensitivity", 0.7
-        )
+        self._crisis_detection_enabled = cfg.get("crisis_detection", {}).get("enabled", True)
+        self._crisis_sensitivity = cfg.get("crisis_detection", {}).get("sensitivity", 0.7)
         self._escalation_threshold = cfg.get("crisis_detection", {}).get(
             "escalation_threshold", 0.9
         )
-        self._alternative_generation_enabled = cfg.get(
-            "alternative_generation", {}
-        ).get("enabled", True)
-        self._therapeutic_tone = cfg.get("alternative_generation", {}).get(
-            "therapeutic_tone", True
+        self._alternative_generation_enabled = cfg.get("alternative_generation", {}).get(
+            "enabled", True
         )
+        self._therapeutic_tone = cfg.get("alternative_generation", {}).get("therapeutic_tone", True)
 
         # Monitoring and alerting
         self._violation_count = 0
@@ -54,9 +48,7 @@ class TherapeuticValidator:
         """Enhanced text validation with comprehensive analysis."""
         audit: list[dict[str, Any]] = []
         if include_audit:
-            audit.append(
-                {"event": "validate_text.start", "text_length": len(text or "")}
-            )
+            audit.append({"event": "validate_text.start", "text_length": len(text or "")})
 
         text = text or ""
 
@@ -66,9 +58,7 @@ class TherapeuticValidator:
         # Comprehensive analysis
         overall_sentiment = self._engine._analyze_sentiment(text)
         crisis_detected = any(f.crisis_type is not None for f in findings)
-        crisis_types = list(
-            {f.crisis_type for f in findings if f.crisis_type is not None}
-        )
+        crisis_types = list({f.crisis_type for f in findings if f.crisis_type is not None})
         escalation_recommended = any(f.escalation_required for f in findings)
 
         # Determine overall level with enhanced logic
@@ -81,9 +71,7 @@ class TherapeuticValidator:
             self._violation_count += 1
 
         # Enhanced scoring based on multiple factors
-        score = self._calculate_comprehensive_score(
-            findings, overall_sentiment, crisis_detected
-        )
+        score = self._calculate_comprehensive_score(findings, overall_sentiment, crisis_detected)
 
         # Calculate therapeutic appropriateness
         therapeutic_appropriateness = self._assess_therapeutic_appropriateness(
@@ -93,9 +81,7 @@ class TherapeuticValidator:
         # Generate alternative content if needed
         alternative_content = None
         if level != SafetyLevel.SAFE and self._alternative_generation_enabled:
-            alternative_content = self._generate_therapeutic_alternative(
-                text, findings, level
-            )
+            alternative_content = self._generate_therapeutic_alternative(text, findings, level)
 
         # Monitoring flags
         monitoring_flags = self._generate_monitoring_flags(

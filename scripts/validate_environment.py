@@ -88,9 +88,15 @@ class EnvironmentValidator:
         print("🔍 Validating API key configuration...")
 
         api_keys = {
-            "OPENROUTER_API_KEY": {"required": False, "pattern": r"^sk-or-v1-[a-f0-9]{64}$"},
+            "OPENROUTER_API_KEY": {
+                "required": False,
+                "pattern": r"^sk-or-v1-[a-f0-9]{64}$",
+            },
             "OPENAI_API_KEY": {"required": False, "pattern": r"^sk-[a-zA-Z0-9]{48,}$"},
-            "ANTHROPIC_API_KEY": {"required": False, "pattern": r"^sk-ant-[a-zA-Z0-9\-]{95,}$"},
+            "ANTHROPIC_API_KEY": {
+                "required": False,
+                "pattern": r"^sk-ant-[a-zA-Z0-9\-]{95,}$",
+            },
         }
 
         has_any_key = False
@@ -113,7 +119,9 @@ class EnvironmentValidator:
                     self.warnings.append(f"⚠️  {key} format may be invalid")
 
         if not has_any_key:
-            self.errors.append("No AI model API keys configured. At least one is required for model management.")
+            self.errors.append(
+                "No AI model API keys configured. At least one is required for model management."
+            )
             all_good = False
 
         return all_good
@@ -140,11 +148,15 @@ class EnvironmentValidator:
                 else:
                     self.warnings.append(f"Optional security variable not set: {var}")
             elif len(value) < config["min_length"]:
-                self.errors.append(f"{var} is too short (minimum {config['min_length']} characters)")
+                self.errors.append(
+                    f"{var} is too short (minimum {config['min_length']} characters)"
+                )
                 all_good = False
             elif value.startswith("dev_") or value.startswith("CHANGE_ME"):
                 if env_vars.get("ENVIRONMENT") == "production":
-                    self.errors.append(f"{var} has development/placeholder value in production")
+                    self.errors.append(
+                        f"{var} has development/placeholder value in production"
+                    )
                     all_good = False
                 else:
                     self.warnings.append(f"{var} has development value (OK for dev)")
@@ -157,7 +169,9 @@ class EnvironmentValidator:
         """Validate feature flag configuration."""
         print("🔍 Validating feature flags...")
 
-        model_management_enabled = env_vars.get("FEATURE_MODEL_MANAGEMENT", "").lower() == "true"
+        model_management_enabled = (
+            env_vars.get("FEATURE_MODEL_MANAGEMENT", "").lower() == "true"
+        )
 
         if not model_management_enabled:
             self.warnings.append("Model management feature is disabled")
@@ -168,7 +182,7 @@ class EnvironmentValidator:
         therapeutic_features = [
             "FEATURE_AI_NARRATIVE",
             "FEATURE_CRISIS_SUPPORT",
-            "FEATURE_REAL_TIME_MONITORING"
+            "FEATURE_REAL_TIME_MONITORING",
         ]
 
         for feature in therapeutic_features:
@@ -220,9 +234,9 @@ class EnvironmentValidator:
         all_passed = all(checks)
 
         # Print results
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("📊 VALIDATION RESULTS")
-        print("="*60)
+        print("=" * 60)
 
         if self.info:
             print("\n✅ SUCCESS:")
@@ -239,7 +253,7 @@ class EnvironmentValidator:
             for msg in self.errors:
                 print(f"  {msg}")
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
 
         if all_passed and not self.errors:
             print("🎉 Environment validation PASSED!")
@@ -249,15 +263,17 @@ class EnvironmentValidator:
             print("Please fix the errors above before running TTA.")
 
         if self.warnings:
-            print(f"\n💡 You have {len(self.warnings)} warnings that should be addressed.")
+            print(
+                f"\n💡 You have {len(self.warnings)} warnings that should be addressed."
+            )
 
         return all_passed and not self.errors
 
     def print_setup_help(self):
         """Print setup help information."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🆘 SETUP HELP")
-        print("="*60)
+        print("=" * 60)
         print("""
 To set up your environment:
 

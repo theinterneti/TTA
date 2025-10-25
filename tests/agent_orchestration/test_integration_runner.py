@@ -111,9 +111,9 @@ def test_test_data_fixtures():
     assert isinstance(inputs, list), "Sample inputs should be a list"
     assert len(inputs) > 0, "Sample inputs should not be empty"
     assert "text" in inputs[0], "Sample input should have 'text' field"
-    assert (
-        "expected_intent" in inputs[0]
-    ), "Sample input should have 'expected_intent' field"
+    assert "expected_intent" in inputs[0], (
+        "Sample input should have 'expected_intent' field"
+    )
 
     print("✓ Test data fixtures are properly structured")
 
@@ -154,9 +154,9 @@ def test_performance_metrics_utility():
     workflow_stats = stats["workflow_stats"]
     assert workflow_stats["count"] == 3, "Incorrect workflow count"
     assert workflow_stats["avg_time"] > 0, "Invalid average time"
-    assert (
-        workflow_stats["max_time"] >= workflow_stats["min_time"]
-    ), "Invalid min/max times"
+    assert workflow_stats["max_time"] >= workflow_stats["min_time"], (
+        "Invalid min/max times"
+    )
 
     # Verify agent statistics
     agent_stats = stats["agent_stats"]
@@ -214,9 +214,9 @@ def test_workflow_state_verifier():
     persistence_checks = verifier.verify_state_persistence(initial_state, final_state)
     assert persistence_checks["session_id_preserved"], "Session ID not preserved"
     assert persistence_checks["player_id_preserved"], "Player ID not preserved"
-    assert persistence_checks[
-        "therapeutic_context_maintained"
-    ], "Therapeutic context not maintained"
+    assert persistence_checks["therapeutic_context_maintained"], (
+        "Therapeutic context not maintained"
+    )
     assert persistence_checks["game_state_updated"], "Game state not updated"
 
     # Test response aggregation verification
@@ -229,9 +229,9 @@ def test_workflow_state_verifier():
     aggregation_checks = verifier.verify_response_aggregation(responses)
     assert aggregation_checks["all_agents_responded"], "Not all agents responded"
     assert aggregation_checks["responses_have_content"], "Some responses lack content"
-    assert aggregation_checks[
-        "therapeutic_validation_present"
-    ], "Therapeutic validation missing"
+    assert aggregation_checks["therapeutic_validation_present"], (
+        "Therapeutic validation missing"
+    )
 
     print("✓ Workflow state verifier working correctly")
 

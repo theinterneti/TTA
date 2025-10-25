@@ -256,7 +256,7 @@ async def main():
         coverage_threshold=70.0,
         max_iterations=5,
     )
-    
+
     if result.syntax_valid and result.tests_pass:
         print(f"✓ Tests generated successfully")
         print(f"  Coverage: {result.coverage_percentage}%")
@@ -279,7 +279,7 @@ async def main():
         "src/agent_orchestration/tools/",
         coverage_threshold=75.0,
     )
-    
+
     for file_path, result in results.items():
         if result.syntax_valid and result.tests_pass:
             print(f"✓ {file_path}: {result.coverage_percentage}%")
@@ -299,9 +299,9 @@ from src.agent_orchestration.openhands_integration import (
 
 async def main():
     result = await generate_tests_for_file("src/module/file.py")
-    
+
     success, issues = validate_test_result(result, coverage_threshold=70.0)
-    
+
     if success:
         print("✓ All validation checks passed")
     else:
@@ -317,4 +317,3 @@ asyncio.run(main())
 **Status:** Active (Production Ready)
 **Last Updated:** 2025-10-24
 **Related Rules:** `prefer-uvx-for-tools.md`, `avoid-long-files.md`, `integrated-workflow.md`, `ai-context-management.md`
-

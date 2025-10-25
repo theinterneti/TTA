@@ -54,9 +54,7 @@ class OpenHandsAdapter:
             fallback_to_mock: Whether to fall back to mock responses on failure
         """
         self.client = client
-        self.retry_config = retry_config or RetryConfig(
-            max_retries=3, base_delay=1.0
-        )
+        self.retry_config = retry_config or RetryConfig(max_retries=3, base_delay=1.0)
         self.fallback_to_mock = fallback_to_mock
 
         logger.info(
@@ -108,9 +106,7 @@ class OpenHandsAdapter:
             if self.fallback_to_mock:
                 return self._mock_response(task_description)
 
-            raise AgentCommunicationError(
-                f"OpenHands execution failed: {e}"
-            ) from e
+            raise AgentCommunicationError(f"OpenHands execution failed: {e}") from e
 
     def _mock_response(self, task_description: str) -> dict[str, Any]:
         """Generate mock response for fallback."""
@@ -121,4 +117,3 @@ class OpenHandsAdapter:
             "execution_time": 0.1,
             "metadata": {"mock": True},
         }
-

@@ -1,7 +1,7 @@
 # Adding Models to the OpenHands Registry
 
-**Audience:** Developers and non-developers  
-**Difficulty:** Beginner  
+**Audience:** Developers and non-developers
+**Difficulty:** Beginner
 **Time Required:** 10-15 minutes
 
 ## Overview
@@ -32,7 +32,7 @@ Add a model to the registry when:
    ```bash
    # Set your API key
    export OPENROUTER_API_KEY="your-key-here"
-   
+
    # Or add to .env file
    echo "OPENROUTER_API_KEY=your-key-here" >> .env
    ```
@@ -341,7 +341,7 @@ After adding your model:
 2. **Test Model Selection**
    ```python
    from src.agent_orchestration.openhands_integration.config import get_fallback_model_chain
-   
+
    # Your model should appear in the fallback chain
    chain = get_fallback_model_chain(max_models=10)
    print(chain)
@@ -361,4 +361,3 @@ After adding your model:
 ---
 
 **Questions?** Open an issue or ask in the project Discord.
-

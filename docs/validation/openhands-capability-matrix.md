@@ -1,7 +1,7 @@
 # OpenHands Comprehensive Capability Matrix
 
-**Date:** 2025-10-25  
-**Purpose:** Decision-making reference for choosing optimal OpenHands configuration  
+**Date:** 2025-10-25
+**Purpose:** Decision-making reference for choosing optimal OpenHands configuration
 **Status:** Production Ready
 
 ---
@@ -309,7 +309,6 @@ Task Type?
 
 ---
 
-**Status:** Complete  
-**Last Updated:** 2025-10-25  
+**Status:** Complete
+**Last Updated:** 2025-10-25
 **Test Results:** openhands_model_test_results.json
-

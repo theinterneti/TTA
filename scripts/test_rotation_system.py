@@ -16,6 +16,9 @@ Usage:
 import asyncio
 import json
 import os
+
+# Add src to path
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -23,12 +26,15 @@ from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 
-# Add src to path
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from agent_orchestration.openhands_integration.model_rotation import ModelRotationManager
-from agent_orchestration.openhands_integration.retry_policy import RetryPolicy, RetryConfig
+from agent_orchestration.openhands_integration.model_rotation import (
+    ModelRotationManager,
+)
+from agent_orchestration.openhands_integration.retry_policy import (
+    RetryConfig,
+    RetryPolicy,
+)
 
 # Load environment
 load_dotenv()
@@ -107,7 +113,10 @@ async def test_model_with_rotation(task: dict) -> dict:
                     json={
                         "model": current_model,
                         "messages": [
-                            {"role": "system", "content": "You are a helpful coding assistant."},
+                            {
+                                "role": "system",
+                                "content": "You are a helpful coding assistant.",
+                            },
                             {"role": "user", "content": task["prompt"]},
                         ],
                         "temperature": 0.7,
@@ -128,11 +137,10 @@ async def test_model_with_rotation(task: dict) -> dict:
                         print(f"  ⏳ Rate limited, rotating in {delay:.2f}s...")
                         await asyncio.sleep(delay)
                     continue
-                else:
-                    attempt += 1
-                    continue
+                attempt += 1
+                continue
 
-            elif response.status_code != 200:
+            if response.status_code != 200:
                 # Other error
                 ROTATION_MANAGER.on_failure(attempt_time)
                 last_error = f"HTTP {response.status_code}"
@@ -220,7 +228,9 @@ async def main():
     print("ROTATION SYSTEM TEST SUMMARY")
     print("=" * 80)
     print(f"Total Tests: {len(TEST_TASKS)}")
-    print(f"Successful: {success_count}/{len(TEST_TASKS)} ({100*success_count/len(TEST_TASKS):.1f}%)")
+    print(
+        f"Successful: {success_count}/{len(TEST_TASKS)} ({100 * success_count / len(TEST_TASKS):.1f}%)"
+    )
     print(f"Failed: {len(TEST_TASKS) - success_count}")
 
     # Rotation metrics
@@ -249,4 +259,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

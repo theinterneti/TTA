@@ -1,7 +1,6 @@
 """Comprehensive unit tests for agent_orchestration.models module."""
 
 import pytest
-from pydantic import ValidationError
 
 from src.agent_orchestration.models import (
     AgentId,
@@ -232,7 +231,11 @@ class TestAgentMessage:
 
     def test_agent_message_with_priority(self):
         """Test AgentMessage with different priorities."""
-        for priority in [MessagePriority.LOW, MessagePriority.NORMAL, MessagePriority.HIGH]:
+        for priority in [
+            MessagePriority.LOW,
+            MessagePriority.NORMAL,
+            MessagePriority.HIGH,
+        ]:
             msg = AgentMessage(
                 message_id=f"msg_{priority.value}",
                 sender=AgentId(type=AgentType.IPA),

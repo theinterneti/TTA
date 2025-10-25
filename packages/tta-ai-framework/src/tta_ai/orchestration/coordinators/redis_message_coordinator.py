@@ -129,9 +129,7 @@ class RedisMessageCoordinator(MessageCoordinator):
         except Exception as e:
             with contextlib.suppress(Exception):
                 self.metrics.inc_delivered_error(1)
-            return MessageResult(
-                message_id=message.message_id, delivered=False, error=str(e)
-            )
+            return MessageResult(message_id=message.message_id, delivered=False, error=str(e))
 
     async def broadcast_message(
         self, sender: AgentId, message: AgentMessage, recipients: list[AgentId]
@@ -169,25 +167,19 @@ class RedisMessageCoordinator(MessageCoordinator):
         for prio in (9, 5, 1):
             skey = self._sched_key(agent_id, prio)
             # Find one due item (score <= now)
-            members = await self._redis.zrangebyscore(
-                skey, min=-1, max=now, start=0, num=1
-            )
+            members = await self._redis.zrangebyscore(skey, min=-1, max=now, start=0, num=1)
             if not members:
                 continue
             member = members[0]
             # Remove it from sched set
             await self._redis.zrem(skey, member)
-            payload = (
-                member.decode() if isinstance(member, (bytes, bytearray)) else member
-            )
+            payload = member.decode() if isinstance(member, (bytes, bytearray)) else member
             # Create reservation
             token = f"res_{uuid.uuid4().hex[:16]}"
             deadline = now + int(visibility_timeout * 1_000_000)
             # Store reservation
             await self._redis.hset(self._reserved_hash(agent_id), token, payload)
-            await self._redis.zadd(
-                self._reserved_deadlines(agent_id), {token: deadline}
-            )
+            await self._redis.zadd(self._reserved_deadlines(agent_id), {token: deadline})
             # Return wrapper
             qmsg_dict = json.loads(payload)
             return ReceivedMessage(
@@ -235,10 +227,7 @@ class RedisMessageCoordinator(MessageCoordinator):
             await self._redis.rpush(self._queue_key(agent_id), updated)
 
             # DLQ on permanent failure or when attempts exceed allowed retries
-            if (
-                failure == FailureType.PERMANENT
-                or qm.delivery_attempts > self._retry_attempts
-            ):
+            if failure == FailureType.PERMANENT or qm.delivery_attempts > self._retry_attempts:
                 await self._redis.rpush(self._dlq_key(agent_id), updated)
                 with contextlib.suppress(Exception):
                     self.metrics.inc_permanent(1)
@@ -258,14 +247,11 @@ class RedisMessageCoordinator(MessageCoordinator):
 
             # Schedule retry with exponential backoff
             delay = min(
-                self._backoff_base
-                * (self._backoff_factor ** (qm.delivery_attempts - 1)),
+                self._backoff_base * (self._backoff_factor ** (qm.delivery_attempts - 1)),
                 self._backoff_max,
             )
             score = _now_us() + int(delay * 1_000_000)
-            await self._redis.zadd(
-                self._sched_key(agent_id, int(qm.priority)), {updated: score}
-            )
+            await self._redis.zadd(self._sched_key(agent_id, int(qm.priority)), {updated: score})
             with contextlib.suppress(Exception):
                 self.metrics.inc_retries_scheduled(1, last_backoff_seconds=delay)
                 self.metrics.inc_nacks(1)
@@ -294,9 +280,7 @@ class RedisMessageCoordinator(MessageCoordinator):
                     f"{self._pfx}:reserved:{at.value}:*",
                 ):
                     async for key in self._redis.scan_iter(match=pattern):
-                        parts = (
-                            key.decode() if isinstance(key, (bytes, bytearray)) else key
-                        )
+                        parts = key.decode() if isinstance(key, (bytes, bytearray)) else key
                         inst = parts.split(":")[-1]
                         sig = f"{at.value}:{inst}"
                         if sig in seen:
@@ -316,9 +300,7 @@ class RedisMessageCoordinator(MessageCoordinator):
                 payload = await self._redis.hget(self._reserved_hash(aid), token)
                 if payload:
                     try:
-                        pdata = (
-                            payload if isinstance(payload, str) else payload.decode()
-                        )
+                        pdata = payload if isinstance(payload, str) else payload.decode()
                         data = json.loads(pdata)
                         qm = QueueMessage(**data)
                         score = _now_us()

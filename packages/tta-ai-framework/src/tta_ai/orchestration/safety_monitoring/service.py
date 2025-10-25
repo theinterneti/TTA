@@ -18,9 +18,7 @@ class SafetyService:
     the underlying raw JSON changes (TTL handled by provider).
     """
 
-    def __init__(
-        self, enabled: bool = False, provider: SafetyRulesProvider | None = None
-    ) -> None:
+    def __init__(self, enabled: bool = False, provider: SafetyRulesProvider | None = None) -> None:
         self._enabled = bool(enabled)
         self._provider = provider or SafetyRulesProvider(redis_client=None)
         self._last_raw: str | None = None
@@ -73,9 +71,7 @@ class SafetyService:
 
 # Global service management
 _global_safety_service: SafetyService | None = None
-_global_safety_locked: bool = (
-    False  # When True, do not auto-refresh from env (component-managed)
-)
+_global_safety_locked: bool = False  # When True, do not auto-refresh from env (component-managed)
 
 
 def get_global_safety_service() -> SafetyService:

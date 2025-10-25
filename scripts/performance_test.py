@@ -41,7 +41,9 @@ class GameplayPerformanceTester:
         response_times = []
         for i in range(100):
             start_time = time.time()
-            async with self.session.get(f"{self.base_url}/api/v1/gameplay/health") as response:
+            async with self.session.get(
+                f"{self.base_url}/api/v1/gameplay/health"
+            ) as response:
                 await response.text()
                 response_times.append(time.time() - start_time)
 
@@ -51,8 +53,10 @@ class GameplayPerformanceTester:
             "avg_response_time": statistics.mean(response_times),
             "min_response_time": min(response_times),
             "max_response_time": max(response_times),
-            "p95_response_time": statistics.quantiles(response_times, n=20)[18],  # 95th percentile
-            "target_met": statistics.mean(response_times) < 0.1  # 100ms target
+            "p95_response_time": statistics.quantiles(response_times, n=20)[
+                18
+            ],  # 95th percentile
+            "target_met": statistics.mean(response_times) < 0.1,  # 100ms target
         }
 
     async def test_session_creation_performance(self) -> dict[str, Any]:
@@ -68,7 +72,7 @@ class GameplayPerformanceTester:
                 async with self.session.post(
                     f"{self.base_url}/api/v1/gameplay/sessions",
                     json={"therapeutic_context": {"goals": ["test"]}},
-                    headers={"Authorization": f"Bearer {self.auth_token}"}
+                    headers={"Authorization": f"Bearer {self.auth_token}"},
                 ) as response:
                     if response.status == 200:
                         success_count += 1
@@ -84,8 +88,10 @@ class GameplayPerformanceTester:
             "avg_response_time": statistics.mean(response_times),
             "min_response_time": min(response_times),
             "max_response_time": max(response_times),
-            "p95_response_time": statistics.quantiles(response_times, n=20)[18] if len(response_times) >= 20 else max(response_times),
-            "target_met": statistics.mean(response_times) < 1.0  # 1 second target
+            "p95_response_time": statistics.quantiles(response_times, n=20)[18]
+            if len(response_times) >= 20
+            else max(response_times),
+            "target_met": statistics.mean(response_times) < 1.0,  # 1 second target
         }
 
     async def test_concurrent_sessions(self) -> dict[str, Any]:
@@ -98,7 +104,7 @@ class GameplayPerformanceTester:
                 async with self.session.post(
                     f"{self.base_url}/api/v1/gameplay/sessions",
                     json={"therapeutic_context": {"goals": ["concurrent_test"]}},
-                    headers={"Authorization": f"Bearer {self.auth_token}"}
+                    headers={"Authorization": f"Bearer {self.auth_token}"},
                 ) as response:
                     success = response.status == 200
                     return time.time() - start_time, success
@@ -118,7 +124,7 @@ class GameplayPerformanceTester:
             "success_rate": success_count / 20,
             "avg_response_time": statistics.mean(response_times),
             "max_response_time": max(response_times),
-            "all_completed_under_5s": max(response_times) < 5.0
+            "all_completed_under_5s": max(response_times) < 5.0,
         }
 
     async def run_all_tests(self) -> dict[str, Any]:
@@ -140,12 +146,18 @@ class GameplayPerformanceTester:
         results["overall"] = {
             "health_target_met": results["health"]["target_met"],
             "session_creation_target_met": results["session_creation"]["target_met"],
-            "concurrent_handling_ok": results["concurrent_sessions"]["all_completed_under_5s"],
-            "overall_performance": "PASS" if all([
-                results["health"]["target_met"],
-                results["session_creation"]["target_met"],
-                results["concurrent_sessions"]["all_completed_under_5s"]
-            ]) else "NEEDS_OPTIMIZATION"
+            "concurrent_handling_ok": results["concurrent_sessions"][
+                "all_completed_under_5s"
+            ],
+            "overall_performance": "PASS"
+            if all(
+                [
+                    results["health"]["target_met"],
+                    results["session_creation"]["target_met"],
+                    results["concurrent_sessions"]["all_completed_under_5s"],
+                ]
+            )
+            else "NEEDS_OPTIMIZATION",
         }
 
         return results
@@ -153,17 +165,17 @@ class GameplayPerformanceTester:
 
 async def main():
     """Main performance testing function."""
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("TTA GAMEPLAY LOOP - PERFORMANCE TESTING")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     async with GameplayPerformanceTester() as tester:
         results = await tester.run_all_tests()
 
         # Display results
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("PERFORMANCE TEST RESULTS")
-        logger.info("="*60)
+        logger.info("=" * 60)
 
         for test_name, test_results in results.items():
             if test_name == "overall":

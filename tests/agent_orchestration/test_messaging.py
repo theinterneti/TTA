@@ -1,7 +1,5 @@
 """Comprehensive unit tests for agent_orchestration.messaging module."""
 
-import pytest
-
 from src.agent_orchestration.messaging import (
     FailureType,
     MessageResult,
@@ -13,7 +11,6 @@ from src.agent_orchestration.models import (
     AgentId,
     AgentMessage,
     AgentType,
-    MessagePriority,
     MessageType,
 )
 
@@ -84,7 +81,11 @@ class TestMessageSubscription:
         sub = MessageSubscription(
             subscription_id="sub_002",
             agent_id=AgentId(type=AgentType.WBA),
-            message_types=[MessageType.REQUEST, MessageType.RESPONSE, MessageType.EVENT],
+            message_types=[
+                MessageType.REQUEST,
+                MessageType.RESPONSE,
+                MessageType.EVENT,
+            ],
         )
         assert len(sub.message_types) == 3
         assert MessageType.REQUEST in sub.message_types

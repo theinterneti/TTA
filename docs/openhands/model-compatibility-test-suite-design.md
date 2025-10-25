@@ -1,7 +1,7 @@
 # OpenHands Model Compatibility Test Suite - Design Document
 
-**Date:** 2025-10-24  
-**Designer:** The Augster (AI Agent)  
+**Date:** 2025-10-24
+**Designer:** The Augster (AI Agent)
 **Purpose:** Design automated test suite for validating OpenRouter model compatibility with OpenHands integration
 
 ---
@@ -183,23 +183,23 @@ class TestResult:
 
 class ModelTestRunner:
     """Executes tasks with different models and collects results."""
-    
+
     def __init__(self, api_key: str):
         self.api_key = SecretStr(api_key)
         self.results: list[TestResult] = []
-    
+
     async def execute_task(
         self, model: str, task: TaskDefinition
     ) -> TestResult:
         """Execute a single task with a specific model."""
         # Implementation details
         pass
-    
+
     def handle_rate_limiting(self, error: Exception) -> bool:
         """Handle rate limiting with exponential backoff."""
         # Implementation details
         pass
-    
+
     def collect_metrics(self, result: TestResult) -> dict:
         """Collect metrics from test result."""
         # Implementation details
@@ -207,12 +207,12 @@ class ModelTestRunner:
 
 class ReportGenerator:
     """Generates JSON and Markdown reports from test results."""
-    
+
     def generate_json(self, results: list[TestResult]) -> dict:
         """Generate JSON report."""
         # Implementation details
         pass
-    
+
     def generate_markdown(self, results: list[TestResult]) -> str:
         """Generate Markdown report."""
         # Implementation details
@@ -381,9 +381,9 @@ result = TestResult(
 ```markdown
 # OpenHands Model Compatibility Test Results
 
-**Date:** 2025-10-24  
-**Models Tested:** 2  
-**Tasks Executed:** 8  
+**Date:** 2025-10-24
+**Models Tested:** 2
+**Tasks Executed:** 8
 **Overall Success Rate:** 50%
 
 ## Summary
@@ -481,7 +481,6 @@ uv run python scripts/test_model_compatibility.py --report-only
 
 ---
 
-**Status:** Design Complete  
-**Next Steps:** Implement test suite, execute tests, document results  
+**Status:** Design Complete
+**Next Steps:** Implement test suite, execute tests, document results
 **Estimated Effort:** 4-6 hours total
-

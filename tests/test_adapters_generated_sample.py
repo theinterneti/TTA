@@ -9,18 +9,18 @@ Coverage Target: 70.0%
 Quality Score: 82.0/100
 """
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from pathlib import Path
 
 from src.agent_orchestration.adapters import (
-    RetryConfig,
-    AgentCommunicationError,
-    retry_with_backoff,
-    IPAAdapter,
-    WBAAdapter,
-    NGAAdapter,
     AgentAdapterFactory,
+    AgentCommunicationError,
+    IPAAdapter,
+    NGAAdapter,
+    RetryConfig,
+    WBAAdapter,
+    retry_with_backoff,
 )
 
 
@@ -116,12 +116,14 @@ class TestIPAAdapter:
     async def test_ipa_adapter_process_input_success(self):
         """Test successful input processing."""
         adapter = IPAAdapter(fallback_to_mock=True)
-        
-        with patch('src.agent_orchestration.adapters.process_input', new_callable=AsyncMock) as mock_process:
+
+        with patch(
+            "src.agent_orchestration.adapters.process_input", new_callable=AsyncMock
+        ) as mock_process:
             mock_process.return_value = {"intent": "test", "confidence": 0.95}
-            
+
             result = await adapter.process_input("test input")
-            
+
             assert result["intent"] == "test"
             assert result["confidence"] == 0.95
 
@@ -209,11 +211,11 @@ class TestAgentAdapterFactory:
             fallback_to_mock=False,
             retry_config=retry_config,
         )
-        
+
         ipa = factory.create_ipa_adapter()
         wba = factory.create_wba_adapter()
         nga = factory.create_nga_adapter()
-        
+
         assert ipa.fallback_to_mock is False
         assert wba.fallback_to_mock is False
         assert nga.fallback_to_mock is False
@@ -249,15 +251,14 @@ class TestAdapterIntegration:
             fallback_to_mock=True,
             retry_config=retry_config,
         )
-        
+
         adapters = [
             factory.create_ipa_adapter(),
             factory.create_wba_adapter(),
             factory.create_nga_adapter(),
         ]
-        
+
         for adapter in adapters:
             assert adapter.fallback_to_mock is True
             assert adapter.retry_config.max_retries == 4
             assert adapter.retry_config.base_delay == 0.5
-

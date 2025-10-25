@@ -1,7 +1,7 @@
 # OpenHands Capability Matrix - Master Index
 
-**Date:** 2025-10-25  
-**Status:** ✅ Complete & Production Ready  
+**Date:** 2025-10-25
+**Status:** ✅ Complete & Production Ready
 **Purpose:** Comprehensive decision-making reference for OpenHands integration
 
 ---
@@ -12,20 +12,20 @@ This comprehensive capability matrix documents what tasks can be accomplished us
 
 ### What You'll Find Here
 
-✅ **Model Performance Data** - Real test results from 6 models  
-✅ **Access Method Comparison** - Direct API vs CLI vs Docker  
-✅ **Task Capability Matrix** - What works for each task type  
-✅ **Decision Trees** - Quick "which model/method should I use?"  
-✅ **Performance Benchmarks** - Speed, quality, cost metrics  
-✅ **Integration Examples** - Code samples for implementation  
-✅ **Troubleshooting Guide** - Solutions for common issues  
+✅ **Model Performance Data** - Real test results from 6 models
+✅ **Access Method Comparison** - Direct API vs CLI vs Docker
+✅ **Task Capability Matrix** - What works for each task type
+✅ **Decision Trees** - Quick "which model/method should I use?"
+✅ **Performance Benchmarks** - Speed, quality, cost metrics
+✅ **Integration Examples** - Code samples for implementation
+✅ **Troubleshooting Guide** - Solutions for common issues
 
 ---
 
 ## 📚 Document Structure
 
 ### 1. **openhands-capability-matrix.md** (START HERE)
-**Purpose:** High-level overview and model comparison  
+**Purpose:** High-level overview and model comparison
 **Contains:**
 - Executive summary with key findings
 - Model performance rankings (speed, quality, reliability)
@@ -38,7 +38,7 @@ This comprehensive capability matrix documents what tasks can be accomplished us
 ---
 
 ### 2. **openhands-decision-guide.md** (QUICK REFERENCE)
-**Purpose:** Fast decision-making for specific tasks  
+**Purpose:** Fast decision-making for specific tasks
 **Contains:**
 - Quick decision matrix ("I need to...")
 - Task-specific recommendations
@@ -52,7 +52,7 @@ This comprehensive capability matrix documents what tasks can be accomplished us
 ---
 
 ### 3. **openhands-task-capability-matrix.md** (DETAILED REFERENCE)
-**Purpose:** Comprehensive task-by-task capability breakdown  
+**Purpose:** Comprehensive task-by-task capability breakdown
 **Contains:**
 - 9 task categories (code gen, analysis, tests, files, bash, projects, build, docs, refactoring)
 - 3 complexity levels per category
@@ -65,7 +65,7 @@ This comprehensive capability matrix documents what tasks can be accomplished us
 ---
 
 ### 4. **openhands-concrete-examples.md** (EXAMPLES)
-**Purpose:** Real examples of what works and what doesn't  
+**Purpose:** Real examples of what works and what doesn't
 **Contains:**
 - 8 concrete examples with results
 - Simple to complex tasks
@@ -78,7 +78,7 @@ This comprehensive capability matrix documents what tasks can be accomplished us
 ---
 
 ### 5. **openhands-comprehensive-reference.md** (MASTER GUIDE)
-**Purpose:** Complete reference guide tying everything together  
+**Purpose:** Complete reference guide tying everything together
 **Contains:**
 - Document index
 - Key findings summary
@@ -99,31 +99,31 @@ This comprehensive capability matrix documents what tasks can be accomplished us
 ### "I want to..."
 
 #### Generate code quickly
-→ See: **openhands-decision-guide.md** → "I need to generate code quickly"  
+→ See: **openhands-decision-guide.md** → "I need to generate code quickly"
 → Use: **Mistral Small + Direct API** (1.6-5.0s)
 
 #### Generate high-quality code
-→ See: **openhands-capability-matrix.md** → "Quality Ranking"  
+→ See: **openhands-capability-matrix.md** → "Quality Ranking"
 → Use: **DeepSeek Chat + Direct API** (5.1-26.1s)
 
 #### Create files
-→ See: **openhands-task-capability-matrix.md** → "File Creation"  
+→ See: **openhands-task-capability-matrix.md** → "File Creation"
 → Use: **Mistral Small + CLI Mode**
 
 #### Run bash commands
-→ See: **openhands-task-capability-matrix.md** → "Bash Execution"  
+→ See: **openhands-task-capability-matrix.md** → "Bash Execution"
 → Use: **Mistral Small + CLI Mode**
 
 #### Generate unit tests
-→ See: **openhands-decision-guide.md** → "Unit Tests"  
+→ See: **openhands-decision-guide.md** → "Unit Tests"
 → Use: **Mistral Small + Direct API** (5.0s)
 
 #### Do complex reasoning
-→ See: **openhands-capability-matrix.md** → "Model Performance"  
+→ See: **openhands-capability-matrix.md** → "Model Performance"
 → Use: **DeepSeek R1 + Direct API** (28.5s)
 
 #### Scaffold a project
-→ See: **openhands-task-capability-matrix.md** → "Multi-File Project"  
+→ See: **openhands-task-capability-matrix.md** → "Multi-File Project"
 → Use: **Mistral Small + CLI Mode**
 
 #### Understand all capabilities
@@ -194,7 +194,7 @@ See **openhands-decision-guide.md** → "Performance Optimization Tips"
 ## 📈 Key Findings
 
 ### Finding 1: All Models Are Free
-✅ No cost for any tested model on OpenRouter  
+✅ No cost for any tested model on OpenRouter
 ✅ Cost per 100 tasks: $0
 
 ### Finding 2: Speed vs Quality Trade-off
@@ -355,14 +355,13 @@ scripts/test_openhands_models_comprehensive.py
 
 ---
 
-**Status:** ✅ Complete  
-**Last Updated:** 2025-10-25  
-**Confidence Level:** High (comprehensive testing)  
+**Status:** ✅ Complete
+**Last Updated:** 2025-10-25
+**Confidence Level:** High (comprehensive testing)
 **Ready for Production:** Yes
 
 ---
 
-**Start with:** openhands-capability-matrix.md  
-**Questions?** See openhands-decision-guide.md  
+**Start with:** openhands-capability-matrix.md
+**Questions?** See openhands-decision-guide.md
 **Need examples?** See openhands-concrete-examples.md
-

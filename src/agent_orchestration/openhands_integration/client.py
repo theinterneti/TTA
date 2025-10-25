@@ -170,21 +170,23 @@ class OpenHandsClient:
             # Extract output from conversation history
             # Get the last agent message as output
             output_lines = []
-            if hasattr(self._conversation, 'history'):
+            if hasattr(self._conversation, "history"):
                 for event in reversed(self._conversation.history):
-                    if hasattr(event, 'source') and event.source == 'agent':
-                        if hasattr(event, 'message'):
+                    if hasattr(event, "source") and event.source == "agent":
+                        if hasattr(event, "message"):
                             output_lines.append(event.message)
-                        elif hasattr(event, 'content'):
+                        elif hasattr(event, "content"):
                             output_lines.append(event.content)
                         if len(output_lines) >= 5:  # Get last 5 agent messages
                             break
 
-            output = "\n\n".join(reversed(output_lines)) if output_lines else "Task completed (no output captured)"
-
-            logger.info(
-                f"Task completed successfully in {execution_time:.2f}s"
+            output = (
+                "\n\n".join(reversed(output_lines))
+                if output_lines
+                else "Task completed (no output captured)"
             )
+
+            logger.info(f"Task completed successfully in {execution_time:.2f}s")
 
             return OpenHandsTaskResult(
                 success=True,
@@ -268,6 +270,5 @@ def create_openhands_client(
             openhands_image=docker_image,
             runtime_image=docker_runtime_image,
         )
-    else:
-        logger.info("Creating OpenHandsClient (SDK mode)")
-        return OpenHandsClient(config=client_config)
+    logger.info("Creating OpenHandsClient (SDK mode)")
+    return OpenHandsClient(config=client_config)

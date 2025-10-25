@@ -12,7 +12,6 @@ This script:
 
 import asyncio
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -29,11 +28,11 @@ else:
 # Setup logging with detailed format
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('test_generation_execution.log'),
-    ]
+        logging.FileHandler("test_generation_execution.log"),
+    ],
 )
 logger = logging.getLogger(__name__)
 
@@ -69,7 +68,7 @@ async def execute_test_generation():
             timeout_seconds=600.0,
         )
 
-        logger.info(f"✓ Specification created:")
+        logger.info("✓ Specification created:")
         logger.info(f"  - Target file: {spec.target_file}")
         logger.info(f"  - Coverage threshold: {spec.coverage_threshold}%")
         logger.info(f"  - Test framework: {spec.test_framework}")
@@ -81,7 +80,7 @@ async def execute_test_generation():
         # Note: OPENROUTER_API_KEY may not be set, which will trigger fallback
         config = OpenHandsIntegrationConfig.from_env()
 
-        logger.info(f"✓ Configuration loaded:")
+        logger.info("✓ Configuration loaded:")
         logger.info(f"  - Model: {config.model}")
         logger.info(f"  - Max retries: {config.max_retries}")
         logger.info(f"  - Retry base delay: {config.retry_base_delay}s")
@@ -106,7 +105,7 @@ async def execute_test_generation():
         logger.info("EXECUTION RESULTS")
         logger.info("=" * 80)
 
-        logger.info(f"\nValidation Results:")
+        logger.info("\nValidation Results:")
         logger.info(f"  - Syntax valid: {result.syntax_valid}")
         logger.info(f"  - Tests pass: {result.tests_pass}")
         logger.info(f"  - Coverage: {result.coverage_percentage}%")
@@ -124,9 +123,12 @@ async def execute_test_generation():
             logger.info(f"\nGenerated test file: {result.test_file_path}")
 
         logger.info("\n" + "=" * 80)
-        if (result.syntax_valid and result.tests_pass and
-            result.coverage_percentage >= spec.coverage_threshold and
-            result.conventions_followed):
+        if (
+            result.syntax_valid
+            and result.tests_pass
+            and result.coverage_percentage >= spec.coverage_threshold
+            and result.conventions_followed
+        ):
             logger.info("✓ TEST GENERATION SUCCESSFUL")
         else:
             logger.warning("⚠ TEST GENERATION COMPLETED WITH ISSUES")
@@ -160,4 +162,3 @@ async def main():
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
-

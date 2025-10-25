@@ -1,7 +1,7 @@
 # OpenHands Task Capability Matrix
 
-**Date:** 2025-10-25  
-**Purpose:** Detailed capability matrix for all task types  
+**Date:** 2025-10-25
+**Purpose:** Detailed capability matrix for all task types
 **Format:** Comprehensive reference table
 
 ---
@@ -299,7 +299,6 @@
 
 ---
 
-**Status:** Complete  
-**Last Updated:** 2025-10-25  
+**Status:** Complete
+**Last Updated:** 2025-10-25
 **Related:** openhands-capability-matrix.md, openhands-decision-guide.md
-

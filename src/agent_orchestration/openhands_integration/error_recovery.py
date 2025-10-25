@@ -68,17 +68,23 @@ Usage Example:
 --------------
 
 ```python
-from src.agent_orchestration.openhands_integration.error_recovery import OpenHandsErrorRecovery
-from src.agent_orchestration.openhands_integration.config import OpenHandsIntegrationConfig
+from src.agent_orchestration.openhands_integration.error_recovery import (
+    OpenHandsErrorRecovery,
+)
+from src.agent_orchestration.openhands_integration.config import (
+    OpenHandsIntegrationConfig,
+)
 
 # Create recovery manager
 config = OpenHandsIntegrationConfig.from_env()
 recovery = OpenHandsErrorRecovery(config)
 
+
 # Execute with automatic recovery
 async def risky_operation():
     # Operation that might fail
     pass
+
 
 result = await recovery.execute_with_recovery(risky_operation)
 ```
@@ -148,9 +154,7 @@ class OpenHandsErrorRecovery:
             )
             self.retry_config = None
 
-    def classify_openhands_error(
-        self, error: Exception
-    ) -> OpenHandsErrorType:
+    def classify_openhands_error(self, error: Exception) -> OpenHandsErrorType:
         """
         Classify error into OpenHands error type.
 
@@ -171,11 +175,7 @@ class OpenHandsErrorRecovery:
             return OpenHandsErrorType.TIMEOUT_ERROR
 
         # Authentication errors
-        if (
-            "auth" in error_str
-            or "api key" in error_str
-            or "401" in error_str
-        ):
+        if "auth" in error_str or "api key" in error_str or "401" in error_str:
             return OpenHandsErrorType.AUTHENTICATION_ERROR
 
         # Rate limit errors
@@ -232,22 +232,15 @@ class OpenHandsErrorRecovery:
                 )
 
         # Fallback: execute without retry
-        return await self._execute_with_circuit_breaker(
-            func, *args, **kwargs
-        )
+        return await self._execute_with_circuit_breaker(func, *args, **kwargs)
 
-    async def _execute_with_circuit_breaker(
-        self, func: Any, *args, **kwargs
-    ) -> Any:
+    async def _execute_with_circuit_breaker(self, func: Any, *args, **kwargs) -> Any:
         """Execute function with circuit breaker if available."""
         try:
             # Execute with circuit breaker if available
             if self.circuit_breaker:
-                return await self.circuit_breaker.execute(
-                    func, *args, **kwargs
-                )
-            else:
-                return await func(*args, **kwargs)
+                return await self.circuit_breaker.execute(func, *args, **kwargs)
+            return await func(*args, **kwargs)
 
         except Exception as e:
             # Classify error
@@ -263,9 +256,7 @@ class OpenHandsErrorRecovery:
                         context={"function": func.__name__},
                     )
                 except Exception as report_error:
-                    logger.warning(
-                        f"Failed to report error: {report_error}"
-                    )
+                    logger.warning(f"Failed to report error: {report_error}")
 
             # Apply recovery strategy
             recovery_strategies = RECOVERY_STRATEGIES.get(
@@ -281,23 +272,23 @@ class OpenHandsErrorRecovery:
                     # Let retry decorator handle this
                     raise
 
-                elif strategy == OpenHandsRecoveryStrategy.RETRY_WITH_BACKOFF:
+                if strategy == OpenHandsRecoveryStrategy.RETRY_WITH_BACKOFF:
                     # Increase backoff delay
                     if self.retry_config:
                         self.retry_config.base_delay *= 2
                     raise
 
-                elif strategy == OpenHandsRecoveryStrategy.CIRCUIT_BREAK:
+                if strategy == OpenHandsRecoveryStrategy.CIRCUIT_BREAK:
                     # Circuit breaker will handle this
                     raise
 
-                elif strategy == OpenHandsRecoveryStrategy.FALLBACK_MOCK:
+                if strategy == OpenHandsRecoveryStrategy.FALLBACK_MOCK:
                     if self.config.fallback_to_mock:
                         logger.warning("Falling back to mock response")
                         return self._generate_mock_response()
                     raise
 
-                elif strategy == OpenHandsRecoveryStrategy.ESCALATE:
+                if strategy == OpenHandsRecoveryStrategy.ESCALATE:
                     logger.error(f"Escalating error: {error_type.value}")
                     raise
 
@@ -313,4 +304,3 @@ class OpenHandsErrorRecovery:
             "execution_time": 0.1,
             "metadata": {"mock": True, "fallback": True},
         }
-

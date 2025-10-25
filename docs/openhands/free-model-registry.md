@@ -320,4 +320,3 @@ uv run python scripts/test_model_compatibility.py --model openrouter/new-model-n
 **Status:** Complete (8 models documented)
 **Recommendation:** Use `openrouter/deepseek/deepseek-chat` for all tasks
 **Next Steps:** Test additional models as they become available, update registry
-

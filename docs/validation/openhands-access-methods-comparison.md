@@ -1,6 +1,6 @@
 # OpenHands Access Methods: Detailed Comparison
 
-**Date:** 2025-10-25  
+**Date:** 2025-10-25
 **Analysis:** Comprehensive comparison of all three access methods
 
 ---
@@ -356,7 +356,6 @@ result = await client.execute_task("Create a file named test.txt")
 
 ---
 
-**Status:** Analysis Complete  
-**Recommendation:** Use Docker Runtime Mode  
+**Status:** Analysis Complete
+**Recommendation:** Use Docker Runtime Mode
 **Next Step:** Implement Docker Runtime Integration
-

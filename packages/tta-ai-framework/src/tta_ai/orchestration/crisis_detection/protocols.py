@@ -67,9 +67,7 @@ class EmergencyProtocolEngine:
 
                 # If a critical step fails, abort protocol
                 if step.get("critical", False) and not step_result["success"]:
-                    raise Exception(
-                        f"Critical protocol step failed: {step_result['error']}"
-                    )
+                    raise Exception(f"Critical protocol step failed: {step_result['error']}")
 
             protocol_execution["success"] = True
             self.successful_protocols += 1
@@ -87,9 +85,7 @@ class EmergencyProtocolEngine:
 
         finally:
             # Calculate response time
-            protocol_execution["response_time_ms"] = (
-                time.perf_counter() - start_time
-            ) * 1000
+            protocol_execution["response_time_ms"] = (time.perf_counter() - start_time) * 1000
 
             # Move to history
             self.protocol_history.append(protocol_execution.copy())
@@ -172,9 +168,7 @@ class EmergencyProtocolEngine:
 
         return step_result
 
-    def _generate_protocol_response(
-        self, step: dict[str, Any], context: dict[str, Any]
-    ) -> str:
+    def _generate_protocol_response(self, step: dict[str, Any], context: dict[str, Any]) -> str:
         """Generate a protocol-specific response message."""
         template = step.get("template", "")
 
@@ -186,9 +180,7 @@ class EmergencyProtocolEngine:
             timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
         )
 
-    def _log_protocol_event(
-        self, step: dict[str, Any], context: dict[str, Any]
-    ) -> None:
+    def _log_protocol_event(self, step: dict[str, Any], context: dict[str, Any]) -> None:
         """Log a protocol event."""
         log_level = step.get("log_level", "info").lower()
         message = step.get("message", "Protocol event")
@@ -237,9 +229,7 @@ class EmergencyProtocolEngine:
         }
 
         # In a real implementation, this would contact actual emergency services
-        self.logger.critical(
-            f"EMERGENCY SERVICES CONTACT: {emergency_contact['reason']}"
-        )
+        self.logger.critical(f"EMERGENCY SERVICES CONTACT: {emergency_contact['reason']}")
 
         return emergency_contact
 
@@ -268,9 +258,7 @@ class EmergencyProtocolEngine:
 
         return resources
 
-    def _schedule_followup(
-        self, step: dict[str, Any], context: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _schedule_followup(self, step: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
         """Schedule follow-up contact."""
         followup = {
             "type": "followup",
@@ -287,9 +275,7 @@ class EmergencyProtocolEngine:
 
     def get_protocol_metrics(self) -> dict[str, Any]:
         """Get comprehensive protocol execution metrics."""
-        success_rate = (
-            self.successful_protocols / max(1, self.protocols_executed)
-        ) * 100
+        success_rate = (self.successful_protocols / max(1, self.protocols_executed)) * 100
 
         # Protocol type distribution
         protocol_types = {}

@@ -1,7 +1,7 @@
 # OpenHands Integration Implementation Roadmap
 
-**Date:** 2025-10-25  
-**Status:** Ready for Implementation  
+**Date:** 2025-10-25
+**Status:** Ready for Implementation
 **Priority:** High (blocks test generation feature)
 
 ---
@@ -65,7 +65,7 @@ docker_runtime_image: str = Field(
 def create_openhands_client(config, use_docker=None):
     # Default to Docker mode
     should_use_docker = use_docker if use_docker is not None else True
-    
+
     if should_use_docker:
         return DockerOpenHandsClient(config)
     else:
@@ -104,7 +104,7 @@ def detect_task_complexity(task_description: str) -> TaskComplexity:
 ```python
 async def execute_development_task(self, task_description):
     complexity = detect_task_complexity(task_description)
-    
+
     if complexity in [TaskComplexity.TRIVIAL, TaskComplexity.SIMPLE]:
         # Use Direct API (faster, cheaper)
         return await self._execute_via_api(task_description)
@@ -327,8 +327,7 @@ logger.info(f"Bash commands executed: {bash_commands}")
 
 ---
 
-**Status:** Ready for Implementation  
-**Owner:** TTA Development Team  
-**Priority:** High  
+**Status:** Ready for Implementation
+**Owner:** TTA Development Team
+**Priority:** High
 **Estimated Effort:** 80-120 hours
-

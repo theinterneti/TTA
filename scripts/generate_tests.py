@@ -150,16 +150,23 @@ async def main() -> int:
 
             total_files = len(results)
             successful_files = sum(
-                1 for r in results.values()
-                if r.syntax_valid and r.tests_pass and r.coverage_percentage >= args.coverage
+                1
+                for r in results.values()
+                if r.syntax_valid
+                and r.tests_pass
+                and r.coverage_percentage >= args.coverage
             )
 
             for file_path, result in results.items():
-                status = "✓" if (
-                    result.syntax_valid
-                    and result.tests_pass
-                    and result.coverage_percentage >= args.coverage
-                ) else "✗"
+                status = (
+                    "✓"
+                    if (
+                        result.syntax_valid
+                        and result.tests_pass
+                        and result.coverage_percentage >= args.coverage
+                    )
+                    else "✗"
+                )
                 print(f"\n{status} {file_path}")
                 print(f"  Coverage: {result.coverage_percentage:.1f}%")
                 print(f"  Quality Score: {result.quality_score:.1f}/100")
@@ -174,51 +181,51 @@ async def main() -> int:
 
             return 0 if successful_files == total_files else 1
 
-        else:
-            # Generate tests for single file
-            logger.info(f"Generating tests for file: {args.target_file}")
+        # Generate tests for single file
+        logger.info(f"Generating tests for file: {args.target_file}")
 
-            spec = TestTaskSpecification(
-                target_file=args.target_file,
-                coverage_threshold=args.coverage,
-                timeout_seconds=args.timeout,
-            )
+        spec = TestTaskSpecification(
+            target_file=args.target_file,
+            coverage_threshold=args.coverage,
+            timeout_seconds=args.timeout,
+        )
 
-            result = await service.generate_tests(spec, max_iterations=args.max_iterations)
+        result = await service.generate_tests(spec, max_iterations=args.max_iterations)
 
-            # Display results
-            print("\n" + "=" * 80)
-            print("TEST GENERATION RESULTS")
-            print("=" * 80)
-            print(f"Target File: {args.target_file}")
-            print(f"Test File: {result.test_file_path}")
-            print(f"\nSyntax Valid: {'✓' if result.syntax_valid else '✗'}")
-            print(f"Tests Pass: {'✓' if result.tests_pass else '✗'}")
-            print(f"Coverage: {result.coverage_percentage:.1f}% (threshold: {args.coverage}%)")
-            print(f"Conventions Followed: {'✓' if result.conventions_followed else '✗'}")
-            print(f"Quality Score: {result.quality_score:.1f}/100")
+        # Display results
+        print("\n" + "=" * 80)
+        print("TEST GENERATION RESULTS")
+        print("=" * 80)
+        print(f"Target File: {args.target_file}")
+        print(f"Test File: {result.test_file_path}")
+        print(f"\nSyntax Valid: {'✓' if result.syntax_valid else '✗'}")
+        print(f"Tests Pass: {'✓' if result.tests_pass else '✗'}")
+        print(
+            f"Coverage: {result.coverage_percentage:.1f}% (threshold: {args.coverage}%)"
+        )
+        print(f"Conventions Followed: {'✓' if result.conventions_followed else '✗'}")
+        print(f"Quality Score: {result.quality_score:.1f}/100")
 
-            if result.issues:
-                print(f"\nIssues ({len(result.issues)}):")
-                for issue in result.issues:
-                    print(f"  - {issue}")
+        if result.issues:
+            print(f"\nIssues ({len(result.issues)}):")
+            for issue in result.issues:
+                print(f"  - {issue}")
 
-            print("=" * 80)
+        print("=" * 80)
 
-            # Determine success
-            success = (
-                result.syntax_valid
-                and result.tests_pass
-                and result.coverage_percentage >= args.coverage
-                and result.conventions_followed
-            )
+        # Determine success
+        success = (
+            result.syntax_valid
+            and result.tests_pass
+            and result.coverage_percentage >= args.coverage
+            and result.conventions_followed
+        )
 
-            if success:
-                print("\n✓ Test generation successful!")
-                return 0
-            else:
-                print("\n✗ Test generation failed or incomplete")
-                return 1
+        if success:
+            print("\n✓ Test generation successful!")
+            return 0
+        print("\n✗ Test generation failed or incomplete")
+        return 1
 
     except Exception as e:
         logger.exception(f"Error during test generation: {e}")
@@ -227,4 +234,3 @@ async def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main()))
-

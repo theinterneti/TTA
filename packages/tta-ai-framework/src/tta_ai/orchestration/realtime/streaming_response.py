@@ -75,9 +75,7 @@ class StreamingWorkflowResponse:
 
         logger.info(f"Started streaming for workflow: {self.workflow_id}")
 
-    async def send_chunk(
-        self, data: str | dict[str, Any], chunk_type: str = "data"
-    ) -> None:
+    async def send_chunk(self, data: str | dict[str, Any], chunk_type: str = "data") -> None:
         """Send a data chunk to the stream."""
         if not self.is_streaming:
             return
@@ -263,9 +261,7 @@ class StreamingWorkflowResponse:
                 "intermediate_results": operation.intermediate_results,
             }
 
-            await self.stream_queue.put(
-                self._format_chunk(progress_data, "progress_update")
-            )
+            await self.stream_queue.put(self._format_chunk(progress_data, "progress_update"))
 
         except Exception as e:
             logger.error(f"Error handling progress update: {e}")
@@ -304,9 +300,7 @@ class StreamingResponseManager:
         logger.info(f"Created streaming response: {workflow_id}")
         return stream_response
 
-    def get_streaming_response(
-        self, workflow_id: str
-    ) -> StreamingWorkflowResponse | None:
+    def get_streaming_response(self, workflow_id: str) -> StreamingWorkflowResponse | None:
         """Get an existing streaming response."""
         return self.active_streams.get(workflow_id)
 

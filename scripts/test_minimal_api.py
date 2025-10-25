@@ -33,10 +33,7 @@ def test_api():
     # Test 2: Authentication
     print("\n2. Testing Authentication...")
     try:
-        login_data = {
-            "username": "demo_user",
-            "password": "demo_password"
-        }
+        login_data = {"username": "demo_user", "password": "demo_password"}
         response = requests.post(f"{base_url}/api/v1/auth/login", json=login_data)
         if response.status_code == 200:
             auth_data = response.json()
@@ -92,7 +89,7 @@ def test_api():
             # Try session creation with proper headers
             headers = {
                 "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
             session_data = {
@@ -106,7 +103,7 @@ def test_api():
             session_response = session.post(
                 f"{base_url}/api/v1/gameplay/sessions",
                 json=session_data,
-                headers=headers
+                headers=headers,
             )
 
             if session_response.status_code == 200:
@@ -150,6 +147,7 @@ def test_api():
     print("4. Add full database integration")
 
     return True
+
 
 if __name__ == "__main__":
     try:

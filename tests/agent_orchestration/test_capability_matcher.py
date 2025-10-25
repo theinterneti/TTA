@@ -9,7 +9,7 @@ Tests cover:
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -100,7 +100,9 @@ class TestCapabilityMatcher:
         """Test CapabilityMatcher initializes correctly."""
         assert matcher is not None
 
-    def test_exact_match_strategy(self, matcher, sample_capability_set, sample_criteria):
+    def test_exact_match_strategy(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test exact match strategy."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -111,7 +113,9 @@ class TestCapabilityMatcher:
         assert isinstance(matches, list)
         assert all(isinstance(m, CapabilityMatchResult) for m in matches)
 
-    def test_weighted_score_strategy(self, matcher, sample_capability_set, sample_criteria):
+    def test_weighted_score_strategy(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test weighted score matching strategy."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -122,7 +126,9 @@ class TestCapabilityMatcher:
         assert isinstance(matches, list)
         assert all(isinstance(m, CapabilityMatchResult) for m in matches)
 
-    def test_fuzzy_match_strategy(self, matcher, sample_capability_set, sample_criteria):
+    def test_fuzzy_match_strategy(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test fuzzy match strategy."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -133,7 +139,9 @@ class TestCapabilityMatcher:
         assert isinstance(matches, list)
         assert all(isinstance(m, CapabilityMatchResult) for m in matches)
 
-    def test_priority_based_strategy(self, matcher, sample_capability_set, sample_criteria):
+    def test_priority_based_strategy(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test priority-based matching strategy."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -144,7 +152,9 @@ class TestCapabilityMatcher:
         assert isinstance(matches, list)
         assert all(isinstance(m, CapabilityMatchResult) for m in matches)
 
-    def test_semantic_match_strategy(self, matcher, sample_capability_set, sample_criteria):
+    def test_semantic_match_strategy(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test semantic match strategy."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -166,7 +176,9 @@ class TestCapabilityMatcher:
         assert isinstance(matches, list)
         assert len(matches) == 0
 
-    def test_match_with_multiple_capability_sets(self, matcher, sample_capability, sample_criteria):
+    def test_match_with_multiple_capability_sets(
+        self, matcher, sample_capability, sample_criteria
+    ):
         """Test matching with multiple capability sets."""
         cap_sets = [
             AgentCapabilitySet(
@@ -187,7 +199,9 @@ class TestCapabilityMatcher:
 
         assert isinstance(matches, list)
 
-    def test_match_result_has_required_fields(self, matcher, sample_capability_set, sample_criteria):
+    def test_match_result_has_required_fields(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test that match results have all required fields."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -204,7 +218,9 @@ class TestCapabilityMatcher:
             assert hasattr(match, "version_match")
             assert hasattr(match, "performance_match")
 
-    def test_match_score_is_numeric(self, matcher, sample_capability_set, sample_criteria):
+    def test_match_score_is_numeric(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test that match scores are numeric."""
         matches = matcher.match_capabilities(
             [sample_capability_set],
@@ -216,7 +232,9 @@ class TestCapabilityMatcher:
             assert isinstance(match.match_score, (int, float))
             assert 0 <= match.match_score <= 1 or match.match_score >= 0
 
-    def test_unknown_strategy_fallback(self, matcher, sample_capability_set, sample_criteria):
+    def test_unknown_strategy_fallback(
+        self, matcher, sample_capability_set, sample_criteria
+    ):
         """Test fallback behavior with unknown strategy."""
         # Try with an invalid strategy - should fallback to weighted_score
         matches = matcher.match_capabilities(
@@ -293,7 +311,9 @@ class TestCapabilityMatcher:
 
         assert isinstance(matches, list)
 
-    def test_match_with_high_load_factor(self, matcher, sample_capability, sample_criteria):
+    def test_match_with_high_load_factor(
+        self, matcher, sample_capability, sample_criteria
+    ):
         """Test matching with high load factor."""
         cap_set = AgentCapabilitySet(
             agent_id=AgentId(type=AgentType.IPA, instance="agent-1"),
@@ -311,7 +331,9 @@ class TestCapabilityMatcher:
 
         assert isinstance(matches, list)
 
-    def test_match_with_low_availability(self, matcher, sample_capability, sample_criteria):
+    def test_match_with_low_availability(
+        self, matcher, sample_capability, sample_criteria
+    ):
         """Test matching with low availability."""
         cap_set = AgentCapabilitySet(
             agent_id=AgentId(type=AgentType.IPA, instance="agent-1"),
@@ -338,7 +360,9 @@ class TestCapabilityMatcher:
         )
 
         # Mock match_capabilities to raise an exception
-        with patch.object(matcher, "_weighted_score_match", side_effect=Exception("Test error")):
+        with patch.object(
+            matcher, "_weighted_score_match", side_effect=Exception("Test error")
+        ):
             matches = matcher.match_capabilities(
                 [sample_capability_set],
                 criteria,
@@ -523,12 +547,16 @@ class TestCapabilityMatcherHelpers:
 
     def test_keyword_similarity_partial_match(self, matcher):
         """Test keyword similarity with partial match."""
-        score = matcher._keyword_similarity("text processing and NLP", "text processing")
+        score = matcher._keyword_similarity(
+            "text processing and NLP", "text processing"
+        )
         assert score == 1.0
 
     def test_keyword_similarity_word_match(self, matcher):
         """Test keyword similarity with word match."""
-        score = matcher._keyword_similarity("advanced text processing", "text processing")
+        score = matcher._keyword_similarity(
+            "advanced text processing", "text processing"
+        )
         assert score > 0
 
     def test_keyword_similarity_empty_text(self, matcher):
@@ -756,4 +784,3 @@ class TestCapabilityMatcherHelpers:
         )
 
         assert matcher._is_exact_match(capability, criteria) is False
-

@@ -253,9 +253,7 @@ def get_component_stage(maturity_file: str) -> str:
                 return stage
 
             # Alternative pattern: "Status: Staging" or "Stage: Staging"
-            alt_match = re.search(
-                r"(?:Status|Stage):\s*(\w+)", content, re.IGNORECASE
-            )
+            alt_match = re.search(r"(?:Status|Stage):\s*(\w+)", content, re.IGNORECASE)
             if alt_match:
                 stage = alt_match.group(1)
                 if stage.lower() in ["staging", "stage"]:
@@ -332,7 +330,9 @@ def get_blocker_issues(maturity_file: str) -> list[dict[str, str]]:
 
             for match in issue_matches:
                 issue_num = match.group(1)
-                description = match.group(2) if match.group(2) else "See issue for details"
+                description = (
+                    match.group(2) if match.group(2) else "See issue for details"
+                )
                 blockers.append(
                     {"issue": f"#{issue_num}", "description": description.strip()}
                 )

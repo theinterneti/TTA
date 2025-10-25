@@ -11,11 +11,8 @@ Usage:
 """
 
 import asyncio
-import json
 import logging
 import os
-import sys
-from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
@@ -73,11 +70,14 @@ async def test_api_simple_task():
                 content = result["choices"][0]["message"]["content"]
                 logger.info("✅ SUCCESS")
                 logger.info(f"Response:\n{content}")
-                return {"success": True, "content": content, "tokens": result.get("usage", {})}
-            else:
-                logger.error(f"❌ FAILED: {response.status_code}")
-                logger.error(f"Response: {response.text}")
-                return None
+                return {
+                    "success": True,
+                    "content": content,
+                    "tokens": result.get("usage", {}),
+                }
+            logger.error(f"❌ FAILED: {response.status_code}")
+            logger.error(f"Response: {response.text}")
+            return None
 
         except Exception as e:
             logger.error(f"❌ ERROR: {e}")
@@ -130,11 +130,14 @@ Include docstring and type hints."""
                 content = result["choices"][0]["message"]["content"]
                 logger.info("✅ SUCCESS")
                 logger.info(f"Response:\n{content}")
-                return {"success": True, "content": content, "tokens": result.get("usage", {})}
-            else:
-                logger.error(f"❌ FAILED: {response.status_code}")
-                logger.error(f"Response: {response.text}")
-                return None
+                return {
+                    "success": True,
+                    "content": content,
+                    "tokens": result.get("usage", {}),
+                }
+            logger.error(f"❌ FAILED: {response.status_code}")
+            logger.error(f"Response: {response.text}")
+            return None
 
         except Exception as e:
             logger.error(f"❌ ERROR: {e}")
@@ -195,11 +198,14 @@ Requirements:
                 content = result["choices"][0]["message"]["content"]
                 logger.info("✅ SUCCESS")
                 logger.info(f"Response:\n{content}")
-                return {"success": True, "content": content, "tokens": result.get("usage", {})}
-            else:
-                logger.error(f"❌ FAILED: {response.status_code}")
-                logger.error(f"Response: {response.text}")
-                return None
+                return {
+                    "success": True,
+                    "content": content,
+                    "tokens": result.get("usage", {}),
+                }
+            logger.error(f"❌ FAILED: {response.status_code}")
+            logger.error(f"Response: {response.text}")
+            return None
 
         except Exception as e:
             logger.error(f"❌ ERROR: {e}")
@@ -243,4 +249,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

@@ -107,19 +107,13 @@ class CircuitBreaker:
         try:
             data = await self._redis.get(self._state_key())
             if data:
-                state_data = json.loads(
-                    data if isinstance(data, str) else data.decode()
-                )
+                state_data = json.loads(data if isinstance(data, str) else data.decode())
                 self._state = CircuitBreakerState(state_data.get("state", "closed"))
                 self._failure_count = int(state_data.get("failure_count", 0))
                 self._half_open_calls = int(state_data.get("half_open_calls", 0))
-                self._half_open_successes = int(
-                    state_data.get("half_open_successes", 0)
-                )
+                self._half_open_successes = int(state_data.get("half_open_successes", 0))
                 self._last_failure_time = state_data.get("last_failure_time")
-                self._state_changed_at = float(
-                    state_data.get("state_changed_at", time.time())
-                )
+                self._state_changed_at = float(state_data.get("state_changed_at", time.time()))
         except Exception as e:
             logger.debug(f"Failed to load circuit breaker state for {self._name}: {e}")
 
@@ -138,18 +132,14 @@ class CircuitBreaker:
             # TTL of 24 hours for state cleanup
             await self._redis.setex(self._state_key(), 86400, json.dumps(state_data))
         except Exception as e:
-            logger.warning(
-                f"Failed to persist circuit breaker state for {self._name}: {e}"
-            )
+            logger.warning(f"Failed to persist circuit breaker state for {self._name}: {e}")
 
     async def _load_metrics(self) -> None:
         """Load metrics from Redis."""
         try:
             data = await self._redis.get(self._metrics_key())
             if data:
-                metrics_data = json.loads(
-                    data if isinstance(data, str) else data.decode()
-                )
+                metrics_data = json.loads(data if isinstance(data, str) else data.decode())
                 self._metrics = CircuitBreakerMetrics(
                     total_calls=int(metrics_data.get("total_calls", 0)),
                     failed_calls=int(metrics_data.get("failed_calls", 0)),
@@ -159,9 +149,7 @@ class CircuitBreaker:
                     last_success_time=metrics_data.get("last_success_time"),
                 )
         except Exception as e:
-            logger.debug(
-                f"Failed to load circuit breaker metrics for {self._name}: {e}"
-            )
+            logger.debug(f"Failed to load circuit breaker metrics for {self._name}: {e}")
 
     async def _persist_metrics(self) -> None:
         """Persist metrics to Redis with TTL."""
@@ -176,13 +164,9 @@ class CircuitBreaker:
                 "updated_at": time.time(),
             }
             # TTL of 7 days for metrics
-            await self._redis.setex(
-                self._metrics_key(), 604800, json.dumps(metrics_data)
-            )
+            await self._redis.setex(self._metrics_key(), 604800, json.dumps(metrics_data))
         except Exception as e:
-            logger.warning(
-                f"Failed to persist circuit breaker metrics for {self._name}: {e}"
-            )
+            logger.warning(f"Failed to persist circuit breaker metrics for {self._name}: {e}")
 
     # ---- State management ----
     async def _transition_to_open(self) -> None:
@@ -196,9 +180,7 @@ class CircuitBreaker:
             # Record metrics and log transition
             from .circuit_breaker_metrics import record_state_transition
 
-            record_state_transition(
-                self._name, old_state, self._state, self._correlation_id
-            )
+            record_state_transition(self._name, old_state, self._state, self._correlation_id)
 
             logger.warning(
                 f"Circuit breaker {self._name} transitioning to OPEN state",
@@ -228,9 +210,7 @@ class CircuitBreaker:
             # Record metrics and log transition
             from .circuit_breaker_metrics import record_state_transition
 
-            record_state_transition(
-                self._name, old_state, self._state, self._correlation_id
-            )
+            record_state_transition(self._name, old_state, self._state, self._correlation_id)
 
             logger.info(
                 f"Circuit breaker {self._name} transitioning to HALF_OPEN state",
@@ -260,9 +240,7 @@ class CircuitBreaker:
             # Record metrics and log transition
             from .circuit_breaker_metrics import record_state_transition
 
-            record_state_transition(
-                self._name, old_state, self._state, self._correlation_id
-            )
+            record_state_transition(self._name, old_state, self._state, self._correlation_id)
 
             logger.info(
                 f"Circuit breaker {self._name} transitioning to CLOSED state",
@@ -321,9 +299,7 @@ class CircuitBreaker:
                     metrics_collector.record_call_rejected(
                         self._name, "circuit_breaker_open", self._correlation_id
                     )
-                    raise CircuitBreakerOpenError(
-                        f"Circuit breaker {self._name} is OPEN"
-                    )
+                    raise CircuitBreakerOpenError(f"Circuit breaker {self._name} is OPEN")
 
             # Check if we should limit calls in HALF_OPEN state
             if self._state == CircuitBreakerState.HALF_OPEN:
@@ -347,9 +323,7 @@ class CircuitBreaker:
             result = await func()
             duration_ms = (time.time() - start_time) * 1000
             await self._record_success()
-            metrics_collector.record_successful_call(
-                self._name, duration_ms, self._correlation_id
-            )
+            metrics_collector.record_successful_call(self._name, duration_ms, self._correlation_id)
             return result
         except Exception as e:
             duration_ms = (time.time() - start_time) * 1000
@@ -359,9 +333,7 @@ class CircuitBreaker:
             )
             raise
 
-    async def execute(
-        self, func: Callable[..., Awaitable[Any]], *args, **kwargs
-    ) -> Any:
+    async def execute(self, func: Callable[..., Awaitable[Any]], *args, **kwargs) -> Any:
         """
         Execute a function with arguments through the circuit breaker.
 
@@ -379,6 +351,7 @@ class CircuitBreaker:
             CircuitBreakerOpenError: When circuit breaker is open
             Exception: Any exception raised by the function
         """
+
         # Create a wrapper function that calls func with the provided arguments
         async def wrapper():
             return await func(*args, **kwargs)
@@ -449,9 +422,7 @@ class CircuitBreaker:
             if self._state == CircuitBreakerState.CLOSED:
                 return True
             if self._state == CircuitBreakerState.OPEN:
-                return (
-                    time.time() - self._state_changed_at >= self._config.timeout_seconds
-                )
+                return time.time() - self._state_changed_at >= self._config.timeout_seconds
             if self._state == CircuitBreakerState.HALF_OPEN:
                 return self._half_open_calls < self._config.half_open_max_calls
             return False

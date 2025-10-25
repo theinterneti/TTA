@@ -4,9 +4,10 @@ Tests for OpenHands integration helper utilities.
 Tests the convenience functions for test generation.
 """
 
-import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from src.agent_orchestration.openhands_integration.helpers import (
     generate_tests_for_file,
@@ -73,9 +74,7 @@ class TestGenerateTestsForFile:
             )
 
     @pytest.mark.asyncio
-    async def test_generate_tests_for_file_not_python(
-        self, tmp_path, openhands_config
-    ):
+    async def test_generate_tests_for_file_not_python(self, tmp_path, openhands_config):
         """Test error when file is not Python."""
         test_file = tmp_path / "test.txt"
         test_file.write_text("not python")
@@ -207,9 +206,7 @@ class TestGenerateTestsForPackage:
             )
 
     @pytest.mark.asyncio
-    async def test_generate_tests_for_package_empty(
-        self, tmp_path, openhands_config
-    ):
+    async def test_generate_tests_for_package_empty(self, tmp_path, openhands_config):
         """Test handling of empty package."""
         package_dir = tmp_path / "empty_package"
         package_dir.mkdir()
@@ -368,4 +365,3 @@ class TestValidateTestResult:
         assert not success
         assert "Missing edge case tests" in issues
         assert "Incomplete error handling" in issues
-

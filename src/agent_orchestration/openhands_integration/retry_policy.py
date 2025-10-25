@@ -11,7 +11,10 @@ Usage:
 ------
 
 ```python
-from src.agent_orchestration.openhands_integration.retry_policy import RetryPolicy, RetryConfig
+from src.agent_orchestration.openhands_integration.retry_policy import (
+    RetryPolicy,
+    RetryConfig,
+)
 
 # Create retry policy
 config = RetryConfig(
@@ -23,10 +26,12 @@ config = RetryConfig(
 )
 retry_policy = RetryPolicy(config)
 
+
 # Execute with retry
 async def risky_operation():
     # Operation that might fail
     pass
+
 
 result = await retry_policy.execute_with_retry(risky_operation)
 ```
@@ -38,8 +43,9 @@ import asyncio
 import logging
 import random
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +71,7 @@ class RetryConfig:
             Delay in seconds
         """
         # Exponential backoff: base_delay * (exponential_base ^ attempt)
-        delay = self.base_delay * (self.exponential_base ** attempt)
+        delay = self.base_delay * (self.exponential_base**attempt)
 
         # Cap at max_delay
         delay = min(delay, self.max_delay)
@@ -87,7 +93,7 @@ class RetryPolicy:
     Handles retries with configurable exponential backoff and jitter.
     """
 
-    def __init__(self, config: Optional[RetryConfig] = None) -> None:
+    def __init__(self, config: RetryConfig | None = None) -> None:
         """
         Initialize retry policy.
 
@@ -105,7 +111,7 @@ class RetryPolicy:
         self,
         func: Callable[..., Any],
         *args,
-        on_retry: Optional[Callable[[int, float, Exception], None]] = None,
+        on_retry: Callable[[int, float, Exception], None] | None = None,
         **kwargs,
     ) -> Any:
         """
@@ -160,7 +166,7 @@ class RetryPolicy:
         self,
         func: Callable[..., Any],
         *args,
-        on_retry: Optional[Callable[[int, float, Exception], None]] = None,
+        on_retry: Callable[[int, float, Exception], None] | None = None,
         **kwargs,
     ) -> Any:
         """
@@ -223,4 +229,3 @@ class RetryPolicy:
                 logger.info(f"Updated retry config: {key}={value}")
             else:
                 logger.warning(f"Unknown retry config parameter: {key}")
-

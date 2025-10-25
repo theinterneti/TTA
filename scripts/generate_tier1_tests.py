@@ -73,11 +73,11 @@ async def generate_for_module(service, module: dict) -> dict:
         TestTaskSpecification,
     )
 
-    logger.info(f"\n{'='*80}")
+    logger.info(f"\n{'=' * 80}")
     logger.info(f"Generating tests for: {module['name']}")
     logger.info(f"File: {module['file']} ({module['lines']} lines)")
     logger.info(f"Current coverage: {module['coverage']}%")
-    logger.info(f"{'='*80}")
+    logger.info(f"{'=' * 80}")
 
     try:
         # OPTIMIZED: Minimal task description
@@ -92,8 +92,8 @@ async def generate_for_module(service, module: dict) -> dict:
             description=f"Generate pytest unit tests for {module['file']} with ≥70% coverage. Test all public APIs, edge cases, and error conditions.",
         )
 
-        logger.info(f"Executing test generation (max_iterations=5)...")
-        logger.info(f"Model: DeepSeek Chat (primary) with automatic fallback")
+        logger.info("Executing test generation (max_iterations=5)...")
+        logger.info("Model: DeepSeek Chat (primary) with automatic fallback")
 
         # Generate tests
         result = await service.generate_tests(spec, max_iterations=5)
@@ -102,13 +102,17 @@ async def generate_for_module(service, module: dict) -> dict:
         module_result = {
             "module": module["name"],
             "file": module["file"],
-            "status": "SUCCESS" if result.syntax_valid and result.tests_pass else "FAILED",
+            "status": "SUCCESS"
+            if result.syntax_valid and result.tests_pass
+            else "FAILED",
             "timestamp": datetime.now().isoformat(),
             "syntax_valid": result.syntax_valid,
             "tests_pass": result.tests_pass,
             "coverage_percentage": result.coverage_percentage,
             "conventions_followed": result.conventions_followed,
-            "test_file_path": str(result.test_file_path) if result.test_file_path else None,
+            "test_file_path": str(result.test_file_path)
+            if result.test_file_path
+            else None,
             "issues": result.issues,
         }
 
@@ -132,18 +136,20 @@ async def generate_for_module(service, module: dict) -> dict:
 
 async def main():
     """Generate tests for all Tier 1 modules with optimized strategy."""
-    logger.info("\n" + "╔" + "="*78 + "╗")
-    logger.info("║" + " "*78 + "║")
+    logger.info("\n" + "╔" + "=" * 78 + "╗")
+    logger.info("║" + " " * 78 + "║")
     logger.info("║" + "Tier 1 Test Generation - Optimized Strategy".center(78) + "║")
-    logger.info("║" + " "*78 + "║")
-    logger.info("╚" + "="*78 + "╝")
+    logger.info("║" + " " * 78 + "║")
+    logger.info("╚" + "=" * 78 + "╝")
 
-    logger.info(f"\nStrategy: Single-module generation with automatic model rotation")
-    logger.info(f"Primary model: DeepSeek Chat (100% success rate)")
-    logger.info(f"Fallback chain: Mistral Small → Google Gemini 2.0 Flash")
-    logger.info(f"Rate limit detection: Enabled (429 errors trigger model rotation)")
-    logger.info(f"\nGenerating tests for {len(TIER1_MODULES)} modules (smallest first)...")
-    logger.info(f"Target coverage: 70% for each module")
+    logger.info("\nStrategy: Single-module generation with automatic model rotation")
+    logger.info("Primary model: DeepSeek Chat (100% success rate)")
+    logger.info("Fallback chain: Mistral Small → Google Gemini 2.0 Flash")
+    logger.info("Rate limit detection: Enabled (429 errors trigger model rotation)")
+    logger.info(
+        f"\nGenerating tests for {len(TIER1_MODULES)} modules (smallest first)..."
+    )
+    logger.info("Target coverage: 70% for each module")
 
     try:
         from agent_orchestration.openhands_integration.config import (
@@ -163,9 +169,9 @@ async def main():
             results.append(result)
 
         # Summary
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("GENERATION SUMMARY")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         successful = sum(1 for r in results if r["status"] == "SUCCESS")
         failed = sum(1 for r in results if r["status"] in ("FAILED", "ERROR"))
@@ -187,7 +193,7 @@ async def main():
             json.dump(results, f, indent=2)
 
         logger.info(f"\nResults saved to {results_file}")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         return 0 if failed == 0 else 1
 
@@ -199,4 +205,3 @@ async def main():
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
-

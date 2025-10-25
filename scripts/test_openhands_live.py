@@ -67,7 +67,7 @@ async def main() -> None:
             workspace_path=project_root,
             timeout_seconds=300.0,  # 5 minutes for development task
         )
-        print(f"✅ Configuration created:")
+        print("✅ Configuration created:")
         print(f"   - Model: {config.model}")
         print(f"   - Workspace: {config.workspace_path}")
         print(f"   - Timeout: {config.timeout_seconds}s")
@@ -174,7 +174,9 @@ Please generate the complete test file with all necessary imports and fixtures.
 
             # Check for parametrize (good practice for multiple test cases)
             has_parametrize = "@pytest.mark.parametrize" in output
-            print(f"   - Parametrized tests: {'✅' if has_parametrize else '⚠️  (optional)'}")
+            print(
+                f"   - Parametrized tests: {'✅' if has_parametrize else '⚠️  (optional)'}"
+            )
 
             # Check for docstrings
             has_docstrings = '"""' in output or "'''" in output
@@ -229,7 +231,7 @@ Please generate the complete test file with all necessary imports and fixtures.
             print()
 
         else:
-            print(f"❌ Task execution failed")
+            print("❌ Task execution failed")
             if error:
                 print(f"   Error: {error}")
             print()
@@ -263,4 +265,3 @@ Please generate the complete test file with all necessary imports and fixtures.
 
 if __name__ == "__main__":
     asyncio.run(main())
-
