@@ -1,0 +1,33 @@
+{
+  "recommendations": [
+    // Python Development
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    
+    // Testing & Coverage
+    "ryanluker.vscode-coverage-gutters",
+    
+    // Code Quality
+    "charliermarsh.ruff",
+    "ms-python.mypy-type-checker",
+    
+    // Git & GitHub Integration
+    "github.vscode-pull-request-github",
+    "github.vscode-github-actions",
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+    "mhutchie.git-graph",
+    
+    // Docker & DevOps
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers",
+    
+    // Additional Tools
+    "editorconfig.editorconfig",
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "redhat.vscode-yaml"
+  ]
+}
+

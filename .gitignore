@@ -35,13 +35,18 @@ wheels/
 .venv
 env/
 venv/
+venv-staging/
 ENV/
 env.bak/
 venv.bak/
-.python-version
+# Keep .python-version for version pinning
+# .python-version
 
 # GitHub Project configuration (contains sensitive IDs)
 .github/project-config.env
+
+# Workflow validation reports
+workflow-validation-report.txt
 
 # -------------------------------------------------
 # 4) Testing & coverage outputs

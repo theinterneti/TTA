@@ -1,0 +1,195 @@
+{
+  // Python Language Server Settings (Pylance)
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "error",
+    "reportMissingTypeStubs": "none",
+    "reportUnusedImport": "information",
+    "reportUnusedClass": "information",
+    "reportUnusedFunction": "information",
+    "reportUnusedVariable": "information",
+    "reportDuplicateImport": "warning",
+    "reportOptionalSubscript": "warning",
+    "reportOptionalMemberAccess": "warning",
+    "reportOptionalCall": "warning",
+    "reportOptionalIterable": "warning",
+    "reportOptionalContextManager": "warning",
+    "reportOptionalOperand": "warning",
+    "reportUntypedFunctionDecorator": "none",
+    "reportUntypedClassDecorator": "none",
+    "reportUntypedBaseClass": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownLambdaType": "none",
+    "reportUnknownVariableType": "none",
+    "reportUnknownMemberType": "none",
+    "reportMissingParameterType": "none",
+    "reportMissingTypeArgument": "none",
+    "reportUndefinedVariable": "error",
+    "reportUnboundVariable": "error"
+  },
+
+  // Inlay Hints (show inferred types inline)
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "editor.inlayHints.enabled": "on",
+
+  // Import Organization
+  "python.analysis.importFormat": "absolute",
+  "python.analysis.completeFunctionParens": true,
+
+  // Indexing and Performance
+  "python.analysis.indexing": true,
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "src",
+      "depth": 10
+    }
+  ],
+
+  // Python Environment
+  // UV manages the virtual environment at .venv/
+  // Recreate environment with: uv sync
+  // CRITICAL: This path MUST point to .venv/bin/python
+  // If VS Code tries to use a different interpreter, manually select this one:
+  // Ctrl+Shift+P -> "Python: Select Interpreter" -> Choose .venv/bin/python
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.pythonPath": "${workspaceFolder}/.venv/bin/python",  // Explicit override
+  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+
+  // Testing Configuration
+  // CRITICAL: These settings must match pytest.ini configuration
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+
+  // Pytest Arguments
+  // Must use absolute path to tests directory for reliable discovery
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+
+  // Pytest Path - Explicitly use .venv pytest
+  "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+
+  // Auto Test Discovery
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+
+  // Formatting and Linting
+  "python.formatting.provider": "none",
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  // File Associations
+  "files.associations": {
+    "*.py": "python",
+    "pyrightconfig.json": "jsonc"
+  },
+
+  // Editor Settings
+  "editor.rulers": [88, 120],
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // Exclude from File Watcher
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/*.pyc": true,
+    "**/monkeytype.sqlite3": true
+  },
+
+  // Search Exclusions
+  "search.exclude": {
+    "**/.git": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/monkeytype.sqlite3": true
+  },
+
+  // Coverage Gutters Configuration
+  "coverage-gutters.coverageFileNames": [
+    "coverage.xml",
+    "htmlcov/index.html"
+  ],
+  "coverage-gutters.showLineCoverage": true,
+  "coverage-gutters.showRulerCoverage": true,
+  "coverage-gutters.highlightdark": "rgba(0, 128, 0, 0.3)",
+  "coverage-gutters.noHighlightDark": "rgba(128, 0, 0, 0.3)",
+
+  // Git & GitHub Integration
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.pruneOnFetch": true,
+  "git.fetchOnPull": true,
+  "git.pullBeforeCheckout": true,
+  "git.showPushSuccessNotification": true,
+  "git.ignoreLimitWarning": true,
+  "git.decorations.enabled": true,
+  "git.enableStatusBarSync": true,
+  
+  // GitLens Configuration
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.currentLine.enabled": true,
+  "gitlens.codeLens.enabled": true,
+  "gitlens.codeLens.authors.enabled": false,
+  "gitlens.codeLens.recentChange.enabled": false,
+  
+  // Source Control View
+  "scm.defaultViewMode": "tree",
+  "scm.alwaysShowRepositories": true,
+  "scm.countBadge": "all",
+  
+  // GitHub Pull Requests
+  "githubPullRequests.queries": [
+    {
+      "label": "Waiting For My Review",
+      "query": "is:open review-requested:${user}"
+    },
+    {
+      "label": "Assigned To Me",
+      "query": "is:open assignee:${user}"
+    },
+    {
+      "label": "Created By Me",
+      "query": "is:open author:${user}"
+    }
+  ],
+  "githubPullRequests.pullBranch": "always",
+  
+  // GitHub Actions
+  "github-actions.workflows.pinned.workflows": [
+    ".github/workflows/tests.yml",
+    ".github/workflows/code-quality.yml",
+    ".github/workflows/docker-build.yml"
+  ],
+  
+  // Markdown
+  "markdown.preview.breaks": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  }
+}
+
