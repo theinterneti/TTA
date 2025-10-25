@@ -75,7 +75,7 @@ The TTA (Therapeutic Text Adventure) system has a **comprehensive but partially 
 MATCH (s:Session {user_id: $user_id})
       -[:ACHIEVES_PROGRESS]->
       (p:Progress)
-RETURN 
+RETURN
     count(p) as total_progress_markers,
     collect(DISTINCT p.progress_type) as progress_types,
     avg(p.progress_value) as average_progress_value
@@ -87,7 +87,7 @@ RETURN
 MATCH (s:Session {user_id: $user_id})
 OPTIONAL MATCH (s)-[made:MADE_CHOICE]->(c:Choice)
 WHERE c.choice_type IN ['therapeutic', 'skill_building']
-RETURN 
+RETURN
     count(DISTINCT s) as total_sessions,
     avg(c.therapeutic_value) as avg_therapeutic_choice_value
 ```
@@ -98,7 +98,7 @@ RETURN
 MATCH (s:Session {session_id: $session_id})
 OPTIONAL MATCH (s)-[:MADE_CHOICE]->(choices:Choice)
 OPTIONAL MATCH (s)-[:ACHIEVES_PROGRESS]->(progress:Progress)
-RETURN 
+RETURN
     count(DISTINCT choices) as total_choices,
     count(DISTINCT progress) as total_progress_markers,
     avg(choices.therapeutic_value) as avg_therapeutic_value

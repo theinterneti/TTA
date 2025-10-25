@@ -11,22 +11,22 @@ import time
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-
-from src.agent_orchestration.models import AgentType
-from src.agent_orchestration.performance.optimization import IntelligentAgentCoordinator
-from src.agent_orchestration.performance.response_time_monitor import (
+import pytest_asyncio
+from tta_ai.orchestration.models import AgentType
+from tta_ai.orchestration.performance.optimization import IntelligentAgentCoordinator
+from tta_ai.orchestration.performance.response_time_monitor import (
     get_response_time_monitor,
 )
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisInterventionManager,
     TherapeuticValidator,
 )
@@ -38,7 +38,7 @@ from src.agent_orchestration.therapeutic_safety import (
 class TestEndToEndValidation:
     """Comprehensive end-to-end system validation tests."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def orchestration_service(
         self, redis_coordinator, neo4j_driver, event_publisher
     ):
@@ -90,7 +90,7 @@ class TestEndToEndValidation:
         # Cleanup
         await crisis_manager.stop()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def performance_monitor(self):
         """Create performance monitoring infrastructure."""
         monitor = get_response_time_monitor()
@@ -117,7 +117,7 @@ class TestEndToEndValidation:
         await coordinator.stop()
         await monitor.stop()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def websocket_manager(self, redis_client, event_publisher):
         """Create WebSocket manager for real-time testing."""
         config_dict = {
@@ -328,11 +328,11 @@ class TestEndToEndValidation:
 
         for i in range(num_concurrent):
             user_input = (
-                f"Hello, I'm user {i+1} and I need help with stress management."
+                f"Hello, I'm user {i + 1} and I need help with stress management."
             )
-            session_id = f"e2e_concurrent_session_{i+1:03d}"
-            world_id = f"e2e_concurrent_world_{i+1:03d}"
-            user_id = f"e2e_concurrent_user_{i+1}"
+            session_id = f"e2e_concurrent_session_{i + 1:03d}"
+            world_id = f"e2e_concurrent_world_{i + 1:03d}"
+            user_id = f"e2e_concurrent_user_{i + 1}"
 
             task = asyncio.create_task(
                 orchestration_service.process_user_input(
@@ -391,9 +391,9 @@ class TestEndToEndValidation:
         ]
 
         for i, malformed_input in enumerate(malformed_inputs):
-            session_id = f"e2e_error_session_{i+1:03d}"
-            world_id = f"e2e_error_world_{i+1:03d}"
-            user_id = f"e2e_error_user_{i+1}"
+            session_id = f"e2e_error_session_{i + 1:03d}"
+            world_id = f"e2e_error_world_{i + 1:03d}"
+            user_id = f"e2e_error_user_{i + 1}"
 
             try:
                 result = await orchestration_service.process_user_input(
@@ -532,9 +532,9 @@ class TestEndToEndValidation:
         ]
 
         for i, scenario in enumerate(therapeutic_scenarios):
-            session_id = f"e2e_therapeutic_session_{i+1:03d}"
-            world_id = f"e2e_therapeutic_world_{i+1:03d}"
-            user_id = f"e2e_therapeutic_user_{i+1}"
+            session_id = f"e2e_therapeutic_session_{i + 1:03d}"
+            world_id = f"e2e_therapeutic_world_{i + 1:03d}"
+            user_id = f"e2e_therapeutic_user_{i + 1}"
 
             result = await orchestration_service.process_user_input(
                 user_input=scenario["input"],

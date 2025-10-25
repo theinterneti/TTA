@@ -10,30 +10,30 @@ import json
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+import pytest_asyncio
 from fastapi.websockets import WebSocket
-
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.realtime.agent_event_integration import (
+from tta_ai.orchestration.realtime.agent_event_integration import (
     AgentWorkflowCoordinator,
 )
-from src.agent_orchestration.realtime.config_manager import get_realtime_config_manager
-from src.agent_orchestration.realtime.error_reporting import (
+from tta_ai.orchestration.realtime.config_manager import get_realtime_config_manager
+from tta_ai.orchestration.realtime.error_reporting import (
     ErrorReportingManager,
     ErrorSeverity,
 )
-from src.agent_orchestration.realtime.event_publisher import EventPublisher
-from src.agent_orchestration.realtime.models import (
+from tta_ai.orchestration.realtime.event_publisher import EventPublisher
+from tta_ai.orchestration.realtime.models import (
     AgentStatus,
     AgentStatusEvent,
 )
-from src.agent_orchestration.realtime.progressive_feedback import (
+from tta_ai.orchestration.realtime.progressive_feedback import (
     ProgressiveFeedbackManager,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
 
@@ -43,7 +43,7 @@ from src.agent_orchestration.realtime.websocket_manager import (
 class TestWebSocketRealAgentIntegration:
     """Test WebSocket integration with real agent communication."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def realtime_config(self):
         """Create real-time configuration for testing."""
         config = {
@@ -78,7 +78,7 @@ class TestWebSocketRealAgentIntegration:
         config_manager = get_realtime_config_manager(config)
         return config_manager.get_config()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_publisher(self, redis_client, realtime_config):
         """Create event publisher for testing."""
         publisher = EventPublisher(
@@ -92,7 +92,7 @@ class TestWebSocketRealAgentIntegration:
         )
         return publisher
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def websocket_manager(self, realtime_config, redis_client):
         """Create WebSocket manager for testing."""
         config_dict = {
@@ -112,7 +112,7 @@ class TestWebSocketRealAgentIntegration:
 
         return manager
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def enhanced_agent_proxies(self, redis_coordinator, event_publisher):
         """Create enhanced agent proxies with real-time integration."""
         ipa_proxy = InputProcessorAgentProxy(
@@ -141,7 +141,7 @@ class TestWebSocketRealAgentIntegration:
 
         return ipa_proxy, wba_proxy, nga_proxy
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def workflow_coordinator(self, enhanced_agent_proxies, event_publisher):
         """Create workflow coordinator for testing."""
         ipa_proxy, wba_proxy, nga_proxy = enhanced_agent_proxies
@@ -155,7 +155,7 @@ class TestWebSocketRealAgentIntegration:
 
         return coordinator
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def mock_websocket(self):
         """Create mock WebSocket for testing."""
         websocket = Mock(spec=WebSocket)
@@ -747,7 +747,7 @@ class TestWebSocketRealAgentIntegration:
             await feedback_manager.update_agent_operation(
                 operation_id=operation_id,
                 progress=progress,
-                stage=f"generating_part_{i+1}",
+                stage=f"generating_part_{i + 1}",
                 message=f"Generated {len(result['partial_story'])} characters",
                 intermediate_result=result,
             )

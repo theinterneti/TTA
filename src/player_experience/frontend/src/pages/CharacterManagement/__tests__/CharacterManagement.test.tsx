@@ -220,13 +220,13 @@ describe('CharacterManagement', () => {
     expect(container).toHaveClass('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
 
     // Click list view button
-    const listViewButton = screen.getAllByRole('button').find(button => 
+    const listViewButton = screen.getAllByRole('button').find(button =>
       button.querySelector('svg')?.querySelector('path')?.getAttribute('d')?.includes('M4 6h16M4 10h16M4 14h16M4 18h16')
     );
-    
+
     if (listViewButton) {
       fireEvent.click(listViewButton);
-      
+
       // Should now be in list view
       const listContainer = screen.getByText('Test Character').closest('.space-y-4');
       expect(listContainer).toBeInTheDocument();

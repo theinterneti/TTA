@@ -13,17 +13,16 @@ Usage:
 import ast
 import sys
 from pathlib import Path
-from typing import List, Dict, Set, Tuple
 
 
 class LoopVariableAnalyzer(ast.NodeVisitor):
     """Analyze loop control variables and their usage within loop bodies."""
 
     def __init__(self):
-        self.fixes: List[Dict] = []
+        self.fixes: list[dict] = []
         self.current_loop_var: str | None = None
         self.current_loop_line: int | None = None
-        self.loop_body_vars: Set[str] = set()
+        self.loop_body_vars: set[str] = set()
         self.in_loop_body = False
 
     def visit_For(self, node: ast.For):
@@ -89,10 +88,10 @@ class LoopVariableAnalyzer(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def analyze_file(file_path: Path) -> List[Dict]:
+def analyze_file(file_path: Path) -> list[dict]:
     """Analyze a Python file for B007 errors."""
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             source = f.read()
 
         tree = ast.parse(source, filename=str(file_path))
@@ -108,13 +107,13 @@ def analyze_file(file_path: Path) -> List[Dict]:
         return []
 
 
-def apply_fixes(file_path: Path, fixes: List[Dict], dry_run: bool = False) -> int:
+def apply_fixes(file_path: Path, fixes: list[dict], dry_run: bool = False) -> int:
     """Apply fixes to a file using line-based replacement."""
     if not fixes:
         return 0
 
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             lines = f.readlines()
 
         changes_made = 0
@@ -145,11 +144,12 @@ def apply_fixes(file_path: Path, fixes: List[Dict], dry_run: bool = False) -> in
                     # Pattern: "for key, value in" -> "for _, value in"
                     new_line = new_line.replace(f"{old_var},", f"{new_var},", 1)
                     new_line = new_line.replace(f", {old_var} in", f", {new_var} in", 1)
-                else:
-                    # Simple loop variable
-                    # Pattern: "for <var> in" -> "for _ in"
-                    if f"for {old_var} in" in new_line:
-                        new_line = new_line.replace(f"for {old_var} in", f"for {new_var} in", 1)
+                # Simple loop variable
+                # Pattern: "for <var> in" -> "for _ in"
+                elif f"for {old_var} in" in new_line:
+                    new_line = new_line.replace(
+                        f"for {old_var} in", f"for {new_var} in", 1
+                    )
 
             if new_line != line:
                 lines[line_idx] = new_line
@@ -233,4 +233,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

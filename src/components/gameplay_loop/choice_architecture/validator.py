@@ -127,10 +127,7 @@ class ChoiceValidator:
 
             # Check therapeutic value threshold
             min_therapeutic_value = rules.get("min_therapeutic_value", 0.0)
-            if choice.therapeutic_value < min_therapeutic_value:
-                return False
-
-            return True
+            return not choice.therapeutic_value < min_therapeutic_value
 
         except Exception as e:
             logger.error(f"Failed to validate choice for emotional state: {e}")
@@ -166,15 +163,15 @@ class ChoiceValidator:
 
             # Analyze skill development
             if user_choice.choice_type == ChoiceType.SKILL_BUILDING:
-                impact_analysis["skill_development"] = (
-                    await self._analyze_skill_development(user_choice, session_state)
-                )
+                impact_analysis[
+                    "skill_development"
+                ] = await self._analyze_skill_development(user_choice, session_state)
 
             # Analyze learning opportunities
-            impact_analysis["learning_opportunities"] = (
-                await self._identify_learning_opportunities(
-                    user_choice, scene, session_state
-                )
+            impact_analysis[
+                "learning_opportunities"
+            ] = await self._identify_learning_opportunities(
+                user_choice, scene, session_state
             )
 
             # Analyze progress markers
@@ -188,10 +185,10 @@ class ChoiceValidator:
             )
 
             # Calculate therapeutic alignment
-            impact_analysis["therapeutic_alignment"] = (
-                await self._calculate_therapeutic_alignment(
-                    user_choice, scene, session_state
-                )
+            impact_analysis[
+                "therapeutic_alignment"
+            ] = await self._calculate_therapeutic_alignment(
+                user_choice, scene, session_state
             )
 
             return impact_analysis
@@ -664,32 +661,29 @@ class ChoiceValidator:
                 for tag in ["safety", "support", "grounding"]
             ):
                 return 1.0
-            else:
-                return 0.2
+            return 0.2
 
         # High alignment for anxious/overwhelmed states with calming choices
-        elif emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
+        if emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
             if any(
                 tag in choice.therapeutic_tags
                 for tag in ["grounding", "calming", "mindfulness"]
             ):
                 return 0.9
-            else:
-                return 0.4
+            return 0.4
 
         # Moderate alignment for engaged state with growth choices
-        elif emotional_state == EmotionalState.ENGAGED:
+        if emotional_state == EmotionalState.ENGAGED:
             if any(
                 tag in choice.therapeutic_tags
                 for tag in ["exploration", "growth", "challenge"]
             ):
                 return 0.8
-            else:
-                return 0.6
+            return 0.6
 
         # Balanced alignment for calm state
-        else:  # CALM
-            return 0.7
+        # CALM
+        return 0.7
 
     async def _calculate_type_appropriateness(
         self, choice: Choice, scene: Scene

@@ -13,10 +13,10 @@ from unittest.mock import AsyncMock, Mock
 
 import psutil
 import pytest
-
-from src.agent_orchestration.realtime.event_publisher import EventPublisher
-from src.agent_orchestration.realtime.models import AgentStatus, AgentStatusEvent
-from src.agent_orchestration.realtime.websocket_manager import (
+import pytest_asyncio
+from tta_ai.orchestration.realtime.event_publisher import EventPublisher
+from tta_ai.orchestration.realtime.models import AgentStatus, AgentStatusEvent
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
 
@@ -58,7 +58,7 @@ class PerformanceMetrics:
 class TestWebSocketPerformance:
     """Test WebSocket performance and scalability."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def high_capacity_websocket_manager(self, redis_client):
         """Create WebSocket manager configured for high capacity."""
         config_dict = {
@@ -78,7 +78,7 @@ class TestWebSocketPerformance:
 
         return manager
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for performance testing."""
         publisher = EventPublisher(
@@ -345,7 +345,7 @@ class TestWebSocketPerformance:
         print(f"  Total Connections: {total_connections}")
         print(f"  Duration: {duration:.2f}s")
         print(f"  Connections/Second: {connections_per_second:.1f}")
-        print(f"  Success Rate: {successful_connections/total_connections:.2%}")
+        print(f"  Success Rate: {successful_connections / total_connections:.2%}")
         print(f"  Memory Increase: {memory_increase:.1f} MB")
 
     async def test_large_message_handling(self, high_capacity_websocket_manager):

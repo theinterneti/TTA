@@ -1,9 +1,9 @@
 import { realTimeTherapeuticMonitor } from '../realTimeTherapeuticMonitor';
-import type { 
-  EmotionalState, 
-  RiskAssessment, 
+import type {
+  EmotionalState,
+  RiskAssessment,
   MonitoringSession,
-  InterventionRecord 
+  InterventionRecord
 } from '../realTimeTherapeuticMonitor';
 
 describe('RealTimeTherapeuticMonitor', () => {
@@ -22,8 +22,8 @@ describe('RealTimeTherapeuticMonitor', () => {
   describe('Session Management', () => {
     test('should start monitoring session successfully', () => {
       const session = realTimeTherapeuticMonitor.startMonitoring(
-        mockSessionId, 
-        mockUserId, 
+        mockSessionId,
+        mockUserId,
         mockTherapeuticGoals
       );
 
@@ -40,9 +40,9 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should stop monitoring session successfully', () => {
       realTimeTherapeuticMonitor.startMonitoring(mockSessionId, mockUserId, mockTherapeuticGoals);
-      
+
       const stoppedSession = realTimeTherapeuticMonitor.stopMonitoring(mockSessionId);
-      
+
       expect(stoppedSession).toBeDefined();
       expect(stoppedSession!.endTime).toBeGreaterThan(0);
       expect(realTimeTherapeuticMonitor.getSession(mockSessionId)).toBeNull();
@@ -56,7 +56,7 @@ describe('RealTimeTherapeuticMonitor', () => {
     test('should get active sessions', () => {
       realTimeTherapeuticMonitor.startMonitoring(mockSessionId, mockUserId, mockTherapeuticGoals);
       realTimeTherapeuticMonitor.startMonitoring('session-2', 'user-2', ['goal-1']);
-      
+
       const activeSessions = realTimeTherapeuticMonitor.getActiveSessions();
       expect(activeSessions).toHaveLength(2);
       expect(activeSessions.map(s => s.sessionId)).toContain(mockSessionId);
@@ -71,10 +71,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should analyze positive emotional state', async () => {
       const userInput = 'I feel happy and excited about my progress today!';
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        userInput, 
+        mockSessionId,
+        userInput,
         {}
       );
 
@@ -87,10 +87,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should analyze negative emotional state', async () => {
       const userInput = 'I feel sad and hopeless. Everything seems overwhelming.';
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        userInput, 
+        mockSessionId,
+        userInput,
         {}
       );
 
@@ -103,10 +103,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should analyze high arousal emotional state', async () => {
       const userInput = 'I am feeling so anxious and panicked right now!';
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        userInput, 
+        mockSessionId,
+        userInput,
         {}
       );
 
@@ -118,10 +118,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should analyze low dominance emotional state', async () => {
       const userInput = 'I feel so helpless and powerless in this situation.';
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        userInput, 
+        mockSessionId,
+        userInput,
         {}
       );
 
@@ -139,10 +139,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should assess low risk for positive input', async () => {
       const userInput = 'I am feeling great today and making good progress!';
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        userInput, 
+        mockSessionId,
+        userInput,
         {}
       );
 
@@ -188,16 +188,16 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should generate appropriate intervention recommendations', async () => {
       const userInput = 'I feel overwhelmed and anxious about everything.';
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        userInput, 
+        mockSessionId,
+        userInput,
         {}
       );
 
       expect(result.riskAssessment.interventionRecommendations).toBeDefined();
       expect(result.riskAssessment.interventionRecommendations.length).toBeGreaterThan(0);
-      
+
       const recommendation = result.riskAssessment.interventionRecommendations[0];
       expect(recommendation.type).toBeDefined();
       expect(recommendation.priority).toBeDefined();
@@ -216,7 +216,7 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should return null metrics for session with no data', () => {
       const metrics = realTimeTherapeuticMonitor.getMonitoringMetrics(mockSessionId);
-      
+
       expect(metrics).toBeDefined();
       expect(metrics!.averageRiskScore).toBe(0);
       expect(metrics!.emotionalStability).toBe(0.5);
@@ -230,9 +230,9 @@ describe('RealTimeTherapeuticMonitor', () => {
       // Add some emotional states
       await realTimeTherapeuticMonitor.analyzeUserInput(mockSessionId, 'I feel happy today!', {});
       await realTimeTherapeuticMonitor.analyzeUserInput(mockSessionId, 'I am content and peaceful.', {});
-      
+
       const metrics = realTimeTherapeuticMonitor.getMonitoringMetrics(mockSessionId);
-      
+
       expect(metrics).toBeDefined();
       expect(metrics!.averageRiskScore).toBeGreaterThanOrEqual(0);
       expect(metrics!.emotionalStability).toBeGreaterThan(0);
@@ -280,10 +280,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should unregister callback', async () => {
       realTimeTherapeuticMonitor.unregisterCallback(mockSessionId);
-      
+
       await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        'I feel good today!', 
+        mockSessionId,
+        'I feel good today!',
         {}
       );
 
@@ -300,10 +300,10 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should handle empty user input gracefully', async () => {
       realTimeTherapeuticMonitor.startMonitoring(mockSessionId, mockUserId, mockTherapeuticGoals);
-      
+
       const result = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        '', 
+        mockSessionId,
+        '',
         {}
       );
 
@@ -322,16 +322,16 @@ describe('RealTimeTherapeuticMonitor', () => {
     test('should consider message length in analysis', async () => {
       const shortMessage = 'ok';
       const longMessage = 'I have been thinking a lot about my progress and I feel like I am making some good strides in managing my anxiety and stress levels.';
-      
+
       const shortResult = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        shortMessage, 
+        mockSessionId,
+        shortMessage,
         { messageLength: shortMessage.length }
       );
-      
+
       const longResult = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        longMessage, 
+        mockSessionId,
+        longMessage,
         { messageLength: longMessage.length }
       );
 
@@ -341,14 +341,14 @@ describe('RealTimeTherapeuticMonitor', () => {
 
     test('should consider response time in analysis', async () => {
       const quickResponse = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        'I feel okay', 
+        mockSessionId,
+        'I feel okay',
         { responseTime: 5000 } // 5 seconds
       );
-      
+
       const slowResponse = await realTimeTherapeuticMonitor.analyzeUserInput(
-        mockSessionId, 
-        'I feel okay', 
+        mockSessionId,
+        'I feel okay',
         { responseTime: 45000 } // 45 seconds
       );
 

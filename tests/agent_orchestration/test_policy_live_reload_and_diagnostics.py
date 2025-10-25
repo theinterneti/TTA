@@ -5,8 +5,8 @@ import time
 
 import pytest
 from starlette.testclient import TestClient
+from tta_ai.orchestration.tools.policy_config import redact_policy_config_dict
 
-from src.agent_orchestration.tools.policy_config import redact_policy_config_dict
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 

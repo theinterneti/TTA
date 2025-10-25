@@ -46,7 +46,7 @@ CONTAINER_PREFIX=tta-dev
 
 **Symptom**: `AuthenticationRateLimit` errors
 **Cause**: Too many failed authentication attempts
-**Solution**: 
+**Solution**:
 - Wait 5-10 seconds between attempts
 - Use correct credentials from environment files
 - Clear existing containers: `./scripts/manage-containers.sh clean`
@@ -88,7 +88,7 @@ docker run -e NEO4J_AUTH=neo4j/password neo4j
 # Test environment
 ./scripts/manage-containers.sh start test
 
-# Development environment  
+# Development environment
 ./scripts/manage-containers.sh start dev
 ```
 
@@ -136,7 +136,7 @@ The health checker automatically:
 ### Development vs Production
 
 - **Development**: Use `.env.dev` with known passwords
-- **Testing**: Use `.env.test` with test-specific passwords  
+- **Testing**: Use `.env.test` with test-specific passwords
 - **CI/CD**: Use GitHub secrets and environment variables
 - **Production**: Use secure credential management systems
 

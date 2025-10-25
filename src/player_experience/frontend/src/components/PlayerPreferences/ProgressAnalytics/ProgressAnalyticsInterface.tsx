@@ -1,9 +1,9 @@
 /**
  * Progress Analytics Interface - Priority 3D Implementation
- * 
+ *
  * Comprehensive progress monitoring and analytics interface for therapeutic goals.
  * Provides real-time progress visualization, outcome measurement display, and therapeutic insights.
- * 
+ *
  * Features:
  * - Interactive progress analytics dashboard
  * - Real-time progress tracking visualization
@@ -433,7 +433,7 @@ export const ProgressAnalyticsInterface: React.FC<ProgressAnalyticsInterfaceProp
         <div id="insights-panel" role="tabpanel" aria-labelledby="insights-tab" className="p-6">
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900">Therapeutic Insights</h3>
-            
+
             {progressResult.therapeuticInsights.length > 0 ? (
               <div className="space-y-4">
                 {progressResult.therapeuticInsights.map((insight) => (
@@ -447,7 +447,7 @@ export const ProgressAnalyticsInterface: React.FC<ProgressAnalyticsInterfaceProp
                           </span>
                         </div>
                         <p className="text-gray-700 mb-3">{insight.description}</p>
-                        
+
                         {expandedInsights.has(insight.id) && (
                           <div className="space-y-3">
                             <div>
@@ -461,7 +461,7 @@ export const ProgressAnalyticsInterface: React.FC<ProgressAnalyticsInterfaceProp
                                 {insight.clinicalRelevance}
                               </span>
                             </div>
-                            
+
                             {insight.actionable && insight.recommendations.length > 0 && (
                               <div>
                                 <p className="text-sm font-medium text-gray-700 mb-2">Recommendations:</p>
@@ -478,7 +478,7 @@ export const ProgressAnalyticsInterface: React.FC<ProgressAnalyticsInterfaceProp
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleInsightExpansion(insight.id)}
@@ -534,7 +534,7 @@ export const ProgressAnalyticsInterface: React.FC<ProgressAnalyticsInterfaceProp
                         </div>
                         <p className="text-gray-700">{recommendation.description}</p>
                       </div>
-                      
+
                       {recommendation.actionable && (
                         <div className="flex items-center space-x-2 ml-4">
                           <button
@@ -587,7 +587,7 @@ export const ProgressAnalyticsInterface: React.FC<ProgressAnalyticsInterfaceProp
                           </p>
                         )}
                       </div>
-                      
+
                       <button
                         onClick={() => onScheduleAction(action.id, action.dueDate || new Date())}
                         className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors ml-4"

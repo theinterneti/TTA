@@ -98,7 +98,7 @@ body:
         ```python
         # Example code snippet
         ```
-        
+
         Or provide example text, diagrams, etc.
     validations:
       required: false
@@ -205,4 +205,3 @@ body:
           required: true
         - label: I have considered the target audience for this documentation
           required: false
-

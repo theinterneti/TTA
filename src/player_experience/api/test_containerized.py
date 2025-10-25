@@ -104,9 +104,8 @@ async def main():
     if all_success:
         print("   🎉 All tests passed! Containerized API is ready.")
         return 0
-    else:
-        print("   ⚠️  Some tests failed. Check the results above.")
-        return 1
+    print("   ⚠️  Some tests failed. Check the results above.")
+    return 1
 
 
 if __name__ == "__main__":

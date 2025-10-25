@@ -89,7 +89,7 @@ const createMockStore = (initialState = {}) => {
 describe('WorldSelection Integration', () => {
   it('renders the world selection page', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />
@@ -102,7 +102,7 @@ describe('WorldSelection Integration', () => {
 
   it('shows character selection notice when no character is selected', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />
@@ -114,7 +114,7 @@ describe('WorldSelection Integration', () => {
 
   it('displays search and filter controls', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />
@@ -129,7 +129,7 @@ describe('WorldSelection Integration', () => {
 
   it('shows empty state when no worlds are available', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />
@@ -166,7 +166,7 @@ describe('WorldSelection Integration', () => {
         },
       },
     });
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />
@@ -214,7 +214,7 @@ describe('WorldSelection Integration', () => {
         },
       },
     });
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />
@@ -249,7 +249,7 @@ describe('WorldSelection Integration', () => {
         },
       },
     });
-    
+
     render(
       <Provider store={store}>
         <WorldSelection />

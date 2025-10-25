@@ -23,7 +23,7 @@ export const useMobile = (): MobileState => {
     const updateMobileState = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       // Breakpoints matching Tailwind CSS
       const breakpoints = {
         xs: 0,
@@ -44,11 +44,11 @@ export const useMobile = (): MobileState => {
       const isMobile = width < breakpoints.md;
       const isTablet = width >= breakpoints.md && width < breakpoints.lg;
       const isDesktop = width >= breakpoints.lg;
-      
+
       const orientation = height > width ? 'portrait' : 'landscape';
-      
+
       // Check for touch support
-      const touchSupported = 
+      const touchSupported =
         'ontouchstart' in window ||
         navigator.maxTouchPoints > 0 ||
         // @ts-ignore - for older browsers

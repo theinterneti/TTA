@@ -1,0 +1,517 @@
+# Production Extended Session Quality Evaluation Configuration
+# Customized for initial baseline establishment and production use
+
+# Inherit base configuration
+base_config: "testing/model_testing_config.yaml"
+
+# Production settings - conservative for initial runs
+extended_evaluation:
+  enabled: true
+  max_concurrent_sessions: 1 # Start with 1 for stability
+  session_timeout_minutes: 300 # 5 hours max per session
+  data_collection_interval_seconds: 10 # Less frequent for production
+  performance_monitoring_enabled: true
+  error_recovery_enabled: true
+  checkpoint_interval_turns: 10 # Save progress every 10 turns
+
+# Initial baseline scenarios - start with shorter sessions
+# These will be used as the primary scenarios for extended evaluation
+extended_scenarios:
+  fantasy_baseline:
+    name: "Fantasy Baseline Test"
+    description: "Baseline fantasy adventure for initial quality measurement"
+    target_turns: 25 # Shorter for initial testing
+    max_duration_minutes: 120
+    story_genre: "fantasy"
+    world_type: "high_fantasy"
+    initial_setup:
+      setting: "medieval_fantasy"
+      character_role: "adventurer"
+      world_complexity: "medium" # Start with medium complexity
+      therapeutic_integration: "subtle"
+    key_decision_points:
+      - turn: 8
+        type: "moral_choice"
+        impact: "moderate"
+        description: "Character faces moral decision"
+      - turn: 16
+        type: "strategic_decision"
+        impact: "major"
+        description: "Decision affects story direction"
+      - turn: 24
+        type: "character_development"
+        impact: "personal"
+        description: "Personal growth moment"
+    narrative_milestones:
+      - turn: 10
+        milestone: "first_conflict"
+        description: "Introduction of conflict"
+      - turn: 20
+        milestone: "character_growth"
+        description: "Character development"
+      - turn: 25
+        milestone: "resolution"
+        description: "Story resolution"
+    primary_metrics:
+      - "narrative_coherence"
+      - "world_consistency"
+      - "user_engagement"
+    success_criteria:
+      narrative_coherence: 7.5 # Realistic initial targets
+      world_consistency: 8.0
+      user_engagement: 7.0
+    interaction_style: "mixed"
+    decision_complexity: "moderate"
+    pacing_preference: "moderate"
+
+  contemporary_baseline:
+    name: "Contemporary Baseline Test"
+    description: "Baseline contemporary story for therapeutic integration testing"
+    target_turns: 20
+    max_duration_minutes: 100
+    story_genre: "drama"
+    world_type: "contemporary_life"
+    initial_setup:
+      setting: "small_town"
+      character_role: "resident"
+      world_complexity: "medium"
+      therapeutic_integration: "moderate"
+    key_decision_points:
+      - turn: 7
+        type: "relationship_choice"
+        impact: "personal"
+        description: "Important relationship decision"
+      - turn: 14
+        type: "life_direction"
+        impact: "major"
+        description: "Life path choice"
+    narrative_milestones:
+      - turn: 10
+        milestone: "relationship_development"
+        description: "Relationship moment"
+      - turn: 20
+        milestone: "personal_growth"
+        description: "Growth achievement"
+    primary_metrics:
+      - "therapeutic_integration"
+      - "character_development"
+      - "user_engagement"
+    success_criteria:
+      therapeutic_integration: 7.8
+      character_development: 7.5
+      user_engagement: 7.2
+    interaction_style: "mixed"
+    decision_complexity: "moderate"
+    pacing_preference: "slow"
+
+  # NEW: Extended session scenarios (30-50+ turns)
+  fantasy_extended_30:
+    name: "Fantasy Extended Test - 30 Turns"
+    description: "Epic fantasy quest testing extended session capabilities"
+    target_turns: 30
+    max_duration_minutes: 180
+    story_genre: "epic_fantasy"
+    world_type: "high_fantasy"
+    initial_setup:
+      setting: "multi_kingdom_realm"
+      character_role: "chosen_hero"
+      world_complexity: "high"
+      therapeutic_integration: "moderate"
+    key_decision_points:
+      - turn: 10
+        type: "power_choice"
+        impact: "major"
+        description: "Character chooses magical path"
+      - turn: 15
+        type: "alliance_decision"
+        impact: "major"
+        description: "Forge alliance with former enemies"
+      - turn: 20
+        type: "sacrifice_choice"
+        impact: "major"
+        description: "Personal sacrifice for greater good"
+      - turn: 25
+        type: "betrayal_response"
+        impact: "major"
+        description: "Response to ally's betrayal"
+    narrative_milestones:
+      - turn: 5
+        milestone: "heritage_discovery"
+        description: "Learn of magical heritage"
+      - turn: 10
+        milestone: "first_trial"
+        description: "First major magical challenge"
+      - turn: 15
+        milestone: "alliance_forged"
+        description: "Unite former enemies"
+      - turn: 20
+        milestone: "power_mastery"
+        description: "Master significant abilities"
+      - turn: 25
+        milestone: "betrayal_revealed"
+        description: "Trusted ally's hidden agenda"
+      - turn: 30
+        milestone: "epic_resolution"
+        description: "Final battle for all kingdoms"
+    primary_metrics:
+      - "narrative_coherence"
+      - "world_consistency"
+      - "character_development"
+      - "memory_consistency"
+    success_criteria:
+      narrative_coherence: 7.8
+      world_consistency: 8.2
+      character_development: 8.0
+      memory_consistency: 8.0
+    interaction_style: "active"
+    decision_complexity: "high"
+    pacing_preference: "moderate"
+
+  contemporary_extended_40:
+    name: "Contemporary Extended Test - 40 Turns"
+    description: "Multi-generational family saga with therapeutic depth"
+    target_turns: 40
+    max_duration_minutes: 240
+    story_genre: "family_drama"
+    world_type: "contemporary_life"
+    initial_setup:
+      setting: "multi_generational_home"
+      character_role: "family_heir"
+      world_complexity: "high"
+      therapeutic_integration: "high"
+    key_decision_points:
+      - turn: 12
+        type: "family_confrontation"
+        impact: "major"
+        description: "Face difficult family history"
+      - turn: 18
+        type: "healing_choice"
+        impact: "major"
+        description: "Choose healing over resentment"
+      - turn: 24
+        type: "community_involvement"
+        impact: "major"
+        description: "Engage in community healing"
+      - turn: 30
+        type: "generational_breakthrough"
+        impact: "major"
+        description: "Break cycle of inherited trauma"
+      - turn: 36
+        type: "legacy_building"
+        impact: "major"
+        description: "Establish new family traditions"
+    narrative_milestones:
+      - turn: 6
+        milestone: "family_secrets"
+        description: "Uncover hidden family history"
+      - turn: 12
+        milestone: "confronting_past"
+        description: "Face family trauma directly"
+      - turn: 18
+        milestone: "relationship_healing"
+        description: "Begin healing damaged relationships"
+      - turn: 24
+        milestone: "community_integration"
+        description: "Become community healing catalyst"
+      - turn: 30
+        milestone: "generational_healing"
+        description: "Break inherited trauma patterns"
+      - turn: 36
+        milestone: "legacy_creation"
+        description: "Establish positive new traditions"
+      - turn: 40
+        milestone: "celebration_resolution"
+        description: "Family celebrates healing journey"
+    primary_metrics:
+      - "therapeutic_integration"
+      - "emotional_depth"
+      - "character_development"
+      - "memory_consistency"
+    success_criteria:
+      therapeutic_integration: 8.5
+      emotional_depth: 8.2
+      character_development: 8.0
+      memory_consistency: 8.0
+    interaction_style: "mixed"
+    decision_complexity: "high"
+    pacing_preference: "slow"
+
+  epic_fantasy_50:
+    name: "Epic Fantasy Marathon - 50 Turns"
+    description: "Ultimate fantasy epic testing maximum session capabilities"
+    target_turns: 50
+    max_duration_minutes: 300
+    story_genre: "cosmic_fantasy"
+    world_type: "multiverse"
+    initial_setup:
+      setting: "interconnected_realms"
+      character_role: "prophesied_savior"
+      world_complexity: "maximum"
+      therapeutic_integration: "subtle"
+    key_decision_points:
+      - turn: 15
+        type: "power_evolution"
+        impact: "major"
+        description: "Choose path of power development"
+      - turn: 25
+        type: "realm_priority"
+        impact: "major"
+        description: "Choose which realm to save first"
+      - turn: 30
+        type: "ultimate_sacrifice"
+        impact: "climactic"
+        description: "Make ultimate personal sacrifice"
+      - turn: 35
+        type: "transcendence_choice"
+        impact: "major"
+        description: "Choose to transcend mortal limits"
+      - turn: 45
+        type: "cosmic_confrontation"
+        impact: "climactic"
+        description: "Face cosmic threat directly"
+    narrative_milestones:
+      - turn: 5
+        milestone: "destiny_awakening"
+        description: "Discover prophetic destiny"
+      - turn: 10
+        milestone: "first_realm_saved"
+        description: "Successfully save first realm"
+      - turn: 15
+        milestone: "power_evolution"
+        description: "Abilities undergo major evolution"
+      - turn: 20
+        milestone: "cosmic_revelation"
+        description: "Learn true nature of threat"
+      - turn: 25
+        milestone: "second_realm_challenge"
+        description: "Face more complex realm crisis"
+      - turn: 30
+        milestone: "ultimate_sacrifice"
+        description: "Make ultimate personal sacrifice"
+      - turn: 35
+        milestone: "transcendence"
+        description: "Transcend mortal limitations"
+      - turn: 40
+        milestone: "final_realm_crisis"
+        description: "Face most challenging realm"
+      - turn: 45
+        milestone: "cosmic_battle"
+        description: "Confront cosmic threat"
+      - turn: 50
+        milestone: "universal_resolution"
+        description: "Resolve multiverse crisis"
+    primary_metrics:
+      - "narrative_coherence"
+      - "world_consistency"
+      - "epic_scope"
+      - "memory_consistency"
+      - "context_management"
+    success_criteria:
+      narrative_coherence: 8.0
+      world_consistency: 8.5
+      epic_scope: 8.8
+      memory_consistency: 8.2
+      context_management: 8.0
+    interaction_style: "active"
+    decision_complexity: "maximum"
+    pacing_preference: "fast"
+
+# Enhanced user profiles for extended testing
+enhanced_user_profiles:
+  typical_user:
+    name: "Typical User"
+    description: "Representative of average TTA user"
+    behavior_pattern:
+      decision_making_style: "analytical"
+      interaction_style: "mixed"
+      narrative_preference: "character_driven"
+      min_thinking_time: 5.0
+      max_thinking_time: 30.0
+      response_length_preference: "medium"
+      engagement_consistency: 0.8
+      attention_span_turns: 20
+      risk_tolerance: 0.5
+      creativity_level: 0.6
+      goal_focus: 0.7
+    demographics:
+      age_range: "25-40"
+      gaming_experience: "medium"
+      tech_comfort: "medium"
+      time_availability: "medium"
+    therapeutic_profile:
+      primary_concerns: ["stress_management", "decision_anxiety"]
+      comfort_zones: ["familiar_settings", "gradual_progress"]
+      challenge_areas: ["uncertainty", "complex_decisions"]
+      preferred_intensity: "medium"
+      therapeutic_goals: ["confidence_building", "stress_reduction"]
+
+  engaged_user:
+    name: "Engaged User"
+    description: "Highly engaged user who enjoys longer sessions"
+    behavior_pattern:
+      decision_making_style: "analytical"
+      interaction_style: "active"
+      narrative_preference: "plot_driven"
+      min_thinking_time: 8.0
+      max_thinking_time: 45.0
+      response_length_preference: "long"
+      engagement_consistency: 0.9
+      attention_span_turns: 30
+      risk_tolerance: 0.7
+      creativity_level: 0.8
+      goal_focus: 0.8
+    demographics:
+      age_range: "22-35"
+      gaming_experience: "high"
+      tech_comfort: "high"
+      time_availability: "high"
+    therapeutic_profile:
+      primary_concerns: ["perfectionism", "social_anxiety"]
+      comfort_zones: ["structured_problems", "clear_objectives"]
+      challenge_areas: ["ambiguity", "emotional_decisions"]
+      preferred_intensity: "medium"
+      therapeutic_goals: ["emotional_intelligence", "flexibility"]
+
+# Production quality metrics with realistic thresholds
+production_quality_metrics:
+  narrative_coherence:
+    weight: 0.35
+    components:
+      - character_consistency: 0.3
+      - plot_logic: 0.3
+      - world_consistency: 0.25
+      - temporal_consistency: 0.15
+    excellence_threshold: 8.0 # Realistic for production
+    minimum_acceptable: 6.5
+    baseline_target: 7.5
+
+  world_state_management:
+    weight: 0.25
+    components:
+      - state_persistence: 0.4
+      - choice_impact_tracking: 0.3
+      - world_evolution: 0.3
+    excellence_threshold: 8.5
+    minimum_acceptable: 7.0
+    baseline_target: 8.0
+
+  user_engagement:
+    weight: 0.25
+    components:
+      - choice_meaningfulness: 0.4
+      - narrative_immersion: 0.3
+      - pacing_quality: 0.3
+    excellence_threshold: 7.8
+    minimum_acceptable: 6.0
+    baseline_target: 7.0
+
+  technical_performance:
+    weight: 0.15
+    components:
+      - response_time: 0.4
+      - error_rate: 0.3
+      - memory_efficiency: 0.3
+    excellence_threshold: 8.0
+    minimum_acceptable: 6.5
+    baseline_target: 7.5
+
+# Production data collection - comprehensive but efficient
+production_data_collection:
+  turn_level_logging: true
+  world_state_snapshots: true
+  performance_monitoring: true
+  error_tracking: true
+  quality_metric_calculation: true
+  real_time_analysis: false # Disable for production stability
+  checkpoint_saving: true
+  memory_optimization: true
+
+# Analysis settings for production
+production_analysis:
+  trend_analysis_enabled: true
+  pattern_recognition_enabled: true
+  comparative_analysis_enabled: true
+  visualization_generation: true
+  baseline_establishment: true
+  automated_reporting: true
+  alert_thresholds:
+    narrative_coherence_drop: 1.5 # Alert if drops by 1.5 points
+    error_rate_spike: 0.1 # Alert if error rate exceeds 10%
+    response_time_spike: 5.0 # Alert if response time exceeds 5 seconds
+
+# Output settings for production
+production_output:
+  results_directory: "testing/results/extended_evaluation"
+  reports_directory: "testing/results/extended_evaluation/reports"
+  export_formats: ["json", "csv"]
+  generate_visualizations: true
+  real_time_dashboard: false
+  archive_old_results: true
+  max_result_age_days: 30
+
+# OpenRouter API Configuration
+openrouter:
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: https://openrouter.ai/api/v1
+  default_headers:
+    HTTP-Referer: "https://tta-storytelling.com" # Replace with your domain
+    X-Title: "TTA Extended Session Evaluation"
+
+# Model Configurations for Extended Evaluation
+models:
+  llama_3_3_8b_instruct:
+    name: "Meta Llama 3.3 8B Instruct"
+    provider: "openrouter"
+    model_id: "meta-llama/llama-3.3-8b-instruct:free"
+    enabled: true
+
+    # Model-specific parameters optimized for extended sessions
+    temperature: 0.7 # Balanced creativity and consistency
+    max_tokens: 2048 # Sufficient for detailed storytelling responses
+    top_p: 0.9
+    frequency_penalty: 0.1 # Slight penalty to reduce repetition over long sessions
+    presence_penalty: 0.1 # Encourage topic diversity
+
+    # OpenRouter free tier optimized settings
+    timeout_seconds: 45 # Generous timeout for free tier
+    retry_attempts: 3 # More retries for free tier reliability
+    retry_delay_seconds: 2 # Wait between retries
+    max_requests_per_minute: 20 # Conservative rate limiting
+
+    # Extended session specific settings
+    context_window: 8192 # Llama 3.3 8B context window
+    memory_optimization: true
+    checkpoint_frequency: 10 # Save state every 10 turns
+
+    # Quality expectations for this model
+    expected_performance:
+      narrative_coherence: 7.8
+      world_consistency: 8.0
+      user_engagement: 7.5
+      technical_performance: 8.2
+
+    # Model strengths for extended sessions
+    strengths:
+      - "fast_inference"
+      - "narrative_coherence"
+      - "character_consistency"
+      - "dialogue_quality"
+      - "cost_effective"
+
+    # Focus areas for evaluation
+    focus_areas:
+      - "extended_session_stability"
+      - "world_state_consistency"
+      - "therapeutic_integration"
+      - "user_engagement_maintenance"
+
+# Primary model for initial baseline testing
+primary_model: "llama_3_3_8b_instruct"
+
+# Monitoring and alerting
+monitoring:
+  enabled: true
+  check_interval_minutes: 5
+  alert_on_failures: true
+  log_performance_metrics: true
+  track_quality_trends: true

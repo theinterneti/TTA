@@ -6,6 +6,7 @@
 [![Code Quality](https://github.com/theinterneti/TTA/workflows/Code%20Quality/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/code-quality.yml)
 [![Security Scan](https://github.com/theinterneti/TTA/workflows/Security%20Scan/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/security-scan.yml)
 [![E2E Tests](https://github.com/theinterneti/TTA/workflows/E2E%20Tests/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/e2e-tests.yml)
+[![Mutation Testing](https://github.com/theinterneti/TTA/workflows/Mutation%20Testing/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/mutation-testing.yml)
 
 **AI-powered therapeutic text adventure platform combining evidence-based mental health support with engaging interactive storytelling**
 
@@ -70,6 +71,15 @@ The Therapeutic Text Adventure (TTA) is an innovative platform that merges the e
 - **LangGraph Integration**: Advanced workflow management for complex interactions
 - **Model Flexibility**: Support for multiple LLM providers (OpenRouter, local models)
 - **RAG System**: Context-aware responses using knowledge management
+
+### 🛠️ **OpenHands Integration (Phase 6)**
+- **AI-Powered Development Automation**: Automated code generation, testing, and refactoring
+- **6 Core Components**: TaskQueue, ModelSelector, ResultValidator, MetricsCollector, ExecutionEngine, CLI
+- **Model Rotation System**: Automatic fallback strategies with 27+ free LLM models
+- **Task-Specific Optimization**: Intelligent model selection based on task requirements
+- **Quality Assurance**: Configurable validation rules and metrics tracking
+- **Production Ready**: 47 identified work items for Phase 7 execution
+- **Documentation**: Comprehensive guides for architecture, usage, and integration
 
 ### 🔒 **Security & Privacy**
 - **HIPAA Compliance**: Secure handling of therapeutic data
@@ -244,7 +254,7 @@ TTA/
 │   ├── integration/           # Integration tests
 │   ├── e2e/                   # End-to-end tests
 │   └── comprehensive_battery/ # Comprehensive test battery
-├── Documentation/             # Project documentation
+├── docs/                      # Project documentation
 │   ├── architecture/          # Architecture docs
 │   ├── api/                   # API documentation
 │   ├── development/           # Development guides
@@ -265,9 +275,22 @@ TTA/
 
 ### Development Workflow
 
-1. **Create a feature branch**
+TTA uses a **three-tier branching strategy**: `development` → `staging` → `main`
+
+See [Branching Strategy Documentation](docs/development/BRANCHING_STRATEGY.md) for complete details.
+
+1. **Create a feature branch from development**
    ```bash
-   git checkout -b feat/your-feature-name
+   # Ensure you're on development and up to date
+   git checkout development
+   git pull origin development
+
+   # Use the helper script (recommended)
+   ./scripts/create-feature-branch.sh <domain> <description>
+   # Example: ./scripts/create-feature-branch.sh game player-inventory
+
+   # Or create manually
+   git checkout -b feature/<domain>-<description>
    ```
 
 2. **Make changes and test**
@@ -279,6 +302,9 @@ TTA/
 
    # Run tests
    uv run pytest -q
+
+   # Validate quality gates before pushing
+   ./scripts/validate-quality-gates.sh development
    ```
 
 3. **Commit with conventional commits**
@@ -287,11 +313,16 @@ TTA/
    # Types: feat, fix, docs, test, refactor, perf, ci, chore
    ```
 
-4. **Push and create PR**
+4. **Push and create PR targeting development**
    ```bash
-   git push origin feat/your-feature-name
-   gh pr create --fill
+   git push origin feature/<domain>-<description>
+   gh pr create --base development --fill
    ```
+
+**Branch Flow:**
+- Feature branches → `development` (auto-merge when tests pass)
+- `development` → `staging` (auto-merge when tests pass)
+- `staging` → `main` (manual approval required)
 
 ### Code Quality Standards
 
@@ -366,10 +397,12 @@ docker-compose down -v
 
 TTA includes comprehensive testing infrastructure with multiple layers of validation.
 
+> **📖 Complete Guide**: See [Testing Infrastructure Guide](docs/development/TESTING_INFRASTRUCTURE.md) for detailed documentation on running tests, viewing coverage, VS Code integration, and troubleshooting.
+
 ### Quick Testing
 
 ```bash
-# Run all tests
+# Run all tests (coverage runs by default)
 uv run pytest
 
 # Run specific test types
@@ -377,13 +410,21 @@ uv run pytest tests/unit/              # Unit tests
 uv run pytest tests/integration/       # Integration tests
 uv run pytest tests/e2e/              # End-to-end tests
 
-# Run with coverage
-uv run pytest --cov=src --cov-report=html
-
 # Run tests with specific markers
 uv run pytest -m "not slow"           # Skip slow tests
 uv run pytest -m "redis or neo4j"     # Only database tests
 ```
+
+**Coverage Reporting:**
+- Coverage runs automatically with every test execution
+- Reports generated in `htmlcov/` (HTML) and `coverage.xml` (XML)
+- Coverage thresholds: **70% (staging)**, **80% (production)**
+- View HTML report: `open htmlcov/index.html`
+
+**VS Code Integration:**
+- **Test Discovery/Execution**: Use Testing panel (beaker icon)
+- **Debugging**: Right-click test → "Debug Test"
+- **Coverage Visualization**: Install "Coverage Gutters" extension for inline coverage indicators
 
 ### Comprehensive Test Battery
 
@@ -424,6 +465,35 @@ python tests/comprehensive_battery/run_comprehensive_tests.py \
 - ✅ Comprehensive reporting (JSON, HTML, CSV, TXT)
 - ✅ Parallel execution support
 
+### Mutation Testing
+
+TTA uses mutation testing to ensure test quality for critical Model Management services:
+
+```bash
+# Run mutation tests for all services
+./scripts/run-mutation-tests.sh
+
+# Run for specific service
+./scripts/run-mutation-tests.sh model-selector
+./scripts/run-mutation-tests.sh fallback-handler
+./scripts/run-mutation-tests.sh performance-monitor
+
+# Set custom threshold
+./scripts/run-mutation-tests.sh -t 90 --all
+```
+
+**Current Mutation Scores:**
+- **ModelSelector**: 100% (534/534 mutations killed) 🏆
+- **FallbackHandler**: 100% (352/352 mutations killed) 🏆
+- **PerformanceMonitor**: 100% (519/519 mutations killed) 🏆
+
+**Automated Testing:**
+- Runs weekly (Sunday 2 AM UTC)
+- Fails if mutation score drops below 85%
+- Reports available as GitHub Actions artifacts
+
+📖 See [Mutation Testing CI/CD Guide](docs/testing/MUTATION_TESTING_CICD_GUIDE.md) for details
+
 ### CI/CD Testing
 
 Tests run automatically on:
@@ -448,26 +518,26 @@ View test results: [GitHub Actions](https://github.com/theinterneti/TTA/actions)
 
 ### Technical Documentation
 
-- **[Architecture Documentation](Documentation/architecture/)**: System design and components
-  - [System Architecture Diagram](Documentation/architecture/system-architecture-diagram.md)
-  - [Component Interactions](Documentation/architecture/component-interaction-diagram.md)
-  - [Data Flow](Documentation/architecture/data-flow-diagram.md)
-  - [CI/CD & Deployment](Documentation/architecture/cicd-deployment-diagram.md)
-- **[API Documentation](Documentation/api/)**: API reference and examples
-- **[Development Guides](Documentation/development/)**: Setup and development guides
+- **[Architecture Documentation](docs/architecture/)**: System design and components
+  - [System Architecture Diagram](docs/architecture/system-architecture-diagram.md)
+  - [Component Interactions](docs/architecture/component-interaction-diagram.md)
+  - [Data Flow](docs/architecture/data-flow-diagram.md)
+  - [CI/CD & Deployment](docs/architecture/cicd-deployment-diagram.md)
+- **[API Documentation](docs/api/)**: API reference and examples
+- **[Development Guides](docs/development/)**: Setup and development guides
 - **[Testing Framework](docs/testing-framework.md)**: Testing strategies and tools
 
 ### Therapeutic Content
 
-- **[Therapeutic Frameworks](Documentation/therapeutic-content/)**: CBT, DBT, ACT integration
-- **[Content Guidelines](Documentation/therapeutic-content/guidelines.md)**: Content creation standards
-- **[Safety Protocols](Documentation/therapeutic-content/safety.md)**: Therapeutic safety measures
+- **[Therapeutic Frameworks](docs/therapeutic-content/)**: CBT, DBT, ACT integration
+- **[Content Guidelines](docs/therapeutic-content/guidelines.md)**: Content creation standards
+- **[Safety Protocols](docs/therapeutic-content/safety.md)**: Therapeutic safety measures
 
 ### Additional Resources
 
-- **[Environment Setup](ENVIRONMENT_SETUP.md)**: Detailed environment configuration
-- **[Docker Setup](Documentation/docker/docker_setup_guide.md)**: Docker and DevContainer setup
-- **[Troubleshooting](Documentation/docker/devcontainer_troubleshooting_guide.md)**: Common issues and solutions
+- **[Environment Setup](docs/project/ENVIRONMENT_SETUP.md)**: Detailed environment configuration
+- **[Docker Setup](docs/deployment/docker_setup_guide.md)**: Docker and DevContainer setup
+- **[Troubleshooting](docs/docker/devcontainer_troubleshooting_guide.md)**: Common issues and solutions
 
 ---
 

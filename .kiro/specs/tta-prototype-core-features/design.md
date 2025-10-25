@@ -14,7 +14,7 @@ graph TB
         ORCH[TTA Orchestrator]
         CONFIG[Configuration Manager]
     end
-    
+
     subgraph "TTA Prototype Core"
         INE[Interactive Narrative Engine]
         CDS[Character Development System]
@@ -24,7 +24,7 @@ graph TB
         NBC[Narrative Branching & Choice]
         ESR[Emotional State Recognition]
     end
-    
+
     subgraph "TTA.dev AI Components"
         LGE[LangGraph Engine]
         IPA[Input Processing Agent]
@@ -32,37 +32,37 @@ graph TB
         TGA[Therapeutic Guidance Agent]
         CMA[Character Management Agent]
     end
-    
+
     subgraph "Knowledge & Storage"
         NEO4J[(Neo4j Knowledge Graph)]
         REDIS[(Redis Cache)]
         CARBON[Carbon Tracking]
     end
-    
+
     subgraph "External Interfaces"
         LLM[LLM API]
         MCP[MCP Servers]
     end
-    
+
     ORCH --> INE
     INE --> LGE
     LGE --> IPA
     LGE --> NGA
     LGE --> TGA
     LGE --> CMA
-    
+
     INE --> NEO4J
     CDS --> NEO4J
     TCI --> NEO4J
     PTP --> NEO4J
     WSM --> NEO4J
-    
+
     LGE --> LLM
     LGE --> MCP
-    
+
     PTP --> REDIS
     ESR --> REDIS
-    
+
     ORCH --> CARBON
 ```
 

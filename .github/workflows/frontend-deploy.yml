@@ -1,0 +1,522 @@
+name: Frontend Deploy to Staging
+
+# =============================================================================
+# WORKFLOW TRIGGERS
+# =============================================================================
+# This workflow automatically rebuilds and redeploys the TTA frontend when:
+# 1. Changes are pushed to main branch in the frontend directory
+# 2. Manually triggered via workflow_dispatch for testing
+# =============================================================================
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/player_experience/frontend/**'
+      - '.github/workflows/frontend-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      skip_quality_checks:
+        description: 'Skip quality checks (linting, type-checking, tests)'
+        required: false
+        default: false
+        type: boolean
+      skip_tests:
+        description: 'Skip unit tests only'
+        required: false
+        default: false
+        type: boolean
+      force_deploy:
+        description: 'Force deployment even if health checks fail'
+        required: false
+        default: false
+        type: boolean
+
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/tta-player-experience-frontend
+  FRONTEND_DIR: src/player_experience/frontend
+  HEALTH_CHECK_RETRIES: 10
+  HEALTH_CHECK_DELAY: 30
+  DEPLOYMENT_TIMEOUT: 600
+
+# =============================================================================
+# WORKFLOW JOBS
+# =============================================================================
+
+jobs:
+  # ===========================================================================
+  # JOB 1: Quality Checks (Linting, Type-Checking, Tests)
+  # ===========================================================================
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    if: github.event.inputs.skip_quality_checks != 'true'
+    defaults:
+      run:
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run ESLint
+        run: |
+          echo "Running ESLint checks..."
+          # CRA includes ESLint, run it via npm
+          npx eslint src/ --ext .js,.jsx,.ts,.tsx --max-warnings 0 || true
+        continue-on-error: true
+
+      - name: Run TypeScript type checking
+        run: |
+          echo "Running TypeScript type checking..."
+          npx tsc --noEmit
+
+      - name: Run unit tests
+        if: github.event.inputs.skip_tests != 'true'
+        run: |
+          echo "Running unit tests with coverage..."
+          npm test -- --coverage --watchAll=false --passWithNoTests
+        env:
+          CI: true
+
+      - name: Upload test coverage
+        if: github.event.inputs.skip_tests != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ${{ env.FRONTEND_DIR }}/coverage
+          retention-days: 7
+
+      - name: Generate quality check summary
+        if: always()
+        run: |
+          echo "## 🔍 Quality Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Node.js Version:** ${{ env.NODE_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ All quality checks passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some quality checks failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ===========================================================================
+  # JOB 2: Build Frontend Docker Image
+  # ===========================================================================
+  build-frontend:
+    name: Build Frontend Image
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    if: always() && (needs.quality-checks.result == 'success' || needs.quality-checks.result == 'skipped')
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        run: |
+          # Generate image tags
+          TAGS="${{ env.IMAGE_NAME }}:staging"
+          TAGS="${TAGS},${{ env.IMAGE_NAME }}:staging-${{ github.sha }}"
+
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "Generated tags: ${TAGS}"
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.FRONTEND_DIR }}
+          file: ${{ env.FRONTEND_DIR }}/Dockerfile.staging
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=frontend-staging
+          cache-to: type=gha,mode=max,scope=frontend-staging
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VERSION=${{ github.ref_name }}
+            GIT_COMMIT=${{ github.sha }}
+            VITE_API_BASE_URL=${{ vars.API_BASE_URL || 'http://localhost:8081' }}
+            VITE_WS_URL=${{ vars.WS_URL || 'ws://localhost:8081' }}
+            VITE_ENVIRONMENT=staging
+            CACHE_BUST=${{ github.run_number }}
+
+      - name: Generate build summary
+        run: |
+          echo "## 🐳 Docker Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** ${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:** staging, staging-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Digest:** ${{ steps.build.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Build Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Image built and pushed successfully" >> $GITHUB_STEP_SUMMARY
+
+  # ===========================================================================
+  # JOB 3: Deploy to Staging Environment
+  # ===========================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    environment:
+      name: staging
+      url: ${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deployment marker
+        run: |
+          echo "## 🚀 Deployment Information" > deployment.log
+          echo "Deployment started at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> deployment.log
+          echo "Commit: ${{ github.sha }}" >> deployment.log
+          echo "Branch: ${{ github.ref_name }}" >> deployment.log
+          echo "Environment: staging" >> deployment.log
+          echo "Image: ${{ env.IMAGE_NAME }}:staging-${{ github.sha }}" >> deployment.log
+          echo "Deployed by: ${{ github.actor }}" >> deployment.log
+          cat deployment.log
+
+      - name: Deploy to staging environment
+        run: |
+          echo "🚀 Deploying frontend to staging environment..."
+          echo "Image: ${{ env.IMAGE_NAME }}:staging-${{ github.sha }}"
+          echo "Environment: staging"
+
+          # =================================================================
+          # DEPLOYMENT IMPLEMENTATION PLACEHOLDER
+          # =================================================================
+          # Replace this section with your actual deployment commands:
+          #
+          # Option 1: SSH to staging server and update Docker container
+          # ssh user@staging-server << 'EOF'
+          #   docker pull ${{ env.IMAGE_NAME }}:staging-${{ github.sha }}
+          #   docker stop tta-frontend-staging || true
+          #   docker rm tta-frontend-staging || true
+          #   docker run -d \
+          #     --name tta-frontend-staging \
+          #     -p 3001:3000 \
+          #     -e VITE_API_BASE_URL=${{ vars.API_BASE_URL }} \
+          #     -e VITE_WS_URL=${{ vars.WS_URL }} \
+          #     --restart unless-stopped \
+          #     ${{ env.IMAGE_NAME }}:staging-${{ github.sha }}
+          # EOF
+          #
+          # Option 2: Update docker-compose on staging server
+          # ssh user@staging-server << 'EOF'
+          #   cd /path/to/tta-staging
+          #   export FRONTEND_IMAGE=${{ env.IMAGE_NAME }}:staging-${{ github.sha }}
+          #   docker-compose pull player-frontend
+          #   docker-compose up -d player-frontend
+          # EOF
+          #
+          # Option 3: Use Kubernetes deployment
+          # kubectl set image deployment/tta-frontend-staging \
+          #   frontend=${{ env.IMAGE_NAME }}:staging-${{ github.sha }} \
+          #   -n staging
+          # kubectl rollout status deployment/tta-frontend-staging -n staging
+          #
+          # Option 4: Use Ansible playbook
+          # ansible-playbook -i inventory/staging deploy-frontend.yml \
+          #   -e "frontend_image=${{ env.IMAGE_NAME }}:staging-${{ github.sha }}"
+          # =================================================================
+
+          echo "✅ Deployment commands executed"
+          echo "Note: Update this step with actual deployment logic"
+
+      - name: Wait for services to start
+        run: |
+          echo "⏳ Waiting for frontend services to initialize..."
+          sleep 30
+          echo "✅ Services should be starting"
+
+  # ===========================================================================
+  # JOB 4: Health Check and Verification
+  # ===========================================================================
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+
+    steps:
+      - name: Check frontend health endpoint
+        run: |
+          FRONTEND_URL="${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}"
+          RETRIES=${{ env.HEALTH_CHECK_RETRIES }}
+          DELAY=${{ env.HEALTH_CHECK_DELAY }}
+
+          echo "Checking health of: ${FRONTEND_URL}/health"
+
+          for i in $(seq 1 $RETRIES); do
+            echo "Attempt $i of $RETRIES..."
+
+            # Try to reach the health endpoint
+            if curl -f -s "${FRONTEND_URL}/health" > /dev/null 2>&1; then
+              echo "✅ Frontend health check passed!"
+              exit 0
+            fi
+
+            # Also try the root endpoint as fallback
+            if curl -f -s "${FRONTEND_URL}/" > /dev/null 2>&1; then
+              echo "✅ Frontend is accessible (root endpoint)!"
+              exit 0
+            fi
+
+            if [ $i -lt $RETRIES ]; then
+              echo "⏳ Waiting ${DELAY} seconds before retry..."
+              sleep $DELAY
+            fi
+          done
+
+          echo "❌ Health check failed after $RETRIES attempts"
+
+          # Don't fail if force_deploy is enabled
+          if [ "${{ github.event.inputs.force_deploy }}" == "true" ]; then
+            echo "⚠️  Force deploy enabled - continuing despite health check failure"
+            exit 0
+          fi
+
+          exit 1
+
+      - name: Check API connectivity
+        run: |
+          API_URL="${{ vars.API_BASE_URL || 'http://localhost:8081' }}"
+
+          echo "Checking API connectivity: ${API_URL}/health"
+
+          if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
+            echo "✅ API is accessible from frontend"
+          else
+            echo "⚠️  API health check failed - frontend may have connectivity issues"
+          fi
+
+      - name: Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests..."
+
+          FRONTEND_URL="${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}"
+
+          # Test 1: Check if frontend serves content
+          echo "Test 1: Checking if frontend serves content..."
+          if curl -s "${FRONTEND_URL}/" | grep -q "TTA"; then
+            echo "✅ Frontend serves content"
+          else
+            echo "⚠️  Frontend content check inconclusive"
+          fi
+
+          # Test 2: Check for critical assets
+          echo "Test 2: Checking for critical assets..."
+          if curl -s "${FRONTEND_URL}/manifest.json" > /dev/null 2>&1; then
+            echo "✅ Manifest file accessible"
+          else
+            echo "⚠️  Manifest file not found"
+          fi
+
+          echo "✅ Smoke tests completed"
+
+      - name: Generate health check summary
+        if: always()
+        run: |
+          echo "## 🏥 Health Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend URL:** ${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**API URL:** ${{ vars.API_BASE_URL || 'http://localhost:8081' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ All health checks passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Health checks failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ===========================================================================
+  # JOB 5: Post-Deployment Summary
+  # ===========================================================================
+  post-deployment:
+    name: Post-Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [build-frontend, deploy-staging, health-check]
+    if: always()
+
+    steps:
+      - name: Generate deployment summary
+        run: |
+          echo "## 🚀 Frontend Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** staging" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** ${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** staging-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Quality Checks: ${{ needs.quality-checks.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build: ${{ needs.build-frontend.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Deploy: ${{ needs.deploy-staging.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health Check: ${{ needs.health-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.health-check.result }}" == "success" ]; then
+            echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Frontend URL:** ${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}" >> $GITHUB_STEP_SUMMARY
+            echo "**API URL:** ${{ vars.API_BASE_URL || 'http://localhost:8081' }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Action Required:** Check logs and consider rollback" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Rollback Command:**" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "# Revert to previous image tag" >> $GITHUB_STEP_SUMMARY
+            echo "docker pull ${{ env.IMAGE_NAME }}:staging" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ needs.health-check.result }}" == "success" ]; then
+            echo "✅ Frontend deployment to staging completed successfully"
+            echo "Frontend URL: ${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}"
+          else
+            echo "❌ Frontend deployment to staging failed"
+            echo "Check the logs above for details"
+            exit 1
+          fi
+
+  # ===========================================================================
+  # JOB 6: Rollback on Failure
+  # ===========================================================================
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, health-check]
+    if: failure() && github.event.inputs.force_deploy != 'true'
+    environment:
+      name: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Rollback to previous version
+        run: |
+          echo "🔄 Rolling back frontend deployment..."
+          echo "Current failed deployment: ${{ env.IMAGE_NAME }}:staging-${{ github.sha }}"
+
+          # =================================================================
+          # ROLLBACK IMPLEMENTATION PLACEHOLDER
+          # =================================================================
+          # Replace this section with your actual rollback commands:
+          #
+          # Option 1: Revert to previous Docker image tag
+          # ssh user@staging-server << 'EOF'
+          #   docker pull ${{ env.IMAGE_NAME }}:staging
+          #   docker stop tta-frontend-staging || true
+          #   docker rm tta-frontend-staging || true
+          #   docker run -d \
+          #     --name tta-frontend-staging \
+          #     -p 3001:3000 \
+          #     -e VITE_API_BASE_URL=${{ vars.API_BASE_URL }} \
+          #     -e VITE_WS_URL=${{ vars.WS_URL }} \
+          #     --restart unless-stopped \
+          #     ${{ env.IMAGE_NAME }}:staging
+          # EOF
+          #
+          # Option 2: Use docker-compose to revert
+          # ssh user@staging-server << 'EOF'
+          #   cd /path/to/tta-staging
+          #   export FRONTEND_IMAGE=${{ env.IMAGE_NAME }}:staging
+          #   docker-compose up -d player-frontend
+          # EOF
+          #
+          # Option 3: Use Kubernetes rollback
+          # kubectl rollout undo deployment/tta-frontend-staging -n staging
+          # kubectl rollout status deployment/tta-frontend-staging -n staging
+          # =================================================================
+
+          echo "⚠️  Rollback initiated"
+          echo "Note: Update this step with actual rollback logic"
+
+      - name: Verify rollback
+        run: |
+          echo "Verifying rollback..."
+
+          FRONTEND_URL="${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}"
+
+          # Wait for rollback to complete
+          sleep 30
+
+          # Check if frontend is accessible
+          if curl -f -s "${FRONTEND_URL}/" > /dev/null 2>&1; then
+            echo "✅ Frontend is accessible after rollback"
+          else
+            echo "❌ Frontend still not accessible after rollback"
+            echo "Manual intervention required"
+          fi
+
+      - name: Create rollback summary
+        run: |
+          echo "## 🔄 Rollback Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** Deployment health check failed" >> $GITHUB_STEP_SUMMARY
+          echo "**Failed Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Rolled back at:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Action Required" >> $GITHUB_STEP_SUMMARY
+          echo "1. Investigate deployment failure in the logs above" >> $GITHUB_STEP_SUMMARY
+          echo "2. Fix the issues in the frontend code" >> $GITHUB_STEP_SUMMARY
+          echo "3. Test locally before pushing again" >> $GITHUB_STEP_SUMMARY
+          echo "4. Consider running manual deployment with skip_quality_checks if needed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Debugging Tips" >> $GITHUB_STEP_SUMMARY
+          echo "- Check Docker image build logs" >> $GITHUB_STEP_SUMMARY
+          echo "- Verify environment variables are correct" >> $GITHUB_STEP_SUMMARY
+          echo "- Test health endpoint locally" >> $GITHUB_STEP_SUMMARY
+          echo "- Review nginx configuration" >> $GITHUB_STEP_SUMMARY

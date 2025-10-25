@@ -1,6 +1,6 @@
 /**
  * Analytics Page - Phase 2 Implementation
- * 
+ *
  * Main page for displaying advanced analytics dashboard
  * Integrates AdvancedAnalyticsDashboard with real API data
  */

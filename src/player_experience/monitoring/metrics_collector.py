@@ -5,6 +5,7 @@ This module provides classes and utilities for collecting, aggregating, and
 analyzing various performance metrics across the Player Experience Interface.
 """
 
+import contextlib
 import json
 import statistics
 import threading
@@ -321,9 +322,9 @@ class MetricsCollector:
         with self.lock:
             if name in self.counters:
                 return self.counters[name]
-            elif name in self.gauges:
+            if name in self.gauges:
                 return self.gauges[name]
-            elif name in self.metrics and self.metrics[name]:
+            if name in self.metrics and self.metrics[name]:
                 return self.metrics[name][-1].value
             return None
 
@@ -454,10 +455,8 @@ class MetricsCollector:
     ):
         """Remove a metric callback."""
         if metric_name in self.metric_callbacks:
-            try:
+            with contextlib.suppress(ValueError):
                 self.metric_callbacks[metric_name].remove(callback)
-            except ValueError:
-                pass
 
     def export_metrics(self, format_type: str = "json") -> str:
         """Export all metrics in specified format."""
@@ -475,8 +474,7 @@ class MetricsCollector:
 
             if format_type.lower() == "json":
                 return json.dumps(metrics_data, indent=2, default=str)
-            else:
-                return str(metrics_data)
+            return str(metrics_data)
 
     def reset_metrics(self):
         """Reset all metrics (useful for testing)."""

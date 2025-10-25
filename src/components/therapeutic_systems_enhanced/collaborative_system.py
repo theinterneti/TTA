@@ -211,9 +211,7 @@ class TherapeuticCollaborativeSystem:
 
         # Collaborative session storage
         self.collaborative_sessions = {}  # session_id -> CollaborativeSession
-        self.collaborative_participants = (
-            {}
-        )  # user_id -> List[CollaborativeParticipant]
+        self.collaborative_participants = {}  # user_id -> List[CollaborativeParticipant]
         self.support_interactions = {}  # interaction_id -> SupportInteraction
         self.collaborative_goals = {}  # goal_id -> CollaborativeGoal
 
@@ -667,7 +665,7 @@ class TherapeuticCollaborativeSystem:
                 primary_participants=primary_participants,
                 supporting_participants=[
                     p_id
-                    for p_id in session.participants.keys()
+                    for p_id in session.participants
                     if p_id not in primary_participants
                 ],
                 target_completion=target_completion,
@@ -823,14 +821,13 @@ class TherapeuticCollaborativeSystem:
         """Determine support preferences for a user."""
         try:
             # Default support preferences
-            default_preferences = [
+            return [
                 SupportType.ENCOURAGEMENT,
                 SupportType.SHARED_EXPERIENCE,
                 SupportType.EMOTIONAL_VALIDATION,
             ]
 
             # Could be enhanced with user preference learning
-            return default_preferences
 
         except Exception as e:
             logger.error(f"Error determining support preferences: {e}")

@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Goal Suggestion Engine
- * 
+ *
  * Tests the intelligent therapeutic goal recommendation system
  * based on evidence-based clinical mappings.
  */
@@ -15,7 +15,7 @@ describe('Goal Suggestion Engine', () => {
   describe('generateGoalSuggestions', () => {
     it('should return empty suggestions when no concerns are provided', () => {
       const result = generateGoalSuggestions([]);
-      
+
       expect(result.suggestions).toHaveLength(0);
       expect(result.totalConcernsAnalyzed).toBe(0);
       expect(result.suggestionStrength).toBe('weak');
@@ -23,7 +23,7 @@ describe('Goal Suggestion Engine', () => {
 
     it('should generate suggestions for single concern', () => {
       const result = generateGoalSuggestions(['Work stress']);
-      
+
       expect(result.suggestions.length).toBeGreaterThan(0);
       expect(result.totalConcernsAnalyzed).toBe(1);
       expect(result.suggestions[0].goalId).toBe('stress_management');
@@ -33,10 +33,10 @@ describe('Goal Suggestion Engine', () => {
 
     it('should generate suggestions for multiple concerns', () => {
       const result = generateGoalSuggestions(['Work stress', 'Social anxiety']);
-      
+
       expect(result.suggestions.length).toBeGreaterThan(0);
       expect(result.totalConcernsAnalyzed).toBe(2);
-      
+
       // Should include stress_management and anxiety_reduction
       const goalIds = result.suggestions.map(s => s.goalId);
       expect(goalIds).toContain('stress_management');
@@ -46,29 +46,29 @@ describe('Goal Suggestion Engine', () => {
     it('should boost confidence for goals suggested by multiple concerns', () => {
       const singleConcernResult = generateGoalSuggestions(['Work stress']);
       const multipleConcernResult = generateGoalSuggestions(['Work stress', 'Academic pressure']);
-      
+
       const stressManagementSingle = singleConcernResult.suggestions.find(s => s.goalId === 'stress_management');
       const stressManagementMultiple = multipleConcernResult.suggestions.find(s => s.goalId === 'stress_management');
-      
+
       expect(stressManagementMultiple?.confidence).toBeGreaterThan(stressManagementSingle?.confidence || 0);
     });
 
     it('should exclude already selected goals from suggestions', () => {
       const result = generateGoalSuggestions(['Work stress'], ['stress_management']);
-      
+
       const goalIds = result.suggestions.map(s => s.goalId);
       expect(goalIds).not.toContain('stress_management');
     });
 
     it('should limit suggestions to maxSuggestions parameter', () => {
       const result = generateGoalSuggestions(['Work stress', 'Social anxiety', 'Depression'], [], 3);
-      
+
       expect(result.suggestions.length).toBeLessThanOrEqual(3);
     });
 
     it('should prioritize high clinical evidence suggestions', () => {
       const result = generateGoalSuggestions(['Social anxiety']);
-      
+
       // anxiety_reduction should be first (high evidence, high confidence)
       expect(result.suggestions[0].goalId).toBe('anxiety_reduction');
       expect(result.suggestions[0].clinicalEvidence).toBe('high');
@@ -77,14 +77,14 @@ describe('Goal Suggestion Engine', () => {
     it('should determine suggestion strength correctly', () => {
       const strongResult = generateGoalSuggestions(['Social anxiety']); // High confidence mappings
       const weakResult = generateGoalSuggestions(['Career uncertainty']); // Lower confidence mappings
-      
+
       expect(strongResult.suggestionStrength).toBe('strong');
       expect(weakResult.suggestionStrength).toBe('moderate');
     });
 
     it('should handle unknown concerns gracefully', () => {
       const result = generateGoalSuggestions(['Unknown concern']);
-      
+
       expect(result.suggestions).toHaveLength(0);
       expect(result.totalConcernsAnalyzed).toBe(1);
       expect(result.suggestionStrength).toBe('weak');
@@ -92,7 +92,7 @@ describe('Goal Suggestion Engine', () => {
 
     it('should provide meaningful reasons for suggestions', () => {
       const result = generateGoalSuggestions(['Work stress']);
-      
+
       result.suggestions.forEach(suggestion => {
         expect(suggestion.reason).toBeTruthy();
         expect(typeof suggestion.reason).toBe('string');
@@ -102,7 +102,7 @@ describe('Goal Suggestion Engine', () => {
 
     it('should categorize goals correctly', () => {
       const result = generateGoalSuggestions(['Work stress']);
-      
+
       result.suggestions.forEach(suggestion => {
         expect(suggestion.category).toBeTruthy();
         expect(typeof suggestion.category).toBe('string');
@@ -113,7 +113,7 @@ describe('Goal Suggestion Engine', () => {
       it('should suggest anxiety_reduction for social anxiety with high confidence', () => {
         const result = generateGoalSuggestions(['Social anxiety']);
         const anxietyReduction = result.suggestions.find(s => s.goalId === 'anxiety_reduction');
-        
+
         expect(anxietyReduction).toBeTruthy();
         expect(anxietyReduction?.confidence).toBeGreaterThan(0.9);
         expect(anxietyReduction?.clinicalEvidence).toBe('high');
@@ -122,7 +122,7 @@ describe('Goal Suggestion Engine', () => {
       it('should suggest relationship_skills for relationship issues', () => {
         const result = generateGoalSuggestions(['Relationship issues']);
         const relationshipSkills = result.suggestions.find(s => s.goalId === 'relationship_skills');
-        
+
         expect(relationshipSkills).toBeTruthy();
         expect(relationshipSkills?.confidence).toBeGreaterThan(0.9);
         expect(relationshipSkills?.clinicalEvidence).toBe('high');
@@ -131,7 +131,7 @@ describe('Goal Suggestion Engine', () => {
       it('should suggest confidence_building for low self-esteem', () => {
         const result = generateGoalSuggestions(['Low self-esteem']);
         const confidenceBuilding = result.suggestions.find(s => s.goalId === 'confidence_building');
-        
+
         expect(confidenceBuilding).toBeTruthy();
         expect(confidenceBuilding?.confidence).toBeGreaterThan(0.9);
         expect(confidenceBuilding?.clinicalEvidence).toBe('high');
@@ -140,7 +140,7 @@ describe('Goal Suggestion Engine', () => {
       it('should suggest emotional_processing for depression', () => {
         const result = generateGoalSuggestions(['Depression']);
         const emotionalProcessing = result.suggestions.find(s => s.goalId === 'emotional_processing');
-        
+
         expect(emotionalProcessing).toBeTruthy();
         expect(emotionalProcessing?.confidence).toBeGreaterThan(0.85);
         expect(emotionalProcessing?.clinicalEvidence).toBe('high');
@@ -149,7 +149,7 @@ describe('Goal Suggestion Engine', () => {
       it('should suggest self_compassion for perfectionism', () => {
         const result = generateGoalSuggestions(['Perfectionism']);
         const selfCompassion = result.suggestions.find(s => s.goalId === 'self_compassion');
-        
+
         expect(selfCompassion).toBeTruthy();
         expect(selfCompassion?.confidence).toBeGreaterThan(0.85);
         expect(selfCompassion?.clinicalEvidence).toBe('high');
@@ -159,14 +159,14 @@ describe('Goal Suggestion Engine', () => {
     describe('Complex Scenarios', () => {
       it('should handle multiple overlapping concerns effectively', () => {
         const result = generateGoalSuggestions([
-          'Work stress', 
-          'Social anxiety', 
+          'Work stress',
+          'Social anxiety',
           'Perfectionism'
         ]);
-        
+
         expect(result.suggestions.length).toBeGreaterThan(0);
         expect(result.totalConcernsAnalyzed).toBe(3);
-        
+
         // Should include goals that address multiple concerns
         const goalIds = result.suggestions.map(s => s.goalId);
         expect(goalIds).toContain('stress_management'); // Work stress
@@ -178,9 +178,9 @@ describe('Goal Suggestion Engine', () => {
           'Work stress', 'Social anxiety', 'Depression', 'Perfectionism',
           'Relationship issues', 'Low self-esteem', 'Financial worries'
         ];
-        
+
         const result = generateGoalSuggestions(manyConcerns, [], 5);
-        
+
         expect(result.suggestions.length).toBeLessThanOrEqual(5);
         expect(result.totalConcernsAnalyzed).toBe(7);
         expect(result.suggestionStrength).toBe('strong');
@@ -190,7 +190,7 @@ describe('Goal Suggestion Engine', () => {
         const result = generateGoalSuggestions([
           'Work stress', 'Relationship issues', 'Low self-esteem'
         ]);
-        
+
         const categories = new Set(result.suggestions.map(s => s.category));
         expect(categories.size).toBeGreaterThan(1); // Multiple categories represented
       });

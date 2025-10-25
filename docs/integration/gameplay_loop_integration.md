@@ -41,23 +41,23 @@ core_gameplay_loop:
   max_concurrent_sessions: 100
   session_timeout_minutes: 30
   enable_performance_tracking: true
-  
+
   narrative_engine:
     complexity_adaptation: true
     immersion_tracking: true
     max_description_length: 2000
     min_description_length: 100
-  
+
   choice_architecture:
     min_choices: 2
     max_choices: 5
     therapeutic_weighting: 0.4
-  
+
   consequence_system:
     learning_emphasis: true
     pattern_tracking: true
     therapeutic_framing: true
-  
+
   session_manager:
     auto_save_interval: 60
     context_preservation: true

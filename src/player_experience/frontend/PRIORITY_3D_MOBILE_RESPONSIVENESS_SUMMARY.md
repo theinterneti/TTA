@@ -88,7 +88,7 @@ className="px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.scrollbar-hide::-webkit-scrollbar { 
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 

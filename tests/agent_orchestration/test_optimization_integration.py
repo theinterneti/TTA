@@ -9,8 +9,7 @@ import asyncio
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-
-from src.agent_orchestration.optimization import (
+from tta_ai.orchestration.optimization import (
     OptimizationEngine,
     OptimizationStrategy,
     PerformanceAnalytics,

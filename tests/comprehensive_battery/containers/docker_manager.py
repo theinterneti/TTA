@@ -170,9 +170,8 @@ class DockerManager:
                 container.start()
                 logger.info(f"✅ Started container: {container_name}")
                 return True
-            else:
-                logger.info(f"Container {container_name} already running")
-                return True
+            logger.info(f"Container {container_name} already running")
+            return True
 
         except docker.errors.NotFound:
             logger.error(f"Container {container_name} not found")
@@ -193,9 +192,8 @@ class DockerManager:
                 container.stop()
                 logger.info(f"✅ Stopped container: {container_name}")
                 return True
-            else:
-                logger.info(f"Container {container_name} not running")
-                return True
+            logger.info(f"Container {container_name} not running")
+            return True
 
         except docker.errors.NotFound:
             logger.error(f"Container {container_name} not found")

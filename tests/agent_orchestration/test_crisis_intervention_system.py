@@ -12,9 +12,8 @@ Tests all crisis intervention components including:
 from unittest.mock import Mock
 
 import pytest
-
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisInterventionManager,
     CrisisLevel,
     CrisisType,

@@ -1,11 +1,12 @@
 """
-Ollama Provider Implementation
+Ollama Provider Implementation.
 
 This module provides integration with Ollama for containerized local model
 deployment and management.
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 from collections.abc import AsyncGenerator
@@ -13,11 +14,14 @@ from datetime import datetime
 from typing import Any
 
 import docker
+import docker.errors
+import docker.types
 import httpx
 
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -295,7 +299,7 @@ class OllamaProvider(BaseProvider):
 
         return OllamaModelInstance(model_id, self, self._client)
 
-    async def _unload_model_impl(self, instance: OllamaModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload an Ollama model instance."""
         # Ollama manages model loading/unloading automatically
         pass
@@ -352,24 +356,23 @@ class OllamaProvider(BaseProvider):
 
             # Add GPU support if available
             device_requests = []
-            try:
+            with contextlib.suppress(Exception):
                 # Check if NVIDIA runtime is available
                 runtime_info = self._docker_client.info()
                 if "nvidia" in runtime_info.get("Runtimes", {}):
                     device_requests = [
                         docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]])
                     ]
-            except Exception:
-                pass
 
+            # Type ignore for docker-py API compatibility (restart_policy dict format)
             container = self._docker_client.containers.run(
                 self._docker_image,
                 name=self._container_name,
                 ports=ports,
                 volumes=volumes,
-                device_requests=device_requests,
+                device_requests=device_requests if device_requests else None,
                 detach=True,
-                restart_policy={"Name": "unless-stopped"},
+                restart_policy={"Name": "unless-stopped"},  # type: ignore
             )
 
             logger.info(f"Created and started Ollama container: {self._container_name}")
@@ -400,7 +403,10 @@ class OllamaProvider(BaseProvider):
 
             # Make pull request (this can take a long time)
             async with self._client.stream(
-                "POST", "/api/pull", json=payload, timeout=1800.0  # 30 minutes timeout
+                "POST",
+                "/api/pull",
+                json=payload,
+                timeout=1800.0,  # 30 minutes timeout
             ) as response:
                 response.raise_for_status()
 
@@ -438,16 +444,14 @@ class OllamaProvider(BaseProvider):
         if "llama" in model_lower:
             if "3.1" in model_lower or "3.2" in model_lower:
                 return 128000  # Llama 3.1/3.2 has 128k context
-            else:
-                return 4096  # Older Llama models
-        elif "qwen" in model_lower:
+            return 4096  # Older Llama models
+        if "qwen" in model_lower:
             return 32768  # Qwen models typically have 32k context
-        elif "mistral" in model_lower:
+        if "mistral" in model_lower:
             return 32768  # Mistral models
-        elif "phi" in model_lower:
+        if "phi" in model_lower:
             return 4096  # Phi models
-        else:
-            return 4096  # Default assumption
+        return 4096  # Default assumption
 
     def _determine_capabilities(self, model_id: str) -> list[str]:
         """Determine model capabilities based on model name."""
@@ -471,10 +475,4 @@ class OllamaProvider(BaseProvider):
             await self._client.aclose()
             self._client = None
 
-        # Optionally stop container (commented out to keep it running)
-        # if self._docker_client and self._use_docker:
-        #     try:
-        #         container = self._docker_client.containers.get(self._container_name)
-        #         container.stop()
-        #     except Exception:
-        #         pass
+        # Note: Docker container is intentionally kept running for reuse

@@ -1,6 +1,6 @@
 /**
  * Goal Progress Service for TherapeuticGoalsSelector
- * 
+ *
  * This service provides progress tracking, dynamic goal evolution, and
  * progress-based recommendations for therapeutic goals.
  */
@@ -206,7 +206,7 @@ const DEFAULT_GOAL_MILESTONES: Record<string, GoalMilestone[]> = {
  */
 export function initializeGoalProgress(goalId: string): GoalProgress {
   const now = new Date();
-  
+
   return {
     goalId,
     progress: 0,
@@ -235,11 +235,11 @@ export function updateGoalProgress(
 ): GoalProgress {
   const now = new Date();
   const updatedProgress = { ...goalProgress };
-  
+
   // Update progress
   updatedProgress.progress = Math.max(0, Math.min(100, newProgress));
   updatedProgress.lastUpdated = now;
-  
+
   // Add progress entry
   updatedProgress.progressHistory.push({
     date: now,
@@ -247,7 +247,7 @@ export function updateGoalProgress(
     notes,
     emotionalState
   });
-  
+
   // Check for milestone achievements
   updatedProgress.milestones = updatedProgress.milestones.map(milestone => {
     if (!milestone.achieved && updatedProgress.progress >= milestone.targetProgress) {
@@ -259,7 +259,7 @@ export function updateGoalProgress(
     }
     return milestone;
   });
-  
+
   // Update status based on progress
   if (updatedProgress.progress === 0) {
     updatedProgress.status = 'not_started';
@@ -268,19 +268,19 @@ export function updateGoalProgress(
   } else {
     updatedProgress.status = 'in_progress';
   }
-  
+
   // Estimate completion date based on progress trend
   if (updatedProgress.progressHistory.length >= 2) {
     const recentEntries = updatedProgress.progressHistory.slice(-5);
     const progressRate = calculateProgressRate(recentEntries);
-    
+
     if (progressRate > 0 && updatedProgress.progress < 100) {
       const remainingProgress = 100 - updatedProgress.progress;
       const estimatedDays = remainingProgress / progressRate;
       updatedProgress.estimatedCompletion = new Date(now.getTime() + estimatedDays * 24 * 60 * 60 * 1000);
     }
   }
-  
+
   return updatedProgress;
 }
 
@@ -289,12 +289,12 @@ export function updateGoalProgress(
  */
 function calculateProgressRate(entries: ProgressEntry[]): number {
   if (entries.length < 2) return 0;
-  
+
   const first = entries[0];
   const last = entries[entries.length - 1];
   const timeDiff = (last.date.getTime() - first.date.getTime()) / (24 * 60 * 60 * 1000); // days
   const progressDiff = last.progress - first.progress;
-  
+
   return timeDiff > 0 ? progressDiff / timeDiff : 0;
 }
 
@@ -306,7 +306,7 @@ export function generateProgressBasedRecommendations(
   primaryConcerns: string[]
 ): ProgressBasedRecommendation[] {
   const recommendations: ProgressBasedRecommendation[] = [];
-  
+
   goalProgresses.forEach(goalProgress => {
     // Check for stalled progress
     if (goalProgress.status === 'in_progress' && isProgressStalled(goalProgress)) {
@@ -320,7 +320,7 @@ export function generateProgressBasedRecommendations(
         clinicalEvidence: 'high'
       });
     }
-    
+
     // Check for rapid progress
     if (isProgressRapid(goalProgress)) {
       recommendations.push({
@@ -333,7 +333,7 @@ export function generateProgressBasedRecommendations(
         clinicalEvidence: 'medium'
       });
     }
-    
+
     // Check for completed goals
     if (goalProgress.status === 'completed') {
       recommendations.push({
@@ -347,13 +347,13 @@ export function generateProgressBasedRecommendations(
       });
     }
   });
-  
+
   return recommendations.sort((a, b) => {
     // Sort by urgency first, then confidence
     const urgencyWeight = { high: 3, medium: 2, low: 1 };
     const urgencyDiff = urgencyWeight[b.urgency] - urgencyWeight[a.urgency];
     if (urgencyDiff !== 0) return urgencyDiff;
-    
+
     return b.confidence - a.confidence;
   });
 }
@@ -364,10 +364,10 @@ export function generateProgressBasedRecommendations(
 function isProgressStalled(goalProgress: GoalProgress): boolean {
   const recentEntries = goalProgress.progressHistory.slice(-3);
   if (recentEntries.length < 2) return false;
-  
+
   const progressRate = calculateProgressRate(recentEntries);
   const daysSinceLastUpdate = (new Date().getTime() - goalProgress.lastUpdated.getTime()) / (24 * 60 * 60 * 1000);
-  
+
   return progressRate <= 0.5 && daysSinceLastUpdate > 7; // Less than 0.5% progress per day and no update in 7 days
 }
 
@@ -377,7 +377,7 @@ function isProgressStalled(goalProgress: GoalProgress): boolean {
 function isProgressRapid(goalProgress: GoalProgress): boolean {
   const recentEntries = goalProgress.progressHistory.slice(-3);
   if (recentEntries.length < 2) return false;
-  
+
   const progressRate = calculateProgressRate(recentEntries);
   return progressRate > 5; // More than 5% progress per day
 }
@@ -389,7 +389,7 @@ export function generateGoalEvolutionSuggestions(
   goalProgresses: GoalProgress[]
 ): GoalEvolutionSuggestion[] {
   const suggestions: GoalEvolutionSuggestion[] = [];
-  
+
   goalProgresses.forEach(goalProgress => {
     if (goalProgress.progress >= 75) {
       // Suggest graduation to advanced goals
@@ -402,7 +402,7 @@ export function generateGoalEvolutionSuggestions(
         requiredProgress: 75
       });
     }
-    
+
     if (goalProgress.progress >= 50 && hasMultipleStrugglingAreas(goalProgress)) {
       // Suggest splitting complex goals
       suggestions.push({
@@ -415,7 +415,7 @@ export function generateGoalEvolutionSuggestions(
       });
     }
   });
-  
+
   return suggestions.sort((a, b) => b.confidence - a.confidence);
 }
 
@@ -429,7 +429,7 @@ function getAdvancedGoalSuggestion(goalId: string): string {
     'confidence_building': 'Public speaking and mentoring others',
     'emotional_processing': 'Emotional intelligence and empathetic leadership'
   };
-  
+
   return advancedGoals[goalId] || `Advanced ${goalId.replace(/_/g, ' ')} mastery`;
 }
 
@@ -443,7 +443,7 @@ function getSplitGoalSuggestion(goalId: string): string {
     'confidence_building': 'Split into self-confidence and social confidence',
     'emotional_processing': 'Separate emotional awareness from emotional expression'
   };
-  
+
   return splitSuggestions[goalId] || `Break ${goalId.replace(/_/g, ' ')} into focused sub-goals`;
 }
 
@@ -452,9 +452,9 @@ function getSplitGoalSuggestion(goalId: string): string {
  */
 function hasMultipleStrugglingAreas(goalProgress: GoalProgress): boolean {
   const unachievedMilestones = goalProgress.milestones.filter(m => !m.achieved);
-  const overdueMilestones = unachievedMilestones.filter(m => 
+  const overdueMilestones = unachievedMilestones.filter(m =>
     goalProgress.progress >= m.targetProgress - 10 // Within 10% of target but not achieved
   );
-  
+
   return overdueMilestones.length >= 2;
 }

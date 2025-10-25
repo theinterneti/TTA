@@ -1,5 +1,5 @@
 """
-TTA Decorators
+TTA Decorators.
 
 This module provides decorators for the TTA orchestration system.
 """
@@ -110,6 +110,7 @@ def retry(
                     time.sleep(current_delay)
                     current_delay *= backoff
                     attempt += 1
+            return None
 
         return cast(F, wrapper)
 
@@ -198,6 +199,8 @@ def singleton(cls: type[T]) -> type[T]:
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
+
+    get_instance._instances = instances  # Expose the instances dictionary
 
     return cast(type[T], get_instance)
 

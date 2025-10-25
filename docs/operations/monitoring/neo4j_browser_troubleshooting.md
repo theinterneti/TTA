@@ -163,7 +163,7 @@ MATCH (c:Character)
 OPTIONAL MATCH (c)-[:LOCATED_AT]->(l:Location)
 OPTIONAL MATCH (c)-[:MEMBER_OF]->(g:Guild)
 OPTIONAL MATCH (c)-[:EQUIPPED]->(e:Equipment)
-RETURN c.name as name, 
+RETURN c.name as name,
        c.description as description,
        c.personality_traits as traits,
        c.stat_strength as strength,
@@ -244,13 +244,13 @@ with driver.session() as session:
             created_at: datetime()
         })
         RETURN c.id as character_id
-    """, 
+    """,
     name="Python Character",
     description="Created via Python driver",
     traits=["intelligent", "resourceful"],
     strength=14
     )
-    
+
     character_id = result.single()["character_id"]
     print(f"Created character: {character_id}")
 

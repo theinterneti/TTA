@@ -234,7 +234,7 @@ describe('GuidedExercise', () => {
 
     const resetButton = screen.container.querySelector('[title="Reset exercise"]');
     expect(resetButton).toBeInTheDocument();
-    
+
     fireEvent.click(resetButton!);
 
     // Should be back to initial state

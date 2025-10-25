@@ -1,5 +1,5 @@
 """
-Core interfaces for the Model Management System
+Core interfaces for the Model Management System.
 
 This module defines the fundamental interfaces and enums used throughout
 the model management system.
@@ -7,7 +7,7 @@ the model management system.
 
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
@@ -55,13 +55,9 @@ class ModelRequirements:
     max_latency_ms: int | None = None
     min_quality_score: float | None = None
     max_cost_per_token: float | None = None
-    required_capabilities: list[str] = None
+    required_capabilities: list[str] = field(default_factory=list)
     context_length_needed: int | None = None
     therapeutic_safety_required: bool = True
-
-    def __post_init__(self):
-        if self.required_capabilities is None:
-            self.required_capabilities = []
 
 
 @dataclass
@@ -75,7 +71,7 @@ class ModelInfo:
     context_length: int | None = None
     cost_per_token: float | None = None
     is_free: bool = False
-    capabilities: list[str] = None
+    capabilities: list[str] = field(default_factory=list)
     therapeutic_safety_score: float | None = None
     performance_score: float | None = None
 
@@ -137,11 +133,9 @@ class IModelInstance(ABC):
         pass
 
     @abstractmethod
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
         """Generate text as a stream."""
-        pass
+        ...
 
     @abstractmethod
     async def health_check(self) -> bool:
@@ -196,6 +190,29 @@ class IModelProvider(ABC):
     async def get_provider_metrics(self) -> dict[str, Any]:
         """Get metrics for this provider."""
         pass
+
+    async def cleanup(self) -> None:
+        """Cleanup provider resources. Optional method with default implementation."""
+        # Default implementation: no cleanup needed
+        ...
+
+    async def get_free_models(self) -> list[ModelInfo]:
+        """Get list of free models. Optional method with default implementation."""
+        return []
+
+    async def set_free_models_filter(
+        self,
+        show_free_only: bool = False,
+        prefer_free: bool = True,
+        max_cost_per_token: float = 0.001,
+    ) -> None:
+        """Enable/disable free models filter. Optional method with default implementation."""
+        # Default implementation: no filtering
+        ...
+
+    async def get_filter_settings(self) -> dict[str, Any]:
+        """Get current filter settings. Optional method with default implementation."""
+        return {}
 
 
 class IModelSelector(ABC):

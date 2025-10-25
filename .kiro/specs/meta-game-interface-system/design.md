@@ -31,10 +31,10 @@ graph TB
     B --> J[Therapeutic Resources Service]
     B --> K[Privacy Management Service]
     B --> L[Platform Integration Service]
-    
+
     C --> M[Narrative Context Manager]
     C --> N[Theme Consistency Engine]
-    
+
     D --> O[Character Data Store]
     E --> P[Progress Analytics Engine]
     F --> Q[User Preferences Store]

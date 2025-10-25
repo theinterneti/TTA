@@ -1,0 +1,954 @@
+{
+  "timestamp": "2025-10-25T13:19:37.075492",
+  "total_models_in_catalog": 347,
+  "models_tested": 121,
+  "successful": [
+    "alibaba/tongyi-deepresearch-30b-a3b:free",
+    "alibaba/tongyi-deepresearch-30b-a3b",
+    "arliai/qwq-32b-arliai-rpr-v1:free",
+    "arliai/qwq-32b-arliai-rpr-v1",
+    "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+    "cognitivecomputations/dolphin3.0-mistral-24b:free",
+    "cognitivecomputations/dolphin3.0-mistral-24b",
+    "deepseek/deepseek-v3.1-terminus:exacto",
+    "meituan/longcat-flash-chat:free",
+    "meta-llama/llama-3.3-8b-instruct:free",
+    "meta-llama/llama-4-maverick:free",
+    "microsoft/mai-ds-r1:free",
+    "microsoft/mai-ds-r1",
+    "minimax/minimax-m2:free",
+    "moonshotai/kimi-k2-0905:exacto",
+    "moonshotai/kimi-k2:free",
+    "nvidia/nemotron-nano-9b-v2:free",
+    "nvidia/nemotron-nano-9b-v2",
+    "openrouter/auto",
+    "shisa-ai/shisa-v2-llama3.3-70b:free",
+    "shisa-ai/shisa-v2-llama3.3-70b",
+    "tngtech/deepseek-r1t2-chimera:free",
+    "tngtech/deepseek-r1t2-chimera",
+    "tngtech/deepseek-r1t-chimera:free",
+    "z-ai/glm-4.6:exacto"
+  ],
+  "failed": [
+    "agentica-org/deepcoder-14b-preview:free",
+    "agentica-org/deepcoder-14b-preview",
+    "ai21/jamba-mini-1.7",
+    "ai21/jamba-large-1.7",
+    "aion-labs/aion-1.0",
+    "aion-labs/aion-1.0-mini",
+    "aion-labs/aion-rp-llama-3.1-8b",
+    "alfredpros/codellama-7b-instruct-solidity",
+    "allenai/olmo-2-0325-32b-instruct",
+    "alpindale/goliath-120b",
+    "amazon/nova-lite-v1",
+    "amazon/nova-micro-v1",
+    "amazon/nova-pro-v1",
+    "anthracite-org/magnum-v4-72b",
+    "anthracite-org/magnum-v2-72b",
+    "anthropic/claude-haiku-4.5",
+    "anthropic/claude-sonnet-4.5",
+    "anthropic/claude-opus-4.1",
+    "arcee-ai/afm-4.5b",
+    "arcee-ai/spotlight",
+    "arcee-ai/maestro-reasoning",
+    "baidu/ernie-4.5-21b-a3b-thinking",
+    "baidu/ernie-4.5-21b-a3b",
+    "baidu/ernie-4.5-vl-28b-a3b",
+    "bytedance/ui-tars-1.5-7b",
+    "cohere/command-a",
+    "cohere/command-r7b-12-2024",
+    "cohere/command-r-08-2024",
+    "deepcogito/cogito-v2-preview-llama-405b",
+    "deepcogito/cogito-v2-preview-llama-70b",
+    "deepcogito/cogito-v2-preview-llama-109b-moe",
+    "deepseek/deepseek-v3.2-exp",
+    "deepseek/deepseek-v3.1-terminus",
+    "eleutherai/llemma_7b",
+    "google/gemini-2.5-flash-image",
+    "google/gemini-2.5-flash-preview-09-2025",
+    "google/gemini-2.5-flash-lite-preview-09-2025",
+    "gryphe/mythomax-l2-13b",
+    "ibm-granite/granite-4.0-h-micro",
+    "inception/mercury",
+    "inception/mercury-coder",
+    "inclusionai/ring-1t",
+    "inclusionai/ling-1t",
+    "inflection/inflection-3-pi",
+    "inflection/inflection-3-productivity",
+    "liquid/lfm2-8b-a1b",
+    "liquid/lfm-2.2-6b",
+    "mancer/weaver",
+    "meituan/longcat-flash-chat",
+    "meta-llama/llama-guard-4-12b",
+    "microsoft/phi-4-reasoning-plus",
+    "minimax/minimax-m1",
+    "minimax/minimax-01",
+    "mistralai/mistral-medium-3.1",
+    "mistralai/codestral-2508",
+    "mistralai/devstral-medium",
+    "moonshotai/kimi-k2-0905",
+    "morph/morph-v3-large",
+    "morph/morph-v3-fast",
+    "neversleep/llama-3.1-lumimaid-8b",
+    "neversleep/noromaid-20b",
+    "nousresearch/hermes-4-70b",
+    "nousresearch/hermes-4-405b",
+    "nousresearch/deephermes-3-mistral-24b-preview",
+    "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "openai/gpt-5-image-mini",
+    "openai/gpt-5-image",
+    "openai/o3-deep-research",
+    "opengvlab/internvl3-78b",
+    "openrouter/andromeda-alpha",
+    "perplexity/sonar-reasoning-pro",
+    "perplexity/sonar-pro",
+    "perplexity/sonar-deep-research",
+    "qwen/qwen3-vl-8b-thinking",
+    "qwen/qwen3-vl-8b-instruct",
+    "qwen/qwen3-vl-30b-a3b-thinking",
+    "raifle/sorcererlm-8x22b",
+    "relace/relace-apply-3",
+    "sao10k/l3.1-70b-hanami-x1",
+    "sao10k/l3.3-euryale-70b",
+    "sao10k/l3.1-euryale-70b",
+    "stepfun-ai/step3",
+    "switchpoint/router",
+    "tencent/hunyuan-a13b-instruct:free",
+    "tencent/hunyuan-a13b-instruct",
+    "thedrummer/cydonia-24b-v4.1",
+    "thedrummer/anubis-70b-v1.1",
+    "thedrummer/skyfall-36b-v2",
+    "thudm/glm-4.1v-9b-thinking",
+    "thudm/glm-z1-32b",
+    "undi95/remm-slerp-l2-13b",
+    "x-ai/grok-4-fast",
+    "x-ai/grok-code-fast-1",
+    "x-ai/grok-4",
+    "z-ai/glm-4.6",
+    "z-ai/glm-4.5v"
+  ],
+  "results": [
+    {
+      "model": "agentica-org/deepcoder-14b-preview:free",
+      "model_with_suffix": "agentica-org/deepcoder-14b-preview:free:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.9529755115509033
+    },
+    {
+      "model": "agentica-org/deepcoder-14b-preview",
+      "model_with_suffix": "agentica-org/deepcoder-14b-preview:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.796046257019043
+    },
+    {
+      "model": "ai21/jamba-mini-1.7",
+      "model_with_suffix": "ai21/jamba-mini-1.7:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10047769546508789
+    },
+    {
+      "model": "ai21/jamba-large-1.7",
+      "model_with_suffix": "ai21/jamba-large-1.7:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09196233749389648
+    },
+    {
+      "model": "aion-labs/aion-1.0",
+      "model_with_suffix": "aion-labs/aion-1.0:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09932398796081543
+    },
+    {
+      "model": "aion-labs/aion-1.0-mini",
+      "model_with_suffix": "aion-labs/aion-1.0-mini:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09839630126953125
+    },
+    {
+      "model": "aion-labs/aion-rp-llama-3.1-8b",
+      "model_with_suffix": "aion-labs/aion-rp-llama-3.1-8b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11382007598876953
+    },
+    {
+      "model": "alfredpros/codellama-7b-instruct-solidity",
+      "model_with_suffix": "alfredpros/codellama-7b-instruct-solidity:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11530876159667969
+    },
+    {
+      "model": "alibaba/tongyi-deepresearch-30b-a3b:free",
+      "model_with_suffix": "alibaba/tongyi-deepresearch-30b-a3b:free:free",
+      "success": true,
+      "time": 2.066316604614258
+    },
+    {
+      "model": "alibaba/tongyi-deepresearch-30b-a3b",
+      "model_with_suffix": "alibaba/tongyi-deepresearch-30b-a3b:free",
+      "success": true,
+      "time": 2.8829917907714844
+    },
+    {
+      "model": "allenai/olmo-2-0325-32b-instruct",
+      "model_with_suffix": "allenai/olmo-2-0325-32b-instruct:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11449050903320312
+    },
+    {
+      "model": "alpindale/goliath-120b",
+      "model_with_suffix": "alpindale/goliath-120b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12253117561340332
+    },
+    {
+      "model": "amazon/nova-lite-v1",
+      "model_with_suffix": "amazon/nova-lite-v1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10903167724609375
+    },
+    {
+      "model": "amazon/nova-micro-v1",
+      "model_with_suffix": "amazon/nova-micro-v1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09975361824035645
+    },
+    {
+      "model": "amazon/nova-pro-v1",
+      "model_with_suffix": "amazon/nova-pro-v1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11104631423950195
+    },
+    {
+      "model": "anthracite-org/magnum-v4-72b",
+      "model_with_suffix": "anthracite-org/magnum-v4-72b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09124588966369629
+    },
+    {
+      "model": "anthracite-org/magnum-v2-72b",
+      "model_with_suffix": "anthracite-org/magnum-v2-72b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10215568542480469
+    },
+    {
+      "model": "anthropic/claude-haiku-4.5",
+      "model_with_suffix": "anthropic/claude-haiku-4.5:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1086733341217041
+    },
+    {
+      "model": "anthropic/claude-sonnet-4.5",
+      "model_with_suffix": "anthropic/claude-sonnet-4.5:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11943793296813965
+    },
+    {
+      "model": "anthropic/claude-opus-4.1",
+      "model_with_suffix": "anthropic/claude-opus-4.1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.15527558326721191
+    },
+    {
+      "model": "arcee-ai/afm-4.5b",
+      "model_with_suffix": "arcee-ai/afm-4.5b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10933828353881836
+    },
+    {
+      "model": "arcee-ai/spotlight",
+      "model_with_suffix": "arcee-ai/spotlight:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10812044143676758
+    },
+    {
+      "model": "arcee-ai/maestro-reasoning",
+      "model_with_suffix": "arcee-ai/maestro-reasoning:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12345671653747559
+    },
+    {
+      "model": "arliai/qwq-32b-arliai-rpr-v1:free",
+      "model_with_suffix": "arliai/qwq-32b-arliai-rpr-v1:free:free",
+      "success": true,
+      "time": 9.939442873001099
+    },
+    {
+      "model": "arliai/qwq-32b-arliai-rpr-v1",
+      "model_with_suffix": "arliai/qwq-32b-arliai-rpr-v1:free",
+      "success": true,
+      "time": 4.709376335144043
+    },
+    {
+      "model": "baidu/ernie-4.5-21b-a3b-thinking",
+      "model_with_suffix": "baidu/ernie-4.5-21b-a3b-thinking:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09842753410339355
+    },
+    {
+      "model": "baidu/ernie-4.5-21b-a3b",
+      "model_with_suffix": "baidu/ernie-4.5-21b-a3b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09470295906066895
+    },
+    {
+      "model": "baidu/ernie-4.5-vl-28b-a3b",
+      "model_with_suffix": "baidu/ernie-4.5-vl-28b-a3b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.13214612007141113
+    },
+    {
+      "model": "bytedance/ui-tars-1.5-7b",
+      "model_with_suffix": "bytedance/ui-tars-1.5-7b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12316775321960449
+    },
+    {
+      "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+      "model_with_suffix": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free:free",
+      "success": true,
+      "time": 1.309788703918457
+    },
+    {
+      "model": "cognitivecomputations/dolphin3.0-mistral-24b:free",
+      "model_with_suffix": "cognitivecomputations/dolphin3.0-mistral-24b:free:free",
+      "success": true,
+      "time": 1.710357904434204
+    },
+    {
+      "model": "cognitivecomputations/dolphin3.0-mistral-24b",
+      "model_with_suffix": "cognitivecomputations/dolphin3.0-mistral-24b:free",
+      "success": true,
+      "time": 3.9368512630462646
+    },
+    {
+      "model": "cohere/command-a",
+      "model_with_suffix": "cohere/command-a:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1255793571472168
+    },
+    {
+      "model": "cohere/command-r7b-12-2024",
+      "model_with_suffix": "cohere/command-r7b-12-2024:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.0939321517944336
+    },
+    {
+      "model": "cohere/command-r-08-2024",
+      "model_with_suffix": "cohere/command-r-08-2024:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.0995795726776123
+    },
+    {
+      "model": "deepcogito/cogito-v2-preview-llama-405b",
+      "model_with_suffix": "deepcogito/cogito-v2-preview-llama-405b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10371732711791992
+    },
+    {
+      "model": "deepcogito/cogito-v2-preview-llama-70b",
+      "model_with_suffix": "deepcogito/cogito-v2-preview-llama-70b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12730979919433594
+    },
+    {
+      "model": "deepcogito/cogito-v2-preview-llama-109b-moe",
+      "model_with_suffix": "deepcogito/cogito-v2-preview-llama-109b-moe:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09763669967651367
+    },
+    {
+      "model": "deepseek/deepseek-v3.2-exp",
+      "model_with_suffix": "deepseek/deepseek-v3.2-exp:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.0955357551574707
+    },
+    {
+      "model": "deepseek/deepseek-v3.1-terminus",
+      "model_with_suffix": "deepseek/deepseek-v3.1-terminus:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10121965408325195
+    },
+    {
+      "model": "deepseek/deepseek-v3.1-terminus:exacto",
+      "model_with_suffix": "deepseek/deepseek-v3.1-terminus:exacto:free",
+      "success": true,
+      "time": 8.91867184638977
+    },
+    {
+      "model": "eleutherai/llemma_7b",
+      "model_with_suffix": "eleutherai/llemma_7b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09052133560180664
+    },
+    {
+      "model": "google/gemini-2.5-flash-image",
+      "model_with_suffix": "google/gemini-2.5-flash-image:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09332561492919922
+    },
+    {
+      "model": "google/gemini-2.5-flash-preview-09-2025",
+      "model_with_suffix": "google/gemini-2.5-flash-preview-09-2025:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1031956672668457
+    },
+    {
+      "model": "google/gemini-2.5-flash-lite-preview-09-2025",
+      "model_with_suffix": "google/gemini-2.5-flash-lite-preview-09-2025:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.0912160873413086
+    },
+    {
+      "model": "gryphe/mythomax-l2-13b",
+      "model_with_suffix": "gryphe/mythomax-l2-13b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.20873212814331055
+    },
+    {
+      "model": "ibm-granite/granite-4.0-h-micro",
+      "model_with_suffix": "ibm-granite/granite-4.0-h-micro:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09604382514953613
+    },
+    {
+      "model": "inception/mercury",
+      "model_with_suffix": "inception/mercury:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09217691421508789
+    },
+    {
+      "model": "inception/mercury-coder",
+      "model_with_suffix": "inception/mercury-coder:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10030055046081543
+    },
+    {
+      "model": "inclusionai/ring-1t",
+      "model_with_suffix": "inclusionai/ring-1t:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09818410873413086
+    },
+    {
+      "model": "inclusionai/ling-1t",
+      "model_with_suffix": "inclusionai/ling-1t:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1146554946899414
+    },
+    {
+      "model": "inflection/inflection-3-pi",
+      "model_with_suffix": "inflection/inflection-3-pi:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11145353317260742
+    },
+    {
+      "model": "inflection/inflection-3-productivity",
+      "model_with_suffix": "inflection/inflection-3-productivity:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09065699577331543
+    },
+    {
+      "model": "liquid/lfm2-8b-a1b",
+      "model_with_suffix": "liquid/lfm2-8b-a1b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1212606430053711
+    },
+    {
+      "model": "liquid/lfm-2.2-6b",
+      "model_with_suffix": "liquid/lfm-2.2-6b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10555553436279297
+    },
+    {
+      "model": "mancer/weaver",
+      "model_with_suffix": "mancer/weaver:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09940743446350098
+    },
+    {
+      "model": "meituan/longcat-flash-chat:free",
+      "model_with_suffix": "meituan/longcat-flash-chat:free:free",
+      "success": true,
+      "time": 3.075310707092285
+    },
+    {
+      "model": "meituan/longcat-flash-chat",
+      "model_with_suffix": "meituan/longcat-flash-chat:free",
+      "success": false,
+      "error": "Rate limited (HTTP 429)",
+      "time": 0.238234281539917
+    },
+    {
+      "model": "meta-llama/llama-3.3-8b-instruct:free",
+      "model_with_suffix": "meta-llama/llama-3.3-8b-instruct:free:free",
+      "success": true,
+      "time": 0.8765923976898193
+    },
+    {
+      "model": "meta-llama/llama-guard-4-12b",
+      "model_with_suffix": "meta-llama/llama-guard-4-12b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10230588912963867
+    },
+    {
+      "model": "meta-llama/llama-4-maverick:free",
+      "model_with_suffix": "meta-llama/llama-4-maverick:free:free",
+      "success": true,
+      "time": 2.350067615509033
+    },
+    {
+      "model": "microsoft/phi-4-reasoning-plus",
+      "model_with_suffix": "microsoft/phi-4-reasoning-plus:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1000523567199707
+    },
+    {
+      "model": "microsoft/mai-ds-r1:free",
+      "model_with_suffix": "microsoft/mai-ds-r1:free:free",
+      "success": true,
+      "time": 12.029918432235718
+    },
+    {
+      "model": "microsoft/mai-ds-r1",
+      "model_with_suffix": "microsoft/mai-ds-r1:free",
+      "success": true,
+      "time": 8.999520301818848
+    },
+    {
+      "model": "minimax/minimax-m2:free",
+      "model_with_suffix": "minimax/minimax-m2:free:free",
+      "success": true,
+      "time": 4.695834636688232
+    },
+    {
+      "model": "minimax/minimax-m1",
+      "model_with_suffix": "minimax/minimax-m1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1279129981994629
+    },
+    {
+      "model": "minimax/minimax-01",
+      "model_with_suffix": "minimax/minimax-01:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12006044387817383
+    },
+    {
+      "model": "mistralai/mistral-medium-3.1",
+      "model_with_suffix": "mistralai/mistral-medium-3.1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11492085456848145
+    },
+    {
+      "model": "mistralai/codestral-2508",
+      "model_with_suffix": "mistralai/codestral-2508:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1494607925415039
+    },
+    {
+      "model": "mistralai/devstral-medium",
+      "model_with_suffix": "mistralai/devstral-medium:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12205195426940918
+    },
+    {
+      "model": "moonshotai/kimi-k2-0905",
+      "model_with_suffix": "moonshotai/kimi-k2-0905:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.13641810417175293
+    },
+    {
+      "model": "moonshotai/kimi-k2-0905:exacto",
+      "model_with_suffix": "moonshotai/kimi-k2-0905:exacto:free",
+      "success": true,
+      "time": 4.122589588165283
+    },
+    {
+      "model": "moonshotai/kimi-k2:free",
+      "model_with_suffix": "moonshotai/kimi-k2:free:free",
+      "success": true,
+      "time": 1.7853648662567139
+    },
+    {
+      "model": "morph/morph-v3-large",
+      "model_with_suffix": "morph/morph-v3-large:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1832718849182129
+    },
+    {
+      "model": "morph/morph-v3-fast",
+      "model_with_suffix": "morph/morph-v3-fast:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.23733139038085938
+    },
+    {
+      "model": "neversleep/llama-3.1-lumimaid-8b",
+      "model_with_suffix": "neversleep/llama-3.1-lumimaid-8b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1757204532623291
+    },
+    {
+      "model": "neversleep/noromaid-20b",
+      "model_with_suffix": "neversleep/noromaid-20b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.16368627548217773
+    },
+    {
+      "model": "nousresearch/hermes-4-70b",
+      "model_with_suffix": "nousresearch/hermes-4-70b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 1.3496623039245605
+    },
+    {
+      "model": "nousresearch/hermes-4-405b",
+      "model_with_suffix": "nousresearch/hermes-4-405b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.19134068489074707
+    },
+    {
+      "model": "nousresearch/deephermes-3-mistral-24b-preview",
+      "model_with_suffix": "nousresearch/deephermes-3-mistral-24b-preview:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.15638017654418945
+    },
+    {
+      "model": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "model_with_suffix": "nvidia/llama-3.3-nemotron-super-49b-v1.5:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.3186631202697754
+    },
+    {
+      "model": "nvidia/nemotron-nano-9b-v2:free",
+      "model_with_suffix": "nvidia/nemotron-nano-9b-v2:free:free",
+      "success": true,
+      "time": 4.080110311508179
+    },
+    {
+      "model": "nvidia/nemotron-nano-9b-v2",
+      "model_with_suffix": "nvidia/nemotron-nano-9b-v2:free",
+      "success": true,
+      "time": 5.516493082046509
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "model_with_suffix": "openai/gpt-5-image-mini:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.23154377937316895
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "model_with_suffix": "openai/gpt-5-image:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.21544480323791504
+    },
+    {
+      "model": "openai/o3-deep-research",
+      "model_with_suffix": "openai/o3-deep-research:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.23909664154052734
+    },
+    {
+      "model": "opengvlab/internvl3-78b",
+      "model_with_suffix": "opengvlab/internvl3-78b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.17400240898132324
+    },
+    {
+      "model": "openrouter/andromeda-alpha",
+      "model_with_suffix": "openrouter/andromeda-alpha:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.18816280364990234
+    },
+    {
+      "model": "openrouter/auto",
+      "model_with_suffix": "openrouter/auto:free",
+      "success": true,
+      "time": 4.830322980880737
+    },
+    {
+      "model": "perplexity/sonar-reasoning-pro",
+      "model_with_suffix": "perplexity/sonar-reasoning-pro:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.30264878273010254
+    },
+    {
+      "model": "perplexity/sonar-pro",
+      "model_with_suffix": "perplexity/sonar-pro:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.19349408149719238
+    },
+    {
+      "model": "perplexity/sonar-deep-research",
+      "model_with_suffix": "perplexity/sonar-deep-research:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.17347192764282227
+    },
+    {
+      "model": "qwen/qwen3-vl-8b-thinking",
+      "model_with_suffix": "qwen/qwen3-vl-8b-thinking:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1109776496887207
+    },
+    {
+      "model": "qwen/qwen3-vl-8b-instruct",
+      "model_with_suffix": "qwen/qwen3-vl-8b-instruct:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12873363494873047
+    },
+    {
+      "model": "qwen/qwen3-vl-30b-a3b-thinking",
+      "model_with_suffix": "qwen/qwen3-vl-30b-a3b-thinking:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.17808055877685547
+    },
+    {
+      "model": "raifle/sorcererlm-8x22b",
+      "model_with_suffix": "raifle/sorcererlm-8x22b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10469913482666016
+    },
+    {
+      "model": "relace/relace-apply-3",
+      "model_with_suffix": "relace/relace-apply-3:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.13840866088867188
+    },
+    {
+      "model": "sao10k/l3.1-70b-hanami-x1",
+      "model_with_suffix": "sao10k/l3.1-70b-hanami-x1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10345792770385742
+    },
+    {
+      "model": "sao10k/l3.3-euryale-70b",
+      "model_with_suffix": "sao10k/l3.3-euryale-70b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12367010116577148
+    },
+    {
+      "model": "sao10k/l3.1-euryale-70b",
+      "model_with_suffix": "sao10k/l3.1-euryale-70b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09529376029968262
+    },
+    {
+      "model": "shisa-ai/shisa-v2-llama3.3-70b:free",
+      "model_with_suffix": "shisa-ai/shisa-v2-llama3.3-70b:free:free",
+      "success": true,
+      "time": 7.9699060916900635
+    },
+    {
+      "model": "shisa-ai/shisa-v2-llama3.3-70b",
+      "model_with_suffix": "shisa-ai/shisa-v2-llama3.3-70b:free",
+      "success": true,
+      "time": 7.711096286773682
+    },
+    {
+      "model": "stepfun-ai/step3",
+      "model_with_suffix": "stepfun-ai/step3:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.2306044101715088
+    },
+    {
+      "model": "switchpoint/router",
+      "model_with_suffix": "switchpoint/router:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.10795164108276367
+    },
+    {
+      "model": "tencent/hunyuan-a13b-instruct:free",
+      "model_with_suffix": "tencent/hunyuan-a13b-instruct:free:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.7693824768066406
+    },
+    {
+      "model": "tencent/hunyuan-a13b-instruct",
+      "model_with_suffix": "tencent/hunyuan-a13b-instruct:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.5454213619232178
+    },
+    {
+      "model": "thedrummer/cydonia-24b-v4.1",
+      "model_with_suffix": "thedrummer/cydonia-24b-v4.1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.11982870101928711
+    },
+    {
+      "model": "thedrummer/anubis-70b-v1.1",
+      "model_with_suffix": "thedrummer/anubis-70b-v1.1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1362302303314209
+    },
+    {
+      "model": "thedrummer/skyfall-36b-v2",
+      "model_with_suffix": "thedrummer/skyfall-36b-v2:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.17915773391723633
+    },
+    {
+      "model": "thudm/glm-4.1v-9b-thinking",
+      "model_with_suffix": "thudm/glm-4.1v-9b-thinking:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.1780843734741211
+    },
+    {
+      "model": "thudm/glm-z1-32b",
+      "model_with_suffix": "thudm/glm-z1-32b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12470054626464844
+    },
+    {
+      "model": "tngtech/deepseek-r1t2-chimera:free",
+      "model_with_suffix": "tngtech/deepseek-r1t2-chimera:free:free",
+      "success": true,
+      "time": 14.331278324127197
+    },
+    {
+      "model": "tngtech/deepseek-r1t2-chimera",
+      "model_with_suffix": "tngtech/deepseek-r1t2-chimera:free",
+      "success": true,
+      "time": 25.574495792388916
+    },
+    {
+      "model": "tngtech/deepseek-r1t-chimera:free",
+      "model_with_suffix": "tngtech/deepseek-r1t-chimera:free:free",
+      "success": true,
+      "time": 8.16604995727539
+    },
+    {
+      "model": "undi95/remm-slerp-l2-13b",
+      "model_with_suffix": "undi95/remm-slerp-l2-13b:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12121319770812988
+    },
+    {
+      "model": "x-ai/grok-4-fast",
+      "model_with_suffix": "x-ai/grok-4-fast:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09764838218688965
+    },
+    {
+      "model": "x-ai/grok-code-fast-1",
+      "model_with_suffix": "x-ai/grok-code-fast-1:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.12209463119506836
+    },
+    {
+      "model": "x-ai/grok-4",
+      "model_with_suffix": "x-ai/grok-4:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.09152483940124512
+    },
+    {
+      "model": "z-ai/glm-4.6",
+      "model_with_suffix": "z-ai/glm-4.6:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.08926510810852051
+    },
+    {
+      "model": "z-ai/glm-4.6:exacto",
+      "model_with_suffix": "z-ai/glm-4.6:exacto:free",
+      "success": true,
+      "time": 4.245008707046509
+    },
+    {
+      "model": "z-ai/glm-4.5v",
+      "model_with_suffix": "z-ai/glm-4.5v:free",
+      "success": false,
+      "error": "Not found (HTTP 404)",
+      "time": 0.21491265296936035
+    }
+  ]
+}

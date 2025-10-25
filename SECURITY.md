@@ -90,10 +90,10 @@ The TTA repository has the following security features enabled:
    ```bash
    # Run pre-commit hooks
    pre-commit run --all-files
-   
+
    # Run security scan
    uv run bandit -r src/
-   
+
    # Check for secrets
    git secrets --scan
    ```
@@ -167,6 +167,5 @@ We would like to thank the following individuals for responsibly disclosing secu
 
 ---
 
-**Last Updated:** October 4, 2025  
+**Last Updated:** October 4, 2025
 **Version:** 1.0
-

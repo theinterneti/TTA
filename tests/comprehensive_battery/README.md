@@ -206,7 +206,7 @@ Override database connections for different environments:
 # Development environment
 python run_comprehensive_tests.py --all --neo4j-uri bolt://dev-neo4j:7687
 
-# Staging environment  
+# Staging environment
 python run_comprehensive_tests.py --all --neo4j-uri bolt://staging-neo4j:7687 --redis-url redis://staging-redis:6379
 ```
 

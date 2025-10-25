@@ -34,8 +34,8 @@ from slowapi.util import get_remote_address  # type: ignore[import-not-found]
 from ..integration.PlayerExperienceIntegration import FranchiseWorldAPI
 
 # Import routers
-from .routers.franchise_worlds import (  # type: ignore[import-not-found]
-    router as franchise_worlds_router,
+from .routers.franchise_worlds import (
+    router as franchise_worlds_router,  # type: ignore[import-not-found]
 )
 
 # Configure structured logging
@@ -233,9 +233,7 @@ async def custom_metrics():
             WORLD_USAGE.labels(
                 world_name=world.get("name", "unknown"),
                 world_genre=world.get("genre", "unknown"),
-            ).inc(
-                0
-            )  # Initialize counter
+            ).inc(0)  # Initialize counter
 
         return {
             "total_worlds": len(worlds),

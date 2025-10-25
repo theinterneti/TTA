@@ -1,5 +1,5 @@
 """
-TTA Configuration
+TTA Configuration.
 
 This module provides configuration management for the TTA project.
 
@@ -210,6 +210,35 @@ class TTAConfig:
                 "track_components": True,
             },
             "environment": {"name": "development", "log_level": "info"},
+            "orchestration": {  # Add this section
+                "components": {
+                    "player_experience": {
+                        "path": "src.components.player_experience_component",
+                        "class_name": "PlayerExperienceComponent",
+                        "dependencies": ["agent_orchestration"],
+                    },
+                    "agent_orchestration": {
+                        "path": "src.components.agent_orchestration_component",
+                        "class_name": "AgentOrchestrationComponent",
+                    },
+                    "docker": {
+                        "path": "src.components.docker_component",
+                        "class_name": "DockerComponent",
+                    },
+                    "carbon": {
+                        "path": "src.components.carbon_component",
+                        "class_name": "CarbonComponent",
+                    },
+                    "gameplay_loop": {
+                        "path": "src.components.gameplay_loop_component",
+                        "class_name": "GameplayLoopComponent",
+                    },
+                    "tta_dev": {
+                        "path": "ai-components.tta_dev.src.tta_dev_component",
+                        "class_name": "TtaDevComponent",
+                    },
+                }
+            },
         }
 
     @log_entry_exit
@@ -299,7 +328,7 @@ class TTAConfig:
 
             # Support compound repository keys like "tta.dev" or "tta.prototype"
             if i + 1 < len(keys):
-                compound = f"{keys[i]}.{keys[i+1]}"
+                compound = f"{keys[i]}.{keys[i + 1]}"
                 if compound in value:
                     value = value[compound]
                     i += 2
@@ -426,15 +455,15 @@ class TTAConfig:
             if expected_type is not None:
                 if expected_type == "dict" and not isinstance(value, dict):
                     raise ValueError(f"Key '{path}.{key}' must be a dictionary")
-                elif expected_type == "list" and not isinstance(value, list):
+                if expected_type == "list" and not isinstance(value, list):
                     raise ValueError(f"Key '{path}.{key}' must be a list")
-                elif expected_type == "str" and not isinstance(value, str):
+                if expected_type == "str" and not isinstance(value, str):
                     raise ValueError(f"Key '{path}.{key}' must be a string")
-                elif expected_type == "int" and not isinstance(value, int):
+                if expected_type == "int" and not isinstance(value, int):
                     raise ValueError(f"Key '{path}.{key}' must be an integer")
-                elif expected_type == "float" and not isinstance(value, (int, float)):
+                if expected_type == "float" and not isinstance(value, (int, float)):
                     raise ValueError(f"Key '{path}.{key}' must be a number")
-                elif expected_type == "bool" and not isinstance(value, bool):
+                if expected_type == "bool" and not isinstance(value, bool):
                     raise ValueError(f"Key '{path}.{key}' must be a boolean")
 
             # Check nested schema

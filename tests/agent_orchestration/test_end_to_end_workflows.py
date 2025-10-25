@@ -10,8 +10,8 @@ import time
 from unittest.mock import patch
 
 import pytest
-
-from src.agent_orchestration import (
+import pytest_asyncio
+from tta_ai.orchestration import (
     AgentStep,
     AgentType,
     OrchestrationRequest,
@@ -19,6 +19,7 @@ from src.agent_orchestration import (
     WorkflowManager,
     WorkflowType,
 )
+
 from tests.agent_orchestration.test_multi_agent_workflow_integration import (
     IntegrationTestHelper,
     WorkflowStateVerifier,
@@ -35,12 +36,12 @@ from tests.agent_orchestration.test_multi_agent_workflow_integration import (
 class TestCompleteWorkflowIntegration:
     """Test complete IPA → WBA → NGA workflow integration."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def workflow_manager(self):
         """Create workflow manager for testing."""
         return WorkflowManager()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def integration_helper(self, redis_client, neo4j_driver):
         """Create integration test helper."""
         return IntegrationTestHelper(redis_client, neo4j_driver)
@@ -86,12 +87,12 @@ class TestCompleteWorkflowIntegration:
 
             # Verify response structure
             assert hasattr(response, "response_text"), "Response missing response_text"
-            assert hasattr(
-                response, "workflow_metadata"
-            ), "Response missing workflow_metadata"
-            assert (
-                response.workflow_metadata.get("steps_executed") == 3
-            ), "Expected 3 steps executed"
+            assert hasattr(response, "workflow_metadata"), (
+                "Response missing workflow_metadata"
+            )
+            assert response.workflow_metadata.get("steps_executed") == 3, (
+                "Expected 3 steps executed"
+            )
 
             # Verify performance
             assert execution_time < 30.0, f"Workflow took too long: {execution_time}s"
@@ -103,9 +104,9 @@ class TestCompleteWorkflowIntegration:
             redis_state = await integration_helper.redis_verifier.verify_workflow_coordination_state(
                 run_id
             )
-            assert redis_state[
-                "workflow_state_exists"
-            ], "Workflow state not persisted in Redis"
+            assert redis_state["workflow_state_exists"], (
+                "Workflow state not persisted in Redis"
+            )
 
             # Check Neo4j state (if available)
             try:
@@ -213,9 +214,9 @@ class TestCompleteWorkflowIntegration:
                 redis_state = await integration_helper.redis_verifier.verify_workflow_coordination_state(
                     run_id
                 )
-                assert redis_state[
-                    "workflow_state_exists"
-                ], f"State not persisted after step {i}"
+                assert redis_state["workflow_state_exists"], (
+                    f"State not persisted after step {i}"
+                )
 
                 # Verify session state in Neo4j
                 session_state = (
@@ -223,9 +224,9 @@ class TestCompleteWorkflowIntegration:
                         test_env["session_id"]
                     )
                 )
-                assert session_state[
-                    "session_exists"
-                ], f"Session not persisted after step {i}"
+                assert session_state["session_exists"], (
+                    f"Session not persisted after step {i}"
+                )
 
             # Verify final state consistency
             final_redis_state = await integration_helper.redis_verifier.verify_workflow_coordination_state(
@@ -238,13 +239,13 @@ class TestCompleteWorkflowIntegration:
             )
 
             # State consistency checks
-            assert final_redis_state[
-                "workflow_state_exists"
-            ], "Final Redis state missing"
+            assert final_redis_state["workflow_state_exists"], (
+                "Final Redis state missing"
+            )
             assert final_neo4j_state["session_exists"], "Final Neo4j state missing"
-            assert final_neo4j_state[
-                "therapeutic_profile_persisted"
-            ], "Therapeutic profile not persisted"
+            assert final_neo4j_state["therapeutic_profile_persisted"], (
+                "Therapeutic profile not persisted"
+            )
 
         finally:
             await integration_helper.cleanup_test_data(
@@ -280,7 +281,6 @@ class TestMessageRoutingIntegration:
                 "src.agent_orchestration.coordinators.redis_message_coordinator.RedisMessageCoordinator.send_message",
                 side_effect=mock_send_message,
             ):
-
                 workflow_manager = WorkflowManager()
                 workflow_manager.register_workflow(
                     "routing_test", multi_agent_workflow_definition
@@ -310,9 +310,9 @@ class TestMessageRoutingIntegration:
                 routing_correct = verifier.verify_message_routing(
                     messages_sent, expected_sequence
                 )
-                assert (
-                    routing_correct
-                ), f"Message routing incorrect. Expected: {expected_sequence}, Got: {routed_agents}"
+                assert routing_correct, (
+                    f"Message routing incorrect. Expected: {expected_sequence}, Got: {routed_agents}"
+                )
 
         finally:
             await integration_helper.cleanup_test_data(
@@ -365,9 +365,9 @@ class TestMessageRoutingIntegration:
             # Verify priority handling for therapeutic content
             for msg in transformed_messages:
                 if "grief" in str(msg["original_input"]):
-                    assert (
-                        msg["priority"] == "high"
-                    ), "Therapeutic content should have high priority"
+                    assert msg["priority"] == "high", (
+                        "Therapeutic content should have high priority"
+                    )
 
             # Verify message chain integrity
             assert (
@@ -391,13 +391,13 @@ class TestMessageRoutingIntegration:
         )
 
         try:
-            from src.agent_orchestration import (
+            from tta_ai.orchestration import (
                 AgentId,
                 AgentMessage,
                 MessagePriority,
                 MessageType,
             )
-            from src.agent_orchestration.coordinators.redis_message_coordinator import (
+            from tta_ai.orchestration.coordinators.redis_message_coordinator import (
                 RedisMessageCoordinator,
             )
 
@@ -436,9 +436,9 @@ class TestMessageRoutingIntegration:
                 wba_id, timeout_seconds=5.0
             )
             assert received_message is not None, "Message not received"
-            assert (
-                received_message.correlation_id == "test_correlation_123"
-            ), "Correlation ID mismatch"
+            assert received_message.correlation_id == "test_correlation_123", (
+                "Correlation ID mismatch"
+            )
 
             # Verify queue is empty after receipt
             post_receipt_state = (
@@ -446,9 +446,9 @@ class TestMessageRoutingIntegration:
                     f"{wba_id.type.value}:{wba_id.instance}"
                 )
             )
-            assert (
-                post_receipt_state["queue_length"] == 0
-            ), "Queue not cleared after receipt"
+            assert post_receipt_state["queue_length"] == 0, (
+                "Queue not cleared after receipt"
+            )
 
         finally:
             await integration_helper.cleanup_test_data(

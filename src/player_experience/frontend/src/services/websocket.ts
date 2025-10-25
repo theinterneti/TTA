@@ -1,12 +1,12 @@
-import { store } from '../store/store';
 import {
-  setConnectionStatus,
-  setConnectionError,
-  addMessage,
-  setTypingStatus
+    addMessage,
+    setConnectionError,
+    setConnectionStatus,
+    setTypingStatus
 } from '../store/slices/chatSlice';
-import { realTimeTherapeuticMonitor } from './realTimeTherapeuticMonitor';
+import { store } from '../store/store';
 import secureStorage from '../utils/secureStorage';
+import { realTimeTherapeuticMonitor } from './realTimeTherapeuticMonitor';
 
 class WebSocketService {
   private socket: WebSocket | null = null;
@@ -53,9 +53,23 @@ class WebSocketService {
     const token = secureStorage.getToken()!; // Safe to use ! after validation
     this.currentSessionId = sessionId || null;
 
-    // Convert HTTP URL to WebSocket URL
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-    const wsUrl = baseUrl.replace(/^http/, 'ws') + '/ws/chat';
+    // Use explicit WebSocket URL if available, otherwise convert HTTP URL to WebSocket URL
+    let wsUrl: string;
+
+    // Priority: REACT_APP_WS_URL > VITE_WS_URL > convert API URL
+    if (process.env.REACT_APP_WS_URL) {
+      wsUrl = process.env.REACT_APP_WS_URL + '/ws/chat';
+    } else if (process.env.VITE_WS_URL) {
+      wsUrl = process.env.VITE_WS_URL + '/ws/chat';
+    } else {
+      // Fallback: convert HTTP API URL to WebSocket URL
+      const apiUrl = process.env.REACT_APP_API_URL ||
+                     process.env.VITE_API_BASE_URL ||
+                     'http://localhost:8080';
+      wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws/chat';
+    }
+
+    console.log('WebSocket connecting to:', wsUrl); // Debug log
 
     // Add authentication token as query parameter
     const url = new URL(wsUrl);
@@ -71,6 +85,8 @@ class WebSocketService {
 
     // Enable typing indicators
     url.searchParams.set('typing', '1');
+
+    console.log('WebSocket full URL:', url.toString()); // Debug log
 
     this.socket = new WebSocket(url.toString());
     this.setupEventListeners();
@@ -367,9 +383,9 @@ class WebSocketService {
 
     const message = {
       type: 'interaction',
-      content: { 
+      content: {
         message_id: messageId,
-        action: action 
+        action: action
       },
       timestamp: new Date().toISOString(),
       session_id: this.currentSessionId,
@@ -387,10 +403,10 @@ class WebSocketService {
 
     const message = {
       type: 'feedback',
-      content: { 
+      content: {
         message_id: messageId,
         feedback: feedback,
-        comment: comment 
+        comment: comment
       },
       timestamp: new Date().toISOString(),
       session_id: this.currentSessionId,

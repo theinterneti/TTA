@@ -128,7 +128,7 @@ describe('Settings', () => {
 
   it('renders settings page with tabs', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -155,7 +155,7 @@ describe('Settings', () => {
         hasUnsavedChanges: false,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -177,7 +177,7 @@ describe('Settings', () => {
         hasUnsavedChanges: false,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -199,7 +199,7 @@ describe('Settings', () => {
         hasUnsavedChanges: true,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -212,7 +212,7 @@ describe('Settings', () => {
 
   it('switches between tabs', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -234,7 +234,7 @@ describe('Settings', () => {
 
   it('handles notification settings toggle', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -254,7 +254,7 @@ describe('Settings', () => {
 
   it('handles accessibility settings toggle', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -284,7 +284,7 @@ describe('Settings', () => {
         hasUnsavedChanges: true,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -311,7 +311,7 @@ describe('Settings', () => {
         hasUnsavedChanges: true,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -342,7 +342,7 @@ describe('Settings', () => {
         hasUnsavedChanges: true,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -363,7 +363,7 @@ describe('Settings', () => {
 
   it('updates therapeutic settings through child component', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -382,7 +382,7 @@ describe('Settings', () => {
 
   it('updates privacy settings through child component', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -414,7 +414,7 @@ describe('Settings', () => {
         hasUnsavedChanges: true,
       },
     });
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -433,7 +433,7 @@ describe('Settings', () => {
 
   it('renders all notification options', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />
@@ -453,7 +453,7 @@ describe('Settings', () => {
 
   it('renders all accessibility options', () => {
     const store = createMockStore();
-    
+
     render(
       <Provider store={store}>
         <Settings />

@@ -10,7 +10,7 @@ test.describe('Chat/Storytelling Interface', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     chatPage = new ChatPage(page);
-    
+
     // Login before each test
     await loginPage.goto();
     await loginPage.login(testUsers.default);
@@ -78,7 +78,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.expectAssistantResponse();
     });
 
@@ -100,7 +100,7 @@ test.describe('Chat/Storytelling Interface', () => {
         { type: 'assistant', content: 'Assistant response' },
         { type: 'system', content: 'System notification' },
       ];
-      
+
       for (const msg of messageTypes) {
         await page.evaluate((message) => {
           window.dispatchEvent(new CustomEvent('websocket-message', {
@@ -111,7 +111,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }));
         }, msg);
       }
-      
+
       await expect(chatPage.userMessages).toHaveCount(1);
       await expect(chatPage.assistantMessages).toHaveCount(1);
       await expect(chatPage.systemMessages).toHaveCount(1);
@@ -137,7 +137,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.expectChoicesAvailable();
     });
 
@@ -159,7 +159,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.selectChoice('Path of courage');
       await chatPage.expectAssistantResponse();
     });
@@ -182,7 +182,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.expectGuidedExercise();
     });
 
@@ -203,7 +203,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.clickInteractiveElement('Continue Journey');
     });
   });
@@ -222,7 +222,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.expectTherapeuticContent();
     });
 
@@ -239,7 +239,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.expectSafetyLevel('caution');
     });
 
@@ -257,7 +257,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.expectCrisisSupport();
     });
 
@@ -272,7 +272,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       await chatPage.provideFeedback(0, 'helpful');
     });
   });
@@ -284,7 +284,7 @@ test.describe('Chat/Storytelling Interface', () => {
         'I\'ve been having trouble sleeping.',
         'What techniques can help me relax?',
       ];
-      
+
       await chatPage.continueConversation(conversation);
       await chatPage.expectMessageCount(conversation.length * 2); // User + assistant messages
     });
@@ -298,7 +298,7 @@ test.describe('Chat/Storytelling Interface', () => {
     test('should save conversation progress', async () => {
       await chatPage.startConversation();
       await chatPage.saveSession();
-      
+
       // Should show save confirmation
       const saveConfirmation = chatPage.page.locator('[data-testid="save-confirmation"]');
       await expect(saveConfirmation).toBeVisible();
@@ -335,7 +335,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }
         }));
       });
-      
+
       const announcement = chatPage.page.locator('[aria-live="polite"]');
       await expect(announcement).toContainText('New message');
     });
@@ -349,7 +349,7 @@ test.describe('Chat/Storytelling Interface', () => {
     test('should adapt input area for mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await chatPage.expectChatLoaded();
-      
+
       const inputBox = await chatPage.messageInput.boundingBox();
       expect(inputBox?.width).toBeLessThan(350);
     });
@@ -357,7 +357,7 @@ test.describe('Chat/Storytelling Interface', () => {
     test('should handle virtual keyboard on mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await chatPage.messageInput.focus();
-      
+
       // Should adjust layout for virtual keyboard
       await expect(chatPage.messageInput).toBeFocused();
     });
@@ -380,7 +380,7 @@ test.describe('Chat/Storytelling Interface', () => {
         content: `Message ${i}`,
         timestamp: new Date().toISOString(),
       }));
-      
+
       for (const msg of messages) {
         await page.evaluate((message) => {
           window.dispatchEvent(new CustomEvent('websocket-message', {
@@ -388,7 +388,7 @@ test.describe('Chat/Storytelling Interface', () => {
           }));
         }, msg);
       }
-      
+
       // Should still be responsive
       await chatPage.sendMessage('Performance test message');
       await chatPage.expectMessageSent('Performance test message');
@@ -401,7 +401,7 @@ test.describe('Chat/Storytelling Interface', () => {
       await page.evaluate(() => {
         window.dispatchEvent(new CustomEvent('websocket-disconnect'));
       });
-      
+
       await chatPage.expectConnectionError();
       await chatPage.expectDisconnected();
     });
@@ -413,7 +413,7 @@ test.describe('Chat/Storytelling Interface', () => {
           detail: { error: 'Failed to send message' }
         }));
       });
-      
+
       await chatPage.sendMessage('Test message');
       await chatPage.expectMessageError();
     });
@@ -428,7 +428,7 @@ test.describe('Chat/Storytelling Interface', () => {
           route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
         }
       });
-      
+
       await chatPage.sendMessage('Retry test message');
       // Should eventually succeed
       await chatPage.expectMessageSent('Retry test message');
@@ -439,7 +439,7 @@ test.describe('Chat/Storytelling Interface', () => {
       await page.evaluate(() => {
         window.dispatchEvent(new CustomEvent('session-timeout'));
       });
-      
+
       const timeoutMessage = chatPage.page.locator('[data-testid="session-timeout"]');
       await expect(timeoutMessage).toBeVisible();
     });
@@ -455,7 +455,7 @@ test.describe('Chat/Storytelling Interface', () => {
     test('should create new session', async () => {
       await chatPage.goto();
       await chatPage.expectChatLoaded();
-      
+
       // Should show new session indicator
       const newSessionIndicator = chatPage.page.locator('[data-testid="new-session"]');
       await expect(newSessionIndicator).toBeVisible();

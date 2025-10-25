@@ -1,9 +1,8 @@
 import asyncio
 
 import pytest
-
-from src.agent_orchestration.tools.models import ToolParameter, ToolSpec
-from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
+from tta_ai.orchestration.tools.models import ToolParameter, ToolSpec
+from tta_ai.orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
 @pytest.mark.redis

@@ -20,7 +20,7 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
     this.loginForm = page.locator('[data-testid="login-form"], form');
     this.usernameInput = page.locator('input[name="username"], input[id="username"]');
@@ -122,14 +122,14 @@ export class LoginPage extends BasePage {
   // Accessibility tests
   async checkAccessibility() {
     await super.checkAccessibility();
-    
+
     // Check form labels
     await expect(this.usernameInput).toHaveAttribute('aria-label');
     await expect(this.passwordInput).toHaveAttribute('aria-label');
-    
+
     // Check form structure
     await expect(this.loginForm).toHaveRole('form');
-    
+
     // Check button accessibility
     await expect(this.loginButton).toHaveAttribute('type', 'submit');
   }
@@ -139,10 +139,10 @@ export class LoginPage extends BasePage {
     await this.usernameInput.focus();
     await this.page.keyboard.press('Tab');
     await expect(this.passwordInput).toBeFocused();
-    
+
     await this.page.keyboard.press('Tab');
     await expect(this.loginButton).toBeFocused();
-    
+
     // Test Enter key submission
     await this.usernameInput.focus();
     await this.fillUsername('testuser');
@@ -155,7 +155,7 @@ export class LoginPage extends BasePage {
   async checkMobileLayout() {
     await this.setMobileViewport();
     await this.expectLoginFormVisible();
-    
+
     // Check that form is properly sized for mobile
     const formBox = await this.loginForm.boundingBox();
     expect(formBox?.width).toBeLessThan(400);
@@ -180,10 +180,10 @@ export class LoginPage extends BasePage {
     await this.login({ username: 'testuser', password: 'testpass', email: '' });
     await this.expectLoginSuccess();
     const endTime = Date.now();
-    
+
     const loginTime = endTime - startTime;
     expect(loginTime).toBeLessThan(5000); // Should complete within 5 seconds
-    
+
     return loginTime;
   }
 
@@ -191,10 +191,10 @@ export class LoginPage extends BasePage {
   async expectCorrectStyling() {
     // Check that the login form has proper styling
     await expect(this.loginForm).toHaveCSS('display', /flex|block/);
-    
+
     // Check button styling
     await expect(this.loginButton).toHaveCSS('cursor', 'pointer');
-    
+
     // Check input styling
     await expect(this.usernameInput).toHaveCSS('border-width', /1px|2px/);
   }

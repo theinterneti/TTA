@@ -10,14 +10,14 @@ import time
 from unittest.mock import patch
 
 import pytest
-
-from src.agent_orchestration import (
+import pytest_asyncio
+from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.adapters import AgentCommunicationError
-from src.agent_orchestration.enhanced_coordinator import EnhancedRedisMessageCoordinator
+from tta_ai.orchestration.adapters import AgentCommunicationError
+from tta_ai.orchestration.enhanced_coordinator import EnhancedRedisMessageCoordinator
 
 
 @pytest.mark.integration
@@ -25,7 +25,7 @@ from src.agent_orchestration.enhanced_coordinator import EnhancedRedisMessageCoo
 class TestRealAgentErrorScenarios:
     """Test error scenarios and failure conditions with real agents."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def error_prone_coordinator(self, redis_client):
         """Create coordinator configured for error testing."""
         return EnhancedRedisMessageCoordinator(
@@ -37,7 +37,7 @@ class TestRealAgentErrorScenarios:
             backoff_base=0.1,  # Faster backoff for testing
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def no_fallback_ipa(self, error_prone_coordinator):
         """Create IPA proxy without fallback for testing failures."""
         return InputProcessorAgentProxy(
@@ -47,7 +47,7 @@ class TestRealAgentErrorScenarios:
             fallback_to_mock=False,  # No fallback to test error handling
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def timeout_ipa(self, error_prone_coordinator):
         """Create IPA proxy with very short timeout."""
         return InputProcessorAgentProxy(
@@ -357,15 +357,15 @@ class TestRealAgentErrorScenarios:
         fallback_rate = fallback_count / total_requests
 
         # Should maintain reasonable success rate even under pressure
-        assert (
-            success_rate > 0.5
-        ), f"Success rate too low under resource pressure: {success_rate}"
+        assert success_rate > 0.5, (
+            f"Success rate too low under resource pressure: {success_rate}"
+        )
 
         # Should complete within reasonable time
         total_time = end_time - start_time
-        assert (
-            total_time < 60.0
-        ), f"Resource exhaustion test took too long: {total_time}s"
+        assert total_time < 60.0, (
+            f"Resource exhaustion test took too long: {total_time}s"
+        )
 
         return {
             "total_requests": total_requests,

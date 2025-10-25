@@ -5,8 +5,7 @@ Tests all validation algorithms, safety rules, crisis detection, and edge cases.
 """
 
 import pytest
-
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisType,
     SafetyLevel,
     TherapeuticValidator,
@@ -114,9 +113,9 @@ class TestValidationAlgorithms:
             result = self.validator.validate_text(text)
 
             assert result.crisis_detected, f"Crisis not detected for: {text}"
-            assert (
-                expected_crisis in result.crisis_types
-            ), f"Wrong crisis type for: {text}"
+            assert expected_crisis in result.crisis_types, (
+                f"Wrong crisis type for: {text}"
+            )
             assert (
                 result.level == SafetyLevel.BLOCKED
                 or result.level == SafetyLevel.WARNING
@@ -206,9 +205,9 @@ class TestCrisisDetection:
             result = self.validator.validate_text(phrase)
 
             # Should not trigger crisis detection
-            assert (
-                not result.crisis_detected or len(result.crisis_types) == 0
-            ), f"False positive for: {phrase}"
+            assert not result.crisis_detected or len(result.crisis_types) == 0, (
+                f"False positive for: {phrase}"
+            )
 
 
 class TestAlternativeGeneration:
@@ -254,9 +253,9 @@ class TestAlternativeGeneration:
 
                 # Should contain supportive language
                 supportive_words = ["support", "help", "care", "here", "understand"]
-                assert any(
-                    word in alt for word in supportive_words
-                ), f"No supportive language in: {alt}"
+                assert any(word in alt for word in supportive_words), (
+                    f"No supportive language in: {alt}"
+                )
 
                 # Should not contain harsh language
                 # Note: "can't" might appear in therapeutic context, so we check for overall tone

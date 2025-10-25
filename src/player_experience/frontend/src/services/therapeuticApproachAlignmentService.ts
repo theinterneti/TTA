@@ -1,6 +1,6 @@
 /**
  * Therapeutic Approach Alignment Service
- * 
+ *
  * Provides intelligent matching between therapeutic goals and appropriate therapeutic approaches,
  * validates compatibility, and offers evidence-based recommendations for enhanced treatment effectiveness.
  */
@@ -178,17 +178,17 @@ export function analyzeTherapeuticApproachAlignment(selectedGoals: string[]): Th
 
   // Generate approach recommendations
   const recommendedApproaches = generateApproachRecommendations(selectedGoals);
-  
+
   // Generate approach alignments
   const approachAlignments = generateApproachAlignments(selectedGoals, recommendedApproaches);
-  
+
   // Analyze approach compatibilities
   const approachCompatibilities = analyzeApproachCompatibilities(recommendedApproaches);
-  
+
   // Calculate overall coherence and effectiveness
   const overallCoherence = calculateOverallCoherence(approachAlignments, approachCompatibilities);
   const treatmentEffectivenessScore = calculateTreatmentEffectiveness(selectedGoals, recommendedApproaches);
-  
+
   // Generate integration recommendations
   const integrationRecommendations = generateIntegrationRecommendations(recommendedApproaches, approachCompatibilities);
 
@@ -213,22 +213,22 @@ function generateApproachRecommendations(selectedGoals: string[]): ApproachRecom
   selectedGoals.forEach(goal => {
     const mappings = GOAL_APPROACH_MAPPINGS[goal] || [];
     mappings.forEach(mapping => {
-      const current = approachScores.get(mapping.approach) || { 
-        score: 0, 
-        goals: [], 
+      const current = approachScores.get(mapping.approach) || {
+        score: 0,
+        goals: [],
         evidenceLevel: 'low' as const,
-        rationales: [] 
+        rationales: []
       };
-      
+
       current.score += mapping.strength;
       current.goals.push(goal);
       current.rationales.push(mapping.rationale);
-      
+
       // Update evidence level to highest available
       if (mapping.evidence === 'high' || (mapping.evidence === 'medium' && current.evidenceLevel === 'low')) {
         current.evidenceLevel = mapping.evidence;
       }
-      
+
       approachScores.set(mapping.approach, current);
     });
   });
@@ -238,7 +238,7 @@ function generateApproachRecommendations(selectedGoals: string[]): ApproachRecom
     .map(([approach, data]) => {
       const approachInfo = THERAPEUTIC_APPROACHES_INFO[approach];
       const confidence = Math.min(1, data.score / selectedGoals.length);
-      
+
       return {
         recommendedApproach: approach,
         confidence,
@@ -267,16 +267,16 @@ function generateApproachAlignments(selectedGoals: string[], recommendations: Ap
     });
 
     const alignmentStrength = alignedGoals.length / selectedGoals.length;
-    
+
     // Get clinical evidence and rationale
-    const goalMappings = alignedGoals.flatMap(goal => 
+    const goalMappings = alignedGoals.flatMap(goal =>
       (GOAL_APPROACH_MAPPINGS[goal] || []).filter(m => m.approach === rec.recommendedApproach)
     );
-    
+
     const clinicalEvidence = goalMappings.some(m => m.evidence === 'high') ? 'high' :
                            goalMappings.some(m => m.evidence === 'medium') ? 'medium' : 'low';
-    
-    const rationale = goalMappings.length > 0 ? goalMappings[0].rationale : 
+
+    const rationale = goalMappings.length > 0 ? goalMappings[0].rationale :
                      `${approachInfo.name} provides structured approach for selected therapeutic goals`;
 
     return {
@@ -296,17 +296,17 @@ function generateApproachAlignments(selectedGoals: string[], recommendations: Ap
  */
 function analyzeApproachCompatibilities(recommendations: ApproachRecommendation[]): ApproachCompatibility[] {
   const compatibilities: ApproachCompatibility[] = [];
-  
+
   for (let i = 0; i < recommendations.length; i++) {
     for (let j = i + 1; j < recommendations.length; j++) {
       const approach1 = recommendations[i].recommendedApproach;
       const approach2 = recommendations[j].recommendedApproach;
-      
+
       const key1 = `${approach1}_${approach2}`;
       const key2 = `${approach2}_${approach1}`;
-      
+
       const compatibility = APPROACH_COMPATIBILITY[key1] || APPROACH_COMPATIBILITY[key2];
-      
+
       if (compatibility) {
         compatibilities.push(compatibility);
       } else {
@@ -315,7 +315,7 @@ function analyzeApproachCompatibilities(recommendations: ApproachRecommendation[
       }
     }
   }
-  
+
   return compatibilities;
 }
 
@@ -325,10 +325,10 @@ function analyzeApproachCompatibilities(recommendations: ApproachRecommendation[
 function generateDefaultCompatibility(approach1: TherapeuticApproach, approach2: TherapeuticApproach): ApproachCompatibility {
   const info1 = THERAPEUTIC_APPROACHES_INFO[approach1];
   const info2 = THERAPEUTIC_APPROACHES_INFO[approach2];
-  
+
   // Simple heuristic based on approach characteristics
   const compatibilityScore = 0.7; // Default neutral-positive compatibility
-  
+
   return {
     primaryApproach: approach1,
     secondaryApproach: approach2,
@@ -345,15 +345,15 @@ function generateDefaultCompatibility(approach1: TherapeuticApproach, approach2:
  */
 function calculateOverallCoherence(alignments: ApproachGoalAlignment[], compatibilities: ApproachCompatibility[]): number {
   if (alignments.length === 0) return 0;
-  
+
   // Average alignment strength
   const avgAlignment = alignments.reduce((sum, a) => sum + a.alignmentStrength, 0) / alignments.length;
-  
+
   // Average compatibility score
-  const avgCompatibility = compatibilities.length > 0 
+  const avgCompatibility = compatibilities.length > 0
     ? compatibilities.reduce((sum, c) => sum + c.compatibilityScore, 0) / compatibilities.length
     : 0.7; // Default if no compatibilities
-  
+
   // Weight alignment more heavily than compatibility
   return (avgAlignment * 0.7) + (avgCompatibility * 0.3);
 }
@@ -363,14 +363,14 @@ function calculateOverallCoherence(alignments: ApproachGoalAlignment[], compatib
  */
 function calculateTreatmentEffectiveness(selectedGoals: string[], recommendations: ApproachRecommendation[]): number {
   if (recommendations.length === 0) return 0;
-  
+
   // Factor in evidence levels and confidence scores
   const effectivenessScore = recommendations.reduce((sum, rec) => {
     const evidenceWeight = rec.clinicalEvidence === 'high' ? 1.0 :
                           rec.clinicalEvidence === 'medium' ? 0.8 : 0.6;
     return sum + (rec.confidence * evidenceWeight);
   }, 0) / recommendations.length;
-  
+
   return Math.min(1, effectivenessScore);
 }
 
@@ -379,30 +379,30 @@ function calculateTreatmentEffectiveness(selectedGoals: string[], recommendation
  */
 function generateIntegrationRecommendations(recommendations: ApproachRecommendation[], compatibilities: ApproachCompatibility[]): string[] {
   const integrationRecs: string[] = [];
-  
+
   if (recommendations.length <= 1) {
     integrationRecs.push('Single approach focus allows for deep, consistent therapeutic work');
     return integrationRecs;
   }
-  
+
   // Analyze compatibility patterns
   const synergisticPairs = compatibilities.filter(c => c.compatibilityType === 'synergistic');
   const conflictingPairs = compatibilities.filter(c => c.compatibilityType === 'conflicting');
-  
+
   if (synergisticPairs.length > 0) {
     integrationRecs.push(`Strong synergies identified: ${synergisticPairs.map(p => `${THERAPEUTIC_APPROACHES_INFO[p.primaryApproach].name} + ${THERAPEUTIC_APPROACHES_INFO[p.secondaryApproach].name}`).join(', ')}`);
   }
-  
+
   if (conflictingPairs.length > 0) {
     integrationRecs.push(`Approach conflicts require careful management: ${conflictingPairs.map(p => p.integrationStrategy).join('; ')}`);
   }
-  
+
   // General integration guidance
   if (recommendations.length > 2) {
     integrationRecs.push('Consider phased implementation: start with highest-confidence approach, then integrate complementary methods');
   }
-  
+
   integrationRecs.push('Regular assessment of approach effectiveness and client preference is essential for successful integration');
-  
+
   return integrationRecs;
 }

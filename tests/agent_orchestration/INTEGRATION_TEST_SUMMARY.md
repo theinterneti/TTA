@@ -89,7 +89,7 @@ $ uv run pytest tests/agent_orchestration/test_*.py --collect-only -q
 ✅ 21 tests discovered
 
 # Tier 2: Redis integration
-$ uv run pytest tests/agent_orchestration/test_*.py --redis --collect-only -q  
+$ uv run pytest tests/agent_orchestration/test_*.py --redis --collect-only -q
 ✅ 21 tests discovered with Redis markers
 
 # Tier 3: Neo4j integration
@@ -169,7 +169,7 @@ $ uv run python tests/agent_orchestration/test_integration_runner.py
 # End-to-end workflow tests
 uv run pytest tests/agent_orchestration/test_end_to_end_workflows.py --redis --neo4j -v
 
-# Error handling tests  
+# Error handling tests
 uv run pytest tests/agent_orchestration/test_error_handling_recovery.py --redis -v
 
 # Performance tests

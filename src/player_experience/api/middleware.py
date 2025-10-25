@@ -5,6 +5,7 @@ This module provides various middleware components for security, logging,
 rate limiting, and authentication with integrated monitoring and security features.
 """
 
+import contextlib
 import time
 import uuid
 from collections import defaultdict, deque
@@ -60,12 +61,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "frame-src 'none';"
         )
 
-        # Ensure CORS headers are present even when no Origin header is provided
-        # This complements CORSMiddleware for test clients that omit Origin
-        if "Access-Control-Allow-Origin" not in response.headers:
-            response.headers["Access-Control-Allow-Origin"] = "*"
-        if "Access-Control-Allow-Credentials" not in response.headers:
-            response.headers["Access-Control-Allow-Credentials"] = "true"
+        # Note: CORS headers are handled by CORSMiddleware in app.py
+        # Do not add wildcard CORS headers here as they conflict with credentials mode
 
         return response
 
@@ -122,6 +119,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         # Support both dict-like and Pydantic TokenData stored on request.state.current_player
         cp = getattr(request.state, "current_player", None)
         user_id = None
+        has_player_id = False
+
         if cp is not None:
             try:
                 user_id = (
@@ -129,8 +128,21 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                     if isinstance(cp, dict)
                     else getattr(cp, "player_id", None)
                 )
+                has_player_id = user_id is not None
             except Exception:
                 user_id = getattr(cp, "player_id", None)
+                has_player_id = user_id is not None
+
+        # Record player_id presence metrics for authenticated endpoints
+        if endpoint not in ["/health", "/metrics", "/docs", "/openapi.json"]:
+            try:
+                from src.monitoring.prometheus_metrics import get_metrics_collector
+
+                collector = get_metrics_collector("player-experience")
+                collector.record_player_id_presence(endpoint, has_player_id)
+            except Exception as e:
+                logger.debug(f"Failed to record player_id presence metrics: {e}")
+
         with performance_monitor.request_tracker.track_request(
             request_id, endpoint, method, user_id=user_id
         ):
@@ -271,7 +283,17 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/register",
+        "/api/v1/openrouter/auth/status",  # Session status check (uses session cookie)
+        "/api/v1/openrouter/auth/token",  # Get token from session (uses session cookie)
         "/api/v1/gameplay/health",  # Gameplay health check endpoint
+        "/api/v1/health/",  # System health check
+        "/api/v1/health/redis",  # Redis health check
+        "/api/v1/health/neo4j",  # Neo4j health check
+        "/api/v1/health/agents",  # Agent orchestration health check
+        "/api/v1/health/openrouter",  # OpenRouter health check
+        "/api/v1/health/liveness",  # Kubernetes liveness probe
+        "/api/v1/health/readiness",  # Kubernetes readiness probe
+        "/api/v1/health/startup",  # Kubernetes startup probe
     }
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
@@ -301,18 +323,12 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         ):
             authorization = request.headers.get("Authorization")
             if authorization:
-                try:
+                with contextlib.suppress(ValueError):
                     scheme, token = authorization.split(" ", 1)
                     if scheme.lower() == "bearer" and token:
-                        try:
+                        with contextlib.suppress(AuthenticationError):
                             token_data = verify_token(token)
                             request.state.current_player = token_data
-                        except AuthenticationError:
-                            # Ignore invalid token for this public endpoint; proceed unauthenticated
-                            pass
-                except ValueError:
-                    # Malformed Authorization header; ignore for public endpoint
-                    pass
             return await call_next(request)
 
         # Get authorization header
@@ -405,7 +421,7 @@ class CrisisDetectionMiddleware(BaseHTTPMiddleware):
 
         # For POST/PUT requests, check body content
         if request.method in ["POST", "PUT", "PATCH"]:
-            try:
+            with contextlib.suppress(Exception):
                 # This is a simplified check - in production, you'd want more sophisticated analysis
                 body = await request.body()
                 if body:
@@ -427,10 +443,6 @@ class CrisisDetectionMiddleware(BaseHTTPMiddleware):
                     request.scope,
                     receive=receive,
                 )
-
-            except Exception:
-                # If we can't read the body, continue normally
-                pass
 
         # Process request
         response = await call_next(request)

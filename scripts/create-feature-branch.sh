@@ -104,4 +104,3 @@ echo "  refactor(${DOMAIN}): refactor code"
 echo "  test(${DOMAIN}): add tests"
 echo ""
 echo -e "${YELLOW}Note: PRs to development require unit tests to pass${NC}"
-

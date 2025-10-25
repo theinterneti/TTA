@@ -190,4 +190,3 @@ Each commit will require user confirmation before execution.
 - Semgrep Rules: https://semgrep.dev/r
 - Docker Security Best Practices: https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html
 - OWASP Top 10: https://owasp.org/www-project-top-ten/
-

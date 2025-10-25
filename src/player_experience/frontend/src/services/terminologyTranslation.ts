@@ -1,6 +1,6 @@
 /**
  * Terminology Translation Service
- * 
+ *
  * Provides entertainment-first language translations for clinical terminology
  * while maintaining therapeutic accuracy in the backend systems.
  */
@@ -49,7 +49,7 @@ const TERMINOLOGY_MAPPINGS = {
     entertainment: 'emergency help',
     clinical: 'crisis support'
   },
-  
+
   // Goals and Progress
   'therapeutic_goals': {
     entertainment: 'personal objectives',
@@ -67,7 +67,7 @@ const TERMINOLOGY_MAPPINGS = {
     entertainment: 'personal insights',
     clinical: 'clinical assessment'
   },
-  
+
   // Emotional and Mental Health
   'emotional_regulation': {
     entertainment: 'emotional mastery',
@@ -85,7 +85,7 @@ const TERMINOLOGY_MAPPINGS = {
     entertainment: 'inner balance',
     clinical: 'psychological wellbeing'
   },
-  
+
   // Settings and Preferences
   'therapeutic_intensity': {
     entertainment: 'experience depth',
@@ -99,7 +99,7 @@ const TERMINOLOGY_MAPPINGS = {
     entertainment: 'adventure preferences',
     clinical: 'therapeutic preferences'
   },
-  
+
   // Safety and Crisis
   'risk_assessment': {
     entertainment: 'wellness check',
@@ -113,7 +113,7 @@ const TERMINOLOGY_MAPPINGS = {
     entertainment: 'emergency support',
     clinical: 'emergency contact'
   },
-  
+
   // Character and Story Elements
   'character_development': {
     entertainment: 'character growth',
@@ -150,7 +150,7 @@ const PHRASE_MAPPINGS = {
     entertainment: 'Achievement Dashboard',
     clinical: 'Progress Tracking'
   },
-  
+
   // Navigation Items
   'Therapeutic Settings': {
     entertainment: 'Experience Settings',
@@ -160,7 +160,7 @@ const PHRASE_MAPPINGS = {
     entertainment: 'Adventure Dashboard',
     clinical: 'Clinical Dashboard'
   },
-  
+
   // Form Labels
   'Therapeutic Goals': {
     entertainment: 'Personal Growth Goals',
@@ -174,7 +174,7 @@ const PHRASE_MAPPINGS = {
     entertainment: 'Story Intensity',
     clinical: 'Therapeutic Intensity'
   },
-  
+
   // Button Labels
   'Start Therapeutic Session': {
     entertainment: 'Begin Adventure',
@@ -184,7 +184,7 @@ const PHRASE_MAPPINGS = {
     entertainment: 'Emergency Help',
     clinical: 'Crisis Support'
   },
-  
+
   // Descriptions
   'therapeutic intervention': {
     entertainment: 'story guidance',
@@ -202,60 +202,60 @@ const PHRASE_MAPPINGS = {
 export class TerminologyTranslationService {
   private static instance: TerminologyTranslationService;
   private currentMode: UIMode = UIMode.ENTERTAINMENT;
-  
+
   private constructor() {}
-  
+
   public static getInstance(): TerminologyTranslationService {
     if (!TerminologyTranslationService.instance) {
       TerminologyTranslationService.instance = new TerminologyTranslationService();
     }
     return TerminologyTranslationService.instance;
   }
-  
+
   /**
    * Set the current UI mode
    */
   public setMode(mode: UIMode): void {
     this.currentMode = mode;
   }
-  
+
   /**
    * Get the current UI mode
    */
   public getMode(): UIMode {
     return this.currentMode;
   }
-  
+
   /**
    * Translate a single term based on current mode
    */
   public translateTerm(term: string, context?: TranslationContext): string {
     const mode = context?.mode || this.currentMode;
     const normalizedTerm = term.toLowerCase().replace(/\s+/g, '_');
-    
+
     const mapping = TERMINOLOGY_MAPPINGS[normalizedTerm as keyof typeof TERMINOLOGY_MAPPINGS];
     if (mapping) {
       return mapping[mode];
     }
-    
+
     return term; // Return original if no mapping found
   }
-  
+
   /**
    * Translate a complete phrase based on current mode
    */
   public translatePhrase(phrase: string, context?: TranslationContext): string {
     const mode = context?.mode || this.currentMode;
-    
+
     const mapping = PHRASE_MAPPINGS[phrase as keyof typeof PHRASE_MAPPINGS];
     if (mapping) {
       return mapping[mode];
     }
-    
+
     // Fallback: try to translate individual words
     return phrase.split(' ').map(word => this.translateTerm(word, context)).join(' ');
   }
-  
+
   /**
    * Get entertainment-friendly description for therapeutic concepts
    */
@@ -269,17 +269,17 @@ export class TerminologyTranslationService {
       'progress_tracking': 'See how your character grows and develops over time',
       'therapeutic_goals': 'Set meaningful objectives for your personal journey'
     };
-    
+
     return descriptions[concept] || concept;
   }
-  
+
   /**
    * Check if entertainment mode is active
    */
   public isEntertainmentMode(): boolean {
     return this.currentMode === UIMode.ENTERTAINMENT;
   }
-  
+
   /**
    * Check if clinical mode is active
    */
@@ -301,7 +301,7 @@ export const translate = (text: string, context?: TranslationContext): string =>
  */
 export const useTranslation = () => {
   const service = TerminologyTranslationService.getInstance();
-  
+
   return {
     translate: (text: string, context?: TranslationContext) => service.translatePhrase(text, context),
     translateTerm: (term: string, context?: TranslationContext) => service.translateTerm(term, context),

@@ -1,10 +1,10 @@
 # 🔐 OpenRouter Authentication Integration Test Report
 
 ## Test Summary
-**Date:** September 16, 2025  
-**Test Environment:** Local Development  
-**Backend Server:** http://localhost:8080  
-**Frontend Test Page:** file:///home/thein/recovered-tta-storytelling/test_auth_ui.html  
+**Date:** September 16, 2025
+**Test Environment:** Local Development
+**Backend Server:** http://localhost:8080
+**Frontend Test Page:** file:///home/thein/recovered-tta-storytelling/test_auth_ui.html
 
 ## ✅ Test Results Overview
 

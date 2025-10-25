@@ -11,6 +11,7 @@ Example:
     ```python
     from src.orchestration.component import Component, ComponentStatus
 
+
     class MyComponent(Component):
         def __init__(self, config):
             super().__init__(config, name="my_component", dependencies=["neo4j"])

@@ -1,8 +1,8 @@
-from src.components.narrative_arc_orchestrator.models import (
+from tta_narrative.orchestration.models import (
     NarrativeScale,
     PlayerChoice,
 )
-from src.components.narrative_arc_orchestrator.scale_manager import ScaleManager
+from tta_narrative.orchestration.scale_manager import ScaleManager
 
 
 def test_scale_manager_evaluate_choice_impact_smoke():
@@ -19,7 +19,7 @@ def test_scale_manager_creates_event_when_magnitude_threshold(monkeypatch):
     )
 
     async def fake_assess(choice, scale):
-        from src.components.narrative_arc_orchestrator.models import ImpactAssessment
+        from tta_narrative.orchestration.models import ImpactAssessment
 
         return ImpactAssessment(scale=scale, magnitude=0.9)
 

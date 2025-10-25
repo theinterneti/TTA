@@ -26,7 +26,7 @@ export const useAccessibility = () => {
     };
 
     // Check for screen reader
-    const screenReader = 
+    const screenReader =
       navigator.userAgent.includes('NVDA') ||
       navigator.userAgent.includes('JAWS') ||
       navigator.userAgent.includes('VoiceOver') ||
@@ -85,9 +85,9 @@ export const useAccessibility = () => {
     announcement.setAttribute('aria-atomic', 'true');
     announcement.className = 'sr-only';
     announcement.textContent = message;
-    
+
     document.body.appendChild(announcement);
-    
+
     setTimeout(() => {
       document.body.removeChild(announcement);
     }, 1000);

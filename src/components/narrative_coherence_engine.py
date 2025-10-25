@@ -15,6 +15,7 @@ Classes:
     CausalValidator: Validator for cause-and-effect relationships
 """
 
+import contextlib
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -713,8 +714,7 @@ class CoherenceValidator:
         )
         max_penalty = len(issues) * 1.0  # Maximum possible penalty
 
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     def _calculate_character_consistency_score(
         self, issues: list[ConsistencyIssue]
@@ -737,8 +737,7 @@ class CoherenceValidator:
             total_penalty += penalty
 
         max_penalty = len(issues) * 1.0
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     def _calculate_therapeutic_alignment_score(
         self, issues: list[ConsistencyIssue]
@@ -760,22 +759,19 @@ class CoherenceValidator:
         )
         max_penalty = len(issues) * 1.0
 
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     def _calculate_overall_consistency_score(self, result: ValidationResult) -> float:
         """Calculate overall consistency score from component scores."""
         # Weighted average of component scores
         weights = {"lore": 0.3, "character": 0.25, "causal": 0.25, "therapeutic": 0.2}
 
-        score = (
+        return (
             weights["lore"] * result.lore_compliance
             + weights["character"] * result.character_consistency
             + weights["causal"] * result.causal_consistency
             + weights["therapeutic"] * result.therapeutic_alignment
         )
-
-        return score
 
     async def _generate_corrections(self, issues: list[ConsistencyIssue]) -> list[str]:
         """Generate suggested corrections for detected issues."""
@@ -796,14 +792,13 @@ class CoherenceValidator:
         """Generate a generic correction suggestion for an issue."""
         if issue.issue_type == ConsistencyIssueType.LORE_VIOLATION:
             return f"Review and revise content to align with established lore for {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:
+        if issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:
             return f"Adjust character behavior/dialogue to match established personality for {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.WORLD_RULE_VIOLATION:
+        if issue.issue_type == ConsistencyIssueType.WORLD_RULE_VIOLATION:
             return f"Modify content to comply with world rules affecting {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT:
+        if issue.issue_type == ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT:
             return "Revise content to ensure therapeutic appropriateness and safety"
-        else:
-            return f"Address {issue.issue_type.value} issue: {issue.description}"
+        return f"Address {issue.issue_type.value} issue: {issue.description}"
 
     # Placeholder methods for detailed validation (to be implemented)
 
@@ -1469,8 +1464,7 @@ class CausalValidator:
             total_penalty += penalty
 
         max_penalty = len(issues) * 1.0
-        score = max(0.0, 1.0 - (total_penalty / max_penalty))
-        return score
+        return max(0.0, 1.0 - (total_penalty / max_penalty))
 
     async def _generate_causal_corrections(
         self, issues: list[ConsistencyIssue]
@@ -1824,9 +1818,8 @@ class NarrativeCoherenceEngine(Component):
             age = datetime.now() - cached_result.validation_timestamp
             if age.total_seconds() < self.cache_ttl:
                 return cached_result
-            else:
-                # Remove expired cache entry
-                del self.validation_cache[cache_key]
+            # Remove expired cache entry
+            del self.validation_cache[cache_key]
 
         return None
 
@@ -2503,33 +2496,39 @@ class NarrativeCoherenceEngine(Component):
 
         # Adjust based on solution type and conflict type compatibility
         compatibility_bonus = 0.0
-        if conflict.type == "direct" and solution.solution_type in [
-            "character_driven",
-            "perspective_based",
-        ]:
-            compatibility_bonus = 0.3
-        elif conflict.type == "temporal" and solution.solution_type in [
-            "temporal",
-            "memory_based",
-        ]:
-            compatibility_bonus = 0.3
-        elif conflict.type == "causal" and solution.solution_type in [
-            "causal_bridge",
-            "hidden_factor",
-        ]:
-            compatibility_bonus = 0.3
-        elif conflict.type == "implicit" and solution.solution_type in [
-            "recontextualization",
-            "subtext",
-        ]:
+        if (
+            conflict.type == "direct"
+            and solution.solution_type
+            in [
+                "character_driven",
+                "perspective_based",
+            ]
+            or conflict.type == "temporal"
+            and solution.solution_type
+            in [
+                "temporal",
+                "memory_based",
+            ]
+            or conflict.type == "causal"
+            and solution.solution_type
+            in [
+                "causal_bridge",
+                "hidden_factor",
+            ]
+            or conflict.type == "implicit"
+            and solution.solution_type
+            in [
+                "recontextualization",
+                "subtext",
+            ]
+        ):
             compatibility_bonus = 0.3
 
         # Universal solutions work for everything but with lower effectiveness
         if solution.solution_type == "universal":
             compatibility_bonus = 0.1
 
-        effectiveness = min(1.0, base_effectiveness + compatibility_bonus)
-        return effectiveness
+        return min(1.0, base_effectiveness + compatibility_bonus)
 
     async def _calculate_narrative_cost(
         self, solution: CreativeSolution, content_history: list[NarrativeContent]
@@ -2687,9 +2686,9 @@ class NarrativeCoherenceEngine(Component):
         # Generate explanation based on change type
         if change.change_type == "modification":
             return f"Upon reflection, the situation was actually: {change.modified_content}"
-        elif change.change_type == "addition":
+        if change.change_type == "addition":
             return f"Additional details have come to light: {change.modified_content}"
-        elif change.change_type == "recontextualization":
+        if change.change_type == "recontextualization":
             return f"The context of the situation was: {change.modified_content}"
 
         return f"The situation has been clarified: {change.modified_content}"
@@ -3148,9 +3147,9 @@ class NarrativeCoherenceEngine(Component):
                             ].text += f"\n\n{change.modified_content}"
                         elif change.change_type == "recontextualization":
                             # Add context metadata
-                            simulated_history[i].metadata[
-                                "recontextualization"
-                            ] = change.modified_content
+                            simulated_history[i].metadata["recontextualization"] = (
+                                change.modified_content
+                            )
                         break
 
             return simulated_history
@@ -3321,7 +3320,7 @@ class NarrativeCoherenceEngine(Component):
 
 
 # Facade re-exports: prefer extracted implementations
-try:
+with contextlib.suppress(Exception):  # pragma: no cover
     from .narrative_coherence.causal_validator import (
         CausalValidator as _ExtractedCausalValidator,
     )
@@ -3335,6 +3334,4 @@ try:
     CoherenceValidator = _ExtractedCoherenceValidator  # type: ignore
     ContradictionDetector = _ExtractedContradictionDetector  # type: ignore
     CausalValidator = _ExtractedCausalValidator  # type: ignore
-except Exception:  # pragma: no cover
     # If extracted modules are unavailable, fall back to in-file definitions
-    pass

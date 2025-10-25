@@ -85,7 +85,7 @@ class GameplayLoopSchema:
         return [
             # Sample therapeutic scene
             f"""
-            CREATE (scene:{cls.NODE_LABELS['SCENE']} {{
+            CREATE (scene:{cls.NODE_LABELS["SCENE"]} {{
                 scene_id: 'sample_intro_scene',
                 title: 'Peaceful Garden Introduction',
                 description: 'A calming introduction to mindfulness in a garden setting',
@@ -102,7 +102,7 @@ class GameplayLoopSchema:
             """,
             # Sample therapeutic choices
             f"""
-            CREATE (choice1:{cls.NODE_LABELS['CHOICE']} {{
+            CREATE (choice1:{cls.NODE_LABELS["CHOICE"]} {{
                 choice_id: 'garden_explore_mindfully',
                 scene_id: 'sample_intro_scene',
                 text: 'Take a moment to notice your breathing and the sensations around you',
@@ -116,7 +116,7 @@ class GameplayLoopSchema:
             }})
             """,
             f"""
-            CREATE (choice2:{cls.NODE_LABELS['CHOICE']} {{
+            CREATE (choice2:{cls.NODE_LABELS["CHOICE"]} {{
                 choice_id: 'garden_explore_curious',
                 scene_id: 'sample_intro_scene',
                 text: 'Walk around the garden and explore what catches your attention',
@@ -131,11 +131,11 @@ class GameplayLoopSchema:
             """,
             # Link choices to scene
             f"""
-            MATCH (scene:{cls.NODE_LABELS['SCENE']} {{scene_id: 'sample_intro_scene'}}),
-                  (choice1:{cls.NODE_LABELS['CHOICE']} {{choice_id: 'garden_explore_mindfully'}}),
-                  (choice2:{cls.NODE_LABELS['CHOICE']} {{choice_id: 'garden_explore_curious'}})
-            CREATE (scene)-[:{cls.RELATIONSHIPS['HAS_CHOICE']}]->(choice1),
-                   (scene)-[:{cls.RELATIONSHIPS['HAS_CHOICE']}]->(choice2)
+            MATCH (scene:{cls.NODE_LABELS["SCENE"]} {{scene_id: 'sample_intro_scene'}}),
+                  (choice1:{cls.NODE_LABELS["CHOICE"]} {{choice_id: 'garden_explore_mindfully'}}),
+                  (choice2:{cls.NODE_LABELS["CHOICE"]} {{choice_id: 'garden_explore_curious'}})
+            CREATE (scene)-[:{cls.RELATIONSHIPS["HAS_CHOICE"]}]->(choice1),
+                   (scene)-[:{cls.RELATIONSHIPS["HAS_CHOICE"]}]->(choice2)
             """,
         ]
 

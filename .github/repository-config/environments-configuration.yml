@@ -1,0 +1,226 @@
+# GitHub Environments Configuration for TTA E2E Testing
+# This file documents the required environment configurations
+
+# =============================================================================
+# GITHUB ENVIRONMENTS SETUP
+# =============================================================================
+# Navigate to: Repository Settings > Environments
+# Create the following environments with their respective configurations
+
+# =============================================================================
+# DEVELOPMENT ENVIRONMENT
+# =============================================================================
+development:
+  description: "Development environment for feature testing"
+  protection_rules:
+    required_reviewers: 0
+    wait_timer: 0
+    deployment_branch_policy: "all"
+
+  environment_secrets:
+    API_BASE_URL:
+      value: "https://dev-api.tta.example.com"
+      description: "Development API endpoint"
+
+    DATABASE_URL:
+      value: "bolt://dev-neo4j.tta.example.com:7687"
+      description: "Development Neo4j database connection"
+
+    REDIS_URL:
+      value: "redis://dev-redis.tta.example.com:6379"
+      description: "Development Redis cache connection"
+
+    WS_URL:
+      value: "wss://dev-ws.tta.example.com"
+      description: "Development WebSocket endpoint"
+
+  environment_variables:
+    ENVIRONMENT_NAME: "development"
+    LOG_LEVEL: "DEBUG"
+    ENABLE_DEBUG_FEATURES: "true"
+    RATE_LIMIT_ENABLED: "false"
+
+# =============================================================================
+# STAGING ENVIRONMENT
+# =============================================================================
+staging:
+  description: "Staging environment for pre-production testing"
+  protection_rules:
+    required_reviewers: 1
+    wait_timer: 5  # minutes
+    deployment_branch_policy: "selected"  # only develop and main
+    allowed_branches:
+      - "develop"
+      - "main"
+
+  environment_secrets:
+    API_BASE_URL:
+      value: "https://staging-api.tta.example.com"
+      description: "Staging API endpoint"
+
+    DATABASE_URL:
+      value: "bolt://staging-neo4j.tta.example.com:7687"
+      description: "Staging Neo4j database connection"
+
+    REDIS_URL:
+      value: "redis://staging-redis.tta.example.com:6379"
+      description: "Staging Redis cache connection"
+
+    WS_URL:
+      value: "wss://staging-ws.tta.example.com"
+      description: "Staging WebSocket endpoint"
+
+    OPENROUTER_API_KEY:
+      value: "${{ secrets.OPENROUTER_STAGING_KEY }}"
+      description: "OpenRouter API key for staging"
+
+  environment_variables:
+    ENVIRONMENT_NAME: "staging"
+    LOG_LEVEL: "INFO"
+    ENABLE_DEBUG_FEATURES: "false"
+    RATE_LIMIT_ENABLED: "true"
+    PERFORMANCE_MONITORING: "true"
+
+# =============================================================================
+# PRODUCTION ENVIRONMENT
+# =============================================================================
+production:
+  description: "Production environment for live application"
+  protection_rules:
+    required_reviewers: 2
+    wait_timer: 30  # minutes
+    deployment_branch_policy: "selected"  # only main
+    allowed_branches:
+      - "main"
+    prevent_self_review: true
+
+  environment_secrets:
+    API_BASE_URL:
+      value: "https://api.tta.example.com"
+      description: "Production API endpoint"
+
+    DATABASE_URL:
+      value: "bolt://prod-neo4j.tta.example.com:7687"
+      description: "Production Neo4j database connection"
+
+    REDIS_URL:
+      value: "redis://prod-redis.tta.example.com:6379"
+      description: "Production Redis cache connection"
+
+    WS_URL:
+      value: "wss://ws.tta.example.com"
+      description: "Production WebSocket endpoint"
+
+    OPENROUTER_API_KEY:
+      value: "${{ secrets.OPENROUTER_PRODUCTION_KEY }}"
+      description: "OpenRouter API key for production"
+
+    SENTRY_DSN:
+      value: "${{ secrets.SENTRY_PRODUCTION_DSN }}"
+      description: "Sentry DSN for production error tracking"
+
+  environment_variables:
+    ENVIRONMENT_NAME: "production"
+    LOG_LEVEL: "WARN"
+    ENABLE_DEBUG_FEATURES: "false"
+    RATE_LIMIT_ENABLED: "true"
+    PERFORMANCE_MONITORING: "true"
+    SECURITY_HEADERS_ENABLED: "true"
+    COMPLIANCE_LOGGING: "true"
+
+# =============================================================================
+# TEST ENVIRONMENT
+# =============================================================================
+test:
+  description: "Test environment for E2E and integration testing"
+  protection_rules:
+    required_reviewers: 0
+    wait_timer: 0
+    deployment_branch_policy: "all"
+
+  environment_secrets:
+    API_BASE_URL:
+      value: "http://localhost:8000"
+      description: "Test mock API endpoint"
+
+    WS_URL:
+      value: "ws://localhost:8000"
+      description: "Test mock WebSocket endpoint"
+
+    TEST_USER_PASSWORD:
+      value: "${{ secrets.TEST_USER_PASSWORD }}"
+      description: "Password for test user accounts"
+
+  environment_variables:
+    ENVIRONMENT_NAME: "test"
+    LOG_LEVEL: "DEBUG"
+    ENABLE_MOCK_SERVICES: "true"
+    ENABLE_TEST_DATA_GENERATION: "true"
+    CLEANUP_TEST_DATA: "true"
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+
+# 1. Create Environments:
+#    - Go to Repository Settings > Environments
+#    - Click "New environment" for each environment above
+#    - Use the exact environment names: development, staging, production, test
+
+# 2. Configure Protection Rules:
+#    - For each environment, set up the protection rules as specified
+#    - Add required reviewers (use GitHub usernames or team names)
+#    - Set wait timers for deployment delays
+#    - Configure deployment branch policies
+
+# 3. Add Environment Secrets:
+#    - In each environment, click "Add secret"
+#    - Use the exact secret names as specified
+#    - Enter the appropriate values for each environment
+#    - Reference repository secrets using ${{ secrets.SECRET_NAME }} syntax
+
+# 4. Add Environment Variables:
+#    - In each environment, click "Add variable"
+#    - Use the exact variable names as specified
+#    - Enter the appropriate values for each environment
+
+# 5. Test Configuration:
+#    - Create a test deployment to each environment
+#    - Verify that protection rules are enforced
+#    - Check that secrets and variables are accessible in workflows
+
+# =============================================================================
+# WORKFLOW INTEGRATION
+# =============================================================================
+
+# Use environments in workflows like this:
+#
+# deploy-staging:
+#   runs-on: ubuntu-latest
+#   environment: staging
+#   steps:
+#     - name: Deploy
+#       run: |
+#         echo "Deploying to ${{ vars.ENVIRONMENT_NAME }}"
+#         echo "API URL: ${{ secrets.API_BASE_URL }}"
+
+# =============================================================================
+# SECURITY CONSIDERATIONS
+# =============================================================================
+
+# - Production environment should have the strictest protection rules
+# - Use different API keys/credentials for each environment
+# - Regularly rotate environment-specific secrets
+# - Monitor environment access through GitHub audit logs
+# - Consider using OIDC for cloud provider authentication
+# - Implement least-privilege access for each environment
+
+# =============================================================================
+# COMPLIANCE NOTES
+# =============================================================================
+
+# - Document all environment changes for audit purposes
+# - Maintain separation between environments (no shared credentials)
+# - Implement proper logging and monitoring for production
+# - Ensure compliance with data protection regulations
+# - Regular security reviews of environment configurations

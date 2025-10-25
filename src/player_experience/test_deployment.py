@@ -85,14 +85,13 @@ class DeploymentValidator:
                     "Health Endpoint", True, "Service is healthy", health_data
                 )
                 return True
-            else:
-                self.log_test_result(
-                    "Health Endpoint",
-                    False,
-                    f"Health check failed with status {response.status_code}",
-                    {"status_code": response.status_code, "response": response.text},
-                )
-                return False
+            self.log_test_result(
+                "Health Endpoint",
+                False,
+                f"Health check failed with status {response.status_code}",
+                {"status_code": response.status_code, "response": response.text},
+            )
+            return False
 
         except Exception as e:
             self.log_test_result(
@@ -114,13 +113,12 @@ class DeploymentValidator:
                     "API Documentation", True, "API documentation is accessible"
                 )
                 return True
-            else:
-                self.log_test_result(
-                    "API Documentation",
-                    False,
-                    f"API docs not accessible, status: {response.status_code}",
-                )
-                return False
+            self.log_test_result(
+                "API Documentation",
+                False,
+                f"API docs not accessible, status: {response.status_code}",
+            )
+            return False
 
         except Exception as e:
             self.log_test_result(
@@ -167,21 +165,19 @@ class DeploymentValidator:
                         "Player CRUD operations working correctly",
                     )
                     return True
-                else:
-                    self.log_test_result(
-                        "Player Management API",
-                        False,
-                        f"Failed to retrieve created player, status: {get_response.status_code}",
-                    )
-                    return False
-            else:
                 self.log_test_result(
                     "Player Management API",
                     False,
-                    f"Failed to create player, status: {response.status_code}",
-                    {"response": response.text},
+                    f"Failed to retrieve created player, status: {get_response.status_code}",
                 )
                 return False
+            self.log_test_result(
+                "Player Management API",
+                False,
+                f"Failed to create player, status: {response.status_code}",
+                {"response": response.text},
+            )
+            return False
 
         except Exception as e:
             self.log_test_result(
@@ -259,16 +255,15 @@ class DeploymentValidator:
                     ),
                 )
                 return success
-            else:
-                # Clean up player
-                self.session.delete(f"{self.base_url}/api/v1/players/{player_id}")
+            # Clean up player
+            self.session.delete(f"{self.base_url}/api/v1/players/{player_id}")
 
-                self.log_test_result(
-                    "Character Management API",
-                    False,
-                    f"Failed to create character, status: {char_response.status_code}",
-                )
-                return False
+            self.log_test_result(
+                "Character Management API",
+                False,
+                f"Failed to create character, status: {char_response.status_code}",
+            )
+            return False
 
         except Exception as e:
             self.log_test_result(
@@ -305,13 +300,12 @@ class DeploymentValidator:
                         "WebSocket connection and messaging working correctly",
                     )
                     return True
-                else:
-                    self.log_test_result(
-                        "WebSocket Connection",
-                        False,
-                        f"Unexpected WebSocket response: {response_data}",
-                    )
-                    return False
+                self.log_test_result(
+                    "WebSocket Connection",
+                    False,
+                    f"Unexpected WebSocket response: {response_data}",
+                )
+                return False
 
         except Exception as e:
             self.log_test_result(
@@ -338,21 +332,19 @@ class DeploymentValidator:
                         "All database connections are healthy",
                     )
                     return True
-                else:
-                    self.log_test_result(
-                        "Database Connectivity",
-                        False,
-                        f"Database connectivity issues - Redis: {redis_ok}, Neo4j: {neo4j_ok}",
-                        health_data,
-                    )
-                    return False
-            else:
                 self.log_test_result(
                     "Database Connectivity",
                     False,
-                    f"Failed to get detailed health status: {response.status_code}",
+                    f"Database connectivity issues - Redis: {redis_ok}, Neo4j: {neo4j_ok}",
+                    health_data,
                 )
                 return False
+            self.log_test_result(
+                "Database Connectivity",
+                False,
+                f"Failed to get detailed health status: {response.status_code}",
+            )
+            return False
 
         except Exception as e:
             self.log_test_result(
@@ -462,7 +454,7 @@ class DeploymentValidator:
         passed_tests = sum(1 for result in self.test_results if result["success"])
         success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
 
-        summary = {
+        return {
             "environment": self.environment,
             "endpoint": self.base_url,
             "total_tests": total_tests,
@@ -473,8 +465,6 @@ class DeploymentValidator:
             "test_results": self.test_results,
             "timestamp": datetime.now().isoformat(),
         }
-
-        return summary
 
     def print_summary(self, summary: dict[str, Any]):
         """Print test summary."""

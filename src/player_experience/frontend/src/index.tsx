@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
-import './index.css';
 import App from './App';
-import { store } from './store/store';
-import reportWebVitals from './reportWebVitals';
-import { initializeSecureStorage } from './utils/secureStorage';
-import { initializeSessionRestoration } from './utils/sessionRestoration';
 import ErrorBoundary from './components/ErrorBoundary';
 import { NotificationProvider } from './components/Notifications';
+import './index.css';
+import reportWebVitals from './reportWebVitals';
+import { store } from './store/store';
+import { initializeSecureStorage } from './utils/secureStorage';
+import { initializeSessionRestoration } from './utils/sessionRestoration';
 
 // Initialize secure storage and migrate from localStorage if needed
 initializeSecureStorage();

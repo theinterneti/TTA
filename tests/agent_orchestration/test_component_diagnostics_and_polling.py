@@ -24,12 +24,12 @@ async def test_poll_queue_metrics_once(redis_client):
     assert comp._start_impl() is True
 
     # Enqueue a message to create keys and then run single polling cycle
-    from src.agent_orchestration.coordinators import RedisMessageCoordinator
+    from tta_ai.orchestration.coordinators import RedisMessageCoordinator
 
     coord = comp._message_coordinator
     assert isinstance(coord, RedisMessageCoordinator)
 
-    from src.agent_orchestration import AgentId, AgentMessage, AgentType, MessageType
+    from tta_ai.orchestration import AgentId, AgentMessage, AgentType, MessageType
 
     aid = AgentId(type=AgentType.IPA, instance="testpoll")
     msg = AgentMessage(

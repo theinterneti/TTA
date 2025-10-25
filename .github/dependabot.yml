@@ -1,0 +1,190 @@
+# Dependabot configuration for TTA repository
+# This file configures automated dependency updates and security patches
+
+version: 2
+updates:
+  # Root package.json (E2E testing dependencies)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "theinterneti"
+    assignees:
+      - "theinterneti"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    allow:
+      # Allow all dependency types
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Ignore major version updates for stable dependencies
+      - dependency-name: "@playwright/test"
+        update-types: ["version-update:semver-major"]
+    groups:
+      playwright:
+        patterns:
+          - "@playwright/*"
+          - "playwright*"
+      testing:
+        patterns:
+          - "*jest*"
+          - "*test*"
+          - "@axe-core/*"
+      security:
+        patterns:
+          - "*security*"
+          - "*audit*"
+
+  # Frontend package.json
+  - package-ecosystem: "npm"
+    directory: "/src/player_experience/frontend"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "theinterneti"
+    assignees:
+      - "theinterneti"
+    commit-message:
+      prefix: "deps(frontend)"
+      prefix-development: "deps-dev(frontend)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "automated"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Be more conservative with React major updates
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      redux:
+        patterns:
+          - "*redux*"
+          - "@reduxjs/*"
+      ui:
+        patterns:
+          - "*ui*"
+          - "*component*"
+          - "*theme*"
+
+  # Mock server package.json
+  - package-ecosystem: "npm"
+    directory: "/tests/e2e/mocks"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "theinterneti"
+    assignees:
+      - "theinterneti"
+    commit-message:
+      prefix: "deps(mocks)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "testing"
+      - "mocks"
+      - "automated"
+    groups:
+      express:
+        patterns:
+          - "express*"
+          - "cors"
+          - "ws"
+
+  # Python dependencies (if any)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "theinterneti"
+    assignees:
+      - "theinterneti"
+    commit-message:
+      prefix: "deps(python)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "theinterneti"
+    assignees:
+      - "theinterneti"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "ci/cd"
+      - "automated"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
+          - "github/*"
+
+  # Docker (if Dockerfiles exist)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 2
+    reviewers:
+      - "theinterneti"
+    assignees:
+      - "theinterneti"
+    commit-message:
+      prefix: "deps(docker)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"

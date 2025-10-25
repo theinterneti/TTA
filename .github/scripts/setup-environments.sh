@@ -189,4 +189,3 @@ echo ""
 echo "For more details, see:"
 echo "  .github/repository-config/environments-configuration.yml"
 echo ""
-

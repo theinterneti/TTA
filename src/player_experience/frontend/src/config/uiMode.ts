@@ -1,6 +1,6 @@
 /**
  * UI Mode Configuration
- * 
+ *
  * Manages the entertainment vs clinical interface modes for different user types
  */
 
@@ -23,10 +23,10 @@ export interface UIModeConfig {
 export const DEFAULT_UI_MODE_CONFIG: UIModeConfig = {
   // Default to entertainment mode for better user engagement
   defaultMode: UIMode.ENTERTAINMENT,
-  
+
   // Allow users to toggle between modes
   allowModeToggle: true,
-  
+
   // Default modes based on user roles
   userRoleDefaults: {
     'player': UIMode.ENTERTAINMENT,
@@ -37,7 +37,7 @@ export const DEFAULT_UI_MODE_CONFIG: UIModeConfig = {
     'researcher': UIMode.CLINICAL,
     'caregiver': UIMode.ENTERTAINMENT, // Caregivers might prefer entertainment mode
   },
-  
+
   // Feature flags for different modes
   featureFlags: {
     entertainmentMode: true,
@@ -51,7 +51,7 @@ export const DEFAULT_UI_MODE_CONFIG: UIModeConfig = {
  */
 export const getUIModeConfig = (): UIModeConfig => {
   const config = { ...DEFAULT_UI_MODE_CONFIG };
-  
+
   // Override with environment variables if available
   if (process.env.REACT_APP_DEFAULT_UI_MODE) {
     const envMode = process.env.REACT_APP_DEFAULT_UI_MODE.toLowerCase();
@@ -59,19 +59,19 @@ export const getUIModeConfig = (): UIModeConfig => {
       config.defaultMode = envMode as UIMode;
     }
   }
-  
+
   if (process.env.REACT_APP_ALLOW_MODE_TOGGLE) {
     config.allowModeToggle = process.env.REACT_APP_ALLOW_MODE_TOGGLE === 'true';
   }
-  
+
   if (process.env.REACT_APP_ENTERTAINMENT_MODE_ENABLED) {
     config.featureFlags.entertainmentMode = process.env.REACT_APP_ENTERTAINMENT_MODE_ENABLED === 'true';
   }
-  
+
   if (process.env.REACT_APP_CLINICAL_MODE_ENABLED) {
     config.featureFlags.clinicalMode = process.env.REACT_APP_CLINICAL_MODE_ENABLED === 'true';
   }
-  
+
   return config;
 };
 
@@ -80,17 +80,17 @@ export const getUIModeConfig = (): UIModeConfig => {
  */
 export const determineUIMode = (userRole?: string, userPreference?: UIMode): UIMode => {
   const config = getUIModeConfig();
-  
+
   // User preference takes precedence
   if (userPreference && config.allowModeToggle) {
     return userPreference;
   }
-  
+
   // Role-based default
   if (userRole && config.userRoleDefaults[userRole]) {
     return config.userRoleDefaults[userRole];
   }
-  
+
   // System default
   return config.defaultMode;
 };
@@ -108,7 +108,7 @@ export const ENTERTAINMENT_THEME = {
     text: '#1F2937',
     textSecondary: '#6B7280',
   },
-  
+
   iconography: {
     session: '🎮',
     progress: '⭐',
@@ -119,7 +119,7 @@ export const ENTERTAINMENT_THEME = {
     help: '❓',
     emergency: '🚨',
   },
-  
+
   terminology: {
     brandName: 'Adventure Platform',
     tagline: 'Your Personal Story Adventure',
@@ -140,7 +140,7 @@ export const CLINICAL_THEME = {
     text: '#111827',
     textSecondary: '#4B5563',
   },
-  
+
   iconography: {
     session: '🏥',
     progress: '📊',
@@ -151,7 +151,7 @@ export const CLINICAL_THEME = {
     help: '❓',
     emergency: '🚨',
   },
-  
+
   terminology: {
     brandName: 'TTA Therapeutic Platform',
     tagline: 'Evidence-Based Therapeutic Gaming',
@@ -185,7 +185,7 @@ export const UIModeUtils = {
   saveUserPreference: (mode: UIMode): void => {
     localStorage.setItem(UI_MODE_STORAGE_KEYS.MODE_PREFERENCE, mode);
   },
-  
+
   /**
    * Load user's UI mode preference from local storage
    */
@@ -193,14 +193,14 @@ export const UIModeUtils = {
     const saved = localStorage.getItem(UI_MODE_STORAGE_KEYS.MODE_PREFERENCE);
     return saved as UIMode || null;
   },
-  
+
   /**
    * Clear user's UI mode preference
    */
   clearUserPreference: (): void => {
     localStorage.removeItem(UI_MODE_STORAGE_KEYS.MODE_PREFERENCE);
   },
-  
+
   /**
    * Check if entertainment mode is available
    */
@@ -208,7 +208,7 @@ export const UIModeUtils = {
     const config = getUIModeConfig();
     return config.featureFlags.entertainmentMode;
   },
-  
+
   /**
    * Check if clinical mode is available
    */
@@ -216,7 +216,7 @@ export const UIModeUtils = {
     const config = getUIModeConfig();
     return config.featureFlags.clinicalMode;
   },
-  
+
   /**
    * Check if mode toggle UI should be shown
    */

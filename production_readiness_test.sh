@@ -65,7 +65,7 @@ if [ ! -z "$CHAR_ID" ]; then
         \"session_id\": \"prod-test-session-$(date +%s)\",
         \"character_id\": \"$CHAR_ID\"
       }")
-    
+
     if echo "$AI_RESPONSE" | grep -q "response" && ! echo "$AI_RESPONSE" | grep -q "I am struggling with anxiety"; then
         echo "✅ AI providing therapeutic responses (not echoing)"
         RESPONSE_TEXT=$(echo "$AI_RESPONSE" | python -c "import sys, json; print(json.load(sys.stdin)['response'])" 2>/dev/null)
@@ -101,7 +101,7 @@ echo "4. Testing Complete User Journey..."
 if [ ! -z "$CHAR_ID" ]; then
     # Test conversation history
     SESSION_ID="prod-test-session-$(date +%s)"
-    
+
     # Send message
     curl -s -X POST http://localhost:3004/api/v1/conversation/send \
       -H "Content-Type: application/json" \
@@ -111,11 +111,11 @@ if [ ! -z "$CHAR_ID" ]; then
         \"session_id\": \"$SESSION_ID\",
         \"character_id\": \"$CHAR_ID\"
       }" > /dev/null
-    
+
     # Check history
     HISTORY=$(curl -s -X GET "http://localhost:3004/api/v1/conversation/$SESSION_ID/history" \
       -H "Authorization: Bearer $TOKEN")
-    
+
     if echo "$HISTORY" | grep -q "stress management" && echo "$HISTORY" | grep -q "total_messages"; then
         echo "✅ Complete user journey working"
         MSG_COUNT=$(echo "$HISTORY" | python -c "import sys, json; print(json.load(sys.stdin)['total_messages'])" 2>/dev/null)

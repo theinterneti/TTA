@@ -11,17 +11,16 @@ rule_files: []
 
 scrape_configs:
   # Prometheus itself - minimal self-monitoring for health check validation
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
         labels:
-          environment: 'ci'
-          instance: 'prometheus-ci'
+          environment: "ci"
+          instance: "prometheus-ci"
 
 # No alerting configuration needed for CI
 alerting:
   alertmanagers: []
-
 # Rationale for CI-Specific Configuration:
 # ========================================
 # The production prometheus.yml contains 16 scrape jobs targeting services that
@@ -39,4 +38,3 @@ alerting:
 # The CI validation focuses on infrastructure correctness (Docker Compose setup,
 # volume mounts, container networking, health checks) rather than full monitoring
 # functionality, which is tested in staging/production environments.
-

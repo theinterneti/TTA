@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
-import websocketService from '../../services/websocket';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import ScreenReaderAnnouncement from '../../components/Accessibility/ScreenReaderAnnouncement';
+import SkipLink from '../../components/Accessibility/SkipLink';
 import ChatMessage from '../../components/Chat/ChatMessage';
 import TypingIndicator from '../../components/Chat/TypingIndicator';
-import SkipLink from '../../components/Accessibility/SkipLink';
-import ScreenReaderAnnouncement from '../../components/Accessibility/ScreenReaderAnnouncement';
 import useAccessibility from '../../hooks/useAccessibility';
 import useMobile from '../../hooks/useMobile';
+import websocketService from '../../services/websocket';
+import { RootState } from '../../store/store';
 
 const Chat: React.FC = () => {
   const { sessionId } = useParams<{ sessionId?: string }>();
@@ -20,14 +20,14 @@ const Chat: React.FC = () => {
   const { selectedCharacter } = useSelector((state: RootState) => state.character);
   const { profile } = useSelector((state: RootState) => state.player);
   const { isAuthenticated, token } = useSelector((state: RootState) => state.auth);
-  
+
   const [inputValue, setInputValue] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [announcement, setAnnouncement] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  
+
   const { preferences, announce } = useAccessibility();
   const { isMobile, isTablet, touchSupported, orientation } = useMobile();
 
@@ -103,14 +103,14 @@ const Chat: React.FC = () => {
       if (messages && messages.length > 0) {
         const currentFocus = document.activeElement;
         const currentIndex = Array.from(messages).indexOf(currentFocus as Element);
-        
+
         let newIndex = currentIndex;
         if (e.key === 'ArrowUp') {
           newIndex = Math.max(0, currentIndex - 1);
         } else {
           newIndex = Math.min(messages.length - 1, currentIndex + 1);
         }
-        
+
         (messages[newIndex] as HTMLElement).focus();
       }
     }
@@ -127,7 +127,8 @@ const Chat: React.FC = () => {
 
 
   return (
-    <div 
+    <div
+      data-testid="chat-container"
       className={`h-screen flex flex-col bg-gray-50 ${
         preferences.highContrast ? 'contrast-more' : ''
       } ${preferences.largeText ? 'text-lg' : ''}`}
@@ -136,16 +137,17 @@ const Chat: React.FC = () => {
       {/* Skip Links */}
       <SkipLink href="#chat-messages">Skip to messages</SkipLink>
       <SkipLink href="#message-input">Skip to message input</SkipLink>
-      
+
       {/* Screen Reader Announcements */}
       <ScreenReaderAnnouncement message={announcement} />
-      
+
       {/* Live region for connection status */}
       <div aria-live="polite" className="sr-only">
         {isConnected ? 'Connected to chat' : 'Disconnected from chat'}
       </div>
       {/* Chat Header */}
-      <header 
+      <header
+        data-testid="chat-header"
         className={`bg-white border-b border-gray-200 shadow-sm ${
           isMobile ? 'px-4 py-3' : 'px-6 py-4'
         }`}
@@ -153,7 +155,8 @@ const Chat: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <button 
+            <button
+              data-testid="chat-back-button"
               onClick={() => navigate('/dashboard')}
               className={`text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1 ${
                 touchSupported ? 'min-w-[44px] min-h-[44px]' : ''
@@ -165,33 +168,35 @@ const Chat: React.FC = () => {
               </svg>
             </button>
             <div className="min-w-0 flex-1">
-              <h1 className={`font-semibold text-gray-900 truncate ${
+              <h1 data-testid="chat-title" className={`font-semibold text-gray-900 truncate ${
                 isMobile ? 'text-base' : 'text-lg'
               }`}>
                 {selectedCharacter ? `${selectedCharacter.name}'s Adventure` : 'Therapeutic Chat'}
               </h1>
               <div className="flex items-center space-x-2 mt-1">
-                <div 
+                <div
+                  data-testid="chat-connection-indicator"
                   className={`w-2 h-2 rounded-full transition-colors ${
                     isConnected ? 'bg-green-500' : 'bg-red-500'
                   }`}
                   aria-hidden="true"
                 />
-                <span className="text-sm text-gray-600 truncate">
+                <span data-testid="chat-connection-status" className="text-sm text-gray-600 truncate">
                   {isConnected ? 'Connected' : connectionError || 'Disconnected'}
                 </span>
                 {isTyping && (
-                  <span className="text-sm text-blue-600 italic" aria-live="polite">
+                  <span data-testid="chat-typing-indicator" className="text-sm text-blue-600 italic" aria-live="polite">
                     Assistant is typing...
                   </span>
                 )}
               </div>
             </div>
           </div>
-          
+
           {!isMobile && (
             <div className="flex items-center space-x-3">
-              <button 
+              <button
+                data-testid="chat-settings-button"
                 className="p-2 text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                 onClick={() => navigate('/settings')}
                 aria-label="Open settings"
@@ -207,8 +212,9 @@ const Chat: React.FC = () => {
       </header>
 
       {/* Messages Area */}
-      <main 
+      <main
         id="chat-messages"
+        data-testid="chat-messages-area"
         ref={messagesContainerRef}
         className={`flex-1 overflow-y-auto bg-gray-50 space-y-4 ${
           isMobile ? 'p-4' : 'p-6'
@@ -218,32 +224,32 @@ const Chat: React.FC = () => {
         tabIndex={-1}
       >
         {messageHistory.length === 0 ? (
-          <div className={`text-center ${isMobile ? 'py-8' : 'py-12'}`}>
+          <div data-testid="chat-empty-state" className={`text-center ${isMobile ? 'py-8' : 'py-12'}`}>
             <div className={`bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 ${
               isMobile ? 'w-12 h-12' : 'w-16 h-16'
             }`}>
-              <svg 
-                className={`text-blue-600 ${isMobile ? 'w-6 h-6' : 'w-8 h-8'}`} 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className={`text-blue-600 ${isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h2 className={`font-medium text-gray-900 mb-2 ${
+            <h2 data-testid="chat-welcome-title" className={`font-medium text-gray-900 mb-2 ${
               isMobile ? 'text-base' : 'text-lg'
             }`}>
               Welcome to your therapeutic adventure!
             </h2>
-            <p className={`text-gray-600 mb-6 max-w-md mx-auto ${
+            <p data-testid="chat-welcome-message" className={`text-gray-600 mb-6 max-w-md mx-auto ${
               isMobile ? 'text-sm px-4' : ''
             }`}>
               Start a conversation to begin your personalized therapeutic journey. Your responses will help guide the experience.
             </p>
             {!isConnected && (
-              <div className={`bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto ${
+              <div data-testid="chat-connecting-message" className={`bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto ${
                 isMobile ? 'mx-4' : ''
               }`}>
                 <p className="text-yellow-800 text-sm" role="status" aria-live="polite">
@@ -256,6 +262,7 @@ const Chat: React.FC = () => {
           messageHistory.map((message, index) => (
             <div
               key={message.id}
+              data-testid={`chat-message-${index}`}
               role="article"
               aria-label={`Message ${index + 1} from ${message.type}`}
               tabIndex={0}
@@ -272,13 +279,14 @@ const Chat: React.FC = () => {
 
         {/* Typing Indicator */}
         <TypingIndicator isVisible={isTyping} />
-        
+
         {/* Scroll anchor */}
         <div ref={messagesEndRef} aria-hidden="true" />
       </main>
 
       {/* Message Input */}
-      <footer 
+      <footer
+        data-testid="chat-input-footer"
         className={`bg-white border-t border-gray-200 shadow-lg ${
           isMobile ? 'p-3' : 'p-4'
         }`}
@@ -292,6 +300,7 @@ const Chat: React.FC = () => {
               </label>
               <input
                 id="message-input"
+                data-testid="chat-message-input"
                 ref={inputRef}
                 type="text"
                 value={inputValue}
@@ -303,8 +312,8 @@ const Chat: React.FC = () => {
                 className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
                   isMobile ? 'px-3 py-2 text-base' : 'px-4 py-3'
                 } ${
-                  !isConnected 
-                    ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed' 
+                  !isConnected
+                    ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-white border-gray-300 text-gray-900'
                 } ${isInputFocused ? 'shadow-md' : 'shadow-sm'} ${
                   touchSupported ? 'min-h-[44px]' : ''
@@ -318,12 +327,13 @@ const Chat: React.FC = () => {
                 spellCheck="true"
               />
               {!isMobile && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400" aria-hidden="true">
+                <div data-testid="chat-character-count" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400" aria-hidden="true">
                   {inputValue.length}/1000
                 </div>
               )}
             </div>
             <button
+              data-testid="chat-send-button"
               onClick={() => handleSendMessage(inputValue)}
               disabled={!isConnected || !inputValue.trim()}
               className={`rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -352,9 +362,9 @@ const Chat: React.FC = () => {
               )}
             </button>
           </div>
-          
+
           {/* Connection status and help text */}
-          <div 
+          <div
             id="message-help"
             className={`mt-2 flex items-center justify-between ${
               isMobile ? 'text-xs' : 'text-xs'

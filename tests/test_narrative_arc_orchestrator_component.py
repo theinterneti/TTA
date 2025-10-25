@@ -8,7 +8,7 @@ to verify its functionality and integration with the TTA component system.
 import unittest
 from datetime import datetime
 
-from src.components.narrative_arc_orchestrator_component import (
+from tta_narrative.orchestration_component import (
     EmergentEvent,
     NarrativeArcOrchestratorComponent,
     NarrativeResponse,
@@ -16,6 +16,7 @@ from src.components.narrative_arc_orchestrator_component import (
     NarrativeStatus,
     PlayerChoice,
 )
+
 from src.orchestration import TTAConfig
 
 

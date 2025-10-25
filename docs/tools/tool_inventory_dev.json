@@ -1,0 +1,13 @@
+{
+  "environment": "dev",
+  "tools": [],
+  "analysis": {
+    "total_count": 0,
+    "by_status": {},
+    "by_capability": {},
+    "missing_descriptions": [],
+    "missing_parameters": [],
+    "missing_returns_schema": []
+  },
+  "timestamp": "2025-10-22T21:58:54.597245Z"
+}

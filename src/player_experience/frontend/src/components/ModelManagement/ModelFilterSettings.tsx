@@ -48,7 +48,7 @@ const ModelFilterSettings: React.FC<ModelFilterSettingsProps> = ({
 
   const handleFilterChange = async (filterType: 'all' | 'free' | 'affordable') => {
     dispatch(setActiveFilter(filterType));
-    
+
     // Fetch appropriate models based on filter
     switch (filterType) {
       case 'free':
@@ -63,10 +63,10 @@ const ModelFilterSettings: React.FC<ModelFilterSettingsProps> = ({
 
     // Track filter usage for analytics
     if (profile?.player_id) {
-      const modelsShown = filterType === 'free' ? freeModels.length : 
-                         filterType === 'affordable' ? affordableModels.length : 
+      const modelsShown = filterType === 'free' ? freeModels.length :
+                         filterType === 'affordable' ? affordableModels.length :
                          availableModels.length;
-      
+
       dispatch(trackFilterUsage({
         filterType: filterType === 'all' ? 'all' : filterType === 'free' ? 'free_only' : 'affordable',
         maxCostThreshold: filterType === 'affordable' ? localCostThreshold : undefined,
@@ -81,7 +81,7 @@ const ModelFilterSettings: React.FC<ModelFilterSettingsProps> = ({
   const handleCostThresholdChange = (value: number) => {
     setLocalCostThreshold(value);
     dispatch(setCostThreshold(value));
-    
+
     // If affordable filter is active, refresh the models
     if (activeFilter === 'affordable') {
       dispatch(fetchAffordableModels({ maxCost: value, provider: 'openrouter' }) as any);
@@ -215,10 +215,10 @@ const ModelFilterSettings: React.FC<ModelFilterSettingsProps> = ({
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 mb-4"
           >
-            <svg 
+            <svg
               className={`mr-2 h-4 w-4 transition-transform ${showAdvanced ? 'rotate-90' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

@@ -19,49 +19,49 @@ graph TB
         MR[Model Registry]
         FB[Fallback Handler]
     end
-    
+
     subgraph "Provider Adapters"
         LA[Local Adapter]
         OA[OpenRouter Adapter]
         CA[Custom API Adapter]
     end
-    
+
     subgraph "Model Providers"
         LM[Local Models<br/>Hugging Face]
         OR[OpenRouter<br/>400+ Models]
         API[Custom APIs<br/>OpenAI, Anthropic, etc.]
     end
-    
+
     subgraph "TTA Components"
         TC[Therapeutic Components]
         NA[Narrative Arc Orchestrator]
         PE[Player Experience]
     end
-    
+
     subgraph "Storage & Monitoring"
         Redis[(Redis Cache)]
         Neo4j[(Neo4j Graph)]
         RM[Resource Monitor]
         PM[Performance Metrics]
     end
-    
+
     TC --> MS
     NA --> MS
     PE --> MS
-    
+
     MS --> MM
     MM --> MB
     MM --> MR
     MM --> FB
-    
+
     MM --> LA
     MM --> OA
     MM --> CA
-    
+
     LA --> LM
     OA --> OR
     CA --> API
-    
+
     MM --> Redis
     MB --> Neo4j
     RM --> Redis
@@ -78,13 +78,13 @@ sequenceDiagram
     participant PA as Provider Adapter
     participant MP as Model Provider
     participant FB as Fallback Handler
-    
+
     TC->>MS: Request model for task
     MS->>MM: Get optimal model
     MM->>MM: Evaluate task requirements
     MM->>PA: Initialize selected model
     PA->>MP: Load/Connect to model
-    
+
     alt Model Available
         MP-->>PA: Model ready
         PA-->>MM: Success
@@ -253,7 +253,7 @@ class LocalModelInfo:
 model_management:
   enabled: true
   default_provider: "openrouter"
-  
+
   providers:
     local:
       enabled: true
@@ -261,14 +261,14 @@ model_management:
       max_concurrent_models: 2
       auto_quantization: true
       gpu_memory_fraction: 0.8
-      
+
     openrouter:
       enabled: true
       api_key: "${OPENROUTER_API_KEY}"
       prefer_free_models: true
       max_cost_per_million_tokens: 10.0
       rate_limit_buffer: 0.8
-      
+
     custom_apis:
       enabled: true
       providers:
@@ -278,14 +278,14 @@ model_management:
         anthropic:
           api_key: "${ANTHROPIC_API_KEY}"
           base_url: "https://api.anthropic.com"
-  
+
   selection_strategy:
     primary_criteria: "cost_effectiveness"
     fallback_criteria: "availability"
     therapeutic_safety_weight: 0.4
     performance_weight: 0.3
     cost_weight: 0.3
-    
+
   benchmarking:
     enabled: true
     benchmark_interval: "24h"
@@ -309,16 +309,16 @@ graph TD
     D -->|No| F{Fallback 2 Available?}
     F -->|Yes| G[Use Fallback 2]
     F -->|No| H[Emergency Fallback]
-    
+
     C --> I[Monitor Performance]
     E --> I
     G --> I
     H --> I
-    
+
     I --> J{Performance OK?}
     J -->|No| K[Switch to Better Model]
     J -->|Yes| L[Continue]
-    
+
     K --> D
 ```
 
@@ -381,25 +381,25 @@ class TherapeuticSafetyValidator:
 class ModelManagementTestSuite:
     def test_local_model_loading(self):
         """Test loading and using local Hugging Face models"""
-        
+
     def test_openrouter_free_model_filtering(self):
         """Test filtering and selection of free OpenRouter models"""
-        
+
     def test_custom_api_integration(self):
         """Test custom API key management and usage"""
-        
+
     def test_fallback_mechanisms(self):
         """Test automatic fallback when primary models fail"""
-        
+
     def test_resource_monitoring(self):
         """Test resource usage monitoring and optimization"""
-        
+
     def test_therapeutic_safety_validation(self):
         """Test therapeutic safety checks and crisis detection"""
-        
+
     def test_cost_optimization(self):
         """Test cost-effective model selection"""
-        
+
     def test_performance_benchmarking(self):
         """Test continuous performance evaluation"""
 ```

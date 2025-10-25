@@ -195,7 +195,7 @@ const OpenRouterAuthStatus: React.FC<OpenRouterAuthStatusProps> = ({
                 </>
               )}
             </button>
-            
+
             <button
               onClick={handleLogout}
               className="text-sm text-red-600 hover:text-red-700 flex items-center"

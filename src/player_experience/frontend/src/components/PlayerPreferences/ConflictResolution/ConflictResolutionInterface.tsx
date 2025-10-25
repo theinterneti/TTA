@@ -1,15 +1,15 @@
 /**
  * Conflict Resolution Interface Component
- * 
+ *
  * Provides user-friendly interface for resolving therapeutic goal conflicts
  * with guided resolution strategies and real-time feedback.
  */
 
 import React, { useState } from 'react';
-import { 
-  EnhancedGoalConflict, 
+import {
+  EnhancedGoalConflict,
   ConflictResolutionStrategy,
-  applyAutomaticResolution 
+  applyAutomaticResolution
 } from '../../../services/conflictDetectionService';
 import { THERAPEUTIC_GOALS } from '../../../types/preferences';
 

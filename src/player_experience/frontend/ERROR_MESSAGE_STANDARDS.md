@@ -1,6 +1,6 @@
 # Error Message Standards
 
-**Version:** 1.0.0  
+**Version:** 1.0.0
 **Last Updated:** 2025-09-29
 
 This document defines the standardized error message format and guidelines for the TTA Player Experience application.
@@ -350,7 +350,7 @@ describe('Error Handling', () => {
   it('should serialize error objects correctly', () => {
     const error = new Error('Test error');
     const serialized = serializeError(error);
-    
+
     expect(serialized.userMessage).toBeDefined();
     expect(serialized.userMessage).not.toContain('[object Object]');
     expect(serialized.severity).toBeDefined();
@@ -363,7 +363,7 @@ describe('Error Handling', () => {
         data: { detail: 'Validation failed' }
       }
     };
-    
+
     const message = getErrorMessage(apiError);
     expect(message).toContain('Validation error');
   });
@@ -389,7 +389,6 @@ describe('Error Handling', () => {
 
 ---
 
-**Document Owner:** Frontend Team  
-**Last Review:** 2025-09-29  
+**Document Owner:** Frontend Team
+**Last Review:** 2025-09-29
 **Next Review:** 2025-12-29
-

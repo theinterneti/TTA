@@ -169,4 +169,3 @@ body:
           required: true
         - label: I have checked the documentation for performance best practices
           required: false
-

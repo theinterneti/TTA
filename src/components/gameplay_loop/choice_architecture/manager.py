@@ -379,14 +379,13 @@ class ChoiceArchitectureManager:
 
         if therapeutic_impact > 0.8 and narrative_progression == "significant":
             return "therapeutic_success"
-        elif therapeutic_impact > 0.6:
+        if therapeutic_impact > 0.6:
             return "therapeutic_opportunity"
-        elif therapeutic_impact < 0.3:
+        if therapeutic_impact < 0.3:
             return "learning_opportunity"
-        elif narrative_progression == "significant":
+        if narrative_progression == "significant":
             return "narrative_success"
-        else:
-            return "neutral_progression"
+        return "neutral_progression"
 
     async def _adapt_choice_for_emotion(
         self, choice: Choice, new_emotional_state: str

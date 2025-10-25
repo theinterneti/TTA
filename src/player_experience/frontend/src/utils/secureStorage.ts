@@ -1,9 +1,9 @@
 /**
  * Secure token storage utility
- * 
+ *
  * Implements secure token storage using httpOnly cookies (server-side) and
  * in-memory storage (client-side) instead of localStorage to prevent XSS attacks.
- * 
+ *
  * Security considerations:
  * - Tokens are never stored in localStorage (vulnerable to XSS)
  * - Access tokens stored in memory (cleared on page refresh)
@@ -27,7 +27,7 @@ class SecureStorage {
    */
   setToken(accessToken: string, expiresIn: number = 3600): void {
     const expiresAt = Date.now() + (expiresIn * 1000);
-    
+
     this.tokenData = {
       accessToken,
       expiresAt,
@@ -66,7 +66,7 @@ class SecureStorage {
    */
   clearToken(): void {
     this.tokenData = null;
-    
+
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
       this.refreshTimer = null;
@@ -82,7 +82,7 @@ class SecureStorage {
     }
 
     const refreshTime = expiresAt - Date.now() - this.TOKEN_REFRESH_BUFFER;
-    
+
     if (refreshTime > 0) {
       this.refreshTimer = setTimeout(() => {
         this.triggerTokenRefresh();
@@ -122,7 +122,7 @@ class SecureStorage {
    */
   needsRefresh(): boolean {
     const timeUntilExpiry = this.getTimeUntilExpiry();
-    
+
     if (timeUntilExpiry === null) {
       return false;
     }
@@ -138,7 +138,7 @@ export default secureStorage;
 
 /**
  * Session persistence utility
- * 
+ *
  * Manages session state persistence using sessionStorage for temporary data
  * and server-side session management for critical data.
  */
@@ -173,7 +173,7 @@ class SessionManager {
   getSession(): SessionData | null {
     try {
       const data = sessionStorage.getItem(this.SESSION_KEY);
-      
+
       if (!data) {
         return null;
       }
@@ -201,7 +201,7 @@ class SessionManager {
    */
   updateLastActivity(): void {
     const session = this.getSession();
-    
+
     if (session) {
       session.lastActivity = Date.now();
       sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
@@ -232,19 +232,19 @@ export const migrateFromLocalStorage = (): void => {
   try {
     // Check if there's an existing token in localStorage
     const oldToken = localStorage.getItem('token');
-    
+
     if (oldToken) {
       console.warn('Found token in localStorage. This is insecure and will be migrated.');
-      
+
       // Store in secure storage (will be cleared on page refresh, requiring re-login)
       // This is intentional for security
       secureStorage.setToken(oldToken);
-      
+
       // Remove from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('refreshToken');
-      
+
       console.info('Token migrated to secure storage. You may need to log in again after page refresh.');
     }
   } catch (error) {
@@ -267,11 +267,10 @@ export const initializeSecureStorage = (): void => {
 
   // Set up activity tracking for session management
   const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-  
+
   activityEvents.forEach(event => {
     window.addEventListener(event, () => {
       sessionManager.updateLastActivity();
     }, { passive: true });
   });
 };
-

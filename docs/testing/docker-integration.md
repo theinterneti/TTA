@@ -90,7 +90,7 @@ containers:
   health_check_timeout: 30        # Health check timeout (seconds)
   startup_wait_timeout: 120       # Container startup timeout
   fallback_to_mock: true          # Fall back to mocks if containers fail
-  
+
   neo4j:
     container_name: "tta-neo4j-test"
     ports:
@@ -99,7 +99,7 @@ containers:
     auth:
       username: "neo4j"
       password: "testpassword"
-      
+
   redis:
     container_name: "tta-redis-test"
     ports:

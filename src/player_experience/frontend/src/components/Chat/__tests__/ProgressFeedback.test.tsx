@@ -167,7 +167,7 @@ describe('ProgressFeedback', () => {
     );
 
     const container = screen.container.firstChild;
-    
+
     // Initially should have translate-y-4 and opacity-0 (before animation)
     // After animation, should have translate-y-0 and opacity-100
     await waitFor(() => {
@@ -265,7 +265,7 @@ describe('ProgressFeedback', () => {
     );
 
     expect(screen.getByText('75%')).toBeInTheDocument();
-    
+
     const progressBar = screen.container.querySelector('.bg-blue-500');
     expect(progressBar).toHaveStyle('width: 75%');
   });

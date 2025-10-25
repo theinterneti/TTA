@@ -1,21 +1,21 @@
-from src.components.narrative_arc_orchestrator.causal_graph import *  # just ensure module loads
-from src.components.narrative_arc_orchestrator.conflict_detection import ScaleConflict
-from src.components.narrative_arc_orchestrator.impact_analysis import ImpactAssessment
-from src.components.narrative_arc_orchestrator.resolution_engine import Resolution
-
-# Verify narrative_arc_orchestrator facades import and names exist
-from src.components.narrative_arc_orchestrator.scale_manager import ScaleManager
-from src.components.narrative_coherence.causal_validator import CausalValidator
-from src.components.narrative_coherence.coherence_validator import CoherenceValidator
+from tta_narrative.coherence.causal_validator import CausalValidator
+from tta_narrative.coherence.coherence_validator import CoherenceValidator
 
 # Verify narrative_coherence facades import and names exist
-from src.components.narrative_coherence.contradiction_detector import (
+from tta_narrative.coherence.contradiction_detector import (
     ContradictionDetector,
 )
-from src.components.narrative_coherence.rules import (
+from tta_narrative.coherence.rules import (
     OVERALL_WEIGHTS,
     SEVERITY_WEIGHTS_LORE,
 )
+from tta_narrative.orchestration.causal_graph import *  # just ensure module loads
+from tta_narrative.orchestration.conflict_detection import ScaleConflict
+from tta_narrative.orchestration.impact_analysis import ImpactAssessment
+from tta_narrative.orchestration.resolution_engine import Resolution
+
+# Verify narrative_arc_orchestrator facades import and names exist
+from tta_narrative.orchestration.scale_manager import ScaleManager
 
 
 def test_facades_importable():

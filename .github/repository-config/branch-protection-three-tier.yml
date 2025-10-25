@@ -20,7 +20,7 @@
 # =============================================================================
 main:
   description: "Production branch - highest protection, manual approval required"
-  
+
   # Status Checks - Comprehensive test suite
   required_status_checks:
     strict: true  # Must be up to date before merging
@@ -28,24 +28,24 @@ main:
       # Core tests (from tests.yml)
       - "unit"
       - "integration"
-      
+
       # E2E tests (from e2e-tests.yml)
       - "e2e-tests / E2E Tests (chromium - auth)"
       - "e2e-tests / E2E Tests (chromium - dashboard)"
       - "e2e-tests / E2E Tests (chromium - character-management)"
       - "e2e-tests / E2E Tests (chromium - chat)"
-      
+
       # Code quality (from code-quality.yml)
       - "code-quality / Lint and Format"
       - "code-quality / Type Check"
-      
+
       # Security (from security-scan.yml)
       - "security-scan / Security Scan"
-      
+
       # Comprehensive tests (from comprehensive-test-battery.yml)
       - "comprehensive-tests / Core Tests"
       - "comprehensive-tests / Integration Tests"
-  
+
   # Pull Request Reviews - Manual approval required
   required_pull_request_reviews:
     required_approving_review_count: 1  # Self-approval allowed for solo dev
@@ -54,10 +54,10 @@ main:
     require_last_push_approval: false
     bypass_pull_request_allowances:
       users: ["theinterneti"]  # Emergency bypass
-  
+
   # Additional Restrictions
   restrictions: null  # No push restrictions for solo developer
-  
+
   # Administrative Settings
   enforce_admins: false  # Allow admin bypass for emergencies
   allow_force_pushes: false  # Prevent accidental history rewriting
@@ -74,7 +74,7 @@ main:
 # =============================================================================
 staging:
   description: "Staging branch - full test suite, auto-merge when green"
-  
+
   # Status Checks - Full test suite (excluding comprehensive battery)
   required_status_checks:
     strict: true  # Must be up to date before merging
@@ -82,29 +82,29 @@ staging:
       # Core tests
       - "unit"
       - "integration"
-      
+
       # E2E tests (core flows only)
       - "e2e-tests / E2E Tests (chromium - auth)"
       - "e2e-tests / E2E Tests (chromium - dashboard)"
       - "e2e-tests / E2E Tests (chromium - chat)"
-      
+
       # Code quality
       - "code-quality / Lint and Format"
       - "code-quality / Type Check"
-      
+
       # Security
       - "security-scan / Security Scan"
-  
+
   # Pull Request Reviews - No approval required (auto-merge)
   required_pull_request_reviews:
     required_approving_review_count: 0  # Auto-merge when tests pass
     dismiss_stale_reviews: false
     require_code_owner_reviews: false
     require_last_push_approval: false
-  
+
   # Additional Restrictions
   restrictions: null
-  
+
   # Administrative Settings
   enforce_admins: false
   allow_force_pushes: false  # Prevent force pushes
@@ -121,23 +121,23 @@ staging:
 # =============================================================================
 development:
   description: "Development branch - fast feedback, minimal protection"
-  
+
   # Status Checks - Unit tests only for fast feedback
   required_status_checks:
     strict: false  # Allow merging without being up to date
     contexts:
       - "unit"  # Only unit tests required
-  
+
   # Pull Request Reviews - No approval required
   required_pull_request_reviews:
     required_approving_review_count: 0  # No approval needed
     dismiss_stale_reviews: false
     require_code_owner_reviews: false
     require_last_push_approval: false
-  
+
   # Additional Restrictions
   restrictions: null
-  
+
   # Administrative Settings
   enforce_admins: false
   allow_force_pushes: false  # Still prevent force pushes
@@ -156,16 +156,16 @@ development:
 # Configure manually via web UI or use rulesets API
 feature/*:
   description: "Feature branches - minimal protection, allow experimentation"
-  
+
   # Status Checks - None required
   required_status_checks: null
-  
+
   # Pull Request Reviews - None required
   required_pull_request_reviews: null
-  
+
   # Additional Restrictions
   restrictions: null
-  
+
   # Administrative Settings
   enforce_admins: false
   allow_force_pushes: true  # Allow force pushes for rebasing
@@ -258,4 +258,3 @@ feature/*:
 # - Phase 3: Add accessibility tests to main
 # - Phase 4: Add visual regression tests to main
 # - Phase 5: Add simulation tests to main (if applicable)
-

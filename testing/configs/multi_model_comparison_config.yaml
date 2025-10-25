@@ -1,0 +1,792 @@
+# Multi-Model Comparison Configuration for TTA Quality Evaluation
+# Comprehensive model comparison across different AI providers
+
+# Multi-model testing configuration
+multi_model_testing:
+  enabled: true
+  comparison_mode: "side_by_side" # "side_by_side", "sequential", "a_b_test"
+  max_concurrent_models: 3 # Test up to 3 models simultaneously
+  identical_scenarios: true # Use identical scenarios for fair comparison
+  randomize_order: true # Randomize model testing order
+
+  # Comparison analysis settings
+  statistical_significance_testing: true
+  confidence_level: 0.95
+  minimum_sample_size: 10 # Minimum tests per model for valid comparison
+
+  # Cost-effectiveness analysis
+  cost_tracking_enabled: true
+  performance_per_dollar_analysis: true
+  roi_calculation: true
+
+# Model configurations for comparison
+models:
+  # FREE MODELS SECTION - All models with $0.00 cost (10 total models)
+
+  # Meta Llama Models (Free Tier)
+  llama_3_3_8b_instruct:
+    name: "Meta Llama 3.3 8B Instruct"
+    provider: "openrouter"
+    model_id: "meta-llama/llama-3.3-8b-instruct:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 45
+    retry_attempts: 3
+    max_requests_per_minute: 20
+    context_window: 128000
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 7.8
+      world_consistency: 8.0
+      user_engagement: 7.5
+      response_time_avg: 2.0
+      cost_effectiveness: 10.0 # Free = maximum cost effectiveness
+
+    # Model strengths and focus areas
+    strengths:
+      - "ultra_fast_inference"
+      - "cost_effective"
+      - "good_narrative_coherence"
+      - "reliable_performance"
+
+    focus_areas:
+      - "extended_session_stability"
+      - "consistent_quality"
+      - "therapeutic_integration"
+
+  llama_3_1_8b_instruct:
+    name: "Meta Llama 3.1 8B Instruct"
+    provider: "openrouter"
+    model_id: "meta-llama/llama-3.1-8b-instruct:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 45
+    retry_attempts: 3
+    max_requests_per_minute: 20
+    context_window: 128000
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 7.5
+      world_consistency: 7.7
+      user_engagement: 7.3
+      response_time_avg: 1.8
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "fast_inference"
+      - "cost_effective"
+      - "stable_performance"
+      - "good_instruction_following"
+
+    focus_areas:
+      - "baseline_comparison"
+      - "consistent_quality"
+      - "reliable_storytelling"
+
+  llama_3_2_11b_vision_instruct:
+    name: "Meta Llama 3.2 11B Vision Instruct"
+    provider: "openrouter"
+    model_id: "meta-llama/llama-3.2-11b-vision-instruct:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 50
+    retry_attempts: 3
+    max_requests_per_minute: 15
+    context_window: 128000
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.0
+      world_consistency: 8.2
+      user_engagement: 7.8
+      response_time_avg: 2.5
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "larger_parameter_count"
+      - "enhanced_reasoning"
+      - "vision_capabilities"
+      - "detailed_descriptions"
+
+    focus_areas:
+      - "rich_world_building"
+      - "detailed_narratives"
+      - "complex_scenarios"
+
+  # Qwen Models (Free Tier)
+  qwen_2_5_72b_instruct:
+    name: "Qwen 2.5 72B Instruct"
+    provider: "openrouter"
+    model_id: "qwen/qwen-2.5-72b-instruct:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 60
+    retry_attempts: 3
+    max_requests_per_minute: 10 # Larger model, more conservative
+    context_window: 32768
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.3
+      world_consistency: 8.5
+      user_engagement: 8.0
+      response_time_avg: 3.0
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "large_parameter_count"
+      - "excellent_reasoning"
+      - "multilingual_capabilities"
+      - "strong_instruction_following"
+
+    focus_areas:
+      - "complex_narratives"
+      - "logical_consistency"
+      - "detailed_world_building"
+
+  qwen_3_4b:
+    name: "Qwen 3 4B"
+    provider: "openrouter"
+    model_id: "qwen/qwen3-4b:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 40
+    retry_attempts: 3
+    max_requests_per_minute: 25
+    context_window: 40960
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 7.2
+      world_consistency: 7.4
+      user_engagement: 7.0
+      response_time_avg: 1.5
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "very_fast_inference"
+      - "efficient_processing"
+      - "good_for_testing"
+      - "lightweight_deployment"
+
+    focus_areas:
+      - "rapid_prototyping"
+      - "high_throughput_testing"
+      - "baseline_comparisons"
+
+  # Google Gemma Models (Free Tier)
+  gemma_2_9b_it:
+    name: "Google Gemma 2 9B IT"
+    provider: "openrouter"
+    model_id: "google/gemma-2-9b-it:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 45
+    retry_attempts: 3
+    max_requests_per_minute: 18
+    context_window: 8192
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 7.6
+      world_consistency: 7.8
+      user_engagement: 7.4
+      response_time_avg: 2.2
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "google_architecture"
+      - "good_reasoning"
+      - "reliable_performance"
+      - "instruction_tuned"
+
+    focus_areas:
+      - "consistent_quality"
+      - "logical_progression"
+      - "character_development"
+
+  gemma_3n_2b:
+    name: "Google Gemma 3n 2B"
+    provider: "openrouter"
+    model_id: "google/gemma-3n-2b:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 35
+    retry_attempts: 3
+    max_requests_per_minute: 30
+    context_window: 8192
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 6.8
+      world_consistency: 7.0
+      user_engagement: 6.5
+      response_time_avg: 1.2
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "ultra_fast_inference"
+      - "minimal_resource_usage"
+      - "good_for_load_testing"
+      - "latest_architecture"
+
+    focus_areas:
+      - "performance_benchmarking"
+      - "speed_optimization"
+      - "resource_efficiency"
+
+  # NEW FREE MODELS - Additional specialized models
+
+  # Moonshot AI Kimi K2 (Chinese AI with strong reasoning)
+  moonshot_kimi_k2:
+    name: "Moonshot AI Kimi K2"
+    provider: "openrouter"
+    model_id: "moonshotai/kimi-k2:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 50
+    retry_attempts: 3
+    max_requests_per_minute: 15
+    context_window: 200000 # Large context window
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.1
+      world_consistency: 8.3
+      user_engagement: 7.9
+      response_time_avg: 2.8
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "strong_reasoning_capabilities"
+      - "large_context_window"
+      - "chinese_ai_perspective"
+      - "complex_narrative_handling"
+
+    focus_areas:
+      - "reasoning_intensive_scenarios"
+      - "long_context_management"
+      - "cultural_narrative_diversity"
+      - "complex_problem_solving"
+
+  # Qwen 3 Coder (Specialized for technical narratives)
+  qwen_3_coder:
+    name: "Qwen 3 Coder"
+    provider: "openrouter"
+    model_id: "qwen/qwen3-coder:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.6 # Slightly lower for technical precision
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 45
+    retry_attempts: 3
+    max_requests_per_minute: 20
+    context_window: 32768
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 7.8
+      world_consistency: 8.1
+      user_engagement: 7.6
+      response_time_avg: 2.2
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "technical_narrative_expertise"
+      - "coding_scenario_handling"
+      - "logical_problem_solving"
+      - "systematic_thinking"
+
+    focus_areas:
+      - "sci_fi_technical_scenarios"
+      - "cyberpunk_narratives"
+      - "problem_solving_stories"
+      - "technical_accuracy"
+
+  # Mistral Small 3.2 24B Instruct (European AI with multilingual support)
+  mistral_small_3_2_24b:
+    name: "Mistral Small 3.2 24B Instruct"
+    provider: "openrouter"
+    model_id: "mistralai/mistral-small-3.2-24b-instruct:free"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 55
+    retry_attempts: 3
+    max_requests_per_minute: 12
+    context_window: 32768
+
+    # Cost information (free tier)
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.2
+      world_consistency: 8.4
+      user_engagement: 8.0
+      response_time_avg: 3.1
+      cost_effectiveness: 10.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "multilingual_support"
+      - "european_ai_perspective"
+      - "cultural_sensitivity"
+      - "balanced_performance"
+
+    focus_areas:
+      - "multilingual_narratives"
+      - "cultural_diversity"
+      - "european_storytelling_styles"
+      - "balanced_quality_speed"
+
+  # PAID MODELS SECTION - For comparison purposes
+
+  # GPT-4 Turbo for comparison
+  gpt_4_turbo:
+    name: "GPT-4 Turbo"
+    provider: "openrouter"
+    model_id: "openai/gpt-4-turbo"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 60
+    retry_attempts: 3
+    max_requests_per_minute: 10 # More conservative for paid model
+    context_window: 128000
+
+    # Cost information (approximate)
+    cost_per_1k_input_tokens: 0.01
+    cost_per_1k_output_tokens: 0.03
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.5
+      world_consistency: 8.8
+      user_engagement: 8.2
+      response_time_avg: 4.0
+      cost_effectiveness: 7.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "exceptional_narrative_quality"
+      - "complex_reasoning"
+      - "world_building_excellence"
+      - "therapeutic_sophistication"
+
+    focus_areas:
+      - "narrative_depth"
+      - "complex_character_development"
+      - "therapeutic_integration"
+      - "creative_storytelling"
+
+  # Claude-3.5 Sonnet for comparison
+  claude_3_5_sonnet:
+    name: "Claude-3.5 Sonnet"
+    provider: "openrouter"
+    model_id: "anthropic/claude-3.5-sonnet"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 60
+    retry_attempts: 3
+    max_requests_per_minute: 8 # Conservative for premium model
+    context_window: 200000 # Larger context window
+
+    # Cost information (approximate)
+    cost_per_1k_input_tokens: 0.003
+    cost_per_1k_output_tokens: 0.015
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.7
+      world_consistency: 8.5
+      user_engagement: 8.4
+      response_time_avg: 3.5
+      cost_effectiveness: 8.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "exceptional_writing_quality"
+      - "nuanced_character_development"
+      - "ethical_reasoning"
+      - "therapeutic_sensitivity"
+
+    focus_areas:
+      - "literary_quality"
+      - "emotional_intelligence"
+      - "therapeutic_depth"
+      - "ethical_storytelling"
+
+  # Gemini Pro for comparison
+  gemini_pro:
+    name: "Google Gemini Pro"
+    provider: "openrouter"
+    model_id: "google/gemini-pro"
+    api_endpoint: "https://openrouter.ai/api/v1/chat/completions"
+
+    # Model parameters optimized for TTA
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+
+    # Performance characteristics
+    timeout_seconds: 45
+    retry_attempts: 3
+    max_requests_per_minute: 15
+    context_window: 32000
+
+    # Cost information (approximate)
+    cost_per_1k_input_tokens: 0.0005
+    cost_per_1k_output_tokens: 0.0015
+
+    # Expected performance benchmarks
+    expected_performance:
+      narrative_coherence: 8.0
+      world_consistency: 7.8
+      user_engagement: 7.8
+      response_time_avg: 2.5
+      cost_effectiveness: 9.0
+
+    # Model strengths and focus areas
+    strengths:
+      - "fast_inference"
+      - "good_reasoning"
+      - "cost_effective"
+      - "reliable_performance"
+
+    focus_areas:
+      - "consistent_quality"
+      - "world_state_management"
+      - "logical_progression"
+
+# Comparison scenarios - identical across all models
+comparison_scenarios:
+  narrative_coherence_test:
+    name: "Narrative Coherence Comparison"
+    description: "Test narrative coherence across models using identical fantasy scenario"
+    base_scenario: "fantasy_baseline"
+    target_turns: 25
+    focus_metrics:
+      - "narrative_coherence"
+      - "character_consistency"
+      - "plot_logic"
+
+  world_consistency_test:
+    name: "World State Management Comparison"
+    description: "Test world state consistency using complex fantasy scenario"
+    base_scenario: "fantasy_extended_30"
+    target_turns: 30
+    focus_metrics:
+      - "world_consistency"
+      - "state_persistence"
+      - "choice_impact_tracking"
+
+  therapeutic_integration_test:
+    name: "Therapeutic Integration Comparison"
+    description: "Test therapeutic capabilities using contemporary scenario"
+    base_scenario: "contemporary_extended_40"
+    target_turns: 40
+    focus_metrics:
+      - "therapeutic_integration"
+      - "emotional_depth"
+      - "character_development"
+
+  extended_session_stability_test:
+    name: "Extended Session Stability Comparison"
+    description: "Test model stability over ultra-long sessions"
+    base_scenario: "epic_fantasy_50"
+    target_turns: 50
+    focus_metrics:
+      - "session_stability"
+      - "quality_degradation"
+      - "memory_consistency"
+      - "context_management"
+
+# Comparison analysis configuration
+comparison_analysis:
+  # Statistical analysis
+  statistical_tests:
+    - "t_test" # Compare means between models
+    - "anova" # Compare multiple models simultaneously
+    - "chi_square" # Compare categorical outcomes
+
+  # Performance benchmarking
+  benchmarking:
+    response_time_analysis: true
+    quality_consistency_analysis: true
+    cost_effectiveness_analysis: true
+    scalability_analysis: true
+
+  # Ranking methodology
+  ranking_methodology:
+    weighted_scoring: true
+    weights:
+      narrative_coherence: 0.25
+      world_consistency: 0.20
+      user_engagement: 0.20
+      therapeutic_integration: 0.15
+      cost_effectiveness: 0.10
+      response_time: 0.10
+
+    # Normalization method
+    normalization: "min_max" # "min_max", "z_score", "rank"
+
+  # Report generation
+  report_generation:
+    comparative_charts: true
+    statistical_significance_tables: true
+    cost_benefit_analysis: true
+    recommendation_engine: true
+
+    # Visualization types
+    visualizations:
+      - "radar_chart" # Multi-dimensional comparison
+      - "box_plot" # Quality distribution comparison
+      - "scatter_plot" # Cost vs. performance
+      - "line_chart" # Quality over time
+      - "heatmap" # Model vs. metric performance
+
+# Model selection recommendations
+model_selection_criteria:
+  # Use case specific recommendations
+  use_cases:
+    development_testing:
+      priority_metrics: ["cost_effectiveness", "response_time", "reliability"]
+      recommended_models:
+        - "llama_3_3_8b_instruct" # Best overall free model
+        - "qwen_3_4b" # Fastest inference
+        - "gemma_3n_2b" # Ultra-fast testing
+        - "gemma_2_9b_it" # Reliable performance
+        - "qwen_2_5_72b_instruct" # Complex testing
+
+    production_deployment:
+      priority_metrics:
+        ["narrative_coherence", "world_consistency", "user_engagement"]
+      recommended_models: ["gpt_4_turbo", "claude_3_5_sonnet"]
+
+    therapeutic_applications:
+      priority_metrics:
+        ["therapeutic_integration", "emotional_depth", "ethical_reasoning"]
+      recommended_models: ["claude_3_5_sonnet", "gpt_4_turbo"]
+
+    extended_sessions:
+      priority_metrics:
+        ["session_stability", "memory_consistency", "quality_degradation"]
+      recommended_models: ["claude_3_5_sonnet", "llama_3_3_8b_instruct"]
+
+  # Budget considerations
+  budget_tiers:
+    free_tier:
+      max_cost_per_session: 0.0
+      recommended_models:
+        - "llama_3_3_8b_instruct" # Best overall free model
+        - "qwen_2_5_72b_instruct" # Largest free model
+        - "llama_3_2_11b_vision_instruct" # Enhanced reasoning
+        - "gemma_2_9b_it" # Google architecture
+        - "llama_3_1_8b_instruct" # Baseline comparison
+        - "qwen_3_4b" # Speed testing
+        - "gemma_3n_2b" # Ultra-fast inference
+
+    low_budget:
+      max_cost_per_session: 0.50
+      recommended_models: ["gemini_pro", "llama_3_3_8b_instruct"]
+
+    medium_budget:
+      max_cost_per_session: 2.00
+      recommended_models: ["claude_3_5_sonnet", "gpt_4_turbo"]
+
+    high_budget:
+      max_cost_per_session: 5.00
+      recommended_models: ["gpt_4_turbo", "claude_3_5_sonnet"]
+
+# A/B testing configuration
+ab_testing:
+  enabled: true
+  test_duration_days: 7
+  sample_size_per_variant: 50
+  significance_threshold: 0.05
+
+  # Test variants
+  variants:
+    control:
+      model: "llama_3_3_8b_instruct"
+      description: "Current baseline model"
+
+    variant_a:
+      model: "qwen_2_5_72b_instruct"
+      description: "Largest free model comparison"
+
+    variant_b:
+      model: "llama_3_2_11b_vision_instruct"
+      description: "Enhanced reasoning free model"
+
+    variant_c:
+      model: "gemma_2_9b_it"
+      description: "Google architecture free model"
+
+    variant_d:
+      model: "gpt_4_turbo"
+      description: "Premium model comparison"
+
+    variant_e:
+      model: "claude_3_5_sonnet"
+      description: "Alternative premium model"
+
+    # NEW FREE MODEL VARIANTS
+    variant_f:
+      model: "moonshot_kimi_k2"
+      description: "Chinese AI with strong reasoning capabilities"
+
+    variant_g:
+      model: "qwen_3_coder"
+      description: "Technical narrative specialist model"
+
+    variant_h:
+      model: "mistral_small_3_2_24b"
+      description: "European AI with multilingual support"
+
+  # Success metrics for A/B testing
+  success_metrics:
+    primary: "overall_quality_score"
+    secondary: ["user_engagement", "narrative_coherence", "cost_effectiveness"]

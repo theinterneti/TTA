@@ -1,8 +1,8 @@
 import os
 
 import pytest
+from tta_ai.orchestration.workflow_transaction import WorkflowTransaction
 
-from src.agent_orchestration.workflow_transaction import WorkflowTransaction
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 

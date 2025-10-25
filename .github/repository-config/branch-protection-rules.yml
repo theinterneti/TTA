@@ -1,0 +1,294 @@
+# GitHub Branch Protection Rules Configuration for TTA Repository
+# This file documents the required branch protection rules
+
+# =============================================================================
+# BRANCH PROTECTION RULES SETUP
+# =============================================================================
+# Navigate to: Repository Settings > Branches
+# Configure the following protection rules for each branch
+
+# =============================================================================
+# MAIN BRANCH PROTECTION
+# =============================================================================
+main:
+  description: "Production branch - highest protection level"
+
+  # Status Checks
+  required_status_checks:
+    strict: true  # Require branches to be up to date before merging
+    contexts:
+      # Core E2E Tests (must pass)
+      - "E2E Tests (chromium - auth)"
+      - "E2E Tests (chromium - dashboard)"
+      - "E2E Tests (chromium - character)"
+      - "E2E Tests (chromium - chat)"
+      - "E2E Tests (chromium - settings)"
+
+      # Critical Quality Gates
+      - "Comprehensive Accessibility Audit"
+      - "Performance Benchmarks"
+      - "Security Scan"
+
+      # Optional but recommended
+      - "Visual Regression Testing"
+      - "Mobile E2E Tests (Mobile Chrome - auth)"
+
+  # Pull Request Reviews
+  required_pull_request_reviews:
+    required_approving_review_count: 2
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: true
+    require_last_push_approval: true
+    bypass_pull_request_allowances:
+      users: []  # No bypass users for main branch
+      teams: []  # No bypass teams for main branch
+
+  # Additional Restrictions
+  restrictions:
+    users: []  # No direct push restrictions by user
+    teams: ["tta-core-team"]  # Only core team can push directly (emergency only)
+    apps: []
+
+  # Administrative Settings
+  enforce_admins: false  # Allow admins to bypass in emergencies
+  allow_force_pushes: false
+  allow_deletions: false
+  required_linear_history: true
+  allow_auto_merge: true
+  delete_branch_on_merge: true
+
+# =============================================================================
+# DEVELOP BRANCH PROTECTION
+# =============================================================================
+develop:
+  description: "Development integration branch - moderate protection"
+
+  # Status Checks
+  required_status_checks:
+    strict: true
+    contexts:
+      # Core E2E Tests (reduced set for faster feedback)
+      - "E2E Tests (chromium - auth)"
+      - "E2E Tests (chromium - dashboard)"
+      - "E2E Tests (chromium - character)"
+
+      # Quality Gates
+      - "Comprehensive Accessibility Audit"
+      - "Security Scan"
+
+  # Pull Request Reviews
+  required_pull_request_reviews:
+    required_approving_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: false
+    bypass_pull_request_allowances:
+      users: []
+      teams: ["tta-dev-team"]
+
+  # Additional Restrictions
+  restrictions:
+    users: []
+    teams: ["tta-dev-team", "tta-core-team"]
+    apps: []
+
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: false
+  allow_deletions: false
+  required_linear_history: false
+  allow_auto_merge: true
+  delete_branch_on_merge: true
+
+# =============================================================================
+# INTEGRATION/* BRANCHES PROTECTION
+# =============================================================================
+integration/*:
+  description: "Integration branches for feature testing"
+
+  # Status Checks
+  required_status_checks:
+    strict: false  # Allow merging without being up to date
+    contexts:
+      # Minimal required tests
+      - "E2E Tests (chromium - auth)"
+      - "Security Scan"
+
+  # Pull Request Reviews
+  required_pull_request_reviews:
+    required_approving_review_count: 1
+    dismiss_stale_reviews: false
+    require_code_owner_reviews: false
+    require_last_push_approval: false
+    bypass_pull_request_allowances:
+      users: []
+      teams: ["tta-dev-team", "tta-qa-team"]
+
+  # Additional Restrictions
+  restrictions: null  # No push restrictions
+
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: true  # Allow force pushes for integration branches
+  allow_deletions: true
+  required_linear_history: false
+  allow_auto_merge: false
+  delete_branch_on_merge: true
+
+# =============================================================================
+# RELEASE/* BRANCHES PROTECTION
+# =============================================================================
+release/*:
+  description: "Release preparation branches"
+
+  # Status Checks
+  required_status_checks:
+    strict: true
+    contexts:
+      # Full test suite for releases
+      - "E2E Tests (chromium - auth)"
+      - "E2E Tests (chromium - dashboard)"
+      - "E2E Tests (chromium - character)"
+      - "E2E Tests (chromium - chat)"
+      - "E2E Tests (chromium - settings)"
+      - "E2E Tests (chromium - accessibility)"
+      - "E2E Tests (chromium - responsive)"
+      - "Comprehensive Accessibility Audit"
+      - "Performance Benchmarks"
+      - "Visual Regression Testing"
+      - "Security Scan"
+
+  # Pull Request Reviews
+  required_pull_request_reviews:
+    required_approving_review_count: 2
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: true
+    require_last_push_approval: true
+    bypass_pull_request_allowances:
+      users: []
+      teams: ["tta-release-team"]
+
+  # Additional Restrictions
+  restrictions:
+    users: []
+    teams: ["tta-core-team", "tta-release-team"]
+    apps: []
+
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: false
+  allow_deletions: false
+  required_linear_history: true
+  allow_auto_merge: false
+  delete_branch_on_merge: false  # Keep release branches
+
+# =============================================================================
+# HOTFIX/* BRANCHES PROTECTION
+# =============================================================================
+hotfix/*:
+  description: "Emergency hotfix branches"
+
+  # Status Checks
+  required_status_checks:
+    strict: false  # Allow fast hotfixes
+    contexts:
+      # Critical tests only
+      - "E2E Tests (chromium - auth)"
+      - "Security Scan"
+
+  # Pull Request Reviews
+  required_pull_request_reviews:
+    required_approving_review_count: 1
+    dismiss_stale_reviews: false
+    require_code_owner_reviews: true
+    require_last_push_approval: false
+    bypass_pull_request_allowances:
+      users: []
+      teams: ["tta-core-team"]
+
+  # Additional Restrictions
+  restrictions:
+    users: []
+    teams: ["tta-core-team"]
+    apps: []
+
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: false
+  allow_deletions: true
+  required_linear_history: false
+  allow_auto_merge: false
+  delete_branch_on_merge: true
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+
+# Method 1: GitHub Web Interface
+# 1. Go to Repository Settings > Branches
+# 2. Click "Add rule" for each branch pattern
+# 3. Configure settings as specified above
+# 4. Save each rule
+
+# Method 2: GitHub CLI (Recommended for automation)
+# Install GitHub CLI: https://cli.github.com/
+#
+# # Main branch protection
+# gh api repos/:owner/:repo/branches/main/protection \
+#   --method PUT \
+#   --field required_status_checks='{"strict":true,"contexts":["E2E Tests (chromium - auth)","Comprehensive Accessibility Audit"]}' \
+#   --field required_pull_request_reviews='{"required_approving_review_count":2,"dismiss_stale_reviews":true,"require_code_owner_reviews":true}' \
+#   --field enforce_admins=false \
+#   --field allow_force_pushes=false \
+#   --field allow_deletions=false
+#
+# # Develop branch protection
+# gh api repos/:owner/:repo/branches/develop/protection \
+#   --method PUT \
+#   --field required_status_checks='{"strict":true,"contexts":["E2E Tests (chromium - auth)","Security Scan"]}' \
+#   --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true}' \
+#   --field enforce_admins=false
+
+# Method 3: Terraform (Infrastructure as Code)
+# Use the github_branch_protection resource:
+#
+# resource "github_branch_protection" "main" {
+#   repository_id = github_repository.repo.node_id
+#   pattern       = "main"
+#
+#   required_status_checks {
+#     strict = true
+#     contexts = [
+#       "E2E Tests (chromium - auth)",
+#       "Comprehensive Accessibility Audit"
+#     ]
+#   }
+#
+#   required_pull_request_reviews {
+#     required_approving_review_count = 2
+#     dismiss_stale_reviews = true
+#     require_code_owner_reviews = true
+#   }
+# }
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+# After setting up branch protection rules:
+# 1. Test with a sample PR to each protected branch
+# 2. Verify that required status checks are enforced
+# 3. Confirm that review requirements work correctly
+# 4. Test bypass permissions for emergency scenarios
+# 5. Document any exceptions or special cases
+
+# =============================================================================
+# MAINTENANCE
+# =============================================================================
+
+# Regular tasks:
+# - Review and update required status checks as new tests are added
+# - Adjust review requirements based on team size and workflow
+# - Monitor bypass usage and ensure it's only for emergencies
+# - Update team permissions as team structure changes
+# - Quarterly review of all protection rules for effectiveness

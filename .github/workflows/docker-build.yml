@@ -61,12 +61,12 @@ jobs:
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             # For PRs, only build changed Dockerfiles
             changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-            
+
             builds='[]'
             for name in "${!dockerfiles[@]}"; do
               dockerfile="${dockerfiles[$name]}"
               context=$(dirname "$dockerfile")
-              
+
               # Check if Dockerfile or its context changed
               if echo "$changed_files" | grep -q "$dockerfile\|$context"; then
                 builds=$(echo "$builds" | jq -c ". + [{\"name\": \"$name\", \"dockerfile\": \"$dockerfile\", \"context\": \"$context\"}]")
@@ -179,16 +179,16 @@ jobs:
         run: |
           # Get the first tag from the metadata
           IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
-          
+
           echo "Testing image: $IMAGE_TAG"
-          
+
           # Basic smoke test - check if image exists and can be inspected
           docker image inspect "$IMAGE_TAG" > /dev/null
-          
+
           # Check image size
           SIZE=$(docker image inspect "$IMAGE_TAG" --format='{{.Size}}' | awk '{print $1/1024/1024}')
           echo "Image size: ${SIZE}MB"
-          
+
           # Warn if image is too large (>2GB)
           if (( $(echo "$SIZE > 2048" | bc -l) )); then
             echo "⚠️  Warning: Image size is larger than 2GB"
@@ -211,8 +211,8 @@ jobs:
 
       - name: Push Docker image
         if: |
-          github.event_name != 'pull_request' && 
-          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || 
+          github.event_name != 'pull_request' &&
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' ||
            github.event.inputs.push_images == 'true')
         uses: docker/build-push-action@v5
         with:
@@ -238,11 +238,11 @@ jobs:
         run: |
           echo "## 🐳 Docker Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ needs.detect-changes.outputs.has_changes }}" == "true" ]; then
             echo "### Built Images" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             if [ "${{ needs.build-and-test.result }}" == "success" ]; then
               echo "✅ All Docker images built successfully" >> $GITHUB_STEP_SUMMARY
             elif [ "${{ needs.build-and-test.result }}" == "failure" ]; then
@@ -250,7 +250,7 @@ jobs:
             else
               echo "⚠️  Docker build status: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
             fi
-            
+
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Registry:** ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
@@ -264,4 +264,3 @@ jobs:
         run: |
           echo "❌ Docker build failed"
           exit 1
-

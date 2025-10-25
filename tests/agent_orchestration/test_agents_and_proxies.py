@@ -1,8 +1,7 @@
 import asyncio
 
 import pytest
-
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentRegistry,
     AgentType,
     InputProcessorAgentProxy,

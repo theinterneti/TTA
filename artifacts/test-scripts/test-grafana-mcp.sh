@@ -96,7 +96,7 @@ if echo "$DATASOURCES" | grep -q '\['; then
     log_success "Datasources accessible"
     DATASOURCE_COUNT=$(echo "$DATASOURCES" | grep -o '"name"' | wc -l)
     log_info "Found $DATASOURCE_COUNT datasource(s)"
-    
+
     # List datasources
     echo "$DATASOURCES" | grep -o '"name":"[^"]*"' | cut -d'"' -f4 | while read -r ds; do
         log_info "  - $ds"

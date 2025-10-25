@@ -1,6 +1,6 @@
 /**
  * Enhanced Player Preference Types for TTA Therapeutic Storytelling Platform
- * 
+ *
  * This file defines comprehensive player preference types that enable
  * personalized therapeutic experiences through AI-powered storytelling.
  */
@@ -42,36 +42,36 @@ export enum PreferredSetting {
 
 export interface PlayerPreferences {
   player_id: string;
-  
+
   // Core therapeutic settings
   intensity_level: IntensityLevel;
   preferred_approaches: TherapeuticApproach[];
   conversation_style: ConversationStyle;
-  
+
   // Therapeutic goals and focus areas
   therapeutic_goals: string[];
   primary_concerns: string[];
-  
+
   // Character and narrative customization
   character_name: string;
   preferred_setting: PreferredSetting;
-  
+
   // Content preferences
   comfort_topics: string[];
   trigger_topics: string[];
   avoid_topics: string[];
-  
+
   // Session preferences
   session_duration_preference: number; // in minutes
   reminder_frequency: 'daily' | 'weekly' | 'monthly' | 'never';
-  
+
   // Advanced preferences
   crisis_contact_info?: {
     emergency_contact: string;
     therapist_contact?: string;
     preferred_crisis_resources: string[];
   };
-  
+
   // Metadata
   created_at: string;
   updated_at: string;

@@ -412,12 +412,11 @@ class TherapeuticWorkflowManager:
 
         if crisis_risk == "crisis":
             return "crisis"
-        elif crisis_risk == "high" or valence < -0.6:
+        if crisis_risk == "high" or valence < -0.6:
             return "distressed"
-        elif valence > 0.3:
+        if valence > 0.3:
             return "engaged"
-        else:
-            return "stable"
+        return "stable"
 
     def _route_based_on_safety(self, state: WorkflowState) -> str:
         """Route workflow based on safety assessment"""
@@ -425,10 +424,9 @@ class TherapeuticWorkflowManager:
 
         if safety_level == "crisis":
             return "crisis"
-        elif safety_level == "needs_support":
+        if safety_level == "needs_support":
             return "needs_support"
-        else:
-            return "safe"
+        return "safe"
 
     def _check_crisis_keywords(self, message: str) -> bool:
         """Check for crisis-related keywords"""
@@ -452,10 +450,9 @@ class TherapeuticWorkflowManager:
 
         if crisis_risk in ["high", "crisis"]:
             return "crisis_intervention"
-        elif state["therapeutic_context"].get("skill_building_needed", False):
+        if state["therapeutic_context"].get("skill_building_needed", False):
             return "skill_building"
-        else:
-            return "main_therapeutic"
+        return "main_therapeutic"
 
     def _extract_workflow_response(self, result: WorkflowState) -> dict[str, Any]:
         """Extract structured response from workflow result"""

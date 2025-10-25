@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
+    "@craco/craco": "^7.1.0",
     "@playwright/test": "^1.55.0",
     "@storybook/test-runner": "^0.23.0",
     "@tailwindcss/forms": "^0.5.7",
@@ -46,18 +47,13 @@
   },
   "overrides": {
     "nth-check": "^2.1.1",
-    "postcss": "^8.4.47",
-    "webpack-dev-server": "^5.2.1"
-  },
-  "overrides": {
-    "nth-check": "^2.1.1",
     "postcss": "^8.4.31",
     "webpack-dev-server": "^5.2.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -86,6 +82,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://localhost:3004"
+  }
 }

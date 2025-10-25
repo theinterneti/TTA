@@ -1,5 +1,5 @@
 """
-Data models for the Model Management System
+Data models for the Model Management System.
 
 This module contains the core data structures used throughout the model
 management system.
@@ -51,6 +51,12 @@ class ModelConfiguration:
     api_key: str | None = None
     api_base: str | None = None
     model_path: str | None = None
+
+    # Security configuration for local models
+    # Git revision (commit hash or tag) to pin when using trust_remote_code=True
+    # This prevents arbitrary code execution from Hugging Face Hub
+    revision: str | None = None
+    trust_remote_code: bool = False
 
     # Generation parameters
     max_tokens: int = 2048
@@ -158,6 +164,13 @@ class ProviderConfiguration:
     max_concurrent_models: int = 2
     auto_quantization: bool = True
     gpu_memory_fraction: float = 0.8
+
+    # Security settings for local models
+    # Map of model_id to trusted git revision (commit hash or tag)
+    # Required when trust_remote_code=True to prevent arbitrary code execution
+    trusted_model_revisions: dict[str, str] = field(default_factory=dict)
+    # Require revision pinning for all models with trust_remote_code=True
+    require_revision_pinning: bool = True
 
     # Ollama settings
     ollama_host: str = "localhost"

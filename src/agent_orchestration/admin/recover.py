@@ -3,9 +3,8 @@ from __future__ import annotations
 import asyncio
 
 from redis.asyncio import Redis
-
-from src.agent_orchestration.coordinators import RedisMessageCoordinator
-from src.agent_orchestration.models import AgentId, AgentType
+from tta_ai.orchestration.coordinators import RedisMessageCoordinator
+from tta_ai.orchestration.models import AgentId, AgentType
 
 
 async def run_recovery(redis_url: str, key_prefix: str = "ao") -> dict[str, int]:

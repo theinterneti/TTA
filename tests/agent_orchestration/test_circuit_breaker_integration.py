@@ -8,16 +8,15 @@ metrics collection, and integration with workflow error handling.
 import asyncio
 
 import pytest
-
-from src.agent_orchestration.circuit_breaker import (
+from tta_ai.orchestration.circuit_breaker import (
     CircuitBreaker,
     CircuitBreakerConfig,
     CircuitBreakerOpenError,
     CircuitBreakerState,
 )
-from src.agent_orchestration.circuit_breaker_metrics import get_circuit_breaker_metrics
-from src.agent_orchestration.circuit_breaker_registry import CircuitBreakerRegistry
-from src.agent_orchestration.resource_exhaustion_detector import (
+from tta_ai.orchestration.circuit_breaker_metrics import get_circuit_breaker_metrics
+from tta_ai.orchestration.circuit_breaker_registry import CircuitBreakerRegistry
+from tta_ai.orchestration.resource_exhaustion_detector import (
     ResourceExhaustionDetector,
     ResourceExhaustionEvent,
     ResourceThresholds,
@@ -268,6 +267,125 @@ async def test_circuit_breaker_cleanup(redis_client):
     assert "total_circuit_breakers" in stats
     assert "state_counts" in stats
     assert stats["total_circuit_breakers"] >= 2
+
+
+@pytest.mark.redis
+@pytest.mark.asyncio
+async def test_circuit_breaker_execute_method(redis_client):
+    """Test circuit breaker execute method with arguments."""
+    config = CircuitBreakerConfig(
+        failure_threshold=2,
+        timeout_seconds=1,
+        recovery_timeout_seconds=2,
+        half_open_max_calls=1,
+        success_threshold=1,
+    )
+
+    cb = CircuitBreaker(redis_client, "execute_test", config, key_prefix="test")
+    await cb.initialize()
+
+    # Test execute with arguments
+    async def add_func(a, b):
+        return a + b
+
+    result = await cb.execute(add_func, 2, 3)
+    assert result == 5
+
+    # Test execute with keyword arguments
+    async def greet_func(name, greeting="Hello"):
+        return f"{greeting}, {name}!"
+
+    result = await cb.execute(greet_func, "World", greeting="Hi")
+    assert result == "Hi, World!"
+
+    # Test execute with failure
+    async def failure_func(msg):
+        raise ValueError(msg)
+
+    with pytest.raises(ValueError, match="test error"):
+        await cb.execute(failure_func, "test error")
+
+
+@pytest.mark.redis
+@pytest.mark.asyncio
+async def test_circuit_breaker_execute_state_transitions(redis_client):
+    """Test circuit breaker execute method with state transitions."""
+    config = CircuitBreakerConfig(
+        failure_threshold=1,
+        timeout_seconds=0.1,
+        recovery_timeout_seconds=0.2,
+        half_open_max_calls=1,
+        success_threshold=1,
+    )
+
+    cb = CircuitBreaker(redis_client, "execute_state_test", config, key_prefix="test")
+    await cb.initialize()
+
+    # Start in CLOSED state
+    assert await cb.get_state() == CircuitBreakerState.CLOSED
+
+    # Trigger failure to open circuit
+    async def failure_func(msg):
+        raise Exception(msg)
+
+    with pytest.raises(Exception, match="test failure"):
+        await cb.execute(failure_func, "test failure")
+
+    # Should be OPEN now
+    assert await cb.get_state() == CircuitBreakerState.OPEN
+
+    # Calls should be rejected
+    async def success_func(value):
+        return value
+
+    with pytest.raises(CircuitBreakerOpenError):
+        await cb.execute(success_func, "test")
+
+    # Wait for timeout to allow transition to HALF_OPEN
+    await asyncio.sleep(0.15)
+
+    # Next call should transition to HALF_OPEN and succeed
+    result = await cb.execute(success_func, "recovered")
+    assert result == "recovered"
+
+    # Should be CLOSED now after successful call in HALF_OPEN
+    assert await cb.get_state() == CircuitBreakerState.CLOSED
+
+
+@pytest.mark.redis
+@pytest.mark.asyncio
+async def test_circuit_breaker_execute_with_metrics(redis_client):
+    """Test circuit breaker execute method metrics collection."""
+    config = CircuitBreakerConfig(failure_threshold=2)
+    cb = CircuitBreaker(redis_client, "execute_metrics_test", config, key_prefix="test")
+    await cb.initialize()
+
+    # Get initial metrics
+    metrics_collector = get_circuit_breaker_metrics()
+    initial_snapshot = metrics_collector.get_snapshot()
+
+    # Perform operations with execute
+    async def success_func(value):
+        return value * 2
+
+    async def failure_func(msg):
+        raise Exception(msg)
+
+    # Successful calls
+    result1 = await cb.execute(success_func, 5)
+    assert result1 == 10
+
+    result2 = await cb.execute(success_func, 10)
+    assert result2 == 20
+
+    # Failed call
+    with pytest.raises(Exception):
+        await cb.execute(failure_func, "test error")
+
+    # Check metrics were updated
+    final_snapshot = metrics_collector.get_snapshot()
+    assert final_snapshot["successful_calls"] > initial_snapshot["successful_calls"]
+    assert final_snapshot["failed_calls"] > initial_snapshot["failed_calls"]
 
 
 if __name__ == "__main__":

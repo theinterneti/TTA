@@ -45,21 +45,21 @@ interface ModelManagementState {
   freeModels: ModelInfo[];
   affordableModels: ModelInfo[];
   selectedModel: ModelInfo | null;
-  
+
   // Filter settings
   filterSettings: FilterSettings;
   activeFilter: 'all' | 'free' | 'affordable';
   costThreshold: number;
-  
+
   // User preferences
   userPreferences: UserPreferences;
-  
+
   // UI state
   isLoading: boolean;
   isLoadingModels: boolean;
   isLoadingFilter: boolean;
   error: string | null;
-  
+
   // Analytics
   selectionHistory: ModelSelectionEvent[];
   filterUsageStats: {
@@ -67,7 +67,7 @@ interface ModelManagementState {
     affordable_filter_usage: number;
     all_models_usage: number;
   };
-  
+
   // Performance data
   modelPerformance: Record<string, any>;
   systemStatus: any;
@@ -78,7 +78,7 @@ const initialState: ModelManagementState = {
   freeModels: [],
   affordableModels: [],
   selectedModel: null,
-  
+
   filterSettings: {
     show_free_only: false,
     prefer_free_models: true,
@@ -86,7 +86,7 @@ const initialState: ModelManagementState = {
   },
   activeFilter: 'all',
   costThreshold: 0.001,
-  
+
   userPreferences: {
     preferred_providers: ['openrouter'],
     cost_tolerance: 0.001,
@@ -95,19 +95,19 @@ const initialState: ModelManagementState = {
     show_performance_metrics: true,
     model_switching_frequency: 'medium',
   },
-  
+
   isLoading: false,
   isLoadingModels: false,
   isLoadingFilter: false,
   error: null,
-  
+
   selectionHistory: [],
   filterUsageStats: {
     free_filter_usage: 0,
     affordable_filter_usage: 0,
     all_models_usage: 0,
   },
-  
+
   modelPerformance: {},
   systemStatus: null,
 };
@@ -170,7 +170,7 @@ export const trackModelSelection = createAsyncThunk(
       user_id: data.userId,
       session_id: data.sessionId,
     };
-    
+
     await analyticsAPI.trackModelSelection(analyticsData);
     return {
       model_id: data.model.model_id,
@@ -218,27 +218,27 @@ const modelManagementSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    
+
     setSelectedModel: (state, action: PayloadAction<ModelInfo>) => {
       state.selectedModel = action.payload;
     },
-    
+
     setActiveFilter: (state, action: PayloadAction<'all' | 'free' | 'affordable'>) => {
       state.activeFilter = action.payload;
     },
-    
+
     setCostThreshold: (state, action: PayloadAction<number>) => {
       state.costThreshold = action.payload;
     },
-    
+
     updateFilterSettings: (state, action: PayloadAction<Partial<FilterSettings>>) => {
       state.filterSettings = { ...state.filterSettings, ...action.payload };
     },
-    
+
     updateUserPreferences: (state, action: PayloadAction<Partial<UserPreferences>>) => {
       state.userPreferences = { ...state.userPreferences, ...action.payload };
     },
-    
+
     addSelectionToHistory: (state, action: PayloadAction<ModelSelectionEvent>) => {
       state.selectionHistory.unshift(action.payload);
       // Keep only last 50 selections
@@ -246,16 +246,16 @@ const modelManagementSlice = createSlice({
         state.selectionHistory = state.selectionHistory.slice(0, 50);
       }
     },
-    
+
     incrementFilterUsage: (state, action: PayloadAction<'free_filter_usage' | 'affordable_filter_usage' | 'all_models_usage'>) => {
       state.filterUsageStats[action.payload]++;
     },
-    
+
     resetState: (state) => {
       return { ...initialState, userPreferences: state.userPreferences };
     },
   },
-  
+
   extraReducers: (builder) => {
     // Fetch available models
     builder
@@ -271,7 +271,7 @@ const modelManagementSlice = createSlice({
         state.isLoadingModels = false;
         state.error = action.error.message || 'Failed to fetch available models';
       });
-    
+
     // Fetch free models
     builder
       .addCase(fetchFreeModels.pending, (state) => {
@@ -285,7 +285,7 @@ const modelManagementSlice = createSlice({
         state.isLoadingModels = false;
         state.error = action.error.message || 'Failed to fetch free models';
       });
-    
+
     // Fetch affordable models
     builder
       .addCase(fetchAffordableModels.pending, (state) => {
@@ -299,7 +299,7 @@ const modelManagementSlice = createSlice({
         state.isLoadingModels = false;
         state.error = action.error.message || 'Failed to fetch affordable models';
       });
-    
+
     // Fetch OpenRouter filter
     builder
       .addCase(fetchOpenRouterFilter.pending, (state) => {
@@ -315,7 +315,7 @@ const modelManagementSlice = createSlice({
         state.isLoadingFilter = false;
         state.error = action.error.message || 'Failed to fetch filter settings';
       });
-    
+
     // Update OpenRouter filter
     builder
       .addCase(updateOpenRouterFilter.pending, (state) => {
@@ -331,7 +331,7 @@ const modelManagementSlice = createSlice({
         state.isLoadingFilter = false;
         state.error = action.error.message || 'Failed to update filter settings';
       });
-    
+
     // Track model selection
     builder
       .addCase(trackModelSelection.fulfilled, (state, action) => {
@@ -340,7 +340,7 @@ const modelManagementSlice = createSlice({
           state.selectionHistory = state.selectionHistory.slice(0, 50);
         }
       });
-    
+
     // Track filter usage
     builder
       .addCase(trackFilterUsage.fulfilled, (state, action) => {
@@ -353,7 +353,7 @@ const modelManagementSlice = createSlice({
           state.filterUsageStats.all_models_usage++;
         }
       });
-    
+
     // Fetch system status
     builder
       .addCase(fetchSystemStatus.pending, (state) => {

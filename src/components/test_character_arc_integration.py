@@ -252,9 +252,8 @@ async def main():
     if integration_test_result and fallback_test_result:
         logger.info("All Character Arc Integration tests passed")
         return True
-    else:
-        logger.error("Some Character Arc Integration tests failed")
-        return False
+    logger.error("Some Character Arc Integration tests failed")
+    return False
 
 
 if __name__ == "__main__":
