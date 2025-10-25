@@ -229,9 +229,7 @@ class ToolNameValidator:
                 )
                 score *= 0.95
 
-        is_valid = score > 0.0 and not any(
-            f.severity == ValidationSeverity.ERROR for f in findings
-        )
+        is_valid = score > 0.0 and not any(f.severity == ValidationSeverity.ERROR for f in findings)
 
         return ValidationResult(
             is_valid=is_valid,
@@ -386,4 +384,3 @@ class ToolDescriptionValidator:
             findings=findings,
             details={"length": desc_len, "first_word": first_word},
         )
-

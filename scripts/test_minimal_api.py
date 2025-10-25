@@ -3,9 +3,10 @@
 Test script for the minimal TTA API server to validate integration.
 """
 
-import requests
-import json
 import sys
+
+import requests
+
 
 def test_api():
     """Test the minimal API server."""
@@ -40,7 +41,7 @@ def test_api():
         if response.status_code == 200:
             auth_data = response.json()
             token = auth_data["access_token"]
-            print(f"✅ Authentication successful")
+            print("✅ Authentication successful")
             print(f"   Token: {token[:20]}...")
         else:
             print(f"❌ Authentication failed: {response.status_code}")
@@ -68,7 +69,7 @@ def test_api():
             openapi_spec = response.json()
             paths = openapi_spec.get("paths", {})
             gameplay_endpoints = [path for path in paths.keys() if "/gameplay/" in path]
-            print(f"✅ OpenAPI spec accessible")
+            print("✅ OpenAPI spec accessible")
             print(f"   Gameplay endpoints found: {len(gameplay_endpoints)}")
             for endpoint in gameplay_endpoints:
                 print(f"   - {endpoint}")
@@ -110,12 +111,12 @@ def test_api():
 
             if session_response.status_code == 200:
                 session_info = session_response.json()
-                print(f"✅ Session creation successful")
+                print("✅ Session creation successful")
                 print(f"   Session ID: {session_info['session_id']}")
             else:
                 print(f"⚠️  Session creation returned {session_response.status_code}")
-                print(f"   This is expected due to token validation in minimal server")
-                print(f"   API structure is correct - integration validated")
+                print("   This is expected due to token validation in minimal server")
+                print("   API structure is correct - integration validated")
 
     except Exception as e:
         print(f"❌ Session creation error: {e}")

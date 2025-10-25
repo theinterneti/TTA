@@ -7,8 +7,7 @@ to achieve comprehensive coverage of retry, timing, logging, and singleton funct
 
 import logging
 import time
-from pathlib import Path
-from unittest.mock import Mock, call, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -113,6 +112,7 @@ class TestTimingDecorator:
 
     def test_timing_decorator_logs_execution_time(self, caplog):
         """Test that timing decorator logs execution time."""
+
         @timing_decorator
         def slow_func():
             time.sleep(0.1)
@@ -128,6 +128,7 @@ class TestTimingDecorator:
 
     def test_timing_decorator_preserves_function_name(self):
         """Test that timing decorator preserves function metadata."""
+
         @timing_decorator
         def my_function():
             """My docstring."""
@@ -138,6 +139,7 @@ class TestTimingDecorator:
 
     def test_timing_decorator_with_arguments(self, caplog):
         """Test timing decorator with function arguments."""
+
         @timing_decorator
         def func_with_args(a, b, c=3):
             time.sleep(0.05)
@@ -155,6 +157,7 @@ class TestLogEntryExitDecorator:
 
     def test_log_entry_exit_logs_entry_and_exit(self, caplog):
         """Test that log_entry_exit logs function entry and exit."""
+
         @log_entry_exit
         def test_func():
             return "result"
@@ -170,6 +173,7 @@ class TestLogEntryExitDecorator:
 
     def test_log_entry_exit_preserves_function_name(self):
         """Test that log_entry_exit preserves function metadata."""
+
         @log_entry_exit
         def my_function():
             """My docstring."""
@@ -180,6 +184,7 @@ class TestLogEntryExitDecorator:
 
     def test_log_entry_exit_with_arguments(self, caplog):
         """Test log_entry_exit with function arguments."""
+
         @log_entry_exit
         def func_with_args(a, b):
             return a + b
@@ -194,6 +199,7 @@ class TestLogEntryExitDecorator:
 
     def test_log_entry_exit_with_exception(self, caplog):
         """Test that log_entry_exit logs even when function raises exception."""
+
         @log_entry_exit
         def failing_func():
             raise ValueError("test error")
@@ -212,6 +218,7 @@ class TestSingletonDecorator:
 
     def test_singleton_returns_same_instance(self):
         """Test that singleton returns the same instance."""
+
         @singleton
         class TestClass:
             def __init__(self, value):
@@ -226,6 +233,7 @@ class TestSingletonDecorator:
 
     def test_singleton_with_different_classes(self):
         """Test that singleton maintains separate instances for different classes."""
+
         @singleton
         class ClassA:
             def __init__(self, value):
@@ -245,6 +253,7 @@ class TestSingletonDecorator:
 
     def test_singleton_with_no_args(self):
         """Test singleton with class that takes no arguments."""
+
         @singleton
         class NoArgsClass:
             def __init__(self):
@@ -258,9 +267,11 @@ class TestSingletonDecorator:
 
     def test_singleton_preserves_class_name(self):
         """Test that singleton preserves class metadata."""
+
         @singleton
         class MyClass:
             """My class docstring."""
+
             pass
 
         # Note: singleton wraps the class, so __name__ might be 'get_instance'
@@ -291,6 +302,7 @@ class TestDecoratorCombinations:
 
     def test_log_entry_exit_with_timing(self, caplog):
         """Test combining log_entry_exit and timing decorators."""
+
         @log_entry_exit
         @timing_decorator
         def test_func():

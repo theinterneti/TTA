@@ -1,5 +1,6 @@
 import sys
 import unittest
+import subprocess
 from pathlib import Path
 from unittest import mock
 
@@ -239,6 +240,81 @@ class TestOrchestrator(unittest.TestCase):
 
         self.assertTrue(self.orchestrator.stop_component(component_name))
         self.assertEqual(component.status, ComponentStatus.STOPPED)
+
+    def test_stop_all(self):
+        """
+        Test stopping all components.
+        """
+        # Start all components first
+        self.orchestrator.start_component("mock_component_1")
+        self.orchestrator.start_component("mock_component_3")
+
+        # Stop all components
+        self.orchestrator.stop_all()
+
+        # Check that all components are stopped
+        for component in self.orchestrator.components.values():
+            self.assertEqual(component.status, ComponentStatus.STOPPED)
+
+    @mock.patch('src.orchestration.orchestrator.safe_run')
+    def test_run_docker_command_success(self, mock_safe_run):
+        """
+        Test successful execution of a Docker command.
+        """
+        mock_safe_run.return_value = subprocess.CompletedProcess(args=['docker', 'ps'], returncode=0, stdout='CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES', stderr='')
+
+        result = self.orchestrator.run_docker_command(['ps'])
+
+        mock_safe_run.assert_called_once_with(['docker', 'ps'], text=True, timeout=120, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0)
+
+    @mock.patch('src.orchestration.orchestrator.safe_run')
+    def test_run_docker_command_failure(self, mock_safe_run):
+        """
+        Test failed execution of a Docker command.
+        """
+        mock_safe_run.return_value = subprocess.CompletedProcess(args=['docker', 'ps'], returncode=1, stdout='', stderr='Cannot connect to the Docker daemon.')
+
+        with self.assertRaises(subprocess.SubprocessError):
+            self.orchestrator.run_docker_command(['ps'])
+
+        calls = [mock.call(['docker', 'ps'], text=True, timeout=120, capture_output=True, check=False)] * 3
+        mock_safe_run.assert_has_calls(calls)
+
+    @mock.patch('src.orchestration.orchestrator.safe_run')
+    def test_run_docker_compose_command_success(self, mock_safe_run):
+        """
+        Test successful execution of a Docker Compose command.
+        """
+        mock_safe_run.return_value = subprocess.CompletedProcess(args=['docker-compose', 'up', '-d'], returncode=0, stdout='Creating network "tta-dev_default" with the default driver\nCreating tta-dev_redis_1 ... done', stderr='')
+
+        results = self.orchestrator.run_docker_compose_command(['up', '-d'])
+
+        self.assertIn('tta.dev', results)
+        self.assertEqual(results['tta.dev'].returncode, 0)
+
+    @mock.patch('src.orchestration.orchestrator.safe_run')
+    def test_run_docker_compose_command_failure(self, mock_safe_run):
+        """
+        Test failed execution of a Docker Compose command.
+        """
+        mock_safe_run.return_value = subprocess.CompletedProcess(args=['docker-compose', 'up', '-d'], returncode=1, stdout='', stderr='ERROR: Some services are not healthy')
+
+        with self.assertRaises(subprocess.SubprocessError):
+            self.orchestrator.run_docker_compose_command(['up', '-d'])
+
+    @mock.patch('src.orchestration.orchestrator.safe_run')
+    def test_run_docker_compose_command_tta_dev_only(self, mock_safe_run):
+        """
+        Test running Docker Compose command only in tta.dev.
+        """
+        mock_safe_run.return_value = subprocess.CompletedProcess(args=['docker-compose', 'up', '-d'], returncode=0, stdout='Creating network "tta-dev_default" with the default driver\nCreating tta-dev_redis_1 ... done', stderr='')
+
+        results = self.orchestrator.run_docker_compose_command(['up', '-d'], repository="tta.dev")
+
+        self.assertIn('tta.dev', results)
+        self.assertEqual(results['tta.dev'].returncode, 0)
+        self.assertNotIn('tta.prototype', results)
 
 
 if __name__ == "__main__":

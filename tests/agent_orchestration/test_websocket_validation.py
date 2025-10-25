@@ -12,7 +12,6 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 import pytest_asyncio
 from fastapi.websockets import WebSocket
-
 from tta_ai.orchestration.realtime.config_manager import (
     RealtimeEnvironment,
     get_realtime_config_manager,

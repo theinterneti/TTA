@@ -48,24 +48,21 @@ class ToolSpec(BaseModel):
 
     # New fields for Phase 3 Tool Optimization (backward compatible with defaults)
     supports_pagination: bool = Field(
-        default=False,
-        description="Whether this tool supports cursor-based pagination"
+        default=False, description="Whether this tool supports cursor-based pagination"
     )
     max_results_without_pagination: int | None = Field(
-        default=None,
-        description="Maximum results returned when pagination is not used"
+        default=None, description="Maximum results returned when pagination is not used"
     )
     related_tools: list[str] = Field(
         default_factory=list,
-        description="Names of related tools (e.g., complementary operations)"
+        description="Names of related tools (e.g., complementary operations)",
     )
     examples: list[dict[str, Any]] = Field(
         default_factory=list,
-        description="Example invocations with parameters and expected results"
+        description="Example invocations with parameters and expected results",
     )
     schema_version: str = Field(
-        default="1.0.0",
-        description="Schema version for response format compatibility"
+        default="1.0.0", description="Schema version for response format compatibility"
     )
 
     def signature_hash(self) -> str:

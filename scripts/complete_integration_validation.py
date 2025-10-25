@@ -6,14 +6,13 @@ This script performs the complete end-to-end validation of the TTA Core Gameplay
 integration, including system startup, database connectivity, and API testing.
 """
 
-import os
-import sys
-import subprocess
-import time
-import requests
 import logging
+import subprocess
+import sys
+import time
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+
+import requests
 
 # Add the project root to Python path
 project_root = Path(__file__).parent.parent
@@ -45,7 +44,7 @@ class TTAIntegrationValidator:
                 logger.info(f"Installing {dep}...")
                 result = subprocess.run([
                     sys.executable, "-m", "pip", "install", dep
-                ], capture_output=True, text=True, timeout=60)
+                ], check=False, capture_output=True, text=True, timeout=60)
 
                 if result.returncode != 0:
                     logger.error(f"Failed to install {dep}: {result.stderr}")
@@ -80,7 +79,7 @@ class TTAIntegrationValidator:
         ]
 
         missing_vars = []
-        with open(env_file, 'r') as f:
+        with open(env_file) as f:
             env_content = f.read()
 
         for var in required_vars:
@@ -107,7 +106,7 @@ class TTAIntegrationValidator:
         logger.info("✅ Environment configuration ready")
         return True
 
-    def check_database_connectivity(self) -> Dict[str, bool]:
+    def check_database_connectivity(self) -> dict[str, bool]:
         """Check Redis and Neo4j connectivity."""
         logger.info("🔍 Checking database connectivity...")
 
@@ -116,7 +115,7 @@ class TTAIntegrationValidator:
         # Test Redis
         try:
             result = subprocess.run(["redis-cli", "ping"],
-                                  capture_output=True, text=True, timeout=5)
+                                  check=False, capture_output=True, text=True, timeout=5)
             if result.returncode == 0 and "PONG" in result.stdout:
                 logger.info("✅ Redis connection successful")
                 results["redis"] = True
@@ -182,9 +181,8 @@ class TTAIntegrationValidator:
 
                 logger.error("❌ TTA system failed to start within timeout")
                 return False
-            else:
-                logger.error("❌ No startup script found")
-                return False
+            logger.error("❌ No startup script found")
+            return False
 
         except Exception as e:
             logger.error(f"❌ TTA system startup failed: {e}")
@@ -198,15 +196,14 @@ class TTAIntegrationValidator:
             validation_script = self.project_root / "scripts" / "validate_integration_architecture.py"
             result = subprocess.run([
                 sys.executable, str(validation_script)
-            ], capture_output=True, text=True, timeout=60)
+            ], check=False, capture_output=True, text=True, timeout=60)
 
             if result.returncode == 0:
                 logger.info("✅ Architecture validation passed")
                 return True
-            else:
-                logger.warning("⚠️  Architecture validation had issues")
-                logger.info(f"Output: {result.stdout}")
-                return False
+            logger.warning("⚠️  Architecture validation had issues")
+            logger.info(f"Output: {result.stdout}")
+            return False
 
         except Exception as e:
             logger.error(f"❌ Architecture validation failed: {e}")
@@ -220,15 +217,14 @@ class TTAIntegrationValidator:
             api_test_script = self.project_root / "scripts" / "test_api_endpoints.py"
             result = subprocess.run([
                 sys.executable, str(api_test_script)
-            ], capture_output=True, text=True, timeout=120)
+            ], check=False, capture_output=True, text=True, timeout=120)
 
             if result.returncode == 0:
                 logger.info("✅ API tests passed")
                 return True
-            else:
-                logger.warning("⚠️  API tests had issues")
-                logger.info(f"Output: {result.stdout}")
-                return False
+            logger.warning("⚠️  API tests had issues")
+            logger.info(f"Output: {result.stdout}")
+            return False
 
         except Exception as e:
             logger.error(f"❌ API tests failed: {e}")
@@ -261,7 +257,7 @@ class TTAIntegrationValidator:
             logger.error(f"❌ Frontend integration test failed: {e}")
             return False
 
-    def run_complete_validation(self) -> Dict[str, bool]:
+    def run_complete_validation(self) -> dict[str, bool]:
         """Run the complete validation sequence."""
         logger.info("🎮 TTA Core Gameplay Loop - Complete Integration Validation")
         logger.info("=" * 70)
@@ -317,13 +313,12 @@ def main():
         logger.info("2. Open examples/frontend_integration.html to test browser integration")
         logger.info("3. Run integration tests: python3 -m pytest tests/integration/ -v")
         return 0
-    else:
-        logger.error("⚠️  Validation incomplete. Check the logs above for details.")
-        logger.info("\n🔧 Troubleshooting:")
-        logger.info("1. Ensure Neo4j and Redis are running")
-        logger.info("2. Check database credentials in .env file")
-        logger.info("3. Verify all dependencies are installed")
-        return 1
+    logger.error("⚠️  Validation incomplete. Check the logs above for details.")
+    logger.info("\n🔧 Troubleshooting:")
+    logger.info("1. Ensure Neo4j and Redis are running")
+    logger.info("2. Check database credentials in .env file")
+    logger.info("3. Verify all dependencies are installed")
+    return 1
 
 if __name__ == "__main__":
     try:

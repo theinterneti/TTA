@@ -14,7 +14,6 @@ import json
 # Import from .augment/context/
 import sys
 import tempfile
-from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -23,8 +22,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / ".augment" / "conte
 
 from conversation_manager import (
     AIConversationContextManager,
-    ConversationContext,
-    ConversationMessage,
 )
 
 
@@ -71,10 +68,7 @@ class TestMessageAddition:
         manager.create_session(session_id)
 
         manager.add_message(
-            session_id=session_id,
-            role="user",
-            content="Hello, world!",
-            importance=0.9
+            session_id=session_id, role="user", content="Hello, world!", importance=0.9
         )
 
         context = manager.contexts[session_id]
@@ -94,7 +88,7 @@ class TestMessageAddition:
             role="user",
             content="Test",
             importance=1.0,
-            metadata={"type": "test", "key": "value"}
+            metadata={"type": "test", "key": "value"},
         )
 
         context = manager.contexts[session_id]
@@ -111,7 +105,7 @@ class TestMessageAddition:
                 session_id=session_id,
                 role="user",
                 content=f"Message {i}",
-                importance=0.5
+                importance=0.5,
             )
 
         context = manager.contexts[session_id]
@@ -128,10 +122,7 @@ class TestTokenCounting:
         manager.create_session(session_id)
 
         manager.add_message(
-            session_id=session_id,
-            role="user",
-            content="Hello, world!",
-            importance=0.9
+            session_id=session_id, role="user", content="Hello, world!", importance=0.9
         )
 
         context = manager.contexts[session_id]
@@ -245,7 +236,7 @@ class TestSessionPersistence:
 
         manager.add_message(session_id, "user", "Test message", importance=0.9)
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json") as f:
             filepath = f.name
 
         try:
@@ -254,7 +245,7 @@ class TestSessionPersistence:
             # Verify file exists and contains data
             assert Path(filepath).exists()
 
-            with open(filepath, 'r') as f:
+            with open(filepath) as f:
                 data = json.load(f)
 
             assert data["session_id"] == session_id
@@ -271,7 +262,7 @@ class TestSessionPersistence:
 
         manager.add_message(session_id, "user", "Test message", importance=0.9)
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json") as f:
             filepath = f.name
 
         try:
@@ -300,10 +291,10 @@ class TestSessionPersistence:
             "user",
             "Test",
             importance=0.9,
-            metadata={"type": "test", "key": "value"}
+            metadata={"type": "test", "key": "value"},
         )
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json") as f:
             filepath = f.name
 
         try:
@@ -312,7 +303,10 @@ class TestSessionPersistence:
             new_manager = AIConversationContextManager()
             loaded_context = new_manager.load_session(filepath)
 
-            assert loaded_context.messages[0].metadata == {"type": "test", "key": "value"}
+            assert loaded_context.messages[0].metadata == {
+                "type": "test",
+                "key": "value",
+            }
         finally:
             Path(filepath).unlink()
 

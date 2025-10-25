@@ -10,7 +10,6 @@ Tests and validates the agent orchestration system:
 """
 
 import asyncio
-import json
 import logging
 import os
 import sys
@@ -301,9 +300,8 @@ async def run_diagnostics():
     if all_passed:
         logger.info("🎉 All diagnostics passed!")
         return 0
-    else:
-        logger.error("⚠️  Some diagnostics failed. Check logs above.")
-        return 1
+    logger.error("⚠️  Some diagnostics failed. Check logs above.")
+    return 1
 
 
 if __name__ == "__main__":

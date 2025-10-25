@@ -12,7 +12,6 @@ Usage:
 """
 
 import argparse
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -28,10 +27,10 @@ def cmd_new(args):
     manager, session_id = create_tta_session(session_id)
 
     print(f"✓ Created new session: {session_id}")
-    print(f"\nArchitecture context loaded automatically.")
-    print(f"\nTo add messages:")
+    print("\nArchitecture context loaded automatically.")
+    print("\nTo add messages:")
     print(f"  python cli.py add {session_id} 'Your message here'")
-    print(f"\nTo view summary:")
+    print("\nTo view summary:")
     print(f"  python cli.py show {session_id}")
 
     # Save immediately
@@ -80,7 +79,7 @@ def cmd_show(args):
 
     if not session_file.exists():
         print(f"✗ Session not found: {session_id}")
-        print(f"\nAvailable sessions:")
+        print("\nAvailable sessions:")
         cmd_list(args)
         return
 
@@ -95,11 +94,9 @@ def cmd_show(args):
     # Show recent messages
     print("\nRecent messages:")
     for msg in context.messages[-5:]:
-        role_emoji = {
-            "system": "⚙️",
-            "user": "👤",
-            "assistant": "🤖"
-        }.get(msg.role, "💬")
+        role_emoji = {"system": "⚙️", "user": "👤", "assistant": "🤖"}.get(
+            msg.role, "💬"
+        )
 
         content_preview = msg.content[:100].replace("\n", " ")
         if len(msg.content) > 100:
@@ -156,10 +153,7 @@ def cmd_add(args):
 
     # Add message
     manager.add_message(
-        session_id=session_id,
-        role=role,
-        content=message,
-        importance=importance
+        session_id=session_id, role=role, content=message, importance=importance
     )
 
     print(f"✓ Added {role} message to session: {session_id}")
@@ -217,14 +211,16 @@ Examples:
 
   # Save session
   python cli.py save tta-feature-xyz
-        """
+        """,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # New command
     parser_new = subparsers.add_parser("new", help="Create new session")
-    parser_new.add_argument("session_id", nargs="?", help="Session ID (auto-generated if not provided)")
+    parser_new.add_argument(
+        "session_id", nargs="?", help="Session ID (auto-generated if not provided)"
+    )
 
     # List command
     parser_list = subparsers.add_parser("list", help="List all sessions")
@@ -241,8 +237,15 @@ Examples:
     parser_add = subparsers.add_parser("add", help="Add message to session")
     parser_add.add_argument("session_id", help="Session ID")
     parser_add.add_argument("message", help="Message content")
-    parser_add.add_argument("--role", default="user", choices=["user", "assistant", "system"], help="Message role")
-    parser_add.add_argument("--importance", type=float, default=0.7, help="Importance score (0.0-1.0)")
+    parser_add.add_argument(
+        "--role",
+        default="user",
+        choices=["user", "assistant", "system"],
+        help="Message role",
+    )
+    parser_add.add_argument(
+        "--importance", type=float, default=0.7, help="Importance score (0.0-1.0)"
+    )
 
     # Save command
     parser_save = subparsers.add_parser("save", help="Save session")
@@ -271,6 +274,7 @@ Examples:
         except Exception as e:
             print(f"✗ Error: {e}")
             import traceback
+
             traceback.print_exc()
     else:
         parser.print_help()

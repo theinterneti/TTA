@@ -2243,7 +2243,6 @@ class AgentOrchestrationComponent(Component):
                 if not sp:
                     sp = "start"
                 import redis.asyncio as aioredis
-
                 from tta_ai.orchestration.workflow_transaction import (
                     WorkflowTransaction,
                 )

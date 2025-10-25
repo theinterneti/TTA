@@ -1,6 +1,6 @@
 # Test Generation Workflow
 
-**Date:** 2025-10-25  
+**Date:** 2025-10-25
 **Status:** ✅ **PRODUCTION READY**
 
 ## Overview
@@ -116,7 +116,7 @@ models:
     cost_per_1m_output: 0.28
     priority: 1
     status: "active"
-    
+
   - name: "google/gemini-2.0-flash-lite"
     provider: "OpenRouter"
     cost_per_1m_input: 0.075
@@ -151,13 +151,13 @@ from src.agent_orchestration.openhands_integration.models import TestTaskSpecifi
 async def main():
     config = OpenHandsIntegrationConfig.from_env()
     service = UnitTestGenerationService(config)
-    
+
     spec = TestTaskSpecification(
         module_name="capability_matcher",
         module_path="src/agent_orchestration/capability_matcher.py",
         coverage_threshold=70.0,
     )
-    
+
     result = await service.generate_tests(spec)
     print(f"Result: {result}")
 
@@ -261,4 +261,3 @@ open htmlcov/index.html
 - **OpenHands Integration:** `src/agent_orchestration/openhands_integration/`
 - **Error Recovery:** `src/agent_orchestration/openhands_integration/error_recovery.py`
 - **Free Model Registry:** `free_models_registry.yaml`
-

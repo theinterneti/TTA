@@ -9,15 +9,16 @@ Usage:
     generate_dashboard(output_file="dev_metrics_dashboard.html")
 """
 
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 try:
     import matplotlib
-    matplotlib.use('Agg')  # Non-interactive backend
+
+    matplotlib.use("Agg")  # Non-interactive backend
     import matplotlib.pyplot as plt
+
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
@@ -29,7 +30,7 @@ from .dev_metrics import DevMetricsCollector
 def generate_dashboard(
     output_file: str = "dev_metrics_dashboard.html",
     days: int = 30,
-    metrics_dir: str = ".metrics"
+    metrics_dir: str = ".metrics",
 ) -> None:
     """
     Generate HTML dashboard for development metrics.
@@ -76,26 +77,28 @@ def _generate_charts(summary: dict[str, Any], output_file: str) -> str | None:
 
         # 1. Success rates
         success_rates = [summary[n]["success_rate"] * 100 for n in names]
-        axes[0, 0].barh(names, success_rates, color='#4CAF50')
+        axes[0, 0].barh(names, success_rates, color="#4CAF50")
         axes[0, 0].set_xlabel("Success Rate (%)")
         axes[0, 0].set_title("Success Rates by Operation")
         axes[0, 0].set_xlim(0, 100)
 
         # 2. Average durations
-        avg_durations = [summary[n]["avg_duration_ms"] / 1000 for n in names]  # Convert to seconds
-        axes[0, 1].barh(names, avg_durations, color='#2196F3')
+        avg_durations = [
+            summary[n]["avg_duration_ms"] / 1000 for n in names
+        ]  # Convert to seconds
+        axes[0, 1].barh(names, avg_durations, color="#2196F3")
         axes[0, 1].set_xlabel("Duration (seconds)")
         axes[0, 1].set_title("Average Execution Times")
 
         # 3. Execution counts
         exec_counts = [summary[n]["total_executions"] for n in names]
-        axes[1, 0].barh(names, exec_counts, color='#FF9800')
+        axes[1, 0].barh(names, exec_counts, color="#FF9800")
         axes[1, 0].set_xlabel("Count")
         axes[1, 0].set_title("Total Executions")
 
         # 4. Failure counts
         failure_counts = [summary[n]["failures"] for n in names]
-        axes[1, 1].barh(names, failure_counts, color='#F44336')
+        axes[1, 1].barh(names, failure_counts, color="#F44336")
         axes[1, 1].set_xlabel("Count")
         axes[1, 1].set_title("Failures")
 
@@ -103,7 +106,7 @@ def _generate_charts(summary: dict[str, Any], output_file: str) -> str | None:
 
         # Save chart
         chart_path = Path(output_file).parent / "dev_metrics_chart.png"
-        plt.savefig(chart_path, dpi=100, bbox_inches='tight')
+        plt.savefig(chart_path, dpi=100, bbox_inches="tight")
         plt.close()
 
         return chart_path.name
@@ -118,7 +121,13 @@ def _generate_html(summary: dict[str, Any], chart_html: str, days: int) -> str:
     # Generate metrics cards
     metrics_html = ""
     for name, metrics in sorted(summary.items()):
-        status_color = "#4CAF50" if metrics["success_rate"] > 0.9 else "#FF9800" if metrics["success_rate"] > 0.7 else "#F44336"
+        status_color = (
+            "#4CAF50"
+            if metrics["success_rate"] > 0.9
+            else "#FF9800"
+            if metrics["success_rate"] > 0.7
+            else "#F44336"
+        )
 
         metrics_html += f"""
         <div class="metric-card">
@@ -253,7 +262,7 @@ def _generate_html(summary: dict[str, Any], chart_html: str, days: int) -> str:
                 Period: Last {days} days
             </div>
 
-            {f'<div class="chart-container">{chart_html}</div>' if chart_html else ''}
+            {f'<div class="chart-container">{chart_html}</div>' if chart_html else ""}
 
             <h2 style="margin-top: 30px; color: #333;">Detailed Metrics</h2>
             <div class="metrics-grid">

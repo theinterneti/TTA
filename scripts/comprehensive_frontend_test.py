@@ -7,13 +7,13 @@ simulating user interactions and validating API responses.
 """
 
 import asyncio
-import aiohttp
-import json
-import sys
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import aiohttp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +24,7 @@ class ComprehensiveFrontendTester:
 
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         self.test_results = {}
         self.test_token = "test_token_demo"
 
@@ -57,12 +57,10 @@ class ComprehensiveFrontendTester:
                     if "swagger-ui" in content.lower():
                         self.log_test_result("Server Accessibility", True, "Swagger UI accessible")
                         return True
-                    else:
-                        self.log_test_result("Server Accessibility", False, "Swagger UI not found")
-                        return False
-                else:
-                    self.log_test_result("Server Accessibility", False, f"HTTP {response.status}")
+                    self.log_test_result("Server Accessibility", False, "Swagger UI not found")
                     return False
+                self.log_test_result("Server Accessibility", False, f"HTTP {response.status}")
+                return False
         except Exception as e:
             self.log_test_result("Server Accessibility", False, f"Connection error: {e}")
             return False
@@ -104,13 +102,11 @@ class ComprehensiveFrontendTester:
                         self.log_test_result("OpenAPI Specification", True,
                                            f"Found {len(found_endpoints)} gameplay endpoints")
                         return True
-                    else:
-                        self.log_test_result("OpenAPI Specification", False,
-                                           f"Only found {len(found_endpoints)} endpoints")
-                        return False
-                else:
-                    self.log_test_result("OpenAPI Specification", False, f"HTTP {response.status}")
+                    self.log_test_result("OpenAPI Specification", False,
+                                       f"Only found {len(found_endpoints)} endpoints")
                     return False
+                self.log_test_result("OpenAPI Specification", False, f"HTTP {response.status}")
+                return False
         except Exception as e:
             self.log_test_result("OpenAPI Specification", False, f"Error: {e}")
             return False
@@ -145,10 +141,9 @@ class ComprehensiveFrontendTester:
                         self.log_test_result("Health Endpoint (With Auth)", True,
                                            "Correctly validates JWT tokens")
                     return True
-                else:
-                    self.log_test_result("Health Endpoint (With Auth)", False,
-                                       f"Unexpected status: {response.status}")
-                    return False
+                self.log_test_result("Health Endpoint (With Auth)", False,
+                                   f"Unexpected status: {response.status}")
+                return False
         except Exception as e:
             self.log_test_result("Health Endpoint (With Auth)", False, f"Error: {e}")
             return False
@@ -188,10 +183,9 @@ class ComprehensiveFrontendTester:
                         self.log_test_result("Session Creation Endpoint", True,
                                            f"Endpoint exists, server error: {response.status}")
                     return True
-                else:
-                    self.log_test_result("Session Creation Endpoint", False,
-                                       f"Unexpected status: {response.status}")
-                    return False
+                self.log_test_result("Session Creation Endpoint", False,
+                                   f"Unexpected status: {response.status}")
+                return False
         except Exception as e:
             self.log_test_result("Session Creation Endpoint", False, f"Error: {e}")
             return False
@@ -224,13 +218,11 @@ class ComprehensiveFrontendTester:
                     self.log_test_result("Frontend File Accessibility", True,
                                        f"Found {len(found_elements)}/{len(required_elements)} key elements")
                     return True
-                else:
-                    self.log_test_result("Frontend File Accessibility", False,
-                                       f"Only found {len(found_elements)}/{len(required_elements)} elements")
-                    return False
-            else:
-                self.log_test_result("Frontend File Accessibility", False, "Frontend file not found")
+                self.log_test_result("Frontend File Accessibility", False,
+                                   f"Only found {len(found_elements)}/{len(required_elements)} elements")
                 return False
+            self.log_test_result("Frontend File Accessibility", False, "Frontend file not found")
+            return False
         except Exception as e:
             self.log_test_result("Frontend File Accessibility", False, f"Error: {e}")
             return False
@@ -259,19 +251,17 @@ class ComprehensiveFrontendTester:
                     self.log_test_result("CORS Configuration", True,
                                        f"CORS headers present: {cors_headers}")
                     return True
-                else:
-                    # Try a simple GET to see if CORS is configured differently
-                    async with self.session.get(f"{self.base_url}/api/v1/gameplay/health",
-                                              headers={"Origin": "file://"}) as get_response:
-                        cors_origin = get_response.headers.get("Access-Control-Allow-Origin")
-                        if cors_origin:
-                            self.log_test_result("CORS Configuration", True,
-                                               f"CORS configured: {cors_origin}")
-                            return True
-                        else:
-                            self.log_test_result("CORS Configuration", False,
-                                               "No CORS headers found")
-                            return False
+                # Try a simple GET to see if CORS is configured differently
+                async with self.session.get(f"{self.base_url}/api/v1/gameplay/health",
+                                          headers={"Origin": "file://"}) as get_response:
+                    cors_origin = get_response.headers.get("Access-Control-Allow-Origin")
+                    if cors_origin:
+                        self.log_test_result("CORS Configuration", True,
+                                           f"CORS configured: {cors_origin}")
+                        return True
+                    self.log_test_result("CORS Configuration", False,
+                                       "No CORS headers found")
+                    return False
         except Exception as e:
             self.log_test_result("CORS Configuration", False, f"Error: {e}")
             return False
@@ -297,15 +287,14 @@ class ComprehensiveFrontendTester:
                     self.log_test_result("Error Handling (Malformed)", True,
                                        "Correctly handles malformed requests")
                     return True
-                else:
-                    self.log_test_result("Error Handling (Malformed)", False,
-                                       f"Expected 400/422, got {response.status}")
-                    return False
+                self.log_test_result("Error Handling (Malformed)", False,
+                                   f"Expected 400/422, got {response.status}")
+                return False
         except Exception as e:
             self.log_test_result("Error Handling", False, f"Error: {e}")
             return False
 
-    async def run_comprehensive_test_suite(self) -> Dict[str, Any]:
+    async def run_comprehensive_test_suite(self) -> dict[str, Any]:
         """Run all frontend integration tests."""
         logger.info("🚀 Starting Comprehensive Frontend Integration Testing")
         logger.info("=" * 80)
@@ -355,7 +344,7 @@ class ComprehensiveFrontendTester:
             status = "✅ PASS" if result["success"] else "❌ FAIL"
             report += f"- **{test_name}:** {status} - {result['details']}\n"
 
-        report += f"""
+        report += """
 ## Overall Assessment
 
 """

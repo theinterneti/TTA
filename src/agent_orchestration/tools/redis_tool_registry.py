@@ -162,7 +162,9 @@ class RedisToolRegistry:
             >>> # First page
             >>> tools, next_cursor = await registry.list_tools(page_size=10)
             >>> # Next page
-            >>> more_tools, cursor = await registry.list_tools(cursor=next_cursor, page_size=10)
+            >>> more_tools, cursor = await registry.list_tools(
+            ...     cursor=next_cursor, page_size=10
+            ... )
         """
         from .cursor import get_cursor_manager
 

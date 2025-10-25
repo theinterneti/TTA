@@ -32,11 +32,19 @@ class ResponseStatus(str, Enum):
 class ToolMetadata(BaseModel):
     """Metadata about tool execution."""
 
-    tool_name: str = Field(..., description="Name of the tool that generated this response")
+    tool_name: str = Field(
+        ..., description="Name of the tool that generated this response"
+    )
     tool_version: str = Field(..., description="Version of the tool (semver)")
-    execution_time_ms: float = Field(..., ge=0.0, description="Execution time in milliseconds")
-    timestamp: float = Field(default_factory=time.time, description="Unix timestamp of response")
-    request_id: str | None = Field(default=None, description="Optional request ID for tracing")
+    execution_time_ms: float = Field(
+        ..., ge=0.0, description="Execution time in milliseconds"
+    )
+    timestamp: float = Field(
+        default_factory=time.time, description="Unix timestamp of response"
+    )
+    request_id: str | None = Field(
+        default=None, description="Optional request ID for tracing"
+    )
 
     @field_validator("tool_version")
     @classmethod
@@ -54,11 +62,17 @@ class ToolMetadata(BaseModel):
 class ToolError(BaseModel):
     """Error information for failed tool execution."""
 
-    code: str = Field(..., description="Error code (e.g., 'VALIDATION_ERROR', 'TIMEOUT')")
+    code: str = Field(
+        ..., description="Error code (e.g., 'VALIDATION_ERROR', 'TIMEOUT')"
+    )
     message: str = Field(..., description="Human-readable error message")
-    details: dict[str, Any] = Field(default_factory=dict, description="Additional error details")
+    details: dict[str, Any] = Field(
+        default_factory=dict, description="Additional error details"
+    )
     retry_after_seconds: int | None = Field(
-        default=None, ge=0, description="Seconds to wait before retrying (for rate limits)"
+        default=None,
+        ge=0,
+        description="Seconds to wait before retrying (for rate limits)",
     )
 
 
@@ -75,8 +89,12 @@ class ToolSuggestion(BaseModel):
     """Suggestion for next action or related tool."""
 
     type: SuggestionType = Field(..., description="Type of suggestion")
-    description: str = Field(..., min_length=1, max_length=512, description="Description of suggestion")
-    tool_name: str | None = Field(default=None, description="Name of suggested tool (if applicable)")
+    description: str = Field(
+        ..., min_length=1, max_length=512, description="Description of suggestion"
+    )
+    tool_name: str | None = Field(
+        default=None, description="Name of suggested tool (if applicable)"
+    )
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Suggested parameters for the tool"
     )
@@ -85,11 +103,19 @@ class ToolSuggestion(BaseModel):
 class PaginationMetadata(BaseModel):
     """Metadata for paginated responses."""
 
-    total_count: int | None = Field(default=None, ge=0, description="Total number of items (if known)")
+    total_count: int | None = Field(
+        default=None, ge=0, description="Total number of items (if known)"
+    )
     has_more: bool = Field(..., description="Whether more items are available")
-    next_cursor: str | None = Field(default=None, description="Cursor for next page (if has_more)")
-    prev_cursor: str | None = Field(default=None, description="Cursor for previous page (if applicable)")
-    page_size: int = Field(..., ge=1, le=100, description="Number of items in this page")
+    next_cursor: str | None = Field(
+        default=None, description="Cursor for next page (if has_more)"
+    )
+    prev_cursor: str | None = Field(
+        default=None, description="Cursor for previous page (if applicable)"
+    )
+    page_size: int = Field(
+        ..., ge=1, le=100, description="Number of items in this page"
+    )
 
     @field_validator("next_cursor", "prev_cursor")
     @classmethod
@@ -126,13 +152,19 @@ class ToolResponse(BaseModel, Generic[T]):
     """
 
     status: ResponseStatus = Field(..., description="Execution status")
-    data: T | None = Field(default=None, description="Response data (type varies by tool)")
+    data: T | None = Field(
+        default=None, description="Response data (type varies by tool)"
+    )
     metadata: ToolMetadata = Field(..., description="Execution metadata")
     suggestions: list[ToolSuggestion] = Field(
         default_factory=list, description="Suggestions for next actions"
     )
-    error: ToolError | None = Field(default=None, description="Error information (if status=error)")
-    schema_version: str = Field(default="1.0.0", description="Response schema version (semver)")
+    error: ToolError | None = Field(
+        default=None, description="Error information (if status=error)"
+    )
+    schema_version: str = Field(
+        default="1.0.0", description="Response schema version (semver)"
+    )
 
     @field_validator("schema_version")
     @classmethod
@@ -173,9 +205,13 @@ def check_schema_compatibility(response_version: str, expected_version: str) -> 
         True if compatible, False otherwise
 
     Examples:
-        >>> check_schema_compatibility("1.2.3", "1.0.0")  # Compatible (same major, newer minor)
+        >>> check_schema_compatibility(
+        ...     "1.2.3", "1.0.0"
+        ... )  # Compatible (same major, newer minor)
         True
-        >>> check_schema_compatibility("2.0.0", "1.0.0")  # Incompatible (different major)
+        >>> check_schema_compatibility(
+        ...     "2.0.0", "1.0.0"
+        ... )  # Incompatible (different major)
         False
         >>> check_schema_compatibility("1.0.5", "1.2.0")  # Incompatible (older minor)
         False
@@ -224,4 +260,3 @@ def get_json_schema(model_class: type[BaseModel]) -> dict[str, Any]:
         'object'
     """
     return model_class.model_json_schema()
-

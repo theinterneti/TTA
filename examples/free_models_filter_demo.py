@@ -11,7 +11,6 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import List
 
 # Add the src directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -25,8 +24,11 @@ async def demo_free_models_filter():
     try:
         # Import required modules
         from components.model_management import ModelManagementComponent
-        from components.model_management.models import ModelManagementConfig, ProviderConfig
         from components.model_management.interfaces import ProviderType
+        from components.model_management.models import (
+            ModelManagementConfig,
+            ProviderConfig,
+        )
 
         print("🚀 OpenRouter Free Models Filter Demo")
         print("=" * 50)
@@ -154,7 +156,7 @@ async def demo_free_models_filter():
         moderate = len([m for m in all_models if m.cost_per_token and 0.001 < m.cost_per_token <= 0.01])
         expensive = len([m for m in all_models if m.cost_per_token and m.cost_per_token > 0.01])
 
-        print(f"Model categorization:")
+        print("Model categorization:")
         print(f"  Free models: {free_count}")
         print(f"  Paid models: {paid_count}")
         print(f"  Very cheap (≤$0.0001/token): {very_cheap}")

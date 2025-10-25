@@ -1,7 +1,7 @@
 # Pre-Rebuild Infrastructure Implementation Guide
 
-**Purpose:** Step-by-step guide for implementing Tier 1 infrastructure improvements  
-**Timeline:** 5-7 hours over 2 days  
+**Purpose:** Step-by-step guide for implementing Tier 1 infrastructure improvements
+**Timeline:** 5-7 hours over 2 days
 **Goal:** Accelerate 16-week hybrid rebuild with automated tooling
 
 ---
@@ -243,7 +243,7 @@ Add to the `repos` section:
         language: system
         types: [python]
         files: ^src/(docker|agent_orchestration|player_experience)/.*\.py$
-        
+
       # Require type annotations
       - id: require-type-annotations
         name: Require type annotations (new code)
@@ -273,17 +273,17 @@ from pathlib import Path
 def check_function_annotations(node: ast.FunctionDef, filename: str) -> list[str]:
     """Check if function has proper type annotations."""
     errors = []
-    
+
     # Skip private functions and test functions
     if node.name.startswith('_') or node.name.startswith('test_'):
         return errors
-    
+
     # Check return annotation
     if node.returns is None and node.name != '__init__':
         errors.append(
             f"{filename}:{node.lineno}: Function '{node.name}' missing return type annotation"
         )
-    
+
     # Check argument annotations
     for arg in node.args.args:
         if arg.arg == 'self' or arg.arg == 'cls':
@@ -292,7 +292,7 @@ def check_function_annotations(node: ast.FunctionDef, filename: str) -> list[str
             errors.append(
                 f"{filename}:{node.lineno}: Argument '{arg.arg}' in '{node.name}' missing type annotation"
             )
-    
+
     return errors
 
 
@@ -303,12 +303,12 @@ def check_file(filepath: Path) -> list[str]:
             tree = ast.parse(f.read(), filename=str(filepath))
     except SyntaxError as e:
         return [f"{filepath}: Syntax error: {e}"]
-    
+
     errors = []
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             errors.extend(check_function_annotations(node, str(filepath)))
-    
+
     return errors
 
 
@@ -317,12 +317,12 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: check-type-annotations.py <file1> <file2> ...")
         sys.exit(1)
-    
+
     all_errors = []
     for filepath in sys.argv[1:]:
         errors = check_file(Path(filepath))
         all_errors.extend(errors)
-    
+
     if all_errors:
         print("❌ Type annotation errors found:")
         for error in all_errors:
@@ -617,6 +617,5 @@ After completing these improvements:
 3. ✅ **Start Week 1 of hybrid rebuild**
 4. ✅ **Use tools throughout rewrite process**
 
-**Estimated Time Saved:** 45-69 hours over 16-week rebuild  
+**Estimated Time Saved:** 45-69 hours over 16-week rebuild
 **ROI:** 6-10x on 5-7 hour investment
-

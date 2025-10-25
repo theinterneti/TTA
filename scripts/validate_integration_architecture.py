@@ -7,14 +7,11 @@ full database connectivity, focusing on code structure, imports,
 and API endpoint availability.
 """
 
-import sys
-import importlib
-import inspect
-from pathlib import Path
-import requests
-import json
-from typing import Dict, List, Any
 import logging
+import sys
+from pathlib import Path
+
+import requests
 
 # Add the project root to Python path
 project_root = Path(__file__).parent.parent
@@ -63,7 +60,9 @@ class IntegrationArchitectureValidator:
         logger.info("🔍 Validating integration layer...")
 
         try:
-            from src.integration.gameplay_loop_integration import GameplayLoopIntegration
+            from src.integration.gameplay_loop_integration import (
+                GameplayLoopIntegration,
+            )
             logger.info("✅ GameplayLoopIntegration import successful")
 
             # Check required methods
@@ -134,12 +133,10 @@ class IntegrationArchitectureValidator:
                 if len(found_endpoints) >= 3:  # At least some core endpoints
                     logger.info("✅ Core gameplay endpoints are available")
                     return True
-                else:
-                    logger.warning("⚠️  Missing critical gameplay endpoints")
-                    return False
-            else:
-                logger.error("❌ Could not retrieve OpenAPI specification")
+                logger.warning("⚠️  Missing critical gameplay endpoints")
                 return False
+            logger.error("❌ Could not retrieve OpenAPI specification")
+            return False
 
         except requests.RequestException as e:
             logger.error(f"❌ API endpoint validation failed: {e}")
@@ -155,18 +152,16 @@ class IntegrationArchitectureValidator:
             if config_path.exists():
                 logger.info("✅ TTA config file exists")
 
-                with open(config_path, 'r') as f:
+                with open(config_path) as f:
                     config_content = f.read()
 
                 if 'core_gameplay_loop' in config_content:
                     logger.info("✅ core_gameplay_loop section found in config")
                     return True
-                else:
-                    logger.warning("⚠️  core_gameplay_loop section missing from config")
-                    return False
-            else:
-                logger.error("❌ TTA config file not found")
+                logger.warning("⚠️  core_gameplay_loop section missing from config")
                 return False
+            logger.error("❌ TTA config file not found")
+            return False
 
         except Exception as e:
             logger.error(f"❌ Configuration validation failed: {e}")
@@ -179,14 +174,18 @@ class IntegrationArchitectureValidator:
         try:
             # Check gameplay loop models
             from src.components.gameplay_loop.models.interactions import (
-                GameplaySession, UserChoice, NarrativeScene
+                GameplaySession,
+                NarrativeScene,
+                UserChoice,
             )
             logger.info("✅ Core gameplay models import successful")
 
             # Check API models
             from src.player_experience.api.routers.gameplay import (
-                CreateSessionRequest, CreateSessionResponse,
-                ProcessChoiceRequest, ProcessChoiceResponse
+                CreateSessionRequest,
+                CreateSessionResponse,
+                ProcessChoiceRequest,
+                ProcessChoiceResponse,
             )
             logger.info("✅ API models import successful")
 
@@ -246,15 +245,14 @@ class IntegrationArchitectureValidator:
             if found_tests >= 1:
                 logger.info("✅ Integration tests are available")
                 return True
-            else:
-                logger.warning("⚠️  No integration tests found")
-                return False
+            logger.warning("⚠️  No integration tests found")
+            return False
 
         except Exception as e:
             logger.error(f"❌ Testing validation failed: {e}")
             return False
 
-    def run_comprehensive_validation(self) -> Dict[str, bool]:
+    def run_comprehensive_validation(self) -> dict[str, bool]:
         """Run all validation checks."""
         logger.info("🚀 Starting comprehensive integration architecture validation...")
         logger.info("=" * 70)
@@ -309,12 +307,11 @@ def main():
     if passed == total:
         logger.info("🎉 ALL VALIDATIONS PASSED! Integration architecture is solid.")
         return 0
-    elif passed >= total * 0.8:  # 80% pass rate
+    if passed >= total * 0.8:  # 80% pass rate
         logger.info("✅ INTEGRATION ARCHITECTURE IS SOLID! Minor issues detected.")
         return 0
-    else:
-        logger.error("⚠️  Integration architecture needs attention.")
-        return 1
+    logger.error("⚠️  Integration architecture needs attention.")
+    return 1
 
 if __name__ == "__main__":
     try:

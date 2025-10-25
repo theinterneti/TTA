@@ -6,9 +6,6 @@ of configuration loading, getting, setting, and saving functionality.
 """
 
 import json
-import os
-from pathlib import Path
-from unittest.mock import Mock, mock_open, patch
 
 import pytest
 import yaml
@@ -22,6 +19,7 @@ def reset_singleton():
     # Patch the singleton decorator to return the class directly
     # This allows each test to create a fresh instance
     from src.orchestration import decorators
+
     original_singleton = decorators.singleton
 
     # Replace singleton with a pass-through decorator
@@ -31,6 +29,7 @@ def reset_singleton():
     import importlib
 
     from src.orchestration import config
+
     importlib.reload(config)
 
     yield
@@ -71,14 +70,14 @@ class TestTTAConfigLoading:
         config_file = tmp_path / "custom_config.yaml"
         config_data = {
             "tta.dev": {"enabled": True},
-            "tta.prototype": {"enabled": False}
+            "tta.prototype": {"enabled": False},
         }
 
         with open(config_file, "w") as f:
             yaml.dump(config_data, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         config = TTAConfig(config_path=config_file)
@@ -91,16 +90,13 @@ class TestTTAConfigLoading:
     def test_init_with_custom_path_json(self, tmp_path):
         """Test TTAConfig initialization with custom JSON path."""
         config_file = tmp_path / "custom_config.json"
-        config_data = {
-            "tta.dev": {"enabled": True},
-            "docker": {"enabled": False}
-        }
+        config_data = {"tta.dev": {"enabled": True}, "docker": {"enabled": False}}
 
         with open(config_file, "w") as f:
             json.dump(config_data, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         config = TTAConfig(config_path=config_file)
@@ -182,21 +178,16 @@ class TestTTAConfigGetSet:
         config_data = {
             "tta.dev": {
                 "enabled": True,
-                "components": {
-                    "neo4j": {
-                        "enabled": True,
-                        "port": 7687
-                    }
-                }
+                "components": {"neo4j": {"enabled": True, "port": 7687}},
             },
-            "docker": {"enabled": False}
+            "docker": {"enabled": False},
         }
 
         with open(config_file, "w") as f:
             yaml.dump(config_data, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         return TTAConfig(config_path=config_file)
@@ -348,7 +339,7 @@ class TestTTAConfigEnvironmentVariables:
             yaml.dump({"docker": {"enabled": True}}, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         config = TTAConfig(config_path=config_file)
@@ -366,7 +357,7 @@ class TestTTAConfigEnvironmentVariables:
             yaml.dump({"tta.dev": {"components": {"neo4j": {"port": 7687}}}}, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         config = TTAConfig(config_path=config_file)
@@ -384,7 +375,7 @@ class TestTTAConfigEnvironmentVariables:
             yaml.dump({"test": {"value": 1.0}}, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         config = TTAConfig(config_path=config_file)
@@ -402,7 +393,7 @@ class TestTTAConfigEnvironmentVariables:
             yaml.dump({"environment": {"name": "development"}}, f)
 
         # Clear singleton instances
-        if hasattr(TTAConfig, '_instances'):
+        if hasattr(TTAConfig, "_instances"):
             TTAConfig._instances.clear()
 
         config = TTAConfig(config_path=config_file)

@@ -6,11 +6,12 @@ This script helps resolve Neo4j authentication issues by testing different
 credential combinations and providing guidance for setup.
 """
 
-import sys
 import logging
 import subprocess
-import requests
+import sys
 from pathlib import Path
+
+import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,12 +34,11 @@ class Neo4jAuthResolver:
             if response.status_code == 200:
                 logger.info("✅ Neo4j HTTP interface is accessible")
                 return True
-            elif response.status_code == 401:
+            if response.status_code == 401:
                 logger.info("✅ Neo4j is running but requires authentication")
                 return True
-            else:
-                logger.warning(f"⚠️  Neo4j HTTP returned {response.status_code}")
-                return False
+            logger.warning(f"⚠️  Neo4j HTTP returned {response.status_code}")
+            return False
         except requests.exceptions.ConnectionError:
             logger.error("❌ Neo4j service is not running or not accessible")
             return False
@@ -61,12 +61,11 @@ class Neo4jAuthResolver:
             if response.status_code == 200:
                 logger.info(f"✅ Credentials work: {username}")
                 return True
-            elif response.status_code == 401:
+            if response.status_code == 401:
                 logger.warning(f"❌ Invalid credentials: {username}")
                 return False
-            else:
-                logger.warning(f"⚠️  Unexpected response: {response.status_code}")
-                return False
+            logger.warning(f"⚠️  Unexpected response: {response.status_code}")
+            return False
 
         except Exception as e:
             logger.error(f"❌ Credential test failed: {e}")
@@ -106,13 +105,12 @@ class Neo4jAuthResolver:
             for cmd in reset_commands:
                 try:
                     logger.info(f"Trying: {' '.join(cmd)}")
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+                    result = subprocess.run(cmd, check=False, capture_output=True, text=True, timeout=30)
 
                     if result.returncode == 0:
                         logger.info("✅ Password reset successful")
                         return True
-                    else:
-                        logger.warning(f"Reset attempt failed: {result.stderr}")
+                    logger.warning(f"Reset attempt failed: {result.stderr}")
 
                 except FileNotFoundError:
                     logger.debug(f"Command not found: {cmd[0]}")
@@ -184,7 +182,7 @@ class Neo4jAuthResolver:
                 logger.info("📝 Updating .env file with working credentials...")
 
                 # Read current content
-                with open(env_file, 'r') as f:
+                with open(env_file) as f:
                     content = f.read()
 
                 # Update or add Neo4j credentials
@@ -200,7 +198,7 @@ class Neo4jAuthResolver:
                         updated_lines.append(f'NEO4J_PASSWORD={password}')
                         neo4j_vars_updated.add('password')
                     elif line.startswith('NEO4J_URI='):
-                        updated_lines.append(f'NEO4J_URI=bolt://localhost:7687')
+                        updated_lines.append('NEO4J_URI=bolt://localhost:7687')
                         neo4j_vars_updated.add('uri')
                     else:
                         updated_lines.append(line)
@@ -253,10 +251,9 @@ def main():
         logger.info("\n🎉 Neo4j authentication resolved!")
         logger.info("You can now proceed with TTA system startup.")
         return 0
-    else:
-        logger.error("\n⚠️  Neo4j authentication still needs attention.")
-        logger.info("Please follow the setup guidance above.")
-        return 1
+    logger.error("\n⚠️  Neo4j authentication still needs attention.")
+    logger.info("Please follow the setup guidance above.")
+    return 1
 
 if __name__ == "__main__":
     try:

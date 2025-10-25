@@ -11,7 +11,6 @@ import time
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,

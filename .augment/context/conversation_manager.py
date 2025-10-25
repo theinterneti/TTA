@@ -644,8 +644,7 @@ class AIConversationContextManager:
         )
         self.contexts[session_id] = context
         logger.info(
-            f"Created new session: {session_id} "
-            f"(max_tokens: {context.max_tokens})"
+            f"Created new session: {session_id} (max_tokens: {context.max_tokens})"
         )
         return context
 

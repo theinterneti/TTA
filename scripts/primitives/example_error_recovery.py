@@ -6,23 +6,20 @@ This demonstrates how to use retry decorators, error classification,
 and fallback strategies in development scripts.
 """
 
-import subprocess
 import logging
-from pathlib import Path
+import subprocess
 
 from error_recovery import (
+    CircuitBreaker,
+    RetryConfig,
+    classify_error,
     with_retry,
     with_retry_async,
-    RetryConfig,
-    CircuitBreaker,
-    ErrorCategory,
-    classify_error
 )
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -33,10 +30,7 @@ def run_tests_simple():
     """Run tests with default retry configuration."""
     logger.info("Running tests...")
     result = subprocess.run(
-        ["uvx", "pytest", "tests/", "-v"],
-        capture_output=True,
-        text=True,
-        check=True
+        ["uvx", "pytest", "tests/", "-v"], capture_output=True, text=True, check=True
     )
     return result.stdout
 
@@ -46,12 +40,7 @@ def run_tests_simple():
 def install_dependencies():
     """Install dependencies with custom retry settings."""
     logger.info("Installing dependencies...")
-    result = subprocess.run(
-        ["uv", "sync"],
-        capture_output=True,
-        text=True,
-        check=True
-    )
+    result = subprocess.run(["uv", "sync"], capture_output=True, text=True, check=True)
     return result.stdout
 
 
@@ -63,10 +52,7 @@ def fallback_cached_dependencies():
     return "Using cached dependencies"
 
 
-@with_retry(
-    RetryConfig(max_retries=3),
-    fallback=fallback_cached_dependencies
-)
+@with_retry(RetryConfig(max_retries=3), fallback=fallback_cached_dependencies)
 def ensure_dependencies():
     """Ensure dependencies are installed, with fallback to cache."""
     return install_dependencies()
@@ -90,7 +76,7 @@ def create_build_circuit_breaker():
     return CircuitBreaker(
         failure_threshold=3,
         recovery_timeout=60.0,
-        expected_exception=subprocess.CalledProcessError
+        expected_exception=subprocess.CalledProcessError,
     )
 
 
@@ -104,7 +90,7 @@ def run_build_with_circuit_breaker():
             ["uv", "run", "python", "-m", "build"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
         return result.stdout
 
@@ -144,8 +130,9 @@ def run_linting():
     logger.info("Running linting...")
     result = subprocess.run(
         ["uvx", "ruff", "check", "src/", "tests/"],
+        check=False,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     if result.returncode != 0:
@@ -160,9 +147,7 @@ def run_type_checking():
     """Run type checking with retry on transient failures."""
     logger.info("Running type checking...")
     result = subprocess.run(
-        ["uvx", "pyright", "src/"],
-        capture_output=True,
-        text=True
+        ["uvx", "pyright", "src/"], check=False, capture_output=True, text=True
     )
 
     if result.returncode != 0:
@@ -179,27 +164,27 @@ def run_quality_checks():
 
     # Run linting
     try:
-        results['linting'] = run_linting()
+        results["linting"] = run_linting()
         logger.info("✓ Linting passed")
     except Exception as e:
         logger.error(f"✗ Linting failed: {e}")
-        results['linting'] = None
+        results["linting"] = None
 
     # Run type checking
     try:
-        results['type_checking'] = run_type_checking()
+        results["type_checking"] = run_type_checking()
         logger.info("✓ Type checking passed")
     except Exception as e:
         logger.error(f"✗ Type checking failed: {e}")
-        results['type_checking'] = None
+        results["type_checking"] = None
 
     # Run tests
     try:
-        results['tests'] = run_tests_simple()
+        results["tests"] = run_tests_simple()
         logger.info("✓ Tests passed")
     except Exception as e:
         logger.error(f"✗ Tests failed: {e}")
-        results['tests'] = None
+        results["tests"] = None
 
     return results
 

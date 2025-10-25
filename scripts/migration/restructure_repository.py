@@ -13,11 +13,8 @@ Usage:
 
 import argparse
 import json
-import re
 import shutil
 from pathlib import Path
-from typing import Dict, List, Tuple
-import sys
 
 # Migration mapping: source -> destination
 MIGRATION_MAP = {
@@ -25,7 +22,6 @@ MIGRATION_MAP = {
     "src/agent_orchestration": "packages/tta-ai-framework/src/tta_ai/orchestration",
     "src/components/model_management": "packages/tta-ai-framework/src/tta_ai/models",
     "src/ai_components/prompts": "packages/tta-ai-framework/src/tta_ai/prompts",
-
     # Narrative Engine components
     "src/components/gameplay_loop/narrative": "packages/tta-narrative-engine/src/tta_narrative/generation",
     "src/components/narrative_arc_orchestrator": "packages/tta-narrative-engine/src/tta_narrative/orchestration",
@@ -41,7 +37,6 @@ IMPORT_REPLACEMENTS = {
     "import tta_ai.orchestration": "import tta_ai.orchestration",
     "import tta_ai.models": "import tta_ai.models",
     "import tta_ai.prompts": "import tta_ai.prompts",
-
     # Narrative Engine imports
     "from tta_narrative.generation": "from tta_narrative.generation",
     "from tta_narrative.orchestration": "from tta_narrative.orchestration",
@@ -73,10 +68,12 @@ class RepositoryRestructurer:
     def __init__(self, repo_root: Path, dry_run: bool = True):
         self.repo_root = repo_root
         self.dry_run = dry_run
-        self.migration_log: List[Dict] = []
-        self.import_updates: List[Dict] = []
+        self.migration_log: list[dict] = []
+        self.import_updates: list[dict] = []
 
-    def log_action(self, action: str, source: str, destination: str = "", status: str = "pending"):
+    def log_action(
+        self, action: str, source: str, destination: str = "", status: str = "pending"
+    ):
         """Log a migration action."""
         entry = {
             "action": action,
@@ -156,7 +153,8 @@ class RepositoryRestructurer:
         # Exclude certain directories
         exclude_patterns = [".venv", "venv", "__pycache__", ".git", "node_modules"]
         python_files = [
-            f for f in python_files
+            f
+            for f in python_files
             if not any(pattern in str(f) for pattern in exclude_patterns)
         ]
 
@@ -175,10 +173,16 @@ class RepositoryRestructurer:
                 # If content changed, update the file
                 if content != original_content:
                     relative_path = py_file.relative_to(self.repo_root)
-                    self.import_updates.append({
-                        "file": str(relative_path),
-                        "changes": sum(1 for old in IMPORT_REPLACEMENTS if old in original_content)
-                    })
+                    self.import_updates.append(
+                        {
+                            "file": str(relative_path),
+                            "changes": sum(
+                                1
+                                for old in IMPORT_REPLACEMENTS
+                                if old in original_content
+                            ),
+                        }
+                    )
 
                     if not self.dry_run:
                         py_file.write_text(content)
@@ -223,16 +227,18 @@ class RepositoryRestructurer:
                 "total_actions": len(self.migration_log),
                 "files_with_import_updates": len(self.import_updates),
                 "total_import_changes": sum(u["changes"] for u in self.import_updates),
-            }
+            },
         }
 
         return json.dumps(report, indent=2)
 
     def execute(self):
         """Execute the full migration."""
-        print(f"\n{'='*60}")
-        print(f"TTA Repository Restructuring - {'DRY RUN' if self.dry_run else 'EXECUTION'}")
-        print(f"{'='*60}")
+        print(f"\n{'=' * 60}")
+        print(
+            f"TTA Repository Restructuring - {'DRY RUN' if self.dry_run else 'EXECUTION'}"
+        )
+        print(f"{'=' * 60}")
 
         self.create_directory_structure()
         self.migrate_code()
@@ -249,27 +255,37 @@ class RepositoryRestructurer:
         else:
             print(f"\n[DRY-RUN] Would save migration report to: {report_path}")
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Migration {'Preview' if self.dry_run else 'Execution'} Complete")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
 
 def main():
     parser = argparse.ArgumentParser(description="TTA Repository Restructuring Tool")
-    parser.add_argument("--dry-run", action="store_true", help="Preview changes without executing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Preview changes without executing"
+    )
     parser.add_argument("--execute", action="store_true", help="Execute the migration")
-    parser.add_argument("--rollback", action="store_true", help="Rollback to pre-restructure-backup branch")
+    parser.add_argument(
+        "--rollback",
+        action="store_true",
+        help="Rollback to pre-restructure-backup branch",
+    )
 
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[2]
 
     if args.rollback:
-        print("Rollback functionality: Use 'git checkout pre-restructure-backup' to rollback")
+        print(
+            "Rollback functionality: Use 'git checkout pre-restructure-backup' to rollback"
+        )
         return
 
     if args.execute:
-        response = input("This will modify the repository structure. Continue? (yes/no): ")
+        response = input(
+            "This will modify the repository structure. Continue? (yes/no): "
+        )
         if response.lower() != "yes":
             print("Migration cancelled.")
             return

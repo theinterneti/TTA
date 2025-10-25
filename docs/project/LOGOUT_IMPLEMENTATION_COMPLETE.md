@@ -31,7 +31,7 @@ Successfully investigated and fixed the logout functionality in the TTA staging 
 async def logout(request: Request, response: Response):
     session_id = get_session_id(request)
     logger.debug(f"Logout endpoint called. Session ID from cookie: {session_id}")
-    
+
     if session_id:
         try:
             session_manager = get_session_manager()
@@ -40,7 +40,7 @@ async def logout(request: Request, response: Response):
             logger.info(f"Session {session_id} deletion result: {deleted}")
         except Exception as e:
             logger.error(f"Error deleting session {session_id}: {e}", exc_info=True)
-    
+
     response.delete_cookie(
         key="openrouter_session_id",
         path="/",
@@ -49,7 +49,7 @@ async def logout(request: Request, response: Response):
         httponly=True,
     )
     logger.debug("Session cookie cleared successfully")
-    
+
     return {"message": "Logged out successfully", "session_id": session_id}
 ```
 
@@ -68,7 +68,7 @@ async def logout(request: Request, response: Response):
 ```python
 async def delete_session(self, session_id: str) -> bool:
     logger.debug(f"Starting session deletion for session_id: {session_id}")
-    
+
     try:
         session = await self.get_session(session_id)
         if session:
@@ -76,18 +76,18 @@ async def delete_session(self, session_id: str) -> bool:
             logger.debug(f"Found session for user_id: {user_id}")
             removed = await self.redis.srem(self._user_sessions_key(user_id), session_id)
             logger.debug(f"Removed session {session_id} from user sessions set: {removed}")
-        
+
         key = self._session_key(session_id)
         logger.debug(f"Deleting session key from Redis: {key}")
         result = await self.redis.delete(key)
-        
+
         # Verify deletion
         verify_key = await self.redis.exists(key)
         if verify_key == 0:
             logger.debug(f"Verified: session key {key} no longer exists in Redis")
         else:
             logger.error(f"ERROR: session key {key} still exists in Redis")
-        
+
         return result > 0
     except Exception as e:
         logger.error(f"Error during session deletion: {e}", exc_info=True)
@@ -277,4 +277,3 @@ For issues or questions:
 2. Check `docs/LOGOUT_FLOW_INVESTIGATION.md` for detailed investigation
 3. Run debug tests: `./scripts/test-logout-flow.sh debug`
 4. Check backend logs: `docker logs tta-api-staging | grep -i logout`
-

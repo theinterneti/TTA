@@ -12,7 +12,6 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 import pytest_asyncio
 from fastapi.websockets import WebSocket
-
 from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,

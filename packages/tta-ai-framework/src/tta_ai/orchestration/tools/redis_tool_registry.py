@@ -237,9 +237,7 @@ class RedisToolRegistry:
         return await self._cache.stats()
 
     async def deprecate_tool(self, name: str, version: str) -> None:
-        await self._redis.set(
-            self._status_key(name, version), ToolStatus.DEPRECATED.value
-        )
+        await self._redis.set(self._status_key(name, version), ToolStatus.DEPRECATED.value)
         key = self._key(name, version)
         cached = await self._cache.get(key)
         if cached:
@@ -277,9 +275,7 @@ class RedisToolRegistry:
             status = data.get("status", ToolStatus.ACTIVE.value)
             if status == ToolStatus.ACTIVE.value and (now - last) > max_idle_seconds:
                 # soft deprecate then remove index to allow GC by external retention policies
-                await self._redis.set(
-                    self._status_key(nm, ver), ToolStatus.DEPRECATED.value
-                )
+                await self._redis.set(self._status_key(nm, ver), ToolStatus.DEPRECATED.value)
                 await self._redis.srem(self._idx, f"{nm}:{ver}")
                 removed += 1
         return removed

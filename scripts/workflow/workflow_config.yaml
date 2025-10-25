@@ -5,25 +5,25 @@
 quality_gates:
   # Testing gates
   test_coverage:
-    dev_threshold: 50.0      # Minimum coverage for development
-    staging_threshold: 70.0  # Minimum coverage for staging promotion
-    production_threshold: 80.0  # Minimum coverage for production promotion
+    dev_threshold: 50.0 # Minimum coverage for development
+    staging_threshold: 70.0 # Minimum coverage for staging promotion
+    production_threshold: 80.0 # Minimum coverage for production promotion
 
   test_pass_rate:
-    required: 100.0  # All tests must pass
+    required: 100.0 # All tests must pass
 
   # Code quality gates
   linting:
-    max_issues: 0  # No linting issues allowed
-    auto_fix: true  # Automatically fix issues where possible
+    max_issues: 0 # No linting issues allowed
+    auto_fix: true # Automatically fix issues where possible
 
   type_checking:
-    max_errors: 0  # No type errors allowed
+    max_errors: 0 # No type errors allowed
 
   security:
-    max_critical: 0  # No critical security issues
-    max_high: 0      # No high security issues
-    max_medium: 5    # Up to 5 medium security issues allowed
+    max_critical: 0 # No critical security issues
+    max_high: 0 # No high security issues
+    max_medium: 5 # Up to 5 medium security issues allowed
 
   # Performance gates (placeholder)
   performance:
@@ -104,7 +104,7 @@ context_management:
   # Pruning strategy
   pruning:
     preserve_system_messages: true
-    preserve_high_importance: true  # importance >= 0.8
+    preserve_high_importance: true # importance >= 0.8
     preserve_recent_count: 5
 
 # Component Maturity Workflow
@@ -121,7 +121,7 @@ maturity_workflow:
   # Staging stage
   staging:
     required_gates:
-      - test_coverage  # >= 70%
+      - test_coverage # >= 70%
       - test_pass_rate
       - linting
       - type_checking
@@ -132,7 +132,7 @@ maturity_workflow:
   # Production stage
   production:
     required_gates:
-      - test_coverage  # >= 80% integration tests
+      - test_coverage # >= 80% integration tests
       - test_pass_rate
       - linting
       - type_checking
@@ -153,7 +153,7 @@ stages:
     timeout_seconds: 60
 
   implementation:
-    enabled: false  # Not yet implemented
+    enabled: false # Not yet implemented
     timeout_seconds: 3600
 
   testing:
@@ -175,7 +175,7 @@ stages:
     enabled: true
     timeout_seconds: 900
     rollback_on_failure: true
-    require_manual_approval: false  # Set to true for production safety
+    require_manual_approval: false # Set to true for production safety
 
 # Notification Configuration (placeholder)
 notifications:

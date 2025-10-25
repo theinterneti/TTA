@@ -110,8 +110,8 @@ def test_provider_configuration():
     print("\n🔍 Testing provider configuration...")
 
     try:
-        from components.model_management.providers import OpenRouterProvider
         from components.model_management.models import ProviderConfig
+        from components.model_management.providers import OpenRouterProvider
 
         # Test OpenRouter provider configuration
         openrouter_key = os.getenv("OPENROUTER_API_KEY")
@@ -125,9 +125,8 @@ def test_provider_configuration():
             provider = OpenRouterProvider(config)
             print("✅ OpenRouter provider configured successfully")
             return True
-        else:
-            print("⚠️  OpenRouter API key not configured, skipping provider test")
-            return True
+        print("⚠️  OpenRouter API key not configured, skipping provider test")
+        return True
 
     except Exception as e:
         print(f"❌ Failed to configure providers: {e}")
@@ -174,9 +173,8 @@ def main():
     if failed == 0:
         print("\n🎉 All tests passed! Model management environment integration is working correctly.")
         return True
-    else:
-        print(f"\n❌ {failed} test(s) failed. Please check your environment configuration.")
-        return False
+    print(f"\n❌ {failed} test(s) failed. Please check your environment configuration.")
+    return False
 
 if __name__ == "__main__":
     success = main()

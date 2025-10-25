@@ -50,9 +50,8 @@ class TestUserCreator:
                         f"API health check passed: {data.get('status', 'unknown')}"
                     )
                     return True
-                else:
-                    logger.error(f"API health check failed: HTTP {response.status}")
-                    return False
+                logger.error(f"API health check failed: HTTP {response.status}")
+                return False
         except Exception as e:
             logger.error(f"API health check error: {e}")
             return False
@@ -112,7 +111,7 @@ class TestUserCreator:
                         "test_group": user_data["test_group"],
                         "created": True,
                     }
-                elif response.status == 409:
+                if response.status == 409:
                     logger.warning(f"User already exists: {user_data['username']}")
                     return {
                         "username": user_data["username"],
@@ -122,12 +121,11 @@ class TestUserCreator:
                         "created": False,
                         "error": "already_exists",
                     }
-                else:
-                    error_text = await response.text()
-                    logger.error(
-                        f"Failed to create user {user_data['username']}: HTTP {response.status} - {error_text}"
-                    )
-                    return None
+                error_text = await response.text()
+                logger.error(
+                    f"Failed to create user {user_data['username']}: HTTP {response.status} - {error_text}"
+                )
+                return None
         except Exception as e:
             logger.error(f"Error creating user {user_data['username']}: {e}")
             return None
@@ -172,8 +170,7 @@ class TestUserCreator:
                 if response.status == 200:
                     result = await response.json()
                     return "access_token" in result
-                else:
-                    return False
+                return False
         except Exception as e:
             logger.error(f"Login verification error for {username}: {e}")
             return False

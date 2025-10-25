@@ -416,4 +416,3 @@ get-library-docs_Context_7(
 **Status:** Active
 **Last Updated:** 2025-10-22
 **Related Rules:** `Use-your-tools.md`, `prefer-uvx-for-tools.md`
-

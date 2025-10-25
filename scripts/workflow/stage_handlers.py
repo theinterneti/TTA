@@ -10,7 +10,6 @@ Implements stage-specific logic for the integrated workflow:
 - Production deployment
 """
 
-import json
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -125,8 +124,12 @@ class TestingStage:
             outputs = {
                 "component_path": str(self.component_path),
                 "gates_run": list(quality_gates.keys()),
-                "gates_passed": [name for name, gate in quality_gates.items() if gate.passed],
-                "gates_failed": [name for name, gate in quality_gates.items() if not gate.passed],
+                "gates_passed": [
+                    name for name, gate in quality_gates.items() if gate.passed
+                ],
+                "gates_failed": [
+                    name for name, gate in quality_gates.items() if not gate.passed
+                ],
             }
 
             # Collect errors
@@ -188,8 +191,12 @@ class RefactoringStage:
             outputs = {
                 "component_path": str(self.component_path),
                 "gates_run": list(quality_gates.keys()),
-                "gates_passed": [name for name, gate in quality_gates.items() if gate.passed],
-                "gates_failed": [name for name, gate in quality_gates.items() if not gate.passed],
+                "gates_passed": [
+                    name for name, gate in quality_gates.items() if gate.passed
+                ],
+                "gates_failed": [
+                    name for name, gate in quality_gates.items() if not gate.passed
+                ],
                 "auto_fix_applied": self.config.get("auto_fix_linting", True),
             }
 
@@ -218,10 +225,15 @@ class RefactoringStage:
         try:
             subprocess.run(
                 [
-                    "uv", "run", "ruff", "check", "--fix",
+                    "uv",
+                    "run",
+                    "ruff",
+                    "check",
+                    "--fix",
                     f"src/{self.component_path.name}/",
                     f"tests/{self.component_path.name}/",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -229,10 +241,14 @@ class RefactoringStage:
 
             subprocess.run(
                 [
-                    "uv", "run", "ruff", "format",
+                    "uv",
+                    "run",
+                    "ruff",
+                    "format",
                     f"src/{self.component_path.name}/",
                     f"tests/{self.component_path.name}/",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -307,13 +323,15 @@ class StagingDeploymentStage:
         security_gate = quality_gates.get("security")
         security_passed = security_gate and security_gate.passed
 
-        all_passed = all([
-            coverage_passed,
-            tests_passed,
-            linting_passed,
-            typing_passed,
-            security_passed,
-        ])
+        all_passed = all(
+            [
+                coverage_passed,
+                tests_passed,
+                linting_passed,
+                typing_passed,
+                security_passed,
+            ]
+        )
 
         errors = []
         if not coverage_passed:
@@ -330,7 +348,9 @@ class StagingDeploymentStage:
         return {
             "passed": all_passed,
             "errors": errors,
-            "quality_gates": {name: gate.to_dict() for name, gate in quality_gates.items()},
+            "quality_gates": {
+                name: gate.to_dict() for name, gate in quality_gates.items()
+            },
         }
 
     def _deploy_to_staging(self) -> dict[str, Any]:

@@ -395,4 +395,3 @@ SKIP=run-tests-on-changed-files git commit -m "message"
 
 **Last Updated:** 2025-10-23
 **Validation Frequency:** Quarterly or after major changes
-

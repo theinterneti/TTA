@@ -12,7 +12,6 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.models import AgentType
 from tta_ai.orchestration.performance.optimization import IntelligentAgentCoordinator
 from tta_ai.orchestration.performance.response_time_monitor import (

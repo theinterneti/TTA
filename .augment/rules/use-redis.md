@@ -597,4 +597,3 @@ type_Redis(key="user:12345")  # Returns: "hash", "string", "list", etc.
 **Status:** Active
 **Last Updated:** 2025-10-22
 **Related Rules:** `Use-your-tools.md`, `ai-context-management.md`
-

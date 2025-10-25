@@ -151,9 +151,8 @@ def check_openrouter_config():
                 f"  ✅ OpenRouter API key valid ({len(free_models)} free models available)"
             )
             return True
-        else:
-            print(f"  ❌ OpenRouter API key invalid (status: {response.status_code})")
-            return False
+        print(f"  ❌ OpenRouter API key invalid (status: {response.status_code})")
+        return False
     except Exception as e:
         print(f"  ❌ OpenRouter API test failed: {e}")
         return False

@@ -13,7 +13,6 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
-import json
 import logging
 import os
 import secrets
@@ -188,9 +187,7 @@ class CursorManager:
         # Validate timestamp
         age_seconds = time.time() - cursor_data.timestamp
         if age_seconds > self.ttl_seconds:
-            logger.warning(
-                f"Cursor expired: age={age_seconds:.1f}s, ttl={self.ttl_seconds}s"
-            )
+            logger.warning(f"Cursor expired: age={age_seconds:.1f}s, ttl={self.ttl_seconds}s")
             raise ValueError(
                 f"Cursor expired: age={age_seconds:.1f}s exceeds TTL of {self.ttl_seconds}s"
             )
@@ -252,9 +249,7 @@ class CursorManager:
             >>> decoded.offset
             50
         """
-        cursor_data = CursorData(
-            offset=offset, filters=filters or {}, sort_key=sort_key
-        )
+        cursor_data = CursorData(offset=offset, filters=filters or {}, sort_key=sort_key)
         return self.encode_cursor(cursor_data)
 
 
@@ -295,4 +290,3 @@ def set_cursor_manager(manager: CursorManager) -> None:
     """
     global _cursor_manager
     _cursor_manager = manager
-

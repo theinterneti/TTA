@@ -24,7 +24,7 @@ import json
 import logging
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from redis.asyncio import Redis
 
@@ -46,7 +46,7 @@ def _now_us() -> int:
 
 
 def _iso_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class RedisMessageCoordinator(MessageCoordinator):
@@ -194,7 +194,7 @@ class RedisMessageCoordinator(MessageCoordinator):
                 token=token,
                 queue_message=QueueMessage(**qmsg_dict),
                 visibility_deadline=datetime.fromtimestamp(
-                    deadline / 1_000_000, tz=timezone.utc
+                    deadline / 1_000_000, tz=UTC
                 ).isoformat(),
             )
         return None

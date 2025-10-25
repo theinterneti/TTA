@@ -1,9 +1,7 @@
 """Tests for safety rule engine."""
 
-import pytest
-
 from src.agent_orchestration.safety_validation.engine import SafetyRuleEngine
-from src.agent_orchestration.safety_validation.enums import SafetyLevel, ValidationType
+from src.agent_orchestration.safety_validation.enums import SafetyLevel
 from src.agent_orchestration.safety_validation.models import SafetyRule
 
 
@@ -56,4 +54,3 @@ class TestSafetyRuleEngine:
         findings = engine.evaluate("test text")
         # Placeholder returns empty list
         assert findings == []
-

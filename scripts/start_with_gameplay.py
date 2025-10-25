@@ -7,17 +7,16 @@ Core Gameplay Loop functionality, ensuring proper initialization order
 and dependency management.
 """
 
-import sys
 import asyncio
 import logging
+import sys
 from pathlib import Path
 
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.orchestration import TTAOrchestrator, TTAConfig
-from src.components.gameplay_loop_component import GameplayLoopComponent
 from src.integration.gameplay_loop_integration import GameplayLoopIntegration
+from src.orchestration import TTAConfig, TTAOrchestrator
 
 # Configure logging
 logging.basicConfig(

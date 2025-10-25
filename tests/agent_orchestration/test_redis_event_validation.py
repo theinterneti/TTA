@@ -10,7 +10,6 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.realtime.event_publisher import EventPublisher
 from tta_ai.orchestration.realtime.event_subscriber import EventSubscriber
 from tta_ai.orchestration.realtime.models import (

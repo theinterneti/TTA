@@ -405,12 +405,11 @@ class RealUserTestingFramework:
             anonymized = user_input.lower()
             # Remove common names, locations, etc. (would use NLP in real implementation)
             return f"[ANONYMIZED_INPUT_{len(anonymized)}_CHARS]"
-        elif anonymization_level == "partial":
+        if anonymization_level == "partial":
             # Partial anonymization - keep general content, remove specific identifiers
             return f"[PARTIALLY_ANONYMIZED]: {user_input[:50]}..."
-        else:
-            # Minimal anonymization - keep most content
-            return user_input
+        # Minimal anonymization - keep most content
+        return user_input
 
     async def end_user_session(
         self, session_id: str, completion_status: str = "completed"

@@ -139,6 +139,5 @@ key: value
 
 ---
 
-**Maintainer**: [GitHub username]  
+**Maintainer**: [GitHub username]
 **Last Updated**: YYYY-MM-DD
-

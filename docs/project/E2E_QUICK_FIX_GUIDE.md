@@ -217,7 +217,7 @@ export class LoginPage extends BasePage {
   readonly passwordInput = this.page.locator('input[name="password"]');
   readonly loginButton = this.page.locator('button[type="submit"]');
   readonly errorMessage = this.page.locator('.bg-red-50, [data-testid="error-message"]');
-  
+
   // Or use data-testid (preferred after adding them to components)
   readonly usernameInput = this.page.locator('[data-testid="username-input"]');
   readonly passwordInput = this.page.locator('[data-testid="password-input"]');
@@ -317,6 +317,5 @@ After making fixes, verify:
 
 ---
 
-**Last Updated:** October 6, 2025  
+**Last Updated:** October 6, 2025
 **Status:** Initial version based on validation findings
-

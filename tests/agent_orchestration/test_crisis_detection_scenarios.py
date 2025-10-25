@@ -6,7 +6,6 @@ appropriate sensitivity and specificity for crisis intervention.
 """
 
 import pytest
-
 from tta_ai.orchestration.therapeutic_safety import (
     CrisisType,
     TherapeuticValidator,

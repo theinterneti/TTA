@@ -7,16 +7,17 @@ Provides Prometheus-compatible health check metrics for TTA services
 import asyncio
 import logging
 import time
-import yaml
-from typing import Dict, Any, Optional
-from prometheus_client import start_http_server, Gauge, Counter, Info, generate_latest
-import requests
-import redis
-from neo4j import GraphDatabase
+from typing import Any
+
 import psycopg2
+import redis
+import requests
+import uvicorn
+import yaml
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
-import uvicorn
+from neo4j import GraphDatabase
+from prometheus_client import Counter, Gauge, Info, generate_latest
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -32,7 +33,7 @@ class HealthChecker:
     """Health check service for TTA infrastructure"""
 
     def __init__(self, config_path: str = "config.yaml"):
-        with open(config_path, 'r') as f:
+        with open(config_path) as f:
             self.config = yaml.safe_load(f)
 
         self.services = self.config.get('services', {})
@@ -44,7 +45,7 @@ class HealthChecker:
 
         logger.info(f"Initialized health checker for {len(self.services)} services")
 
-    async def check_redis_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_redis_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check Redis service health"""
         start_time = time.time()
         try:
@@ -81,7 +82,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_neo4j_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_neo4j_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check Neo4j service health"""
         start_time = time.time()
         try:
@@ -121,7 +122,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_postgres_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_postgres_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check PostgreSQL service health"""
         start_time = time.time()
         try:
@@ -162,7 +163,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_http_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_http_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check HTTP service health"""
         start_time = time.time()
         try:
@@ -185,12 +186,11 @@ class HealthChecker:
                         'headers': dict(response.headers)
                     }
                 }
-            else:
-                return {
-                    'status': 'down',
-                    'response_time': response_time,
-                    'error': f"Unexpected status code: {response.status_code}"
-                }
+            return {
+                'status': 'down',
+                'response_time': response_time,
+                'error': f"Unexpected status code: {response.status_code}"
+            }
         except Exception as e:
             response_time = time.time() - start_time
             logger.error(f"HTTP health check failed for {service_name}: {e}")
@@ -200,26 +200,25 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_service_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_service_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check health of a single service based on its type"""
         service_type = config.get('type', 'http')
 
         if service_type == 'redis':
             return await self.check_redis_health(service_name, config)
-        elif service_type == 'neo4j':
+        if service_type == 'neo4j':
             return await self.check_neo4j_health(service_name, config)
-        elif service_type == 'postgres':
+        if service_type == 'postgres':
             return await self.check_postgres_health(service_name, config)
-        elif service_type == 'http':
+        if service_type == 'http':
             return await self.check_http_health(service_name, config)
-        else:
-            return {
-                'status': 'down',
-                'response_time': 0,
-                'error': f"Unknown service type: {service_type}"
-            }
+        return {
+            'status': 'down',
+            'response_time': 0,
+            'error': f"Unknown service type: {service_type}"
+        }
 
-    async def update_metrics(self, service_name: str, result: Dict[str, Any]):
+    async def update_metrics(self, service_name: str, result: dict[str, Any]):
         """Update Prometheus metrics based on health check result"""
         environment = 'staging'
         instance = f"{service_name}-staging"

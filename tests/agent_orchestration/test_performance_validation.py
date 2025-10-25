@@ -11,7 +11,6 @@ import time
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.models import AgentType
 from tta_ai.orchestration.performance.alerting import PerformanceAlerting
 from tta_ai.orchestration.performance.analytics import PerformanceAnalytics

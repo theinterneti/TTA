@@ -45,12 +45,12 @@ description: "Brief description of what this prompt does"
 agent_type: "agent_name"  # e.g., "safety_validator", "narrative_generator"
 template: |
   Your prompt template here with {variable_placeholders}.
-  
+
   Example:
   Analyze this input: "{user_input}"
-  
+
   Context: {context}
-  
+
   Respond with structured output.
 variables:
   - user_input
@@ -129,10 +129,10 @@ try:
         intent=intent,
         world_context=context
     )
-    
+
     response = await llm.ainvoke([SystemMessage(content=prompt_text)])
     latency_ms = (time.time() - start_time) * 1000
-    
+
     # Record metrics
     registry.record_metrics(
         "narrative_generation",
@@ -141,7 +141,7 @@ try:
         cost_usd=0.0005,
         quality_score=8.5,
     )
-    
+
 except Exception as e:
     # Record error
     registry.record_metrics(
@@ -358,4 +358,3 @@ See `src/agent_orchestration/langgraph_orchestrator.py` for production examples:
 - [AI Development Best Practices Audit](../docs/ai-development-audit.md)
 - [LLM Response Quality Testing](../docs/llm-quality-testing.md)
 - [Prompt Engineering Guide](../docs/prompt-engineering.md)
-

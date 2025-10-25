@@ -359,6 +359,32 @@ class CircuitBreaker:
             )
             raise
 
+    async def execute(
+        self, func: Callable[..., Awaitable[Any]], *args, **kwargs
+    ) -> Any:
+        """
+        Execute a function with arguments through the circuit breaker.
+
+        This is an alias for call() that supports passing arguments to the function.
+
+        Args:
+            func: Async function to execute
+            *args: Positional arguments to pass to the function
+            **kwargs: Keyword arguments to pass to the function
+
+        Returns:
+            Result of the function call
+
+        Raises:
+            CircuitBreakerOpenError: When circuit breaker is open
+            Exception: Any exception raised by the function
+        """
+        # Create a wrapper function that calls func with the provided arguments
+        async def wrapper():
+            return await func(*args, **kwargs)
+
+        return await self.call(wrapper)
+
     async def _record_success(self) -> None:
         """Record a successful operation."""
         async with self._lock:

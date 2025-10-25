@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Health check script for Carbon component."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
+
 
 def health_check():
     """Perform health check on Carbon component."""

@@ -10,8 +10,9 @@ Usage:
 
 import subprocess
 import time
-from dev_metrics import track_execution, get_collector
+
 from dashboard import generate_dashboard
+from dev_metrics import get_collector, track_execution
 
 
 # Example 1: Track test execution
@@ -21,8 +22,9 @@ def run_unit_tests():
     print("Running unit tests...")
     result = subprocess.run(
         ["uvx", "pytest", "tests/unit/", "-v", "--tb=short"],
+        check=False,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     if result.returncode != 0:
@@ -31,14 +33,17 @@ def run_unit_tests():
     return result.stdout
 
 
-@track_execution("pytest_integration_tests", metadata={"suite": "integration", "type": "test"})
+@track_execution(
+    "pytest_integration_tests", metadata={"suite": "integration", "type": "test"}
+)
 def run_integration_tests():
     """Run integration tests with metrics tracking."""
     print("Running integration tests...")
     result = subprocess.run(
         ["uvx", "pytest", "tests/integration/", "-v", "--tb=short"],
+        check=False,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     if result.returncode != 0:
@@ -54,8 +59,9 @@ def build_docker_image():
     print("Building Docker image...")
     result = subprocess.run(
         ["docker", "build", "-t", "tta:dev", "-f", "docker/Dockerfile.dev", "."],
+        check=False,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     if result.returncode != 0:
@@ -71,8 +77,9 @@ def run_ruff_lint():
     print("Running ruff lint...")
     result = subprocess.run(
         ["uvx", "ruff", "check", "src/", "tests/"],
+        check=False,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     if result.returncode != 0:
@@ -86,9 +93,7 @@ def run_pyright():
     """Run pyright type checking with metrics tracking."""
     print("Running pyright...")
     result = subprocess.run(
-        ["uvx", "pyright", "src/"],
-        capture_output=True,
-        text=True
+        ["uvx", "pyright", "src/"], check=False, capture_output=True, text=True
     )
 
     if result.returncode != 0:
@@ -118,9 +123,9 @@ def flaky_operation():
 # Example 6: Complete development workflow
 def run_complete_workflow():
     """Run complete development workflow with metrics tracking."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Running Complete Development Workflow")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     operations = [
         ("Linting", run_ruff_lint),
@@ -138,9 +143,9 @@ def run_complete_workflow():
         except Exception as e:
             results[name] = f"✗ FAILED: {str(e)[:50]}"
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Workflow Results:")
-    print("="*60)
+    print("=" * 60)
     for name, result in results.items():
         print(f"  {name}: {result}")
     print()
@@ -152,9 +157,9 @@ def view_metrics_summary():
     collector = get_collector()
     summary = collector.get_metrics_summary(days=7)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Development Metrics Summary (Last 7 Days)")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     if not summary:
         print("No metrics available yet.")
@@ -165,7 +170,9 @@ def view_metrics_summary():
         print(f"  Total Executions: {metrics['total_executions']}")
         print(f"  Success Rate: {metrics['success_rate']:.1%}")
         print(f"  Avg Duration: {metrics['avg_duration_ms']:.0f}ms")
-        print(f"  Min/Max Duration: {metrics['min_duration_ms']:.0f}ms / {metrics['max_duration_ms']:.0f}ms")
+        print(
+            f"  Min/Max Duration: {metrics['min_duration_ms']:.0f}ms / {metrics['max_duration_ms']:.0f}ms"
+        )
         print(f"  Successes: {metrics['successes']}")
         print(f"  Failures: {metrics['failures']}")
         print()
@@ -174,14 +181,11 @@ def view_metrics_summary():
 # Example 8: Generate dashboard
 def generate_metrics_dashboard():
     """Generate HTML dashboard."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Generating Metrics Dashboard")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
-    generate_dashboard(
-        output_file="dev_metrics_dashboard.html",
-        days=30
-    )
+    generate_dashboard(output_file="dev_metrics_dashboard.html", days=30)
 
     print("\nDashboard generated: dev_metrics_dashboard.html")
     print("Open in browser to view visualizations.")
@@ -193,12 +197,12 @@ def view_recent_metrics(operation_name: str = None, limit: int = 5):
     collector = get_collector()
     recent = collector.get_recent_metrics(name=operation_name, limit=limit)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     if operation_name:
         print(f"Recent Metrics for: {operation_name}")
     else:
         print("Recent Metrics (All Operations)")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     if not recent:
         print("No recent metrics found.")
@@ -210,7 +214,7 @@ def view_recent_metrics(operation_name: str = None, limit: int = 5):
         print(f"  Started: {metric['started_at']}")
         print(f"  Duration: {metric.get('duration_ms', 0):.0f}ms")
         print(f"  Status: {metric['status']}")
-        if metric.get('error'):
+        if metric.get("error"):
             print(f"  Error: {metric['error'][:100]}")
         print()
 
@@ -221,7 +225,9 @@ def cleanup_old_metrics(days_to_keep: int = 30):
     collector = get_collector()
     deleted = collector.clear_old_metrics(days_to_keep=days_to_keep)
 
-    print(f"\nCleaned up {deleted} old metrics files (keeping last {days_to_keep} days)")
+    print(
+        f"\nCleaned up {deleted} old metrics files (keeping last {days_to_keep} days)"
+    )
 
 
 if __name__ == "__main__":

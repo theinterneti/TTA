@@ -1,6 +1,6 @@
 # TTA Staging Authentication Debugging Investigation Report
-**Date:** 2025-10-13  
-**Issue:** Login authentication failure - "Failed to fetch" error  
+**Date:** 2025-10-13
+**Issue:** Login authentication failure - "Failed to fetch" error
 **Test:** Complete User Journey E2E Test (Staging Environment)
 
 ---
@@ -333,7 +333,7 @@ npx playwright test tests/e2e-staging/complete-user-journey.staging.spec.ts
      -H "Content-Type: application/json" \
      -d '{"username": "demo_user", "password": "DemoPassword123!"}' \
      -w "\n\nHTTP Status: %{http_code}\n"
-   
+
    {"access_token":"eyJhbGci...","refresh_token":"","token_type":"bearer","expires_in":1800,...}
    HTTP Status: 200
    ```

@@ -1,7 +1,5 @@
 """Tests for safety validation enums."""
 
-import pytest
-
 from src.agent_orchestration.safety_validation.enums import SafetyLevel, ValidationType
 
 
@@ -36,4 +34,3 @@ class TestValidationType:
         """Test ValidationType enum values are strings."""
         assert isinstance(ValidationType.KEYWORD, str)
         assert isinstance(ValidationType.SENTIMENT, str)
-

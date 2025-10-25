@@ -440,4 +440,3 @@ github-api(
 **Status:** Active
 **Last Updated:** 2025-10-22
 **Related Rules:** `Use-your-tools.md`, `integrated-workflow.md`, `ai-context-management.md`
-

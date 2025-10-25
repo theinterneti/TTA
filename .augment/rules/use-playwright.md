@@ -444,4 +444,3 @@ browser_wait_for_Playwright(text="Agent: Active")
 **Status:** Active
 **Last Updated:** 2025-10-22
 **Related Rules:** `Use-your-tools.md`, `integrated-workflow.md`
-

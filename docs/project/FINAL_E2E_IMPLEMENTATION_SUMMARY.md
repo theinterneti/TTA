@@ -337,4 +337,3 @@ You now have a production-ready, comprehensive end-to-end testing framework that
 ---
 
 **Ready to test?** Run `npm run browsers:install && npm run test:staging` 🎉
-

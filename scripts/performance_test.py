@@ -7,11 +7,12 @@ for the integrated gameplay loop system.
 """
 
 import asyncio
-import aiohttp
-import time
-import statistics
-from typing import List, Dict, Any
 import logging
+import statistics
+import time
+from typing import Any
+
+import aiohttp
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class GameplayPerformanceTester:
         if self.session:
             await self.session.close()
 
-    async def test_health_endpoint(self) -> Dict[str, Any]:
+    async def test_health_endpoint(self) -> dict[str, Any]:
         """Test health endpoint performance."""
         logger.info("Testing health endpoint performance...")
 
@@ -54,7 +55,7 @@ class GameplayPerformanceTester:
             "target_met": statistics.mean(response_times) < 0.1  # 100ms target
         }
 
-    async def test_session_creation_performance(self) -> Dict[str, Any]:
+    async def test_session_creation_performance(self) -> dict[str, Any]:
         """Test session creation performance."""
         logger.info("Testing session creation performance...")
 
@@ -87,7 +88,7 @@ class GameplayPerformanceTester:
             "target_met": statistics.mean(response_times) < 1.0  # 1 second target
         }
 
-    async def test_concurrent_sessions(self) -> Dict[str, Any]:
+    async def test_concurrent_sessions(self) -> dict[str, Any]:
         """Test concurrent session handling."""
         logger.info("Testing concurrent session handling...")
 
@@ -120,7 +121,7 @@ class GameplayPerformanceTester:
             "all_completed_under_5s": max(response_times) < 5.0
         }
 
-    async def run_all_tests(self) -> Dict[str, Any]:
+    async def run_all_tests(self) -> dict[str, Any]:
         """Run all performance tests."""
         logger.info("Starting comprehensive performance testing...")
 

@@ -8,21 +8,20 @@ dependencies that might cause startup issues.
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add the project root to Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Dict, Any, Optional, List
-import uuid
 import logging
-import json
+import uuid
+from typing import Any
+
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -48,8 +47,8 @@ app.add_middleware(
 security = HTTPBearer(auto_error=False)
 
 # In-memory storage for testing
-sessions_store: Dict[str, Dict[str, Any]] = {}
-users_store: Dict[str, Dict[str, Any]] = {
+sessions_store: dict[str, dict[str, Any]] = {}
+users_store: dict[str, dict[str, Any]] = {
     "demo_user": {
         "username": "demo_user",
         "password": "demo_password",  # In real app, this would be hashed
@@ -64,7 +63,7 @@ users_store: Dict[str, Dict[str, Any]] = {
 
 # Pydantic models
 class CreateSessionRequest(BaseModel):
-    therapeutic_context: Optional[Dict[str, Any]] = None
+    therapeutic_context: dict[str, Any] | None = None
 
 class CreateSessionResponse(BaseModel):
     session_id: str
@@ -76,23 +75,23 @@ class ProcessChoiceRequest(BaseModel):
 
 class ProcessChoiceResponse(BaseModel):
     success: bool
-    narrative_update: Optional[Dict[str, Any]] = None
+    narrative_update: dict[str, Any] | None = None
     message: str
 
 class SessionStatusResponse(BaseModel):
     session_id: str
-    session_status: Dict[str, Any]
+    session_status: dict[str, Any]
     is_active: bool
 
 class ProgressResponse(BaseModel):
     session_id: str
-    progress: Dict[str, Any]
-    therapeutic_metrics: Optional[Dict[str, Any]] = None
+    progress: dict[str, Any]
+    therapeutic_metrics: dict[str, Any] | None = None
 
 class HealthResponse(BaseModel):
     status: str
     message: str
-    components: Dict[str, str]
+    components: dict[str, str]
     timestamp: str
 
 class LoginRequest(BaseModel):

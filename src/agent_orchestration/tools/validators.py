@@ -277,7 +277,9 @@ class ToolDescriptionValidator:
 
         Example:
             >>> validator = ToolDescriptionValidator()
-            >>> result = validator.validate("Retrieves player profile data including preferences and progress.")
+            >>> result = validator.validate(
+            ...     "Retrieves player profile data including preferences and progress."
+            ... )
             >>> result.score >= 3.0
             True
         """
@@ -386,4 +388,3 @@ class ToolDescriptionValidator:
             findings=findings,
             details={"length": desc_len, "first_word": first_word},
         )
-

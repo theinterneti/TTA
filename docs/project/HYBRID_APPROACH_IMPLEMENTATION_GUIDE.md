@@ -1,9 +1,9 @@
 # Hybrid Approach Implementation Guide
 
-**Date:** 2025-10-21  
-**Strategy:** Spec-Kit (code generation from existing specs) + Custom Gemini Tools (feature parity validation)  
-**Investment:** 6-8 hours  
-**Expected Savings:** 85-129 hours  
+**Date:** 2025-10-21
+**Strategy:** Spec-Kit (code generation from existing specs) + Custom Gemini Tools (feature parity validation)
+**Investment:** 6-8 hours
+**Expected Savings:** 85-129 hours
 **ROI:** 10-16x
 
 ---
@@ -347,13 +347,13 @@ from pathlib import Path
 def check_file(filepath: Path) -> list[str]:
     """Check file for type annotation and anti-pattern violations."""
     violations = []
-    
+
     with open(filepath) as f:
         try:
             tree = ast.parse(f.read(), filename=str(filepath))
         except SyntaxError as e:
             return [f"{filepath}: Syntax error: {e}"]
-    
+
     for node in ast.walk(tree):
         # Check for print statements (T201)
         if isinstance(node, ast.Call):
@@ -361,35 +361,35 @@ def check_file(filepath: Path) -> list[str]:
                 violations.append(
                     f"{filepath}:{node.lineno}: T201 print() found - use logging instead"
                 )
-        
+
         # Check for missing type annotations on functions
         if isinstance(node, ast.FunctionDef):
             if not node.returns and not node.name.startswith('_'):
                 violations.append(
                     f"{filepath}:{node.lineno}: Missing return type annotation on {node.name}()"
                 )
-            
+
             for arg in node.args.args:
                 if not arg.annotation and arg.arg != 'self':
                     violations.append(
                         f"{filepath}:{node.lineno}: Missing type annotation on parameter '{arg.arg}' in {node.name}()"
                     )
-    
+
     return violations
 
 def main():
     """Main entry point."""
     files = [Path(f) for f in sys.argv[1:] if f.endswith('.py')]
-    
+
     all_violations = []
     for filepath in files:
         violations = check_file(filepath)
         all_violations.extend(violations)
-    
+
     if all_violations:
         print("\n".join(all_violations))
         return 1
-    
+
     return 0
 
 if __name__ == '__main__':
@@ -577,7 +577,6 @@ gemini --version
 
 ---
 
-**Status:** ✅ **READY TO PROCEED**  
-**Recommendation:** **HYBRID APPROACH** (Spec-Kit + Custom Gemini Tools)  
+**Status:** ✅ **READY TO PROCEED**
+**Recommendation:** **HYBRID APPROACH** (Spec-Kit + Custom Gemini Tools)
 **Expected Outcome:** Superior code quality, guaranteed feature parity, 10-16x ROI
-

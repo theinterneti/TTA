@@ -9,22 +9,25 @@ Tests cover:
 - Dashboard generation (basic validation)
 """
 
-import pytest
 import json
-import tempfile
-import time
-from pathlib import Path
-from datetime import datetime, timedelta
 
 # Import from scripts/observability/
 import sys
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts" / "observability"))
+import tempfile
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(
+    0, str(Path(__file__).parent.parent.parent / "scripts" / "observability")
+)
 
 from dev_metrics import (
-    ExecutionMetric,
     DevMetricsCollector,
+    ExecutionMetric,
     track_execution,
-    get_collector,
 )
 
 
@@ -35,9 +38,7 @@ class TestExecutionMetric:
         """Test creating an execution metric."""
         started_at = datetime.utcnow()
         metric = ExecutionMetric(
-            name="test_operation",
-            started_at=started_at,
-            metadata={"key": "value"}
+            name="test_operation", started_at=started_at, metadata={"key": "value"}
         )
 
         assert metric.name == "test_operation"
@@ -56,7 +57,7 @@ class TestExecutionMetric:
             ended_at=ended_at,
             duration_ms=1000.0,
             status="success",
-            metadata={"key": "value"}
+            metadata={"key": "value"},
         )
 
         data = metric.to_dict()
@@ -83,7 +84,9 @@ class TestDevMetricsCollector:
         with tempfile.TemporaryDirectory() as tmpdir:
             collector = DevMetricsCollector(metrics_dir=tmpdir)
 
-            exec_id = collector.start_execution("test_operation", metadata={"key": "value"})
+            exec_id = collector.start_execution(
+                "test_operation", metadata={"key": "value"}
+            )
 
             assert exec_id in collector.current_metrics
             metric = collector.current_metrics[exec_id]
@@ -109,7 +112,7 @@ class TestDevMetricsCollector:
             assert metrics_file.exists()
 
             # Verify metric content
-            with open(metrics_file, 'r') as f:
+            with open(metrics_file) as f:
                 line = f.readline()
                 data = json.loads(line)
 
@@ -129,7 +132,7 @@ class TestDevMetricsCollector:
             date_str = datetime.utcnow().strftime("%Y-%m-%d")
             metrics_file = Path(tmpdir) / f"{date_str}.jsonl"
 
-            with open(metrics_file, 'r') as f:
+            with open(metrics_file) as f:
                 line = f.readline()
                 data = json.loads(line)
 
@@ -228,10 +231,12 @@ class TestTrackExecutionDecorator:
 
             # Replace global collector
             import dev_metrics
+
             original_collector = dev_metrics._collector
             dev_metrics._collector = collector
 
             try:
+
                 @track_execution("test_operation", metadata={"type": "test"})
                 def successful_function():
                     return "success"
@@ -254,10 +259,12 @@ class TestTrackExecutionDecorator:
 
             # Replace global collector
             import dev_metrics
+
             original_collector = dev_metrics._collector
             dev_metrics._collector = collector
 
             try:
+
                 @track_execution("test_operation")
                 def failing_function():
                     raise ValueError("Test error")
@@ -279,10 +286,12 @@ class TestTrackExecutionDecorator:
 
             # Replace global collector
             import dev_metrics
+
             original_collector = dev_metrics._collector
             dev_metrics._collector = collector
 
             try:
+
                 @track_execution("test_operation", metadata={"key": "value"})
                 def function_with_metadata():
                     return "success"
@@ -313,11 +322,7 @@ class TestDashboardGeneration:
             from dashboard import generate_dashboard
 
             output_file = Path(tmpdir) / "dashboard.html"
-            generate_dashboard(
-                output_file=str(output_file),
-                days=1,
-                metrics_dir=tmpdir
-            )
+            generate_dashboard(output_file=str(output_file), days=1, metrics_dir=tmpdir)
 
             # Verify dashboard file exists
             assert output_file.exists()
@@ -333,18 +338,17 @@ class TestDashboardGeneration:
             from dashboard import generate_dashboard
 
             output_file = Path(tmpdir) / "dashboard.html"
-            generate_dashboard(
-                output_file=str(output_file),
-                days=1,
-                metrics_dir=tmpdir
-            )
+            generate_dashboard(output_file=str(output_file), days=1, metrics_dir=tmpdir)
 
             # Verify dashboard file exists
             assert output_file.exists()
 
             # Verify dashboard indicates no metrics
             content = output_file.read_text()
-            assert "No metrics" in content or "TTA Development Metrics Dashboard" in content
+            assert (
+                "No metrics" in content
+                or "TTA Development Metrics Dashboard" in content
+            )
 
 
 if __name__ == "__main__":

@@ -18,12 +18,12 @@ Fix session persistence so users remain authenticated after page refresh.
 ```typescript
 setToken(accessToken: string, expiresIn: number = 3600): void {
   const expiresAt = Date.now() + (expiresIn * 1000);
-  
+
   this.tokenData = {
     accessToken,
     expiresAt,
   };
-  
+
   // PERSIST TO LOCALSTORAGE (NEW)
   try {
     localStorage.setItem('tta_token', JSON.stringify({
@@ -33,7 +33,7 @@ setToken(accessToken: string, expiresIn: number = 3600): void {
   } catch (error) {
     console.warn('Failed to persist token to localStorage:', error);
   }
-  
+
   this.scheduleTokenRefresh(expiresAt);
 }
 ```
@@ -78,7 +78,7 @@ async function restoreAuthentication(): Promise<boolean> {
   try {
     // RESTORE TOKEN FROM STORAGE FIRST (NEW)
     secureStorage.restoreFromStorage();
-    
+
     // Check retry limit...
     if (authRetryCount >= MAX_AUTH_RETRIES) {
       // ... existing code
@@ -104,7 +104,7 @@ async function restoreAuthentication(): Promise<boolean> {
   state.user = action.payload.user;
   state.token = action.payload.token;
   state.sessionId = action.payload.sessionId;
-  
+
   // PERSIST AUTH STATE (NEW)
   try {
     localStorage.setItem('tta_auth_state', JSON.stringify({
@@ -122,7 +122,7 @@ async function restoreAuthentication(): Promise<boolean> {
 ```typescript
 .addCase(logout.fulfilled, (state) => {
   // ... existing code
-  
+
   // CLEAR PERSISTED STATE (NEW)
   localStorage.removeItem('tta_auth_state');
 })
@@ -201,4 +201,3 @@ async function restoreAuthentication(): Promise<boolean> {
 5. Deploy to staging
 6. Validate in staging environment
 7. Deploy to production
-

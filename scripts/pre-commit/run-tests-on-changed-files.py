@@ -27,10 +27,9 @@ Skip this hook:
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Set
 
 
-def map_source_to_test_files(source_file: Path) -> List[Path]:
+def map_source_to_test_files(source_file: Path) -> list[Path]:
     """
     Map a source file to its corresponding test file(s).
 
@@ -64,7 +63,7 @@ def map_source_to_test_files(source_file: Path) -> List[Path]:
         if len(relative_parts) > 1:
             dir_path = Path(*relative_parts[:-1])
         else:
-            dir_path = Path(".")
+            dir_path = Path()
 
         # Pattern 1: tests/unit/module/test_file.py
         unit_test = Path("tests/unit") / dir_path / f"test_{file_stem}.py"
@@ -89,7 +88,7 @@ def map_source_to_test_files(source_file: Path) -> List[Path]:
     return test_files
 
 
-def collect_test_files(changed_files: List[str]) -> Set[Path]:
+def collect_test_files(changed_files: list[str]) -> set[Path]:
     """
     Collect all test files for the changed source files.
 
@@ -109,7 +108,7 @@ def collect_test_files(changed_files: List[str]) -> Set[Path]:
     return test_files
 
 
-def run_tests(test_files: Set[Path], timeout: int = 60) -> int:
+def run_tests(test_files: set[Path], timeout: int = 60) -> int:
     """
     Run pytest on the collected test files.
 
@@ -139,6 +138,7 @@ def run_tests(test_files: Set[Path], timeout: int = 60) -> int:
         # Run pytest with timeout
         result = subprocess.run(
             cmd,
+            check=False,
             timeout=timeout,
             capture_output=False,  # Show output in real-time
             text=True,
@@ -161,7 +161,7 @@ def run_tests(test_files: Set[Path], timeout: int = 60) -> int:
         return 1
 
 
-def main(filenames: List[str]) -> int:
+def main(filenames: list[str]) -> int:
     """
     Main entry point for the pre-commit hook.
 
@@ -193,4 +193,3 @@ def main(filenames: List[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
-

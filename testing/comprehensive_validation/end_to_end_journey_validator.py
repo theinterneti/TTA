@@ -410,36 +410,35 @@ class EndToEndJourneyValidator:
 
         if stage == JourneyStage.ONBOARDING:
             return await self._execute_onboarding_stage(scenario, journey_context)
-        elif stage == JourneyStage.PREFERENCE_SELECTION:
+        if stage == JourneyStage.PREFERENCE_SELECTION:
             return await self._execute_preference_selection_stage(
                 scenario, journey_context
             )
-        elif stage == JourneyStage.CHARACTER_CREATION:
+        if stage == JourneyStage.CHARACTER_CREATION:
             return await self._execute_character_creation_stage(
                 scenario, journey_context
             )
-        elif stage == JourneyStage.WORLD_INITIALIZATION:
+        if stage == JourneyStage.WORLD_INITIALIZATION:
             return await self._execute_world_initialization_stage(
                 scenario, journey_context
             )
-        elif stage == JourneyStage.NARRATIVE_GENERATION:
+        if stage == JourneyStage.NARRATIVE_GENERATION:
             return await self._execute_narrative_generation_stage(
                 scenario, journey_context
             )
-        elif stage == JourneyStage.THERAPEUTIC_INTERACTION:
+        if stage == JourneyStage.THERAPEUTIC_INTERACTION:
             return await self._execute_therapeutic_interaction_stage(
                 scenario, journey_context
             )
-        elif stage == JourneyStage.SESSION_PERSISTENCE:
+        if stage == JourneyStage.SESSION_PERSISTENCE:
             return await self._execute_session_persistence_stage(
                 scenario, journey_context
             )
-        elif stage == JourneyStage.JOURNEY_COMPLETION:
+        if stage == JourneyStage.JOURNEY_COMPLETION:
             return await self._execute_journey_completion_stage(
                 scenario, journey_context
             )
-        else:
-            return {"success": False, "error": f"Unknown stage: {stage}"}
+        return {"success": False, "error": f"Unknown stage: {stage}"}
 
     async def _execute_onboarding_stage(
         self, scenario: UserJourneyScenario, journey_context: dict[str, Any]

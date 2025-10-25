@@ -7,11 +7,10 @@ to validate the frontend-to-backend integration.
 """
 
 import asyncio
-import aiohttp
-import json
-import sys
-from typing import Dict, Any, Optional
 import logging
+import sys
+
+import aiohttp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -22,9 +21,9 @@ class GameplayAPITester:
 
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.session: Optional[aiohttp.ClientSession] = None
-        self.auth_token: Optional[str] = None
-        self.session_id: Optional[str] = None
+        self.session: aiohttp.ClientSession | None = None
+        self.auth_token: str | None = None
+        self.session_id: str | None = None
 
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
@@ -34,7 +33,7 @@ class GameplayAPITester:
         if self.session:
             await self.session.close()
 
-    def _get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> dict[str, str]:
         """Get headers with authentication."""
         headers = {"Content-Type": "application/json"}
         if self.auth_token:
@@ -91,10 +90,9 @@ class GameplayAPITester:
                         self.auth_token = data.get("access_token") or data.get("token")
                         logger.info(f"✅ Authentication successful with {credentials['username']}")
                         return True
-                    else:
-                        error_data = await response.text()
-                        logger.warning(f"⚠️  Login failed for {credentials['username']}: {response.status}")
-                        continue  # Try next credentials
+                    error_data = await response.text()
+                    logger.warning(f"⚠️  Login failed for {credentials['username']}: {response.status}")
+                    continue  # Try next credentials
             except Exception as e:
                 logger.warning(f"⚠️  Authentication error for {credentials['username']}: {e}")
                 continue  # Try next credentials
@@ -114,9 +112,8 @@ class GameplayAPITester:
                     data = await response.json()
                     logger.info(f"✅ Health check passed: {data}")
                     return True
-                else:
-                    logger.error(f"❌ Health check failed: {response.status}")
-                    return False
+                logger.error(f"❌ Health check failed: {response.status}")
+                return False
         except Exception as e:
             logger.error(f"❌ Health check error: {e}")
             return False
@@ -141,10 +138,9 @@ class GameplayAPITester:
                     self.session_id = data.get("session_id")
                     logger.info(f"✅ Session created: {self.session_id}")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Session creation failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(f"❌ Session creation failed: {response.status} - {error_data}")
+                return False
         except Exception as e:
             logger.error(f"❌ Session creation error: {e}")
             return False
@@ -165,10 +161,9 @@ class GameplayAPITester:
                     data = await response.json()
                     logger.info(f"✅ Session status retrieved: {data.get('session_status', {}).get('is_active', 'unknown')}")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Session status failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(f"❌ Session status failed: {response.status} - {error_data}")
+                return False
         except Exception as e:
             logger.error(f"❌ Session status error: {e}")
             return False
@@ -192,12 +187,11 @@ class GameplayAPITester:
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    logger.info(f"✅ Choice processed successfully")
+                    logger.info("✅ Choice processed successfully")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Choice processing failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(f"❌ Choice processing failed: {response.status} - {error_data}")
+                return False
         except Exception as e:
             logger.error(f"❌ Choice processing error: {e}")
             return False
@@ -216,12 +210,11 @@ class GameplayAPITester:
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    logger.info(f"✅ Progress retrieved successfully")
+                    logger.info("✅ Progress retrieved successfully")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Progress retrieval failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(f"❌ Progress retrieval failed: {response.status} - {error_data}")
+                return False
         except Exception as e:
             logger.error(f"❌ Progress retrieval error: {e}")
             return False
@@ -240,12 +233,11 @@ class GameplayAPITester:
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    logger.info(f"✅ Session terminated successfully")
+                    logger.info("✅ Session terminated successfully")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Session termination failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(f"❌ Session termination failed: {response.status} - {error_data}")
+                return False
         except Exception as e:
             logger.error(f"❌ Session termination error: {e}")
             return False
@@ -263,14 +255,13 @@ class GameplayAPITester:
                 if response.status == 404:
                     logger.info("✅ Error handling works: Invalid session ID returns 404")
                     return True
-                else:
-                    logger.error(f"❌ Error handling failed: Expected 404, got {response.status}")
-                    return False
+                logger.error(f"❌ Error handling failed: Expected 404, got {response.status}")
+                return False
         except Exception as e:
             logger.error(f"❌ Error handling test error: {e}")
             return False
 
-    async def run_comprehensive_test(self) -> Dict[str, bool]:
+    async def run_comprehensive_test(self) -> dict[str, bool]:
         """Run all tests and return results."""
         logger.info("🚀 Starting comprehensive API testing...")
 
@@ -332,9 +323,8 @@ async def main():
         if passed == total:
             logger.info("🎉 ALL TESTS PASSED! Integration is working correctly.")
             return 0
-        else:
-            logger.error("⚠️  Some tests failed. Check the logs above for details.")
-            return 1
+        logger.error("⚠️  Some tests failed. Check the logs above for details.")
+        return 1
 
 if __name__ == "__main__":
     try:

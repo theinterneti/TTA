@@ -75,8 +75,12 @@ class ToolSuggestion(BaseModel):
     """Suggestion for next action or related tool."""
 
     type: SuggestionType = Field(..., description="Type of suggestion")
-    description: str = Field(..., min_length=1, max_length=512, description="Description of suggestion")
-    tool_name: str | None = Field(default=None, description="Name of suggested tool (if applicable)")
+    description: str = Field(
+        ..., min_length=1, max_length=512, description="Description of suggestion"
+    )
+    tool_name: str | None = Field(
+        default=None, description="Name of suggested tool (if applicable)"
+    )
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Suggested parameters for the tool"
     )
@@ -85,10 +89,14 @@ class ToolSuggestion(BaseModel):
 class PaginationMetadata(BaseModel):
     """Metadata for paginated responses."""
 
-    total_count: int | None = Field(default=None, ge=0, description="Total number of items (if known)")
+    total_count: int | None = Field(
+        default=None, ge=0, description="Total number of items (if known)"
+    )
     has_more: bool = Field(..., description="Whether more items are available")
     next_cursor: str | None = Field(default=None, description="Cursor for next page (if has_more)")
-    prev_cursor: str | None = Field(default=None, description="Cursor for previous page (if applicable)")
+    prev_cursor: str | None = Field(
+        default=None, description="Cursor for previous page (if applicable)"
+    )
     page_size: int = Field(..., ge=1, le=100, description="Number of items in this page")
 
     @field_validator("next_cursor", "prev_cursor")
@@ -224,4 +232,3 @@ def get_json_schema(model_class: type[BaseModel]) -> dict[str, Any]:
         'object'
     """
     return model_class.model_json_schema()
-

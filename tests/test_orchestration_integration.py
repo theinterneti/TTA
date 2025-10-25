@@ -5,9 +5,11 @@ These tests focus on testing the orchestration module with more realistic
 scenarios and less mocking to increase coverage.
 """
 
-import pytest
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
+
+import pytest
+
 from src.orchestration.component import Component, ComponentStatus
 from src.orchestration.config import TTAConfig
 from src.orchestration.orchestrator import TTAOrchestrator
@@ -21,9 +23,7 @@ class TestComponentIntegration:
         # Arrange
         mock_config = Mock()
         component = Component(
-            config=mock_config,
-            name="lifecycle_test",
-            dependencies=[]
+            config=mock_config, name="lifecycle_test", dependencies=[]
         )
 
         # Assert initial state
@@ -31,7 +31,7 @@ class TestComponentIntegration:
         assert component.process is None
 
         # Act - Start
-        with patch.object(component, '_start_impl', return_value=True):
+        with patch.object(component, "_start_impl", return_value=True):
             start_result = component.start()
 
         # Assert after start
@@ -39,7 +39,7 @@ class TestComponentIntegration:
         assert component.status == ComponentStatus.RUNNING
 
         # Act - Stop
-        with patch.object(component, '_stop_impl', return_value=True):
+        with patch.object(component, "_stop_impl", return_value=True):
             stop_result = component.stop()
 
         # Assert after stop
@@ -50,14 +50,10 @@ class TestComponentIntegration:
         """Test that failed start sets ERROR status."""
         # Arrange
         mock_config = Mock()
-        component = Component(
-            config=mock_config,
-            name="fail_test",
-            dependencies=[]
-        )
+        component = Component(config=mock_config, name="fail_test", dependencies=[])
 
         # Act - Start with failure
-        with patch.object(component, '_start_impl', return_value=False):
+        with patch.object(component, "_start_impl", return_value=False):
             result = component.start()
 
         # Assert
@@ -69,13 +65,13 @@ class TestComponentIntegration:
         # Arrange
         mock_config = Mock()
         component = Component(
-            config=mock_config,
-            name="exception_test",
-            dependencies=[]
+            config=mock_config, name="exception_test", dependencies=[]
         )
 
         # Act - Start with exception
-        with patch.object(component, '_start_impl', side_effect=RuntimeError("Test error")):
+        with patch.object(
+            component, "_start_impl", side_effect=RuntimeError("Test error")
+        ):
             result = component.start()
 
         # Assert
@@ -87,14 +83,12 @@ class TestComponentIntegration:
         # Arrange
         mock_config = Mock()
         component = Component(
-            config=mock_config,
-            name="stop_fail_test",
-            dependencies=[]
+            config=mock_config, name="stop_fail_test", dependencies=[]
         )
         component.status = ComponentStatus.RUNNING
 
         # Act - Stop with failure
-        with patch.object(component, '_stop_impl', return_value=False):
+        with patch.object(component, "_stop_impl", return_value=False):
             result = component.stop()
 
         # Assert
@@ -153,9 +147,13 @@ class TestOrchestratorIntegration:
         tta_dev.mkdir()
         tta_prototype.mkdir()
 
-        with patch.object(Path, 'cwd', return_value=tmp_path):
-            with patch('src.orchestration.orchestrator.TTAOrchestrator._validate_repositories'):
-                with patch('src.orchestration.orchestrator.TTAOrchestrator._import_components'):
+        with patch.object(Path, "cwd", return_value=tmp_path):
+            with patch(
+                "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"
+            ):
+                with patch(
+                    "src.orchestration.orchestrator.TTAOrchestrator._import_components"
+                ):
                     orchestrator = TTAOrchestrator()
                     orchestrator.tta_dev_path = tta_dev
                     orchestrator.tta_prototype_path = tta_prototype
@@ -166,11 +164,7 @@ class TestOrchestratorIntegration:
         # Arrange
         orchestrator = orchestrator_minimal
         mock_config = Mock()
-        component = Component(
-            config=mock_config,
-            name="flow_test",
-            dependencies=[]
-        )
+        component = Component(config=mock_config, name="flow_test", dependencies=[])
 
         # Act - Register component
         orchestrator.components["flow_test"] = component
@@ -180,7 +174,7 @@ class TestOrchestratorIntegration:
         assert orchestrator.get_component_status("flow_test") == ComponentStatus.STOPPED
 
         # Act - Start component
-        with patch.object(component, '_start_impl', return_value=True):
+        with patch.object(component, "_start_impl", return_value=True):
             start_result = orchestrator.start_component("flow_test")
 
         # Assert - Component is running
@@ -188,7 +182,7 @@ class TestOrchestratorIntegration:
         assert orchestrator.get_component_status("flow_test") == ComponentStatus.RUNNING
 
         # Act - Stop component
-        with patch.object(component, '_stop_impl', return_value=True):
+        with patch.object(component, "_stop_impl", return_value=True):
             stop_result = orchestrator.stop_component("flow_test")
 
         # Assert - Component is stopped
@@ -205,16 +199,12 @@ class TestOrchestratorIntegration:
         comp2 = Component(config=mock_config, name="comp2", dependencies=[])
         comp3 = Component(config=mock_config, name="comp3", dependencies=[])
 
-        orchestrator.components = {
-            "comp1": comp1,
-            "comp2": comp2,
-            "comp3": comp3
-        }
+        orchestrator.components = {"comp1": comp1, "comp2": comp2, "comp3": comp3}
 
         # Act - Start all
-        with patch.object(comp1, '_start_impl', return_value=True):
-            with patch.object(comp2, '_start_impl', return_value=True):
-                with patch.object(comp3, '_start_impl', return_value=True):
+        with patch.object(comp1, "_start_impl", return_value=True):
+            with patch.object(comp2, "_start_impl", return_value=True):
+                with patch.object(comp3, "_start_impl", return_value=True):
                     result = orchestrator.start_all()
 
         # Assert - All started
@@ -224,9 +214,9 @@ class TestOrchestratorIntegration:
         assert orchestrator.get_component_status("comp3") == ComponentStatus.RUNNING
 
         # Act - Stop all
-        with patch.object(comp1, '_stop_impl', return_value=True):
-            with patch.object(comp2, '_stop_impl', return_value=True):
-                with patch.object(comp3, '_stop_impl', return_value=True):
+        with patch.object(comp1, "_stop_impl", return_value=True):
+            with patch.object(comp2, "_stop_impl", return_value=True):
+                with patch.object(comp3, "_stop_impl", return_value=True):
                     result = orchestrator.stop_all()
 
         # Assert - All stopped
@@ -253,7 +243,7 @@ class TestOrchestratorIntegration:
         orchestrator.components = {
             "running": running_comp,
             "stopped": stopped_comp,
-            "error": error_comp
+            "error": error_comp,
         }
 
         # Act
@@ -263,7 +253,7 @@ class TestOrchestratorIntegration:
         assert statuses == {
             "running": ComponentStatus.RUNNING,
             "stopped": ComponentStatus.STOPPED,
-            "error": ComponentStatus.ERROR
+            "error": ComponentStatus.ERROR,
         }
 
 

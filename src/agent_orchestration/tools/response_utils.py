@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import functools
 import time
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from .response_models import (
     PaginatedData,
@@ -56,7 +57,7 @@ def success_response(
         ...     data={"player_id": "123", "name": "Alice"},
         ...     tool_name="get_player_profile",
         ...     tool_version="1.0.0",
-        ...     execution_time_ms=45.2
+        ...     execution_time_ms=45.2,
         ... )
         >>> response.status
         <ResponseStatus.SUCCESS: 'success'>
@@ -111,7 +112,7 @@ def error_response(
         ...     error_message="Player not found",
         ...     tool_name="get_player_profile",
         ...     tool_version="1.0.0",
-        ...     execution_time_ms=12.5
+        ...     execution_time_ms=12.5,
         ... )
         >>> response.status
         <ResponseStatus.ERROR: 'error'>
@@ -183,7 +184,7 @@ def paginated_response(
         ...     page_size=2,
         ...     tool_name="list_players",
         ...     tool_version="1.0.0",
-        ...     execution_time_ms=78.3
+        ...     execution_time_ms=78.3,
         ... )
         >>> response.data.pagination.has_more
         True
@@ -237,7 +238,6 @@ def timed_tool_response(
         >>> @timed_tool_response("get_player_profile", "1.0.0")
         ... async def get_player_profile(player_id: str):
         ...     return {"player_id": player_id, "name": "Alice"}
-        ...
         >>> # Returns ToolResponse with automatic timing
     """
 
@@ -301,8 +301,6 @@ def timed_tool_response(
 
         if inspect.iscoroutinefunction(func):
             return async_wrapper
-        else:
-            return sync_wrapper
+        return sync_wrapper
 
     return decorator
-

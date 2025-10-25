@@ -78,22 +78,21 @@ class AdversarialUserProfile:
         """Generate a response based on the adversarial pattern."""
         if pattern.behavior_type == AdversarialBehaviorType.CONTRADICTORY:
             return self._generate_contradictory_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.DISRUPTIVE:
+        if pattern.behavior_type == AdversarialBehaviorType.DISRUPTIVE:
             return self._generate_disruptive_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.PASSIVE:
+        if pattern.behavior_type == AdversarialBehaviorType.PASSIVE:
             return self._generate_passive_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.POWER_USER:
+        if pattern.behavior_type == AdversarialBehaviorType.POWER_USER:
             return self._generate_power_user_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.INCONSISTENT:
+        if pattern.behavior_type == AdversarialBehaviorType.INCONSISTENT:
             return self._generate_inconsistent_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.BOUNDARY_TESTING:
+        if pattern.behavior_type == AdversarialBehaviorType.BOUNDARY_TESTING:
             return self._generate_boundary_testing_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.RAPID_FIRE:
+        if pattern.behavior_type == AdversarialBehaviorType.RAPID_FIRE:
             return self._generate_rapid_fire_response(context)
-        elif pattern.behavior_type == AdversarialBehaviorType.CONTEXT_BREAKING:
+        if pattern.behavior_type == AdversarialBehaviorType.CONTEXT_BREAKING:
             return self._generate_context_breaking_response(context)
-        else:
-            return "I continue with the story."
+        return "I continue with the story."
 
     def _generate_contradictory_response(self, context: dict[str, Any]) -> str:
         """Generate responses that contradict previous choices."""

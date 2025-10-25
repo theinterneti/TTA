@@ -5,8 +5,7 @@ This module tests component start/stop, status retrieval, and lifecycle manageme
 to improve coverage of orchestrator.py.
 """
 
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -212,7 +211,9 @@ class TestOrchestratorComponentLifecycle:
         # Create component that fails to start
         failing_component = MockComponent(name="failing_component")
         failing_component.start = Mock(return_value=False)
-        orchestrator_with_mock_components.components["failing_component"] = failing_component
+        orchestrator_with_mock_components.components["failing_component"] = (
+            failing_component
+        )
 
         result = orchestrator_with_mock_components.start_component("failing_component")
 
@@ -223,7 +224,9 @@ class TestOrchestratorComponentLifecycle:
         # Create component that fails to stop
         failing_component = MockComponent(name="failing_component")
         failing_component.stop = Mock(return_value=False)
-        orchestrator_with_mock_components.components["failing_component"] = failing_component
+        orchestrator_with_mock_components.components["failing_component"] = (
+            failing_component
+        )
 
         result = orchestrator_with_mock_components.stop_component("failing_component")
 
@@ -232,7 +235,9 @@ class TestOrchestratorComponentLifecycle:
     def test_start_all_with_partial_failure(self, orchestrator_with_mock_components):
         """Test start_all continues even if one component fails."""
         # Make component1 fail to start
-        orchestrator_with_mock_components.components["component1"].start = Mock(return_value=False)
+        orchestrator_with_mock_components.components["component1"].start = Mock(
+            return_value=False
+        )
 
         result = orchestrator_with_mock_components.start_all()
 
@@ -245,7 +250,9 @@ class TestOrchestratorComponentLifecycle:
         orchestrator_with_mock_components.start_all()
 
         # Make component1 fail to stop
-        orchestrator_with_mock_components.components["component1"].stop = Mock(return_value=False)
+        orchestrator_with_mock_components.components["component1"].stop = Mock(
+            return_value=False
+        )
 
         result = orchestrator_with_mock_components.stop_all()
 
@@ -264,7 +271,9 @@ class TestOrchestratorComponentLifecycle:
         # This method uses rich.console.print, so we just verify it runs without error
         orchestrator.display_status()
 
-    def test_get_component_status_missing_component(self, orchestrator_with_mock_components):
+    def test_get_component_status_missing_component(
+        self, orchestrator_with_mock_components
+    ):
         """Test get_component_status with missing component."""
         orchestrator = orchestrator_with_mock_components
 

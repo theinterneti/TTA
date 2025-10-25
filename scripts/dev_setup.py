@@ -6,16 +6,16 @@ This script sets up a complete development environment for testing
 the TTA Core Gameplay Loop integration.
 """
 
-import sys
 import asyncio
 import logging
 import subprocess
+import sys
 from pathlib import Path
 
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.orchestration import TTAOrchestrator, TTAConfig
+from src.orchestration import TTAConfig, TTAOrchestrator
 
 # Configure logging
 logging.basicConfig(
@@ -38,7 +38,7 @@ def check_dependencies():
     missing = []
     for dep, description in dependencies.items():
         try:
-            result = subprocess.run(['which', dep], capture_output=True, text=True)
+            result = subprocess.run(['which', dep], check=False, capture_output=True, text=True)
             if result.returncode == 0:
                 logger.info(f"✓ {dep} found: {result.stdout.strip()}")
             else:
@@ -62,7 +62,7 @@ def setup_databases():
 
     # Start Neo4j (if available)
     try:
-        result = subprocess.run(['neo4j', 'status'], capture_output=True, text=True)
+        result = subprocess.run(['neo4j', 'status'], check=False, capture_output=True, text=True)
         if 'Neo4j is running' in result.stdout:
             logger.info("✓ Neo4j is already running")
         else:
@@ -76,7 +76,7 @@ def setup_databases():
 
     # Start Redis (if available)
     try:
-        result = subprocess.run(['redis-cli', 'ping'], capture_output=True, text=True)
+        result = subprocess.run(['redis-cli', 'ping'], check=False, capture_output=True, text=True)
         if 'PONG' in result.stdout:
             logger.info("✓ Redis is already running")
         else:
@@ -133,7 +133,7 @@ def run_integration_tests():
     for cmd in test_commands:
         try:
             logger.info(f"Running: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(cmd, check=False, capture_output=True, text=True, timeout=60)
 
             if result.returncode == 0:
                 logger.info("✓ Tests passed")

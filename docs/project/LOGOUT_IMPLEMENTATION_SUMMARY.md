@@ -112,7 +112,7 @@ This document summarizes all changes made to implement and fix the logout functi
    ```bash
    # Frontend
    docker build -f src/player_experience/frontend/Dockerfile.staging -t tta-dev-player-frontend-staging:latest .
-   
+
    # API
    docker build -f src/player_experience/api/Dockerfile.staging -t tta-dev-player-api-staging:latest .
    ```
@@ -150,15 +150,15 @@ Logout endpoints are public because they:
 ## Troubleshooting
 
 ### Issue: 401 Unauthorized on logout
-**Cause**: Logout endpoint not in PUBLIC_ROUTES  
+**Cause**: Logout endpoint not in PUBLIC_ROUTES
 **Solution**: Add to middleware PUBLIC_ROUTES set
 
 ### Issue: Session cookie not cleared
-**Cause**: Wrong endpoint called or cookie flags incorrect  
+**Cause**: Wrong endpoint called or cookie flags incorrect
 **Solution**: Verify endpoint and cookie flags match
 
 ### Issue: Frontend not calling correct endpoint
-**Cause**: Docker build cache  
+**Cause**: Docker build cache
 **Solution**: Rebuild with `--no-cache` flag
 
 ## Future Improvements
@@ -172,4 +172,3 @@ Logout endpoints are public because they:
 ## Conclusion
 
 The logout functionality is fully implemented and tested. All components work together to provide a secure and reliable logout experience for users.
-

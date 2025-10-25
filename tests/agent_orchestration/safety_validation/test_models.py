@@ -1,7 +1,5 @@
 """Tests for safety validation models."""
 
-import pytest
-
 from src.agent_orchestration.safety_validation.enums import SafetyLevel, ValidationType
 from src.agent_orchestration.safety_validation.models import (
     SafetyRule,
@@ -75,4 +73,3 @@ class TestSafetyRule:
         compiled = rule.compile()
         assert compiled is not None
         assert compiled.match("TEST") is not None  # case insensitive
-

@@ -13,7 +13,6 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
-import json
 import logging
 import os
 import secrets
@@ -29,7 +28,9 @@ class CursorData(BaseModel):
     """Data structure for pagination cursor."""
 
     offset: int = Field(..., ge=0, description="Offset in result set")
-    timestamp: float = Field(default_factory=time.time, description="Cursor creation timestamp")
+    timestamp: float = Field(
+        default_factory=time.time, description="Cursor creation timestamp"
+    )
     filters: dict[str, Any] = Field(default_factory=dict, description="Applied filters")
     sort_key: str | None = Field(default=None, description="Sort key for ordering")
 
@@ -160,7 +161,9 @@ class CursorManager:
 
         parts = cursor.split(".")
         if len(parts) != 2:
-            raise ValueError("Invalid cursor format: must have exactly one '.' separator")
+            raise ValueError(
+                "Invalid cursor format: must have exactly one '.' separator"
+            )
 
         base64_data, provided_signature = parts
 
@@ -170,7 +173,9 @@ class CursorManager:
         ).hexdigest()
 
         if not hmac.compare_digest(provided_signature, expected_signature):
-            logger.warning("Cursor signature verification failed - possible tampering detected")
+            logger.warning(
+                "Cursor signature verification failed - possible tampering detected"
+            )
             raise ValueError("Invalid cursor: signature verification failed")
 
         # Decode Base64
@@ -183,7 +188,9 @@ class CursorManager:
         try:
             cursor_data = CursorData.model_validate_json(json_data)
         except Exception as e:
-            raise ValueError(f"Invalid cursor: JSON deserialization failed - {e}") from e
+            raise ValueError(
+                f"Invalid cursor: JSON deserialization failed - {e}"
+            ) from e
 
         # Validate timestamp
         age_seconds = time.time() - cursor_data.timestamp
@@ -295,4 +302,3 @@ def set_cursor_manager(manager: CursorManager) -> None:
     """
     global _cursor_manager
     _cursor_manager = manager
-

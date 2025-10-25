@@ -23,7 +23,6 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from redis.asyncio import Redis
-from tta_ai.orchestration.tools.models import ToolSpec
 from tta_ai.orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
@@ -52,7 +51,9 @@ async def get_redis_connection(env: str) -> Redis:
     }
 
     if env not in redis_configs:
-        raise ValueError(f"Invalid environment: {env}. Must be dev, staging, or production")
+        raise ValueError(
+            f"Invalid environment: {env}. Must be dev, staging, or production"
+        )
 
     config = redis_configs[env]
     return Redis(**config)
@@ -101,7 +102,9 @@ async def audit_tools(env: str) -> dict[str, Any]:
 
             # Count by capability
             for cap in tool.get("capabilities", []):
-                analysis["by_capability"][cap] = analysis["by_capability"].get(cap, 0) + 1
+                analysis["by_capability"][cap] = (
+                    analysis["by_capability"].get(cap, 0) + 1
+                )
 
             # Identify missing/incomplete data
             if not tool.get("description") or len(tool.get("description", "")) < 50:
@@ -185,4 +188,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

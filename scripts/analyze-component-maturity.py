@@ -17,7 +17,7 @@ import re
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Component definitions
 COMPONENTS = {
@@ -246,9 +246,9 @@ def get_component_stage(maturity_file: str) -> str:
                 # Normalize stage names
                 if stage.lower() in ["staging", "stage"]:
                     return "Staging"
-                elif stage.lower() in ["production", "prod"]:
+                if stage.lower() in ["production", "prod"]:
                     return "Production"
-                elif stage.lower() in ["development", "dev"]:
+                if stage.lower() in ["development", "dev"]:
                     return "Development"
                 return stage
 
@@ -260,7 +260,7 @@ def get_component_stage(maturity_file: str) -> str:
                 stage = alt_match.group(1)
                 if stage.lower() in ["staging", "stage"]:
                     return "Staging"
-                elif stage.lower() in ["production", "prod"]:
+                if stage.lower() in ["production", "prod"]:
                     return "Production"
 
     except Exception as e:
@@ -269,7 +269,7 @@ def get_component_stage(maturity_file: str) -> str:
     return "Development"
 
 
-def get_observation_period(maturity_file: str) -> Optional[dict[str, Any]]:
+def get_observation_period(maturity_file: str) -> dict[str, Any] | None:
     """Extract 7-day observation period info from MATURITY.md file."""
     try:
         maturity_path = Path(maturity_file)

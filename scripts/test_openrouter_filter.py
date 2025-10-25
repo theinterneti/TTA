@@ -19,9 +19,9 @@ def test_imports():
 
     try:
         # Test basic imports
-        from components.model_management.providers.openrouter import OpenRouterProvider
         from components.model_management.interfaces import ProviderType
         from components.model_management.models import ProviderConfig
+        from components.model_management.providers.openrouter import OpenRouterProvider
         print("✅ All imports successful")
         return True
     except ImportError as e:
@@ -33,9 +33,9 @@ def test_provider_configuration():
     print("\n🔧 Testing provider configuration...")
 
     try:
-        from components.model_management.providers.openrouter import OpenRouterProvider
         from components.model_management.interfaces import ProviderType
         from components.model_management.models import ProviderConfig
+        from components.model_management.providers.openrouter import OpenRouterProvider
 
         # Create a test configuration
         config = ProviderConfig(
@@ -93,9 +93,9 @@ def test_environment_configuration():
         os.environ[key] = value
 
     try:
-        from components.model_management.providers.openrouter import OpenRouterProvider
         from components.model_management.interfaces import ProviderType
         from components.model_management.models import ProviderConfig
+        from components.model_management.providers.openrouter import OpenRouterProvider
 
         # Create provider with environment configuration
         config = ProviderConfig(
@@ -140,9 +140,9 @@ def test_filter_methods():
     print("\n🔍 Testing filter methods...")
 
     try:
-        from components.model_management.providers.openrouter import OpenRouterProvider
         from components.model_management.interfaces import ProviderType
         from components.model_management.models import ProviderConfig
+        from components.model_management.providers.openrouter import OpenRouterProvider
 
         # Create provider
         config = ProviderConfig(
@@ -245,7 +245,7 @@ def main():
             print(f"❌ {test_name} test crashed: {e}")
             failed += 1
 
-    print(f"\n📊 Validation Results")
+    print("\n📊 Validation Results")
     print("=" * 30)
     print(f"✅ Passed: {passed}")
     print(f"❌ Failed: {failed}")

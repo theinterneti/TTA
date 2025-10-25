@@ -7,13 +7,13 @@ can be performed and that the expected results are achievable.
 """
 
 import asyncio
-import aiohttp
-import json
-import sys
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import aiohttp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +24,7 @@ class ManualTestingGuideValidator:
 
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         self.validation_results = {}
 
     async def __aenter__(self):
@@ -72,8 +72,7 @@ class ManualTestingGuideValidator:
         if missing_elements:
             self.log_validation("Frontend Content", False, f"Missing: {missing_elements}")
             return False
-        else:
-            self.log_validation("Frontend Content", True, "All required elements present")
+        self.log_validation("Frontend Content", True, "All required elements present")
 
         return True
 
@@ -116,8 +115,7 @@ class ManualTestingGuideValidator:
                 if missing_endpoints:
                     self.log_validation("Required Endpoints", False, f"Missing: {missing_endpoints}")
                     return False
-                else:
-                    self.log_validation("Required Endpoints", True, "All required endpoints present")
+                self.log_validation("Required Endpoints", True, "All required endpoints present")
 
             return True
 
@@ -269,8 +267,7 @@ class ManualTestingGuideValidator:
         if missing_js:
             self.log_validation("JavaScript Structure", False, f"Missing: {missing_js}")
             return False
-        else:
-            self.log_validation("JavaScript Structure", True, "Proper async/await and error handling")
+        self.log_validation("JavaScript Structure", True, "Proper async/await and error handling")
 
         return True
 
@@ -307,12 +304,11 @@ class ManualTestingGuideValidator:
         if missing_sections:
             self.log_validation("Guide Completeness", False, f"Missing sections: {missing_sections}")
             return False
-        else:
-            self.log_validation("Guide Completeness", True, "All required sections present")
+        self.log_validation("Guide Completeness", True, "All required sections present")
 
         return True
 
-    async def run_comprehensive_validation(self) -> Dict[str, Any]:
+    async def run_comprehensive_validation(self) -> dict[str, Any]:
         """Run all manual testing guide validations."""
         logger.info("🚀 Starting Manual Testing Guide Validation")
         logger.info("=" * 70)
@@ -365,9 +361,8 @@ async def main():
         if passed_validations >= total_validations * 0.8:
             logger.info("🎉 MANUAL TESTING GUIDE IS COMPREHENSIVE AND VALID!")
             return 0
-        else:
-            logger.error("⚠️  Manual testing guide needs improvements.")
-            return 1
+        logger.error("⚠️  Manual testing guide needs improvements.")
+        return 1
 
 if __name__ == "__main__":
     try:

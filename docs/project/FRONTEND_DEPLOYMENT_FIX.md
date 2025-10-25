@@ -216,4 +216,3 @@ After deployment:
 - Create React App Documentation: https://create-react-app.dev/docs/deployment/
 - Docker Multi-Stage Builds: https://docs.docker.com/build/building/multi-stage/
 - Nginx Caching: https://www.nginx.com/blog/nginx-caching-guide/
-

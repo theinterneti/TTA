@@ -10,27 +10,26 @@ Tests cover:
 - Async retry decorator
 """
 
-import pytest
-import asyncio
+# Import from scripts/primitives/
+import sys
 import time
 from pathlib import Path
 
-# Import from scripts/primitives/
-import sys
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts" / "primitives"))
 
 from error_recovery import (
-    with_retry,
-    with_retry_async,
-    RetryConfig,
+    CircuitBreaker,
+    CircuitBreakerOpenError,
+    CircuitBreakerState,
     ErrorCategory,
-    ErrorSeverity,
+    RetryConfig,
+    calculate_delay,
     classify_error,
     should_retry,
-    calculate_delay,
-    CircuitBreaker,
-    CircuitBreakerState,
-    CircuitBreakerOpenError,
+    with_retry,
+    with_retry_async,
 )
 
 
@@ -105,7 +104,9 @@ class TestDelayCalculation:
 
     def test_max_delay_cap(self):
         """Test that delay is capped at max_delay."""
-        config = RetryConfig(base_delay=1.0, max_delay=5.0, exponential_base=2.0, jitter=False)
+        config = RetryConfig(
+            base_delay=1.0, max_delay=5.0, exponential_base=2.0, jitter=False
+        )
 
         delay10 = calculate_delay(10, config)
 
@@ -196,7 +197,9 @@ class TestRetryDecorator:
         def fallback_function():
             return "fallback"
 
-        @with_retry(RetryConfig(max_retries=2, base_delay=0.01), fallback=fallback_function)
+        @with_retry(
+            RetryConfig(max_retries=2, base_delay=0.01), fallback=fallback_function
+        )
         def always_fails():
             nonlocal call_count
             call_count += 1
@@ -270,7 +273,9 @@ class TestAsyncRetryDecorator:
         async def async_fallback():
             return "fallback"
 
-        @with_retry_async(RetryConfig(max_retries=2, base_delay=0.01), fallback=async_fallback)
+        @with_retry_async(
+            RetryConfig(max_retries=2, base_delay=0.01), fallback=async_fallback
+        )
         async def async_always_fails():
             nonlocal call_count
             call_count += 1

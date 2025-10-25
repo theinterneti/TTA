@@ -13,24 +13,25 @@ Usage:
         pass
 """
 
-import json
-import time
 import functools
+import json
 import logging
-from dataclasses import dataclass, field, asdict
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Callable, TypeVar, ParamSpec
+from typing import Any, ParamSpec, TypeVar
 
 logger = logging.getLogger(__name__)
 
-P = ParamSpec('P')
-T = TypeVar('T')
+P = ParamSpec("P")
+T = TypeVar("T")
 
 
 @dataclass
 class ExecutionMetric:
     """Metric for a single execution."""
+
     name: str
     started_at: datetime
     ended_at: datetime | None = None
@@ -48,7 +49,7 @@ class ExecutionMetric:
             "duration_ms": self.duration_ms,
             "status": self.status,
             "metadata": self.metadata,
-            "error": self.error
+            "error": self.error,
         }
 
 
@@ -66,9 +67,7 @@ class DevMetricsCollector:
 
         exec_id = str(uuid.uuid4())
         metric = ExecutionMetric(
-            name=name,
-            started_at=datetime.utcnow(),
-            metadata=metadata or {}
+            name=name, started_at=datetime.utcnow(), metadata=metadata or {}
         )
 
         self.current_metrics[exec_id] = metric
@@ -76,10 +75,7 @@ class DevMetricsCollector:
         return exec_id
 
     def end_execution(
-        self,
-        exec_id: str,
-        status: str = "success",
-        error: str | None = None
+        self, exec_id: str, status: str = "success", error: str | None = None
     ) -> None:
         """End tracking an execution."""
         metric = self.current_metrics.get(exec_id)
@@ -89,8 +85,8 @@ class DevMetricsCollector:
 
         metric.ended_at = datetime.utcnow()
         metric.duration_ms = (
-            (metric.ended_at - metric.started_at).total_seconds() * 1000
-        )
+            metric.ended_at - metric.started_at
+        ).total_seconds() * 1000
         metric.status = status
         metric.error = error
 
@@ -110,8 +106,8 @@ class DevMetricsCollector:
         date_str = metric.started_at.strftime("%Y-%m-%d")
         metrics_file = self.metrics_dir / f"{date_str}.jsonl"
 
-        with open(metrics_file, 'a') as f:
-            f.write(json.dumps(metric.to_dict()) + '\n')
+        with open(metrics_file, "a") as f:
+            f.write(json.dumps(metric.to_dict()) + "\n")
 
     def get_metrics_summary(self, days: int = 7) -> dict[str, Any]:
         """Get summary of metrics for the last N days."""
@@ -125,7 +121,7 @@ class DevMetricsCollector:
             metrics_file = self.metrics_dir / f"{date_str}.jsonl"
 
             if metrics_file.exists():
-                with open(metrics_file, 'r') as f:
+                with open(metrics_file) as f:
                     for line in f:
                         try:
                             metrics.append(json.loads(line))
@@ -160,7 +156,9 @@ class DevMetricsCollector:
 
         return summary
 
-    def get_recent_metrics(self, name: str | None = None, limit: int = 10) -> list[dict]:
+    def get_recent_metrics(
+        self, name: str | None = None, limit: int = 10
+    ) -> list[dict]:
         """Get recent metrics, optionally filtered by name."""
         all_metrics = []
 
@@ -171,7 +169,7 @@ class DevMetricsCollector:
             metrics_file = self.metrics_dir / f"{date_str}.jsonl"
 
             if metrics_file.exists():
-                with open(metrics_file, 'r') as f:
+                with open(metrics_file) as f:
                     for line in f:
                         try:
                             metric = json.loads(line)
@@ -224,6 +222,7 @@ def track_execution(name: str, metadata: dict | None = None):
         name: Name of the operation being tracked
         metadata: Optional metadata to attach to the metric
     """
+
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
@@ -235,7 +234,9 @@ def track_execution(name: str, metadata: dict | None = None):
             except Exception as e:
                 _collector.end_execution(exec_id, status="failed", error=str(e))
                 raise
+
         return wrapper
+
     return decorator
 
 
@@ -250,6 +251,7 @@ if __name__ == "__main__":
     def example_operation():
         """Example operation for testing."""
         import time
+
         time.sleep(0.1)
         return "success"
 

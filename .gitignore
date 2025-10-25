@@ -120,6 +120,9 @@ logs/
 tmp/
 temp/
 
+# OpenHands workspace (generated files from OpenHands SDK)
+openhands_workspace/
+
 # -------------------------------------------------
 # 7) Data & databases (local dev data only)
 #    NOTE: This ignores generic data directories and common local DB files.

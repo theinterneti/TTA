@@ -81,19 +81,17 @@ async def test_openrouter_connection():
                             )
 
                         return True
-                    else:
-                        print("❌ Llama 3.3 8B Instruct model not found")
-                        print("Available models with 'llama' in name:")
-                        for model in models:
-                            if "llama" in model.get("id", "").lower():
-                                print(f"   - {model['id']}")
-                        return False
-
-                else:
-                    print(f"❌ API request failed: {response.status}")
-                    error_text = await response.text()
-                    print(f"Error: {error_text}")
+                    print("❌ Llama 3.3 8B Instruct model not found")
+                    print("Available models with 'llama' in name:")
+                    for model in models:
+                        if "llama" in model.get("id", "").lower():
+                            print(f"   - {model['id']}")
                     return False
+
+                print(f"❌ API request failed: {response.status}")
+                error_text = await response.text()
+                print(f"Error: {error_text}")
+                return False
 
     except asyncio.TimeoutError:
         print("❌ API request timed out")
@@ -159,16 +157,14 @@ async def test_simple_completion():
                             print(f"   Total tokens: {usage.get('total_tokens', 0)}")
 
                         return True
-                    else:
-                        print("❌ No completion in response")
-                        print(f"Response: {data}")
-                        return False
-
-                else:
-                    print(f"❌ Completion request failed: {response.status}")
-                    error_text = await response.text()
-                    print(f"Error: {error_text}")
+                    print("❌ No completion in response")
+                    print(f"Response: {data}")
                     return False
+
+                print(f"❌ Completion request failed: {response.status}")
+                error_text = await response.text()
+                print(f"Error: {error_text}")
+                return False
 
     except asyncio.TimeoutError:
         print("❌ Completion request timed out")
@@ -219,13 +215,12 @@ async def main():
             "2. python testing/run_extended_evaluation.py --mode comprehensive --config testing/configs/production_extended_evaluation.yaml"
         )
         return True
-    else:
-        print("\n❌ TESTS FAILED")
-        print("💡 Fix the issues above before running extended evaluation")
-        if not connection_ok:
-            print("💡 Make sure you have a valid OpenRouter API key")
-            print("💡 Run: ./testing/extended_evaluation/setup_api_key.sh")
-        return False
+    print("\n❌ TESTS FAILED")
+    print("💡 Fix the issues above before running extended evaluation")
+    if not connection_ok:
+        print("💡 Make sure you have a valid OpenRouter API key")
+        print("💡 Run: ./testing/extended_evaluation/setup_api_key.sh")
+    return False
 
 
 if __name__ == "__main__":

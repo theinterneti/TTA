@@ -38,7 +38,7 @@ deeply:
       key: 42
 docker:
   compose_profiles:
-  - default
+    - default
   enabled: true
   ensure_consistent_env_vars: true
   ensure_consistent_extensions: true
@@ -94,8 +94,8 @@ model_management:
       max_concurrent_models: 2
       models_cache_dir: ./models
       preferred_models:
-      - microsoft/DialoGPT-medium
-      - gpt2
+        - microsoft/DialoGPT-medium
+        - gpt2
     ollama:
       auto_pull_models: true
       base_url: http://localhost:11434
@@ -104,9 +104,9 @@ model_management:
       enabled: true
       gpu_enabled: true
       preferred_models:
-      - llama3.1:8b
-      - qwen2.5:7b
-      - phi3:mini
+        - llama3.1:8b
+        - qwen2.5:7b
+        - phi3:mini
     openrouter:
       api_key: ${OPENROUTER_API_KEY}
       base_url: https://openrouter.ai/api/v1
@@ -114,9 +114,9 @@ model_management:
       enabled: true
       free_models_only: false
       preferred_models:
-      - meta-llama/llama-3.1-8b-instruct:free
-      - microsoft/phi-3-mini-128k-instruct:free
-      - qwen/qwen-2-7b-instruct:free
+        - meta-llama/llama-3.1-8b-instruct:free
+        - microsoft/phi-3-mini-128k-instruct:free
+        - qwen/qwen-2-7b-instruct:free
   selection_strategy:
     algorithm: performance_based
     max_latency_ms: 5000
@@ -150,7 +150,7 @@ orchestration:
     player_experience:
       class_name: PlayerExperienceComponent
       dependencies:
-      - agent_orchestration
+        - agent_orchestration
       path: src.components.player_experience_component
     tta_dev:
       class_name: TtaDevComponent
@@ -158,8 +158,8 @@ orchestration:
 player_experience:
   api:
     cors_origins:
-    - http://localhost:3000
-    - https://localhost:3000
+      - http://localhost:3000
+      - https://localhost:3000
     host: 0.0.0.0
     port: 8080
   character_limits:

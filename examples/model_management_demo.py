@@ -17,8 +17,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from components.model_management import (
     ModelManagementComponent,
+    ModelRequirements,
     TaskType,
-    ModelRequirements
 )
 
 # Configure logging

@@ -25,9 +25,9 @@ async def main():
         # List all tools
         tools, next_cursor = await registry.list_tools()
 
-        print(f"\n{'='*80}")
-        print(f"REGISTERED TOOLS IN REDIS (DB 1, prefix: ao-dev)")
-        print(f"{'='*80}\n")
+        print(f"\n{'=' * 80}")
+        print("REGISTERED TOOLS IN REDIS (DB 1, prefix: ao-dev)")
+        print(f"{'=' * 80}\n")
 
         if not tools:
             print("❌ NO TOOLS REGISTERED")
@@ -43,7 +43,7 @@ async def main():
                 print(f"   Status: {tool.status}")
                 print()
 
-        print(f"{'='*80}\n")
+        print(f"{'=' * 80}\n")
 
     finally:
         await redis_client.aclose()
@@ -51,4 +51,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

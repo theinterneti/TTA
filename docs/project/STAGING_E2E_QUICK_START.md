@@ -330,4 +330,3 @@ When adding new features:
 ---
 
 **Questions?** Check `tests/e2e-staging/README.md` for detailed documentation.
-

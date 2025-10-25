@@ -147,6 +147,10 @@ class AgentsConfig(BaseModel):
         default_factory=lambda: AgentConfig(max_instances=3, timeout=20),
         description="Narrative Generator Agent configuration",
     )
+    openhands: AgentConfig = Field(
+        default_factory=lambda: AgentConfig(max_instances=1, timeout=300),
+        description="OpenHands Development Agent configuration",
+    )
 
     @validator("heartbeat_interval")
     def validate_heartbeat_interval(cls, v, values):

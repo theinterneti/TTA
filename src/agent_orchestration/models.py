@@ -19,6 +19,7 @@ class AgentType(str, Enum):
     IPA = "input_processor"
     WBA = "world_builder"
     NGA = "narrative_generator"
+    OPENHANDS = "openhands"  # OpenHands development agent
 
 
 class MessageType(str, Enum):

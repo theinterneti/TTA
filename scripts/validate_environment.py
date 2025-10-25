@@ -7,10 +7,9 @@ variables are set and properly configured for the model management system.
 """
 
 import os
+import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import re
 
 # Add the src directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -26,9 +25,9 @@ class EnvironmentValidator:
     """Validates TTA environment configuration."""
 
     def __init__(self):
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
-        self.info: List[str] = []
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
+        self.info: list[str] = []
 
     def validate_file_structure(self) -> bool:
         """Validate environment file structure."""
@@ -54,7 +53,7 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_required_variables(self, env_vars: Dict[str, str]) -> bool:
+    def validate_required_variables(self, env_vars: dict[str, str]) -> bool:
         """Validate required environment variables."""
         print("🔍 Validating required environment variables...")
 
@@ -84,7 +83,7 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_api_keys(self, env_vars: Dict[str, str]) -> bool:
+    def validate_api_keys(self, env_vars: dict[str, str]) -> bool:
         """Validate API key configuration."""
         print("🔍 Validating API key configuration...")
 
@@ -119,7 +118,7 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_security_config(self, env_vars: Dict[str, str]) -> bool:
+    def validate_security_config(self, env_vars: dict[str, str]) -> bool:
         """Validate security configuration."""
         print("🔍 Validating security configuration...")
 
@@ -154,7 +153,7 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_feature_flags(self, env_vars: Dict[str, str]) -> bool:
+    def validate_feature_flags(self, env_vars: dict[str, str]) -> bool:
         """Validate feature flag configuration."""
         print("🔍 Validating feature flags...")
 
@@ -180,7 +179,7 @@ class EnvironmentValidator:
 
         return True
 
-    def validate_database_urls(self, env_vars: Dict[str, str]) -> bool:
+    def validate_database_urls(self, env_vars: dict[str, str]) -> bool:
         """Validate database URL formats."""
         print("🔍 Validating database URL formats...")
 
