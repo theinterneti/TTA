@@ -47,6 +47,24 @@ jobs:
         env:
           TTA_METRICS_ENABLED: true
           TTA_TEST_METRICS_COLLECTION: true
+
+      - name: Run generated tests (protocol_bridge, capability_matcher, circuit_breaker)
+        run: |
+          # Run generated tests for high-priority modules
+          # These tests were generated using OpenHands integration for improved coverage
+          uv run pytest \
+            tests/agent_orchestration/test_protocol_bridge.py \
+            tests/agent_orchestration/test_capability_matcher.py \
+            tests/agent_orchestration/test_circuit_breaker.py \
+            -v --tb=short \
+            --junitxml=test-results/generated-tests.xml \
+            --cov=src/agent_orchestration \
+            --cov-report=xml:coverage-generated.xml
+        continue-on-error: true
+        env:
+          TTA_METRICS_ENABLED: true
+          TTA_TEST_METRICS_COLLECTION: true
+
       - name: Upload unit test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -55,6 +73,7 @@ jobs:
           path: |
             test-results/
             coverage-unit.xml
+            coverage-generated.xml
 
   integration:
     runs-on: ubuntu-latest

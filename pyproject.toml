@@ -84,6 +84,8 @@ dependencies = [
     # MCP Integration
     "fastmcp>=0.4.1",
     "mcp>=1.6.0",
+    # Agent Integration
+    "openhands-sdk>=0.1.0",
     # LangChain and LangGraph
     "langchain-core>=0.3.0",
     "langchain-openai>=0.2.0",
@@ -99,7 +101,7 @@ dependencies = [
     "py-cpuinfo>=9.0.0",
     "pynvml>=12.0.0",
     "py3nvml>=0.2.7",
-    "codecarbon>=2.8.0",
+    # "codecarbon>=3.0.7",  # Temporarily disabled due to httpx version conflict with openhands-sdk
     "cloudpickle>=3.1.0",
     "fsspec>=2024.0.0",
     "dill>=0.3.4",
@@ -134,6 +136,7 @@ dev = [
     "pyright>=1.1.350",
     "pre-commit>=3.5.0",
     "testcontainers>=4.12.0",
+    "prospector[with_pyright]>=1.10.2",
 ]
 
 minimal = [
@@ -166,7 +169,7 @@ minimal = [
     "ruff>=0.11.0",
     "pyright>=1.1.350",
     "psutil>=7.0.0",
-    "codecarbon>=2.8.0",
+    # "codecarbon>=3.0.7",  # Temporarily disabled due to httpx version conflict with openhands-sdk
 ]
 
 # ============================================================================
@@ -186,6 +189,7 @@ dev = [
     "pre-commit>=3.5.0",
     "ipython>=8.12.0",
     "ipdb>=0.13.13",
+    "prospector[with_pyright]>=1.10.2",
 ]
 
 # Testing frameworks and utilities
@@ -255,7 +259,7 @@ gpu = [
     # GPU Utilities
     "pynvml>=12.0.0",
     "py3nvml>=0.2.7",
-    "codecarbon>=2.8.0",
+    # "codecarbon>=3.0.7",  # Temporarily disabled due to httpx version conflict with openhands-sdk
     "ray>=2.44.0",
 ]
 
@@ -536,6 +540,15 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+]
+
+# Coverage thresholds for generated tests (OpenHands integration)
+# These modules have generated test suites targeting 70% coverage
+[tool.coverage.paths]
+source = [
+    "src/agent_orchestration/protocol_bridge.py",
+    "src/agent_orchestration/capability_matcher.py",
+    "src/agent_orchestration/circuit_breaker.py",
 ]
 
 [tool.coverage.html]
