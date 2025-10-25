@@ -1,0 +1,822 @@
+{
+  "001585cb-4b2f-4a3b-a107-1152d10c6fd4": {
+    "task_id": "001585cb-4b2f-4a3b-a107-1152d10c6fd4",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/agent_orchestration/adapters.py (coverage: 5% \u2192 70%)",
+    "target_file": "src/agent_orchestration/adapters.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409396+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "5275aa81-ead5-46b1-95fc-57088b83173e": {
+    "task_id": "5275aa81-ead5-46b1-95fc-57088b83173e",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/agent_orchestration/agents.py (coverage: 5% \u2192 70%)",
+    "target_file": "src/agent_orchestration/agents.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409420+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "86975d5e-09ef-468a-ba54-5a00c3cdbc7f": {
+    "task_id": "86975d5e-09ef-468a-ba54-5a00c3cdbc7f",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/agent_orchestration/service.py (coverage: 5% \u2192 70%)",
+    "target_file": "src/agent_orchestration/service.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409434+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "1e518dab-6bbf-4860-bca6-76dfa40193a6": {
+    "task_id": "1e518dab-6bbf-4860-bca6-76dfa40193a6",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/player_experience/api/routers/auth.py (coverage: 3% \u2192 70%)",
+    "target_file": "src/player_experience/api/routers/auth.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409444+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "ba1b1f9d-2fb9-4497-92d9-81ed2907ccce": {
+    "task_id": "ba1b1f9d-2fb9-4497-92d9-81ed2907ccce",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/player_experience/api/routers/characters.py (coverage: 3% \u2192 70%)",
+    "target_file": "src/player_experience/api/routers/characters.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409452+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "6c8d32c8-30aa-42b0-a6bb-6342d6a11af8": {
+    "task_id": "6c8d32c8-30aa-42b0-a6bb-6342d6a11af8",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/player_experience/managers/player_experience_manager.py (coverage: 3% \u2192 70%)",
+    "target_file": "src/player_experience/managers/player_experience_manager.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409488+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "complex",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "c739beaf-ebfc-4f74-9def-df454fae02cc": {
+    "task_id": "c739beaf-ebfc-4f74-9def-df454fae02cc",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/agent_orchestration/realtime/websocket_manager.py (coverage: 5% \u2192 70%)",
+    "target_file": "src/agent_orchestration/realtime/websocket_manager.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409498+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "complex",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "be8547cb-4d6b-4aeb-9f03-d85d2b05c623": {
+    "task_id": "be8547cb-4d6b-4aeb-9f03-d85d2b05c623",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/agent_orchestration/openhands_integration/docker_client.py (coverage: 5% \u2192 70%)",
+    "target_file": "src/agent_orchestration/openhands_integration/docker_client.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409504+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "complex",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "fa611fd4-b9be-4127-9c96-723528f6131f": {
+    "task_id": "fa611fd4-b9be-4127-9c96-723528f6131f",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/player_experience/api/routers/worlds.py (coverage: 3% \u2192 70%)",
+    "target_file": "src/player_experience/api/routers/worlds.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409510+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "12da1a7f-c584-4759-bd75-b3a894ccd3c0": {
+    "task_id": "12da1a7f-c584-4759-bd75-b3a894ccd3c0",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/player_experience/production_readiness.py (coverage: 3% \u2192 70%)",
+    "target_file": "src/player_experience/production_readiness.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409515+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "complex",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "edec1a69-530d-4abc-826c-3041d42e9a3f": {
+    "task_id": "edec1a69-530d-4abc-826c-3041d42e9a3f",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/components/neo4j_integration/manager.py (coverage: 27% \u2192 70%)",
+    "target_file": "src/components/neo4j_integration/manager.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409521+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "4d26a94f-53a2-478f-9fca-1699557c689e": {
+    "task_id": "4d26a94f-53a2-478f-9fca-1699557c689e",
+    "task_type": "unit_test",
+    "description": "Generate unit tests for src/components/neo4j_integration/query_builder.py (coverage: 27% \u2192 70%)",
+    "target_file": "src/components/neo4j_integration/query_builder.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409527+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "unit_test",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "acc7a309-ef06-48e9-9fac-b802dde8e8ea": {
+    "task_id": "acc7a309-ef06-48e9-9fac-b802dde8e8ea",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/therapeutic_safety.py",
+    "target_file": "src/agent_orchestration/therapeutic_safety.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409533+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "9390f097-de69-4cec-9f31-4d9ca2b2fbcf": {
+    "task_id": "9390f097-de69-4cec-9f31-4d9ca2b2fbcf",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/realtime/websocket_manager.py",
+    "target_file": "src/agent_orchestration/realtime/websocket_manager.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409539+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "e67473b2-a63c-44d1-b7a7-536e259d28f8": {
+    "task_id": "e67473b2-a63c-44d1-b7a7-536e259d28f8",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/production_readiness.py",
+    "target_file": "src/player_experience/production_readiness.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409544+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "ea971179-a6cc-4f56-ac3a-9be1d7ea7a14": {
+    "task_id": "ea971179-a6cc-4f56-ac3a-9be1d7ea7a14",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/adapters.py",
+    "target_file": "src/agent_orchestration/adapters.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409549+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "complex",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "d3d6e649-9382-4a14-8ca2-aea3c81e186c": {
+    "task_id": "d3d6e649-9382-4a14-8ca2-aea3c81e186c",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/agents.py",
+    "target_file": "src/agent_orchestration/agents.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409554+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "acda85bc-3cbf-4737-925e-21ea079920b9": {
+    "task_id": "acda85bc-3cbf-4737-925e-21ea079920b9",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/api/routers/auth.py",
+    "target_file": "src/player_experience/api/routers/auth.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409560+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "8b9b6049-d15d-4ce1-9510-610d802478d4": {
+    "task_id": "8b9b6049-d15d-4ce1-9510-610d802478d4",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/openhands_integration/",
+    "target_file": "src/agent_orchestration/openhands_integration",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409565+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "c0e53447-72b4-4b2b-97c5-7ceab2ac8086": {
+    "task_id": "c0e53447-72b4-4b2b-97c5-7ceab2ac8086",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/api/routers/",
+    "target_file": "src/player_experience/api/routers",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409570+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "fb53c6be-d494-44c8-b0ab-f633e54e311b": {
+    "task_id": "fb53c6be-d494-44c8-b0ab-f633e54e311b",
+    "task_type": "code_generation",
+    "description": "Generate code for src/components/",
+    "target_file": "src/components",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409575+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "117f9cb6-77c8-48af-98f2-e7e2235c8823": {
+    "task_id": "117f9cb6-77c8-48af-98f2-e7e2235c8823",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/service.py",
+    "target_file": "src/agent_orchestration/service.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409580+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "9df6644f-1dad-4b2f-b0d1-f95772947541": {
+    "task_id": "9df6644f-1dad-4b2f-b0d1-f95772947541",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/managers/",
+    "target_file": "src/player_experience/managers",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409586+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "55ffa1a2-9250-4b82-a500-76f285d9b5cd": {
+    "task_id": "55ffa1a2-9250-4b82-a500-76f285d9b5cd",
+    "task_type": "code_generation",
+    "description": "Generate code for src/components/gameplay_loop/",
+    "target_file": "src/components/gameplay_loop",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409591+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "e51374e0-4d87-445c-8a87-605164db1675": {
+    "task_id": "e51374e0-4d87-445c-8a87-605164db1675",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/openhands_integration/",
+    "target_file": "src/agent_orchestration/openhands_integration",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409596+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "3fcfef6a-7dc4-4acf-bace-7b13e465832e": {
+    "task_id": "3fcfef6a-7dc4-4acf-bace-7b13e465832e",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/managers/",
+    "target_file": "src/player_experience/managers",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409605+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "0c1d297c-2f9e-4860-9c7a-048f0f21644d": {
+    "task_id": "0c1d297c-2f9e-4860-9c7a-048f0f21644d",
+    "task_type": "code_generation",
+    "description": "Generate code for src/components/redis_integration/",
+    "target_file": "src/components/redis_integration",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409611+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "24d7aad5-6404-4141-b777-c444afe094e8": {
+    "task_id": "24d7aad5-6404-4141-b777-c444afe094e8",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/api/routers/",
+    "target_file": "src/player_experience/api/routers",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409618+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "2eec0927-b7b7-42e9-b4a9-ea15185b9926": {
+    "task_id": "2eec0927-b7b7-42e9-b4a9-ea15185b9926",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/service.py",
+    "target_file": "src/agent_orchestration/service.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409624+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "1b14b014-75ed-4bab-b45c-162877d4d44c": {
+    "task_id": "1b14b014-75ed-4bab-b45c-162877d4d44c",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/",
+    "target_file": "src/agent_orchestration",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409629+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "7fefb03d-5dd7-4665-8bc2-06e4b3c71054": {
+    "task_id": "7fefb03d-5dd7-4665-8bc2-06e4b3c71054",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/",
+    "target_file": "src/player_experience",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409634+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "341126f2-c975-48f9-8c38-03aa0696c301": {
+    "task_id": "341126f2-c975-48f9-8c38-03aa0696c301",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/adapters.py",
+    "target_file": "src/agent_orchestration/adapters.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409639+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "a1660259-59e1-405f-a91f-f9c0b0124858": {
+    "task_id": "a1660259-59e1-405f-a91f-f9c0b0124858",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/api/routers/auth.py",
+    "target_file": "src/player_experience/api/routers/auth.py",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409644+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "5cfa7582-f2b5-4324-a1a8-cd3385d69255": {
+    "task_id": "5cfa7582-f2b5-4324-a1a8-cd3385d69255",
+    "task_type": "code_generation",
+    "description": "Generate code for src/components/gameplay_loop/",
+    "target_file": "src/components/gameplay_loop",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409650+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "d5b6a7b3-69d2-4472-97b9-454ec09f0a8b": {
+    "task_id": "d5b6a7b3-69d2-4472-97b9-454ec09f0a8b",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/utils/",
+    "target_file": "src/agent_orchestration/utils",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409655+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "a3ba1979-2019-4e99-b71d-32556351b160": {
+    "task_id": "a3ba1979-2019-4e99-b71d-32556351b160",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/utils/",
+    "target_file": "src/player_experience/utils",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409660+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "169d57ef-2a2c-4fb6-a220-5272d0036d28": {
+    "task_id": "169d57ef-2a2c-4fb6-a220-5272d0036d28",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/validators/",
+    "target_file": "src/player_experience/validators",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409665+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "6fa09901-33f2-49c0-a655-2be8a16c5f41": {
+    "task_id": "6fa09901-33f2-49c0-a655-2be8a16c5f41",
+    "task_type": "code_generation",
+    "description": "Generate code for src/components/gameplay_loop/validators/",
+    "target_file": "src/components/gameplay_loop/validators",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409670+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "8b094526-f713-42de-9765-fdf7ab3fd2b9": {
+    "task_id": "8b094526-f713-42de-9765-fdf7ab3fd2b9",
+    "task_type": "code_generation",
+    "description": "Generate code for src/agent_orchestration/config/",
+    "target_file": "src/agent_orchestration/config",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409675+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "e5b42200-5d5d-44b6-9a8b-fc93f1cec6fe": {
+    "task_id": "e5b42200-5d5d-44b6-9a8b-fc93f1cec6fe",
+    "task_type": "code_generation",
+    "description": "Generate code for src/player_experience/config/",
+    "target_file": "src/player_experience/config",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.409681+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "simple",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  },
+  "1ba60e6d-2a03-41e8-aed5-02c77b075713": {
+    "task_id": "1ba60e6d-2a03-41e8-aed5-02c77b075713",
+    "task_type": "code_generation",
+    "description": "Generate code for src/components/",
+    "target_file": "src/components",
+    "priority": "NORMAL",
+    "status": "queued",
+    "created_at": "2025-10-25T23:17:09.408653+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "metadata": {
+      "category": "code_generation",
+      "complexity": "moderate",
+      "quality_threshold": 0.7
+    },
+    "result": null,
+    "error": null,
+    "retry_count": 0,
+    "max_retries": 3
+  }
+}

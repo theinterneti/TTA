@@ -1,0 +1,35 @@
+{
+  "timestamp": "\"2025-10-25T23:17:49.716029+00:00\"",
+  "queue_stats": {
+    "total_tasks": 41,
+    "pending": 0,
+    "queued": 0,
+    "running": 0,
+    "completed": 0,
+    "failed": 41,
+    "queue_size": 0,
+    "max_size": 1000
+  },
+  "metrics": {
+    "system": {
+      "total_tasks": 164,
+      "completed_tasks": 0,
+      "failed_tasks": 164,
+      "success_rate": "0.0%",
+      "total_cost": "$0.00",
+      "total_tokens": 0,
+      "uptime_hours": "0.0h"
+    },
+    "models": {
+      "llama-3.3": {
+        "executions": 164,
+        "success_rate": "0.0%",
+        "avg_duration_ms": "0ms",
+        "avg_tokens": "0",
+        "avg_cost": "$0.0000",
+        "avg_quality": "0.00/5.0"
+      }
+    }
+  },
+  "running": true
+}

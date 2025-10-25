@@ -18,7 +18,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from agent_orchestration.openhands_integration.config import (
     OpenHandsConfig,
     OpenHandsIntegrationConfig,
-    get_model_by_preset,
 )
 from agent_orchestration.openhands_integration.execution_engine import ExecutionEngine
 from agent_orchestration.openhands_integration.task_queue import (
@@ -73,9 +72,7 @@ def load_all_tasks():
                             task_type=task_type,
                             description=description,
                             target_file=(
-                                Path(item.get("file"))
-                                if item.get("file")
-                                else None
+                                Path(item.get("file")) if item.get("file") else None
                             ),
                             priority=priority,
                             metadata={
@@ -148,7 +145,7 @@ async def run_execution():
 
     # Run engine for specified duration
     duration = 3600  # 1 hour
-    print(f"⏱️  Running engine for {duration}s ({duration//60} minutes)...")
+    print(f"⏱️  Running engine for {duration}s ({duration // 60} minutes)...")
     print("   (Press Ctrl+C to stop early)")
     print()
 
@@ -191,11 +188,10 @@ async def run_execution():
 
     print()
     print("=" * 80)
-    print(f"✅ EXECUTION COMPLETE")
+    print("✅ EXECUTION COMPLETE")
     print(f"   Results saved to: {output_file}")
     print("=" * 80)
 
 
 if __name__ == "__main__":
     asyncio.run(run_execution())
-

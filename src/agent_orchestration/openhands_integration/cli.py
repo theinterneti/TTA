@@ -86,14 +86,17 @@ def submit_task(
             },
         )
 
-        # Create engine and submit
+        # Create engine and submit (don't stop engine - let it run)
         engine = ExecutionEngine(config)
 
         async def run():
-            await engine.start()
-            task_id = await engine.submit_task(task)
+            # Load existing tasks from persistence
+            await engine.queue.load_from_file()
+            # Submit new task
+            task_id = await engine.queue.enqueue(task)
+            # Save to persistence file
+            await engine.queue.save_to_file()
             click.echo(f"Task submitted: {task_id}")
-            await engine.stop()
 
         asyncio.run(run())
 

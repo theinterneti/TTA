@@ -24,7 +24,10 @@ from agent_orchestration.openhands_integration.config import (
     OpenHandsIntegrationConfig,
 )
 from agent_orchestration.openhands_integration.execution_engine import ExecutionEngine
-from agent_orchestration.openhands_integration.task_queue import QueuedTask, TaskPriority
+from agent_orchestration.openhands_integration.task_queue import (
+    QueuedTask,
+    TaskPriority,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -153,7 +156,7 @@ async def main():
 
         # Get queue stats
         stats = await engine.get_queue_stats()
-        logger.info(f"\n📊 Queue Statistics:")
+        logger.info("\n📊 Queue Statistics:")
         logger.info(f"   Total tasks: {stats.get('total_tasks', 0)}")
         logger.info(f"   Pending: {stats.get('pending_count', 0)}")
         logger.info(f"   Running: {stats.get('running_count', 0)}")
@@ -187,4 +190,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

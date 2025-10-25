@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Phase 7 Task Re-queuing Script
+Phase 7 Task Submission to Running Engine
 
-Re-submits all 47 tasks from batch results to the running execution engine.
-This ensures tasks are properly queued for processing.
+Submits all 41 tasks from batch results to the running execution engine.
+This script communicates with the running engine process to queue tasks.
 """
 
 import asyncio
@@ -24,7 +24,6 @@ from agent_orchestration.openhands_integration.task_queue import (
 )
 
 
-# Load all task IDs from batch results
 def load_all_tasks():
     """Load all tasks from batch result files."""
     tasks = []
@@ -56,10 +55,10 @@ def load_all_tasks():
     return tasks
 
 
-async def requeue_tasks():
-    """Re-queue all tasks to the running engine."""
+async def submit_tasks_to_engine():
+    """Submit all tasks to the running engine."""
     print("=" * 80)
-    print("🔄 PHASE 7 TASK RE-QUEUING")
+    print("🚀 SUBMITTING TASKS TO RUNNING ENGINE")
     print("=" * 80)
     print()
 
@@ -71,7 +70,7 @@ async def requeue_tasks():
         workspace_path=integration_config.workspace_root,
     )
 
-    # Create engine
+    # Create engine (connects to running instance)
     engine = ExecutionEngine(config, max_concurrent_tasks=5)
 
     # Load all tasks
@@ -79,8 +78,8 @@ async def requeue_tasks():
     print(f"📋 Loaded {len(all_tasks)} tasks from batch results")
     print()
 
-    # Re-queue each task
-    requeued = 0
+    # Submit each task
+    submitted = 0
     failed = 0
 
     for task_data in all_tasks:
@@ -119,8 +118,8 @@ async def requeue_tasks():
             # Submit task
             new_task_id = await engine.submit_task(task)
             print(f"✅ Batch {batch}: {description[:50]}")
-            print(f"   New Task ID: {new_task_id}")
-            requeued += 1
+            print(f"   Task ID: {new_task_id}")
+            submitted += 1
         except Exception as e:
             print(f"❌ Batch {batch}: {description[:50]}")
             print(f"   Error: {e}")
@@ -128,8 +127,8 @@ async def requeue_tasks():
 
     print()
     print("=" * 80)
-    print("✅ RE-QUEUING COMPLETE")
-    print(f"   Re-queued: {requeued}/{len(all_tasks)} tasks")
+    print("✅ SUBMISSION COMPLETE")
+    print(f"   Submitted: {submitted}/{len(all_tasks)} tasks")
     print(f"   Failed: {failed}/{len(all_tasks)} tasks")
     print("=" * 80)
 
@@ -141,4 +140,5 @@ async def requeue_tasks():
 
 
 if __name__ == "__main__":
-    asyncio.run(requeue_tasks())
+    asyncio.run(submit_tasks_to_engine())
+

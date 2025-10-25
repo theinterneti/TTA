@@ -11,7 +11,6 @@ Submits documentation tasks:
 
 import json
 import subprocess
-import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -114,6 +113,7 @@ def submit_task(item: dict) -> str | None:
     try:
         result = subprocess.run(
             cmd,
+            check=False,
             capture_output=True,
             text=True,
             timeout=10,
@@ -129,7 +129,7 @@ def submit_task(item: dict) -> str | None:
             print(f"❌ Error: {result.stderr}")
             return None
     except subprocess.TimeoutExpired:
-        print(f"❌ Timeout submitting task")
+        print("❌ Timeout submitting task")
         return None
     except Exception as e:
         print(f"❌ Exception: {e}")
@@ -157,7 +157,7 @@ def main():
             task_ids.append(task_id)
             results.append({"item": item, "task_id": task_id, "status": "submitted"})
         else:
-            print(f"        ❌ Failed to submit")
+            print("        ❌ Failed to submit")
             results.append({"item": item, "task_id": None, "status": "failed"})
 
         print()
@@ -177,7 +177,7 @@ def main():
         json.dump(output, f, indent=2)
 
     print("=" * 80)
-    print(f"✅ BATCH 4 SUBMISSION COMPLETE")
+    print("✅ BATCH 4 SUBMISSION COMPLETE")
     print(f"   Submitted: {len(task_ids)}/{len(BATCH4_ITEMS)} tasks")
     print(f"   Results saved to: {output_file}")
     print("=" * 80)
@@ -185,4 +185,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

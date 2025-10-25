@@ -36,11 +36,11 @@ logger = logging.getLogger(__name__)
 def load_all_tasks() -> list[dict[str, Any]]:
     """Load all tasks from batch result files."""
     all_tasks = []
-    batch_dir = Path(".")
-    
+    batch_dir = Path()
+
     # Find all batch result files
     batch_files = sorted(batch_dir.glob("batch*_results.json"))
-    
+
     for batch_file in batch_files:
         try:
             with open(batch_file) as f:
@@ -51,7 +51,7 @@ def load_all_tasks() -> list[dict[str, Any]]:
                     all_tasks.extend(data)
         except Exception as e:
             logger.warning(f"Failed to load {batch_file}: {e}")
-    
+
     return all_tasks
 
 
@@ -59,10 +59,10 @@ async def execute_task(client: OpenHandsClient, task: dict[str, Any]) -> dict[st
     """Execute a single task."""
     task_id = task.get("id", "unknown")
     task_type = task.get("type", "unknown")
-    
+
     try:
         logger.info(f"Executing task {task_id}: {task_type}")
-        
+
         # Execute the task
         result = await client.execute_task(
             task_type=task_type,
@@ -70,7 +70,7 @@ async def execute_task(client: OpenHandsClient, task: dict[str, Any]) -> dict[st
             target_file=task.get("target_file"),
             parameters=task.get("parameters", {}),
         )
-        
+
         logger.info(f"✅ Task {task_id} completed successfully")
         return {
             "task_id": task_id,
@@ -94,76 +94,81 @@ async def main():
     print("🚀 PHASE 7 DIRECT EXECUTION")
     print("=" * 80)
     print()
-    
+
     # Load configuration
     integration_config = OpenHandsIntegrationConfig.from_env()
-    
+
     # Use high-performance Llama model (100% success rate, 0.88s avg latency)
     model_id = "openrouter/meta-llama/llama-3.3-8b-instruct:free"
-    
+
     config = OpenHandsConfig(
         api_key=integration_config.api_key,
         model=model_id,
         workspace_path=integration_config.workspace_root,
     )
-    
+
     # Create client
     client = OpenHandsClient(config)
-    
+
     # Load all tasks
     all_tasks = load_all_tasks()
     print(f"📋 Loaded {len(all_tasks)} tasks")
     print()
-    
+
     if not all_tasks:
         print("❌ No tasks found!")
         return
-    
+
     # Execute tasks
     results = []
     completed = 0
     failed = 0
-    
+
     print(f"🔄 Executing {len(all_tasks)} tasks...")
     print()
-    
+
     for i, task in enumerate(all_tasks, 1):
         result = await execute_task(client, task)
         results.append(result)
-        
+
         if result["status"] == "completed":
             completed += 1
         else:
             failed += 1
-        
+
         if i % 5 == 0:
-            print(f"   [{i}/{len(all_tasks)}] Progress: {completed} completed, {failed} failed")
-    
+            print(
+                f"   [{i}/{len(all_tasks)}] Progress: {completed} completed, {failed} failed"
+            )
+
     # Summary
     print()
     print("=" * 80)
     print("📊 EXECUTION SUMMARY")
     print("=" * 80)
     print(f"Total tasks: {len(all_tasks)}")
-    print(f"Completed: {completed} ({100*completed/len(all_tasks):.1f}%)")
-    print(f"Failed: {failed} ({100*failed/len(all_tasks):.1f}%)")
+    print(f"Completed: {completed} ({100 * completed / len(all_tasks):.1f}%)")
+    print(f"Failed: {failed} ({100 * failed / len(all_tasks):.1f}%)")
     print()
-    
+
     # Save results
     output_file = Path("phase7_direct_execution_results.json")
     with open(output_file, "w") as f:
-        json.dump({
-            "timestamp": datetime.now().isoformat(),
-            "total_tasks": len(all_tasks),
-            "completed": completed,
-            "failed": failed,
-            "results": results,
-        }, f, indent=2)
-    
+        json.dump(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "total_tasks": len(all_tasks),
+                "completed": completed,
+                "failed": failed,
+                "results": results,
+            },
+            f,
+            indent=2,
+        )
+
     print(f"✅ Results saved to: {output_file}")
     print("=" * 80)
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-

@@ -10,7 +10,10 @@ Provides:
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import os
+from pathlib import Path
 from typing import Any, Optional
 
 from .adapter import OpenHandsAdapter
@@ -33,6 +36,8 @@ class ExecutionEngine:
         config: OpenHandsConfig,
         queue_size: int = 1000,
         max_concurrent_tasks: int = 5,
+        state_file: str = "engine_state.json",
+        persistence_file: str = "task_queue.json",
     ):
         """Initialize execution engine.
 
@@ -40,9 +45,11 @@ class ExecutionEngine:
             config: OpenHands configuration
             queue_size: Task queue size
             max_concurrent_tasks: Maximum concurrent tasks
+            state_file: File to write engine state to (for monitoring)
+            persistence_file: File to persist tasks to
         """
         self.config = config
-        self.queue = TaskQueue(max_size=queue_size)
+        self.queue = TaskQueue(max_size=queue_size, persistence_file=persistence_file)
         self.model_selector = ModelSelector()
         self.model_rotation = ModelRotationManager()
         self.result_validator = ResultValidator()
@@ -50,6 +57,9 @@ class ExecutionEngine:
         self.max_concurrent_tasks = max_concurrent_tasks
         self._running = False
         self._workers: list[asyncio.Task] = []
+        self.state_file = state_file
+        self._state_export_task: Optional[asyncio.Task] = None
+        self._persistence_task: Optional[asyncio.Task] = None
 
         # Create OpenHands client and adapter
         self.client = OpenHandsClient(config)
@@ -64,10 +74,19 @@ class ExecutionEngine:
         self._running = True
         logger.info(f"Starting execution engine with {self.max_concurrent_tasks} workers")
 
+        # Load persisted tasks
+        await self.queue.load_from_file()
+
         # Start worker tasks
         for i in range(self.max_concurrent_tasks):
             worker = asyncio.create_task(self._worker(i))
             self._workers.append(worker)
+
+        # Start state export task
+        self._state_export_task = asyncio.create_task(self._export_state_periodically())
+
+        # Start persistence task
+        self._persistence_task = asyncio.create_task(self._persist_queue_periodically())
 
     async def stop(self) -> None:
         """Stop execution engine."""
@@ -77,6 +96,22 @@ class ExecutionEngine:
         self._running = False
         logger.info("Stopping execution engine")
 
+        # Cancel state export task
+        if self._state_export_task:
+            self._state_export_task.cancel()
+            try:
+                await self._state_export_task
+            except asyncio.CancelledError:
+                pass
+
+        # Cancel persistence task
+        if self._persistence_task:
+            self._persistence_task.cancel()
+            try:
+                await self._persistence_task
+            except asyncio.CancelledError:
+                pass
+
         # Cancel all workers
         for worker in self._workers:
             worker.cancel()
@@ -84,6 +119,9 @@ class ExecutionEngine:
         # Wait for workers to finish
         await asyncio.gather(*self._workers, return_exceptions=True)
         self._workers.clear()
+
+        # Final save
+        await self.queue.save_to_file()
 
     async def submit_task(self, task: QueuedTask) -> str:
         """Submit task for execution.
@@ -226,4 +264,56 @@ class ExecutionEngine:
             Metrics summary
         """
         return self.metrics.get_summary()
+
+    async def _export_state_periodically(self) -> None:
+        """Periodically export engine state to file for monitoring."""
+        while self._running:
+            try:
+                await asyncio.sleep(5)  # Export every 5 seconds
+                await self._export_state()
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error exporting state: {e}")
+
+    async def _export_state(self) -> None:
+        """Export current engine state to file."""
+        try:
+            stats = await self.get_queue_stats()
+            metrics = self.get_metrics_summary()
+
+            state = {
+                "timestamp": json.dumps(
+                    __import__("datetime").datetime.now(
+                        __import__("datetime").timezone.utc
+                    ).isoformat()
+                ),
+                "queue_stats": stats,
+                "metrics": metrics,
+                "running": self._running,
+            }
+
+            # Write to file atomically
+            temp_file = f"{self.state_file}.tmp"
+            with open(temp_file, "w") as f:
+                json.dump(state, f, indent=2, default=str)
+
+            # Atomic rename
+            import os
+
+            os.replace(temp_file, self.state_file)
+            logger.debug(f"Engine state exported to {self.state_file}")
+        except Exception as e:
+            logger.error(f"Failed to export state: {e}")
+
+    async def _persist_queue_periodically(self) -> None:
+        """Periodically persist task queue to file."""
+        while self._running:
+            try:
+                await asyncio.sleep(10)  # Persist every 10 seconds
+                await self.queue.save_to_file()
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error persisting queue: {e}")
 

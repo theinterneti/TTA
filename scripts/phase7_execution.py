@@ -11,7 +11,6 @@ import asyncio
 import json
 import logging
 import sys
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +20,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from agent_orchestration.openhands_integration.config import (
     OpenHandsConfig,
     OpenHandsIntegrationConfig,
-    get_model_by_preset,
 )
 from agent_orchestration.openhands_integration.execution_engine import ExecutionEngine
 from agent_orchestration.openhands_integration.task_queue import (
@@ -184,4 +182,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

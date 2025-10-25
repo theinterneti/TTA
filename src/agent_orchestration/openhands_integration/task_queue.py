@@ -12,6 +12,7 @@ Provides:
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -91,13 +92,15 @@ class QueuedTask:
 class TaskQueue:
     """FIFO task queue with priority support."""
 
-    def __init__(self, max_size: int = 1000):
+    def __init__(self, max_size: int = 1000, persistence_file: Optional[str] = None):
         """Initialize task queue.
 
         Args:
             max_size: Maximum queue size
+            persistence_file: Optional file path for persisting tasks
         """
         self.max_size = max_size
+        self.persistence_file = persistence_file or "task_queue.json"
         self._queue: asyncio.PriorityQueue[tuple[int, QueuedTask]] = (
             asyncio.PriorityQueue(maxsize=max_size)
         )
@@ -218,4 +221,56 @@ class TaskQueue:
                 "queue_size": self._queue.qsize(),
                 "max_size": self.max_size,
             }
+
+    async def save_to_file(self) -> None:
+        """Save all tasks to persistence file."""
+        try:
+            async with self._lock:
+                tasks_data = {
+                    task_id: task.to_dict()
+                    for task_id, task in self._tasks.items()
+                }
+
+            with open(self.persistence_file, "w") as f:
+                json.dump(tasks_data, f, indent=2, default=str)
+            logger.debug(f"Saved {len(tasks_data)} tasks to {self.persistence_file}")
+        except Exception as e:
+            logger.error(f"Failed to save tasks: {e}")
+
+    async def load_from_file(self) -> None:
+        """Load tasks from persistence file."""
+        try:
+            if not Path(self.persistence_file).exists():
+                logger.debug(f"No persistence file found at {self.persistence_file}")
+                return
+
+            with open(self.persistence_file, "r") as f:
+                tasks_data = json.load(f)
+
+            async with self._lock:
+                for task_id, task_dict in tasks_data.items():
+                    # Reconstruct task from dict
+                    task = QueuedTask(
+                        task_id=task_dict["task_id"],
+                        task_type=task_dict["task_type"],
+                        description=task_dict["description"],
+                        target_file=Path(task_dict["target_file"]) if task_dict.get("target_file") else None,
+                        priority=TaskPriority[task_dict["priority"]],
+                        status=TaskStatus(task_dict["status"]),
+                        metadata=task_dict.get("metadata", {}),
+                        result=task_dict.get("result"),
+                        error=task_dict.get("error"),
+                        retry_count=task_dict.get("retry_count", 0),
+                        max_retries=task_dict.get("max_retries", 3),
+                    )
+                    self._tasks[task_id] = task
+
+                    # Re-queue pending and queued tasks
+                    if task.status in (TaskStatus.PENDING, TaskStatus.QUEUED):
+                        task.status = TaskStatus.QUEUED
+                        await self._queue.put((task.priority.value, task))
+
+            logger.info(f"Loaded {len(tasks_data)} tasks from {self.persistence_file}")
+        except Exception as e:
+            logger.error(f"Failed to load tasks: {e}")
 
