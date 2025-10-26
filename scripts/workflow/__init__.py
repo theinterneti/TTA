@@ -12,7 +12,7 @@ Main Components:
 
 Usage:
     from workflow import run_workflow
-    
+
     result = run_workflow(
         spec_file="specs/my_component.md",
         component_name="my_component",
@@ -33,4 +33,3 @@ __all__ = [
 ]
 
 __version__ = "1.0.0"
-

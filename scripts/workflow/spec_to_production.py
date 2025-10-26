@@ -36,8 +36,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from scripts.observability.dashboard import generate_dashboard
-from scripts.observability.dev_metrics import get_collector, track_execution
-from scripts.primitives.error_recovery import RetryConfig, with_retry
+from scripts.observability.dev_metrics import track_execution
 
 # Import context manager
 try:
@@ -46,6 +45,7 @@ try:
         AIConversationContextManager,
         create_tta_session,
     )
+
     CONTEXT_MANAGER_AVAILABLE = True
 except ImportError:
     CONTEXT_MANAGER_AVAILABLE = False
@@ -93,7 +93,7 @@ class WorkflowResult:
 
     def save_report(self, output_file: Path):
         """Save workflow report to file."""
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(self.to_dict(), f, indent=2)
 
 
@@ -133,7 +133,9 @@ class WorkflowOrchestrator:
         """Initialize AI context management session."""
         try:
             session_id = f"{self.component_name}-workflow-{datetime.utcnow().strftime('%Y-%m-%d')}"
-            self.context_manager, self.context_session_id = create_tta_session(session_id)
+            self.context_manager, self.context_session_id = create_tta_session(
+                session_id
+            )
 
             # Add initial context
             self.context_manager.add_message(
@@ -242,7 +244,7 @@ class WorkflowOrchestrator:
 
                 result.stages_completed.append("staging_deployment")
                 self._update_context(
-                    f"Staging deployment successful",
+                    "Staging deployment successful",
                     importance=0.9,
                 )
 
@@ -261,7 +263,7 @@ class WorkflowOrchestrator:
 
                 result.stages_completed.append("production_deployment")
                 self._update_context(
-                    f"Production deployment successful - component is now in production!",
+                    "Production deployment successful - component is now in production!",
                     importance=1.0,
                 )
 
@@ -275,7 +277,9 @@ class WorkflowOrchestrator:
 
             # Calculate total execution time
             end_time = datetime.utcnow()
-            result.total_execution_time_ms = (end_time - start_time).total_seconds() * 1000
+            result.total_execution_time_ms = (
+                end_time - start_time
+            ).total_seconds() * 1000
 
             return result
 
@@ -404,4 +408,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
