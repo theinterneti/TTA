@@ -5,26 +5,26 @@
 quality_gates:
   # Testing gates
   test_coverage:
-    dev_threshold: 50.0      # Minimum coverage for development
-    staging_threshold: 70.0  # Minimum coverage for staging promotion
-    production_threshold: 80.0  # Minimum coverage for production promotion
-  
+    dev_threshold: 50.0 # Minimum coverage for development
+    staging_threshold: 70.0 # Minimum coverage for staging promotion
+    production_threshold: 80.0 # Minimum coverage for production promotion
+
   test_pass_rate:
-    required: 100.0  # All tests must pass
-  
+    required: 100.0 # All tests must pass
+
   # Code quality gates
   linting:
-    max_issues: 0  # No linting issues allowed
-    auto_fix: true  # Automatically fix issues where possible
-  
+    max_issues: 0 # No linting issues allowed
+    auto_fix: true # Automatically fix issues where possible
+
   type_checking:
-    max_errors: 0  # No type errors allowed
-  
+    max_errors: 0 # No type errors allowed
+
   security:
-    max_critical: 0  # No critical security issues
-    max_high: 0      # No high security issues
-    max_medium: 5    # Up to 5 medium security issues allowed
-  
+    max_critical: 0 # No critical security issues
+    max_high: 0 # No high security issues
+    max_medium: 5 # Up to 5 medium security issues allowed
+
   # Performance gates (placeholder)
   performance:
     max_response_time_ms: 5000
@@ -39,21 +39,21 @@ error_recovery:
     exponential_base: 2.0
     max_delay: 10.0
     jitter: true
-  
+
   staging_deployment:
     max_retries: 5
     base_delay: 2.0
     exponential_base: 2.0
     max_delay: 30.0
     jitter: true
-  
+
   production_deployment:
     max_retries: 3
     base_delay: 5.0
     exponential_base: 1.5
     max_delay: 60.0
     jitter: true
-  
+
   # Circuit breaker configuration
   circuit_breaker:
     failure_threshold: 5
@@ -67,13 +67,13 @@ observability:
     enabled: true
     metrics_dir: ".metrics"
     retention_days: 30
-  
+
   # Dashboard generation
   dashboard:
     enabled: true
     auto_generate: true
     output_dir: "workflow_dashboards"
-  
+
   # Metrics to track
   track_metrics:
     - stage_execution_time
@@ -89,7 +89,7 @@ context_management:
     enabled: true
     max_tokens: 8000
     auto_save: true
-  
+
   # Importance scoring
   importance:
     architectural_decisions: 1.0
@@ -100,11 +100,11 @@ context_management:
     deployment_status: 0.9
     refactoring_decisions: 0.7
     progress_updates: 0.5
-  
+
   # Pruning strategy
   pruning:
     preserve_system_messages: true
-    preserve_high_importance: true  # importance >= 0.8
+    preserve_high_importance: true # importance >= 0.8
     preserve_recent_count: 5
 
 # Component Maturity Workflow
@@ -117,22 +117,22 @@ maturity_workflow:
     optional_gates:
       - test_coverage
       - type_checking
-  
+
   # Staging stage
   staging:
     required_gates:
-      - test_coverage  # >= 70%
+      - test_coverage # >= 70%
       - test_pass_rate
       - linting
       - type_checking
       - security
     optional_gates:
       - performance
-  
+
   # Production stage
   production:
     required_gates:
-      - test_coverage  # >= 80% integration tests
+      - test_coverage # >= 80% integration tests
       - test_pass_rate
       - linting
       - type_checking
@@ -151,31 +151,31 @@ stages:
   specification:
     enabled: true
     timeout_seconds: 60
-  
+
   implementation:
-    enabled: false  # Not yet implemented
+    enabled: false # Not yet implemented
     timeout_seconds: 3600
-  
+
   testing:
     enabled: true
     timeout_seconds: 600
     parallel_execution: false
-  
+
   refactoring:
     enabled: true
     timeout_seconds: 300
     auto_fix_linting: true
-  
+
   staging_deployment:
     enabled: true
     timeout_seconds: 600
     rollback_on_failure: true
-  
+
   production_deployment:
     enabled: true
     timeout_seconds: 900
     rollback_on_failure: true
-    require_manual_approval: false  # Set to true for production safety
+    require_manual_approval: false # Set to true for production safety
 
 # Notification Configuration (placeholder)
 notifications:
@@ -195,4 +195,3 @@ logging:
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   file: "workflow.log"
   console: true
-

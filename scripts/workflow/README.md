@@ -458,10 +458,10 @@ python scripts/observability/dashboard.py
 **Solution:**
 ```bash
 # Run tests manually to see failures
-uvx pytest tests/my_component/ -v
+uv run pytest tests/my_component/ -v
 
 # Check coverage
-uvx pytest tests/my_component/ --cov=src/my_component --cov-report=term
+uv run pytest tests/my_component/ --cov=src/my_component --cov-report=term
 
 # Fix tests and re-run workflow
 ```
@@ -475,11 +475,11 @@ uvx pytest tests/my_component/ --cov=src/my_component --cov-report=term
 **Solution:**
 ```bash
 # Auto-fix linting issues
-uvx ruff check --fix src/my_component/ tests/my_component/
-uvx ruff format src/my_component/ tests/my_component/
+uv run ruff check --fix src/my_component/ tests/my_component/
+uv run ruff format src/my_component/ tests/my_component/
 
 # Check type errors
-uvx pyright src/my_component/
+uv run pyright src/my_component/
 
 # Fix type errors manually and re-run workflow
 ```
