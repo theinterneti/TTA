@@ -68,6 +68,150 @@ print(manager.get_context_summary(session_id))
 manager.save_session(session_id)
 ```
 
+### Instruction Loading
+
+The context manager automatically loads `.instructions.md` files from `.augment/instructions/` at session creation. Instructions provide AI agents with project-specific development standards, testing patterns, and component-specific conventions.
+
+```python
+from .augment.context.conversation_manager import create_tta_session
+
+# Create session with only global instructions
+manager, session_id = create_tta_session()
+
+# Create session with file-scoped instructions
+# This loads global + player-experience instructions
+manager, session_id = create_tta_session(
+    current_file="src/player_experience/service.py"
+)
+
+# Manually load instructions for a different file
+manager.load_instructions(session_id, "src/agent_orchestration/service.py")
+```
+
+**How it works:**
+1. Discovers all `.instructions.md` files in `.augment/instructions/`
+2. Parses YAML frontmatter to extract `applyTo` glob patterns
+3. Matches current file against patterns (e.g., `src/player_experience/**/*.py`)
+4. Loads matching instructions as system messages with importance scores:
+   - Global instructions (`**/*.py`): importance=0.9
+   - Scoped instructions: importance=0.8
+
+**Creating instruction files:**
+See `.augment/instructions/templates/instruction.template.md` for the template.
+
+```markdown
+---
+applyTo: "src/player_experience/**/*.py"
+description: "Player Experience component patterns"
+---
+
+# Component Instructions
+
+[Your instructions here]
+```
+
+### Memory Loading
+
+The context manager automatically loads `.memory.md` files from `.augment/memory/` subdirectories at session creation. Memories capture historical learnings from past development sessions, including implementation failures, successful patterns, and architectural decisions.
+
+```python
+from .augment.context.conversation_manager import create_tta_session
+
+# Create session and load all relevant memories
+manager, session_id = create_tta_session()
+
+# Load memories for specific component
+manager.load_memories(session_id, component="agent-orchestration")
+
+# Load only implementation failures
+manager.load_memories(session_id, category="implementation-failures")
+
+# Load memories with specific tags
+manager.load_memories(session_id, tags=["pytest", "testing"])
+
+# Load high-importance memories only
+manager.load_memories(session_id, min_importance=0.7)
+
+# Limit number of memories
+manager.load_memories(session_id, max_memories=5)
+```
+
+**How it works:**
+1. Discovers all `.memory.md` files in `.augment/memory/` subdirectories:
+   - `implementation-failures/`: Failed approaches and resolutions
+   - `successful-patterns/`: Proven solutions and best practices
+   - `architectural-decisions/`: Design choices and rationale
+2. Parses YAML frontmatter to extract metadata (component, tags, severity, date)
+3. Matches memories against current context using:
+   - **Component match:** Exact component or global memories
+   - **Tag match:** Overlapping tags between memory and current task
+   - **Category match:** Specific memory category (failures, patterns, decisions)
+4. Calculates importance score based on:
+   - **Severity:** critical (1.0), high (0.9), medium (0.7), low (0.5)
+   - **Recency:** Newer memories score higher (decay over 6 months)
+   - **Relevance:** How well memory matches current context
+5. Loads top-scoring memories as system messages with importance scores
+
+**Memory matching algorithm:**
+- **No filters:** Base relevance of 0.5 (all memories considered)
+- **Exact component match:** +0.5 relevance
+- **Global component:** +0.3 relevance (applies to any component)
+- **Tag match:** +0.3 × (proportion of matching tags)
+- **Category match:** +0.2 relevance
+
+**Importance scoring formula:**
+```
+importance = (relevance × 0.5) + (severity_score × 0.3) + (recency_score × 0.2)
+```
+
+**Creating memory files:**
+See `.augment/memory/templates/memory.template.md` for the template.
+
+```markdown
+---
+category: implementation-failures
+date: 2025-10-22
+component: agent-orchestration
+severity: high
+tags: [pytest, imports, test-environment]
+---
+
+# Memory Title
+
+## Context
+[What was happening when this occurred]
+
+## Problem
+[What went wrong or what was the challenge]
+
+## Root Cause
+[Why it happened]
+
+## Solution
+[How it was resolved]
+
+## Lesson Learned
+[Key takeaway for future work]
+```
+
+**Memory categories:**
+- **implementation-failures:** Failed approaches, errors, and their resolutions
+  - Capture when: Spent >30 minutes debugging or resolving an issue
+  - Severity: Based on time lost and impact
+- **successful-patterns:** Proven solutions and best practices
+  - Capture when: Found an effective approach worth reusing (>2 hours saved)
+  - Severity: Based on reusability and impact
+- **architectural-decisions:** Design choices and rationale
+  - Capture when: Made a significant architectural decision
+  - Severity: Based on scope and permanence
+
+**Best practices:**
+- Capture memories immediately after resolution (while context is fresh)
+- Use specific, searchable tags (e.g., "pytest", "redis", "async")
+- Include enough context for future understanding
+- Link to related memories and references
+- Update severity based on actual impact
+
 ### Advanced Usage
 
 ```python
@@ -305,7 +449,7 @@ if context.utilization > 0.9:
     # Option 1: Start new session
     manager.save_session(session_id)
     manager, new_session_id = create_tta_session(f"{session_id}-continued")
-    
+
     # Option 2: Manual pruning
     context = manager._prune_context(context, needed_tokens=1000)
 ```
@@ -378,7 +522,6 @@ This is a Phase 1 meta-level implementation. Feedback and improvements welcome!
 
 ---
 
-**Status:** Active (Phase 1 - Meta-Level Implementation)  
-**Last Updated:** 2025-10-20  
+**Status:** Active (Phase 1 - Meta-Level Implementation)
+**Last Updated:** 2025-10-20
 **Next Review:** After 1 week of usage
-

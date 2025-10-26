@@ -7,9 +7,11 @@ Implements quality gates for TTA component maturity workflow:
 - Security gates (secrets, vulnerabilities)
 - Performance gates (response time, memory)
 - Documentation gates (README, API docs)
+- Instruction validation gates (YAML frontmatter, content structure)
 """
 
 import json
+import re
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -21,6 +23,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from scripts.observability.dev_metrics import track_execution
 from scripts.primitives.error_recovery import RetryConfig, with_retry
+
+try:
+    import yaml
+
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
 
 
 @dataclass
@@ -93,10 +102,10 @@ class TestCoverageGate(QualityGateValidator):
         name_variations = [component_name]
 
         # Handle common suffixes (e.g., orchestration -> orchestrator)
-        if component_name.endswith('ion'):
-            name_variations.append(component_name.rstrip('ion') + 'or')
-        if component_name.endswith('tion'):
-            name_variations.append(component_name.rstrip('tion') + 'tor')
+        if component_name.endswith("ion"):
+            name_variations.append(component_name.rstrip("ion") + "or")
+        if component_name.endswith("tion"):
+            name_variations.append(component_name.rstrip("tion") + "tor")
 
         for name_var in name_variations:
             # Pattern 1: Directory-based (e.g., tests/orchestration/)
@@ -130,12 +139,15 @@ class TestCoverageGate(QualityGateValidator):
             # Run pytest with coverage using project environment
             result = subprocess.run(
                 [
-                    "uv", "run", "pytest",
+                    "uv",
+                    "run",
+                    "pytest",
                     *test_paths,
                     f"--cov=src/{self.component_path.name}",
                     "--cov-report=json",
                     "--cov-report=term",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=300,
@@ -147,7 +159,9 @@ class TestCoverageGate(QualityGateValidator):
                 with open(coverage_file) as f:
                     coverage_data = json.load(f)
 
-                total_coverage = coverage_data.get("totals", {}).get("percent_covered", 0.0)
+                total_coverage = coverage_data.get("totals", {}).get(
+                    "percent_covered", 0.0
+                )
 
                 passed = total_coverage >= threshold
 
@@ -157,17 +171,22 @@ class TestCoverageGate(QualityGateValidator):
                     details={
                         "coverage": total_coverage,
                         "threshold": threshold,
-                        "lines_covered": coverage_data.get("totals", {}).get("covered_lines", 0),
-                        "lines_total": coverage_data.get("totals", {}).get("num_statements", 0),
+                        "lines_covered": coverage_data.get("totals", {}).get(
+                            "covered_lines", 0
+                        ),
+                        "lines_total": coverage_data.get("totals", {}).get(
+                            "num_statements", 0
+                        ),
                     },
-                    errors=[] if passed else [f"Coverage {total_coverage:.1f}% < threshold {threshold}%"],
+                    errors=[]
+                    if passed
+                    else [f"Coverage {total_coverage:.1f}% < threshold {threshold}%"],
                 )
-            else:
-                return QualityGateResult(
-                    passed=False,
-                    gate_name="test_coverage",
-                    errors=["Coverage report not generated"],
-                )
+            return QualityGateResult(
+                passed=False,
+                gate_name="test_coverage",
+                errors=["Coverage report not generated"],
+            )
 
         except subprocess.TimeoutExpired:
             return QualityGateResult(
@@ -193,10 +212,10 @@ class TestPassRateGate(QualityGateValidator):
 
         # Generate naming variations
         name_variations = [component_name]
-        if component_name.endswith('ion'):
-            name_variations.append(component_name.rstrip('ion') + 'or')
-        if component_name.endswith('tion'):
-            name_variations.append(component_name.rstrip('tion') + 'tor')
+        if component_name.endswith("ion"):
+            name_variations.append(component_name.rstrip("ion") + "or")
+        if component_name.endswith("tion"):
+            name_variations.append(component_name.rstrip("tion") + "tor")
 
         for name_var in name_variations:
             # Pattern 1: Directory-based
@@ -229,11 +248,14 @@ class TestPassRateGate(QualityGateValidator):
             # Run pytest using project environment
             result = subprocess.run(
                 [
-                    "uv", "run", "pytest",
+                    "uv",
+                    "run",
+                    "pytest",
                     *test_paths,
                     "-v",
                     "--tb=short",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=300,
@@ -280,11 +302,14 @@ class LintingGate(QualityGateValidator):
             # Run ruff check
             result = subprocess.run(
                 [
-                    "uvx", "ruff", "check",
+                    "uvx",
+                    "ruff",
+                    "check",
                     f"src/{self.component_path.name}/",
                     f"tests/{self.component_path.name}/",
                     "--output-format=json",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -308,7 +333,9 @@ class LintingGate(QualityGateValidator):
                     "issues": issues[:10],  # First 10 issues
                 },
                 errors=[] if passed else [f"Found {len(issues)} linting issues"],
-                warnings=[f"Run 'uvx ruff check --fix' to auto-fix issues"] if not passed else [],
+                warnings=["Run 'uvx ruff check --fix' to auto-fix issues"]
+                if not passed
+                else [],
             )
 
         except subprocess.TimeoutExpired:
@@ -336,10 +363,12 @@ class TypeCheckingGate(QualityGateValidator):
             # Run pyright
             result = subprocess.run(
                 [
-                    "uvx", "pyright",
+                    "uvx",
+                    "pyright",
                     f"src/{self.component_path.name}/",
                     "--outputjson",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=120,
@@ -391,10 +420,14 @@ class SecurityGate(QualityGateValidator):
             # Run detect-secrets
             result = subprocess.run(
                 [
-                    "uvx", "detect-secrets", "scan",
+                    "uvx",
+                    "detect-secrets",
+                    "scan",
                     f"src/{self.component_path.name}/",
-                    "--baseline", ".secrets.baseline",
+                    "--baseline",
+                    ".secrets.baseline",
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -409,7 +442,9 @@ class SecurityGate(QualityGateValidator):
                     "scan_output": result.stdout[:500] if result.stdout else "",
                 },
                 errors=[] if passed else ["Potential secrets detected"],
-                warnings=["Review .secrets.baseline if secrets are false positives"] if not passed else [],
+                warnings=["Review .secrets.baseline if secrets are false positives"]
+                if not passed
+                else [],
             )
 
         except subprocess.TimeoutExpired:
@@ -423,6 +458,200 @@ class SecurityGate(QualityGateValidator):
                 passed=False,
                 gate_name="security",
                 errors=[f"Security scan failed: {str(e)}"],
+            )
+
+
+class InstructionsValidationGate(QualityGateValidator):
+    """Validates .instructions.md files have correct YAML frontmatter and content structure."""
+
+    def __init__(
+        self,
+        component_path: str | None = None,
+        config: dict[str, Any] | None = None,
+        instructions_dir: str = ".augment/instructions",
+    ):
+        """
+        Initialize validator.
+
+        Args:
+            component_path: Not used for instruction validation (kept for compatibility)
+            config: Optional configuration overrides
+            instructions_dir: Directory containing .instructions.md files
+        """
+        # Call parent init with dummy path (not used for instruction validation)
+        super().__init__(component_path or ".", config)
+        self.instructions_dir = Path(instructions_dir)
+
+    def _parse_frontmatter(self, content: str) -> tuple[dict[str, Any] | None, str]:
+        """
+        Parse YAML frontmatter from instruction file.
+
+        Args:
+            content: File content
+
+        Returns:
+            Tuple of (frontmatter dict, content after frontmatter)
+        """
+        # Match YAML frontmatter between --- markers
+        frontmatter_pattern = r"^---\s*\n(.*?)\n---\s*\n(.*)$"
+        match = re.match(frontmatter_pattern, content, re.DOTALL)
+
+        if not match:
+            return None, content
+
+        frontmatter_text = match.group(1)
+        content_text = match.group(2)
+
+        if not YAML_AVAILABLE:
+            return None, content_text
+
+        try:
+            frontmatter = yaml.safe_load(frontmatter_text)
+            return frontmatter, content_text
+        except yaml.YAMLError:
+            return None, content_text
+
+    def _validate_frontmatter(
+        self, frontmatter: dict[str, Any] | None, filename: str
+    ) -> list[str]:
+        """
+        Validate YAML frontmatter has required fields.
+
+        Args:
+            frontmatter: Parsed frontmatter dict
+            filename: Instruction filename for error messages
+
+        Returns:
+            List of validation errors
+        """
+        errors = []
+
+        if frontmatter is None:
+            errors.append(f"{filename}: Missing or invalid YAML frontmatter")
+            return errors
+
+        # Validate required fields
+        if "applyTo" not in frontmatter:
+            errors.append(f"{filename}: Missing required field 'applyTo'")
+        else:
+            apply_to = frontmatter["applyTo"]
+            # applyTo must be string or list of strings
+            if not isinstance(apply_to, (str, list)):  # noqa: UP038
+                errors.append(
+                    f"{filename}: 'applyTo' must be string or list of strings"
+                )
+            elif isinstance(apply_to, list) and not all(
+                isinstance(item, str) for item in apply_to
+            ):
+                errors.append(
+                    f"{filename}: All items in 'applyTo' list must be strings"
+                )
+
+        if "description" not in frontmatter:
+            errors.append(f"{filename}: Missing required field 'description'")
+        else:
+            description = frontmatter["description"]
+            if not isinstance(description, str) or not description.strip():
+                errors.append(f"{filename}: 'description' must be non-empty string")
+
+        return errors
+
+    def _validate_content(self, content: str, filename: str) -> list[str]:
+        """
+        Validate content structure.
+
+        Args:
+            content: Markdown content after frontmatter
+            filename: Instruction filename for warnings
+
+        Returns:
+            List of validation warnings
+        """
+        warnings = []
+
+        # Check for markdown headers (basic structure validation)
+        if not re.search(r"^##\s+", content, re.MULTILINE):
+            warnings.append(
+                f"{filename}: No markdown headers found (consider adding sections)"
+            )
+
+        # Check minimum content length
+        if len(content.strip()) < 100:
+            warnings.append(
+                f"{filename}: Content is very short ({len(content.strip())} chars)"
+            )
+
+        return warnings
+
+    @track_execution("quality_gate_instructions_validation")
+    @with_retry(RetryConfig(max_retries=1, base_delay=0.5))
+    def validate(self) -> QualityGateResult:
+        """Validate instruction files."""
+        if not YAML_AVAILABLE:
+            return QualityGateResult(
+                passed=False,
+                gate_name="instructions_validation",
+                errors=["pyyaml not available - cannot validate instruction files"],
+            )
+
+        if not self.instructions_dir.exists():
+            return QualityGateResult(
+                passed=False,
+                gate_name="instructions_validation",
+                errors=[f"Instructions directory not found: {self.instructions_dir}"],
+            )
+
+        try:
+            # Find all .instructions.md files
+            instruction_files = list(self.instructions_dir.glob("*.instructions.md"))
+
+            if not instruction_files:
+                return QualityGateResult(
+                    passed=True,
+                    gate_name="instructions_validation",
+                    details={"file_count": 0},
+                    warnings=["No instruction files found"],
+                )
+
+            all_errors = []
+            all_warnings = []
+            validated_files = []
+
+            for file_path in instruction_files:
+                # Read file content
+                content = file_path.read_text()
+
+                # Parse frontmatter
+                frontmatter, content_text = self._parse_frontmatter(content)
+
+                # Validate frontmatter
+                errors = self._validate_frontmatter(frontmatter, file_path.name)
+                all_errors.extend(errors)
+
+                # Validate content structure (warnings only)
+                warnings = self._validate_content(content_text, file_path.name)
+                all_warnings.extend(warnings)
+
+                validated_files.append(file_path.name)
+
+            passed = len(all_errors) == 0
+
+            return QualityGateResult(
+                passed=passed,
+                gate_name="instructions_validation",
+                details={
+                    "file_count": len(instruction_files),
+                    "validated_files": validated_files,
+                },
+                errors=all_errors,
+                warnings=all_warnings,
+            )
+
+        except Exception as e:
+            return QualityGateResult(
+                passed=False,
+                gate_name="instructions_validation",
+                errors=[f"Validation failed: {str(e)}"],
             )
 
 
@@ -448,6 +677,7 @@ def run_quality_gates(
         "linting": LintingGate,
         "type_checking": TypeCheckingGate,
         "security": SecurityGate,
+        "instructions_validation": InstructionsValidationGate,
     }
 
     gates_to_run = gates or list(available_gates.keys())
@@ -494,4 +724,3 @@ if __name__ == "__main__":
     # Exit with error if any gate failed
     if not all(r.passed for r in results.values()):
         sys.exit(1)
-

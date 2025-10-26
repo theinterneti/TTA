@@ -1,7 +1,7 @@
 # Integrated Development Workflow
 
-**Version:** 1.0.0  
-**Status:** Production Ready  
+**Version:** 1.0.0
+**Status:** Production Ready
 **Last Updated:** 2025-10-20
 
 ---
@@ -207,6 +207,74 @@ else:
 | Critical Vulnerabilities | 0 | No |
 | High Vulnerabilities | 0 | No |
 | Medium Vulnerabilities | ≤5 | No |
+
+### Instruction Validation Gates
+
+| Gate | Threshold | Auto-Fix |
+|------|-----------|----------|
+| YAML Frontmatter | Valid | No |
+| Required Fields | Present | No |
+| Content Structure | Recommended | No |
+
+**Validation Rules:**
+
+1. **YAML Frontmatter Validation**
+   - Frontmatter must be present between `---` markers
+   - Must be valid YAML syntax
+   - Required fields: `applyTo`, `description`
+
+2. **Field Type Validation**
+   - `applyTo`: Must be string or list of strings (glob patterns)
+   - `description`: Must be non-empty string
+
+3. **Content Structure Validation** (warnings only)
+   - Markdown headers recommended (`##` sections)
+   - Minimum content length: 100 characters
+
+**Example Valid Instruction File:**
+
+```markdown
+---
+applyTo: "src/player_experience/**/*.py"
+description: "Player experience component patterns"
+---
+# Player Experience Instructions
+
+## Architecture Patterns
+
+Content here...
+
+## Common Patterns
+
+More content...
+```
+
+**Common Validation Errors:**
+
+| Error | Fix |
+|-------|-----|
+| Missing frontmatter | Add `---` delimited YAML at file start |
+| Missing `applyTo` | Add `applyTo: "**/*.py"` to frontmatter |
+| Missing `description` | Add `description: "..."` to frontmatter |
+| Invalid `applyTo` type | Use string or list of strings |
+| Empty `description` | Provide meaningful description |
+
+**Running Validation Manually:**
+
+```bash
+# Validate all instruction files
+python scripts/workflow/quality_gates.py instructions_validation
+
+# Or use Python API
+from scripts.workflow.quality_gates import InstructionsValidationGate
+
+gate = InstructionsValidationGate()
+result = gate.validate()
+
+if not result.passed:
+    for error in result.errors:
+        print(f"ERROR: {error}")
+```
 
 ---
 
@@ -491,6 +559,5 @@ jobs:
 
 ---
 
-**Status:** Production Ready  
+**Status:** Production Ready
 **Next Steps:** Run workflow for your component!
-
