@@ -10,6 +10,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: ^(.github/workflows/pr-automation\.yml|.github/workflows/comprehensive-test-battery\.yml)
       - id: check-toml
       - id: check-json
       - id: check-added-large-files

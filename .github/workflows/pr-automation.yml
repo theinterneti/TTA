@@ -203,18 +203,18 @@ jobs:
             );
 
             // Create summary
-            const summary = `
-## 🤖 Copilot Review Summary
-
-**Total Comments**: ${copilotComments.length}
-**Unresolved**: ${unresolved.length}
-**Critical**: ${critical.length}
-
-${critical.length > 0 ? '### ⚠️ Critical Issues\n' + critical.map(c => `- ${c.path}:${c.line} - ${c.body.substring(0, 100)}...`).join('\n') : ''}
-
----
-*Review the [full Copilot review](${context.payload.pull_request.html_url}/files) for details.*
-            `.trim();
+            const summary = [
+              '## 🤖 Copilot Review Summary',
+              '',
+              `Total Comments: ${copilotComments.length}`,
+              `Unresolved: ${unresolved.length}`,
+              `Critical: ${critical.length}`,
+              '',
+              critical.length > 0 ? '### ⚠️ Critical Issues\n' + critical.map(c => `- ${c.path}:${c.line} - ${c.body.substring(0, 100)}...`).join('\n') : '',
+              '',
+              '---',
+              `*Review the [full Copilot review](${context.payload.pull_request.html_url}/files) for details.*`
+            ].filter(Boolean).join('\n');
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -275,19 +275,19 @@ ${critical.length > 0 ? '### ⚠️ Critical Issues\n' + critical.map(c => `- ${
             const threshold = 70;
             const emoji = coverage >= threshold ? '✅' : '⚠️';
 
-            const body = `
-## ${emoji} Code Coverage Report
-
-**Current Coverage**: ${coverage.toFixed(2)}%
-**Required**: ${threshold}%
-
-${coverage >= threshold
-              ? '✅ Coverage threshold met!'
-              : '⚠️ Coverage below threshold - please add tests'}
-
----
-View detailed coverage report in the workflow artifacts.
-            `.trim();
+            const body = [
+              `## ${emoji} Code Coverage Report`,
+              '',
+              `Current Coverage: ${coverage.toFixed(2)}%`,
+              `Required: ${threshold}%`,
+              '',
+              coverage >= threshold
+                ? '✅ Coverage threshold met!'
+                : '⚠️ Coverage below threshold - please add tests',
+              '',
+              '---',
+              'View detailed coverage report in the workflow artifacts.'
+            ].join('\n');
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
