@@ -29,7 +29,7 @@ class ConditionalPrimitive(WorkflowPrimitive[Any, Any]):
         condition: Callable[[Any, WorkflowContext], bool],
         then_primitive: WorkflowPrimitive,
         else_primitive: WorkflowPrimitive | None = None,
-    ):
+    ) -> None:
         """
         Initialize conditional primitive.
 
@@ -90,7 +90,7 @@ class SwitchPrimitive(WorkflowPrimitive[Any, Any]):
         selector: Callable[[Any, WorkflowContext], str],
         cases: dict[str, WorkflowPrimitive],
         default: WorkflowPrimitive | None = None,
-    ):
+    ) -> None:
         """
         Initialize switch primitive.
 

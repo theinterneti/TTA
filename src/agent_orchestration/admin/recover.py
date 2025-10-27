@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 
 from redis.asyncio import Redis
-
 from tta_ai.orchestration.coordinators import RedisMessageCoordinator
 from tta_ai.orchestration.models import AgentId, AgentType
 

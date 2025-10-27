@@ -161,6 +161,12 @@ stages:
     timeout_seconds: 600
     parallel_execution: false
 
+  openhands_test_generation:
+    enabled: false # Disabled by default - enable with --enable-openhands
+    timeout_seconds: 300
+    coverage_threshold: 80
+    use_docker: true # Use Docker runtime for full tool access
+
   refactoring:
     enabled: true
     timeout_seconds: 300

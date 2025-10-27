@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Comprehensive test of OpenHands sub-agent workflow.

@@ -21,6 +21,8 @@ from typing import Any
 # Add parent directories to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import contextlib
+
 from scripts.observability.dev_metrics import track_execution
 from scripts.primitives.error_recovery import RetryConfig, with_retry
 
@@ -137,7 +139,7 @@ class TestCoverageGate(QualityGateValidator):
 
         try:
             # Run pytest with coverage using project environment
-            result = subprocess.run(
+            subprocess.run(
                 [
                     "uv",
                     "run",
@@ -321,10 +323,8 @@ class LintingGate(QualityGateValidator):
             # Parse JSON output
             issues = []
             if result.stdout:
-                try:
+                with contextlib.suppress(json.JSONDecodeError):
                     issues = json.loads(result.stdout)
-                except json.JSONDecodeError:
-                    pass
 
             return QualityGateResult(
                 passed=passed,

@@ -1,7 +1,130 @@
 {
     "folders": [
         {
-            "path": "."
+            "path": ".",
+            "name": "🪟 TTA Windows"
         }
-    ]
+    ],
+    "settings": {
+        // ============================================================================
+        // PYTHON LANGUAGE SERVER (Pylance)
+        // ============================================================================
+        "python.languageServer": "Pylance",
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.diagnosticMode": "workspace",
+        "python.analysis.autoImportCompletions": true,
+        "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+        "python.terminal.activateEnvironment": true,
+        "python.envFile": "${workspaceFolder}\\.env",
+        "python.analysis.extraPaths": [
+            "${workspaceFolder}\\src"
+        ],
+
+        // ============================================================================
+        // TESTING - pytest
+        // ============================================================================
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": [
+            "tests",
+            "-v",
+            "--color=yes"
+        ],
+
+        // ============================================================================
+        // CODE QUALITY - Ruff
+        // ============================================================================
+        "python.formatting.provider": "none",
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.codeActionsOnSave": {
+                "source.fixAll": "explicit",
+                "source.organizeImports": "explicit"
+            },
+            "editor.defaultFormatter": "charliermarsh.ruff"
+        },
+        "ruff.enable": true,
+        "ruff.lint.enable": true,
+        "ruff.format.args": ["--line-length=88"],
+        "ruff.importStrategy": "fromEnvironment",
+
+        // ============================================================================
+        // EDITOR CONFIGURATION
+        // ============================================================================
+        "editor.formatOnSave": true,
+        "editor.rulers": [88, 120],
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": true,
+
+        // ============================================================================
+        // FILE MANAGEMENT
+        // ============================================================================
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/.pytest_cache": true,
+            "**/*.pyc": true,
+            "**/.mypy_cache": true,
+            "**/.ruff_cache": true,
+            "**/node_modules": true,
+            "**/.venv": false
+        },
+
+        "search.exclude": {
+            "**/__pycache__": true,
+            "**/.pytest_cache": true,
+            "**/.mypy_cache": true,
+            "**/.ruff_cache": true,
+            "**/node_modules": true,
+            "**/logs": true
+        },
+
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+
+        // ============================================================================
+        // TERMINAL CONFIGURATION - Windows
+        // ============================================================================
+        "terminal.integrated.defaultProfile.windows": "PowerShell",
+        "terminal.integrated.profiles.windows": {
+            "PowerShell": {
+                "source": "PowerShell",
+                "icon": "terminal-powershell"
+            },
+            "Command Prompt": {
+                "path": "cmd.exe",
+                "icon": "terminal-cmd"
+            }
+        },
+
+        // ============================================================================
+        // GIT CONFIGURATION
+        // ============================================================================
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "git.autofetch": true,
+
+        // ============================================================================
+        // MARKDOWN
+        // ============================================================================
+        "[markdown]": {
+            "editor.wordWrap": "on"
+        },
+
+        // Environment-Specific Settings
+        "tta.environment": "windows-development"
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "charliermarsh.ruff",
+            "ms-azuretools.vscode-docker",
+            "eamodio.gitlens",
+            "streetsidesoftware.code-spell-checker",
+            "redhat.vscode-yaml",
+            "tamasfe.even-better-toml"
+        ]
+    }
 }

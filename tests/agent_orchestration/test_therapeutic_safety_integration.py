@@ -8,7 +8,6 @@ AgentOrchestrationService, ensuring seamless operation and proper error handling
 from unittest.mock import Mock, patch
 
 import pytest
-
 from tta_ai.orchestration.agents import AgentRegistry
 from tta_ai.orchestration.interfaces import MessageCoordinator
 from tta_ai.orchestration.service import (

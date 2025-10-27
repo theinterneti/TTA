@@ -10,7 +10,7 @@ from tta_workflow_primitives.testing.mocks import MockPrimitive
 
 
 @pytest.mark.asyncio
-async def test_cache_hit():
+async def test_cache_hit() -> None:
     """Test cache hit on second call."""
     mock = MockPrimitive("test", return_value={"result": "cached"})
 
@@ -30,7 +30,7 @@ async def test_cache_hit():
 
 
 @pytest.mark.asyncio
-async def test_cache_miss_different_keys():
+async def test_cache_miss_different_keys() -> None:
     """Test cache miss with different keys."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 
@@ -45,7 +45,7 @@ async def test_cache_miss_different_keys():
 
 
 @pytest.mark.asyncio
-async def test_cache_expiration():
+async def test_cache_expiration() -> None:
     """Test cache expiration after TTL."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 
@@ -68,7 +68,7 @@ async def test_cache_expiration():
 
 
 @pytest.mark.asyncio
-async def test_cache_clear():
+async def test_cache_clear() -> None:
     """Test cache clearing."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 
@@ -82,7 +82,7 @@ async def test_cache_clear():
 
 
 @pytest.mark.asyncio
-async def test_cache_stats():
+async def test_cache_stats() -> None:
     """Test cache statistics."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 
@@ -116,7 +116,7 @@ async def test_cache_stats():
 
 
 @pytest.mark.asyncio
-async def test_cache_context_tracking():
+async def test_cache_context_tracking() -> None:
     """Test cache hit/miss tracking in context."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 
@@ -136,7 +136,7 @@ async def test_cache_context_tracking():
 
 
 @pytest.mark.asyncio
-async def test_cache_eviction():
+async def test_cache_eviction() -> None:
     """Test manual cache eviction."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 
@@ -160,7 +160,7 @@ async def test_cache_eviction():
 
 
 @pytest.mark.asyncio
-async def test_cache_realistic_llm_scenario():
+async def test_cache_realistic_llm_scenario() -> None:
     """Test realistic LLM caching scenario."""
     call_count = 0
 
@@ -212,7 +212,7 @@ async def test_cache_realistic_llm_scenario():
 
 
 @pytest.mark.asyncio
-async def test_cache_key_generation():
+async def test_cache_key_generation() -> None:
     """Test various cache key generation strategies."""
     mock = MockPrimitive("test", return_value={"result": "value"})
 

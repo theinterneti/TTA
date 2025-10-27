@@ -1,5 +1,4 @@
 import pytest
-
 from tta_ai.orchestration.models import AgentId, AgentType
 from tta_ai.orchestration.router import AgentRouter
 

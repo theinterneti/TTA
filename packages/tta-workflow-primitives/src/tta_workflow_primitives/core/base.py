@@ -104,7 +104,7 @@ class LambdaPrimitive(WorkflowPrimitive[T, U]):
         ```
     """
 
-    def __init__(self, func: Any):
+    def __init__(self, func: Any) -> None:
         """
         Initialize with a function.
 

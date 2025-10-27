@@ -127,6 +127,9 @@ uv run mypy src/
 # Run tests
 uv run pytest -q
 
+# Validate agentic primitives (if you modified .github/ files)
+python scripts/validate-agentic-frontmatter.py
+
 # Validate quality gates before pushing
 ./scripts/validate-quality-gates.sh development
 
@@ -195,6 +198,59 @@ gh pr create --base development --fill
 ```
 
 **Important:** Always target the `development` branch for your PRs, not `main` or `staging`.
+
+## 🤖 Agentic Primitives Validation
+
+If you're modifying files in the `.github/` directory (instructions, chat modes, prompts, or specs), you must ensure they have valid YAML frontmatter.
+
+### What Gets Validated
+
+- **Instruction Files** (`.github/instructions/*.instructions.md`): Must have `applyTo`, `priority`, `category`, `description`
+- **Chat Mode Files** (`.github/chatmodes/*.chatmode.md`): Must have `mode`, `model`, `tools`, `description`
+- **Prompt Files** (`.github/prompts/*.prompt.md`): Must have `mode`, `model`, `tools`, `description`
+- **Spec Files** (`.github/specs/*.spec.md`): Must have `type`, `category`, `status`, `priority`, `created`, `updated`
+
+### Running Validation
+
+```bash
+# Validate all agentic primitives frontmatter
+python scripts/validate-agentic-frontmatter.py
+
+# Or use APM script (when Agent CLI Runtime is available)
+# copilot run validate:primitives
+```
+
+### Schema Files
+
+Validation schemas are located in `.github/schemas/`:
+- `instruction.schema.yaml` - For instruction files
+- `chatmode.schema.yaml` - For chat mode files
+- `prompt.schema.yaml` - For prompt/workflow files
+- `spec.schema.yaml` - For specification templates
+
+### Common Validation Errors
+
+**Missing required field:**
+```
+❌ safety.instructions.md: Required field 'priority' not found
+```
+Fix: Add the missing field to the YAML frontmatter
+
+**Invalid enum value:**
+```
+❌ chatmode.md: mode: 'invalid' is not a valid enum value
+```
+Fix: Use one of the allowed values (check schema file)
+
+**Invalid YAML syntax:**
+```
+❌ No valid YAML frontmatter found in file.md
+```
+Fix: Ensure frontmatter starts and ends with `---`
+
+For more details, see `docs/development/AGENTIC_PRIMITIVES_CONSISTENCY.md`
+
+---
 
 ## 📝 Code Standards
 

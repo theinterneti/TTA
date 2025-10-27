@@ -212,7 +212,7 @@ class StreamingWorkflowResponse:
                     if self.completion_event.is_set() or self.error_event.is_set():
                         break
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Send heartbeat
                     heartbeat_data = {
                         "type": "heartbeat",

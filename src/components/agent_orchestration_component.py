@@ -1439,8 +1439,6 @@ class AgentOrchestrationComponent(Component):
 
                     from tta_ai.orchestration.tools.policy_config import (
                         ToolPolicyConfig as _TPC,
-                    )
-                    from tta_ai.orchestration.tools.policy_config import (
                         _load_from_file,
                         validate_tool_policy_config,
                     )
@@ -2148,8 +2146,6 @@ class AgentOrchestrationComponent(Component):
 
                 from tta_ai.orchestration.tools.policy_config import (
                     ToolPolicyConfig as _TPC,
-                )
-                from tta_ai.orchestration.tools.policy_config import (
                     load_tool_policy_config,
                     load_tool_policy_config_from,
                 )
@@ -2243,7 +2239,6 @@ class AgentOrchestrationComponent(Component):
                 if not sp:
                     sp = "start"
                 import redis.asyncio as aioredis
-
                 from tta_ai.orchestration.workflow_transaction import (
                     WorkflowTransaction,
                 )
@@ -2744,7 +2739,7 @@ class AgentOrchestrationComponent(Component):
                     "duration_ms": dur_ms,
                     "metrics": usage,
                 }
-            except _asyncio.TimeoutError:
+            except TimeoutError:
                 return {"ok": False, "error": "timeout"}
             except Exception as e:
                 return {"ok": False, "error": str(e)}

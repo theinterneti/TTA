@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
@@ -31,16 +33,16 @@ jobs:
           path: |
             ~/.cache/uv
             .venv
-          key: ${{ runner.os }}-uv-unit-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          key: ${{ runner.os }}-uv-v2-unit-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
           restore-keys: |
-            ${{ runner.os }}-uv-unit-
-            ${{ runner.os }}-uv-
+            ${{ runner.os }}-uv-v2-unit-
+            ${{ runner.os }}-uv-v2-
 
       - name: Sync deps
-        run: uv sync --group test
+        run: uv sync --all-groups
       - name: Run unit tests with metrics collection
         run: |
-          uvx pytest -q --tb=short \
+          uv run pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-report=xml:coverage-unit.xml
         env:
@@ -87,6 +89,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
@@ -94,13 +98,13 @@ jobs:
           path: |
             ~/.cache/uv
             .venv
-          key: ${{ runner.os }}-uv-integration-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          key: ${{ runner.os }}-uv-v2-integration-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
           restore-keys: |
-            ${{ runner.os }}-uv-integration-
-            ${{ runner.os }}-uv-
+            ${{ runner.os }}-uv-v2-integration-
+            ${{ runner.os }}-uv-v2-
 
       - name: Sync deps
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
       - name: Run integration tests with monitoring
         run: |
           uv run pytest -q --neo4j --redis --tb=short \
@@ -127,8 +131,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
       - name: Sync deps
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
       - name: Download test results
         uses: actions/download-artifact@v4
         with:

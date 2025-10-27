@@ -1,10 +1,3 @@
-from tta_narrative.orchestration.causal_graph import *  # just ensure module loads
-from tta_narrative.orchestration.conflict_detection import ScaleConflict
-from tta_narrative.orchestration.impact_analysis import ImpactAssessment
-from tta_narrative.orchestration.resolution_engine import Resolution
-
-# Verify narrative_arc_orchestrator facades import and names exist
-from tta_narrative.orchestration.scale_manager import ScaleManager
 from tta_narrative.coherence.causal_validator import CausalValidator
 from tta_narrative.coherence.coherence_validator import CoherenceValidator
 
@@ -16,6 +9,13 @@ from tta_narrative.coherence.rules import (
     OVERALL_WEIGHTS,
     SEVERITY_WEIGHTS_LORE,
 )
+from tta_narrative.orchestration.causal_graph import *  # just ensure module loads
+from tta_narrative.orchestration.conflict_detection import ScaleConflict
+from tta_narrative.orchestration.impact_analysis import ImpactAssessment
+from tta_narrative.orchestration.resolution_engine import Resolution
+
+# Verify narrative_arc_orchestrator facades import and names exist
+from tta_narrative.orchestration.scale_manager import ScaleManager
 
 
 def test_facades_importable():

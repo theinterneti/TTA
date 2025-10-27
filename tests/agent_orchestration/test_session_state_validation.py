@@ -10,7 +10,6 @@ import json
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,

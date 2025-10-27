@@ -170,21 +170,15 @@ class Agent(AgentProxy):
             if router and isinstance(router, AgentRouter):
                 recipient = await router.resolve_target(recipient)
 
-        msg = self.serialize(
-            recipient, payload, priority=priority, message_type=message_type
-        )
+        msg = self.serialize(recipient, payload, priority=priority, message_type=message_type)
         return await self._coordinator.send_message(
             sender=self.agent_id, recipient=recipient, message=msg
         )
 
-    async def receive_next(
-        self, *, visibility_timeout: int = 5
-    ) -> ReceivedMessage | None:
+    async def receive_next(self, *, visibility_timeout: int = 5) -> ReceivedMessage | None:
         if not self._coordinator:
             return None
-        return await self._coordinator.receive(
-            self.agent_id, visibility_timeout=visibility_timeout
-        )
+        return await self._coordinator.receive(self.agent_id, visibility_timeout=visibility_timeout)
 
     async def ack(self, token: str) -> bool:
         if not self._coordinator:
@@ -200,9 +194,7 @@ class Agent(AgentProxy):
     ) -> bool:
         if not self._coordinator:
             return False
-        return await self._coordinator.nack(
-            self.agent_id, token, failure=failure, error=error
-        )
+        return await self._coordinator.nack(self.agent_id, token, failure=failure, error=error)
 
     # ---- Processing API ----
     async def process(
@@ -228,20 +220,16 @@ class Agent(AgentProxy):
                 self._metrics.requests = 0
             # perf aggregation per agent instance
             with contextlib.suppress(Exception):
-                get_step_aggregator().record(
-                    key, (time.time() - start) * 1000.0, success=True
-                )
+                get_step_aggregator().record(key, (time.time() - start) * 1000.0, success=True)
             return result
-        except asyncio.TimeoutError:
+        except TimeoutError:
             with contextlib.suppress(Exception):
                 self._metrics.record_error()
             # Fallback if record_error fails
             if not hasattr(self._metrics, "errors"):
                 self._metrics.errors = 0
             with contextlib.suppress(Exception):
-                get_step_aggregator().record(
-                    key, (time.time() - start) * 1000.0, success=False
-                )
+                get_step_aggregator().record(key, (time.time() - start) * 1000.0, success=False)
             raise
         except Exception as e:
             with contextlib.suppress(Exception):
@@ -250,23 +238,15 @@ class Agent(AgentProxy):
             if not hasattr(self._metrics, "errors"):
                 self._metrics.errors = 0
             with contextlib.suppress(Exception):
-                get_step_aggregator().record(
-                    key, (time.time() - start) * 1000.0, success=False
-                )
+                get_step_aggregator().record(key, (time.time() - start) * 1000.0, success=False)
             logger.exception("Agent %s processing error: %s", self.name, e)
             raise
         finally:
-            self._status = (
-                AgentRuntimeStatus.IDLE if self._running else AgentRuntimeStatus.ERROR
-            )
+            self._status = AgentRuntimeStatus.IDLE if self._running else AgentRuntimeStatus.ERROR
 
     # ---- Sync wrappers ----
-    def process_sync(
-        self, input_payload: dict, *, timeout_s: float | None = None
-    ) -> dict:
-        return asyncio.run(
-            self.process_with_timeout(input_payload, timeout_s=timeout_s)
-        )
+    def process_sync(self, input_payload: dict, *, timeout_s: float | None = None) -> dict:
+        return asyncio.run(self.process_with_timeout(input_payload, timeout_s=timeout_s))
 
     def health_check_sync(self) -> dict[str, Any]:
         return asyncio.run(self.health_check())
@@ -407,9 +387,7 @@ class AgentRegistry:
     def _key(self, agent_id: AgentId) -> tuple[str, str]:
         return (agent_id.type.value, agent_id.instance or "default")
 
-    def set_fallback_callback(
-        self, cb: Callable[[Agent, Agent], Awaitable[bool]]
-    ) -> None:
+    def set_fallback_callback(self, cb: Callable[[Agent, Agent], Awaitable[bool]]) -> None:
         self._fallback_cb = cb
 
     def set_restart_callback(self, cb: Callable[[Agent], Awaitable[bool]]) -> None:

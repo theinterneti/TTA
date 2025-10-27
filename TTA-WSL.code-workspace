@@ -1,20 +1,390 @@
 {
     "folders": [
         {
-            "path": "."
+            "path": ".",
+            "name": "🎯 TTA WSL Development"
+        },
+        {
+            "path": "src",
+            "name": "💻 Source Code"
+        },
+        {
+            "path": "tests",
+            "name": "🧪 Tests"
+        },
+        {
+            "path": ".augment",
+            "name": "🤖 AI Workflow"
         }
     ],
     "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "python.defaultInterpreterPath": "/app/.venv/bin/python",
-        "python.formatting.provider": "black",
+        // ============================================================================
+        // PYTHON LANGUAGE SERVER (Pylance) - Enhanced Type Checking
+        // ============================================================================
+        "python.languageServer": "Pylance",
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.diagnosticMode": "workspace",
+        "python.analysis.autoImportCompletions": true,
+        "python.analysis.autoSearchPaths": true,
+        "python.analysis.inlayHints.functionReturnTypes": true,
+        "python.analysis.inlayHints.variableTypes": true,
+        "python.analysis.inlayHints.pytestParameters": true,
+        "python.analysis.diagnosticSeverityOverrides": {
+            "reportUnusedImport": "information",
+            "reportUnusedVariable": "information"
+        },
+        "editor.inlayHints.enabled": "on",
+        // Python Environment - WSL specific
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "python.envFile": "${workspaceFolder}/.env",
+        "python.analysis.extraPaths": [
+            "${workspaceFolder}/src",
+            "${workspaceFolder}/packages/tta-workflow-primitives/src",
+            "${workspaceFolder}/packages/ai-dev-toolkit/src"
+        ],
+        // ============================================================================
+        // TESTING - pytest with coverage
+        // ============================================================================
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": [
+            "tests",
+            "-v",
+            "--color=yes",
+            "--tb=short"
+        ],
+        "python.testing.autoTestDiscoverOnSaveEnabled": true,
+        // ============================================================================
+        // CODE QUALITY - Ruff (linting & formatting)
+        // ============================================================================
+        "python.formatting.provider": "none",
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.codeActionsOnSave": {
+                "source.fixAll": "explicit",
+                "source.organizeImports": "explicit"
+            },
+            "editor.defaultFormatter": "charliermarsh.ruff"
+        },
+        "ruff.enable": true,
+        "ruff.lint.enable": true,
+        "ruff.format.args": [
+            "--line-length=88"
+        ],
+        "ruff.importStrategy": "fromEnvironment",
+        // ============================================================================
+        // EDITOR CONFIGURATION
+        // ============================================================================
         "editor.formatOnSave": true,
+        "editor.rulers": [
+            88,
+            120
+        ],
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": true,
+        "editor.stickyScroll.enabled": true,
+        "editor.minimap.enabled": true,
+        "editor.minimap.showSlider": "always",
+        "editor.suggest.showStatusBar": true,
+        "editor.linkedEditing": true,
+        // ============================================================================
+        // FILE MANAGEMENT
+        // ============================================================================
+        "files.watcherExclude": {
+            "**/.git/objects/**": true,
+            "**/.git/subtree-cache/**": true,
+            "**/node_modules/**": true,
+            "**/.venv/**": true,
+            "**/__pycache__/**": true,
+            "**/*.pyc": true,
+            "**/monkeytype.sqlite3": true,
+            "**/session.sqlite": true,
+            "**/.uv_cache/**": true
+        },
         "files.exclude": {
             "**/__pycache__": true,
             "**/.pytest_cache": true,
             "**/*.pyc": true,
             "**/.mypy_cache": true,
-            "**/.coverage": true
-        }
+            "**/.ruff_cache": true,
+            "**/.coverage": true,
+            "**/node_modules": true,
+            "**/.venv": false,
+            "**/htmlcov": true,
+            "**/*.egg-info": true,
+            "**/dist": true,
+            "**/build": true
+        },
+        "search.exclude": {
+            "**/__pycache__": true,
+            "**/.pytest_cache": true,
+            "**/.mypy_cache": true,
+            "**/.ruff_cache": true,
+            "**/node_modules": true,
+            "**/logs": true,
+            "**/*.log": true,
+            "**/htmlcov": true,
+            "**/coverage": true
+        },
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        // ============================================================================
+        // TERMINAL CONFIGURATION - WSL Optimized
+        // ============================================================================
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+            "bash": {
+                "path": "bash",
+                "icon": "terminal-bash"
+            },
+            "uv-shell": {
+                "path": "bash",
+                "args": [
+                    "-c",
+                    "source .venv/bin/activate && exec bash"
+                ],
+                "icon": "package"
+            },
+            "dev-services": {
+                "path": "bash",
+                "args": [
+                    "-c",
+                    "echo '🚀 Development Environment'; docker-compose -f docker-compose.dev.yml ps"
+                ],
+                "icon": "server"
+            }
+        },
+        // ============================================================================
+        // DOCKER & CONTAINERS
+        // ============================================================================
+        "docker.dockerComposeBuild": true,
+        "docker.dockerComposeDetached": true,
+        "docker.showExplorer": true,
+        // ============================================================================
+        // GIT CONFIGURATION
+        // ============================================================================
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "git.autofetch": true,
+        "git.pruneOnFetch": true,
+        "gitlens.codeLens.enabled": true,
+        "gitlens.currentLine.enabled": true,
+        // ============================================================================
+        // YAML & TOML
+        // ============================================================================
+        "yaml.schemas": {
+            "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
+            "https://json.schemastore.org/docker-compose.json": "docker-compose*.yml"
+        },
+        // ============================================================================
+        // ERROR LENS - Inline error display
+        // ============================================================================
+        "errorLens.enabled": true,
+        "errorLens.enabledDiagnosticLevels": [
+            "error",
+            "warning"
+        ],
+        // ============================================================================
+        // MARKDOWN
+        // ============================================================================
+        "[markdown]": {
+            "editor.wordWrap": "on",
+            "editor.quickSuggestions": {
+                "comments": "on",
+                "strings": "on",
+                "other": "on"
+            }
+        },
+        // Environment-Specific
+        "tta.environment": "development",
+        "tta.composeFile": "docker-compose.dev.yml",
+        "containers.composeBuild": true,
+        "containers.composeDetached": true
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "charliermarsh.ruff",
+            "ms-azuretools.vscode-docker",
+            "ms-vscode-remote.remote-containers",
+            "ms-vscode-remote.remote-wsl",
+            "neo4j.neo4j-vscode",
+            "cweijan.vscode-redis-client",
+            "eamodio.gitlens",
+            "mhutchie.git-graph",
+            "streetsidesoftware.code-spell-checker",
+            "editorconfig.editorconfig",
+            "aaron-bond.better-comments",
+            "usernamehw.errorlens",
+            "gruntfuggly.todo-tree",
+            "redhat.vscode-yaml",
+            "tamasfe.even-better-toml",
+            // Markdown
+            "yzhang.markdown-all-in-one",
+            "DavidAnson.vscode-markdownlint",
+            // Testing
+            "LittleFoxTeam.vscode-python-test-adapter",
+            "hbenl.vscode-test-explorer",
+            // Utilities
+            "shardulm94.trailing-spaces",
+            "oderwat.indent-rainbow",
+            "PKief.material-icon-theme"
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "🧪 Test: Run All Tests",
+                "type": "shell",
+                "command": "uv run pytest tests/ -v",
+                "problemMatcher": [
+                    "$pytest"
+                ],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "dedicated"
+                },
+                "group": {
+                    "kind": "test",
+                    "isDefault": true
+                }
+            },
+            {
+                "label": "🧪 Test: Run with Coverage",
+                "type": "shell",
+                "command": "uv run pytest tests/ -v --cov=src --cov-report=html --cov-report=term-missing",
+                "problemMatcher": [
+                    "$pytest"
+                ],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "dedicated"
+                }
+            },
+            {
+                "label": "✨ Quality: Format Code (Ruff)",
+                "type": "shell",
+                "command": "uv run ruff format .",
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "🔍 Quality: Lint Code (Ruff)",
+                "type": "shell",
+                "command": "uv run ruff check . --fix",
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "🚀 Dev: Start All Services",
+                "type": "shell",
+                "command": "docker-compose -f docker-compose.dev.yml up -d",
+                "problemMatcher": [],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "🛑 Dev: Stop All Services",
+                "type": "shell",
+                "command": "docker-compose -f docker-compose.dev.yml down",
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "📋 Dev: View Logs",
+                "type": "shell",
+                "command": "docker-compose -f docker-compose.dev.yml logs -f",
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "📊 Dev: Service Status",
+                "type": "shell",
+                "command": "docker-compose -f docker-compose.dev.yml ps",
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always",
+                    "panel": "new"
+                }
+            }
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "🐍 Python: Current File",
+                "type": "python",
+                "request": "launch",
+                "program": "${file}",
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}/src",
+                    "ENVIRONMENT": "development"
+                }
+            },
+            {
+                "name": "🧪 Python: Debug Tests",
+                "type": "python",
+                "request": "launch",
+                "module": "pytest",
+                "args": [
+                    "${file}",
+                    "-v",
+                    "-s"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}/src",
+                    "ENVIRONMENT": "development"
+                }
+            },
+            {
+                "name": "🚀 Python: API Server",
+                "type": "python",
+                "request": "launch",
+                "module": "uvicorn",
+                "args": [
+                    "src.player_experience.api.main:app",
+                    "--host",
+                    "0.0.0.0",
+                    "--port",
+                    "8080",
+                    "--reload"
+                ],
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}/src",
+                    "ENVIRONMENT": "development",
+                    "API_DEBUG": "true"
+                }
+            }
+        ]
     }
 }

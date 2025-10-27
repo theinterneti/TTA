@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 class CompensationStrategy:
     """Strategy for compensating transaction (undoing effects)."""
 
-    def __init__(self, compensation_primitive: WorkflowPrimitive):
+    def __init__(self, compensation_primitive: WorkflowPrimitive) -> None:
         """
         Initialize compensation strategy.
 
@@ -42,7 +42,7 @@ class SagaPrimitive(WorkflowPrimitive[Any, Any]):
         self,
         forward: WorkflowPrimitive,
         compensation: WorkflowPrimitive,
-    ):
+    ) -> None:
         """
         Initialize saga primitive.
 

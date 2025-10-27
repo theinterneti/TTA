@@ -1,0 +1,190 @@
+# TTA Production Environment
+# Usage: docker-compose -f docker/compose/docker-compose.base.yml -f docker/compose/docker-compose.prod.yml up
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PRODUCTION DEPLOYMENT CHECKLIST
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# [ ] Secrets managed via AWS Secrets Manager / Vault
+# [ ] TLS certificates configured for all services
+# [ ] Reverse proxy (Nginx/Traefik) configured
+# [ ] Automated backups scheduled (Neo4j + Redis)
+# [ ] Log aggregation configured (CloudWatch/ELK)
+# [ ] Monitoring alerts configured
+# [ ] Resource limits tuned for production load
+# [ ] Disaster recovery plan documented
+# [ ] Security audit completed
+# [ ] Load testing completed
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+services:
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Neo4j - Production Configuration
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  neo4j:
+    # NO external ports - use reverse proxy
+    expose:
+      - "7474"
+      - "7687"
+    environment:
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
+      # Production-sized memory (adjust per server)
+      - NEO4J_dbms_memory_heap_initial__size=4G
+      - NEO4J_dbms_memory_heap_max__size=8G
+      - NEO4J_dbms_memory_pagecache_size=4G
+      # Security hardening
+      - NEO4J_dbms_logs_debug_level=WARN
+      - NEO4J_dbms_security_auth_enabled=true
+      - NEO4J_dbms_ssl_policy_bolt_enabled=true
+      - NEO4J_dbms_ssl_policy_https_enabled=true
+    volumes:
+      - tta_neo4j_prod_data:/data
+      - tta_neo4j_prod_logs:/logs
+      - tta_neo4j_prod_backups:/backups
+      - /etc/neo4j/ssl:/ssl:ro
+    secrets:
+      - neo4j_auth
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 16G
+        reservations:
+          cpus: "2.0"
+          memory: 8G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    read_only: true
+    tmpfs:
+      - /tmp:size=1G
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Redis - Production Configuration
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  redis:
+    expose:
+      - "6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+      --tcp-backlog 511
+      --timeout 300
+      --tcp-keepalive 300
+      --maxclients 10000
+      --save 900 1 300 10 60 10000
+    volumes:
+      - tta_redis_prod_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    read_only: true
+    tmpfs:
+      - /tmp:size=256M
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Prometheus - Production Configuration
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  prometheus:
+    expose:
+      - "9090"
+    volumes:
+      - ../../monitoring/prometheus/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
+      - ../../monitoring/prometheus/alerts:/etc/prometheus/alerts:ro
+      - tta_prometheus_prod_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=90d"
+      - "--web.enable-lifecycle"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # Grafana - Production Configuration
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  grafana:
+    expose:
+      - "3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SERVER_ROOT_URL=https://metrics.tta.example.com
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_INSTALL_PLUGINS=redis-datasource,neo4j-datasource
+      - GF_LOG_LEVEL=warn
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+    volumes:
+      - tta_grafana_prod_data:/var/lib/grafana
+      - ../../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ../../monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    secrets:
+      - grafana_admin_password
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+volumes:
+  tta_neo4j_prod_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/tta/neo4j/data
+      o: bind
+  tta_neo4j_prod_logs:
+    driver: local
+  tta_neo4j_prod_backups:
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/tta/neo4j/backups
+      o: bind
+  tta_redis_prod_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/tta/redis/data
+      o: bind
+  tta_prometheus_prod_data:
+    driver: local
+  tta_grafana_prod_data:
+    driver: local
+
+secrets:
+  neo4j_auth:
+    external: true
+    name: tta-prod-neo4j-auth
+  grafana_admin_password:
+    external: true
+    name: tta-prod-grafana-admin-password
+# Production uses external secrets from AWS Secrets Manager / Vault
+# Create secrets with:
+#   aws secretsmanager create-secret --name tta-prod-neo4j-auth --secret-string "neo4j/STRONG_PASSWORD"

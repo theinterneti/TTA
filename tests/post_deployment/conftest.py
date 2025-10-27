@@ -147,7 +147,9 @@ async def health_check(api_client: httpx.AsyncClient) -> dict[str, Any]:
         return health_data
 
     except Exception as e:
-        pytest.skip(f"Health check endpoint unavailable: {e}. Skipping post-deployment tests.")
+        pytest.skip(
+            f"Health check endpoint unavailable: {e}. Skipping post-deployment tests."
+        )
 
 
 @pytest.fixture

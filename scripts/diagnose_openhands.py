@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Diagnostic script to understand OpenHands test generation behavior.

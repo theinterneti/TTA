@@ -74,10 +74,12 @@ jobs:
 
       - name: Install UV
         uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
       - name: Install dependencies
         run: |
-          uv sync --all-extras --dev
+          uv sync --all-groups
 
       - name: Set environment variables
         run: |

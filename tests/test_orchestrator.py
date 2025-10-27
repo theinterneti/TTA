@@ -6,6 +6,8 @@ import sys
 import unittest
 from pathlib import Path
 
+import pytest
+
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -15,12 +17,26 @@ from src.orchestration import TTAConfig, TTAOrchestrator
 class TestOrchestrator(unittest.TestCase):
     """Test the TTA Orchestrator."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Check if filesystem structure exists before running tests."""
+        # Check if required directories exist
+        root_dir = Path(__file__).parent.parent
+        tta_dev_path = root_dir / "tta.dev"
+        tta_prototype_path = root_dir / "tta.prototype"
+
+        if not (tta_dev_path.exists() and tta_prototype_path.exists()):
+            pytest.skip(
+                "Skipping integration tests: tta.dev and/or tta.prototype directories not found. "
+                "These tests require a complete filesystem structure."
+            )
+
     def setUp(self):
         """Set up the test."""
         # Create a test configuration
         self.config = TTAConfig()
 
-        # Create the orchestrator
+        # Create the orchestrator (uses FilesystemComponentLoader by default)
         self.orchestrator = TTAOrchestrator()
 
     def test_orchestrator_initialization(self):

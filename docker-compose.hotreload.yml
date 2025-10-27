@@ -1,7 +1,6 @@
 # Hot reloading overrides for TTA development
 # Usage: docker-compose -f tta.dev/docker-compose.yml -f docker-compose.hotreload.yml up
 
-version: '3.8'
 
 services:
   # Hot reloading configurations for all TTA services

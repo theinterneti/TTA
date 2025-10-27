@@ -8,7 +8,6 @@ progressive feedback, and workflow progress tracking.
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-
 from tta_ai.orchestration.realtime.event_publisher import EventPublisher
 from tta_ai.orchestration.realtime.models import (
     AgentStatus,

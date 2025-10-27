@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Neo4j Authentication Resolution Script
@@ -6,15 +7,19 @@ This script helps resolve Neo4j authentication issues by testing different
 credential combinations and providing guidance for setup.
 """
 
-import sys
 import logging
 import subprocess
-import requests
+import sys
 from pathlib import Path
 
+import requests
+
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 class Neo4jAuthResolver:
     """Resolves Neo4j authentication issues."""
@@ -33,12 +38,11 @@ class Neo4jAuthResolver:
             if response.status_code == 200:
                 logger.info("✅ Neo4j HTTP interface is accessible")
                 return True
-            elif response.status_code == 401:
+            if response.status_code == 401:
                 logger.info("✅ Neo4j is running but requires authentication")
                 return True
-            else:
-                logger.warning(f"⚠️  Neo4j HTTP returned {response.status_code}")
-                return False
+            logger.warning(f"⚠️  Neo4j HTTP returned {response.status_code}")
+            return False
         except requests.exceptions.ConnectionError:
             logger.error("❌ Neo4j service is not running or not accessible")
             return False
@@ -53,20 +57,17 @@ class Neo4jAuthResolver:
         try:
             # Test with HTTP API
             response = requests.get(
-                f"{self.neo4j_http_url}/db/data/",
-                auth=(username, password),
-                timeout=5
+                f"{self.neo4j_http_url}/db/data/", auth=(username, password), timeout=5
             )
 
             if response.status_code == 200:
                 logger.info(f"✅ Credentials work: {username}")
                 return True
-            elif response.status_code == 401:
+            if response.status_code == 401:
                 logger.warning(f"❌ Invalid credentials: {username}")
                 return False
-            else:
-                logger.warning(f"⚠️  Unexpected response: {response.status_code}")
-                return False
+            logger.warning(f"⚠️  Unexpected response: {response.status_code}")
+            return False
 
         except Exception as e:
             logger.error(f"❌ Credential test failed: {e}")
@@ -100,19 +101,27 @@ class Neo4jAuthResolver:
             # Try to reset using neo4j-admin (if available)
             reset_commands = [
                 ["neo4j-admin", "set-initial-password", "password"],
-                ["docker", "exec", "neo4j", "neo4j-admin", "set-initial-password", "password"],
+                [
+                    "docker",
+                    "exec",
+                    "neo4j",
+                    "neo4j-admin",
+                    "set-initial-password",
+                    "password",
+                ],
             ]
 
             for cmd in reset_commands:
                 try:
                     logger.info(f"Trying: {' '.join(cmd)}")
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+                    result = subprocess.run(
+                        cmd, check=False, capture_output=True, text=True, timeout=30
+                    )
 
                     if result.returncode == 0:
                         logger.info("✅ Password reset successful")
                         return True
-                    else:
-                        logger.warning(f"Reset attempt failed: {result.stderr}")
+                    logger.warning(f"Reset attempt failed: {result.stderr}")
 
                 except FileNotFoundError:
                     logger.debug(f"Command not found: {cmd[0]}")
@@ -144,7 +153,9 @@ class Neo4jAuthResolver:
 
         logger.info("\n2. Local Neo4j Installation:")
         logger.info("   - Download from: https://neo4j.com/download/")
-        logger.info("   - Set initial password: neo4j-admin set-initial-password password")
+        logger.info(
+            "   - Set initial password: neo4j-admin set-initial-password password"
+        )
         logger.info("   - Start service: neo4j start")
 
         logger.info("\n3. Update .env file:")
@@ -184,38 +195,38 @@ class Neo4jAuthResolver:
                 logger.info("📝 Updating .env file with working credentials...")
 
                 # Read current content
-                with open(env_file, 'r') as f:
+                with open(env_file) as f:
                     content = f.read()
 
                 # Update or add Neo4j credentials
-                lines = content.split('\n')
+                lines = content.split("\n")
                 updated_lines = []
                 neo4j_vars_updated = set()
 
                 for line in lines:
-                    if line.startswith('NEO4J_USERNAME='):
-                        updated_lines.append(f'NEO4J_USERNAME={username}')
-                        neo4j_vars_updated.add('username')
-                    elif line.startswith('NEO4J_PASSWORD='):
-                        updated_lines.append(f'NEO4J_PASSWORD={password}')
-                        neo4j_vars_updated.add('password')
-                    elif line.startswith('NEO4J_URI='):
-                        updated_lines.append(f'NEO4J_URI=bolt://localhost:7687')
-                        neo4j_vars_updated.add('uri')
+                    if line.startswith("NEO4J_USERNAME="):
+                        updated_lines.append(f"NEO4J_USERNAME={username}")
+                        neo4j_vars_updated.add("username")
+                    elif line.startswith("NEO4J_PASSWORD="):
+                        updated_lines.append(f"NEO4J_PASSWORD={password}")
+                        neo4j_vars_updated.add("password")
+                    elif line.startswith("NEO4J_URI="):
+                        updated_lines.append("NEO4J_URI=bolt://localhost:7687")
+                        neo4j_vars_updated.add("uri")
                     else:
                         updated_lines.append(line)
 
                 # Add missing variables
-                if 'username' not in neo4j_vars_updated:
-                    updated_lines.append(f'NEO4J_USERNAME={username}')
-                if 'password' not in neo4j_vars_updated:
-                    updated_lines.append(f'NEO4J_PASSWORD={password}')
-                if 'uri' not in neo4j_vars_updated:
-                    updated_lines.append('NEO4J_URI=bolt://localhost:7687')
+                if "username" not in neo4j_vars_updated:
+                    updated_lines.append(f"NEO4J_USERNAME={username}")
+                if "password" not in neo4j_vars_updated:
+                    updated_lines.append(f"NEO4J_PASSWORD={password}")
+                if "uri" not in neo4j_vars_updated:
+                    updated_lines.append("NEO4J_URI=bolt://localhost:7687")
 
                 # Write back
-                with open(env_file, 'w') as f:
-                    f.write('\n'.join(updated_lines))
+                with open(env_file, "w") as f:
+                    f.write("\n".join(updated_lines))
 
                 logger.info("✅ .env file updated with working credentials")
 
@@ -236,6 +247,7 @@ class Neo4jAuthResolver:
 
         return results
 
+
 def main():
     """Main execution."""
     resolver = Neo4jAuthResolver()
@@ -253,10 +265,10 @@ def main():
         logger.info("\n🎉 Neo4j authentication resolved!")
         logger.info("You can now proceed with TTA system startup.")
         return 0
-    else:
-        logger.error("\n⚠️  Neo4j authentication still needs attention.")
-        logger.info("Please follow the setup guidance above.")
-        return 1
+    logger.error("\n⚠️  Neo4j authentication still needs attention.")
+    logger.info("Please follow the setup guidance above.")
+    return 1
+
 
 if __name__ == "__main__":
     try:

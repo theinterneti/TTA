@@ -1,0 +1,7 @@
+# Schema for .github/prompts/*.prompt.md YAML frontmatter
+# Validates workflow/prompt files for agentic primitives
+
+mode: enum('agent', 'workflow', required=True)
+model: str(required=True)
+tools: list(str(), min=1, required=True)
+description: str(required=True)

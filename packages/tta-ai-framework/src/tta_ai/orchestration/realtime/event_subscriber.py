@@ -82,9 +82,7 @@ class EventSubscriber:
 
         logger.info(f"EventSubscriber stopped: {self.subscriber_id}")
 
-    async def subscribe_to_all_events(
-        self, handler: Callable[[WebSocketEvent], None]
-    ) -> None:
+    async def subscribe_to_all_events(self, handler: Callable[[WebSocketEvent], None]) -> None:
         """Subscribe to all events."""
         await self.subscribe_to_channel(f"{self.channel_prefix}:all", handler)
 
@@ -92,25 +90,19 @@ class EventSubscriber:
         self, event_type: EventType, handler: Callable[[WebSocketEvent], None]
     ) -> None:
         """Subscribe to a specific event type."""
-        await self.subscribe_to_channel(
-            f"{self.channel_prefix}:{event_type.value}", handler
-        )
+        await self.subscribe_to_channel(f"{self.channel_prefix}:{event_type.value}", handler)
 
     async def subscribe_to_agent_events(
         self, agent_id: str, handler: Callable[[WebSocketEvent], None]
     ) -> None:
         """Subscribe to events for a specific agent."""
-        await self.subscribe_to_channel(
-            f"{self.channel_prefix}:agent:{agent_id}", handler
-        )
+        await self.subscribe_to_channel(f"{self.channel_prefix}:agent:{agent_id}", handler)
 
     async def subscribe_to_user_events(
         self, user_id: str, handler: Callable[[WebSocketEvent], None]
     ) -> None:
         """Subscribe to events for a specific user."""
-        await self.subscribe_to_channel(
-            f"{self.channel_prefix}:user:{user_id}", handler
-        )
+        await self.subscribe_to_channel(f"{self.channel_prefix}:user:{user_id}", handler)
 
     async def subscribe_to_channel(
         self, channel: str, handler: Callable[[WebSocketEvent], None]
@@ -173,7 +165,7 @@ class EventSubscriber:
                     # Process the message
                     await self._process_message(message)
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     continue
                 except Exception as e:
                     logger.error(f"Error in subscription loop: {e}")
@@ -226,9 +218,7 @@ class EventSubscriber:
             # Wait for all handlers to complete
             if handler_tasks:
                 results = await asyncio.gather(*handler_tasks, return_exceptions=True)
-                success_count = sum(
-                    1 for result in results if not isinstance(result, Exception)
-                )
+                success_count = sum(1 for result in results if not isinstance(result, Exception))
 
                 if success_count > 0:
                     self.events_processed += 1
@@ -236,9 +226,7 @@ class EventSubscriber:
                 # Log any handler errors
                 for i, result in enumerate(results):
                     if isinstance(result, Exception):
-                        logger.error(
-                            f"Handler {i} failed for channel {channel}: {result}"
-                        )
+                        logger.error(f"Handler {i} failed for channel {channel}: {result}")
                         self.events_failed += 1
 
         except Exception as e:
@@ -267,9 +255,7 @@ class EventSubscriber:
             "events_processed": self.events_processed,
             "events_failed": self.events_failed,
             "active_subscriptions": len(self.subscriptions),
-            "total_handlers": sum(
-                len(handlers) for handlers in self.subscriptions.values()
-            ),
+            "total_handlers": sum(len(handlers) for handlers in self.subscriptions.values()),
             "subscribed_channels": list(self.subscriptions.keys()),
         }
 
@@ -316,9 +302,7 @@ class EventDistributor:
     def remove_websocket_manager(self, manager: Any) -> None:
         """Remove a WebSocket manager."""
         self.websocket_managers.discard(manager)
-        logger.debug(
-            f"Removed WebSocket manager: {len(self.websocket_managers)} remaining"
-        )
+        logger.debug(f"Removed WebSocket manager: {len(self.websocket_managers)} remaining")
 
     async def start_all_subscribers(self) -> None:
         """Start all registered subscribers."""

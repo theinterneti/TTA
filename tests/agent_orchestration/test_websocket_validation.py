@@ -6,13 +6,13 @@ correctly with the new configuration management and real-time features.
 """
 
 import asyncio
+import contextlib
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 import pytest_asyncio
 from fastapi.websockets import WebSocket
-
 from tta_ai.orchestration.realtime.config_manager import (
     RealtimeEnvironment,
     get_realtime_config_manager,
@@ -127,10 +127,8 @@ class TestWebSocketValidation:
         """Test WebSocket connection when authentication is disabled."""
         mock_websocket.receive_text.side_effect = [asyncio.CancelledError()]
 
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await websocket_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Should accept connection without authentication
         mock_websocket.accept.assert_called_once()
@@ -165,10 +163,8 @@ class TestWebSocketValidation:
             asyncio.CancelledError(),
         ]
 
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await auth_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Should close connection due to auth failure
         mock_websocket.close.assert_called()
@@ -184,10 +180,8 @@ class TestWebSocketValidation:
             asyncio.CancelledError(),
         ]
 
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await websocket_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Should respond to ping messages
         sent_messages = [
@@ -240,10 +234,8 @@ class TestWebSocketValidation:
 
         # Cleanup
         task1.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await task1
-        except asyncio.CancelledError:
-            pass
 
     async def test_websocket_event_broadcasting(
         self, websocket_manager, mock_websocket
@@ -276,10 +268,8 @@ class TestWebSocketValidation:
 
         # Cleanup
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
     async def test_websocket_connection_recovery(
         self, websocket_manager, mock_websocket
@@ -292,10 +282,8 @@ class TestWebSocketValidation:
             asyncio.CancelledError(),  # Simulate disconnect
         ]
 
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await websocket_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Check that connection history was recorded for recovery
         assert "test_user" in websocket_manager.connection_history

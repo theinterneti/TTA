@@ -10,7 +10,7 @@ from tta_workflow_primitives.testing.mocks import MockPrimitive
 
 
 @pytest.mark.asyncio
-async def test_timeout_success():
+async def test_timeout_success() -> None:
     """Test successful execution within timeout."""
     fast = LambdaPrimitive(lambda data, ctx: {"result": "fast"})
 
@@ -21,7 +21,7 @@ async def test_timeout_success():
 
 
 @pytest.mark.asyncio
-async def test_timeout_exceeded():
+async def test_timeout_exceeded() -> None:
     """Test timeout exceeded without fallback."""
 
     async def slow(data, ctx):
@@ -36,7 +36,7 @@ async def test_timeout_exceeded():
 
 
 @pytest.mark.asyncio
-async def test_timeout_with_fallback():
+async def test_timeout_with_fallback() -> None:
     """Test fallback on timeout."""
 
     async def slow(data, ctx):
@@ -54,7 +54,7 @@ async def test_timeout_with_fallback():
 
 
 @pytest.mark.asyncio
-async def test_timeout_tracking():
+async def test_timeout_tracking() -> None:
     """Test timeout tracking in context."""
 
     async def slow(data, ctx):
@@ -78,7 +78,7 @@ async def test_timeout_tracking():
 
 
 @pytest.mark.asyncio
-async def test_timeout_multiple_calls():
+async def test_timeout_multiple_calls() -> None:
     """Test multiple timeout scenarios."""
 
     async def sometimes_slow(data, ctx):
@@ -111,7 +111,7 @@ async def test_timeout_multiple_calls():
 
 
 @pytest.mark.asyncio
-async def test_timeout_no_tracking():
+async def test_timeout_no_tracking() -> None:
     """Test timeout without tracking."""
 
     async def slow(data, ctx):
@@ -134,7 +134,7 @@ async def test_timeout_no_tracking():
 
 
 @pytest.mark.asyncio
-async def test_timeout_realistic_scenario():
+async def test_timeout_realistic_scenario() -> None:
     """Test realistic LLM call with timeout."""
     call_count = 0
 

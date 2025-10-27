@@ -1,47 +1,55 @@
 ---
-type: "agent_requested"
-description: "Example description"
+applyTo:
+  - "pyproject.toml"
+  - "uv.lock"
+  - "scripts/**"
+  - "**/*.sh"
+auto_trigger: true
+applies_to: ["uv", "uvx", "package manager", "dependencies", "tool execution", "pip", "poetry"]
+priority: medium
+category: tooling
+description: "UV package manager usage patterns for TTA - prefer uvx for standalone tools"
 ---
 
-# AI Agent Rule: Prefer `uvx` for Tool Execution
+# Package Management: Prefer `uvx` for Tool Execution
 
-## Rule Priority
-**MEDIUM** - Apply when suggesting commands or running tools
+**Auto-triggered when**: Working with package management, dependencies, or tool execution.
+
+## Quick Reference
+
+**Default recommendation:** Use `uvx` for standalone development tools (ruff, pyright, pytest)
+**Alternative:** Use `uv run` only when tool needs project dependencies or context
+**Best practice:** Pin versions in CI/CD for reproducibility
 
 ## Context
+
 This project uses UV as the package manager. UV provides two ways to run tools:
 1. `uv run <tool>` - Runs tool from project's virtual environment
 2. `uvx <tool>` - Runs tool in isolated environment (like `npx` for Node.js)
 
-## Rule
-When suggesting commands to run development tools, **prefer `uvx`** over `uv run` for the following tools:
+## When to Use `uvx`
 
-### Tools to Run with `uvx`
+**Prefer `uvx`** for standalone development tools:
 - **Linting:** `uvx ruff check src/ tests/`
 - **Formatting:** `uvx ruff format src/ tests/`
 - **Type Checking:** `uvx pyright src/`
 - **Testing:** `uvx pytest tests/`
 - **Any standalone tool** that doesn't need project dependencies
 
-### When to Use `uv run` Instead
+## When to Use `uv run`
+
 Use `uv run` when:
 - Running project-specific scripts that import project code
 - Running tools that need access to project dependencies
 - Running custom scripts defined in `pyproject.toml`
 
-## Rationale
+## Benefits of `uvx`
 
-### Benefits of `uvx`
 1. **No Installation Required:** Tools run without being added to project dependencies
 2. **Always Latest:** Can easily test different versions without modifying `pyproject.toml`
 3. **Cleaner Dependencies:** Project `pyproject.toml` only contains actual dependencies
 4. **Faster CI/CD:** No need to install tools in project environment
 5. **Isolation:** Tools run in isolated environments, preventing conflicts
-
-### Trade-offs
-- **Version Consistency:** `uvx` uses latest version by default (can pin with `uvx tool@version`)
-- **Reproducibility:** Requires explicit version pinning for reproducible builds
-- **Network Dependency:** First run downloads tool (cached afterwards)
 
 ## Examples
 
@@ -102,24 +110,6 @@ export RUFF_VERSION=0.13.0
 uvx ruff@$RUFF_VERSION check src/
 ```
 
-## Migration from `uv run`
-
-When you see existing commands using `uv run` for standalone tools, suggest migrating to `uvx`:
-
-**Before:**
-```bash
-uv run ruff check src/
-uv run mypy src/
-uv run pytest tests/
-```
-
-**After:**
-```bash
-uvx ruff check src/
-uvx pyright src/  # Also migrated from mypy to pyright
-uvx pytest tests/
-```
-
 ## Convenience Script
 
 The project provides `scripts/dev.sh` which already uses `uvx` internally:
@@ -132,13 +122,6 @@ The project provides `scripts/dev.sh` which already uses `uvx` internally:
 ./scripts/dev.sh test
 ```
 
-## Documentation References
-
-When suggesting commands, reference:
-- `docs/dev-workflow-quick-reference.md` - Developer workflow guide
-- `docs/tooling-optimization-summary.md` - Tooling decisions and rationale
-- `scripts/dev.sh` - Convenience script implementation
-
 ## Exceptions
 
 Do NOT suggest `uvx` for:
@@ -147,8 +130,13 @@ Do NOT suggest `uvx` for:
 3. **Tools requiring project context:** Tools that need to import project modules
 4. **Pre-commit hooks:** These use their own virtual environments
 
-## Summary
+## Documentation References
 
-**Default recommendation:** Use `uvx` for standalone development tools (ruff, pyright, pytest)
-**Alternative:** Use `uv run` only when tool needs project dependencies or context
-**Best practice:** Pin versions in CI/CD for reproducibility
+- `docs/dev-workflow-quick-reference.md` - Developer workflow guide
+- `docs/tooling-optimization-summary.md` - Tooling decisions and rationale
+- `scripts/dev.sh` - Convenience script implementation
+
+---
+
+**Last Updated**: 2025-10-27
+**Status**: Active - TTA package management standard

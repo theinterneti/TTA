@@ -1,0 +1,11 @@
+# Schema for .github/chatmodes/*.chatmode.md YAML frontmatter
+# Validates chat mode files for agentic primitives
+
+mode: str(required=True)
+model: str(required=True)
+tools: include('tools-config', required=True)
+description: str(required=True)
+---
+tools-config:
+  allowed: list(str(), min=1, required=True)
+  denied: list(str(), required=False)

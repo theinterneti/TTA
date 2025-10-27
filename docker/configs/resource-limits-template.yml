@@ -1,0 +1,40 @@
+# Resource Limits Template
+# Apply these to services in docker-compose.dev.yml and docker-compose.test.yml
+
+# Development Environment (Generous for debugging)
+services:
+  neo4j:
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  api-gateway:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+# Test Environment (Constrained for CI)
+# For test environment, reduce limits by 50%
+# limits.memory: 2G for neo4j, 256M for redis, 512M for api-gateway
+
+# Staging Environment (Production-like)
+# Use production sizing with 10% overhead for safety margin

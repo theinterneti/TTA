@@ -10,6 +10,7 @@ Collects and analyzes metrics during comprehensive testing including:
 """
 
 import asyncio
+import contextlib
 import logging
 import statistics
 from collections import defaultdict
@@ -94,10 +95,8 @@ class TestMetricsCollector:
         # Stop monitoring task
         if self.monitoring_task:
             self.monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self.monitoring_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("Test metrics collection stopped")
 

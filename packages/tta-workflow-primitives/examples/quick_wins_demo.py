@@ -40,7 +40,7 @@ workflow = CachePrimitive(
 )
 
 
-async def main():
+async def main() -> None:
     print("✓ Quick Wins Captured - All 23 tests passing!")
     print("  Router, Timeout, Cache primitives ready to use")
 

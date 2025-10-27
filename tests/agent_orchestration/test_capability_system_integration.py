@@ -9,7 +9,6 @@ import asyncio
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.api.diagnostics import DiagnosticsAPI
 from tta_ai.orchestration.capabilities.auto_discovery import (
     AutoDiscoveryManager,

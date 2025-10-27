@@ -1,7 +1,6 @@
 import asyncio
 
 import pytest
-
 from tta_ai.orchestration import (
     AgentRegistry,
     AgentType,

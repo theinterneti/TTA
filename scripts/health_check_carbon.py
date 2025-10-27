@@ -1,8 +1,10 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """Health check script for Carbon component."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
+
 
 def health_check():
     """Perform health check on Carbon component."""
@@ -39,6 +41,7 @@ def health_check():
         # Check codecarbon availability
         try:
             from codecarbon import EmissionsTracker
+
             print("✅ codecarbon library: Available")
             codecarbon_available = True
         except ImportError:
@@ -69,8 +72,10 @@ def health_check():
     except Exception as e:
         print(f"❌ Health check failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     sys.exit(0 if health_check() else 1)

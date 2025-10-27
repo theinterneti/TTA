@@ -26,11 +26,14 @@ Usage:
 
 import argparse
 import json
+import logging
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -51,6 +54,9 @@ except ImportError:
     CONTEXT_MANAGER_AVAILABLE = False
     print("WARNING: AI Context Manager not available")
 
+from scripts.workflow.openhands_stage import (
+    OpenHandsTestGenerationStage,
+)
 from scripts.workflow.stage_handlers import (
     ProductionDeploymentStage,
     RefactoringStage,
@@ -74,6 +80,12 @@ class WorkflowResult:
     total_execution_time_ms: float = 0.0
     context_session_id: str | None = None
     metrics_dashboard: str | None = None
+    # Performance measurement fields
+    execution_mode: str = "sync"  # "sync" or "async"
+    stage_timings: dict[str, float] = field(default_factory=dict)  # stage_name -> ms
+    openhands_submission_time_ms: float = 0.0
+    openhands_collection_time_ms: float = 0.0
+    parallel_execution_savings_ms: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -211,6 +223,25 @@ class WorkflowOrchestrator:
                 importance=0.9,
             )
 
+            # Stage 2.5: OpenHands Test Generation (optional, if enabled)
+            if self.config.get("enable_openhands_test_generation", False):
+                openhands_result = self._run_openhands_test_generation_stage()
+                result.stage_results["openhands_test_generation"] = openhands_result
+
+                if openhands_result.success:
+                    result.stages_completed.append("openhands_test_generation")
+                    self._update_context(
+                        f"OpenHands test generation completed: "
+                        f"{len(openhands_result.generated_tests)} modules processed",
+                        importance=0.8,
+                    )
+                else:
+                    logger.warning(
+                        f"OpenHands test generation had issues: "
+                        f"{', '.join(openhands_result.errors)}"
+                    )
+                    # Don't fail workflow - test generation is optional
+
             # Stage 3: Refactoring
             refactoring_result = self._run_refactoring_stage()
             result.stage_results["refactoring"] = refactoring_result
@@ -291,6 +322,176 @@ class WorkflowOrchestrator:
             )
             return result
 
+    async def run_async_with_parallel_openhands(self) -> WorkflowResult:
+        """
+        Run workflow with async OpenHands execution and parallel stages.
+
+        This method enables:
+        - Non-blocking OpenHands task submission
+        - Parallel execution of independent stages while OpenHands tasks run
+        - Result collection at the end of the workflow
+
+        Returns:
+            WorkflowResult with execution details
+        """
+        start_time = datetime.utcnow()
+
+        result = WorkflowResult(
+            success=False,
+            component_name=self.component_name,
+            target_stage=self.target_stage,
+            context_session_id=self.context_session_id,
+            execution_mode="async",
+        )
+
+        try:
+            # Stage 1: Parse Specification
+            spec_result = self._run_specification_stage()
+            result.stage_results["specification"] = spec_result
+
+            if not spec_result.success:
+                result.stages_failed.append("specification")
+                return result
+
+            result.stages_completed.append("specification")
+            self._update_context(
+                "Specification parsed successfully",
+                importance=0.9,
+            )
+
+            # Stage 2: Testing
+            testing_result = self._run_testing_stage()
+            result.stage_results["testing"] = testing_result
+
+            if not testing_result.success:
+                result.stages_failed.append("testing")
+                self._update_context(
+                    f"Testing stage failed: {', '.join(testing_result.errors)}",
+                    importance=0.9,
+                )
+                return result
+
+            result.stages_completed.append("testing")
+            self._update_context(
+                "Testing stage passed",
+                importance=0.9,
+            )
+
+            # Stage 2.5: Submit OpenHands tasks asynchronously (non-blocking)
+            submitted_tasks = {}
+            if self.config.get("enable_openhands_test_generation", False):
+                (
+                    submitted_tasks,
+                    submission_time,
+                ) = await self._run_async_openhands_test_generation_stage()
+                result.openhands_submission_time_ms = submission_time
+                result.stage_timings["openhands_submission"] = submission_time
+                self._update_context(
+                    f"OpenHands tasks submitted asynchronously: "
+                    f"{len(submitted_tasks)} modules in {submission_time:.0f}ms",
+                    importance=0.8,
+                )
+
+            # Stage 3: Refactoring (runs in parallel with OpenHands)
+            refactoring_start = datetime.utcnow()
+            refactoring_result = self._run_refactoring_stage()
+            refactoring_time = (
+                datetime.utcnow() - refactoring_start
+            ).total_seconds() * 1000
+            result.stage_results["refactoring"] = refactoring_result
+            result.stage_timings["refactoring"] = refactoring_time
+
+            if not refactoring_result.success:
+                result.stages_failed.append("refactoring")
+                self._update_context(
+                    f"Refactoring stage failed: {', '.join(refactoring_result.errors)}",
+                    importance=0.7,
+                )
+                return result
+
+            result.stages_completed.append("refactoring")
+            self._update_context(
+                f"Refactoring stage passed in {refactoring_time:.0f}ms",
+                importance=0.7,
+            )
+
+            # Collect OpenHands results
+            if submitted_tasks:
+                success, collection_time = await self._collect_async_openhands_results(
+                    submitted_tasks
+                )
+                result.openhands_collection_time_ms = collection_time
+                result.stage_timings["openhands_collection"] = collection_time
+                if not success:
+                    logger.warning("OpenHands result collection had issues")
+                else:
+                    self._update_context(
+                        f"OpenHands results collected in {collection_time:.0f}ms",
+                        importance=0.8,
+                    )
+
+            # Stage 4: Staging Deployment (if target is staging or production)
+            if self.target_stage in ["staging", "production"]:
+                staging_result = self._run_staging_deployment_stage()
+                result.stage_results["staging_deployment"] = staging_result
+
+                if not staging_result.success:
+                    result.stages_failed.append("staging_deployment")
+                    self._update_context(
+                        "Staging deployment failed",
+                        importance=0.9,
+                    )
+                    return result
+
+                result.stages_completed.append("staging_deployment")
+                self._update_context(
+                    "Staging deployment successful",
+                    importance=0.9,
+                )
+
+            # Stage 5: Production Deployment (if target is production)
+            if self.target_stage == "production":
+                production_result = self._run_production_deployment_stage()
+                result.stage_results["production_deployment"] = production_result
+
+                if not production_result.success:
+                    result.stages_failed.append("production_deployment")
+                    self._update_context(
+                        "Production deployment failed",
+                        importance=1.0,
+                    )
+                    return result
+
+                result.stages_completed.append("production_deployment")
+                self._update_context(
+                    "Production deployment successful",
+                    importance=1.0,
+                )
+
+            # All stages completed successfully
+            result.success = True
+
+            # Generate metrics dashboard
+            dashboard_file = f"workflow_dashboard_{self.component_name}.html"
+            generate_dashboard(output_file=dashboard_file, days=1)
+            result.metrics_dashboard = dashboard_file
+
+            # Calculate total execution time
+            end_time = datetime.utcnow()
+            result.total_execution_time_ms = (
+                end_time - start_time
+            ).total_seconds() * 1000
+
+            return result
+
+        except Exception as e:
+            result.stages_failed.append("workflow_orchestration")
+            self._update_context(
+                f"Workflow failed with exception: {str(e)}",
+                importance=1.0,
+            )
+            return result
+
     def _run_specification_stage(self) -> StageResult:
         """Run specification parsing stage."""
         parser = SpecificationParser(self.spec_file)
@@ -299,6 +500,11 @@ class WorkflowOrchestrator:
     def _run_testing_stage(self) -> StageResult:
         """Run testing stage."""
         stage = TestingStage(self.component_path, self.config)
+        return stage.execute()
+
+    def _run_openhands_test_generation_stage(self) -> Any:
+        """Run OpenHands test generation stage."""
+        stage = OpenHandsTestGenerationStage(self.component_path, self.config)
         return stage.execute()
 
     def _run_refactoring_stage(self) -> StageResult:
@@ -315,6 +521,66 @@ class WorkflowOrchestrator:
         """Run production deployment stage."""
         stage = ProductionDeploymentStage(self.component_path, self.config)
         return stage.execute()
+
+    async def _run_async_openhands_test_generation_stage(
+        self,
+    ) -> tuple[dict[str, str], float]:
+        """
+        Run OpenHands test generation stage asynchronously (non-blocking).
+
+        Returns:
+            Tuple of (submitted_tasks dict, submission_time_ms)
+        """
+        # Import here to avoid circular imports
+        from scripts.workflow.openhands_stage import AsyncOpenHandsTestGenerationStage
+
+        stage = AsyncOpenHandsTestGenerationStage(self.component_path, self.config)
+        result = await stage.submit_tasks()
+
+        if result.success:
+            self._update_context(
+                f"OpenHands tasks submitted: {len(result.submitted_tasks)} modules",
+                importance=0.8,
+            )
+            return result.submitted_tasks, result.total_execution_time_ms
+        logger.warning(
+            f"OpenHands task submission had issues: {', '.join(result.errors)}"
+        )
+        return {}, result.total_execution_time_ms
+
+    async def _collect_async_openhands_results(
+        self, submitted_tasks: dict[str, str]
+    ) -> tuple[bool, float]:
+        """
+        Collect results from previously submitted OpenHands tasks.
+
+        Args:
+            submitted_tasks: Dictionary mapping module_path -> task_id
+
+        Returns:
+            Tuple of (success, collection_time_ms)
+        """
+        if not submitted_tasks:
+            return True, 0.0
+
+        # Import here to avoid circular imports
+        from scripts.workflow.openhands_stage import AsyncOpenHandsTestGenerationStage
+
+        stage = AsyncOpenHandsTestGenerationStage(self.component_path, self.config)
+        result = await stage.collect_results(submitted_tasks)
+
+        if result.success:
+            self._update_context(
+                f"OpenHands results collected: "
+                f"{len(result.completed_tasks)} completed, "
+                f"{len(result.failed_tasks)} failed",
+                importance=0.8,
+            )
+            return True, result.total_execution_time_ms
+        logger.warning(
+            f"OpenHands result collection had issues: {', '.join(result.errors)}"
+        )
+        return False, result.total_execution_time_ms
 
 
 def run_workflow(
@@ -370,15 +636,44 @@ def main():
         "--output",
         help="Output file for workflow report (default: workflow_report_<component>.json)",
     )
+    parser.add_argument(
+        "--async",
+        dest="async_mode",
+        action="store_true",
+        help="Use async workflow with parallel OpenHands execution (Phase 2)",
+    )
+    parser.add_argument(
+        "--enable-openhands",
+        action="store_true",
+        help="Enable OpenHands test generation",
+    )
 
     args = parser.parse_args()
 
-    # Run workflow
-    result = run_workflow(
-        spec_file=args.spec,
-        component_name=args.component,
-        target_stage=args.target,
-    )
+    # Build config
+    config = {
+        "enable_openhands_test_generation": args.enable_openhands,
+        "coverage_threshold": 80,
+    }
+
+    # Run workflow (async or sync)
+    if args.async_mode:
+        # Run async workflow
+        orchestrator = WorkflowOrchestrator(
+            spec_file=Path(args.spec),
+            component_name=args.component,
+            target_stage=args.target,
+            config=config,
+        )
+        result = asyncio.run(orchestrator.run_async_with_parallel_openhands())
+    else:
+        # Run sync workflow (existing)
+        result = run_workflow(
+            spec_file=args.spec,
+            component_name=args.component,
+            target_stage=args.target,
+            config=config,
+        )
 
     # Save report
     output_file = args.output or f"workflow_report_{args.component}.json"

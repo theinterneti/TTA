@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Manual Testing Guide Validation Script
@@ -7,24 +8,27 @@ can be performed and that the expected results are achievable.
 """
 
 import asyncio
-import aiohttp
-import json
-import sys
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import aiohttp
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 class ManualTestingGuideValidator:
     """Validates the manual testing guide procedures."""
 
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         self.validation_results = {}
 
     async def __aenter__(self):
@@ -42,7 +46,7 @@ class ManualTestingGuideValidator:
         self.validation_results[step] = {
             "success": success,
             "details": details,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def validate_phase1_initial_setup(self) -> bool:
@@ -61,7 +65,7 @@ class ManualTestingGuideValidator:
             "TTA Therapeutic Text Adventure",
             "Authentication",
             "Use Test Token",
-            "Start New Session"
+            "Start New Session",
         ]
 
         missing_elements = []
@@ -70,10 +74,11 @@ class ManualTestingGuideValidator:
                 missing_elements.append(element)
 
         if missing_elements:
-            self.log_validation("Frontend Content", False, f"Missing: {missing_elements}")
+            self.log_validation(
+                "Frontend Content", False, f"Missing: {missing_elements}"
+            )
             return False
-        else:
-            self.log_validation("Frontend Content", True, "All required elements present")
+        self.log_validation("Frontend Content", True, "All required elements present")
 
         return True
 
@@ -85,27 +90,33 @@ class ManualTestingGuideValidator:
             # Test Swagger UI accessibility
             async with self.session.get(f"{self.base_url}/docs") as response:
                 if response.status != 200:
-                    self.log_validation("Swagger UI Access", False, f"HTTP {response.status}")
+                    self.log_validation(
+                        "Swagger UI Access", False, f"HTTP {response.status}"
+                    )
                     return False
 
                 content = await response.text()
                 if "swagger-ui" not in content.lower():
-                    self.log_validation("Swagger UI Content", False, "Swagger UI not found")
+                    self.log_validation(
+                        "Swagger UI Content", False, "Swagger UI not found"
+                    )
                     return False
 
             # Test OpenAPI spec
             async with self.session.get(f"{self.base_url}/openapi.json") as response:
                 if response.status != 200:
-                    self.log_validation("OpenAPI Spec", False, f"HTTP {response.status}")
+                    self.log_validation(
+                        "OpenAPI Spec", False, f"HTTP {response.status}"
+                    )
                     return False
 
                 spec = await response.json()
-                paths = spec.get('paths', {})
+                paths = spec.get("paths", {})
 
                 # Check for required gameplay endpoints
                 required_endpoints = [
-                    '/api/v1/gameplay/sessions',
-                    '/api/v1/gameplay/health'
+                    "/api/v1/gameplay/sessions",
+                    "/api/v1/gameplay/health",
                 ]
 
                 missing_endpoints = []
@@ -114,10 +125,13 @@ class ManualTestingGuideValidator:
                         missing_endpoints.append(endpoint)
 
                 if missing_endpoints:
-                    self.log_validation("Required Endpoints", False, f"Missing: {missing_endpoints}")
+                    self.log_validation(
+                        "Required Endpoints", False, f"Missing: {missing_endpoints}"
+                    )
                     return False
-                else:
-                    self.log_validation("Required Endpoints", True, "All required endpoints present")
+                self.log_validation(
+                    "Required Endpoints", True, "All required endpoints present"
+                )
 
             return True
 
@@ -131,11 +145,17 @@ class ManualTestingGuideValidator:
 
         # Test that authentication is required
         try:
-            async with self.session.get(f"{self.base_url}/api/v1/gameplay/health") as response:
+            async with self.session.get(
+                f"{self.base_url}/api/v1/gameplay/health"
+            ) as response:
                 if response.status == 401:
-                    self.log_validation("Auth Required", True, "Correctly requires authentication")
+                    self.log_validation(
+                        "Auth Required", True, "Correctly requires authentication"
+                    )
                 else:
-                    self.log_validation("Auth Required", False, f"Expected 401, got {response.status}")
+                    self.log_validation(
+                        "Auth Required", False, f"Expected 401, got {response.status}"
+                    )
                     return False
         except Exception as e:
             self.log_validation("Auth Required", False, f"Error: {e}")
@@ -146,9 +166,13 @@ class ManualTestingGuideValidator:
         content = frontend_path.read_text()
 
         if "Use Test Token" in content and "test_token" in content:
-            self.log_validation("Test Token Option", True, "Test token option available")
+            self.log_validation(
+                "Test Token Option", True, "Test token option available"
+            )
         else:
-            self.log_validation("Test Token Option", False, "Test token option not found")
+            self.log_validation(
+                "Test Token Option", False, "Test token option not found"
+            )
             return False
 
         return True
@@ -162,15 +186,28 @@ class ManualTestingGuideValidator:
             headers = {"Content-Type": "application/json"}
             payload = {"therapeutic_context": {"goals": ["test"]}}
 
-            async with self.session.post(f"{self.base_url}/api/v1/gameplay/sessions",
-                                       headers=headers, json=payload) as response:
+            async with self.session.post(
+                f"{self.base_url}/api/v1/gameplay/sessions",
+                headers=headers,
+                json=payload,
+            ) as response:
                 # Should require authentication
                 if response.status == 401:
-                    self.log_validation("Session Endpoint", True, "Session endpoint exists and requires auth")
+                    self.log_validation(
+                        "Session Endpoint",
+                        True,
+                        "Session endpoint exists and requires auth",
+                    )
                 elif response.status in [200, 201, 422]:
-                    self.log_validation("Session Endpoint", True, "Session endpoint functional")
+                    self.log_validation(
+                        "Session Endpoint", True, "Session endpoint functional"
+                    )
                 else:
-                    self.log_validation("Session Endpoint", False, f"Unexpected status: {response.status}")
+                    self.log_validation(
+                        "Session Endpoint",
+                        False,
+                        f"Unexpected status: {response.status}",
+                    )
                     return False
         except Exception as e:
             self.log_validation("Session Endpoint", False, f"Error: {e}")
@@ -186,28 +223,36 @@ class ManualTestingGuideValidator:
             # Get OpenAPI spec to validate endpoint documentation
             async with self.session.get(f"{self.base_url}/openapi.json") as response:
                 spec = await response.json()
-                paths = spec.get('paths', {})
+                paths = spec.get("paths", {})
 
                 # Check that endpoints have proper documentation
-                gameplay_endpoints = [p for p in paths.keys() if '/gameplay/' in p]
+                gameplay_endpoints = [p for p in paths if "/gameplay/" in p]
 
                 if len(gameplay_endpoints) < 3:
-                    self.log_validation("Swagger Endpoints", False, f"Only {len(gameplay_endpoints)} endpoints")
+                    self.log_validation(
+                        "Swagger Endpoints",
+                        False,
+                        f"Only {len(gameplay_endpoints)} endpoints",
+                    )
                     return False
 
                 # Check that endpoints have proper schemas
                 documented_properly = True
                 for endpoint in gameplay_endpoints:
                     endpoint_info = paths[endpoint]
-                    for method, method_info in endpoint_info.items():
-                        if 'responses' not in method_info:
+                    for _method, method_info in endpoint_info.items():
+                        if "responses" not in method_info:
                             documented_properly = False
                             break
 
                 if documented_properly:
-                    self.log_validation("Swagger Documentation", True, "Endpoints properly documented")
+                    self.log_validation(
+                        "Swagger Documentation", True, "Endpoints properly documented"
+                    )
                 else:
-                    self.log_validation("Swagger Documentation", False, "Missing response schemas")
+                    self.log_validation(
+                        "Swagger Documentation", False, "Missing response schemas"
+                    )
                     return False
 
         except Exception as e:
@@ -222,20 +267,39 @@ class ManualTestingGuideValidator:
 
         try:
             # Test unauthorized access
-            async with self.session.get(f"{self.base_url}/api/v1/gameplay/health") as response:
+            async with self.session.get(
+                f"{self.base_url}/api/v1/gameplay/health"
+            ) as response:
                 if response.status == 401:
-                    self.log_validation("Unauthorized Handling", True, "Returns 401 for unauthorized")
+                    self.log_validation(
+                        "Unauthorized Handling", True, "Returns 401 for unauthorized"
+                    )
                 else:
-                    self.log_validation("Unauthorized Handling", False, f"Expected 401, got {response.status}")
+                    self.log_validation(
+                        "Unauthorized Handling",
+                        False,
+                        f"Expected 401, got {response.status}",
+                    )
 
             # Test malformed request
             headers = {"Content-Type": "application/json"}
-            async with self.session.post(f"{self.base_url}/api/v1/gameplay/sessions",
-                                       headers=headers, data="invalid json") as response:
+            async with self.session.post(
+                f"{self.base_url}/api/v1/gameplay/sessions",
+                headers=headers,
+                data="invalid json",
+            ) as response:
                 if response.status in [400, 401, 422]:
-                    self.log_validation("Malformed Request", True, f"Handles malformed requests: {response.status}")
+                    self.log_validation(
+                        "Malformed Request",
+                        True,
+                        f"Handles malformed requests: {response.status}",
+                    )
                 else:
-                    self.log_validation("Malformed Request", False, f"Unexpected status: {response.status}")
+                    self.log_validation(
+                        "Malformed Request",
+                        False,
+                        f"Unexpected status: {response.status}",
+                    )
 
             return True
 
@@ -258,7 +322,7 @@ class ManualTestingGuideValidator:
             "Authorization",
             "Bearer",
             "try {",
-            "catch"
+            "catch",
         ]
 
         missing_js = []
@@ -269,8 +333,9 @@ class ManualTestingGuideValidator:
         if missing_js:
             self.log_validation("JavaScript Structure", False, f"Missing: {missing_js}")
             return False
-        else:
-            self.log_validation("JavaScript Structure", True, "Proper async/await and error handling")
+        self.log_validation(
+            "JavaScript Structure", True, "Proper async/await and error handling"
+        )
 
         return True
 
@@ -296,7 +361,7 @@ class ManualTestingGuideValidator:
             "Phase 6: Error Handling",
             "Phase 7: Browser Console",
             "Expected Results",
-            "Troubleshooting"
+            "Troubleshooting",
         ]
 
         missing_sections = []
@@ -305,14 +370,15 @@ class ManualTestingGuideValidator:
                 missing_sections.append(section)
 
         if missing_sections:
-            self.log_validation("Guide Completeness", False, f"Missing sections: {missing_sections}")
+            self.log_validation(
+                "Guide Completeness", False, f"Missing sections: {missing_sections}"
+            )
             return False
-        else:
-            self.log_validation("Guide Completeness", True, "All required sections present")
+        self.log_validation("Guide Completeness", True, "All required sections present")
 
         return True
 
-    async def run_comprehensive_validation(self) -> Dict[str, Any]:
+    async def run_comprehensive_validation(self) -> dict[str, Any]:
         """Run all manual testing guide validations."""
         logger.info("🚀 Starting Manual Testing Guide Validation")
         logger.info("=" * 70)
@@ -339,6 +405,7 @@ class ManualTestingGuideValidator:
 
         return self.validation_results
 
+
 async def main():
     """Main validation execution."""
     logger.info("📋 TTA Core Gameplay Loop - Manual Testing Guide Validation")
@@ -360,14 +427,16 @@ async def main():
             logger.info(f"{validation_name:30} : {status}")
 
         logger.info("-" * 70)
-        logger.info(f"TOTAL: {passed_validations}/{total_validations} validations passed ({passed_validations/total_validations*100:.1f}%)")
+        logger.info(
+            f"TOTAL: {passed_validations}/{total_validations} validations passed ({passed_validations / total_validations * 100:.1f}%)"
+        )
 
         if passed_validations >= total_validations * 0.8:
             logger.info("🎉 MANUAL TESTING GUIDE IS COMPREHENSIVE AND VALID!")
             return 0
-        else:
-            logger.error("⚠️  Manual testing guide needs improvements.")
-            return 1
+        logger.error("⚠️  Manual testing guide needs improvements.")
+        return 1
+
 
 if __name__ == "__main__":
     try:

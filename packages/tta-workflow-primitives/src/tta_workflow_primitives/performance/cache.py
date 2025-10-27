@@ -52,7 +52,7 @@ class CachePrimitive(WorkflowPrimitive[Any, Any]):
         primitive: WorkflowPrimitive,
         cache_key_fn: Callable[[Any, WorkflowContext], str],
         ttl_seconds: float = 3600.0,
-    ):
+    ) -> None:
         """
         Initialize cache primitive.
 

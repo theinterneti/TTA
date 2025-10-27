@@ -1,6 +1,4 @@
-"""
-Sessions router: minimal endpoints to support test workflows.
-"""
+"""Sessions router: minimal endpoints to support test workflows."""
 
 from __future__ import annotations
 
@@ -11,12 +9,24 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from ...database.world_repository import WorldRepository
 from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
 
 # In-memory session store for tests (non-persistent)
 _SESSIONS: dict[str, dict[str, Any]] = {}
+
+# Global world repository instance
+_world_repository: WorldRepository | None = None
+
+
+async def get_world_repository() -> WorldRepository:
+    """Get or create world repository (shared singleton)."""
+    global _world_repository
+    if _world_repository is None:
+        _world_repository = WorldRepository()
+    return _world_repository
 
 
 class TherapeuticSettings(BaseModel):
@@ -40,7 +50,16 @@ class UpdateSessionRequest(BaseModel):
 async def create_session(
     request: CreateSessionRequest,
     current_player: TokenData = Depends(get_current_active_player),
+    world_repo: WorldRepository = Depends(get_world_repository),
 ) -> dict[str, Any]:
+    # Validate world exists
+    world = world_repo.get_world(request.world_id)
+    if world is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"World {request.world_id} not found",
+        )
+
     session_id = str(uuid.uuid4())
     now = datetime.utcnow().isoformat()
     _SESSIONS[session_id] = {

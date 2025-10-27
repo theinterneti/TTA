@@ -121,7 +121,7 @@ class MockRedisClient:
             keys = list(self._data.keys())
         else:
             # Basic pattern matching
-            keys = [key for key in self._data.keys() if pattern.replace("*", "") in key]
+            keys = [key for key in self._data if pattern.replace("*", "") in key]
 
         logger.debug(f"Mock Redis KEYS: {pattern} = {len(keys)} keys")
         return keys

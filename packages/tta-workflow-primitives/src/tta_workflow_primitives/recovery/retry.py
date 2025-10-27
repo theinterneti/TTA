@@ -57,7 +57,7 @@ class RetryPrimitive(WorkflowPrimitive[Any, Any]):
         self,
         primitive: WorkflowPrimitive,
         strategy: RetryStrategy | None = None,
-    ):
+    ) -> None:
         """
         Initialize retry primitive.
 

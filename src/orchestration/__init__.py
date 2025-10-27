@@ -21,6 +21,11 @@ Decorators:
 """
 
 from .component import Component, ComponentStatus
+from .component_loader import (
+    ComponentLoader,
+    FilesystemComponentLoader,
+    MockComponentLoader,
+)
 from .config import TTAConfig
 from .decorators import (
     deprecated,
@@ -38,6 +43,9 @@ __all__ = [
     "TTAConfig",
     "Component",
     "ComponentStatus",
+    "ComponentLoader",
+    "FilesystemComponentLoader",
+    "MockComponentLoader",
     "log_entry_exit",
     "timing_decorator",
     "retry",

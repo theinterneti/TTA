@@ -1,7 +1,6 @@
 import asyncio
 
 import pytest
-
 from tta_ai.orchestration.tools.models import ToolParameter, ToolSpec
 from tta_ai.orchestration.tools.redis_tool_registry import RedisToolRegistry
 

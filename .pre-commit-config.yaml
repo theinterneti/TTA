@@ -10,6 +10,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: ^(.github/workflows/pr-automation\.yml|.github/workflows/comprehensive-test-battery\.yml)
       - id: check-toml
       - id: check-json
       - id: check-added-large-files
@@ -44,7 +45,7 @@ repos:
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
-        exclude: ^(tests/|docs/|scripts/|examples/)
+        files: ^src/
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets
@@ -79,7 +80,7 @@ repos:
             "--convention=google",
             "--add-ignore=D100,D101,D102,D103,D104,D105,D106,D107,D212",
           ]
-        exclude: ^(tests/|docs/|scripts/|examples/|tta\.prototype/|tta\.dev/|tta\.prod/)
+        files: ^src/
 
   # YAML formatting
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -101,6 +102,14 @@ repos:
         files: ^tests/.*\.py$
         pass_filenames: true
 
+      # Custom hook: Validate agentic primitives frontmatter
+      - id: validate-agentic-frontmatter
+        name: Validate agentic primitives frontmatter
+        entry: python scripts/validate-agentic-frontmatter.py
+        language: system
+        files: ^\.github/(instructions|chatmodes|prompts|specs)/.*\.md$
+        pass_filenames: false
+
 # Configuration for specific tools
 ci:
   autofix_commit_msg: |
@@ -114,11 +123,12 @@ ci:
   skip: []
   submodules: false
 
-# Exclude patterns
+# Exclude patterns - Only exclude generated/cache/vendor files
 exclude: |
   (?x)^(
     \.venv/|
     venv/|
+    venv-staging/|
     __pycache__/|
     \.git/|
     \.mypy_cache/|
@@ -137,16 +147,8 @@ exclude: |
     \.env|
     \.env\..*|
     uv\.lock|
+    node_modules/|
+    package-lock\.json|
     .*\.backup\.\d+|
-    tta/prod/src/utils/neo4j_utils\.py|
-    validate_live_databases\.py|
-    templates/.*\.json|
-    .*\.k8s/.*\.yaml|
-    scripts/manual_mutation_test\.py|
-    scripts/setup_mutants_env\.py|
-    tests/contract/.*|
-    tests/contracts/.*|
-    tests/integration/.*|
-    tests/unit/.*|
-    tests/performance/.*
+    templates/.*\.json
   )$

@@ -8,10 +8,13 @@ Usage:
     python scripts/observability/examples.py
 """
 
+import builtins
+import contextlib
 import subprocess
 import time
-from dev_metrics import track_execution, get_collector
+
 from dashboard import generate_dashboard
+from dev_metrics import get_collector, track_execution
 
 
 # Example 1: Track test execution
@@ -24,10 +27,10 @@ def run_unit_tests():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Unit tests failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -40,10 +43,10 @@ def run_integration_tests():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Integration tests failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -57,10 +60,10 @@ def build_docker_image():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Docker build failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -74,10 +77,10 @@ def run_ruff_lint():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Ruff lint failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -90,10 +93,10 @@ def run_pyright():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Pyright failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -121,14 +124,14 @@ def run_complete_workflow():
     print("\n" + "="*60)
     print("Running Complete Development Workflow")
     print("="*60 + "\n")
-    
+
     operations = [
         ("Linting", run_ruff_lint),
         ("Type Checking", run_pyright),
         ("Unit Tests", run_unit_tests),
         ("Integration Tests", run_integration_tests),
     ]
-    
+
     results = {}
     for name, operation in operations:
         try:
@@ -137,7 +140,7 @@ def run_complete_workflow():
             results[name] = "✓ PASSED"
         except Exception as e:
             results[name] = f"✗ FAILED: {str(e)[:50]}"
-    
+
     print("\n" + "="*60)
     print("Workflow Results:")
     print("="*60)
@@ -151,15 +154,15 @@ def view_metrics_summary():
     """View metrics summary."""
     collector = get_collector()
     summary = collector.get_metrics_summary(days=7)
-    
+
     print("\n" + "="*60)
     print("Development Metrics Summary (Last 7 Days)")
     print("="*60 + "\n")
-    
+
     if not summary:
         print("No metrics available yet.")
         return
-    
+
     for name, metrics in sorted(summary.items()):
         print(f"{name}:")
         print(f"  Total Executions: {metrics['total_executions']}")
@@ -177,12 +180,12 @@ def generate_metrics_dashboard():
     print("\n" + "="*60)
     print("Generating Metrics Dashboard")
     print("="*60 + "\n")
-    
+
     generate_dashboard(
         output_file="dev_metrics_dashboard.html",
         days=30
     )
-    
+
     print("\nDashboard generated: dev_metrics_dashboard.html")
     print("Open in browser to view visualizations.")
 
@@ -192,18 +195,18 @@ def view_recent_metrics(operation_name: str = None, limit: int = 5):
     """View recent metrics for a specific operation."""
     collector = get_collector()
     recent = collector.get_recent_metrics(name=operation_name, limit=limit)
-    
+
     print("\n" + "="*60)
     if operation_name:
         print(f"Recent Metrics for: {operation_name}")
     else:
         print("Recent Metrics (All Operations)")
     print("="*60 + "\n")
-    
+
     if not recent:
         print("No recent metrics found.")
         return
-    
+
     for metric in recent:
         status_symbol = "✓" if metric["status"] == "success" else "✗"
         print(f"{status_symbol} {metric['name']}")
@@ -220,16 +223,16 @@ def cleanup_old_metrics(days_to_keep: int = 30):
     """Cleanup metrics older than specified days."""
     collector = get_collector()
     deleted = collector.clear_old_metrics(days_to_keep=days_to_keep)
-    
+
     print(f"\nCleaned up {deleted} old metrics files (keeping last {days_to_keep} days)")
 
 
 if __name__ == "__main__":
     import sys
-    
+
     if len(sys.argv) > 1:
         command = sys.argv[1]
-        
+
         if command == "workflow":
             run_complete_workflow()
         elif command == "summary":
@@ -245,24 +248,18 @@ if __name__ == "__main__":
         elif command == "demo":
             # Run demo operations
             print("Running demo operations...")
-            
+
             # Successful operations
-            try:
+            with contextlib.suppress(builtins.BaseException):
                 run_ruff_lint()
-            except:
-                pass
-            
-            try:
+
+            with contextlib.suppress(builtins.BaseException):
                 run_pyright()
-            except:
-                pass
-            
+
             # Failed operation
-            try:
+            with contextlib.suppress(builtins.BaseException):
                 flaky_operation()
-            except:
-                pass
-            
+
             # View results
             view_metrics_summary()
             generate_metrics_dashboard()
@@ -286,4 +283,3 @@ if __name__ == "__main__":
         print("  recent [operation] - View recent metrics")
         print("  cleanup [days] - Cleanup old metrics")
         print("  demo       - Run demo operations")
-

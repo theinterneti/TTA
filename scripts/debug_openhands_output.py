@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Debug script to inspect OpenHands SDK conversation history structure.

@@ -95,7 +95,7 @@ async def test_openrouter_connection():
                     print(f"Error: {error_text}")
                     return False
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         print("❌ API request timed out")
         print("💡 Check your internet connection")
         return False
@@ -136,41 +136,41 @@ async def test_simple_completion():
 
     try:
         print("📤 Sending test completion request...")
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                url, headers=headers, json=payload, timeout=30
-            ) as response:
-                if response.status == 200:
-                    data = await response.json()
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(url, headers=headers, json=payload, timeout=30) as response,
+        ):
+            if response.status == 200:
+                data = await response.json()
 
-                    if "choices" in data and len(data["choices"]) > 0:
-                        content = data["choices"][0]["message"]["content"]
-                        print("✅ Completion successful!")
-                        print(f"📝 Response: {content}")
+                if "choices" in data and len(data["choices"]) > 0:
+                    content = data["choices"][0]["message"]["content"]
+                    print("✅ Completion successful!")
+                    print(f"📝 Response: {content}")
 
-                        # Check usage stats
-                        usage = data.get("usage", {})
-                        if usage:
-                            print("📊 Token usage:")
-                            print(f"   Prompt tokens: {usage.get('prompt_tokens', 0)}")
-                            print(
-                                f"   Completion tokens: {usage.get('completion_tokens', 0)}"
-                            )
-                            print(f"   Total tokens: {usage.get('total_tokens', 0)}")
+                    # Check usage stats
+                    usage = data.get("usage", {})
+                    if usage:
+                        print("📊 Token usage:")
+                        print(f"   Prompt tokens: {usage.get('prompt_tokens', 0)}")
+                        print(
+                            f"   Completion tokens: {usage.get('completion_tokens', 0)}"
+                        )
+                        print(f"   Total tokens: {usage.get('total_tokens', 0)}")
 
-                        return True
-                    else:
-                        print("❌ No completion in response")
-                        print(f"Response: {data}")
-                        return False
-
+                    return True
                 else:
-                    print(f"❌ Completion request failed: {response.status}")
-                    error_text = await response.text()
-                    print(f"Error: {error_text}")
+                    print("❌ No completion in response")
+                    print(f"Response: {data}")
                     return False
 
-    except asyncio.TimeoutError:
+            else:
+                print(f"❌ Completion request failed: {response.status}")
+                error_text = await response.text()
+                print(f"Error: {error_text}")
+                return False
+
+    except TimeoutError:
         print("❌ Completion request timed out")
         return False
     except Exception as e:

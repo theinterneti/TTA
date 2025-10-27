@@ -53,7 +53,7 @@ class RouterPrimitive(WorkflowPrimitive[Any, Any]):
         routes: dict[str, WorkflowPrimitive],
         router_fn: Callable[[Any, WorkflowContext], str],
         default: str | None = None,
-    ):
+    ) -> None:
         """
         Initialize router primitive.
 

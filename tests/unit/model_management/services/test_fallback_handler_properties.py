@@ -9,9 +9,7 @@ from datetime import datetime
 from unittest.mock import AsyncMock
 
 import pytest
-from hypothesis import assume, given, settings
-from hypothesis import strategies as st
-
+from hypothesis import assume, given, settings, strategies as st
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,
@@ -142,7 +140,7 @@ class TestFallbackHandlerProperties:
         import asyncio
 
         # Ensure we have at least 2 unique model IDs
-        assume(len(set(m.model_id for m in models)) >= 2)
+        assume(len({m.model_id for m in models}) >= 2)
 
         # Create handler
         mock_provider = AsyncMock()
@@ -333,7 +331,7 @@ class TestFallbackHandlerProperties:
         import asyncio
 
         # Ensure unique model IDs
-        assume(len(set(m.model_id for m in models)) >= 2)
+        assume(len({m.model_id for m in models}) >= 2)
 
         # Create handler
         mock_provider = AsyncMock()

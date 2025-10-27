@@ -2,7 +2,6 @@ import asyncio
 import json
 
 import pytest
-
 from tta_ai.orchestration.proxies import InputProcessorAgentProxy
 from tta_ai.orchestration.registries import RedisAgentRegistry
 

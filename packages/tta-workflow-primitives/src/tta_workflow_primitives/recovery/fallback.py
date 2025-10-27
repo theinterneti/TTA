@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 class FallbackStrategy:
     """Strategy for fallback to alternative primitive."""
 
-    def __init__(self, fallback_primitive: WorkflowPrimitive):
+    def __init__(self, fallback_primitive: WorkflowPrimitive) -> None:
         """
         Initialize fallback strategy.
 
@@ -40,7 +40,7 @@ class FallbackPrimitive(WorkflowPrimitive[Any, Any]):
         self,
         primary: WorkflowPrimitive,
         fallback: WorkflowPrimitive,
-    ):
+    ) -> None:
         """
         Initialize fallback primitive.
 

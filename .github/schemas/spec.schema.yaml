@@ -1,0 +1,9 @@
+# Schema for .github/specs/*.spec.md YAML frontmatter
+# Validates specification template files for agentic primitives
+
+type: enum('feature', 'api', 'component', required=True)
+category: str(required=True)
+status: enum('draft', 'review', 'approved', 'implemented', required=True)
+priority: enum('critical', 'high', 'medium', 'low', required=True)
+created: str(required=True)
+updated: str(required=True)

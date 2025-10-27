@@ -132,9 +132,7 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
             if self.fallback_to_mock:
                 logger.warning("Falling back to standard Redis message delivery")
                 return await super().send_message(sender, recipient, message)
-            return MessageResult(
-                message_id=message.message_id, delivered=False, error=str(e)
-            )
+            return MessageResult(message_id=message.message_id, delivered=False, error=str(e))
 
     async def send_message(
         self, sender: AgentId, recipient: AgentId, message: AgentMessage
@@ -159,9 +157,7 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
                 if self.fallback_to_mock:
                     logger.info("Falling back to standard Redis delivery")
                     return await super().send_message(sender, recipient, message)
-                return MessageResult(
-                    message_id=message.message_id, delivered=False, error=str(e)
-                )
+                return MessageResult(message_id=message.message_id, delivered=False, error=str(e))
 
         # Use standard Redis message delivery
         return await super().send_message(sender, recipient, message)
@@ -325,9 +321,7 @@ class BatchedMessageProcessor:
         self._processing_semaphore = asyncio.Semaphore(max_concurrent_batches)
         self._batch_timer: asyncio.Task | None = None
 
-    async def add_message(
-        self, message: dict[str, Any], processor_func: Callable
-    ) -> Any:
+    async def add_message(self, message: dict[str, Any], processor_func: Callable) -> Any:
         """Add message to batch for processing."""
         async with self._batch_lock:
             # Add message to pending batch
@@ -388,24 +382,18 @@ class BatchedMessageProcessor:
             for group in processor_groups.values():
                 await self._process_group(group["processor"], group["entries"])
 
-    async def _process_group(
-        self, processor_func: Callable, entries: list[dict[str, Any]]
-    ):
+    async def _process_group(self, processor_func: Callable, entries: list[dict[str, Any]]):
         """Process a group of messages with the same processor."""
         tasks = []
 
         for entry in entries:
-            task = asyncio.create_task(
-                self._process_single_message(processor_func, entry)
-            )
+            task = asyncio.create_task(self._process_single_message(processor_func, entry))
             tasks.append(task)
 
         # Wait for all messages in the group to complete
         await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def _process_single_message(
-        self, processor_func: Callable, entry: dict[str, Any]
-    ):
+    async def _process_single_message(self, processor_func: Callable, entry: dict[str, Any]):
         """Process a single message and set its future result."""
         try:
             result = await processor_func(entry["message"])
@@ -469,9 +457,7 @@ class ScalableWorkflowCoordinator:
 
                 # Execute workflow with timeout
                 result = await asyncio.wait_for(
-                    self._execute_workflow_steps(
-                        workflow_id, workflow_steps, context or {}
-                    ),
+                    self._execute_workflow_steps(workflow_id, workflow_steps, context or {}),
                     timeout=self.workflow_timeout_s,
                 )
 
@@ -485,10 +471,8 @@ class ScalableWorkflowCoordinator:
 
                 return result
 
-            except asyncio.TimeoutError:
-                logger.error(
-                    f"Workflow {workflow_id} timed out after {self.workflow_timeout_s}s"
-                )
+            except TimeoutError:
+                logger.error(f"Workflow {workflow_id} timed out after {self.workflow_timeout_s}s")
                 self._system_monitor.end_workflow(workflow_id, success=False)
 
                 async with self._workflow_lock:
@@ -528,21 +512,13 @@ class ScalableWorkflowCoordinator:
 
             try:
                 if step_type == "ipa":
-                    result = await self._execute_ipa_step(
-                        step_config, accumulated_context
-                    )
+                    result = await self._execute_ipa_step(step_config, accumulated_context)
                 elif step_type == "wba":
-                    result = await self._execute_wba_step(
-                        step_config, accumulated_context
-                    )
+                    result = await self._execute_wba_step(step_config, accumulated_context)
                 elif step_type == "nga":
-                    result = await self._execute_nga_step(
-                        step_config, accumulated_context
-                    )
+                    result = await self._execute_nga_step(step_config, accumulated_context)
                 elif step_type == "parallel":
-                    result = await self._execute_parallel_steps(
-                        step_config, accumulated_context
-                    )
+                    result = await self._execute_parallel_steps(step_config, accumulated_context)
                 else:
                     raise ValueError(f"Unknown step type: {step_type}")
 
@@ -576,13 +552,9 @@ class ScalableWorkflowCoordinator:
         if self._batch_processor:
             # Use batched processing
             async def ipa_processor(message):
-                return await self.enhanced_coordinator.ipa_adapter.process_input(
-                    message["text"]
-                )
+                return await self.enhanced_coordinator.ipa_adapter.process_input(message["text"])
 
-            result = await self._batch_processor.add_message(
-                {"text": text}, ipa_processor
-            )
+            result = await self._batch_processor.add_message({"text": text}, ipa_processor)
         else:
             # Direct processing
             result = await self.enhanced_coordinator.ipa_adapter.process_input(text)
@@ -599,10 +571,8 @@ class ScalableWorkflowCoordinator:
         if self._batch_processor:
             # Use batched processing
             async def wba_processor(message):
-                return (
-                    await self.enhanced_coordinator.wba_adapter.process_world_request(
-                        message["world_id"], message.get("updates")
-                    )
+                return await self.enhanced_coordinator.wba_adapter.process_world_request(
+                    message["world_id"], message.get("updates")
                 )
 
             result = await self._batch_processor.add_message(

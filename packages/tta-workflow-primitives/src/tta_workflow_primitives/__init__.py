@@ -10,10 +10,10 @@ from .recovery.timeout import TimeoutError, TimeoutPrimitive
 
 # APM support (optional)
 try:
-    from .apm import setup_apm, get_tracer, get_meter, is_apm_enabled
-    from .apm.instrumented import APMWorkflowPrimitive
+    from .apm import get_meter, get_tracer, is_apm_enabled, setup_apm
     from .apm.decorators import trace_workflow, track_metric
-    
+    from .apm.instrumented import APMWorkflowPrimitive
+
     _apm_exports = [
         "setup_apm",
         "get_tracer",
@@ -41,4 +41,3 @@ __all__ = [
 ] + _apm_exports
 
 __version__ = "0.2.0"
-

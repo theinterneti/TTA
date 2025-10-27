@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Test script to verify the FastAPI server can start and respond to requests.

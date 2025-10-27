@@ -75,9 +75,9 @@ class TestFreeModelsFilter:
                     "yes",
                     "on",
                 )
-                assert (
-                    result == expected
-                ), f"Failed for {env_value}, expected {expected}, got {result}"
+                assert result == expected, (
+                    f"Failed for {env_value}, expected {expected}, got {result}"
+                )
 
     def test_float_parsing(self):
         """Test that float environment variables are parsed correctly."""
@@ -92,9 +92,9 @@ class TestFreeModelsFilter:
             with patch.dict(os.environ, {"TEST_FLOAT": env_value}):
                 # Simulate the float parsing logic
                 result = float(os.getenv("TEST_FLOAT", "0.0"))
-                assert (
-                    result == expected
-                ), f"Failed for {env_value}, expected {expected}, got {result}"
+                assert result == expected, (
+                    f"Failed for {env_value}, expected {expected}, got {result}"
+                )
 
     def test_free_models_filtering(self):
         """Test filtering to show only free models."""

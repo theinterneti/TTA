@@ -13,7 +13,6 @@ from typing import Any
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
@@ -125,12 +124,16 @@ class TestRealAgentPerformance:
             p95_latency=(
                 statistics.quantiles(latencies, n=20)[18]
                 if len(latencies) >= 20
-                else max(latencies) if latencies else 0
+                else max(latencies)
+                if latencies
+                else 0
             ),
             p99_latency=(
                 statistics.quantiles(latencies, n=100)[98]
                 if len(latencies) >= 100
-                else max(latencies) if latencies else 0
+                else max(latencies)
+                if latencies
+                else 0
             ),
             throughput_rps=num_requests / total_time if total_time > 0 else 0,
             error_rate=failed / num_requests if num_requests > 0 else 0,
@@ -147,12 +150,12 @@ class TestRealAgentPerformance:
 
         # Performance assertions
         assert metrics.error_rate < 0.1, f"Error rate too high: {metrics.error_rate}"
-        assert (
-            metrics.average_latency < 5000
-        ), f"Average latency too high: {metrics.average_latency}ms"
-        assert (
-            metrics.throughput_rps > 1
-        ), f"Throughput too low: {metrics.throughput_rps} RPS"
+        assert metrics.average_latency < 5000, (
+            f"Average latency too high: {metrics.average_latency}ms"
+        )
+        assert metrics.throughput_rps > 1, (
+            f"Throughput too low: {metrics.throughput_rps} RPS"
+        )
 
         return metrics
 
@@ -167,12 +170,12 @@ class TestRealAgentPerformance:
 
         # Performance assertions
         assert metrics.error_rate < 0.1, f"Error rate too high: {metrics.error_rate}"
-        assert (
-            metrics.average_latency < 8000
-        ), f"Average latency too high: {metrics.average_latency}ms"
-        assert (
-            metrics.throughput_rps > 0.5
-        ), f"Throughput too low: {metrics.throughput_rps} RPS"
+        assert metrics.average_latency < 8000, (
+            f"Average latency too high: {metrics.average_latency}ms"
+        )
+        assert metrics.throughput_rps > 0.5, (
+            f"Throughput too low: {metrics.throughput_rps} RPS"
+        )
 
         return metrics
 
@@ -193,12 +196,12 @@ class TestRealAgentPerformance:
 
         # Performance assertions (NGA typically slower due to content generation)
         assert metrics.error_rate < 0.15, f"Error rate too high: {metrics.error_rate}"
-        assert (
-            metrics.average_latency < 15000
-        ), f"Average latency too high: {metrics.average_latency}ms"
-        assert (
-            metrics.throughput_rps > 0.2
-        ), f"Throughput too low: {metrics.throughput_rps} RPS"
+        assert metrics.average_latency < 15000, (
+            f"Average latency too high: {metrics.average_latency}ms"
+        )
+        assert metrics.throughput_rps > 0.2, (
+            f"Throughput too low: {metrics.throughput_rps} RPS"
+        )
 
         return metrics
 
@@ -295,12 +298,12 @@ class TestRealAgentPerformance:
 
         # Verify throughput scaling
         for concurrency, result in throughput_results.items():
-            assert (
-                result["workflows_per_second"] > 0
-            ), f"No throughput at concurrency {concurrency}"
-            assert (
-                result["successful_workflows"] == concurrency
-            ), f"Not all workflows succeeded at concurrency {concurrency}"
+            assert result["workflows_per_second"] > 0, (
+                f"No throughput at concurrency {concurrency}"
+            )
+            assert result["successful_workflows"] == concurrency, (
+                f"Not all workflows succeeded at concurrency {concurrency}"
+            )
 
         return throughput_results
 
@@ -350,18 +353,18 @@ class TestRealAgentPerformance:
         success_rate = successful_count / request_count if request_count > 0 else 0
 
         # Performance assertions for sustained load
-        assert (
-            success_rate > 0.8
-        ), f"Success rate too low under sustained load: {success_rate}"
-        assert (
-            actual_rps >= target_rps * 0.8
-        ), f"Actual RPS too low: {actual_rps} (target: {target_rps})"
+        assert success_rate > 0.8, (
+            f"Success rate too low under sustained load: {success_rate}"
+        )
+        assert actual_rps >= target_rps * 0.8, (
+            f"Actual RPS too low: {actual_rps} (target: {target_rps})"
+        )
 
         if latencies:
             avg_latency = statistics.mean(latencies)
-            assert (
-                avg_latency < 10000
-            ), f"Average latency too high under sustained load: {avg_latency}ms"
+            assert avg_latency < 10000, (
+                f"Average latency too high under sustained load: {avg_latency}ms"
+            )
 
         return {
             "duration": actual_duration,
@@ -374,7 +377,9 @@ class TestRealAgentPerformance:
             "p95_latency": (
                 statistics.quantiles(latencies, n=20)[18]
                 if len(latencies) >= 20
-                else max(latencies) if latencies else 0
+                else max(latencies)
+                if latencies
+                else 0
             ),
         }
 
@@ -412,9 +417,9 @@ class TestRealAgentPerformance:
                 memory_increase = current_memory - baseline_memory
 
                 # Memory should not grow excessively
-                assert (
-                    memory_increase < 500
-                ), f"Memory usage increased too much: {memory_increase}MB"
+                assert memory_increase < 500, (
+                    f"Memory usage increased too much: {memory_increase}MB"
+                )
 
         # Final memory check
         final_memory = process.memory_info().rss / 1024 / 1024  # MB

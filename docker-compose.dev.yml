@@ -1,7 +1,6 @@
-version: '3.8'
 services:
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5.26.1-community
     container_name: ${CONTAINER_PREFIX:-tta-dev}-neo4j
     ports:
     - 7474:7474
@@ -36,7 +35,7 @@ services:
     security_opt:
     - no-new-privileges:true
   redis:
-    image: redis:7-alpine
+    image: redis:7.2.4-alpine3.19
     container_name: ${CONTAINER_PREFIX:-tta-dev}-redis
     ports:
     - 6379:6379
@@ -88,7 +87,7 @@ services:
     security_opt:
     - no-new-privileges:true
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:10.2.3:10.2.3
     container_name: tta-grafana-dev
     ports:
     - 3000:3000
@@ -103,7 +102,7 @@ services:
     security_opt:
     - no-new-privileges:true
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.48.1:latest
     container_name: tta-prometheus-dev
     ports:
     - 9090:9090

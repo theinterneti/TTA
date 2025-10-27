@@ -6,7 +6,7 @@ decorators for securing API endpoints.
 """
 
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import Depends, HTTPException, status
@@ -118,11 +118,9 @@ def create_access_token(
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -139,7 +137,7 @@ def create_refresh_token(data: dict[str, Any]) -> str:
         str: The encoded JWT refresh token
     """
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(UTC) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "refresh"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -172,11 +170,7 @@ def verify_token(token: str) -> TokenData:
         if player_id is None:
             raise AuthenticationError("Invalid token: missing player ID")
 
-        exp = (
-            datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
-            if exp_timestamp
-            else None
-        )
+        exp = datetime.fromtimestamp(exp_timestamp, tz=UTC) if exp_timestamp else None
 
         return TokenData(player_id=player_id, username=username, email=email, exp=exp)
     except JWTError as e:
@@ -229,7 +223,7 @@ async def get_current_player(
         token_data = verify_token(credentials.credentials)
 
         # Check if token is expired
-        if token_data.exp and datetime.now(timezone.utc) > token_data.exp:
+        if token_data.exp and datetime.now(UTC) > token_data.exp:
             raise AuthenticationError("Token has expired")
 
         return token_data

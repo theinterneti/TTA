@@ -201,7 +201,6 @@ async def test_scenario_4_cost_comparison():
     ]
 
     total_cost = 0.0
-    total_cached_cost = 0.0
 
     print(f"\n📤 Simulating {len(prompts)} requests...")
 
