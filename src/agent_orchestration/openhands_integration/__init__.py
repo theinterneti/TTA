@@ -24,4 +24,3 @@ __all__ = [
     "OpenHandsIntegrationConfig",
     "OpenHandsTaskResult",
 ]
-

@@ -53,7 +53,8 @@ jobs:
       - name: Run ruff linter
         run: |
           echo "Running ruff linter..."
-          uvx ruff check src/ tests/ --output-format=github
+          echo "Ruff version: $(uvx ruff --version)"
+          uvx ruff check src/ tests/ --output-format=github --statistics
         continue-on-error: false
 
       - name: Run ruff formatter check
@@ -213,7 +214,7 @@ jobs:
   summary:
     name: Code Quality Summary
     runs-on: ubuntu-latest
-    needs: [lint, format-check, type-check, complexity]
+    needs: [lint, type-check, complexity]
     if: always()
 
     steps:
@@ -224,21 +225,15 @@ jobs:
 
           # Check job results
           if [[ "${{ needs.lint.result }}" == "success" ]]; then
-            echo "✅ **Linting (ruff):** Passed" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Linting & Formatting (Ruff):** Passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Linting (ruff):** Failed" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [[ "${{ needs.format-check.result }}" == "success" ]]; then
-            echo "✅ **Format Check (black/isort):** Passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Format Check (black/isort):** Failed" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Linting & Formatting (Ruff):** Failed" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.type-check.result }}" == "success" ]]; then
-            echo "✅ **Type Check (mypy):** Passed" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Type Check (Pyright):** Passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Type Check (mypy):** Failed" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Type Check (Pyright):** Failed" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.complexity.result }}" == "success" ]]; then
@@ -250,26 +245,23 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Quick Fixes" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "To fix formatting issues locally:" >> $GITHUB_STEP_SUMMARY
+          echo "To fix linting and formatting issues locally:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "uv run black src/ tests/" >> $GITHUB_STEP_SUMMARY
-          echo "uv run isort src/ tests/" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "# Auto-fix linting issues" >> $GITHUB_STEP_SUMMARY
+          echo "uv run ruff check --fix src/ tests/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "To check linting issues locally:" >> $GITHUB_STEP_SUMMARY
-          echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "uv run ruff check src/ tests/" >> $GITHUB_STEP_SUMMARY
+          echo "# Auto-format code" >> $GITHUB_STEP_SUMMARY
+          echo "uv run ruff format src/ tests/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "To check type issues locally:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "uv run mypy src/" >> $GITHUB_STEP_SUMMARY
+          echo "uvx pyright src/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Check overall status
         run: |
           if [[ "${{ needs.lint.result }}" != "success" ]] || \
-             [[ "${{ needs.format-check.result }}" != "success" ]] || \
              [[ "${{ needs.type-check.result }}" != "success" ]]; then
             echo "Code quality checks failed. Please fix the issues and try again."
             exit 1

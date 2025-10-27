@@ -9,7 +9,6 @@ Usage:
     generate_dashboard(output_file="dev_metrics_dashboard.html")
 """
 
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any

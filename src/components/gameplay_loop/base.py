@@ -16,6 +16,7 @@ from enum import Enum
 from typing import Any
 
 from tta_ai.orchestration.service import AgentOrchestrationService
+
 from src.components.base import Component
 
 logger = logging.getLogger(__name__)

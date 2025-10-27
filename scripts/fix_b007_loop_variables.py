@@ -195,7 +195,7 @@ def main():
             print(f"Warning: File not found: {file_path}", file=sys.stderr)
             continue
 
-        if not file_path.suffix == ".py":
+        if file_path.suffix != ".py":
             continue
 
         fixes = analyze_file(file_path)

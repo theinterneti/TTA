@@ -142,7 +142,7 @@ def check_test_coverage(component_path: str, test_path: str) -> dict[str, Any]:
 
             # Find the specific component file in the coverage data
             component_file = None
-            for file_path in data.get("files", {}).keys():
+            for file_path in data.get("files", {}):
                 if component_path in file_path:
                     component_file = file_path
                     break

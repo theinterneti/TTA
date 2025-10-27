@@ -107,4 +107,4 @@ async def test_admin_recover_script(redis_client):
 
     per_agent = await run_recovery(url, key_prefix="ao")
     # Should have recovered at least for our agent
-    assert any(k.startswith("ipa:adminrecov") for k in per_agent.keys())
+    assert any(k.startswith("ipa:adminrecov") for k in per_agent)

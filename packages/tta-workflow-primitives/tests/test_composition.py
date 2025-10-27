@@ -13,7 +13,7 @@ from tta_workflow_primitives.testing import MockPrimitive
 
 
 @pytest.mark.asyncio
-async def test_sequential_composition():
+async def test_sequential_composition() -> None:
     """Test sequential primitive composition."""
     mock1 = MockPrimitive("step1", return_value="result1")
     mock2 = MockPrimitive("step2", return_value="result2")
@@ -31,7 +31,7 @@ async def test_sequential_composition():
 
 
 @pytest.mark.asyncio
-async def test_parallel_composition():
+async def test_parallel_composition() -> None:
     """Test parallel primitive composition."""
     mock1 = MockPrimitive("branch1", return_value="result1")
     mock2 = MockPrimitive("branch2", return_value="result2")
@@ -49,7 +49,7 @@ async def test_parallel_composition():
 
 
 @pytest.mark.asyncio
-async def test_conditional_composition():
+async def test_conditional_composition() -> None:
     """Test conditional primitive composition."""
     then_mock = MockPrimitive("then", return_value="then_result")
     else_mock = MockPrimitive("else", return_value="else_result")
@@ -78,7 +78,7 @@ async def test_conditional_composition():
 
 
 @pytest.mark.asyncio
-async def test_mixed_composition():
+async def test_mixed_composition() -> None:
     """Test mixed sequential and parallel composition."""
     step1 = MockPrimitive("step1", return_value="processed")
     branch1 = MockPrimitive("branch1", return_value="b1")
@@ -97,7 +97,7 @@ async def test_mixed_composition():
 
 
 @pytest.mark.asyncio
-async def test_lambda_primitive():
+async def test_lambda_primitive() -> None:
     """Test lambda primitive."""
 
     def transform(x: str, ctx: WorkflowContext) -> str:
@@ -112,7 +112,7 @@ async def test_lambda_primitive():
 
 
 @pytest.mark.asyncio
-async def test_workflow_context():
+async def test_workflow_context() -> None:
     """Test workflow context passing."""
     collected_contexts = []
 

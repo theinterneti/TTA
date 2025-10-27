@@ -5,6 +5,7 @@ This module provides support for custom API providers like OpenAI, Anthropic,
 and other compatible APIs.
 """
 
+import contextlib
 import logging
 from collections.abc import AsyncGenerator
 from datetime import datetime

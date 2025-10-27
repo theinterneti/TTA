@@ -226,7 +226,7 @@ class ManualTestingGuideValidator:
                 paths = spec.get("paths", {})
 
                 # Check that endpoints have proper documentation
-                gameplay_endpoints = [p for p in paths.keys() if "/gameplay/" in p]
+                gameplay_endpoints = [p for p in paths if "/gameplay/" in p]
 
                 if len(gameplay_endpoints) < 3:
                     self.log_validation(
@@ -240,7 +240,7 @@ class ManualTestingGuideValidator:
                 documented_properly = True
                 for endpoint in gameplay_endpoints:
                     endpoint_info = paths[endpoint]
-                    for method, method_info in endpoint_info.items():
+                    for _method, method_info in endpoint_info.items():
                         if "responses" not in method_info:
                             documented_properly = False
                             break

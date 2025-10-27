@@ -49,6 +49,7 @@ Enhanced config format supports multiple validation types:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 import time

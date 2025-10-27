@@ -72,9 +72,9 @@ class PlayerProfileSchemaManager:
         try:
             from neo4j.exceptions import (
                 AuthError,
+                ClientError as _ClientError,
+                ServiceUnavailable as _ServiceUnavailable,
             )
-            from neo4j.exceptions import ClientError as _ClientError
-            from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
         except Exception:  # pragma: no cover - neo4j not installed path
             AuthError = Exception  # type: ignore
             _ServiceUnavailable = ServiceUnavailable  # type: ignore

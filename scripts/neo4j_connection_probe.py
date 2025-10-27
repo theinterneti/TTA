@@ -21,14 +21,14 @@ def attempt_connect(
     """Replicate the project's connect() logic with retries and backoff.
     Returns True/False and a summary list of (attempt_idx, elapsed, outcome, err_str).
     """
-    t0 = time.time()
+    time.time()
     try:
         from neo4j import GraphDatabase
         from neo4j.exceptions import (
             AuthError,
+            ClientError as _ClientError,
+            ServiceUnavailable as _ServiceUnavailable,
         )
-        from neo4j.exceptions import ClientError as _ClientError
-        from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
     except Exception as e:
         logger.error("neo4j package not installed: %s", e)
         return False, [(0, 0.0, "no-neo4j", str(e))]

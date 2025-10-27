@@ -32,6 +32,8 @@ except ImportError:
         pass
 
 
+import builtins
+
 from ..apm_setup import get_meter
 
 logger = logging.getLogger(__name__)
@@ -199,7 +201,7 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
 
             return result
 
-        except asyncio.TimeoutError as e:
+        except builtins.TimeoutError as e:
             # Timeout - operation exceeded timeout + grace period
             self._total_failures += 1
 

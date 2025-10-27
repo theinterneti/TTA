@@ -130,7 +130,7 @@ def test_provider_configuration():
                 base_url="https://openrouter.ai/api/v1",
             )
 
-            provider = OpenRouterProvider(config)
+            OpenRouterProvider(config)
             print("✅ OpenRouter provider configured successfully")
             return True
         print("⚠️  OpenRouter API key not configured, skipping provider test")

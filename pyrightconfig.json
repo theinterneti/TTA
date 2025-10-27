@@ -1,6 +1,8 @@
 {
   "include": [
-    "src"
+    "src",
+    "packages/tta-ai-framework/src",
+    "packages/tta-narrative-engine/src"
   ],
   "exclude": [
     "**/node_modules",
@@ -11,7 +13,13 @@
     ".git",
     "build",
     "dist",
-    "*.egg-info"
+    "*.egg-info",
+    ".uv_cache",
+    "tta.prototype",
+    "tta.dev",
+    "tta.prod",
+    "obsolete",
+    "artifacts"
   ],
   "ignore": [
     "tests/comprehensive_battery",
@@ -76,11 +84,22 @@
       "pythonVersion": "3.12",
       "pythonPlatform": "Linux",
       "extraPaths": [
-        "tta/prod/src"
+        "packages/tta-ai-framework/src",
+        "packages/tta-narrative-engine/src"
       ]
+    },
+    {
+      "root": "packages/tta-ai-framework/src",
+      "pythonVersion": "3.12",
+      "pythonPlatform": "Linux"
+    },
+    {
+      "root": "packages/tta-narrative-engine/src",
+      "pythonVersion": "3.12",
+      "pythonPlatform": "Linux"
     }
   ],
-  "typeCheckingMode": "basic",
+  "typeCheckingMode": "standard",
   "useLibraryCodeForTypes": true,
   "venvPath": ".",
   "venv": ".venv"

@@ -7,16 +7,17 @@ Provides Prometheus-compatible health check metrics for TTA services
 import asyncio
 import logging
 import time
-import yaml
-from typing import Dict, Any, Optional
-from prometheus_client import start_http_server, Gauge, Counter, Info, generate_latest
-import requests
-import redis
-from neo4j import GraphDatabase
+from typing import Any
+
 import psycopg2
+import redis
+import requests
+import uvicorn
+import yaml
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
-import uvicorn
+from neo4j import GraphDatabase
+from prometheus_client import Counter, Gauge, Info, generate_latest
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -32,7 +33,7 @@ class HealthChecker:
     """Health check service for TTA infrastructure"""
 
     def __init__(self, config_path: str = "config.yaml"):
-        with open(config_path, 'r') as f:
+        with open(config_path) as f:
             self.config = yaml.safe_load(f)
 
         self.services = self.config.get('services', {})
@@ -44,7 +45,7 @@ class HealthChecker:
 
         logger.info(f"Initialized health checker for {len(self.services)} services")
 
-    async def check_redis_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_redis_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check Redis service health"""
         start_time = time.time()
         try:
@@ -81,7 +82,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_neo4j_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_neo4j_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check Neo4j service health"""
         start_time = time.time()
         try:
@@ -121,7 +122,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_postgres_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_postgres_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check PostgreSQL service health"""
         start_time = time.time()
         try:
@@ -162,7 +163,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_http_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_http_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check HTTP service health"""
         start_time = time.time()
         try:
@@ -200,7 +201,7 @@ class HealthChecker:
                 'error': str(e)
             }
 
-    async def check_service_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_service_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check health of a single service based on its type"""
         service_type = config.get('type', 'http')
 
@@ -219,7 +220,7 @@ class HealthChecker:
                 'error': f"Unknown service type: {service_type}"
             }
 
-    async def update_metrics(self, service_name: str, result: Dict[str, Any]):
+    async def update_metrics(self, service_name: str, result: dict[str, Any]):
         """Update Prometheus metrics based on health check result"""
         environment = 'staging'
         instance = f"{service_name}-staging"

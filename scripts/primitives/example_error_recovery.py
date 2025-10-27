@@ -6,17 +6,15 @@ This demonstrates how to use retry decorators, error classification,
 and fallback strategies in development scripts.
 """
 
-import subprocess
 import logging
-from pathlib import Path
+import subprocess
 
 from error_recovery import (
+    CircuitBreaker,
+    RetryConfig,
+    classify_error,
     with_retry,
     with_retry_async,
-    RetryConfig,
-    CircuitBreaker,
-    ErrorCategory,
-    classify_error
 )
 
 # Configure logging
@@ -77,7 +75,7 @@ def ensure_dependencies():
 async def fetch_remote_data():
     """Fetch data from remote API with retry."""
     import aiohttp
-    
+
     async with aiohttp.ClientSession() as session:
         async with session.get("https://api.example.com/data") as response:
             response.raise_for_status()
@@ -97,7 +95,7 @@ def create_build_circuit_breaker():
 def run_build_with_circuit_breaker():
     """Run build with circuit breaker protection."""
     circuit_breaker = create_build_circuit_breaker()
-    
+
     def build():
         logger.info("Running build...")
         result = subprocess.run(
@@ -107,7 +105,7 @@ def run_build_with_circuit_breaker():
             check=True
         )
         return result.stdout
-    
+
     try:
         return circuit_breaker.call(build)
     except Exception as e:
@@ -126,7 +124,7 @@ def demonstrate_error_classification():
         Exception("Service temporarily unavailable"),
         ValueError("Invalid input"),
     ]
-    
+
     logger.info("\n=== Error Classification Demo ===")
     for error in test_errors:
         category, severity = classify_error(error)
@@ -147,11 +145,11 @@ def run_linting():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         # Linting errors are permanent, not transient
         raise RuntimeError(f"Linting failed:\n{result.stdout}\n{result.stderr}")
-    
+
     return result.stdout
 
 
@@ -164,19 +162,19 @@ def run_type_checking():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Type checking failed:\n{result.stdout}\n{result.stderr}")
-    
+
     return result.stdout
 
 
 def run_quality_checks():
     """Run all quality checks with error recovery."""
     logger.info("\n=== Running Quality Checks ===\n")
-    
+
     results = {}
-    
+
     # Run linting
     try:
         results['linting'] = run_linting()
@@ -184,7 +182,7 @@ def run_quality_checks():
     except Exception as e:
         logger.error(f"✗ Linting failed: {e}")
         results['linting'] = None
-    
+
     # Run type checking
     try:
         results['type_checking'] = run_type_checking()
@@ -192,7 +190,7 @@ def run_quality_checks():
     except Exception as e:
         logger.error(f"✗ Type checking failed: {e}")
         results['type_checking'] = None
-    
+
     # Run tests
     try:
         results['tests'] = run_tests_simple()
@@ -200,7 +198,7 @@ def run_quality_checks():
     except Exception as e:
         logger.error(f"✗ Tests failed: {e}")
         results['tests'] = None
-    
+
     return results
 
 
@@ -208,7 +206,7 @@ def run_quality_checks():
 def development_workflow():
     """
     Complete development workflow with error recovery.
-    
+
     This demonstrates a realistic development script that:
     1. Ensures dependencies are installed (with fallback)
     2. Runs quality checks (with retry)
@@ -217,7 +215,7 @@ def development_workflow():
     logger.info("\n" + "=" * 60)
     logger.info("Development Workflow with Error Recovery")
     logger.info("=" * 60 + "\n")
-    
+
     # Step 1: Ensure dependencies
     logger.info("Step 1: Ensuring dependencies...")
     try:
@@ -226,31 +224,31 @@ def development_workflow():
     except Exception as e:
         logger.error(f"✗ Failed to ensure dependencies: {e}")
         return False
-    
+
     # Step 2: Run quality checks
     logger.info("\nStep 2: Running quality checks...")
     quality_results = run_quality_checks()
-    
+
     all_passed = all(v is not None for v in quality_results.values())
     if not all_passed:
         logger.warning("⚠ Some quality checks failed")
         return False
-    
+
     logger.info("\n✓ All quality checks passed!")
-    
+
     # Step 3: Build (with circuit breaker)
     logger.info("\nStep 3: Building project...")
     try:
-        build_result = run_build_with_circuit_breaker()
+        run_build_with_circuit_breaker()
         logger.info("✓ Build successful")
     except Exception as e:
         logger.error(f"✗ Build failed: {e}")
         return False
-    
+
     logger.info("\n" + "=" * 60)
     logger.info("✓ Development workflow completed successfully!")
     logger.info("=" * 60 + "\n")
-    
+
     return True
 
 
@@ -258,11 +256,11 @@ def main():
     """Run all examples."""
     # Example 6: Error classification
     demonstrate_error_classification()
-    
+
     # Example 7 & 8: Practical workflow
     # Uncomment to run (requires actual project setup)
     # development_workflow()
-    
+
     logger.info("\n=== Error Recovery Examples Complete ===")
     logger.info("\nTo use in your scripts:")
     logger.info("1. Import: from error_recovery import with_retry, RetryConfig")

@@ -22,8 +22,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from enhanced_preference_ai_server import EnhancedContext, PlayerPreferences
 from tta_ai.orchestration.models import AgentType
+
+from enhanced_preference_ai_server import EnhancedContext, PlayerPreferences
 from src.components.therapeutic_systems_enhanced.therapeutic_integration_system import (
     TherapeuticIntegrationSystem,
 )
@@ -557,7 +558,7 @@ class ContextEngineeringValidator:
 
         # Check therapeutic context consistency
         if scenario.therapeutic_context:
-            for key, value in scenario.therapeutic_context.items():
+            for _key, value in scenario.therapeutic_context.items():
                 context_str = json.dumps(context).lower()
                 if str(value).lower() in context_str:
                     score += 0.2
@@ -588,9 +589,7 @@ class ContextEngineeringValidator:
 
         # Check intensity level compliance
         intensity = scenario.player_preferences.intensity_level
-        if intensity == "gentle" and "gentle" in context_str:
-            score += 0.3
-        elif intensity == "high" and (
+        if intensity == "gentle" and "gentle" in context_str or intensity == "high" and (
             "challenge" in context_str or "intensive" in context_str
         ):
             score += 0.3

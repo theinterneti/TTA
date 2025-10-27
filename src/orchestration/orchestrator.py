@@ -24,11 +24,10 @@ Example:
     ```
 """
 
-import importlib.util
 import logging
 import subprocess
-import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.table import Table
@@ -36,8 +35,12 @@ from rich.table import Table
 from src.common.process_utils import run as safe_run
 
 from .component import Component, ComponentStatus
+from .component_loader import FilesystemComponentLoader
 from .config import TTAConfig
 from .decorators import log_entry_exit, retry, timing_decorator, validate_args
+
+if TYPE_CHECKING:
+    from .component_loader import ComponentLoader
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -62,15 +65,22 @@ class TTAOrchestrator:
         tta_prototype_path: Path to the tta.prototype repository
     """
 
-    def __init__(self, config_path: str | Path | None = None):
+    def __init__(
+        self,
+        config_path: str | Path | None = None,
+        component_loader: "ComponentLoader | None" = None,
+    ):
         """
         Initialize the TTA Orchestrator.
 
         Args:
             config_path: Path to the configuration file. If None, uses default.
+            component_loader: Optional component loader for dependency injection.
+                            If None, uses FilesystemComponentLoader with default paths.
 
         Raises:
-            FileNotFoundError: If a repository path does not exist.
+            FileNotFoundError: If a repository path does not exist (when using
+                             FilesystemComponentLoader).
         """
         self.config = TTAConfig(config_path)
         self.components: dict[str, Component] = {}
@@ -80,11 +90,20 @@ class TTAOrchestrator:
         self.tta_dev_path = self.root_dir / "tta.dev"
         self.tta_prototype_path = self.root_dir / "tta.prototype"
 
-        # Validate repository paths
-        self._validate_repositories()
+        # Use injected loader or create default filesystem loader
+        if component_loader is None:
+            component_loader = FilesystemComponentLoader(
+                config=self.config,
+                root_dir=self.root_dir,
+                tta_dev_path=self.tta_dev_path,
+                tta_prototype_path=self.tta_prototype_path,
+            )
 
-        # Import components
-        self._import_components()
+        self.component_loader = component_loader
+
+        # Validate paths and import components using the loader
+        self.component_loader.validate_paths()
+        self.components = self.component_loader.discover_components()
 
         logger.info(
             f"TTAOrchestrator initialized with {len(self.components)} components"
@@ -218,9 +237,10 @@ class TTAOrchestrator:
                 continue
 
             # Start dependency if not already running
-            if (
-                self.components[dependency].status != ComponentStatus.RUNNING
-                and not self.start_component(dependency)
+            if self.components[
+                dependency
+            ].status != ComponentStatus.RUNNING and not self.start_component(
+                dependency
             ):
                 logger.error(
                     f"Failed to start dependency {dependency} for {component_name}"
@@ -265,10 +285,9 @@ class TTAOrchestrator:
 
         # Stop dependent components first
         for dependent in dependent_components:
-            if (
-                self.components[dependent].status == ComponentStatus.RUNNING
-                and not self.stop_component(dependent)
-            ):
+            if self.components[
+                dependent
+            ].status == ComponentStatus.RUNNING and not self.stop_component(dependent):
                 logger.error(
                     f"Failed to stop dependent component {dependent} for {component_name}"
                 )
@@ -336,9 +355,10 @@ class TTAOrchestrator:
 
         # Stop components in the determined order
         for component_name in stop_order:
-            if (
-                self.components[component_name].status == ComponentStatus.RUNNING
-                and not self.stop_component(component_name)
+            if self.components[
+                component_name
+            ].status == ComponentStatus.RUNNING and not self.stop_component(
+                component_name
             ):
                 success = False
 

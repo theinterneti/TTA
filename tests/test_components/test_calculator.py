@@ -71,4 +71,3 @@ class TestDivision:
         """Test division by zero raises ValueError."""
         with pytest.raises(ValueError, match="Cannot divide by zero"):
             divide(5, 0)
-

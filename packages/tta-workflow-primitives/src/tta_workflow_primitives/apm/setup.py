@@ -1,16 +1,15 @@
 """OpenTelemetry APM setup and configuration."""
 
-from typing import Optional
 import logging
 
 try:
-    from opentelemetry import trace, metrics
-    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry import metrics, trace
+    from opentelemetry.exporter.prometheus import PrometheusMetricReader
     from opentelemetry.sdk.metrics import MeterProvider
     from opentelemetry.sdk.resources import Resource
-    from opentelemetry.exporter.prometheus import PrometheusMetricReader
+    from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-    
+
     OPENTELEMETRY_AVAILABLE = True
 except ImportError:
     OPENTELEMETRY_AVAILABLE = False
@@ -21,8 +20,8 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-_tracer_provider: Optional[TracerProvider] = None
-_meter_provider: Optional[MeterProvider] = None
+_tracer_provider: TracerProvider | None = None
+_meter_provider: MeterProvider | None = None
 _initialized = False
 
 
@@ -32,19 +31,19 @@ def setup_apm(
     enable_prometheus: bool = True,
     enable_console: bool = False,
     prometheus_port: int = 9464,
-) -> tuple[Optional[TracerProvider], Optional[MeterProvider]]:
+) -> tuple[TracerProvider | None, MeterProvider | None]:
     """Setup OpenTelemetry APM for workflow primitives.
-    
+
     Args:
         service_name: Name of the service
         service_version: Version of the service
         enable_prometheus: Enable Prometheus metrics export
         enable_console: Enable console export (for debugging)
         prometheus_port: Port for Prometheus metrics endpoint
-        
+
     Returns:
         Tuple of (tracer_provider, meter_provider)
-        
+
     Example:
         >>> from tta_workflow_primitives.apm import setup_apm
         >>> tracer, meter = setup_apm(
@@ -53,34 +52,34 @@ def setup_apm(
         ... )
     """
     global _tracer_provider, _meter_provider, _initialized
-    
+
     if not OPENTELEMETRY_AVAILABLE:
         logger.warning("OpenTelemetry not available, APM disabled")
         return None, None
-    
+
     if _initialized:
         logger.info("APM already initialized")
         return _tracer_provider, _meter_provider
-    
+
     # Create resource with service info
     resource = Resource.create({
         "service.name": service_name,
         "service.version": service_version,
         "library.name": "tta-workflow-primitives",
     })
-    
+
     # Setup tracing
     _tracer_provider = TracerProvider(resource=resource)
-    
+
     if enable_console:
         # Add console exporter for debugging
         console_processor = BatchSpanProcessor(ConsoleSpanExporter())
         _tracer_provider.add_span_processor(console_processor)
         logger.info("Console trace export enabled")
-    
+
     trace.set_tracer_provider(_tracer_provider)
     logger.info(f"Tracer initialized for service: {service_name}")
-    
+
     # Setup metrics
     if enable_prometheus:
         # Prometheus metrics reader
@@ -95,21 +94,21 @@ def setup_apm(
         _meter_provider = MeterProvider(resource=resource)
         metrics.set_meter_provider(_meter_provider)
         logger.info("Metrics provider initialized (no exporters)")
-    
+
     _initialized = True
-    
+
     return _tracer_provider, _meter_provider
 
 
-def get_tracer(name: str = __name__) -> Optional[trace.Tracer]:
+def get_tracer(name: str = __name__) -> trace.Tracer | None:
     """Get a tracer instance.
-    
+
     Args:
         name: Name for the tracer (usually __name__)
-        
+
     Returns:
         Tracer instance or None if not initialized
-        
+
     Example:
         >>> tracer = get_tracer(__name__)
         >>> with tracer.start_as_current_span("my_operation"):
@@ -118,23 +117,23 @@ def get_tracer(name: str = __name__) -> Optional[trace.Tracer]:
     """
     if not OPENTELEMETRY_AVAILABLE:
         return None
-    
+
     if not _initialized:
         logger.warning("APM not initialized, call setup_apm() first")
         return None
-    
+
     return trace.get_tracer(name)
 
 
-def get_meter(name: str = __name__) -> Optional[metrics.Meter]:
+def get_meter(name: str = __name__) -> metrics.Meter | None:
     """Get a meter instance.
-    
+
     Args:
         name: Name for the meter (usually __name__)
-        
+
     Returns:
         Meter instance or None if not initialized
-        
+
     Example:
         >>> meter = get_meter(__name__)
         >>> counter = meter.create_counter(
@@ -145,17 +144,17 @@ def get_meter(name: str = __name__) -> Optional[metrics.Meter]:
     """
     if not OPENTELEMETRY_AVAILABLE:
         return None
-    
+
     if not _initialized:
         logger.warning("APM not initialized, call setup_apm() first")
         return None
-    
+
     return metrics.get_meter(name)
 
 
 def is_apm_enabled() -> bool:
     """Check if APM is enabled and initialized.
-    
+
     Returns:
         True if APM is enabled, False otherwise
     """

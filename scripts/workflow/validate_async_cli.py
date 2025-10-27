@@ -54,7 +54,7 @@ async def validate_async_workflow():
     print("Test 3: Invoke async method...")
     try:
         result = await orchestrator.run_async_with_parallel_openhands()
-        print(f"✓ Async method executed")
+        print("✓ Async method executed")
         print(f"  - Execution mode: {result.execution_mode}")
         print(f"  - Success: {result.success}")
         print(f"  - Stages completed: {len(result.stages_completed)}")

@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import os
 import sys
@@ -136,9 +137,9 @@ def neo4j_container(pytestconfig):
             from neo4j import GraphDatabase
             from neo4j.exceptions import (
                 AuthError,
+                ClientError as _ClientError,
+                ServiceUnavailable as _ServiceUnavailable,
             )
-            from neo4j.exceptions import ClientError as _ClientError
-            from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
         except Exception:
             GraphDatabase = None  # type: ignore
             AuthError = Exception  # type: ignore
@@ -233,9 +234,9 @@ def neo4j_driver(neo4j_container):
     try:
         from neo4j.exceptions import (
             AuthError,
+            ClientError as _ClientError,
+            ServiceUnavailable as _ServiceUnavailable,
         )
-        from neo4j.exceptions import ClientError as _ClientError
-        from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
     except Exception:
         AuthError = Exception  # type: ignore
         _ServiceUnavailable = Exception  # type: ignore
@@ -262,10 +263,8 @@ def neo4j_driver(neo4j_container):
             try:
                 yield d
             finally:
-                try:
+                with contextlib.suppress(Exception):
                     d.close()
-                except Exception:
-                    pass
             return
         except (AuthError, _ServiceUnavailable) as e:
             last_exc = e
@@ -403,10 +402,8 @@ def redis_client_sync(redis_container):
         client.ping()
         yield client
     finally:
-        try:
+        with contextlib.suppress(Exception):
             client.close()
-        except Exception:
-            pass
 
 
 # Comprehensive Test Battery Integration

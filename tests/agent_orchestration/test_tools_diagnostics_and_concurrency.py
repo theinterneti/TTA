@@ -2,10 +2,10 @@ import asyncio
 import os
 
 import pytest
-
 from tta_ai.orchestration.tools.coordinator import ToolCoordinator
 from tta_ai.orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
 from tta_ai.orchestration.tools.redis_tool_registry import RedisToolRegistry
+
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 

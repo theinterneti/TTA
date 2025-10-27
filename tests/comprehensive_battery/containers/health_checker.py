@@ -6,6 +6,7 @@ with specific focus on Neo4j and Redis reliability.
 """
 
 import asyncio
+import contextlib
 import logging
 import socket
 import time
@@ -146,7 +147,7 @@ class ContainerHealthChecker:
                         details={"status_code": response.status},
                     )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             response_time = (time.time() - start_time) * 1000
             return HealthCheckResult(
                 status=HealthStatus.TIMEOUT,
@@ -255,7 +256,7 @@ class ContainerHealthChecker:
                     message=f"Neo4j authentication rate limited - waiting before retry: {e}",
                     response_time_ms=response_time,
                 )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             response_time = (time.time() - start_time) * 1000
             return HealthCheckResult(
                 status=HealthStatus.TIMEOUT,
@@ -370,7 +371,7 @@ class ContainerHealthChecker:
                 response_time_ms=response_time,
             )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             response_time = (time.time() - start_time) * 1000
             return HealthCheckResult(
                 status=HealthStatus.TIMEOUT,
@@ -385,10 +386,8 @@ class ContainerHealthChecker:
                 response_time_ms=response_time,
             )
         finally:
-            try:
+            with contextlib.suppress(Exception):
                 await redis_client.aclose()
-            except Exception:
-                pass
 
     async def wait_for_service_health(
         self,

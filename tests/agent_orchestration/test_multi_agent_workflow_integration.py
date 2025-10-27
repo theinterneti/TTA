@@ -12,6 +12,7 @@ Test Categories:
 """
 
 import asyncio
+import contextlib
 import json
 import time
 from typing import Any
@@ -19,7 +20,6 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration import (
     AgentMessage,
     AgentRegistry,
@@ -507,10 +507,8 @@ class RedisStateVerifier:
         # Parse message content
         parsed_messages = []
         for msg in pending_messages:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 parsed_messages.append(json.loads(msg))
-            except json.JSONDecodeError:
-                pass
 
         return {
             "queue_exists": queue_length >= 0,
@@ -560,16 +558,12 @@ class RedisStateVerifier:
         coordination_state = {}
 
         if workflow_data:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 workflow_state = json.loads(workflow_data)
-            except json.JSONDecodeError:
-                pass
 
         if coordination_data:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 coordination_state = json.loads(coordination_data)
-            except json.JSONDecodeError:
-                pass
 
         return {
             "workflow_state_exists": bool(workflow_state),

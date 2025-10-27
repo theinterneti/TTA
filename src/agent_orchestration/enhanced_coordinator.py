@@ -485,7 +485,7 @@ class ScalableWorkflowCoordinator:
 
                 return result
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.error(
                     f"Workflow {workflow_id} timed out after {self.workflow_timeout_s}s"
                 )

@@ -40,7 +40,7 @@ class GameplayPerformanceTester:
         logger.info("Testing health endpoint performance...")
 
         response_times = []
-        for i in range(100):
+        for _i in range(100):
             start_time = time.time()
             async with self.session.get(
                 f"{self.base_url}/api/v1/gameplay/health"
@@ -67,7 +67,7 @@ class GameplayPerformanceTester:
         response_times = []
         success_count = 0
 
-        for i in range(50):  # Fewer requests for session creation
+        for _i in range(50):  # Fewer requests for session creation
             start_time = time.time()
             try:
                 async with self.session.post(
