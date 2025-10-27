@@ -92,7 +92,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
     if (!customTopic.trim()) return;
 
     const topic = customTopic.trim();
-    
+
     if (activeTab === 'comfort' && !comfortTopics.includes(topic)) {
       onChange({ comfort_topics: [...comfortTopics, topic] });
     } else if (activeTab === 'trigger' && !triggerTopics.includes(topic)) {
@@ -100,7 +100,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
     } else if (activeTab === 'avoid' && !avoidTopics.includes(topic)) {
       onChange({ avoid_topics: [...avoidTopics, topic] });
     }
-    
+
     setCustomTopic('');
   };
 
@@ -121,7 +121,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
           Topic Preferences
         </h3>
         <p className="text-gray-600 mb-6">
-          Help personalize your experience by indicating topics that make you comfortable, 
+          Help personalize your experience by indicating topics that make you comfortable,
           topics that might be triggering, and topics you'd prefer to avoid entirely.
         </p>
       </div>
@@ -168,7 +168,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <h4 className="font-medium text-green-900 mb-2">🌟 Comfort Topics</h4>
             <p className="text-green-800 text-sm">
-              These topics make you feel comfortable, safe, and positive. They can be incorporated 
+              These topics make you feel comfortable, safe, and positive. They can be incorporated
               into your therapeutic conversations to create a supportive atmosphere.
             </p>
           </div>
@@ -213,7 +213,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <h4 className="font-medium text-amber-900 mb-2">⚠️ Trigger Topics</h4>
             <p className="text-amber-800 text-sm">
-              These topics might cause emotional distress or discomfort. The AI will approach 
+              These topics might cause emotional distress or discomfort. The AI will approach
               these areas with extra care and sensitivity, or avoid them if you prefer.
             </p>
           </div>
@@ -247,7 +247,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <h4 className="font-medium text-red-900 mb-2">🚫 Topics to Avoid</h4>
             <p className="text-red-800 text-sm">
-              These topics will be completely avoided in your therapeutic conversations. 
+              These topics will be completely avoided in your therapeutic conversations.
               The AI will not bring up these subjects or explore them.
             </p>
           </div>
@@ -280,9 +280,9 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
         <h4 className="font-semibold text-gray-900">
           Add Custom {activeTab === 'comfort' ? 'Comfort' : activeTab === 'trigger' ? 'Trigger' : 'Avoid'} Topic
         </h4>
-        
+
         {/* Display custom topics */}
-        {activeTab === 'comfort' && 
+        {activeTab === 'comfort' &&
           comfortTopics.filter(topic => !COMFORT_TOPICS.includes(topic as ComfortTopic)).map((topic) => (
             <div key={topic} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
               <span className="text-green-900">{topic}</span>
@@ -298,7 +298,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
           ))
         }
 
-        {activeTab === 'trigger' && 
+        {activeTab === 'trigger' &&
           triggerTopics.filter(topic => !commonTriggerTopics.includes(topic)).map((topic) => (
             <div key={topic} className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
               <span className="text-amber-900">{topic}</span>
@@ -314,7 +314,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
           ))
         }
 
-        {activeTab === 'avoid' && 
+        {activeTab === 'avoid' &&
           avoidTopics.filter(topic => !commonAvoidTopics.includes(topic)).map((topic) => (
             <div key={topic} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
               <span className="text-red-900">{topic}</span>
@@ -353,7 +353,7 @@ const TopicPreferences: React.FC<TopicPreferencesProps> = ({
       {(comfortTopics.length > 0 || triggerTopics.length > 0 || avoidTopics.length > 0) && (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 mb-3">Topic Preferences Summary</h4>
-          
+
           {comfortTopics.length > 0 && (
             <div className="mb-3">
               <h5 className="text-sm font-medium text-green-800 mb-2">

@@ -1,0 +1,98 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: "tta-platform"
+    environment: "development"
+
+rule_files:
+  - "rules/*.yml"
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+    scrape_interval: 15s
+
+  # TTA Core Services
+  - job_name: "tta-player-experience"
+    static_configs:
+      - targets: ["player-experience:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    honor_labels: true
+    params:
+      format: ["prometheus"]
+
+  - job_name: "tta-agent-orchestration"
+    static_configs:
+      - targets: ["agent-orchestration:8000"]
+    metrics_path: "/metrics-prom"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    honor_labels: true
+
+  - job_name: "tta-developer-dashboard"
+    static_configs:
+      - targets: ["developer-dashboard:8080"]
+    metrics_path: "/dashboard/metrics/system"
+    scrape_interval: 15s
+    scrape_timeout: 5s
+    honor_labels: true
+
+  # Legacy API Services (keeping for backward compatibility)
+  - job_name: "patient-api"
+    static_configs:
+      - targets: ["patient-api:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  - job_name: "clinical-api"
+    static_configs:
+      - targets: ["clinical-api:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  - job_name: "developer-api"
+    static_configs:
+      - targets: ["developer-api:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  - job_name: "admin-api"
+    static_configs:
+      - targets: ["admin-api:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  - job_name: "langgraph-service"
+    static_configs:
+      - targets: ["langgraph-service:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+
+  # Infrastructure Services
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis:6379"]
+    scrape_interval: 30s
+    metrics_path: "/metrics"
+
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres:5432"]
+    scrape_interval: 30s
+
+  - job_name: "neo4j"
+    static_configs:
+      - targets: ["neo4j:7474"]
+    scrape_interval: 30s
+    metrics_path: "/metrics"
+
+  # Node Exporter for system metrics (if available)
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+    scrape_interval: 15s

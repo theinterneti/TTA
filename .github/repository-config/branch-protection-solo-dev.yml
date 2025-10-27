@@ -18,7 +18,7 @@
 # =============================================================================
 main:
   description: "Production branch - practical protection for solo developer"
-  
+
   # Status Checks - Only require checks that currently exist
   required_status_checks:
     strict: true  # Require branches to be up to date before merging
@@ -26,14 +26,14 @@ main:
       # Core tests (from tests.yml)
       - "unit"
       - "integration"
-      
+
       # Security (from security-scan.yml) - will be added after workflow fix
       # - "security-scan / Security Scan"
-      
+
       # Code quality (will be added after code-quality.yml is created)
       # - "code-quality / Lint and Format"
       # - "code-quality / Type Check"
-  
+
   # Pull Request Reviews - Solo developer friendly
   required_pull_request_reviews:
     required_approving_review_count: 1  # Can self-approve or use auto-merge
@@ -42,10 +42,10 @@ main:
     require_last_push_approval: false  # Allow self-approval
     bypass_pull_request_allowances:
       users: ["theinterneti"]  # Allow bypass for emergencies
-  
+
   # Additional Restrictions
   restrictions: null  # No push restrictions for solo developer
-  
+
   # Administrative Settings
   enforce_admins: false  # Allow admin bypass for emergencies
   allow_force_pushes: false  # Prevent accidental history rewriting
@@ -62,23 +62,23 @@ main:
 # =============================================================================
 develop:
   description: "Development integration branch - flexible for experimentation"
-  
+
   # Status Checks - Minimal for faster iteration
   required_status_checks:
     strict: false  # Allow merging without being up to date
     contexts:
       - "unit"  # Only require unit tests
-  
+
   # Pull Request Reviews - Optional for develop
   required_pull_request_reviews:
     required_approving_review_count: 0  # No approval required
     dismiss_stale_reviews: false
     require_code_owner_reviews: false
     require_last_push_approval: false
-  
+
   # Additional Restrictions
   restrictions: null
-  
+
   # Administrative Settings
   enforce_admins: false
   allow_force_pushes: false  # Still prevent force pushes
@@ -97,16 +97,16 @@ develop:
 # For now, configure manually via web UI if needed
 feat/*:
   description: "Feature branches - minimal protection, allow experimentation"
-  
+
   # Status Checks - None required for feature branches
   required_status_checks: null
-  
+
   # Pull Request Reviews - None required
   required_pull_request_reviews: null
-  
+
   # Additional Restrictions
   restrictions: null
-  
+
   # Administrative Settings
   enforce_admins: false
   allow_force_pushes: true  # Allow force pushes for rebasing
@@ -120,7 +120,7 @@ feat/*:
 # =============================================================================
 staging:
   description: "Staging environment branch - moderate protection"
-  
+
   # Status Checks
   required_status_checks:
     strict: true
@@ -128,17 +128,17 @@ staging:
       - "unit"
       - "integration"
       - "e2e-tests / E2E Tests (chromium - auth)"
-  
+
   # Pull Request Reviews
   required_pull_request_reviews:
     required_approving_review_count: 1
     dismiss_stale_reviews: true
     require_code_owner_reviews: false
     require_last_push_approval: false
-  
+
   # Additional Restrictions
   restrictions: null
-  
+
   # Administrative Settings
   enforce_admins: false
   allow_force_pushes: false
@@ -195,7 +195,7 @@ staging:
 # =============================================================================
 
 # As workflows are added, update required status checks:
-# 
+#
 # Phase 1 (Current):
 #   - unit
 #   - integration
@@ -230,4 +230,3 @@ staging:
 # 2. Document reason in commit message
 # 3. Create follow-up issue to address properly
 # 4. Review bypass usage monthly
-

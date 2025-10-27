@@ -1,4 +1,4 @@
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentId,
     AgentMessage,
     AgentType,

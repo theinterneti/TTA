@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.therapeutic_safety import (
     SafetyLevel,
     SafetyRulesProvider,
     SafetyService,

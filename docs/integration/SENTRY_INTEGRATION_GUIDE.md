@@ -5,7 +5,7 @@
 Sentry has been successfully integrated into your TTA (Therapeutic Text Adventure) storytelling project to provide:
 
 - **Error Monitoring**: Automatic capture and reporting of application errors
-- **Performance Tracking**: Transaction and query performance monitoring  
+- **Performance Tracking**: Transaction and query performance monitoring
 - **Therapeutic Data Protection**: Built-in filtering to prevent sensitive therapeutic content from being sent to Sentry
 - **Environment-Specific Configuration**: Different settings for development, staging, and production
 
@@ -98,7 +98,7 @@ except Exception as e:
 - **Profiles Sample Rate**: 100% (profile all transactions)
 - **Send PII**: False (never send personal information)
 
-### Staging  
+### Staging
 - **Traces Sample Rate**: 20% (sample for testing)
 - **Profiles Sample Rate**: 20%
 - **Send PII**: False

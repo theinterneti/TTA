@@ -14,8 +14,8 @@ def _client_with_token(player_id: str = "playerTest") -> tuple[TestClient, str]:
     app = create_app()
     client = TestClient(app)
 
-    # Create a simple JWT via the API auth util
-    token = create_access_token({"sub": player_id})
+    # Create a simple JWT via the API auth util with player_id field
+    token = create_access_token({"sub": player_id, "player_id": player_id})
     return client, token
 
 

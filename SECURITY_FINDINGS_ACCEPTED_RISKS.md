@@ -37,8 +37,8 @@ This document tracks Semgrep security findings that have been reviewed and accep
 **Finding ID:** `yaml.docker-compose.security.exposing-docker-socket-volume.exposing-docker-socket-volume`
 
 **Locations:**
-- `templates/tta.dev/docker-compose.yml:29`
-- `templates/tta.prototype/docker-compose.yml:29`
+- `templates/development/docker-compose.yml:29`
+- `templates/production/docker-compose.yml:29`
 
 **Description:** Docker socket is mounted in development template containers.
 
@@ -113,4 +113,3 @@ This document tracks Semgrep security findings that have been reviewed and accep
 - **INFO Severity:** 0
 
 All other findings have been remediated.
-

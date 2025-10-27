@@ -3,13 +3,13 @@ import uuid
 
 import pytest
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentId,
     AgentMessage,
     AgentType,
     MessageType,
 )
-from src.agent_orchestration.coordinators import RedisMessageCoordinator
+from tta_ai.orchestration.coordinators import RedisMessageCoordinator
 
 
 @pytest.mark.redis

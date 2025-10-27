@@ -227,22 +227,17 @@ class TherapeuticConsequenceSystem:
 
         if scenario_context and scenario_context.get("type") == "therapeutic":
             return ChoiceType.THERAPEUTIC
-        elif any(
-            word in choice_lower for word in ["help", "support", "care", "comfort"]
-        ):
+        if any(word in choice_lower for word in ["help", "support", "care", "comfort"]):
             return ChoiceType.SOCIAL
-        elif any(
+        if any(
             word in choice_lower for word in ["think", "consider", "reflect", "analyze"]
         ):
             return ChoiceType.COGNITIVE
-        elif any(
-            word in choice_lower for word in ["feel", "emotion", "heart", "sense"]
-        ):
+        if any(word in choice_lower for word in ["feel", "emotion", "heart", "sense"]):
             return ChoiceType.EMOTIONAL
-        elif any(word in choice_lower for word in ["do", "act", "perform", "practice"]):
+        if any(word in choice_lower for word in ["do", "act", "perform", "practice"]):
             return ChoiceType.BEHAVIORAL
-        else:
-            return ChoiceType.NARRATIVE
+        return ChoiceType.NARRATIVE
 
     def _calculate_therapeutic_relevance(
         self, choice: str, therapeutic_goals: list[str] | None
@@ -296,15 +291,14 @@ class TherapeuticConsequenceSystem:
 
         if any(word in choice_lower for word in high_emotion_words):
             return 0.8
-        elif any(word in choice_lower for word in medium_emotion_words):
+        if any(word in choice_lower for word in medium_emotion_words):
             return 0.6
-        elif (
+        if (
             scenario_context
             and scenario_context.get("emotional_intensity", "medium") == "high"
         ):
             return 0.7
-        else:
-            return 0.4
+        return 0.4
 
     def _calculate_therapeutic_value_direct(
         self,

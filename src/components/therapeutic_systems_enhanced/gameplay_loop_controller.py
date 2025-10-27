@@ -263,13 +263,12 @@ class TherapeuticGameplayLoopController:
                 self.session_configurations.pop(session_id, None)
 
             # Return error state
-            error_session = SessionState(
+            return SessionState(
                 session_id=str(uuid4()),
                 user_id=user_id,
                 status=SessionStatus.ERROR,
                 current_phase=SessionPhase.INITIALIZATION,
             )
-            return error_session
 
     async def process_user_choice(
         self,
@@ -595,14 +594,12 @@ class TherapeuticGameplayLoopController:
         """Assess emotional safety of user input."""
         try:
             if self.emotional_safety_system:
-                safety_result = await self.emotional_safety_system.assess_crisis_risk(
+                return await self.emotional_safety_system.assess_crisis_risk(
                     user_id=session_state.user_id,
                     user_input=user_input,
                     session_context=context,
                 )
-                return safety_result
-            else:
-                return {"crisis_detected": False, "safety_level": "standard"}
+            return {"crisis_detected": False, "safety_level": "standard"}
 
         except Exception as e:
             logger.error(f"Error in safety assessment: {e}")
@@ -654,18 +651,16 @@ class TherapeuticGameplayLoopController:
         """Process user choice through consequence system."""
         try:
             if self.consequence_system:
-                consequence = await self.consequence_system.process_choice_consequence(
+                return await self.consequence_system.process_choice_consequence(
                     user_id=session_state.user_id,
                     choice=user_choice,
                     scenario_context=context or {},
                 )
-                return consequence
-            else:
-                return {
-                    "consequence_text": "Your choice has been noted.",
-                    "therapeutic_value": 1.0,
-                    "character_impact": {},
-                }
+            return {
+                "consequence_text": "Your choice has been noted.",
+                "therapeutic_value": 1.0,
+                "character_impact": {},
+            }
 
         except Exception as e:
             logger.error(f"Error processing choice consequence: {e}")
@@ -694,11 +689,10 @@ class TherapeuticGameplayLoopController:
                     )
 
                 return character_update
-            else:
-                return {
-                    "character_updated": False,
-                    "reason": "No character development system",
-                }
+            return {
+                "character_updated": False,
+                "reason": "No character development system",
+            }
 
         except Exception as e:
             logger.error(f"Error updating character development: {e}")
@@ -730,11 +724,10 @@ class TherapeuticGameplayLoopController:
                     ]
 
                 return difficulty_adjustment
-            else:
-                return {
-                    "difficulty_adjusted": False,
-                    "current_difficulty": session_state.difficulty_level,
-                }
+            return {
+                "difficulty_adjusted": False,
+                "current_difficulty": session_state.difficulty_level,
+            }
 
         except Exception as e:
             logger.error(f"Error adjusting difficulty: {e}")
@@ -855,8 +848,7 @@ class TherapeuticGameplayLoopController:
                     character_id=session_state.character_id
                 )
                 return progression.get("attribute_changes", {})
-            else:
-                return session_state.character_attributes
+            return session_state.character_attributes
 
         except Exception as e:
             logger.error(f"Error generating character progression summary: {e}")

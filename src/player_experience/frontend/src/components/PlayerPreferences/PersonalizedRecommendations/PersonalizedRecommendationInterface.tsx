@@ -1,6 +1,6 @@
 /**
  * Personalized Recommendation Interface Component
- * 
+ *
  * Displays intelligent, contextual recommendations for therapeutic goals,
  * concerns, and approaches with user-friendly interaction and feedback capabilities.
  */
@@ -217,7 +217,7 @@ const PersonalizedRecommendationInterface: React.FC<PersonalizedRecommendationIn
                     </span>
                   </div>
                   <p className="text-gray-700 mb-2">{recommendation.description}</p>
-                  
+
                   {/* Timeframe and Expected Outcome */}
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                     <span>⏱️ {recommendation.timeframe.replace('_', ' ')}</span>
@@ -271,7 +271,7 @@ const PersonalizedRecommendationInterface: React.FC<PersonalizedRecommendationIn
                   More Info
                 </button>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 {feedbackMode === recommendation.id ? (
                   <div className="flex items-center space-x-2">

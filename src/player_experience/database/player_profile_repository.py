@@ -5,17 +5,22 @@ This module provides data access layer for player profiles,
 handling CRUD operations and data persistence in Neo4j.
 """
 
+import contextlib
 import json
 import logging
 import uuid
 from datetime import datetime
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
 try:
     from neo4j import Driver, GraphDatabase, Result, Session
     from neo4j.exceptions import ClientError, ServiceUnavailable
 except ImportError:
-    print("Warning: neo4j package not installed. Install with: pip install neo4j")
+    logger.warning(
+        "Warning: neo4j package not installed. Install with: pip install neo4j"
+    )
     GraphDatabase = None
     Driver = None
     Session = None
@@ -71,7 +76,7 @@ class PlayerProfileRepository:
         self.uri = uri
         self.username = username
         self.password = password
-        self.driver: "Driver | None" = None  # type: ignore[name-defined]
+        self.driver: Driver | None = None  # type: ignore[name-defined]
 
     def connect(self) -> None:
         """Establish connection to Neo4j database with retry/backoff for readiness races."""
@@ -104,27 +109,20 @@ class PlayerProfileRepository:
                 last_exc = e
                 delay = min(base_delay * (2**attempt), 8.0)
                 logger.debug(
-                    f"Neo4j connect attempt {attempt+1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
+                    f"Neo4j connect attempt {attempt + 1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
                 )
-                try:
+                with contextlib.suppress(Exception):
                     if self.driver:
                         self.driver.close()
-                except Exception:
-                    pass
                 self.driver = None
                 import time as _t
 
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
-                else:
-                    if isinstance(e, AuthError):
-                        raise PlayerProfileRepositoryError(
-                            f"Failed to connect to Neo4j after retries: {e}"
-                        ) from e
-                    elif isinstance(e, _ServiceUnavailable):
-                        raise PlayerProfileRepositoryError(
-                            f"Failed to connect to Neo4j after retries: {e}"
-                        ) from e
+                elif isinstance(e, (AuthError, _ServiceUnavailable)):
+                    raise PlayerProfileRepositoryError(
+                        f"Failed to connect to Neo4j after retries: {e}"
+                    ) from e
             except _ClientError as e:
                 emsg = str(e)
                 if ("AuthenticationRateLimit" in emsg) or (
@@ -133,13 +131,11 @@ class PlayerProfileRepository:
                     last_exc = e
                     delay = min(base_delay * (2**attempt), 8.0)
                     logger.debug(
-                        f"Neo4j connect attempt {attempt+1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
+                        f"Neo4j connect attempt {attempt + 1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
                     )
-                    try:
+                    with contextlib.suppress(Exception):
                         if self.driver:
                             self.driver.close()
-                    except Exception:
-                        pass
                     self.driver = None
                     import time as _t
 
@@ -404,11 +400,8 @@ class PlayerProfileRepository:
                 if record:
                     logger.info(f"Created player profile: {profile.player_id}")
                     return True
-                else:
-                    logger.error(
-                        f"Failed to create player profile: {profile.player_id}"
-                    )
-                    return False
+                logger.error(f"Failed to create player profile: {profile.player_id}")
+                return False
 
         except ClientError as e:
             if "already exists" in str(e).lower():
@@ -416,11 +409,10 @@ class PlayerProfileRepository:
                 raise PlayerProfileRepositoryError(
                     f"Player profile already exists: {profile.player_id}"
                 ) from e
-            else:
-                logger.error(f"Error creating player profile: {e}")
-                raise PlayerProfileRepositoryError(
-                    f"Error creating player profile: {e}"
-                ) from e
+            logger.error(f"Error creating player profile: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error creating player profile: {e}"
+            ) from e
         except Exception as e:
             logger.error(f"Unexpected error creating player profile: {e}")
             raise PlayerProfileRepositoryError(
@@ -553,13 +545,11 @@ class PlayerProfileRepository:
                     # Restore authentication data if present (temporary solution)
                     # Using setattr for dynamic attributes not in PrivacySettings dataclass
                     if "password_hash" in privacy_settings_data:
-                        setattr(
-                            privacy_settings,
-                            "password_hash",
-                            privacy_settings_data["password_hash"],
-                        )
+                        privacy_settings.password_hash = privacy_settings_data[
+                            "password_hash"
+                        ]
                     if "role" in privacy_settings_data:
-                        setattr(privacy_settings, "role", privacy_settings_data["role"])
+                        privacy_settings.role = privacy_settings_data["role"]
 
                 # Reconstruct progress summary
                 progress_summary = ProgressSummary()
@@ -600,12 +590,10 @@ class PlayerProfileRepository:
                         # Neo4j temporal objects often expose to_native()
                         conv = getattr(val, "to_native", None)
                         if callable(conv):
-                            try:
+                            with contextlib.suppress(Exception):
                                 result = conv()
                                 if isinstance(result, datetime):
                                     return result
-                            except Exception:
-                                pass
                         if isinstance(val, str):
                             try:
                                 return datetime.fromisoformat(val)
@@ -631,12 +619,10 @@ class PlayerProfileRepository:
                         return val
                     conv = getattr(val, "to_native", None)
                     if callable(conv):
-                        try:
+                        with contextlib.suppress(Exception):
                             result = conv()
                             if isinstance(result, datetime):
                                 return result
-                        except Exception:
-                            pass
                     if isinstance(val, str):
                         try:
                             return datetime.fromisoformat(val)
@@ -661,7 +647,7 @@ class PlayerProfileRepository:
                 else:
                     _active_parsed = _active_raw or {}
 
-                profile = PlayerProfile(
+                return PlayerProfile(
                     player_id=player_data["player_id"],
                     username=player_data["username"],
                     email=player_data["email"],
@@ -675,13 +661,11 @@ class PlayerProfileRepository:
                     is_active=player_data.get("is_active", True),
                 )
 
-                return profile
-
         except Exception as e:
-            logger.error(f"Error retrieving player profile {player_id}: {e}")
-            raise PlayerProfileRepositoryError(
-                f"Error retrieving player profile: {e}"
-            ) from e
+            # If the query fails (e.g., label doesn't exist), return None
+            # This allows the system to gracefully handle empty databases
+            logger.warning(f"Error retrieving player profile {player_id}: {e}")
+            return None
 
     def update_player_profile(self, profile: PlayerProfile) -> bool:
         """
@@ -756,11 +740,10 @@ class PlayerProfileRepository:
                 if record:
                     logger.info(f"Updated player profile: {profile.player_id}")
                     return True
-                else:
-                    logger.error(
-                        f"Player profile not found for update: {profile.player_id}"
-                    )
-                    return False
+                logger.error(
+                    f"Player profile not found for update: {profile.player_id}"
+                )
+                return False
 
         except Exception as e:
             logger.error(f"Error updating player profile {profile.player_id}: {e}")
@@ -798,11 +781,8 @@ class PlayerProfileRepository:
                 if record and record["deleted_count"] > 0:
                     logger.info(f"Deleted player profile: {player_id}")
                     return True
-                else:
-                    logger.warning(
-                        f"Player profile not found for deletion: {player_id}"
-                    )
-                    return False
+                logger.warning(f"Player profile not found for deletion: {player_id}")
+                return False
 
         except Exception as e:
             logger.error(f"Error deleting player profile {player_id}: {e}")
@@ -835,14 +815,12 @@ class PlayerProfileRepository:
 
                 if record:
                     return self.get_player_profile(record["player_id"])
-                else:
-                    return None
-
+                return None
         except Exception as e:
-            logger.error(f"Error retrieving player by username {username}: {e}")
-            raise PlayerProfileRepositoryError(
-                f"Error retrieving player by username: {e}"
-            ) from e
+            # If the query fails (e.g., label doesn't exist), return None
+            # This allows the system to gracefully handle empty databases
+            logger.warning(f"Error retrieving player by username {username}: {e}")
+            return None
 
     def get_player_by_email(self, email: str) -> PlayerProfile | None:
         """
@@ -869,14 +847,13 @@ class PlayerProfileRepository:
 
                 if record:
                     return self.get_player_profile(record["player_id"])
-                else:
-                    return None
+                return None
 
         except Exception as e:
-            logger.error(f"Error retrieving player by email {email}: {e}")
-            raise PlayerProfileRepositoryError(
-                f"Error retrieving player by email: {e}"
-            ) from e
+            # If the query fails (e.g., label doesn't exist), return None
+            # This allows the system to gracefully handle empty databases
+            logger.warning(f"Error retrieving player by email {email}: {e}")
+            return None
 
     def list_active_players(self, limit: int = 100) -> list[PlayerProfile]:
         """

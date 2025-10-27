@@ -44,24 +44,24 @@ echo "Setting up symbolic links for shared volumes..."
 # Link tta.dev models to TTA.prototype
 if [ -d "tta.dev/.model_cache" ] && [ -d "TTA.prototype/ai_models" ]; then
     echo "Linking tta.dev models to TTA.prototype..."
-    
+
     # Get container IDs
     ROOT_CONTAINER=$(docker ps -qf "name=tta-root-app")
     DEV_CONTAINER=$(docker ps -qf "name=tta-dev-app")
     PROTOTYPE_CONTAINER=$(docker ps -qf "name=tta-prototype-app")
-    
+
     if [ -n "$ROOT_CONTAINER" ]; then
         echo "Root container is running."
-        
+
         # Ensure the model cache directory exists in the root container
         docker exec $ROOT_CONTAINER mkdir -p /app/.model_cache
-        
+
         # If dev container is running, copy models from dev to root
         if [ -n "$DEV_CONTAINER" ]; then
             echo "Dev container is running. Copying models from dev to root..."
             docker exec $DEV_CONTAINER bash -c "cp -r /app/.model_cache/* /app/external_data/models/ 2>/dev/null || true"
         fi
-        
+
         # If prototype container is running, copy models from root to prototype
         if [ -n "$PROTOTYPE_CONTAINER" ]; then
             echo "Prototype container is running. Copying models from root to prototype..."

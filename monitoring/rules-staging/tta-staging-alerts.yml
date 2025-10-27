@@ -1,0 +1,282 @@
+# TTA Staging Environment Alert Rules
+# Comprehensive alerting for homelab staging deployment
+
+groups:
+  - name: tta-staging-infrastructure
+    interval: 30s
+    rules:
+      # Service availability alerts
+      - alert: TTAServiceDown
+        expr: up{environment="staging"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          environment: staging
+          category: infrastructure
+        annotations:
+          summary: "TTA service {{ $labels.service }} is down in staging"
+          description: "Service {{ $labels.service }} on instance {{ $labels.instance }} has been down for more than 1 minute in staging environment."
+          runbook_url: "https://docs.tta-homelab.local/runbooks/service-down"
+
+      # High CPU usage
+      - alert: TTAHighCPUUsage
+        expr: (100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle",environment="staging"}[5m])) * 100)) > 80
+        for: 5m
+        labels:
+          severity: warning
+          environment: staging
+          category: performance
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }} in staging"
+          description: "CPU usage is above 80% on {{ $labels.instance }} for more than 5 minutes."
+
+      # High memory usage
+      - alert: TTAHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes{environment="staging"} / node_memory_MemTotal_bytes{environment="staging"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          environment: staging
+          category: performance
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }} in staging"
+          description: "Memory usage is above 85% on {{ $labels.instance }} for more than 5 minutes."
+
+      # Disk space alerts
+      - alert: TTALowDiskSpace
+        expr: (node_filesystem_avail_bytes{environment="staging",mountpoint="/"} / node_filesystem_size_bytes{environment="staging",mountpoint="/"}) * 100 < 20
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: storage
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }} in staging"
+          description: "Disk space is below 20% on {{ $labels.instance }}."
+
+      - alert: TTACriticalDiskSpace
+        expr: (node_filesystem_avail_bytes{environment="staging",mountpoint="/"} / node_filesystem_size_bytes{environment="staging",mountpoint="/"}) * 100 < 10
+        for: 1m
+        labels:
+          severity: critical
+          environment: staging
+          category: storage
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }} in staging"
+          description: "Disk space is below 10% on {{ $labels.instance }}. Immediate action required."
+
+  - name: tta-staging-application
+    interval: 15s
+    rules:
+      # API response time alerts
+      - alert: TTAHighAPIResponseTime
+        expr: histogram_quantile(0.95, rate(tta_http_request_duration_seconds_bucket{environment="staging",service="player-api"}[5m])) > 2
+        for: 3m
+        labels:
+          severity: warning
+          environment: staging
+          category: performance
+        annotations:
+          summary: "High API response time in staging"
+          description: "95th percentile response time is above 2 seconds for {{ $labels.endpoint }} for more than 3 minutes."
+
+      # API error rate alerts
+      - alert: TTAHighAPIErrorRate
+        expr: (rate(tta_http_requests_total{environment="staging",service="player-api",status_code=~"5.."}[5m]) / rate(tta_http_requests_total{environment="staging",service="player-api"}[5m])) * 100 > 5
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: reliability
+        annotations:
+          summary: "High API error rate in staging"
+          description: "API error rate is above 5% for {{ $labels.endpoint }} for more than 2 minutes."
+
+      # WebSocket connection alerts
+      - alert: TTAHighWebSocketDisconnections
+        expr: rate(tta_websocket_disconnections_total{environment="staging"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: connectivity
+        annotations:
+          summary: "High WebSocket disconnection rate in staging"
+          description: "WebSocket disconnection rate is above 10/minute for more than 2 minutes."
+
+      # Session management alerts
+      - alert: TTAHighActiveSessions
+        expr: tta_active_sessions{environment="staging"} > 80
+        for: 1m
+        labels:
+          severity: warning
+          environment: staging
+          category: capacity
+        annotations:
+          summary: "High number of active sessions in staging"
+          description: "Number of active sessions ({{ $value }}) is approaching the limit of 100."
+
+  - name: tta-staging-database
+    interval: 30s
+    rules:
+      # Neo4j alerts
+      - alert: TTANeo4jHighMemoryUsage
+        expr: neo4j_memory_heap_used_bytes{environment="staging"} / neo4j_memory_heap_max_bytes{environment="staging"} * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          environment: staging
+          category: database
+        annotations:
+          summary: "Neo4j high memory usage in staging"
+          description: "Neo4j heap memory usage is above 85% for more than 5 minutes."
+
+      - alert: TTANeo4jSlowQueries
+        expr: neo4j_cypher_query_duration_seconds{environment="staging",quantile="0.95"} > 10
+        for: 3m
+        labels:
+          severity: warning
+          environment: staging
+          category: performance
+        annotations:
+          summary: "Neo4j slow queries in staging"
+          description: "95th percentile query duration is above 10 seconds for more than 3 minutes."
+
+      # Redis alerts
+      - alert: TTARedisHighMemoryUsage
+        expr: redis_memory_used_bytes{environment="staging"} / redis_memory_max_bytes{environment="staging"} * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          environment: staging
+          category: database
+        annotations:
+          summary: "Redis high memory usage in staging"
+          description: "Redis memory usage is above 80% for more than 5 minutes."
+
+      - alert: TTARedisHighConnections
+        expr: redis_connected_clients{environment="staging"} > 100
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: connectivity
+        annotations:
+          summary: "Redis high connection count in staging"
+          description: "Redis has more than 100 connected clients for more than 2 minutes."
+
+      # PostgreSQL alerts
+      - alert: TTAPostgreSQLHighConnections
+        expr: pg_stat_database_numbackends{environment="staging"} > 80
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: database
+        annotations:
+          summary: "PostgreSQL high connection count in staging"
+          description: "PostgreSQL has more than 80 active connections for more than 2 minutes."
+
+      - alert: TTAPostgreSQLSlowQueries
+        expr: pg_stat_statements_mean_time_ms{environment="staging"} > 5000
+        for: 3m
+        labels:
+          severity: warning
+          environment: staging
+          category: performance
+        annotations:
+          summary: "PostgreSQL slow queries in staging"
+          description: "Average query time is above 5 seconds for more than 3 minutes."
+
+  - name: tta-staging-testing
+    interval: 60s
+    rules:
+      # Load testing alerts
+      - alert: TTALoadTestHighFailureRate
+        expr: (locust_failures_total{environment="staging"} / locust_requests_total{environment="staging"}) * 100 > 10
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: testing
+        annotations:
+          summary: "High failure rate in load testing"
+          description: "Load test failure rate is above 10% for more than 2 minutes."
+
+      # Performance regression alerts
+      - alert: TTAPerformanceRegression
+        expr: histogram_quantile(0.95, rate(tta_http_request_duration_seconds_bucket{environment="staging"}[10m])) > 1.5 * histogram_quantile(0.95, rate(tta_http_request_duration_seconds_bucket{environment="staging"}[10m] offset 1h))
+        for: 5m
+        labels:
+          severity: warning
+          environment: staging
+          category: regression
+        annotations:
+          summary: "Performance regression detected in staging"
+          description: "Current 95th percentile response time is 50% higher than 1 hour ago."
+
+      # Test execution alerts
+      - alert: TTATestExecutionFailure
+        expr: tta_test_execution_status{environment="staging",status="failed"} > 0
+        for: 1m
+        labels:
+          severity: warning
+          environment: staging
+          category: testing
+        annotations:
+          summary: "Test execution failure in staging"
+          description: "Test suite {{ $labels.test_suite }} has failed in staging environment."
+
+  - name: tta-staging-security
+    interval: 30s
+    rules:
+      # Authentication alerts
+      - alert: TTAHighFailedLogins
+        expr: rate(tta_authentication_failures_total{environment="staging"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          environment: staging
+          category: security
+        annotations:
+          summary: "High failed login rate in staging"
+          description: "Failed login rate is above 5/minute for more than 2 minutes."
+
+      # Rate limiting alerts
+      - alert: TTARateLimitExceeded
+        expr: rate(tta_rate_limit_exceeded_total{environment="staging"}[5m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+          environment: staging
+          category: security
+        annotations:
+          summary: "Rate limit frequently exceeded in staging"
+          description: "Rate limit is being exceeded more than 10 times per minute."
+
+  - name: tta-staging-business
+    interval: 60s
+    rules:
+      # User experience alerts
+      - alert: TTALowUserEngagement
+        expr: avg_over_time(tta_active_users{environment="staging"}[1h]) < 5
+        for: 10m
+        labels:
+          severity: info
+          environment: staging
+          category: business
+        annotations:
+          summary: "Low user engagement in staging"
+          description: "Average active users in the last hour is below 5."
+
+      # Story generation alerts
+      - alert: TTAStoryGenerationFailures
+        expr: rate(tta_story_generation_failures_total{environment="staging"}[10m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          environment: staging
+          category: functionality
+        annotations:
+          summary: "Story generation failures in staging"
+          description: "Story generation failure rate is above 0.1/minute for more than 5 minutes."

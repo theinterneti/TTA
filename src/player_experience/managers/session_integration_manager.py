@@ -79,9 +79,8 @@ class SessionIntegrationManager:
                 self._active_sessions[player_id] = session_context
                 logger.info(f"Created session {session_id} for player {player_id}")
                 return session_context
-            else:
-                logger.error(f"Failed to persist session {session_id}")
-                return None
+            logger.error(f"Failed to persist session {session_id}")
+            return None
 
         except Exception as e:
             logger.error(f"Failed to create session for player {player_id}: {e}")
@@ -116,14 +115,13 @@ class SessionIntegrationManager:
                 # Resume existing session
                 logger.info(f"Resuming existing session {existing_session.session_id}")
                 return await self.resume_session(existing_session.session_id)
-            else:
-                # Create new session with preserved therapeutic settings
-                therapeutic_settings = (
-                    current_session.therapeutic_settings if current_session else None
-                )
-                return await self.create_session(
-                    player_id, new_character_id, new_world_id, therapeutic_settings
-                )
+            # Create new session with preserved therapeutic settings
+            therapeutic_settings = (
+                current_session.therapeutic_settings if current_session else None
+            )
+            return await self.create_session(
+                player_id, new_character_id, new_world_id, therapeutic_settings
+            )
 
         except Exception as e:
             logger.error(f"Failed to switch context for player {player_id}: {e}")

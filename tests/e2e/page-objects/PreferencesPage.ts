@@ -68,7 +68,7 @@ export class PreferencesPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Main page elements
     this.pageTitle = page.locator('h1:has-text("Therapeutic Preferences")');
     this.pageDescription = page.locator('text=Customize your therapeutic experience');
@@ -153,7 +153,7 @@ export class PreferencesPage extends BasePage {
       'character': this.characterTab,
       'topics': this.topicsTab,
     };
-    
+
     await tabMap[tabName].click();
     await this.page.waitForTimeout(300);
   }
@@ -176,7 +176,7 @@ export class PreferencesPage extends BasePage {
       'MINDFULNESS': this.mindfulnessCheckbox,
       'DBT': this.dbtCheckbox,
     };
-    
+
     await approachMap[approach].check();
   }
 
@@ -186,7 +186,7 @@ export class PreferencesPage extends BasePage {
       'MINDFULNESS': this.mindfulnessCheckbox,
       'DBT': this.dbtCheckbox,
     };
-    
+
     await approachMap[approach].uncheck();
   }
 
@@ -196,7 +196,7 @@ export class PreferencesPage extends BasePage {
       'MINDFULNESS': this.mindfulnessCheckbox,
       'DBT': this.dbtCheckbox,
     };
-    
+
     await expect(approachMap[approach]).toBeChecked();
   }
 
@@ -207,7 +207,7 @@ export class PreferencesPage extends BasePage {
       'CHALLENGING': this.challengingRadio,
       'NEUTRAL': this.neutralRadio,
     };
-    
+
     await styleMap[style].check();
   }
 
@@ -217,7 +217,7 @@ export class PreferencesPage extends BasePage {
       'CHALLENGING': this.challengingRadio,
       'NEUTRAL': this.neutralRadio,
     };
-    
+
     await expect(styleMap[expectedStyle]).toBeChecked();
   }
 

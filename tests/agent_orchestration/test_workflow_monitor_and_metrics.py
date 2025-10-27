@@ -32,7 +32,7 @@ async def test_workflow_monitor_metrics_and_diagnostics(redis_client):
     client = TestClient(app)
 
     # Simulate a run by interacting with the monitor directly
-    from src.agent_orchestration.workflow_monitor import WorkflowMonitor
+    from tta_ai.orchestration.workflow_monitor import WorkflowMonitor
 
     mon = getattr(comp, "_workflow_monitor", None)
     assert isinstance(mon, WorkflowMonitor)

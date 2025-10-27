@@ -2,7 +2,7 @@
 
 /**
  * Convert World Script
- * 
+ *
  * Node.js script to convert a franchise world to TTA WorldDetails format
  */
 
@@ -48,7 +48,7 @@ function generateSettingDescription(world) {
     'stellar_confederation': 'A galactic federation spanning multiple star systems, diverse alien worlds, and advanced starships where diplomacy and exploration thrive.',
     'neon_metropolis': 'A cyberpunk urban environment with towering megacorps, underground communities, and digital networks where identity and justice intersect.'
   };
-  
+
   return settingMap[world.franchiseId] || `A ${world.genre} world inspired by ${world.inspirationSource}`;
 }
 
@@ -75,7 +75,7 @@ function generateKeyCharacters(world) {
       { name: 'Justice Hacker', role: 'Social Activist', description: 'Fights for equality and social change' }
     ]
   };
-  
+
   return characterMap[world.franchiseId] || [];
 }
 
@@ -107,7 +107,7 @@ function generateMainStorylines(world) {
       'The Identity Quest: Discover authentic self in digital age'
     ]
   };
-  
+
   return storylineMap[world.franchiseId] || [];
 }
 
@@ -119,19 +119,19 @@ function extractTherapeuticTechniques(world) {
     'group_therapy': ['peer_support', 'social_skills_practice', 'group_problem_solving'],
     'solution_focused_therapy': ['goal_setting', 'strength_identification', 'solution_building']
   };
-  
+
   const techniques = new Set();
   world.therapeuticApproaches.forEach(approach => {
     const approachTechniques = techniqueMap[approach] || [];
     approachTechniques.forEach(technique => techniques.add(technique));
   });
-  
+
   return Array.from(techniques);
 }
 
 function generatePrerequisites(world) {
   const prerequisites = [];
-  
+
   if (world.difficultyLevel === 'advanced') {
     prerequisites.push({
       type: 'therapeutic_readiness',
@@ -147,7 +147,7 @@ function generatePrerequisites(world) {
       description: 'Some experience with therapeutic content helpful'
     });
   }
-  
+
   return prerequisites;
 }
 
@@ -157,13 +157,13 @@ function calculateTherapeuticReadiness(world) {
     'intermediate': 0.6,
     'advanced': 0.8
   };
-  
+
   return difficultyMap[world.difficultyLevel] || 0.5;
 }
 
 function generateContentWarnings(world) {
   const warnings = [];
-  
+
   // Extract from content ratings
   world.contentRatings.forEach(rating => {
     rating.descriptors.forEach(descriptor => {
@@ -172,17 +172,17 @@ function generateContentWarnings(world) {
       }
     });
   });
-  
+
   // Add therapeutic content warnings
   if (world.therapeuticThemes.includes('healing_from_trauma')) {
     warnings.push('Contains themes related to trauma and recovery');
   }
-  
-  if (world.therapeuticThemes.includes('academic_anxiety') || 
+
+  if (world.therapeuticThemes.includes('academic_anxiety') ||
       world.therapeuticThemes.includes('social_anxiety_in_formal_settings')) {
     warnings.push('Contains scenarios that may trigger anxiety (in therapeutic context)');
   }
-  
+
   return warnings;
 }
 
@@ -190,7 +190,7 @@ function main() {
   try {
     // Parse command line arguments
     const args = process.argv.slice(2);
-    
+
     if (args.length === 0) {
       console.error(JSON.stringify({
         success: false,
@@ -198,7 +198,7 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     let requestData;
     try {
       requestData = JSON.parse(args[0]);
@@ -209,7 +209,7 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     const worldId = requestData.worldId;
     if (!worldId) {
       console.error(JSON.stringify({
@@ -218,11 +218,11 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     // Find the franchise world
     const allWorlds = getAllWorlds();
     const franchiseWorld = allWorlds.find(world => world.franchiseId === worldId);
-    
+
     if (!franchiseWorld) {
       console.error(JSON.stringify({
         success: false,
@@ -230,18 +230,18 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     // Convert to TTA format
     const worldDetails = convertFranchiseWorldToTTA(franchiseWorld);
-    
+
     // Return results
     const response = {
       success: true,
       worldDetails: worldDetails
     };
-    
+
     console.log(JSON.stringify(response, null, 2));
-    
+
   } catch (error) {
     console.error(JSON.stringify({
       success: false,

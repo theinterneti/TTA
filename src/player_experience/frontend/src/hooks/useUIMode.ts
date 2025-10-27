@@ -1,6 +1,6 @@
 /**
  * UI Mode Hook
- * 
+ *
  * React hook for managing UI mode state and initialization
  */
 
@@ -28,7 +28,7 @@ interface UseUIModeReturn {
  */
 export const useUIMode = (options: UseUIModeOptions = {}): UseUIModeReturn => {
   const { userRole, autoInitialize = true } = options;
-  
+
   const [currentMode, setCurrentMode] = useState<UIMode>(UIMode.ENTERTAINMENT);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,10 +50,10 @@ export const useUIMode = (options: UseUIModeOptions = {}): UseUIModeReturn => {
 
         // Check for saved user preference
         const savedPreference = UIModeUtils.loadUserPreference();
-        
+
         // Determine the appropriate mode
         const determinedMode = determineUIMode(userRole, savedPreference);
-        
+
         // Set the mode in the translation service
         translationService.setMode(determinedMode);
         setCurrentMode(determinedMode);
@@ -66,12 +66,12 @@ export const useUIMode = (options: UseUIModeOptions = {}): UseUIModeReturn => {
       } catch (err) {
         console.error('Failed to initialize UI mode:', err);
         setError('Failed to initialize interface mode');
-        
+
         // Fallback to entertainment mode
         const translationService = TerminologyTranslationService.getInstance();
         translationService.setMode(UIMode.ENTERTAINMENT);
         setCurrentMode(UIMode.ENTERTAINMENT);
-        
+
       } finally {
         setIsLoading(false);
       }

@@ -26,11 +26,11 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  startTherapeuticSession, 
-  updateProgressMetrics, 
+import {
+  startTherapeuticSession,
+  updateProgressMetrics,
   triggerIntervention,
-  updateSessionStatus 
+  updateSessionStatus
 } from '@tta/shared-components/store/therapeuticStore';
 import type { RootState, AppDispatch } from '@tta/shared-components/store/therapeuticStore';
 import type { TherapeuticSession, ProgressMetrics } from '@tta/shared-components/types/therapeutic';
@@ -43,13 +43,13 @@ interface GameInterfaceProps {
 const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetected }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  
-  const { 
-    currentSession, 
-    progressMetrics, 
-    loading, 
-    error, 
-    featureFlags 
+
+  const {
+    currentSession,
+    progressMetrics,
+    loading,
+    error,
+    featureFlags
   } = useSelector((state: RootState) => state.therapeutic);
 
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'paused'>('idle');
@@ -80,10 +80,10 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetect
           },
           engagementLevel: gameState === 'playing' ? 85 : 30,
         };
-        
-        dispatch(updateProgressMetrics({ 
-          sessionId: currentSession.id, 
-          metrics 
+
+        dispatch(updateProgressMetrics({
+          sessionId: currentSession.id,
+          metrics
         }));
       }, 30000);
 
@@ -210,13 +210,13 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetect
               Therapeutic Gaming Session
             </Typography>
             <Box display="flex" gap={1}>
-              <Chip 
+              <Chip
                 icon={<Psychology />}
                 label={currentSession?.status || 'Not Started'}
                 color={currentSession?.status === 'active' ? 'primary' : 'default'}
               />
               {featureFlags.aiNarrativeEnhancement && (
-                <Chip 
+                <Chip
                   icon={<Favorite />}
                   label="AI Enhanced"
                   color="secondary"
@@ -238,7 +238,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetect
                 Start Session
               </Button>
             )}
-            
+
             {gameState === 'playing' && (
               <>
                 <Button
@@ -282,16 +282,16 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetect
               <LinearProgress
                 variant="determinate"
                 value={progressMetrics.engagementLevel}
-                sx={{ 
+                sx={{
                   mb: 1,
                   '& .MuiLinearProgress-bar': {
                     backgroundColor: getProgressColor(progressMetrics.engagementLevel),
                   },
                 }}
               />
-              
+
               <Typography variant="body2" gutterBottom>
-                Emotional State: Valence {progressMetrics.emotionalState.valence}, 
+                Emotional State: Valence {progressMetrics.emotionalState.valence},
                 Arousal {progressMetrics.emotionalState.arousal}
               </Typography>
             </Box>
@@ -316,7 +316,7 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetect
                 <Typography variant="body1" paragraph>
                   {currentScenario || 'Loading therapeutic content...'}
                 </Typography>
-                
+
                 {featureFlags.livingWorldsSystem && (
                   <Alert severity="info" sx={{ mt: 2 }}>
                     Living Worlds System Active - Your choices shape the narrative
@@ -371,8 +371,8 @@ const GameInterface: React.FC<GameInterfaceProps> = ({ patientId, onCrisisDetect
           <Button onClick={() => setShowCrisisDialog(false)}>
             Close
           </Button>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             color="error"
             onClick={handleCrisisSupport}
           >

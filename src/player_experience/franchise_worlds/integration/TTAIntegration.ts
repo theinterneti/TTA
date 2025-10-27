@@ -1,6 +1,6 @@
 /**
  * TTA Integration Module
- * 
+ *
  * Integrates the franchise world system with existing TTA components including
  * WorldDetails model, AIWorldGenerator, simulation framework, and other systems.
  */
@@ -15,7 +15,7 @@ import { STELLAR_CONFEDERATION, NEON_METROPOLIS } from '../worlds/SciFiWorlds';
  */
 export class FranchiseWorldIntegration {
   private franchiseSystem: FranchiseWorldSystem;
-  
+
   constructor() {
     this.franchiseSystem = new FranchiseWorldSystem();
     this.initializeFranchiseWorlds();
@@ -105,7 +105,7 @@ export class FranchiseWorldIntegration {
     // Calculate average complexity across all world systems
     const avgComplexity = Object.values(config.worldSystems)
       .reduce((sum, system) => sum + system.complexity, 0) / Object.keys(config.worldSystems).length;
-    
+
     if (avgComplexity < 0.4) return DifficultyLevel.BEGINNER;
     if (avgComplexity < 0.7) return DifficultyLevel.INTERMEDIATE;
     return DifficultyLevel.ADVANCED;
@@ -115,10 +115,10 @@ export class FranchiseWorldIntegration {
     // Base duration on session length support and complexity
     const avgComplexity = Object.values(config.worldSystems)
       .reduce((sum, system) => sum + system.complexity, 0) / Object.keys(config.worldSystems).length;
-    
+
     const baseDuration = config.sessionLengthSupport.medium.targetDuration / 60; // Convert to hours
     const complexityMultiplier = 1 + avgComplexity; // 1-2x multiplier
-    
+
     return { hours: Math.round(baseDuration * complexityMultiplier) };
   }
 
@@ -131,7 +131,7 @@ export class FranchiseWorldIntegration {
       })
       .slice(0, 4) // Limit to 4 systems for readability
       .join('; ');
-    
+
     return `A ${config.genre} world featuring: ${systemDescriptions}`;
   }
 
@@ -144,54 +144,54 @@ export class FranchiseWorldIntegration {
   }
 
   private generateMainStorylines(config: FranchiseWorldConfig): string[] {
-    return config.scenarioTemplates.map(template => 
+    return config.scenarioTemplates.map(template =>
       `${template.name}: ${template.description} (${template.duration} session)`
     );
   }
 
   private extractTherapeuticTechniques(config: FranchiseWorldConfig): string[] {
     const techniques = new Set<string>();
-    
+
     // Extract from therapeutic integration points
     config.therapeuticIntegrationPoints.forEach(point => {
       techniques.add(point.technique);
     });
-    
+
     // Extract from character interaction patterns
     config.characterArchetypes.forEach(archetype => {
       archetype.interactionPatterns.forEach(pattern => {
         techniques.add(pattern.therapeutic_technique);
       });
     });
-    
+
     return Array.from(techniques);
   }
 
   private generatePrerequisites(config: FranchiseWorldConfig): Array<{type: string, description: string}> {
     const prerequisites: Array<{type: string, description: string}> = [];
-    
+
     // Add therapeutic readiness prerequisites
     const avgTherapeuticRelevance = Object.values(config.worldSystems)
       .reduce((sum, system) => sum + system.therapeuticRelevance, 0) / Object.keys(config.worldSystems).length;
-    
+
     if (avgTherapeuticRelevance > 0.7) {
       prerequisites.push({
         type: 'therapeutic_readiness',
         description: 'Comfortable with moderate therapeutic content and self-reflection'
       });
     }
-    
+
     // Add complexity prerequisites
     const avgComplexity = Object.values(config.worldSystems)
       .reduce((sum, system) => sum + system.complexity, 0) / Object.keys(config.worldSystems).length;
-    
+
     if (avgComplexity > 0.8) {
       prerequisites.push({
         type: 'complexity_comfort',
         description: 'Comfortable with complex narratives and multiple interconnected systems'
       });
     }
-    
+
     return prerequisites;
   }
 
@@ -199,15 +199,15 @@ export class FranchiseWorldIntegration {
     // Calculate based on therapeutic intensity and integration points
     const avgTherapeuticRelevance = Object.values(config.worldSystems)
       .reduce((sum, system) => sum + system.therapeuticRelevance, 0) / Object.keys(config.worldSystems).length;
-    
+
     const integrationIntensity = config.therapeuticIntegrationPoints.length / 10; // Normalize to 0-1
-    
+
     return Math.min((avgTherapeuticRelevance + integrationIntensity) / 2, 1.0);
   }
 
   private generateContentWarnings(config: FranchiseWorldConfig): string[] {
     const warnings: string[] = [];
-    
+
     // Extract from content ratings
     config.contentRatings.forEach(rating => {
       rating.descriptors.forEach(descriptor => {
@@ -216,16 +216,16 @@ export class FranchiseWorldIntegration {
         }
       });
     });
-    
+
     // Add therapeutic content warnings
     if (config.therapeuticThemes.includes('trauma_recovery')) {
       warnings.push('Contains themes related to trauma and recovery');
     }
-    
+
     if (config.therapeuticThemes.includes('anxiety_management')) {
       warnings.push('Contains scenarios that may trigger anxiety (in therapeutic context)');
     }
-    
+
     return warnings;
   }
 
@@ -250,7 +250,7 @@ export class FranchiseWorldIntegration {
   private calculateTherapeuticIntensity(config: FranchiseWorldConfig, playerPreferences: any): number {
     const baseIntensity = this.calculateTherapeuticReadiness(config);
     const playerPreference = playerPreferences?.therapeutic_intensity || 0.5;
-    
+
     // Blend world capability with player preference
     return (baseIntensity + playerPreference) / 2;
   }
@@ -258,11 +258,11 @@ export class FranchiseWorldIntegration {
   private determineNarrativePace(config: FranchiseWorldConfig, playerPreferences: any): string {
     const playerPace = playerPreferences?.narrative_pace;
     if (playerPace) return playerPace;
-    
+
     // Default based on world complexity
     const avgComplexity = Object.values(config.worldSystems)
       .reduce((sum, system) => sum + system.complexity, 0) / Object.keys(config.worldSystems).length;
-    
+
     if (avgComplexity > 0.8) return 'slow';
     if (avgComplexity > 0.5) return 'medium';
     return 'fast';
@@ -271,10 +271,10 @@ export class FranchiseWorldIntegration {
   private determineInteractionFrequency(config: FranchiseWorldConfig, playerPreferences: any): string {
     const playerFreq = playerPreferences?.interaction_frequency;
     if (playerFreq) return playerFreq;
-    
+
     // Default based on social system complexity
     const socialComplexity = config.worldSystems.social?.complexity || 0.5;
-    
+
     if (socialComplexity > 0.8) return 'frequent';
     if (socialComplexity > 0.5) return 'balanced';
     return 'minimal';
@@ -286,11 +286,11 @@ export class FranchiseWorldIntegration {
   async validateWorldForSimulation(worldId: string): Promise<boolean> {
     const world = this.franchiseSystem.getWorld(worldId);
     if (!world) return false;
-    
+
     // Check if world has sufficient complexity for simulation
     const avgComplexity = Object.values(world.worldSystems)
       .reduce((sum, system) => sum + system.complexity, 0) / Object.keys(world.worldSystems).length;
-    
+
     return avgComplexity >= 0.5 && world.characterArchetypes.length >= 2;
   }
 }

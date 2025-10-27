@@ -28,7 +28,7 @@ test.describe('Performance Testing', () => {
     await mockApiResponse(page, '**/players/*/characters', []);
     await mockApiResponse(page, '**/worlds', []);
     await mockApiResponse(page, '**/players/*/preferences', {});
-    
+
     // Login before each test
     await loginPage.goto();
     await loginPage.login(testUsers.default);
@@ -73,7 +73,7 @@ test.describe('Performance Testing', () => {
       });
 
       const loadTimes = await Promise.all(loadPromises);
-      
+
       // All pages should load within reasonable time even when concurrent
       loadTimes.forEach(time => {
         expect(time).toBeLessThan(5000); // 5 seconds for concurrent loads
@@ -87,13 +87,13 @@ test.describe('Performance Testing', () => {
   test.describe('User Interaction Performance', () => {
     test('should handle character creation quickly', async ({ page }) => {
       await characterPage.goto();
-      
+
       const creationTime = await measureActionTime(async () => {
         await mockApiResponse(page, '**/players/*/characters', {
           character_id: 'new-char-1',
           name: 'Test Character',
         }, 201, 'POST');
-        
+
         const testCharacter = generateRandomCharacter();
         await characterPage.createCharacter(testCharacter);
       });
@@ -103,7 +103,7 @@ test.describe('Performance Testing', () => {
 
     test('should handle world filtering quickly', async ({ page }) => {
       await worldSelectionPage.goto();
-      
+
       const filterTime = await measureActionTime(async () => {
         await worldSelectionPage.filterByDifficulty('BEGINNER');
       });
@@ -113,7 +113,7 @@ test.describe('Performance Testing', () => {
 
     test('should handle preferences saving quickly', async ({ page }) => {
       await preferencesPage.goto();
-      
+
       const saveTime = await measureActionTime(async () => {
         await mockApiResponse(page, '**/players/*/preferences', { success: true }, 200, 'PUT');
         await preferencesPage.setIntensityLevel(7);
@@ -125,13 +125,13 @@ test.describe('Performance Testing', () => {
 
     test('should handle chat message sending quickly', async ({ page }) => {
       await chatPage.goto();
-      
+
       const messageTime = await measureActionTime(async () => {
         await mockApiResponse(page, '**/chat/send', {
           message_id: 'msg-1',
           response: 'Test response',
         }, 200, 'POST');
-        
+
         await chatPage.sendMessage('Hello, how are you?');
       });
 
@@ -140,7 +140,7 @@ test.describe('Performance Testing', () => {
 
     test('should handle rapid user interactions', async ({ page }) => {
       await dashboardPage.goto();
-      
+
       // Simulate rapid navigation
       const rapidNavigationTime = await measureActionTime(async () => {
         await dashboardPage.navigateToCharacters();
@@ -181,7 +181,7 @@ test.describe('Performance Testing', () => {
       }));
 
       await mockApiResponse(page, '**/players/*/characters', largeCharacterList);
-      
+
       const loadTime = await measureActionTime(async () => {
         await characterPage.goto();
         await characterPage.expectCharacterListLoaded();
@@ -216,11 +216,11 @@ test.describe('Performance Testing', () => {
 
       // Navigate through multiple pages
       const pages = ['/dashboard', '/characters', '/worlds', '/preferences', '/settings'];
-      
+
       for (const pagePath of pages) {
         await page.goto(pagePath);
         await page.waitForLoadState('networkidle');
-        
+
         // Force garbage collection if available
         await page.evaluate(() => {
           if ((window as any).gc) {
@@ -242,7 +242,7 @@ test.describe('Performance Testing', () => {
     test('should handle large DOM efficiently', async ({ page }) => {
       // Create a page with many elements
       await page.goto('/characters');
-      
+
       // Mock large character list to create large DOM
       const largeCharacterList = Array.from({ length: 200 }, (_, i) => ({
         character_id: `char-${i}`,
@@ -266,7 +266,7 @@ test.describe('Performance Testing', () => {
 
     test('should handle WebSocket connections efficiently', async ({ page }) => {
       await chatPage.goto();
-      
+
       // Measure WebSocket connection time
       const connectionTime = await measureActionTime(async () => {
         await chatPage.expectChatLoaded();
@@ -285,17 +285,17 @@ test.describe('Performance Testing', () => {
       });
 
       const loadTime = await measurePageLoadTime(page, '/dashboard');
-      
+
       // Should still be usable on slow networks
       expect(loadTime).toBeLessThan(8000); // 8 seconds on slow network
     });
 
     test('should optimize image loading', async ({ page }) => {
       await dashboardPage.goto();
-      
+
       // Check that images are loaded efficiently
       const images = await page.locator('img').all();
-      
+
       for (const img of images) {
         const src = await img.getAttribute('src');
         if (src && !src.startsWith('data:')) {
@@ -308,16 +308,16 @@ test.describe('Performance Testing', () => {
 
     test('should handle offline scenarios gracefully', async ({ page }) => {
       await dashboardPage.goto();
-      
+
       // Simulate offline
       await page.context().setOffline(true);
-      
+
       // Try to navigate
       await page.click('a[href="/characters"]');
-      
+
       // Should show offline message or cached content
       await expect(page.locator('text=offline, text=cached, text=unavailable')).toBeVisible();
-      
+
       // Restore online
       await page.context().setOffline(false);
     });
@@ -326,14 +326,14 @@ test.describe('Performance Testing', () => {
   test.describe('Rendering Performance', () => {
     test('should achieve good Core Web Vitals', async ({ page }) => {
       await page.goto('/dashboard');
-      
+
       // Measure Core Web Vitals
       const vitals = await page.evaluate(() => {
         return new Promise((resolve) => {
           const observer = new PerformanceObserver((list) => {
             const entries = list.getEntries();
             const vitals: any = {};
-            
+
             entries.forEach((entry) => {
               if (entry.name === 'first-contentful-paint') {
                 vitals.fcp = entry.startTime;
@@ -345,10 +345,10 @@ test.describe('Performance Testing', () => {
                 vitals.cls = (vitals.cls || 0) + (entry as any).value;
               }
             });
-            
+
             setTimeout(() => resolve(vitals), 3000);
           });
-          
+
           observer.observe({ entryTypes: ['paint', 'largest-contentful-paint', 'layout-shift'] });
         });
       });
@@ -361,16 +361,16 @@ test.describe('Performance Testing', () => {
 
     test('should render animations smoothly', async ({ page }) => {
       await dashboardPage.goto();
-      
+
       // Trigger animations (e.g., modal opening)
       await dashboardPage.openUserMenu();
-      
+
       // Measure frame rate during animation
       const frameRate = await page.evaluate(() => {
         return new Promise((resolve) => {
           let frames = 0;
           const startTime = performance.now();
-          
+
           function countFrames() {
             frames++;
             if (performance.now() - startTime < 1000) {
@@ -379,7 +379,7 @@ test.describe('Performance Testing', () => {
               resolve(frames);
             }
           }
-          
+
           requestAnimationFrame(countFrames);
         });
       });
@@ -409,7 +409,7 @@ test.describe('Performance Testing', () => {
   test.describe('Stress Testing', () => {
     test('should handle rapid user interactions', async ({ page }) => {
       await characterPage.goto();
-      
+
       // Simulate rapid clicking
       const rapidClickTime = await measureActionTime(async () => {
         for (let i = 0; i < 10; i++) {
@@ -433,18 +433,18 @@ test.describe('Performance Testing', () => {
       const userActions = userPages.map(async (userPage, index) => {
         const userLoginPage = new LoginPage(userPage);
         const userDashboardPage = new DashboardPage(userPage);
-        
+
         await userLoginPage.goto();
         await userLoginPage.login({ ...testUsers.default, username: `user${index}` });
         await userDashboardPage.goto();
-        
+
         return measureActionTime(async () => {
           await userDashboardPage.expectDashboardLoaded();
         });
       });
 
       const loadTimes = await Promise.all(userActions);
-      
+
       // All users should be able to use the system simultaneously
       loadTimes.forEach(time => {
         expect(time).toBeLessThan(5000); // 5 seconds per user
@@ -456,7 +456,7 @@ test.describe('Performance Testing', () => {
 
     test('should handle long-running sessions', async ({ page }) => {
       await chatPage.goto();
-      
+
       // Simulate a long chat session
       const longSessionTime = await measureActionTime(async () => {
         for (let i = 0; i < 20; i++) {
@@ -464,7 +464,7 @@ test.describe('Performance Testing', () => {
             message_id: `msg-${i}`,
             response: `Response ${i}`,
           }, 200, 'POST');
-          
+
           await chatPage.sendMessage(`Message ${i}`);
           await page.waitForTimeout(100);
         }

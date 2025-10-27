@@ -17,9 +17,9 @@ The diagnostic evidence points to a corrupted Docker Desktop installation:
 
 **Critical Evidence:**
 ```bash
-WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-buildx" is not valid: 
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-buildx" is not valid:
 failed to fetch metadata: signal: bus error (core dumped)
-WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-compose" is not valid: 
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-compose" is not valid:
 failed to fetch metadata: signal: bus error (core dumped)
 ```
 

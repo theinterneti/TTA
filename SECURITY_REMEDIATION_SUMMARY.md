@@ -67,7 +67,7 @@ This document summarizes the security remediation work performed on the TTA proj
    - All services have `no-new-privileges:true` security option applied
 
 2. **Docker Socket Exposure (2 findings)** - ACCEPTED RISK (Development Only)
-   - `templates/tta.dev/docker-compose.yml` and `templates/tta.prototype/docker-compose.yml`
+   - `templates/development/docker-compose.yml` and `templates/production/docker-compose.yml`
    - Only used in local development, never in production
 
 3. **Privileged Container (1 finding)** - ACCEPTED RISK (Required for Monitoring)
@@ -118,8 +118,9 @@ This document summarizes the security remediation work performed on the TTA proj
 - `monitoring/docker-compose.monitoring.yml`
 - `src/player_experience/docker-compose.yml`
 - `src/player_experience/franchise_worlds/deployment/docker-compose.yml`
-- `templates/tta.dev/docker-compose.yml`
-- `templates/tta.prototype/docker-compose.yml`
+- `templates/development/docker-compose.yml`
+- `templates/production/docker-compose.yml`
+- `templates/staging/docker-compose.yml`
 
 ### Documentation:
 - `SECURITY_FINDINGS_ACCEPTED_RISKS.md` (new)
@@ -190,4 +191,3 @@ Each commit will require user confirmation before execution.
 - Semgrep Rules: https://semgrep.dev/r
 - Docker Security Best Practices: https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html
 - OWASP Top 10: https://owasp.org/www-project-top-ten/
-

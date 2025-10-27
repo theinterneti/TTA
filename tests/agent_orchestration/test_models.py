@@ -1,13 +1,13 @@
 import pytest
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentId,
     AgentMessage,
     AgentType,
     MessagePriority,
     MessageType,
 )
-from src.agent_orchestration.validators import validate_agent_message
+from tta_ai.orchestration.validators import validate_agent_message
 
 
 def test_agent_message_valid():

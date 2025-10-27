@@ -1,0 +1,40 @@
+[project]
+name = "dev-primitives"
+version = "0.1.0"
+description = "Development primitives for error recovery, retry logic, and observability"
+authors = [
+    {name = "TTA Development Team"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "structlog>=24.1.0",
+    "tenacity>=8.2.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dev_primitives"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "B", "UP"]
+ignore = ["E501"]

@@ -51,8 +51,11 @@ def normalize_approaches(
     for v in values or []:
         try:
             result.append(normalize_approach(v))
-        except Exception:
-            # Skip invalid entries silently
+        except Exception as e:
+            # Skip invalid entries with debug logging
+            logger.debug(
+                f"Skipping invalid therapeutic approach '{v}': {type(e).__name__}: {e}"
+            )
             continue
     return result
 

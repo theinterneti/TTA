@@ -18,7 +18,7 @@ class GameplayQueries:
     def get_active_sessions_for_user(self) -> str:
         """Get all active sessions for a user."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{user_id: $user_id, is_active: true}})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{user_id: $user_id, is_active: true}})
         RETURN s
         ORDER BY s.last_activity_time DESC
         """
@@ -26,16 +26,16 @@ class GameplayQueries:
     def get_session_with_current_scene(self) -> str:
         """Get session with its current scene."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
-        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['CURRENT_SCENE']}]->(current_scene:{self.schema.NODE_LABELS['SCENE']})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
+        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS["CURRENT_SCENE"]}]->(current_scene:{self.schema.NODE_LABELS["SCENE"]})
         RETURN s, current_scene
         """
 
     def get_session_history(self) -> str:
         """Get session with scene history."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
-        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['HAS_SCENE']}]->(scenes:{self.schema.NODE_LABELS['SCENE']})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
+        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS["HAS_SCENE"]}]->(scenes:{self.schema.NODE_LABELS["SCENE"]})
         RETURN s, collect(scenes) as scene_history
         ORDER BY scenes.created_at
         """
@@ -44,8 +44,8 @@ class GameplayQueries:
     def get_scene_with_choices(self) -> str:
         """Get scene with all available choices."""
         return f"""
-        MATCH (sc:{self.schema.NODE_LABELS['SCENE']} {{scene_id: $scene_id}})
-        OPTIONAL MATCH (sc)-[:{self.schema.RELATIONSHIPS['HAS_CHOICE']}]->(c:{self.schema.NODE_LABELS['CHOICE']})
+        MATCH (sc:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
+        OPTIONAL MATCH (sc)-[:{self.schema.RELATIONSHIPS["HAS_CHOICE"]}]->(c:{self.schema.NODE_LABELS["CHOICE"]})
         WHERE c.is_available = true
         RETURN sc, collect(c) as choices
         ORDER BY c.therapeutic_value DESC, c.created_at
@@ -54,9 +54,9 @@ class GameplayQueries:
     def get_next_scenes_from_choice(self) -> str:
         """Get possible next scenes from a choice."""
         return f"""
-        MATCH (c:{self.schema.NODE_LABELS['CHOICE']} {{choice_id: $choice_id}})
-              -[:{self.schema.RELATIONSHIPS['LEADS_TO']}]->
-              (next_scene:{self.schema.NODE_LABELS['SCENE']})
+        MATCH (c:{self.schema.NODE_LABELS["CHOICE"]} {{choice_id: $choice_id}})
+              -[:{self.schema.RELATIONSHIPS["LEADS_TO"]}]->
+              (next_scene:{self.schema.NODE_LABELS["SCENE"]})
         RETURN next_scene
         ORDER BY next_scene.difficulty_level, next_scene.created_at
         """
@@ -64,21 +64,21 @@ class GameplayQueries:
     def link_scene_to_session(self) -> str:
         """Link a scene to a session."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}}),
-              (sc:{self.schema.NODE_LABELS['SCENE']} {{scene_id: $scene_id}})
-        MERGE (s)-[:{self.schema.RELATIONSHIPS['HAS_SCENE']}]->(sc)
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}}),
+              (sc:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
+        MERGE (s)-[:{self.schema.RELATIONSHIPS["HAS_SCENE"]}]->(sc)
         RETURN s, sc
         """
 
     def set_current_scene(self) -> str:
         """Set the current scene for a session."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
-        OPTIONAL MATCH (s)-[old_current:{self.schema.RELATIONSHIPS['CURRENT_SCENE']}]->()
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
+        OPTIONAL MATCH (s)-[old_current:{self.schema.RELATIONSHIPS["CURRENT_SCENE"]}]->()
         DELETE old_current
         WITH s
-        MATCH (new_scene:{self.schema.NODE_LABELS['SCENE']} {{scene_id: $scene_id}})
-        CREATE (s)-[:{self.schema.RELATIONSHIPS['CURRENT_SCENE']}]->(new_scene)
+        MATCH (new_scene:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
+        CREATE (s)-[:{self.schema.RELATIONSHIPS["CURRENT_SCENE"]}]->(new_scene)
         SET s.current_scene_id = $scene_id,
             s.updated_at = datetime()
         RETURN s, new_scene
@@ -88,9 +88,9 @@ class GameplayQueries:
     def record_user_choice(self) -> str:
         """Record a user's choice and create consequence relationship."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}}),
-              (c:{self.schema.NODE_LABELS['CHOICE']} {{choice_id: $choice_id}})
-        CREATE (s)-[made:{self.schema.RELATIONSHIPS['MADE_CHOICE']} {{
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}}),
+              (c:{self.schema.NODE_LABELS["CHOICE"]} {{choice_id: $choice_id}})
+        CREATE (s)-[made:{self.schema.RELATIONSHIPS["MADE_CHOICE"]} {{
             made_at: datetime(),
             response_time: $response_time,
             emotional_state_before: $emotional_state_before,
@@ -102,8 +102,8 @@ class GameplayQueries:
     def create_choice_consequence(self) -> str:
         """Create a consequence set for a choice."""
         return f"""
-        MATCH (c:{self.schema.NODE_LABELS['CHOICE']} {{choice_id: $choice_id}})
-        CREATE (consequence:{self.schema.NODE_LABELS['CONSEQUENCE']} {{
+        MATCH (c:{self.schema.NODE_LABELS["CHOICE"]} {{choice_id: $choice_id}})
+        CREATE (consequence:{self.schema.NODE_LABELS["CONSEQUENCE"]} {{
             consequence_id: $consequence_id,
             choice_id: $choice_id,
             session_id: $session_id,
@@ -120,7 +120,7 @@ class GameplayQueries:
             application_time: $application_time,
             created_at: datetime()
         }})
-        CREATE (c)-[:{self.schema.RELATIONSHIPS['HAS_CONSEQUENCE']}]->(consequence)
+        CREATE (c)-[:{self.schema.RELATIONSHIPS["HAS_CONSEQUENCE"]}]->(consequence)
         RETURN consequence
         """
 
@@ -128,8 +128,8 @@ class GameplayQueries:
     def create_progress_marker(self) -> str:
         """Create a progress marker for therapeutic development."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
-        CREATE (progress:{self.schema.NODE_LABELS['PROGRESS']} {{
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
+        CREATE (progress:{self.schema.NODE_LABELS["PROGRESS"]} {{
             progress_id: $progress_id,
             session_id: $session_id,
             user_id: $user_id,
@@ -144,16 +144,16 @@ class GameplayQueries:
             skills_involved: $skills_involved,
             achieved_at: datetime()
         }})
-        CREATE (s)-[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->(progress)
+        CREATE (s)-[:{self.schema.RELATIONSHIPS["ACHIEVES_PROGRESS"]}]->(progress)
         RETURN progress
         """
 
     def get_user_progress_summary(self) -> str:
         """Get comprehensive progress summary for a user."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{user_id: $user_id}})
-              -[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->
-              (p:{self.schema.NODE_LABELS['PROGRESS']})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{user_id: $user_id}})
+              -[:{self.schema.RELATIONSHIPS["ACHIEVES_PROGRESS"]}]->
+              (p:{self.schema.NODE_LABELS["PROGRESS"]})
         RETURN
             count(p) as total_progress_markers,
             collect(DISTINCT p.progress_type) as progress_types,
@@ -165,9 +165,9 @@ class GameplayQueries:
     def get_skill_development_history(self) -> str:
         """Get skill development history for a user."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{user_id: $user_id}})
-              -[:{self.schema.RELATIONSHIPS['DEVELOPS_SKILL']}]->
-              (skill:{self.schema.NODE_LABELS['SKILL']})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{user_id: $user_id}})
+              -[:{self.schema.RELATIONSHIPS["DEVELOPS_SKILL"]}]->
+              (skill:{self.schema.NODE_LABELS["SKILL"]})
         RETURN skill
         ORDER BY skill.last_practiced DESC
         """
@@ -176,7 +176,7 @@ class GameplayQueries:
     def create_validation_result(self) -> str:
         """Create a validation result record."""
         return f"""
-        CREATE (validation:{self.schema.NODE_LABELS['VALIDATION']} {{
+        CREATE (validation:{self.schema.NODE_LABELS["VALIDATION"]} {{
             validation_id: $validation_id,
             session_id: $session_id,
             validation_type: $validation_type,
@@ -199,7 +199,7 @@ class GameplayQueries:
     def get_session_validations(self) -> str:
         """Get all validation results for a session."""
         return f"""
-        MATCH (v:{self.schema.NODE_LABELS['VALIDATION']} {{session_id: $session_id}})
+        MATCH (v:{self.schema.NODE_LABELS["VALIDATION"]} {{session_id: $session_id}})
         RETURN v
         ORDER BY v.validated_at DESC
         """
@@ -208,10 +208,10 @@ class GameplayQueries:
     def get_session_analytics(self) -> str:
         """Get comprehensive analytics for a session."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
-        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['MADE_CHOICE']}]->(choices:{self.schema.NODE_LABELS['CHOICE']})
-        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->(progress:{self.schema.NODE_LABELS['PROGRESS']})
-        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['HAS_SCENE']}]->(scenes:{self.schema.NODE_LABELS['SCENE']})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
+        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS["MADE_CHOICE"]}]->(choices:{self.schema.NODE_LABELS["CHOICE"]})
+        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS["ACHIEVES_PROGRESS"]}]->(progress:{self.schema.NODE_LABELS["PROGRESS"]})
+        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS["HAS_SCENE"]}]->(scenes:{self.schema.NODE_LABELS["SCENE"]})
         RETURN
             s,
             count(DISTINCT choices) as total_choices,
@@ -225,10 +225,10 @@ class GameplayQueries:
     def get_therapeutic_effectiveness_metrics(self) -> str:
         """Get therapeutic effectiveness metrics for a user."""
         return f"""
-        MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{user_id: $user_id}})
-        OPTIONAL MATCH (s)-[made:{self.schema.RELATIONSHIPS['MADE_CHOICE']}]->(c:{self.schema.NODE_LABELS['CHOICE']})
+        MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{user_id: $user_id}})
+        OPTIONAL MATCH (s)-[made:{self.schema.RELATIONSHIPS["MADE_CHOICE"]}]->(c:{self.schema.NODE_LABELS["CHOICE"]})
         WHERE c.choice_type IN ['therapeutic', 'skill_building', 'emotional_regulation']
-        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->(p:{self.schema.NODE_LABELS['PROGRESS']})
+        OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS["ACHIEVES_PROGRESS"]}]->(p:{self.schema.NODE_LABELS["PROGRESS"]})
         RETURN
             count(DISTINCT s) as total_sessions,
             sum(s.total_session_time) as total_time,

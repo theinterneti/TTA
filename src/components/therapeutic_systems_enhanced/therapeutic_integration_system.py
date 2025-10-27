@@ -1114,7 +1114,7 @@ class TherapeuticIntegrationSystem:
                 simplified.append(f"guided_{opportunity}")
             return simplified
 
-        elif difficulty_level in ["hard", "very_hard"]:
+        if difficulty_level in ["hard", "very_hard"]:
             # Add advanced opportunities for harder levels
             advanced = base_opportunities.copy()
             advanced.extend(

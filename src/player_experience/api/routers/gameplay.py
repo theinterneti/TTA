@@ -120,17 +120,16 @@ async def create_session(
 
         if result.get("success"):
             return CreateSessionResponse(**result)
-        else:
-            # Map error codes to HTTP status codes
-            status_code = status.HTTP_400_BAD_REQUEST
-            if result.get("code") == "AUTH_ERROR":
-                status_code = status.HTTP_401_UNAUTHORIZED
-            elif result.get("code") == "SAFETY_ERROR":
-                status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        # Map error codes to HTTP status codes
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") == "SAFETY_ERROR":
+            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
 
-            raise HTTPException(
-                status_code=status_code, detail=result.get("error", "Unknown error")
-            )
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
 
     except HTTPException:
         raise
@@ -164,19 +163,18 @@ async def process_choice(
 
         if result.get("success"):
             return ProcessChoiceResponse(**result)
-        else:
-            # Map error codes to HTTP status codes
-            status_code = status.HTTP_400_BAD_REQUEST
-            if result.get("code") == "AUTH_ERROR":
-                status_code = status.HTTP_401_UNAUTHORIZED
-            elif result.get("code") == "SESSION_NOT_FOUND":
-                status_code = status.HTTP_404_NOT_FOUND
-            elif result.get("code") == "ACCESS_DENIED":
-                status_code = status.HTTP_403_FORBIDDEN
+        # Map error codes to HTTP status codes
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") == "SESSION_NOT_FOUND":
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
 
-            raise HTTPException(
-                status_code=status_code, detail=result.get("error", "Unknown error")
-            )
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
 
     except HTTPException:
         raise
@@ -207,19 +205,18 @@ async def get_session_status(
 
         if result.get("success"):
             return SessionStatusResponse(**result)
-        else:
-            # Map error codes to HTTP status codes
-            status_code = status.HTTP_400_BAD_REQUEST
-            if result.get("code") == "AUTH_ERROR":
-                status_code = status.HTTP_401_UNAUTHORIZED
-            elif result.get("code") == "SESSION_NOT_FOUND":
-                status_code = status.HTTP_404_NOT_FOUND
-            elif result.get("code") == "ACCESS_DENIED":
-                status_code = status.HTTP_403_FORBIDDEN
+        # Map error codes to HTTP status codes
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") == "SESSION_NOT_FOUND":
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
 
-            raise HTTPException(
-                status_code=status_code, detail=result.get("error", "Unknown error")
-            )
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
 
     except HTTPException:
         raise
@@ -250,19 +247,18 @@ async def end_session(
 
         if result.get("success"):
             return EndSessionResponse(**result)
-        else:
-            # Map error codes to HTTP status codes
-            status_code = status.HTTP_400_BAD_REQUEST
-            if result.get("code") == "AUTH_ERROR":
-                status_code = status.HTTP_401_UNAUTHORIZED
-            elif result.get("code") == "SESSION_NOT_FOUND":
-                status_code = status.HTTP_404_NOT_FOUND
-            elif result.get("code") == "ACCESS_DENIED":
-                status_code = status.HTTP_403_FORBIDDEN
+        # Map error codes to HTTP status codes
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") == "SESSION_NOT_FOUND":
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
 
-            raise HTTPException(
-                status_code=status_code, detail=result.get("error", "Unknown error")
-            )
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
 
     except HTTPException:
         raise
@@ -292,15 +288,14 @@ async def get_user_sessions(
 
         if result.get("success"):
             return UserSessionsResponse(**result)
-        else:
-            # Map error codes to HTTP status codes
-            status_code = status.HTTP_400_BAD_REQUEST
-            if result.get("code") == "AUTH_ERROR":
-                status_code = status.HTTP_401_UNAUTHORIZED
+        # Map error codes to HTTP status codes
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
 
-            raise HTTPException(
-                status_code=status_code, detail=result.get("error", "Unknown error")
-            )
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
 
     except HTTPException:
         raise

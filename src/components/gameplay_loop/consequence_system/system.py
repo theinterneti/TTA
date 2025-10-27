@@ -186,9 +186,9 @@ class ConsequenceSystem:
             )
 
             # Identify growth indicators
-            impact_analysis["growth_indicators"] = (
-                await self._identify_growth_indicators(consequence_set)
-            )
+            impact_analysis[
+                "growth_indicators"
+            ] = await self._identify_growth_indicators(consequence_set)
 
             return impact_analysis
 

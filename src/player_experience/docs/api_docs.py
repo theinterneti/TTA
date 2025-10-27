@@ -425,31 +425,30 @@ class APIDocumentationGenerator:
 
             return example
 
-        elif schema_type == "array":
+        if schema_type == "array":
             items_schema = schema.get("items", {"type": "string"})
             return [self._generate_example_from_schema(items_schema)]
 
-        elif schema_type == "string":
+        if schema_type == "string":
             if "format" in schema:
                 if schema["format"] == "email":
                     return "user@example.com"
-                elif schema["format"] == "date-time":
+                if schema["format"] == "date-time":
                     return "2023-01-01T00:00:00Z"
-                elif schema["format"] == "uuid":
+                if schema["format"] == "uuid":
                     return "123e4567-e89b-12d3-a456-426614174000"
             return "string"
 
-        elif schema_type == "integer":
+        if schema_type == "integer":
             return 42
 
-        elif schema_type == "number":
+        if schema_type == "number":
             return 3.14
 
-        elif schema_type == "boolean":
+        if schema_type == "boolean":
             return True
 
-        else:
-            return None
+        return None
 
     def generate_html_docs(self) -> Path:
         """Generate HTML API documentation."""
@@ -467,13 +466,13 @@ class APIDocumentationGenerator:
         markdown_content = self._generate_markdown_content()
 
         # Basic HTML wrapper
-        html_content = f"""
+        return f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{self.metadata['title']} - API Documentation</title>
+    <title>{self.metadata["title"]} - API Documentation</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -601,8 +600,6 @@ class APIDocumentationGenerator:
 </html>
         """
 
-        return html_content
-
     def _markdown_to_html(self, markdown: str) -> str:
         """Convert markdown to HTML (simplified implementation)."""
         # This is a very basic markdown to HTML converter
@@ -673,9 +670,7 @@ class APIDocumentationGenerator:
         # Clean up empty paragraphs
         html = re.sub(r"<p>\s*</p>", "", html)
         html = re.sub(r"<p>\s*(<h[1-6]>)", r"\1", html)
-        html = re.sub(r"(</h[1-6]>)\s*</p>", r"\1", html)
-
-        return html
+        return re.sub(r"(</h[1-6]>)\s*</p>", r"\1", html)
 
     def generate_endpoint_reference(self) -> Path:
         """Generate detailed endpoint reference."""
@@ -819,7 +814,7 @@ class APIDocumentationGenerator:
                         content.append("")
 
                         if "content" in response:
-                            for _, content_schema in response["content"].items():
+                            for content_schema in response["content"].values():
                                 if "schema" in content_schema:
                                     schema = content_schema["schema"]
                                     content.append("```json")

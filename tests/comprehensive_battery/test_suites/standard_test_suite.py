@@ -271,7 +271,7 @@ class StandardTestSuite:
                         session = await self.test_data_generator.create_test_session(
                             user, scenario
                         )
-                        session.session_id = f"{session.session_id}_part_{i+1}"
+                        session.session_id = f"{session.session_id}_part_{i + 1}"
                         sessions.append(session)
 
                     # Test continuity between sessions

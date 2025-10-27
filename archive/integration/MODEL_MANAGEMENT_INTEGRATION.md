@@ -70,15 +70,15 @@ The model management configuration has been added to your `config/tta_config.yam
 model_management:
   enabled: true
   default_provider: "openrouter"
-  
+
   providers:
     openrouter:
       enabled: true
       free_models_only: true  # Start with free models
-    
+
     ollama:
       enabled: false  # Enable if you want local models
-    
+
     local:
       enabled: false  # Enable for direct HuggingFace models
 ```
@@ -220,7 +220,7 @@ model_instance = await component.select_model(requirements)
 ```python
 # Get model performance metrics
 performance = await component.performance_monitor.get_model_performance(
-    "llama-3.1-8b", 
+    "llama-3.1-8b",
     timeframe_hours=24
 )
 

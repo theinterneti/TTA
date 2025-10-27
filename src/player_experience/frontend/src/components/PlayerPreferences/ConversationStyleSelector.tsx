@@ -77,7 +77,7 @@ const ConversationStyleSelector: React.FC<ConversationStyleSelectorProps> = ({
 
   const getColorClasses = (color: string, isSelected: boolean, isPreview: boolean = false) => {
     const baseClasses = 'border-2 transition-all duration-200';
-    
+
     if (isSelected) {
       switch (color) {
         case 'pink':
@@ -105,7 +105,7 @@ const ConversationStyleSelector: React.FC<ConversationStyleSelectorProps> = ({
           Conversation Style
         </h3>
         <p className="text-gray-600 mb-6">
-          Choose the communication style that feels most comfortable and effective for you. 
+          Choose the communication style that feels most comfortable and effective for you.
           This affects the tone, approach, and manner of interaction in your therapeutic conversations.
         </p>
       </div>
@@ -116,7 +116,7 @@ const ConversationStyleSelector: React.FC<ConversationStyleSelectorProps> = ({
           <div
             key={item.style}
             className={`p-6 rounded-xl cursor-pointer ${getColorClasses(
-              item.color, 
+              item.color,
               value === item.style,
               previewStyle === item.style
             )}`}
@@ -128,11 +128,11 @@ const ConversationStyleSelector: React.FC<ConversationStyleSelectorProps> = ({
               <span className="text-3xl mr-3">{item.icon}</span>
               <h4 className="text-lg font-semibold">{item.title}</h4>
             </div>
-            
+
             <p className="text-sm mb-4 opacity-90">
               {CONVERSATION_STYLE_DESCRIPTIONS[item.style]}
             </p>
-            
+
             <div className="space-y-3">
               <div>
                 <h5 className="font-medium text-sm mb-2">Characteristics:</h5>
@@ -160,7 +160,7 @@ const ConversationStyleSelector: React.FC<ConversationStyleSelectorProps> = ({
                 </div>
               </div>
             </div>
-            
+
             {value === item.style && (
               <div className="mt-4 pt-4 border-t border-current border-opacity-20">
                 <div className="flex items-center text-sm font-medium">

@@ -92,7 +92,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character, isSelected, on
     const now = new Date();
     const lastActive = new Date(dateString);
     const diffInHours = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Active now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
@@ -160,7 +160,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character, isSelected, on
             </span>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg p-3 border border-gray-200">
           <div className="text-xs text-gray-600 mb-1">Active Worlds</div>
           <div className="text-lg font-semibold text-gray-900">
@@ -229,7 +229,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character, isSelected, on
         >
           Edit Details
         </button>
-        
+
         {!showDeleteConfirm ? (
           <button
             onClick={handleDeleteClick}

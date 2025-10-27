@@ -38,3 +38,4 @@ For more detailed architecture documentation specific to each component:
 - [System Architecture Diagram](system-architecture-diagram.md): Visual representation of the system architecture
 - [Component Interaction Diagram](component-interaction-diagram.md): Visualization of component interactions
 - [Data Flow Diagram](data-flow-diagram.md): Visualization of data flow through the system
+- [CI/CD and Deployment Diagram](cicd-deployment-diagram.md): Continuous integration, deployment, and infrastructure architecture

@@ -82,7 +82,7 @@ const CrisisSupportSection: React.FC<CrisisSupportSectionProps> = ({
     const updatedResources = currentResources.includes(resourceId)
       ? currentResources.filter(id => id !== resourceId)
       : [...currentResources, resourceId];
-    
+
     handleContactInfoUpdate('preferred_crisis_resources', updatedResources);
   };
 
@@ -106,7 +106,7 @@ const CrisisSupportSection: React.FC<CrisisSupportSectionProps> = ({
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Crisis Support Resources</h3>
         <p className="text-gray-600 mb-6">
-          Set up your crisis support preferences and access immediate help when needed. 
+          Set up your crisis support preferences and access immediate help when needed.
           Your safety and well-being are our highest priority.
         </p>
       </div>
@@ -142,8 +142,8 @@ const CrisisSupportSection: React.FC<CrisisSupportSectionProps> = ({
                   <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ${
-                  resource.availability === '24/7' 
-                    ? 'bg-green-100 text-green-800' 
+                  resource.availability === '24/7'
+                    ? 'bg-green-100 text-green-800'
                     : 'bg-blue-100 text-blue-800'
                 }`}>
                   {resource.availability}
@@ -207,7 +207,7 @@ const CrisisSupportSection: React.FC<CrisisSupportSectionProps> = ({
         <p className="text-sm text-gray-600 mb-4">
           Select the crisis resources you'd prefer to have quick access to. These will be prioritized in emergency situations.
         </p>
-        
+
         <div className="space-y-3">
           {defaultCrisisResources.map((resource) => (
             <label key={resource.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
@@ -221,8 +221,8 @@ const CrisisSupportSection: React.FC<CrisisSupportSectionProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-900">{resource.name}</span>
                   <span className={`px-2 py-1 text-xs rounded-full ${
-                    resource.availability === '24/7' 
-                      ? 'bg-green-100 text-green-800' 
+                    resource.availability === '24/7'
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-blue-100 text-blue-800'
                   }`}>
                     {resource.availability}

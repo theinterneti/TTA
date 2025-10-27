@@ -811,7 +811,7 @@ class TherapeuticReplayabilitySystem:
                 total_score = 0.0
                 metric_count = 0
 
-                for _metric_name, path_scores in metric_scores.items():
+                for path_scores in metric_scores.values():
                     if path.path_id in path_scores:
                         total_score += path_scores[path.path_id]
                         metric_count += 1
@@ -982,7 +982,7 @@ class TherapeuticReplayabilitySystem:
                 total_score = 0.0
                 metric_count = 0
 
-                for _metric_name, path_metric_scores in metric_scores.items():
+                for path_metric_scores in metric_scores.values():
                     if path.path_id in path_metric_scores:
                         total_score += path_metric_scores[path.path_id]
                         metric_count += 1

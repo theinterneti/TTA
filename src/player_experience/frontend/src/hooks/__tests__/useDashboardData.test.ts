@@ -213,10 +213,10 @@ describe('useDashboardData', () => {
     jest.useFakeTimers();
 
     const { result } = renderHook(() =>
-      useDashboardData({ 
-        playerId: 'player_1', 
-        autoRefresh: true, 
-        refreshInterval: 1000 
+      useDashboardData({
+        playerId: 'player_1',
+        autoRefresh: true,
+        refreshInterval: 1000
       })
     );
 
@@ -249,10 +249,10 @@ describe('useDashboardData', () => {
     jest.useFakeTimers();
 
     const { result } = renderHook(() =>
-      useDashboardData({ 
-        playerId: 'player_1', 
-        autoRefresh: false, 
-        refreshInterval: 1000 
+      useDashboardData({
+        playerId: 'player_1',
+        autoRefresh: false,
+        refreshInterval: 1000
       })
     );
 
@@ -316,10 +316,10 @@ describe('useDashboardData', () => {
     const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
 
     const { unmount } = renderHook(() =>
-      useDashboardData({ 
-        playerId: 'player_1', 
-        autoRefresh: true, 
-        refreshInterval: 1000 
+      useDashboardData({
+        playerId: 'player_1',
+        autoRefresh: true,
+        refreshInterval: 1000
       })
     );
 

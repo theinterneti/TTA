@@ -1,8 +1,8 @@
 import pytest
 
-from src.agent_orchestration.models import AgentType, OrchestrationRequest
-from src.agent_orchestration.workflow import AgentStep, WorkflowDefinition, WorkflowType
-from src.agent_orchestration.workflow_manager import WorkflowManager
+from tta_ai.orchestration.models import AgentType, OrchestrationRequest
+from tta_ai.orchestration.workflow import AgentStep, WorkflowDefinition, WorkflowType
+from tta_ai.orchestration.workflow_manager import WorkflowManager
 
 
 @pytest.mark.asyncio
@@ -19,7 +19,7 @@ async def test_workflow_manager_aggregates_safety_findings(monkeypatch):
 
     # Monkeypatch internal _execute_step to attach therapeutic_validation
     def fake_exec(step, run_state):
-        from src.agent_orchestration.workflow_manager import StepResult
+        from tta_ai.orchestration.workflow_manager import StepResult
 
         res = StepResult(step=step)
         if step.agent == AgentType.IPA:

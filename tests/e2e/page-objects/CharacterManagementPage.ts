@@ -39,7 +39,7 @@ export class CharacterManagementPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
     this.pageTitle = page.locator('h1').filter({ hasText: /character.*management/i });
     this.createCharacterButton = page.locator('button').filter({ hasText: /create.*character|new character/i });
@@ -94,19 +94,19 @@ export class CharacterManagementPage extends BasePage {
     await this.nameInput.fill(character.name);
     await this.descriptionInput.fill(character.appearance.description);
     await this.storyInput.fill(character.background.story);
-    
+
     // Handle personality traits (might be comma-separated or individual inputs)
     await this.personalityTraitsInput.fill(character.background.personality_traits.join(', '));
-    
+
     // Handle goals
     await this.goalsInput.fill(character.background.goals.join(', '));
-    
+
     // Set comfort level
     await this.comfortLevelSlider.fill(character.therapeutic_profile.comfort_level.toString());
-    
+
     // Set intensity
     await this.intensitySelect.selectOption(character.therapeutic_profile.preferred_intensity);
-    
+
     // Handle therapeutic goals
     await this.therapeuticGoalsInput.fill(character.therapeutic_profile.therapeutic_goals.join(', '));
   }
@@ -217,7 +217,7 @@ export class CharacterManagementPage extends BasePage {
   async expectFormValidation() {
     await this.clickCreateCharacter();
     await this.saveCharacterButton.click();
-    
+
     // Should show validation errors for required fields
     const errorMessages = this.page.locator('.error, [data-testid="error"]');
     await expect(errorMessages.first()).toBeVisible();
@@ -227,7 +227,7 @@ export class CharacterManagementPage extends BasePage {
     await this.clickCreateCharacter();
     await this.descriptionInput.fill('Test description');
     await this.saveCharacterButton.click();
-    
+
     const nameError = this.page.locator('.error').filter({ hasText: /name.*required/i });
     await expect(nameError).toBeVisible();
   }
@@ -235,12 +235,12 @@ export class CharacterManagementPage extends BasePage {
   // Accessibility tests
   async checkAccessibility() {
     await super.checkAccessibility();
-    
+
     // Check form accessibility
     await this.clickCreateCharacter();
     await expect(this.nameInput).toHaveAttribute('aria-label');
     await expect(this.characterForm).toHaveRole('form');
-    
+
     // Check button accessibility
     await expect(this.createCharacterButton).toHaveRole('button');
     await expect(this.saveCharacterButton).toHaveRole('button');
@@ -249,11 +249,11 @@ export class CharacterManagementPage extends BasePage {
   // Keyboard navigation
   async navigateFormWithKeyboard() {
     await this.clickCreateCharacter();
-    
+
     await this.nameInput.focus();
     await this.page.keyboard.press('Tab');
     await expect(this.descriptionInput).toBeFocused();
-    
+
     await this.page.keyboard.press('Tab');
     await expect(this.storyInput).toBeFocused();
   }
@@ -262,7 +262,7 @@ export class CharacterManagementPage extends BasePage {
   async checkMobileLayout() {
     await this.setMobileViewport();
     await this.expectPageLoaded();
-    
+
     // Should automatically switch to list view on mobile
     const gridContainer = await this.characterGrid.boundingBox();
     expect(gridContainer?.width).toBeLessThan(768);

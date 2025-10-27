@@ -12,13 +12,14 @@ This document provides a comprehensive analysis of the current test coverage for
 
 ### Current State Overview
 
-- **Total Python Test Functions:** 971
-- **Total Python Test Files:** 123
+- **Total Python Test Functions:** 971+
+- **Total Python Test Files:** 123+
 - **Total E2E Test Specs:** 20
-- **GitHub Actions Workflows:** 7 (tests, integration, e2e, security, code-quality, simulation, comprehensive-battery)
+- **Post-Deployment Tests:** 3 test suites (JWT validation, player profile creation, frontend deployment)
+- **GitHub Actions Workflows:** 8 (tests, integration, e2e, security, code-quality, simulation, comprehensive-battery, post-deployment-tests)
 - **Test Infrastructure:** Mature with pytest, Playwright, comprehensive test battery, simulation framework
 - **Database Integration:** Redis and Neo4j markers present, real database testing supported
-- **CI/CD Integration:** Comprehensive with PR validation, main branch full tests, scheduled runs
+- **CI/CD Integration:** Comprehensive with PR validation, main branch full tests, scheduled runs, post-deployment validation
 
 ### Key Findings
 
@@ -538,6 +539,11 @@ tests/
 │   ├── page-objects/       # Page object models
 │   ├── fixtures/           # Test fixtures and data
 │   └── mocks/              # Mock API server
+├── post_deployment/         # Post-deployment regression tests
+│   ├── conftest.py         # Deployment test fixtures
+│   ├── test_jwt_token_validation.py      # Issue #2 validation
+│   ├── test_player_profile_creation.py   # Issue #3 validation
+│   └── test_frontend_deployment.py       # Issue #4 validation
 ├── performance/             # Performance and load tests
 ├── comprehensive_battery/   # Comprehensive test battery
 └── conftest.py             # Shared pytest fixtures
@@ -868,6 +874,90 @@ docker-compose -f docker-compose.test.yml down -v
 
 ---
 
+## 8. Post-Deployment Regression Tests
+
+### 8.1 Overview
+
+Post-deployment tests are automated integration tests that run after each deployment to verify that critical bug fixes remain effective. These tests prevent regression of Issues #2, #3, and #4.
+
+**Location:** `tests/post_deployment/`
+
+**Execution:** Automatically triggered after staging and production deployments via GitHub Actions
+
+**Documentation:** See [POST_DEPLOYMENT_TESTING.md](./POST_DEPLOYMENT_TESTING.md) for detailed guide
+
+### 8.2 Test Coverage
+
+#### Issue #2: JWT Token Validation
+**File:** `test_jwt_token_validation.py`
+
+**Tests:**
+- JWT tokens contain explicit `player_id` field
+- `player_id` matches expected user ID
+- Backward compatibility with `sub` field maintained
+- Token refresh preserves `player_id`
+- All required JWT fields present
+
+**Rationale:** Prevents regression of authentication fix where JWT tokens were missing player_id field
+
+#### Issue #3: Player Profile Auto-Creation
+**File:** `test_player_profile_creation.py`
+
+**Tests:**
+- New user login triggers automatic player profile creation
+- Player profile persists in Neo4j database
+- Existing users don't get duplicate profiles
+- Profile creation failure doesn't block login (graceful degradation)
+- Profile accessible via API after creation
+
+**Rationale:** Prevents regression of player profile auto-creation fix
+
+#### Issue #4: Frontend Deployment Verification
+**File:** `test_frontend_deployment.py`
+
+**Tests:**
+- Frontend serves fresh builds (not cached)
+- `index.html` has no-cache headers
+- Static assets have proper cache headers
+- Environment variables correctly injected
+- Frontend can communicate with backend API
+- React app properly configured
+
+**Rationale:** Prevents regression of frontend deployment cache issues
+
+### 8.3 CI/CD Integration
+
+**Staging Deployment:**
+- Runs all post-deployment tests including database validation
+- Executes after health checks pass
+- Blocks deployment if tests fail
+
+**Production Deployment:**
+- Runs post-deployment tests with `-m "not neo4j"` to skip data-creating tests
+- Executes after health checks pass
+- Alerts on failure but doesn't block deployment
+
+**Manual Execution:**
+```bash
+# Verify staging deployment
+./scripts/verify-deployment.sh staging
+
+# Verify production deployment
+./scripts/verify-deployment.sh production
+
+# Run specific test suite
+uv run pytest tests/post_deployment/test_jwt_token_validation.py -v
+```
+
+### 8.4 Success Metrics
+
+- **Execution Time:** < 5 minutes for full post-deployment test suite
+- **Reliability:** 100% pass rate when fixes are intact
+- **Coverage:** All 3 critical issues (JWT, player profile, frontend) validated
+- **Automation:** Runs automatically on every deployment
+
+---
+
 ## 9. Next Steps and Recommendations
 
 ### Immediate Actions (Week 1)
@@ -943,5 +1033,3 @@ docker-compose -f docker-compose.test.yml down -v
 **Last Updated:** 2025-10-03
 **Author:** The Augster (AI Development Assistant)
 **Status:** Ready for Review
-
-

@@ -95,7 +95,9 @@ async def _persist_conversation_to_redis(
             "message_count": len(messages),
         }
         await redis_client.setex(
-            conversation_key, 86400 * 30, json.dumps(conversation_data)  # 30 days TTL
+            conversation_key,
+            86400 * 30,
+            json.dumps(conversation_data),  # 30 days TTL
         )
 
         # Store messages as a list
@@ -375,7 +377,7 @@ AI Response: "{ai_response}"
 
 Session Context:
 - Interaction Count: {interaction_count}
-- Current Emotional Themes: {', '.join(emotional_themes)}
+- Current Emotional Themes: {", ".join(emotional_themes)}
 
 Please provide a JSON analysis with these fields:
 {{
@@ -585,23 +587,30 @@ async def send_message(
 
         # Analyze emotional themes
         user_lower = user_message.lower()
-        if any(
-            word in user_lower for word in ["anxious", "anxiety", "worried", "nervous"]
+        if (
+            any(
+                word in user_lower
+                for word in ["anxious", "anxiety", "worried", "nervous"]
+            )
+            and "anxiety" not in session_state["emotional_themes"]
         ):
-            if "anxiety" not in session_state["emotional_themes"]:
-                session_state["emotional_themes"].append("anxiety")
-        if any(
-            word in user_lower
-            for word in ["stressed", "stress", "overwhelmed", "pressure"]
+            session_state["emotional_themes"].append("anxiety")
+        if (
+            any(
+                word in user_lower
+                for word in ["stressed", "stress", "overwhelmed", "pressure"]
+            )
+            and "stress" not in session_state["emotional_themes"]
         ):
-            if "stress" not in session_state["emotional_themes"]:
-                session_state["emotional_themes"].append("stress")
-        if any(
-            word in user_lower
-            for word in ["sad", "sadness", "depressed", "down", "low"]
+            session_state["emotional_themes"].append("stress")
+        if (
+            any(
+                word in user_lower
+                for word in ["sad", "sadness", "depressed", "down", "low"]
+            )
+            and "depression" not in session_state["emotional_themes"]
         ):
-            if "depression" not in session_state["emotional_themes"]:
-                session_state["emotional_themes"].append("depression")
+            session_state["emotional_themes"].append("depression")
 
         # Add user message
         user_msg = ConversationMessage(

@@ -61,8 +61,8 @@ const ModelManagementSection: React.FC<ModelManagementSectionProps> = ({
   };
 
   const getTotalFilterUsage = () => {
-    return filterUsageStats.free_filter_usage + 
-           filterUsageStats.affordable_filter_usage + 
+    return filterUsageStats.free_filter_usage +
+           filterUsageStats.affordable_filter_usage +
            filterUsageStats.all_models_usage;
   };
 
@@ -143,8 +143,8 @@ const ModelManagementSection: React.FC<ModelManagementSectionProps> = ({
             </div>
             <div className="text-right">
               <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                selectedModel.is_free 
-                  ? 'bg-green-100 text-green-800' 
+                selectedModel.is_free
+                  ? 'bg-green-100 text-green-800'
                   : 'bg-yellow-100 text-yellow-800'
               }`}>
                 {selectedModel.is_free ? 'FREE' : `$${(selectedModel.cost_per_token || 0).toFixed(6)}/token`}
@@ -157,10 +157,10 @@ const ModelManagementSection: React.FC<ModelManagementSectionProps> = ({
               </button>
             </div>
           </div>
-          
+
           {showCostDetails && selectedModel && (
             <div className="mt-4 pt-4 border-t border-green-200">
-              <ModelCostDisplay 
+              <ModelCostDisplay
                 model={selectedModel}
                 showEstimatedCost={true}
                 className="bg-white rounded-lg p-3"
@@ -227,7 +227,7 @@ const ModelManagementSection: React.FC<ModelManagementSectionProps> = ({
         {activeTab === 'settings' && (
           <div className="space-y-6">
             <ModelFilterSettings />
-            
+
             {/* User Preferences */}
             <div className="bg-gray-50 rounded-lg p-4">
               <h4 className="font-medium text-gray-900 mb-4">User Preferences</h4>
@@ -349,7 +349,7 @@ const ModelManagementSection: React.FC<ModelManagementSectionProps> = ({
               <div className="text-blue-800 text-sm space-y-1">
                 <p>
                   <strong>Most Used Filter:</strong> {
-                    filterUsageStats.free_filter_usage >= filterUsageStats.affordable_filter_usage && 
+                    filterUsageStats.free_filter_usage >= filterUsageStats.affordable_filter_usage &&
                     filterUsageStats.free_filter_usage >= filterUsageStats.all_models_usage
                       ? 'Free Models'
                       : filterUsageStats.affordable_filter_usage >= filterUsageStats.all_models_usage

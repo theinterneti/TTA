@@ -1,6 +1,6 @@
 import pytest
 
-from src.agent_orchestration.tools.metrics import get_tool_metrics
+from tta_ai.orchestration.tools.metrics import get_tool_metrics
 from tta.prod.src.tools.dynamic_tools import DynamicTool
 
 

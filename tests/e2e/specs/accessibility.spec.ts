@@ -33,7 +33,7 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       await checkBasicAccessibility(dashboardPage.page);
       await dashboardPage.checkAccessibility();
     });
@@ -43,7 +43,7 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await characterPage.goto();
       await characterPage.expectPageLoaded();
-      
+
       await checkBasicAccessibility(characterPage.page);
       await characterPage.checkAccessibility();
     });
@@ -53,7 +53,7 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await chatPage.goto();
       await chatPage.expectChatLoaded();
-      
+
       await checkBasicAccessibility(chatPage.page);
       await chatPage.checkAccessibility();
     });
@@ -63,7 +63,7 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await settingsPage.goto();
       await settingsPage.expectPageLoaded();
-      
+
       await checkBasicAccessibility(settingsPage.page);
       await settingsPage.checkAccessibility();
     });
@@ -111,7 +111,7 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await characterPage.goto();
       await characterPage.clickCreateCharacter();
-      
+
       // Test tab trapping within modal
       const modalElements = [
         'input[name="name"]',
@@ -120,7 +120,7 @@ test.describe('Accessibility Compliance', () => {
         'button[type="submit"]',
         'button:has-text("Cancel")',
       ];
-      
+
       await testKeyboardNavigation(page, modalElements);
     });
   });
@@ -128,7 +128,7 @@ test.describe('Accessibility Compliance', () => {
   test.describe('Screen Reader Support', () => {
     test('should have proper ARIA labels and roles', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Check form accessibility
       await expect(loginPage.loginForm).toHaveRole('form');
       await expect(loginPage.usernameInput).toHaveAttribute('aria-label');
@@ -140,18 +140,18 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Check heading structure
       const h1 = page.locator('h1');
       const h2 = page.locator('h2');
       const h3 = page.locator('h3');
-      
+
       await expect(h1).toHaveCount(1); // Should have exactly one h1
-      
+
       if (await h2.count() > 0) {
         await expect(h2.first()).toBeVisible();
       }
-      
+
       if (await h3.count() > 0) {
         await expect(h3.first()).toBeVisible();
       }
@@ -161,11 +161,11 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Check for landmark regions
       await expect(page.locator('main, [role="main"]')).toBeVisible();
       await expect(page.locator('nav, [role="navigation"]')).toBeVisible();
-      
+
       // Check for complementary regions if present
       const complementary = page.locator('[role="complementary"]');
       if (await complementary.count() > 0) {
@@ -178,11 +178,11 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await chatPage.goto();
       await chatPage.expectChatLoaded();
-      
+
       // Check for live regions
       const liveRegions = page.locator('[aria-live]');
       await expect(liveRegions.first()).toBeVisible();
-      
+
       // Check for status announcements
       const statusRegions = page.locator('[role="status"]');
       if (await statusRegions.count() > 0) {
@@ -194,19 +194,19 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Check that links have descriptive text
       const links = page.locator('a');
       const linkCount = await links.count();
-      
+
       for (let i = 0; i < linkCount; i++) {
         const link = links.nth(i);
         const text = await link.textContent();
         const ariaLabel = await link.getAttribute('aria-label');
-        
+
         // Link should have either text content or aria-label
         expect(text || ariaLabel).toBeTruthy();
-        
+
         // Avoid generic link text
         if (text) {
           expect(text.toLowerCase()).not.toMatch(/^(click here|read more|link)$/);
@@ -220,28 +220,28 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await characterPage.goto();
-      
+
       // Open modal
       await characterPage.createCharacterButton.click();
-      
+
       // Focus should move to modal
       const firstInput = page.locator('input[name="name"]');
       await expect(firstInput).toBeFocused();
-      
+
       // Close modal
       const cancelButton = page.locator('button:has-text("Cancel")');
       await cancelButton.click();
-      
+
       // Focus should return to trigger button
       await expect(characterPage.createCharacterButton).toBeFocused();
     });
 
     test('should maintain focus visibility', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Check that focused elements have visible focus indicators
       await loginPage.usernameInput.focus();
-      
+
       // Should have focus styles (outline, box-shadow, etc.)
       const focusedElement = page.locator(':focus');
       await expect(focusedElement).toHaveCSS('outline-width', /[1-9]/);
@@ -251,11 +251,11 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Check for skip links
       const skipLink = page.locator('a[href="#main"], a[href="#content"]').first();
       await expect(skipLink).toBeVisible();
-      
+
       // Test skip link functionality
       await skipLink.click();
       const mainContent = page.locator('#main, #content, main').first();
@@ -266,17 +266,17 @@ test.describe('Accessibility Compliance', () => {
   test.describe('Color and Contrast', () => {
     test('should have sufficient color contrast', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Check that text has sufficient contrast
       // This is a basic check - in practice, you'd use tools like axe-core
       const textElements = page.locator('p, span, label, button');
       const elementCount = await textElements.count();
-      
+
       for (let i = 0; i < Math.min(elementCount, 10); i++) {
         const element = textElements.nth(i);
         const color = await element.evaluate(el => getComputedStyle(el).color);
         const backgroundColor = await element.evaluate(el => getComputedStyle(el).backgroundColor);
-        
+
         // Basic check that colors are defined
         expect(color).toBeTruthy();
         expect(backgroundColor).toBeTruthy();
@@ -287,14 +287,14 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await settingsPage.goto();
-      
+
       // Enable high contrast mode
       await settingsPage.goToAccessibilityTab();
       await settingsPage.highContrastToggle.check();
-      
+
       // Check that high contrast styles are applied
       await expect(page.locator('body')).toHaveClass(/high-contrast/);
-      
+
       // Interface should still be usable
       await settingsPage.expectPageLoaded();
     });
@@ -304,10 +304,10 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await chatPage.goto();
       await chatPage.expectChatLoaded();
-      
+
       // Check that error states have more than just color
       await chatPage.sendMessage('');
-      
+
       // Error should be indicated by text, icons, or other visual cues
       const errorElements = page.locator('.error, [data-testid="error"]');
       if (await errorElements.count() > 0) {
@@ -322,14 +322,14 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await settingsPage.goto();
-      
+
       // Enable large text
       await settingsPage.goToAccessibilityTab();
       await settingsPage.largeTextToggle.check();
-      
+
       // Check that large text styles are applied
       await expect(page.locator('body')).toHaveClass(/large-text/);
-      
+
       // Text should be larger
       const textElement = page.locator('p, span').first();
       const fontSize = await textElement.evaluate(el => getComputedStyle(el).fontSize);
@@ -340,10 +340,10 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Simulate 200% zoom
       await page.setViewportSize({ width: 640, height: 360 });
-      
+
       // Content should still be accessible
       await dashboardPage.expectDashboardLoaded();
       await expect(dashboardPage.createCharacterButton).toBeVisible();
@@ -351,7 +351,7 @@ test.describe('Accessibility Compliance', () => {
 
     test('should handle text spacing adjustments', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Inject CSS to increase text spacing (WCAG requirement)
       await page.addStyleTag({
         content: `
@@ -365,7 +365,7 @@ test.describe('Accessibility Compliance', () => {
           }
         `
       });
-      
+
       // Interface should still be usable
       await loginPage.expectLoginFormVisible();
       await expect(loginPage.usernameInput).toBeVisible();
@@ -378,18 +378,18 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await settingsPage.goto();
-      
+
       // Enable reduced motion
       await settingsPage.goToAccessibilityTab();
       await settingsPage.reducedMotionToggle.check();
-      
+
       // Check that reduced motion styles are applied
       await expect(page.locator('body')).toHaveClass(/reduced-motion/);
-      
+
       // Animations should be disabled or reduced
       const animatedElements = page.locator('[class*="animate"], [class*="transition"]');
       if (await animatedElements.count() > 0) {
-        const animationDuration = await animatedElements.first().evaluate(el => 
+        const animationDuration = await animatedElements.first().evaluate(el =>
           getComputedStyle(el).animationDuration
         );
         // Should be very short or none
@@ -402,7 +402,7 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await chatPage.goto();
       await chatPage.expectChatLoaded();
-      
+
       // Check that there are no rapidly flashing elements
       // This is a basic check - in practice, you'd need more sophisticated testing
       const flashingElements = page.locator('[class*="flash"], [class*="blink"]');
@@ -416,22 +416,22 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await characterPage.goto();
       await characterPage.clickCreateCharacter();
-      
+
       // Check that all form inputs have labels
       const inputs = page.locator('input, textarea, select');
       const inputCount = await inputs.count();
-      
+
       for (let i = 0; i < inputCount; i++) {
         const input = inputs.nth(i);
         const id = await input.getAttribute('id');
         const ariaLabel = await input.getAttribute('aria-label');
         const ariaLabelledBy = await input.getAttribute('aria-labelledby');
-        
+
         if (id) {
           // Should have associated label
           const label = page.locator(`label[for="${id}"]`);
           const hasLabel = await label.count() > 0;
-          
+
           // Should have either label, aria-label, or aria-labelledby
           expect(hasLabel || ariaLabel || ariaLabelledBy).toBeTruthy();
         }
@@ -443,10 +443,10 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await characterPage.goto();
       await characterPage.clickCreateCharacter();
-      
+
       // Submit form without required fields
       await characterPage.saveCharacterButton.click();
-      
+
       // Should show clear error messages
       const errorMessages = page.locator('.error, [data-testid="error"]');
       if (await errorMessages.count() > 0) {
@@ -461,14 +461,14 @@ test.describe('Accessibility Compliance', () => {
       await loginPage.login(testUsers.default);
       await characterPage.goto();
       await characterPage.clickCreateCharacter();
-      
+
       // Submit form without required fields
       await characterPage.saveCharacterButton.click();
-      
+
       // Check that errors are properly associated with fields
       const nameInput = page.locator('input[name="name"]');
       const ariaDescribedBy = await nameInput.getAttribute('aria-describedby');
-      
+
       if (ariaDescribedBy) {
         const errorElement = page.locator(`#${ariaDescribedBy}`);
         await expect(errorElement).toBeVisible();

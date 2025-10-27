@@ -291,17 +291,16 @@ class AlertManager:
 
                         logger.warning(f"Alert triggered: {alert.message}")
                         await self._send_notifications(alert)
-                else:
-                    if alert_key in self.active_alerts:
-                        # Resolve existing alert
-                        alert = self.active_alerts[alert_key]
-                        alert.status = AlertStatus.RESOLVED
-                        alert.resolved_at = datetime.now()
+                elif alert_key in self.active_alerts:
+                    # Resolve existing alert
+                    alert = self.active_alerts[alert_key]
+                    alert.status = AlertStatus.RESOLVED
+                    alert.resolved_at = datetime.now()
 
-                        del self.active_alerts[alert_key]
+                    del self.active_alerts[alert_key]
 
-                        logger.info(f"Alert resolved: {alert.message}")
-                        await self._send_notifications(alert)
+                    logger.info(f"Alert resolved: {alert.message}")
+                    await self._send_notifications(alert)
 
         except requests.RequestException as e:
             logger.error(f"Error querying Prometheus for rule {rule.name}: {e}")
@@ -314,17 +313,16 @@ class AlertManager:
         """Evaluate alert condition."""
         if comparison == "gt":
             return value > threshold
-        elif comparison == "gte":
+        if comparison == "gte":
             return value >= threshold
-        elif comparison == "lt":
+        if comparison == "lt":
             return value < threshold
-        elif comparison == "lte":
+        if comparison == "lte":
             return value <= threshold
-        elif comparison == "eq":
+        if comparison == "eq":
             return value == threshold
-        else:
-            logger.warning(f"Unknown comparison operator: {comparison}")
-            return False
+        logger.warning(f"Unknown comparison operator: {comparison}")
+        return False
 
     def _format_message(
         self, template: str, labels: dict[str, str], value: float
@@ -372,7 +370,9 @@ def console_notification_handler(alert: Alert):
     status_emoji = (
         "🔴"
         if alert.severity == AlertSeverity.CRITICAL
-        else "🟡" if alert.severity == AlertSeverity.WARNING else "🔵"
+        else "🟡"
+        if alert.severity == AlertSeverity.WARNING
+        else "🔵"
     )
     action = "RESOLVED" if alert.status == AlertStatus.RESOLVED else "TRIGGERED"
 

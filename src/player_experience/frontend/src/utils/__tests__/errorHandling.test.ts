@@ -1,6 +1,6 @@
 /**
  * Error Handling Utilities Tests
- * 
+ *
  * Comprehensive tests for error serialization, formatting, and display utilities.
  */
 
@@ -30,7 +30,7 @@ describe('Error Handling Utilities', () => {
   describe('serializeError', () => {
     it('should handle null/undefined errors', () => {
       const result = serializeError(null);
-      
+
       expect(result.message).toBe('An unknown error occurred');
       expect(result.severity).toBe(ErrorSeverity.ERROR);
       expect(result.userMessage).toBe('Something went wrong. Please try again.');
@@ -40,7 +40,7 @@ describe('Error Handling Utilities', () => {
     it('should serialize Error objects', () => {
       const error = new Error('Test error message');
       const result = serializeError(error);
-      
+
       expect(result.message).toBe('Test error message');
       expect(result.severity).toBe(ErrorSeverity.ERROR);
       expect(result.userMessage).toContain('error');
@@ -57,9 +57,9 @@ describe('Error Handling Utilities', () => {
           },
         },
       };
-      
+
       const result = serializeError(apiError);
-      
+
       expect(result.message).toBe('Validation failed');
       expect(result.code).toBe('422');
       expect(result.severity).toBe(ErrorSeverity.ERROR);
@@ -68,7 +68,7 @@ describe('Error Handling Utilities', () => {
 
     it('should serialize string errors', () => {
       const result = serializeError('Simple error message');
-      
+
       expect(result.message).toBe('Simple error message');
       expect(result.severity).toBe(ErrorSeverity.ERROR);
       expect(result.userMessage).toBe('Simple error message');
@@ -80,9 +80,9 @@ describe('Error Handling Utilities', () => {
         code: 'CUSTOM_ERROR',
         severity: ErrorSeverity.WARNING,
       };
-      
+
       const result = serializeError(error);
-      
+
       expect(result.message).toBe('Custom error');
       expect(result.code).toBe('CUSTOM_ERROR');
       expect(result.severity).toBe(ErrorSeverity.WARNING);
@@ -91,7 +91,7 @@ describe('Error Handling Utilities', () => {
     it('should handle generic objects', () => {
       const error = { foo: 'bar', baz: 123 };
       const result = serializeError(error);
-      
+
       expect(result.message).toContain('foo');
       expect(result.message).toContain('bar');
       expect(result.userMessage).toBe('An unexpected error occurred. Please try again.');
@@ -122,7 +122,7 @@ describe('Error Handling Utilities', () => {
     it('should extract user-friendly message from errors', () => {
       const error = new Error('Technical error message');
       const message = getErrorMessage(error);
-      
+
       expect(message).toBeDefined();
       expect(message).not.toContain('[object Object]');
     });
@@ -130,7 +130,7 @@ describe('Error Handling Utilities', () => {
     it('should include context in message', () => {
       const error = new Error('Test error');
       const message = getErrorMessage(error, 'Character Creation');
-      
+
       expect(message).toContain('Character Creation');
     });
 
@@ -141,7 +141,7 @@ describe('Error Handling Utilities', () => {
           data: { detail: 'Unauthorized' },
         },
       };
-      
+
       const message = getErrorMessage(apiError);
       expect(message).toContain('log in');
     });
@@ -167,7 +167,7 @@ describe('Error Handling Utilities', () => {
             data: {},
           },
         };
-        
+
         const message = getErrorMessage(error);
         expect(message.toLowerCase()).toContain(expectedText.toLowerCase());
       });
@@ -195,7 +195,7 @@ describe('Error Handling Utilities', () => {
           },
         },
       };
-      
+
       const message = getErrorMessage(error);
       expect(message).toContain('Validation error');
       expect(message).toContain('name');
@@ -211,7 +211,7 @@ describe('Error Handling Utilities', () => {
           },
         },
       };
-      
+
       const message = getErrorMessage(error);
       expect(message).toContain('Validation error');
       expect(message).toContain('Character name is required');
@@ -222,7 +222,7 @@ describe('Error Handling Utilities', () => {
     it('should detect network errors', () => {
       const networkError = new Error('Network request failed');
       expect(isNetworkError(networkError)).toBe(true);
-      
+
       const otherError = new Error('Something else');
       expect(isNetworkError(otherError)).toBe(false);
     });
@@ -235,7 +235,7 @@ describe('Error Handling Utilities', () => {
         },
       };
       expect(isAuthError(authError)).toBe(true);
-      
+
       const forbiddenError = {
         response: {
           status: 403,
@@ -243,7 +243,7 @@ describe('Error Handling Utilities', () => {
         },
       };
       expect(isAuthError(forbiddenError)).toBe(true);
-      
+
       const otherError = {
         response: {
           status: 500,
@@ -261,7 +261,7 @@ describe('Error Handling Utilities', () => {
         },
       };
       expect(isValidationError(validationError)).toBe(true);
-      
+
       const badRequestError = {
         response: {
           status: 400,
@@ -269,7 +269,7 @@ describe('Error Handling Utilities', () => {
         },
       };
       expect(isValidationError(badRequestError)).toBe(true);
-      
+
       const otherError = {
         response: {
           status: 500,
@@ -284,7 +284,7 @@ describe('Error Handling Utilities', () => {
     it('should create notification with default options', () => {
       const error = new Error('Test error');
       const notification = createErrorNotification(error);
-      
+
       expect(notification.id).toBeDefined();
       expect(notification.message).toBeDefined();
       expect(notification.message).not.toContain('[object Object]');
@@ -296,13 +296,13 @@ describe('Error Handling Utilities', () => {
     it('should create notification with custom options', () => {
       const error = new Error('Test error');
       const action = { label: 'Retry', handler: jest.fn() };
-      
+
       const notification = createErrorNotification(error, 'Test Context', {
         dismissible: false,
         autoHideDuration: 10000,
         action,
       });
-      
+
       expect(notification.message).toContain('Test Context');
       expect(notification.dismissible).toBe(false);
       expect(notification.autoHideDuration).toBe(10000);
@@ -316,7 +316,7 @@ describe('Error Handling Utilities', () => {
           data: { detail: 'Server error' },
         },
       };
-      
+
       const notification = createErrorNotification(criticalError);
       expect(notification.severity).toBe(ErrorSeverity.CRITICAL);
       expect(notification.autoHideDuration).toBeUndefined();
@@ -327,7 +327,7 @@ describe('Error Handling Utilities', () => {
     it('should log errors to console', () => {
       const error = new Error('Test error');
       displayError(error);
-      
+
       expect(console.error).toHaveBeenCalled();
     });
 
@@ -336,7 +336,7 @@ describe('Error Handling Utilities', () => {
         message: 'Warning message',
         severity: ErrorSeverity.WARNING,
       };
-      
+
       displayError(warningError);
       expect(console.warn).toHaveBeenCalled();
     });
@@ -344,7 +344,7 @@ describe('Error Handling Utilities', () => {
     it('should return serialized error', () => {
       const error = new Error('Test error');
       const result = displayError(error, 'Test Context');
-      
+
       expect(result.message).toBe('Test error');
       expect(result.userMessage).toBeDefined();
     });
@@ -354,14 +354,14 @@ describe('Error Handling Utilities', () => {
     it('should prepend context to user messages', () => {
       const error = new Error('Test error');
       const message = getErrorMessage(error, 'Character Creation');
-      
+
       expect(message).toMatch(/Character Creation/);
     });
 
     it('should handle missing context gracefully', () => {
       const error = new Error('Test error');
       const message = getErrorMessage(error);
-      
+
       expect(message).toBeDefined();
       expect(message).not.toContain('undefined');
     });
@@ -371,7 +371,7 @@ describe('Error Handling Utilities', () => {
     it('should handle circular references', () => {
       const circular: any = { foo: 'bar' };
       circular.self = circular;
-      
+
       const result = serializeError(circular);
       expect(result.userMessage).toBeDefined();
       expect(result.userMessage).not.toContain('[object Object]');
@@ -380,7 +380,7 @@ describe('Error Handling Utilities', () => {
     it('should handle very long error messages', () => {
       const longMessage = 'A'.repeat(1000);
       const error = new Error(longMessage);
-      
+
       const result = serializeError(error);
       expect(result.userMessage).toBeDefined();
       expect(result.userMessage.length).toBeLessThan(200);
@@ -389,10 +389,9 @@ describe('Error Handling Utilities', () => {
     it('should handle errors with special characters', () => {
       const error = new Error('Error with <html> & "quotes" and \'apostrophes\'');
       const result = serializeError(error);
-      
+
       expect(result.userMessage).toBeDefined();
       expect(result.userMessage).not.toContain('[object Object]');
     });
   });
 });
-

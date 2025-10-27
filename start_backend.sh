@@ -135,4 +135,3 @@ fi
 
 # Run the server
 exec $UVICORN_CMD
-

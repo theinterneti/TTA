@@ -2,7 +2,7 @@
 
 /**
  * Get Franchise Worlds Script
- * 
+ *
  * Node.js script to retrieve franchise worlds from the TypeScript system
  * for integration with the Python TTA API.
  */
@@ -162,7 +162,7 @@ function main() {
     // Parse command line arguments
     const args = process.argv.slice(2);
     let requestData = {};
-    
+
     if (args.length > 0) {
       try {
         requestData = JSON.parse(args[0]);
@@ -174,16 +174,16 @@ function main() {
         process.exit(1);
       }
     }
-    
+
     const genre = requestData.genre;
     let worlds;
-    
+
     if (genre) {
       worlds = getWorldsByGenre(genre);
     } else {
       worlds = getAllWorlds();
     }
-    
+
     // Return results
     const response = {
       success: true,
@@ -191,9 +191,9 @@ function main() {
       totalCount: worlds.length,
       genreFilter: genre || 'all'
     };
-    
+
     console.log(JSON.stringify(response, null, 2));
-    
+
   } catch (error) {
     console.error(JSON.stringify({
       success: false,

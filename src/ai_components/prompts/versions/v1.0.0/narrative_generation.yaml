@@ -1,0 +1,40 @@
+version: "1.0.0"
+created_at: "2025-01-20"
+author: "system"
+description: "Narrative generation prompt for creating therapeutic narrative responses"
+agent_type: "narrative_generator"
+template: |
+  Generate a therapeutic narrative response based on:
+
+  User input: {user_input}
+  Intent: {intent}
+  World context: {world_context}
+
+  The response should:
+  - Acknowledge the user's input
+  - Provide engaging narrative
+  - Maintain therapeutic tone
+  - Encourage continued engagement
+  - Be appropriate for the therapeutic context
+
+  Generate a response that advances the narrative while supporting the user's therapeutic journey.
+variables:
+  - user_input
+  - intent
+  - world_context
+performance_baseline:
+  avg_tokens: 250
+  avg_latency_ms: 1200
+  quality_score: 8.2
+  cost_per_call_usd: 0.0005
+metadata:
+  model_requirements:
+    min_context_window: 4096
+    recommended_temperature: 0.7
+    recommended_max_tokens: 500
+  validation_rules:
+    - "Response must be 50-500 characters"
+    - "Must maintain therapeutic tone"
+    - "Must acknowledge user input"
+  therapeutic_context: "general_therapy"
+  priority: 80

@@ -282,7 +282,7 @@ const ws = new WebSocket('ws://localhost:8080/dashboard/test-battery/ws');
 
 ws.onmessage = function(event) {
     const message = JSON.parse(event.data);
-    
+
     if (message.type === 'battery_status') {
         updateDashboard(message.data);
     } else if (message.type === 'test_result') {

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Neo4j Database Service
@@ -6,8 +6,8 @@ services:
     image: neo4j:5.13.0
     container_name: tta-dev-dev-dev-neo4j
     ports:
-      - "7474:7474"  # HTTP browser interface
-      - "7687:7687"  # Bolt port
+      - "7474:7474" # HTTP browser interface
+      - "7687:7687" # Bolt port
     volumes:
       - neo4j-data:/data
       - ./neo4j/conf:/conf

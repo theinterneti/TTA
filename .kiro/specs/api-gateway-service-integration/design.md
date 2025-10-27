@@ -14,20 +14,20 @@ The gateway will be implemented as a high-performance, containerized service tha
 graph TB
     Client[Client Applications] --> LB[Load Balancer]
     LB --> GW[API Gateway]
-    
+
     GW --> Auth[Authentication Service]
     GW --> Cache[Redis Cache]
     GW --> Monitor[Monitoring & Logging]
-    
+
     GW --> Router[Request Router]
     Router --> Dev[tta.dev Services]
     Router --> Proto[tta.prototype Services]
     Router --> Prod[tta.prod Services]
-    
+
     GW --> WS[WebSocket Handler]
     WS --> Chat[Chat Services]
     WS --> Narrative[Narrative Engine]
-    
+
     GW --> Discovery[Service Discovery]
     Discovery --> Health[Health Monitor]
     Discovery --> Registry[Service Registry]
@@ -262,7 +262,7 @@ class CircuitBreaker:
 
 ### Load Testing Requirements
 
-1. **Performance Benchmarks**: 
+1. **Performance Benchmarks**:
    - Target: 10,000 concurrent connections
    - Response time: <100ms for cached responses, <500ms for proxied requests
    - Throughput: 50,000 requests per minute sustained

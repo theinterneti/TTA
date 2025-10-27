@@ -34,7 +34,7 @@ COPY config ./config
 
 # Create directories (simplified approach)
 RUN mkdir -p /app/logs
-RUN mkdir -p /app/cache  
+RUN mkdir -p /app/cache
 RUN mkdir -p /app/tmp
 RUN mkdir -p /app/data
 

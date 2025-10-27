@@ -1,0 +1,49 @@
+services:
+  redis:
+    type: redis
+    host: tta-staging-redis
+    port: 6379
+    timeout: 5
+
+  neo4j:
+    type: neo4j
+    host: tta-staging-neo4j
+    port: 7687
+    timeout: 10
+    auth:
+      username: neo4j
+      password: password
+
+  postgres:
+    type: postgres
+    host: tta-staging-postgres
+    port: 5432
+    timeout: 10
+    auth:
+      username: postgres
+      password: password
+      database: postgres
+
+  player-api:
+    type: http
+    url: http://tta-staging-player-api:8080/health
+    timeout: 10
+
+  player-frontend:
+    type: http
+    url: http://tta-staging-player-frontend:3000
+    timeout: 10
+    expected_status: [200, 302]
+
+  grafana:
+    type: http
+    url: http://tta-staging-grafana:3000/api/health
+    timeout: 10
+
+metrics:
+  port: 8080
+  path: /metrics
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

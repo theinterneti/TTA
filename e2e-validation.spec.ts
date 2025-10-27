@@ -1,6 +1,6 @@
 /**
  * End-to-End Validation Tests with Backend
- * 
+ *
  * Tests the complete TTA system with both frontend and backend running.
  * Run with: npx playwright test e2e-validation.spec.ts --config=playwright.quick.config.ts
  */
@@ -11,23 +11,23 @@ const BASE_URL = 'http://localhost:3000';
 const API_URL = 'http://localhost:8080';
 
 test.describe('TTA E2E Validation with Backend', () => {
-  
+
   test('Backend API is healthy', async ({ request }) => {
     console.log('\n🧪 Testing: Backend API health');
-    
+
     const response = await request.get(`${API_URL}/health`);
     expect(response.ok()).toBeTruthy();
-    
+
     const data = await response.json();
     expect(data.status).toBe('healthy');
     expect(data.service).toBe('player-experience-api');
-    
+
     console.log('✅ PASS: Backend API is healthy\n');
   });
 
   test('Frontend connects to backend', async ({ page }) => {
     console.log('\n🧪 Testing: Frontend-Backend connection');
-    
+
     // Monitor network requests
     const apiRequests: string[] = [];
     page.on('request', request => {
@@ -35,32 +35,32 @@ test.describe('TTA E2E Validation with Backend', () => {
         apiRequests.push(request.url());
       }
     });
-    
+
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
+
     // Frontend should attempt to connect to backend
     console.log(`  API requests made: ${apiRequests.length}`);
-    
+
     console.log('✅ PASS: Frontend loaded (backend connection attempted)\n');
   });
 
   test('API documentation is accessible', async ({ page }) => {
     console.log('\n🧪 Testing: API documentation');
-    
+
     await page.goto(`${API_URL}/docs`);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
+
     // Check for Swagger UI
     const title = await page.title();
     expect(title).toContain('Swagger UI');
-    
+
     console.log('✅ PASS: API documentation accessible\n');
   });
 
   test('Character creation endpoint exists', async ({ request }) => {
     console.log('\n🧪 Testing: Character creation endpoint');
-    
+
     // Try to access the endpoint (will fail without auth, but should exist)
     const response = await request.post(`${API_URL}/api/v1/characters`, {
       data: {
@@ -81,17 +81,17 @@ test.describe('TTA E2E Validation with Backend', () => {
       },
       failOnStatusCode: false
     });
-    
+
     // Should get 401 (unauthorized) or 422 (validation), not 404 (not found)
     expect([401, 422, 403]).toContain(response.status());
-    
+
     console.log(`  Response status: ${response.status()}`);
     console.log('✅ PASS: Character creation endpoint exists\n');
   });
 
   test('Chat WebSocket endpoint exists', async ({ page }) => {
     console.log('\n🧪 Testing: WebSocket endpoint');
-    
+
     // Monitor WebSocket connections
     let wsConnected = false;
     page.on('websocket', ws => {
@@ -100,11 +100,11 @@ test.describe('TTA E2E Validation with Backend', () => {
         console.log(`  WebSocket connection attempted: ${ws.url()}`);
       }
     });
-    
+
     await page.goto(`${BASE_URL}/chat`);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await page.waitForTimeout(2000); // Wait for WS connection attempt
-    
+
     // WebSocket connection may be attempted (depends on auth state)
     console.log(`  WebSocket connection attempted: ${wsConnected}`);
     console.log('✅ PASS: Chat page loaded\n');
@@ -112,7 +112,7 @@ test.describe('TTA E2E Validation with Backend', () => {
 
   test('Authentication endpoints exist', async ({ request }) => {
     console.log('\n🧪 Testing: Authentication endpoints');
-    
+
     // Test login endpoint
     const loginResponse = await request.post(`${API_URL}/api/v1/auth/login`, {
       data: {
@@ -121,11 +121,11 @@ test.describe('TTA E2E Validation with Backend', () => {
       },
       failOnStatusCode: false
     });
-    
+
     // Should get 401 (invalid credentials) or 422 (validation), not 404
     expect([401, 422, 403]).toContain(loginResponse.status());
     console.log(`  Login endpoint status: ${loginResponse.status()}`);
-    
+
     // Test health endpoint (public)
     const healthResponse = await request.get(`${API_URL}/api/v1/auth/health`, {
       failOnStatusCode: false
@@ -133,24 +133,24 @@ test.describe('TTA E2E Validation with Backend', () => {
     // Accept any reasonable status code (200, 401, 404)
     expect([200, 401, 404]).toContain(healthResponse.status());
     console.log(`  Health endpoint status: ${healthResponse.status()}`);
-    
+
     console.log('✅ PASS: Authentication endpoints exist\n');
   });
 
   test('CORS is configured correctly', async ({ request }) => {
     console.log('\n🧪 Testing: CORS configuration');
-    
+
     const response = await request.get(`${API_URL}/health`, {
       headers: {
         'Origin': 'http://localhost:3000'
       }
     });
-    
+
     expect(response.ok()).toBeTruthy();
-    
+
     const headers = response.headers();
     console.log(`  Access-Control-Allow-Origin: ${headers['access-control-allow-origin'] || 'not set'}`);
-    
+
     console.log('✅ PASS: CORS configured\n');
   });
 
@@ -181,7 +181,7 @@ test.describe('TTA E2E Validation with Backend', () => {
 
   test('Frontend handles API errors gracefully', async ({ page }) => {
     console.log('\n🧪 Testing: Frontend error handling');
-    
+
     // Monitor console errors
     const consoleErrors: string[] = [];
     page.on('console', msg => {
@@ -189,73 +189,73 @@ test.describe('TTA E2E Validation with Backend', () => {
         consoleErrors.push(msg.text());
       }
     });
-    
+
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
+
     // Check for [object Object] errors
     const hasObjectError = await page.locator('text="[object Object]"').isVisible({ timeout: 1000 })
       .catch(() => false);
-    
+
     expect(hasObjectError).toBeFalsy();
-    
+
     // Filter critical errors
-    const criticalErrors = consoleErrors.filter(err => 
-      !err.includes('Warning') && 
+    const criticalErrors = consoleErrors.filter(err =>
+      !err.includes('Warning') &&
       !err.includes('DevTools') &&
       !err.includes('favicon')
     );
-    
+
     console.log(`  Critical console errors: ${criticalErrors.length}`);
-    
+
     console.log('✅ PASS: Frontend handles errors gracefully\n');
   });
 
   test('Complete system integration', async ({ page }) => {
     console.log('\n🧪 Testing: Complete system integration');
-    
+
     // Load frontend
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
+
     // Check frontend loaded
     const bodyText = await page.textContent('body');
     expect(bodyText).toBeTruthy();
-    
+
     // Check no critical errors
     const hasObjectError = await page.locator('text="[object Object]"').isVisible({ timeout: 1000 })
       .catch(() => false);
     expect(hasObjectError).toBeFalsy();
-    
+
     // Navigate to different routes
     const routes = ['/', '/login', '/dashboard'];
     for (const route of routes) {
       await page.goto(`${BASE_URL}${route}`);
       await page.waitForLoadState('networkidle', { timeout: 10000 });
-      
+
       const hasError = await page.locator('text="[object Object]"').isVisible({ timeout: 1000 })
         .catch(() => false);
       expect(hasError).toBeFalsy();
-      
+
       console.log(`  ✓ Route ${route} works`);
     }
-    
+
     console.log('✅ PASS: Complete system integration working\n');
   });
 
   test('System stability check', async ({ page }) => {
     console.log('\n🧪 Testing: System stability');
-    
+
     // Monitor for crashes or major errors
     let crashed = false;
     page.on('crash', () => {
       crashed = true;
     });
-    
+
     // Load and interact with the app
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
+
     // Navigate multiple times
     for (let i = 0; i < 3; i++) {
       await page.goto(`${BASE_URL}/login`);
@@ -263,10 +263,9 @@ test.describe('TTA E2E Validation with Backend', () => {
       await page.goto(`${BASE_URL}/dashboard`);
       await page.waitForLoadState('networkidle', { timeout: 10000 });
     }
-    
+
     expect(crashed).toBeFalsy();
-    
+
     console.log('✅ PASS: System is stable\n');
   });
 });
-

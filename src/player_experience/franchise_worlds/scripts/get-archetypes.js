@@ -2,7 +2,7 @@
 
 /**
  * Get Character Archetypes Script
- * 
+ *
  * Node.js script to retrieve character archetypes from the TypeScript system
  * for integration with the Python TTA API.
  */
@@ -239,7 +239,7 @@ function getArchetypeById(archetypeId) {
 }
 
 function getArchetypesByRole(role) {
-  return CHARACTER_ARCHETYPES.filter(archetype => 
+  return CHARACTER_ARCHETYPES.filter(archetype =>
     archetype.role.toLowerCase().includes(role.toLowerCase())
   );
 }
@@ -249,7 +249,7 @@ function main() {
     // Parse command line arguments
     const args = process.argv.slice(2);
     let requestData = {};
-    
+
     if (args.length > 0) {
       try {
         requestData = JSON.parse(args[0]);
@@ -261,12 +261,12 @@ function main() {
         process.exit(1);
       }
     }
-    
+
     const archetypeId = requestData.archetypeId;
     const role = requestData.role;
-    
+
     let archetypes;
-    
+
     if (archetypeId) {
       const archetype = getArchetypeById(archetypeId);
       archetypes = archetype ? [archetype] : [];
@@ -275,7 +275,7 @@ function main() {
     } else {
       archetypes = getAllArchetypes();
     }
-    
+
     // Return results
     const response = {
       success: true,
@@ -286,9 +286,9 @@ function main() {
         role: role || null
       }
     };
-    
+
     console.log(JSON.stringify(response, null, 2));
-    
+
   } catch (error) {
     console.error(JSON.stringify({
       success: false,

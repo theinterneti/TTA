@@ -196,7 +196,7 @@ The Core Gameplay Loop system has been successfully integrated with the existing
    ```bash
    # Using the demonstration script
    python scripts/start_with_gameplay.py
-   
+
    # Or using the main orchestrator
    python src/main.py start
    ```

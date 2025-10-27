@@ -192,6 +192,70 @@ workflow_executions_total = Counter(
     registry=TTA_REGISTRY,
 )
 
+# Authentication & Player Profile Metrics
+jwt_token_generation_total = Counter(
+    "tta_jwt_token_generation_total",
+    "Total JWT token generation attempts",
+    ["service", "result"],  # result: success, failure
+    registry=TTA_REGISTRY,
+)
+
+jwt_token_generation_duration_seconds = Histogram(
+    "tta_jwt_token_generation_duration_seconds",
+    "JWT token generation duration in seconds",
+    ["service"],
+    buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5],
+    registry=TTA_REGISTRY,
+)
+
+jwt_token_verification_total = Counter(
+    "tta_jwt_token_verification_total",
+    "Total JWT token verification attempts",
+    ["service", "result"],  # result: success, failure, missing_player_id
+    registry=TTA_REGISTRY,
+)
+
+player_id_field_presence_total = Counter(
+    "tta_player_id_field_presence_total",
+    "Total requests with player_id field presence tracking",
+    ["endpoint", "has_player_id"],  # has_player_id: true, false
+    registry=TTA_REGISTRY,
+)
+
+player_id_presence_rate = Gauge(
+    "tta_player_id_presence_rate_percent",
+    "Percentage of requests with valid player_id field",
+    ["endpoint"],
+    registry=TTA_REGISTRY,
+)
+
+player_profile_autocreation_total = Counter(
+    "tta_player_profile_autocreation_total",
+    "Total player profile auto-creation attempts",
+    [
+        "trigger",
+        "result",
+    ],  # trigger: oauth_signin, first_login, etc; result: success, failure
+    registry=TTA_REGISTRY,
+)
+
+player_profile_autocreation_duration_seconds = Histogram(
+    "tta_player_profile_autocreation_duration_seconds",
+    "Player profile auto-creation duration in seconds",
+    ["trigger"],
+    buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0],
+    registry=TTA_REGISTRY,
+)
+
+player_profile_autocreation_errors_total = Counter(
+    "tta_player_profile_autocreation_errors_total",
+    "Total player profile auto-creation errors by category",
+    [
+        "error_category"
+    ],  # error_category: validation_error, database_error, duplicate_user, etc
+    registry=TTA_REGISTRY,
+)
+
 
 class TTAMetricsCollector:
     """Centralized metrics collector for TTA application."""
@@ -286,6 +350,61 @@ class TTAMetricsCollector:
             memory_percent
         )
         system_disk_usage_percent.labels(service=self.service_name).set(disk_percent)
+
+    def record_jwt_token_generation(self, success: bool, duration: float):
+        """Record JWT token generation metrics."""
+        result = "success" if success else "failure"
+        jwt_token_generation_total.labels(
+            service=self.service_name, result=result
+        ).inc()
+
+        if success:
+            jwt_token_generation_duration_seconds.labels(
+                service=self.service_name
+            ).observe(duration)
+
+    def record_jwt_token_verification(self, success: bool, has_player_id: bool):
+        """Record JWT token verification metrics."""
+        if not success:
+            result = "failure"
+        elif not has_player_id:
+            result = "missing_player_id"
+        else:
+            result = "success"
+
+        jwt_token_verification_total.labels(
+            service=self.service_name, result=result
+        ).inc()
+
+    def record_player_id_presence(self, endpoint: str, has_player_id: bool):
+        """Record player_id field presence in requests."""
+        player_id_field_presence_total.labels(
+            endpoint=endpoint, has_player_id=str(has_player_id).lower()
+        ).inc()
+
+    def update_player_id_presence_rate(self, endpoint: str, rate_percent: float):
+        """Update player_id presence rate gauge."""
+        player_id_presence_rate.labels(endpoint=endpoint).set(rate_percent)
+
+    def record_player_profile_autocreation(
+        self,
+        trigger: str,
+        success: bool,
+        duration: float,
+        error_category: str | None = None,
+    ):
+        """Record player profile auto-creation metrics."""
+        result = "success" if success else "failure"
+        player_profile_autocreation_total.labels(trigger=trigger, result=result).inc()
+
+        player_profile_autocreation_duration_seconds.labels(trigger=trigger).observe(
+            duration
+        )
+
+        if not success and error_category:
+            player_profile_autocreation_errors_total.labels(
+                error_category=error_category
+            ).inc()
 
     @contextmanager
     def time_operation(self, operation_name: str, labels: dict[str, str] | None = None):

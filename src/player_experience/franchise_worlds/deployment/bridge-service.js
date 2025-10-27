@@ -2,7 +2,7 @@
 
 /**
  * TTA Franchise World Bridge Service
- * 
+ *
  * HTTP service wrapper for Node.js bridge scripts to enable
  * containerized execution and better error handling.
  */
@@ -55,7 +55,7 @@ async function executeBridgeScript(scriptName, args = null) {
     }
 
     const scriptPath = path.join(__dirname, 'scripts', scriptFile);
-    
+
     // Check if script exists
     if (!fs.existsSync(scriptPath)) {
       reject(new Error(`Script file not found: ${scriptPath}`));
@@ -158,7 +158,7 @@ app.get('/archetypes', async (req, res) => {
     const args = {};
     if (archetypeId) args.archetypeId = archetypeId;
     if (role) args.role = role;
-    
+
     const result = await executeBridgeScript('get-archetypes', Object.keys(args).length > 0 ? args : null);
     res.json(result);
   } catch (error) {
@@ -172,11 +172,11 @@ app.post('/archetypes/:archetypeId/adapt', async (req, res) => {
   try {
     const { archetypeId } = req.params;
     const { worldGenre, worldContext } = req.body;
-    
+
     if (!worldGenre || !worldContext) {
       return res.status(400).json({ error: 'worldGenre and worldContext are required' });
     }
-    
+
     const result = await executeBridgeScript('adapt-archetype', {
       archetypeId,
       worldGenre,
@@ -184,9 +184,9 @@ app.post('/archetypes/:archetypeId/adapt', async (req, res) => {
     });
     res.json(result);
   } catch (error) {
-    log('error', 'Failed to adapt archetype', { 
-      archetypeId: req.params.archetypeId, 
-      error: error.message 
+    log('error', 'Failed to adapt archetype', {
+      archetypeId: req.params.archetypeId,
+      error: error.message
     });
     res.status(500).json({ error: error.message });
   }
@@ -209,20 +209,20 @@ app.post('/worlds/:worldId/parameters', async (req, res) => {
   try {
     const { worldId } = req.params;
     const { playerPreferences } = req.body;
-    
+
     if (!playerPreferences) {
       return res.status(400).json({ error: 'playerPreferences are required' });
     }
-    
+
     const result = await executeBridgeScript('create-parameters', {
       worldId,
       playerPreferences
     });
     res.json(result);
   } catch (error) {
-    log('error', 'Failed to create parameters', { 
-      worldId: req.params.worldId, 
-      error: error.message 
+    log('error', 'Failed to create parameters', {
+      worldId: req.params.worldId,
+      error: error.message
     });
     res.status(500).json({ error: error.message });
   }
@@ -253,7 +253,7 @@ app.get('/system/status', async (req, res) => {
     });
   } catch (error) {
     log('error', 'Failed to get system status', { error: error.message });
-    res.status(500).json({ 
+    res.status(500).json({
       error: error.message,
       bridgeService: {
         status: 'degraded',

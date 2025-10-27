@@ -1,7 +1,7 @@
 import pytest
 
-from src.agent_orchestration.models import AgentId, AgentType
-from src.agent_orchestration.router import AgentRouter
+from tta_ai.orchestration.models import AgentId, AgentType
+from tta_ai.orchestration.router import AgentRouter
 
 
 class DummyMetrics:

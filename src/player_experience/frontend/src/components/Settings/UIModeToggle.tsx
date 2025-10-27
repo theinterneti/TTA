@@ -1,6 +1,6 @@
 /**
  * UI Mode Toggle Component
- * 
+ *
  * Allows users to switch between Entertainment and Clinical interface modes
  */
 
@@ -14,10 +14,10 @@ interface UIModeToggleProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const UIModeToggle: React.FC<UIModeToggleProps> = ({ 
-  className = '', 
+const UIModeToggle: React.FC<UIModeToggleProps> = ({
+  className = '',
   showLabels = true,
-  size = 'md' 
+  size = 'md'
 }) => {
   const { getMode, setMode, isEntertainmentMode } = useTranslation();
   const [currentMode, setCurrentMode] = useState<UIMode>(getMode());
@@ -34,25 +34,25 @@ const UIModeToggle: React.FC<UIModeToggleProps> = ({
 
   const handleModeToggle = async () => {
     if (isToggling) return;
-    
+
     setIsToggling(true);
-    
+
     try {
       const newMode = currentMode === UIMode.ENTERTAINMENT ? UIMode.CLINICAL : UIMode.ENTERTAINMENT;
-      
+
       // Update the translation service
       setMode(newMode);
       setCurrentMode(newMode);
-      
+
       // Save user preference
       UIModeUtils.saveUserPreference(newMode);
-      
+
       // Optional: Trigger a page refresh to update all components
       // This ensures all components re-render with the new mode
       setTimeout(() => {
         window.location.reload();
       }, 300);
-      
+
     } catch (error) {
       console.error('Failed to toggle UI mode:', error);
     } finally {
@@ -74,20 +74,20 @@ const UIModeToggle: React.FC<UIModeToggleProps> = ({
   const getToggleClasses = () => {
     const baseClasses = 'relative inline-flex items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2';
     const sizeClasses = getSizeClasses();
-    const colorClasses = isEntertainmentMode() 
-      ? 'bg-purple-600 hover:bg-purple-700' 
+    const colorClasses = isEntertainmentMode()
+      ? 'bg-purple-600 hover:bg-purple-700'
       : 'bg-blue-600 hover:bg-blue-700';
-    
+
     return `${baseClasses} ${sizeClasses} ${colorClasses}`;
   };
 
   const getKnobClasses = () => {
     const baseClasses = 'inline-block rounded-full bg-white shadow transform transition-transform duration-300';
     const sizeClasses = size === 'sm' ? 'w-5 h-5' : size === 'lg' ? 'w-7 h-7' : 'w-6 h-6';
-    const positionClasses = isEntertainmentMode() 
+    const positionClasses = isEntertainmentMode()
       ? (size === 'sm' ? 'translate-x-6' : size === 'lg' ? 'translate-x-8' : 'translate-x-7')
       : 'translate-x-1';
-    
+
     return `${baseClasses} ${sizeClasses} ${positionClasses}`;
   };
 
@@ -106,7 +106,7 @@ const UIModeToggle: React.FC<UIModeToggleProps> = ({
           </span>
         </div>
       )}
-      
+
       <button
         type="button"
         onClick={handleModeToggle}
@@ -123,7 +123,7 @@ const UIModeToggle: React.FC<UIModeToggleProps> = ({
           )}
         </span>
       </button>
-      
+
       {showLabels && (
         <div className="flex items-center space-x-2 text-sm">
           <span className={`transition-colors duration-200 ${
@@ -142,7 +142,7 @@ const UIModeToggle: React.FC<UIModeToggleProps> = ({
  */
 export const CompactUIModeToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
-    <UIModeToggle 
+    <UIModeToggle
       className={className}
       showLabels={false}
       size="sm"
@@ -155,7 +155,7 @@ export const CompactUIModeToggle: React.FC<{ className?: string }> = ({ classNam
  */
 export const FullUIModeToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { isEntertainmentMode } = useTranslation();
-  
+
   return (
     <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
       <div className="flex items-center justify-between">
@@ -164,11 +164,11 @@ export const FullUIModeToggle: React.FC<{ className?: string }> = ({ className =
             Interface Style
           </h3>
           <p className="text-sm text-gray-600 mb-4">
-            Choose how you'd like the interface to be presented. Adventure mode uses 
-            gaming language and focuses on storytelling, while Clinical mode uses 
+            Choose how you'd like the interface to be presented. Adventure mode uses
+            gaming language and focuses on storytelling, while Clinical mode uses
             professional therapeutic terminology.
           </p>
-          
+
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
               <div className={`w-3 h-3 rounded-full ${
@@ -179,7 +179,7 @@ export const FullUIModeToggle: React.FC<{ className?: string }> = ({ className =
                 <p className="text-sm text-gray-600">Professional therapeutic interface with clinical terminology</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <div className={`w-3 h-3 rounded-full ${
                 isEntertainmentMode() ? 'bg-purple-500' : 'bg-gray-300'
@@ -191,7 +191,7 @@ export const FullUIModeToggle: React.FC<{ className?: string }> = ({ className =
             </div>
           </div>
         </div>
-        
+
         <div className="ml-6">
           <UIModeToggle size="lg" />
         </div>

@@ -134,7 +134,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('line-chart');
       const chartData = JSON.parse(chart.getAttribute('data-chart-data') || '{}');
-      
+
       expect(chartData.labels).toBeDefined();
       expect(chartData.datasets).toBeDefined();
       expect(chartData.datasets.length).toBe(mockGoalProgresses.length);
@@ -145,7 +145,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('radar-chart');
       const chartData = JSON.parse(chart.getAttribute('data-chart-data') || '{}');
-      
+
       expect(chartData.labels).toEqual([
         'Anxiety Reduction',
         'Mindfulness Practice',
@@ -159,7 +159,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('doughnut-chart');
       const chartData = JSON.parse(chart.getAttribute('data-chart-data') || '{}');
-      
+
       expect(chartData.datasets[0].data).toEqual([75, 50, 25]);
     });
   });
@@ -176,7 +176,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('radar-chart');
       const chartData = JSON.parse(chart.getAttribute('data-chart-data') || '{}');
-      
+
       expect(chartData.labels).toHaveLength(2);
       expect(chartData.datasets[0].data).toEqual([75, 50]);
     });
@@ -186,7 +186,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('radar-chart');
       const chartData = JSON.parse(chart.getAttribute('data-chart-data') || '{}');
-      
+
       expect(chartData.labels).toHaveLength(3);
       expect(chartData.datasets[0].data).toEqual([75, 50, 25]);
     });
@@ -266,7 +266,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('line-chart');
       const chartOptions = JSON.parse(chart.getAttribute('data-chart-options') || '{}');
-      
+
       expect(chartOptions.plugins.legend.display).toBe(true);
     });
 
@@ -280,7 +280,7 @@ describe('GoalProgressChart', () => {
 
       const chart = screen.getByTestId('line-chart');
       const chartOptions = JSON.parse(chart.getAttribute('data-chart-options') || '{}');
-      
+
       expect(chartOptions.plugins.legend.display).toBe(false);
     });
   });

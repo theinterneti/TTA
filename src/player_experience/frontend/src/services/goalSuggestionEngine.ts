@@ -1,6 +1,6 @@
 /**
  * Goal Suggestion Engine for TherapeuticGoalsSelector
- * 
+ *
  * This service provides intelligent therapeutic goal recommendations based on
  * user-selected primary concerns using evidence-based clinical mappings.
  */
@@ -73,97 +73,97 @@ const CONCERN_TO_GOAL_MAPPINGS: Record<string, Array<{
     { goalId: 'coping_strategies', confidence: 0.80, reason: 'Building healthy coping mechanisms for workplace challenges', clinicalEvidence: 'high' },
     { goalId: 'boundary_setting', confidence: 0.75, reason: 'Work-life balance and professional boundary management', clinicalEvidence: 'medium' },
   ],
-  
+
   'Relationship issues': [
     { goalId: 'relationship_skills', confidence: 0.95, reason: 'Direct focus on improving interpersonal relationships', clinicalEvidence: 'high' },
     { goalId: 'communication_skills', confidence: 0.90, reason: 'Communication is fundamental to healthy relationships', clinicalEvidence: 'high' },
     { goalId: 'boundary_setting', confidence: 0.80, reason: 'Healthy boundaries essential for relationship wellbeing', clinicalEvidence: 'high' },
     { goalId: 'emotional_processing', confidence: 0.75, reason: 'Understanding emotions improves relationship dynamics', clinicalEvidence: 'medium' },
   ],
-  
+
   'Family problems': [
     { goalId: 'communication_skills', confidence: 0.90, reason: 'Family therapy emphasizes communication improvement', clinicalEvidence: 'high' },
     { goalId: 'boundary_setting', confidence: 0.85, reason: 'Healthy family boundaries reduce conflict and stress', clinicalEvidence: 'high' },
     { goalId: 'relationship_skills', confidence: 0.80, reason: 'Family relationships benefit from interpersonal skills', clinicalEvidence: 'high' },
     { goalId: 'coping_strategies', confidence: 0.75, reason: 'Managing family stress requires effective coping tools', clinicalEvidence: 'medium' },
   ],
-  
+
   'Financial worries': [
     { goalId: 'stress_management', confidence: 0.90, reason: 'Financial stress is a major stressor requiring management techniques', clinicalEvidence: 'high' },
     { goalId: 'coping_strategies', confidence: 0.85, reason: 'Healthy coping mechanisms for financial uncertainty', clinicalEvidence: 'high' },
     { goalId: 'anxiety_reduction', confidence: 0.80, reason: 'Financial worries often manifest as anxiety symptoms', clinicalEvidence: 'high' },
     { goalId: 'mindfulness_development', confidence: 0.70, reason: 'Mindfulness helps with financial anxiety and decision-making', clinicalEvidence: 'medium' },
   ],
-  
+
   'Health concerns': [
     { goalId: 'anxiety_reduction', confidence: 0.90, reason: 'Health anxiety is common and treatable with CBT techniques', clinicalEvidence: 'high' },
     { goalId: 'stress_management', confidence: 0.85, reason: 'Health concerns create significant stress requiring management', clinicalEvidence: 'high' },
     { goalId: 'mindfulness_development', confidence: 0.80, reason: 'Mindfulness-based interventions effective for health anxiety', clinicalEvidence: 'high' },
     { goalId: 'coping_strategies', confidence: 0.75, reason: 'Adaptive coping strategies for health-related challenges', clinicalEvidence: 'medium' },
   ],
-  
+
   'Life transitions': [
     { goalId: 'coping_strategies', confidence: 0.90, reason: 'Transitions require adaptive coping mechanisms', clinicalEvidence: 'high' },
     { goalId: 'personal_growth', confidence: 0.85, reason: 'Life transitions offer opportunities for personal development', clinicalEvidence: 'high' },
     { goalId: 'confidence_building', confidence: 0.80, reason: 'Building confidence helps navigate life changes', clinicalEvidence: 'medium' },
     { goalId: 'stress_management', confidence: 0.75, reason: 'Transitions often involve stress that needs management', clinicalEvidence: 'medium' },
   ],
-  
+
   'Social anxiety': [
     { goalId: 'anxiety_reduction', confidence: 0.95, reason: 'Social anxiety disorder directly addressed through anxiety reduction techniques', clinicalEvidence: 'high' },
     { goalId: 'confidence_building', confidence: 0.85, reason: 'Building self-confidence reduces social anxiety symptoms', clinicalEvidence: 'high' },
     { goalId: 'communication_skills', confidence: 0.80, reason: 'Improved communication skills reduce social anxiety', clinicalEvidence: 'high' },
     { goalId: 'mindfulness_development', confidence: 0.75, reason: 'Mindfulness techniques help manage social anxiety in the moment', clinicalEvidence: 'medium' },
   ],
-  
+
   'Depression': [
     { goalId: 'emotional_processing', confidence: 0.90, reason: 'Processing emotions is central to depression treatment', clinicalEvidence: 'high' },
     { goalId: 'self_compassion', confidence: 0.85, reason: 'Self-compassion therapy effective for depression', clinicalEvidence: 'high' },
     { goalId: 'personal_growth', confidence: 0.80, reason: 'Personal growth activities counter depressive symptoms', clinicalEvidence: 'high' },
     { goalId: 'mindfulness_development', confidence: 0.75, reason: 'Mindfulness-based cognitive therapy for depression', clinicalEvidence: 'high' },
   ],
-  
+
   'Perfectionism': [
     { goalId: 'self_compassion', confidence: 0.90, reason: 'Self-compassion directly counters perfectionist self-criticism', clinicalEvidence: 'high' },
     { goalId: 'anxiety_reduction', confidence: 0.85, reason: 'Perfectionism often involves anxiety about performance', clinicalEvidence: 'high' },
     { goalId: 'stress_management', confidence: 0.80, reason: 'Perfectionist tendencies create chronic stress', clinicalEvidence: 'medium' },
     { goalId: 'boundary_setting', confidence: 0.75, reason: 'Setting realistic boundaries and expectations', clinicalEvidence: 'medium' },
   ],
-  
+
   'Procrastination': [
     { goalId: 'confidence_building', confidence: 0.85, reason: 'Low confidence often underlies procrastination behaviors', clinicalEvidence: 'medium' },
     { goalId: 'stress_management', confidence: 0.80, reason: 'Procrastination often stems from stress avoidance', clinicalEvidence: 'medium' },
     { goalId: 'personal_growth', confidence: 0.75, reason: 'Personal development addresses procrastination patterns', clinicalEvidence: 'medium' },
     { goalId: 'coping_strategies', confidence: 0.70, reason: 'Healthy coping strategies replace procrastination behaviors', clinicalEvidence: 'medium' },
   ],
-  
+
   'Low self-esteem': [
     { goalId: 'confidence_building', confidence: 0.95, reason: 'Direct correlation between confidence building and self-esteem improvement', clinicalEvidence: 'high' },
     { goalId: 'self_compassion', confidence: 0.90, reason: 'Self-compassion therapy highly effective for low self-esteem', clinicalEvidence: 'high' },
     { goalId: 'personal_growth', confidence: 0.80, reason: 'Personal growth activities build self-worth and esteem', clinicalEvidence: 'high' },
   ],
-  
+
   'Loneliness': [
     { goalId: 'relationship_skills', confidence: 0.90, reason: 'Building relationship skills addresses loneliness directly', clinicalEvidence: 'high' },
     { goalId: 'communication_skills', confidence: 0.85, reason: 'Better communication helps form meaningful connections', clinicalEvidence: 'high' },
     { goalId: 'confidence_building', confidence: 0.80, reason: 'Confidence helps in social situations and forming relationships', clinicalEvidence: 'medium' },
     { goalId: 'self_compassion', confidence: 0.75, reason: 'Self-compassion reduces self-criticism that can worsen loneliness', clinicalEvidence: 'medium' },
   ],
-  
+
   'Career uncertainty': [
     { goalId: 'confidence_building', confidence: 0.85, reason: 'Career confidence helps with decision-making and job searching', clinicalEvidence: 'medium' },
     { goalId: 'personal_growth', confidence: 0.80, reason: 'Personal development clarifies career goals and values', clinicalEvidence: 'medium' },
     { goalId: 'stress_management', confidence: 0.75, reason: 'Career uncertainty creates stress requiring management', clinicalEvidence: 'medium' },
     { goalId: 'coping_strategies', confidence: 0.70, reason: 'Coping with career transitions and uncertainty', clinicalEvidence: 'medium' },
   ],
-  
+
   'Academic pressure': [
     { goalId: 'stress_management', confidence: 0.90, reason: 'Academic stress management is well-researched and effective', clinicalEvidence: 'high' },
     { goalId: 'anxiety_reduction', confidence: 0.85, reason: 'Academic pressure often manifests as performance anxiety', clinicalEvidence: 'high' },
     { goalId: 'coping_strategies', confidence: 0.80, reason: 'Healthy coping mechanisms for academic challenges', clinicalEvidence: 'high' },
     { goalId: 'mindfulness_development', confidence: 0.75, reason: 'Mindfulness helps with academic focus and stress', clinicalEvidence: 'medium' },
   ],
-  
+
   'Parenting challenges': [
     { goalId: 'stress_management', confidence: 0.90, reason: 'Parenting stress management is crucial for family wellbeing', clinicalEvidence: 'high' },
     { goalId: 'boundary_setting', confidence: 0.85, reason: 'Healthy boundaries essential in parent-child relationships', clinicalEvidence: 'high' },
@@ -247,7 +247,7 @@ export function generateGoalSuggestions(
       const evidenceWeight = { high: 3, medium: 2, low: 1 };
       const evidenceDiff = evidenceWeight[b.clinicalEvidence] - evidenceWeight[a.clinicalEvidence];
       if (evidenceDiff !== 0) return evidenceDiff;
-      
+
       // Then by confidence
       return b.confidence - a.confidence;
     })
@@ -255,8 +255,8 @@ export function generateGoalSuggestions(
 
   // Determine suggestion strength
   const avgConfidence = sortedSuggestions.reduce((sum, s) => sum + s.confidence, 0) / sortedSuggestions.length;
-  const suggestionStrength: 'strong' | 'moderate' | 'weak' = 
-    avgConfidence >= 0.8 ? 'strong' : 
+  const suggestionStrength: 'strong' | 'moderate' | 'weak' =
+    avgConfidence >= 0.8 ? 'strong' :
     avgConfidence >= 0.6 ? 'moderate' : 'weak';
 
   return {

@@ -1,0 +1,323 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "TTA Simulation Framework Dashboard",
+    "tags": ["tta", "simulation", "testing", "entertainment", "therapeutic"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1,
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Simulation Framework Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"tta-simulation-framework\"}",
+            "legendFormat": "Framework Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "mappings": [
+              {"options": {"0": {"text": "DOWN"}}, "type": "value"},
+              {"options": {"1": {"text": "UP"}}, "type": "value"}
+            ]
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Active Simulations",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "tta_active_simulations_total",
+            "legendFormat": "Active Simulations"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Average Engagement Score",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(tta_engagement_score)",
+            "legendFormat": "Engagement"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.7},
+                {"color": "green", "value": 0.85}
+              ]
+            },
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Average Immersion Score",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(tta_immersion_score)",
+            "legendFormat": "Immersion"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.7},
+                {"color": "green", "value": 0.8}
+              ]
+            },
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Simulation Success Rate Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(tta_simulations_completed_total[5m])",
+            "legendFormat": "Completed"
+          },
+          {
+            "expr": "rate(tta_simulations_failed_total[5m])",
+            "legendFormat": "Failed"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+      },
+      {
+        "id": 6,
+        "title": "Persona Performance Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (persona_type) (tta_persona_sessions_total)",
+            "legendFormat": "{{persona_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+      },
+      {
+        "id": 7,
+        "title": "World Generation Quality Metrics",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(tta_world_generation_score)",
+            "legendFormat": "World Generation"
+          },
+          {
+            "expr": "avg(tta_world_consistency_score)",
+            "legendFormat": "World Consistency"
+          },
+          {
+            "expr": "avg(tta_world_complexity_score)",
+            "legendFormat": "World Complexity"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12}
+      },
+      {
+        "id": 8,
+        "title": "Entertainment vs Therapeutic Balance",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(tta_entertainment_value_score)",
+            "legendFormat": "Entertainment Value"
+          },
+          {
+            "expr": "avg(tta_therapeutic_benefit_score)",
+            "legendFormat": "Therapeutic Benefit"
+          },
+          {
+            "expr": "avg(tta_therapeutic_integration_subtlety)",
+            "legendFormat": "Integration Subtlety"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+      },
+      {
+        "id": 9,
+        "title": "Session Duration Distribution",
+        "type": "histogram",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(tta_session_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "50th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.90, sum(rate(tta_session_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "90th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(tta_session_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "99th percentile"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "s"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+      },
+      {
+        "id": 10,
+        "title": "Recent Simulation Results",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "tta_simulation_results",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 0.7},
+                {"color": "green", "value": 0.85}
+              ]
+            }
+          }
+        },
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "simulation_id": "Simulation ID",
+                "config_name": "Configuration",
+                "status": "Status",
+                "engagement_score": "Engagement",
+                "immersion_score": "Immersion",
+                "entertainment_value": "Entertainment",
+                "therapeutic_benefit": "Therapeutic"
+              }
+            }
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 28}
+      }
+    ],
+    "annotations": {
+      "list": [
+        {
+          "name": "Simulation Events",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "changes(tta_simulation_started_total[1m]) > 0",
+          "iconColor": "blue",
+          "titleFormat": "Simulation Started"
+        }
+      ]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "environment",
+          "type": "query",
+          "query": "label_values(up{job=\"tta-simulation-framework\"}, environment)",
+          "refresh": 1,
+          "includeAll": false,
+          "multi": false
+        },
+        {
+          "name": "persona_type",
+          "type": "query",
+          "query": "label_values(tta_persona_sessions_total, persona_type)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true
+        }
+      ]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 /**
  * Enhanced Conflict Detection Service
- * 
+ *
  * Provides real-time conflict detection for therapeutic goal combinations with
  * intelligent analysis, user-friendly warnings, and resolution guidance.
  * Implements evidence-based therapeutic principles for optimal goal planning.
@@ -72,13 +72,13 @@ const ENHANCED_CONFLICT_PATTERNS: Array<{
   {
     pattern: ['perfectionism_management', 'high_achievement', 'performance_optimization'],
     detector: (goals, progress, approaches) => {
-      const conflictingGoals = goals.filter(g => 
+      const conflictingGoals = goals.filter(g =>
         ['perfectionism_management', 'high_achievement', 'performance_optimization'].includes(g)
       );
-      
+
       if (conflictingGoals.length >= 2) {
         const severity = calculateSeverityLevel(conflictingGoals, progress);
-        
+
         return {
           conflictId: `perfectionism-achievement-${Date.now()}`,
           conflictingGoals,
@@ -133,13 +133,13 @@ const ENHANCED_CONFLICT_PATTERNS: Array<{
   {
     pattern: ['anxiety_reduction', 'social_confidence', 'public_speaking', 'assertiveness'],
     detector: (goals, progress, approaches) => {
-      const anxietyRelatedGoals = goals.filter(g => 
+      const anxietyRelatedGoals = goals.filter(g =>
         ['anxiety_reduction', 'social_confidence', 'public_speaking', 'assertiveness'].includes(g)
       );
-      
+
       if (anxietyRelatedGoals.length >= 3) {
         const severity = calculateSeverityLevel(anxietyRelatedGoals, progress);
-        
+
         return {
           conflictId: `cognitive-overload-${Date.now()}`,
           conflictingGoals: anxietyRelatedGoals,
@@ -197,28 +197,28 @@ const ENHANCED_CONFLICT_PATTERNS: Array<{
  * Calculates severity level based on goals and progress
  */
 function calculateSeverityLevel(
-  conflictingGoals: string[], 
+  conflictingGoals: string[],
   progress?: GoalProgress[]
 ): ConflictSeverityLevel {
   const goalCount = conflictingGoals.length;
   const hasProgress = progress && progress.length > 0;
-  
+
   // Base severity on number of conflicting goals
   let score = Math.min(goalCount / 5, 1); // Normalize to 0-1
-  
+
   // Adjust based on progress - conflicts are more severe with active progress
   if (hasProgress) {
     const avgProgress = progress
       .filter(p => conflictingGoals.includes(p.goalId))
       .reduce((sum, p) => sum + p.progress, 0) / conflictingGoals.length;
-    
+
     if (avgProgress > 0.5) {
       score += 0.2; // Higher severity if goals are actively being worked on
     }
   }
-  
+
   score = Math.min(score, 1);
-  
+
   if (score >= 0.8) {
     return {
       level: 'critical',
@@ -259,7 +259,7 @@ export function detectGoalConflicts(
   approachAnalysis?: TherapeuticApproachAnalysis
 ): ConflictDetectionResult {
   const conflicts: EnhancedGoalConflict[] = [];
-  
+
   // Run enhanced pattern detection
   ENHANCED_CONFLICT_PATTERNS.forEach(({ pattern, detector }) => {
     const conflict = detector(selectedGoals, goalProgresses, approachAnalysis);
@@ -267,24 +267,24 @@ export function detectGoalConflicts(
       conflicts.push(conflict);
     }
   });
-  
+
   // Calculate overall risk score
-  const overallRiskScore = conflicts.length > 0 
+  const overallRiskScore = conflicts.length > 0
     ? conflicts.reduce((sum, c) => sum + c.severityLevel.score, 0) / conflicts.length
     : 0;
-  
+
   // Determine warning level
   const warningLevel = overallRiskScore >= 0.8 ? 'critical' :
                       overallRiskScore >= 0.6 ? 'high' :
                       overallRiskScore >= 0.4 ? 'medium' :
                       overallRiskScore > 0 ? 'low' : 'none';
-  
+
   // Generate recommended actions
   const recommendedActions = generateRecommendedActions(conflicts);
-  
+
   // Determine if safe to proceed
   const safeToProceeed = conflicts.filter(c => c.severityLevel.level === 'critical').length === 0;
-  
+
   return {
     conflicts,
     overallRiskScore,
@@ -305,28 +305,28 @@ export function detectGoalConflicts(
  */
 function generateRecommendedActions(conflicts: EnhancedGoalConflict[]): string[] {
   const actions: string[] = [];
-  
+
   const criticalConflicts = conflicts.filter(c => c.severityLevel.level === 'critical');
   const highConflicts = conflicts.filter(c => c.severityLevel.level === 'high');
   const autoResolvable = conflicts.filter(c => c.autoResolvable);
-  
+
   if (criticalConflicts.length > 0) {
     actions.push('🚨 Address critical conflicts immediately before proceeding');
     actions.push('Consider removing or modifying conflicting goals');
   }
-  
+
   if (highConflicts.length > 0) {
     actions.push('⚠️ Review high-priority conflicts and apply suggested resolutions');
   }
-  
+
   if (autoResolvable.length > 0) {
     actions.push('✨ Apply automatic conflict resolution for compatible goals');
   }
-  
+
   if (conflicts.length > 3) {
     actions.push('📊 Consider reducing the total number of active goals');
   }
-  
+
   return actions;
 }
 
@@ -370,7 +370,7 @@ export function applyAutomaticResolution(
   const resolvedConflicts: string[] = [];
   const modifiedGoals = [...selectedGoals];
   const remainingConflicts: EnhancedGoalConflict[] = [];
-  
+
   conflicts.forEach(conflict => {
     if (conflict.autoResolvable && conflict.severityLevel.level !== 'critical') {
       // Apply automatic resolution logic
@@ -384,7 +384,7 @@ export function applyAutomaticResolution(
       remainingConflicts.push(conflict);
     }
   });
-  
+
   return {
     resolvedConflicts,
     modifiedGoals,

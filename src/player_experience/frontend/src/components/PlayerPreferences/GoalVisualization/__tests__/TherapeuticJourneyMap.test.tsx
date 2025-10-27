@@ -248,7 +248,7 @@ describe('TherapeuticJourneyMap', () => {
       );
 
       const stageIcon = screen.getByText('🌱');
-      
+
       // First click to expand
       fireEvent.click(stageIcon);
       expect(screen.getByText('Goals')).toBeInTheDocument();

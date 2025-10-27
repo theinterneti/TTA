@@ -31,7 +31,6 @@ Example:
 import datetime
 import json
 import logging
-import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, TypeVar
@@ -40,9 +39,9 @@ from typing import Any, TypeVar
 try:
     from codecarbon import EmissionsTracker, track_emissions
 
-    CODECARBON_AVAILABLE = True
+    codecarbon_available = True
 except ImportError:
-    CODECARBON_AVAILABLE = False
+    codecarbon_available = False
 
 from src.orchestration.component import Component
 from src.orchestration.decorators import log_entry_exit, timing_decorator
@@ -107,14 +106,14 @@ class CarbonComponent(Component):
             bool: True if the component was started successfully, False otherwise
         """
         try:
-            if not CODECARBON_AVAILABLE:
+            if not codecarbon_available:
                 logger.warning(
                     "codecarbon not available, carbon tracking will be disabled"
                 )
                 return False
 
             # Create the output directory if it doesn't exist
-            os.makedirs(self.output_dir, exist_ok=True)
+            Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
             # Initialize emissions data
             self.emissions_data = {}
@@ -139,7 +138,7 @@ class CarbonComponent(Component):
             bool: True if the component was stopped successfully, False otherwise
         """
         try:
-            if not CODECARBON_AVAILABLE:
+            if not codecarbon_available:
                 logger.warning("codecarbon not available, carbon tracking was disabled")
                 return True
 
@@ -152,7 +151,9 @@ class CarbonComponent(Component):
             logger.error(f"Error stopping Carbon component: {e}")
             return False
 
-    def track_function(self, func: F, *args: Any, **kwargs: Any) -> Any:
+    def track_function(
+        self, func: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Any:
         """
         Track carbon emissions of a function.
 
@@ -167,14 +168,14 @@ class CarbonComponent(Component):
         Raises:
             Exception: If an error occurs during function execution
         """
-        if not CODECARBON_AVAILABLE:
+        if not codecarbon_available:
             logger.warning(
                 f"codecarbon not available, skipping emissions tracking for {func.__name__}"
             )
             return func(*args, **kwargs)
 
         # Create the output directory if it doesn't exist
-        os.makedirs(self.output_dir, exist_ok=True)
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
         # Track emissions
         tracker = EmissionsTracker(
@@ -212,7 +213,7 @@ class CarbonComponent(Component):
         Returns:
             Dict[str, Any]: Dictionary containing emissions data
         """
-        if not CODECARBON_AVAILABLE:
+        if not codecarbon_available:
             logger.warning("codecarbon not available, emissions report is empty")
             return {"error": "codecarbon not available"}
 
@@ -221,16 +222,14 @@ class CarbonComponent(Component):
             data["emissions"] for data in self.emissions_data.values()
         )
 
-        # Create the report
-        report = {
+        # Create and return the report
+        return {
             "project_name": self.project_name,
             "timestamp": datetime.datetime.now().isoformat(),
             "total_emissions": total_emissions,
             "unit": "kg CO2eq",
             "functions": self.emissions_data,
         }
-
-        return report
 
     def _save_emissions_data(self) -> None:
         """
@@ -241,14 +240,14 @@ class CarbonComponent(Component):
             return
 
         # Create the output directory if it doesn't exist
-        os.makedirs(self.output_dir, exist_ok=True)
+        output_path = Path(self.output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
 
         # Save the data to a JSON file
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{self.output_dir}/emissions_{timestamp}.json"
+        filename = output_path / f"emissions_{timestamp}.json"
 
-        with open(filename, "w") as f:
-            json.dump(self.get_emissions_report(), f, indent=2)
+        filename.write_text(json.dumps(self.get_emissions_report(), indent=2))
 
         logger.info(f"Emissions data saved to {filename}")
 
@@ -262,7 +261,7 @@ class CarbonComponent(Component):
         Returns:
             Callable[[F], F]: Decorator function
         """
-        if not CODECARBON_AVAILABLE:
+        if not codecarbon_available:
             logger.warning("codecarbon not available, carbon decorator will be a no-op")
 
             # Return a no-op decorator
@@ -274,7 +273,7 @@ class CarbonComponent(Component):
         project = project_name or self.project_name
 
         # Create the output directory if it doesn't exist
-        os.makedirs(self.output_dir, exist_ok=True)
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
         # Return the track_emissions decorator
         return track_emissions(

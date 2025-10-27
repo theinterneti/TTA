@@ -2,11 +2,11 @@ import asyncio
 
 import pytest
 
-from src.agent_orchestration.tools.coordinator import ToolCoordinator
-from src.agent_orchestration.tools.invocation_service import ToolInvocationService
-from src.agent_orchestration.tools.models import ToolPolicy, ToolSpec
-from src.agent_orchestration.tools.policy_config import ToolPolicyConfig
-from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
+from tta_ai.orchestration.tools.coordinator import ToolCoordinator
+from tta_ai.orchestration.tools.invocation_service import ToolInvocationService
+from tta_ai.orchestration.tools.models import ToolPolicy, ToolSpec
+from tta_ai.orchestration.tools.policy_config import ToolPolicyConfig
+from tta_ai.orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
 async def async_identity(v):

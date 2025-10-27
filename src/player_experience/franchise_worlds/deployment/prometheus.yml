@@ -11,68 +11,68 @@ alerting:
   alertmanagers:
     - static_configs:
         - targets:
-          - alertmanager:9093
+            - alertmanager:9093
 
 scrape_configs:
   # Prometheus self-monitoring
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
   # TTA Franchise API metrics
-  - job_name: 'tta-franchise-api'
+  - job_name: "tta-franchise-api"
     static_configs:
-      - targets: ['franchise-api:8000']
-    metrics_path: '/metrics'
+      - targets: ["franchise-api:8000"]
+    metrics_path: "/metrics"
     scrape_interval: 30s
     scrape_timeout: 10s
 
   # Node.js Bridge Service metrics
-  - job_name: 'tta-franchise-bridge'
+  - job_name: "tta-franchise-bridge"
     static_configs:
-      - targets: ['franchise-bridge:3001']
-    metrics_path: '/metrics'
+      - targets: ["franchise-bridge:3001"]
+    metrics_path: "/metrics"
     scrape_interval: 30s
     scrape_timeout: 10s
 
   # Redis metrics
-  - job_name: 'redis'
+  - job_name: "redis"
     static_configs:
-      - targets: ['redis:6379']
-    metrics_path: '/metrics'
+      - targets: ["redis:6379"]
+    metrics_path: "/metrics"
     scrape_interval: 30s
 
   # Neo4j metrics
-  - job_name: 'neo4j'
+  - job_name: "neo4j"
     static_configs:
-      - targets: ['neo4j:2004']
-    metrics_path: '/metrics'
+      - targets: ["neo4j:2004"]
+    metrics_path: "/metrics"
     scrape_interval: 30s
 
   # Nginx metrics
-  - job_name: 'nginx'
+  - job_name: "nginx"
     static_configs:
-      - targets: ['nginx:9113']
-    metrics_path: '/metrics'
+      - targets: ["nginx:9113"]
+    metrics_path: "/metrics"
     scrape_interval: 30s
 
   # Node Exporter for system metrics
-  - job_name: 'node-exporter'
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
     scrape_interval: 30s
 
   # cAdvisor for container metrics
-  - job_name: 'cadvisor'
+  - job_name: "cadvisor"
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ["cadvisor:8080"]
     scrape_interval: 30s
 
   # Custom application metrics
-  - job_name: 'tta-custom-metrics'
+  - job_name: "tta-custom-metrics"
     static_configs:
-      - targets: ['franchise-api:8000']
-    metrics_path: '/api/metrics/custom'
+      - targets: ["franchise-api:8000"]
+    metrics_path: "/api/metrics/custom"
     scrape_interval: 60s
     params:
-      format: ['prometheus']
+      format: ["prometheus"]

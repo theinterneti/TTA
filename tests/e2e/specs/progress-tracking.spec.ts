@@ -11,7 +11,7 @@ test.describe('Progress Tracking', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     progressPage = new ProgressPage(page);
-    
+
     // Mock API responses for progress data
     await mockApiResponse(page, '**/players/*/progress', {
       total_sessions: 15,
@@ -91,11 +91,11 @@ test.describe('Progress Tracking', () => {
 
     test('should display correct progress metrics', async () => {
       await progressPage.goto();
-      
+
       const sessionCount = await progressPage.getSessionCount();
       const streakCount = await progressPage.getStreakCount();
       const goalsCount = await progressPage.getCompletedGoalsCount();
-      
+
       expect(sessionCount).toBe(15);
       expect(streakCount).toBe(7);
       expect(goalsCount).toBe(3);
@@ -171,7 +171,7 @@ test.describe('Progress Tracking', () => {
     test('should show milestone progress for incomplete milestones', async () => {
       await progressPage.clickMilestone('Anxiety Management');
       await progressPage.expectMilestoneDetails('Anxiety Management');
-      
+
       // Should show 60% progress
       const progressBar = progressPage.page.locator('[data-testid="milestone-progress-bar"]');
       await expect(progressBar).toHaveAttribute('aria-valuenow', '60');
@@ -194,10 +194,10 @@ test.describe('Progress Tracking', () => {
 
     test('should allow sharing achievements', async ({ page }) => {
       await mockApiResponse(page, '**/achievements/*/share', { success: true }, 200, 'POST');
-      
+
       await progressPage.clickAchievement('Consistent Learner');
       await progressPage.shareAchievement();
-      
+
       await expect(page.locator('text=Achievement shared')).toBeVisible();
     });
 
@@ -225,7 +225,7 @@ test.describe('Progress Tracking', () => {
       }, 201, 'POST');
 
       await progressPage.addNewGoal('Improve Sleep Quality', '2024-02-01');
-      
+
       await expect(page.locator('text=Goal added successfully')).toBeVisible();
     });
 
@@ -235,7 +235,7 @@ test.describe('Progress Tracking', () => {
       }, 200, 'PUT');
 
       await progressPage.editGoal('Old Goal Title', 'Updated Goal Title');
-      
+
       await expect(page.locator('text=Goal updated successfully')).toBeVisible();
     });
 
@@ -245,7 +245,7 @@ test.describe('Progress Tracking', () => {
 
     test('should validate goal input', async () => {
       await progressPage.addNewGoal('', ''); // Empty inputs
-      
+
       await expect(progressPage.page.locator('text=Goal title is required')).toBeVisible();
     });
   });
@@ -332,7 +332,7 @@ test.describe('Progress Tracking', () => {
       const downloadPromise = page.waitForEvent('download');
       await progressPage.exportProgress('pdf');
       const download = await downloadPromise;
-      
+
       expect(download.suggestedFilename()).toContain('progress-report');
       expect(download.suggestedFilename()).toContain('.pdf');
     });
@@ -341,7 +341,7 @@ test.describe('Progress Tracking', () => {
       const downloadPromise = page.waitForEvent('download');
       await progressPage.exportProgress('csv');
       const download = await downloadPromise;
-      
+
       expect(download.suggestedFilename()).toContain('progress-data');
       expect(download.suggestedFilename()).toContain('.csv');
     });
@@ -353,7 +353,7 @@ test.describe('Progress Tracking', () => {
       });
 
       await progressPage.printReport();
-      
+
       // Verify print was triggered (in real test, you'd check for print dialog)
       const printLogs = await page.evaluate(() => console.log);
     });
@@ -386,12 +386,12 @@ test.describe('Progress Tracking', () => {
       };
 
       await mockApiResponse(page, '**/players/*/progress', largeProgressData);
-      
+
       const startTime = Date.now();
       await page.reload();
       await progressPage.expectPageLoaded();
       const loadTime = Date.now() - startTime;
-      
+
       expect(loadTime).toBeLessThan(10000); // 10 seconds for large dataset
     });
   });
@@ -435,7 +435,7 @@ test.describe('Progress Tracking', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await progressPage.goto();
       await progressPage.expectPageLoaded();
-      
+
       // Test mobile-specific functionality
       await progressPage.filterByWeekly();
       await progressPage.expectProgressChart();
@@ -445,7 +445,7 @@ test.describe('Progress Tracking', () => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await progressPage.goto();
       await progressPage.expectPageLoaded();
-      
+
       // Test tablet-specific functionality
       await progressPage.clickMilestone('First Week Complete');
       await progressPage.expectMilestoneDetails('First Week Complete');
@@ -461,7 +461,7 @@ test.describe('Progress Tracking', () => {
       for (const viewport of viewports) {
         await page.setViewportSize(viewport);
         await progressPage.expectProgressChart();
-        
+
         // Chart should be visible and properly sized
         const chartBounds = await progressPage.progressChart.boundingBox();
         expect(chartBounds?.width).toBeGreaterThan(200);
@@ -491,7 +491,7 @@ test.describe('Progress Tracking', () => {
 
       await progressPage.goto();
       await progressPage.expectPageLoaded();
-      
+
       // Should show empty states
       await expect(page.locator('text=No progress data yet')).toBeVisible();
     });

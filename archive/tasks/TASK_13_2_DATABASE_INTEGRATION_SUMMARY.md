@@ -142,7 +142,7 @@ def create_character(self, character_id: str, name: str, **properties) -> bool:
 
 ### Neo4j Constraints (All Created Successfully)
 - `character_id` uniqueness constraint
-- `location_id` uniqueness constraint  
+- `location_id` uniqueness constraint
 - `user_id` uniqueness constraint
 - `session_id` uniqueness constraint
 - `goal_id` uniqueness constraint
@@ -187,7 +187,7 @@ def create_character(self, character_id: str, name: str, **properties) -> bool:
 Task 13.2 has been **successfully completed** with all major requirements fulfilled:
 
 - ✅ Neo4j connection and schema properly initialized
-- ✅ Redis caching integrated with all components  
+- ✅ Redis caching integrated with all components
 - ✅ Data persistence validated across therapeutic components
 - ✅ Database operations tested under load and error conditions
 - ✅ Neo4j constraints and indexes properly created

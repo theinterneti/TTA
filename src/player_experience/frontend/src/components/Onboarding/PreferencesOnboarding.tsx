@@ -33,7 +33,7 @@ const PreferencesOnboarding: React.FC<PreferencesOnboardingProps> = ({
 
   const handlePreferencesComplete = (preferences: PlayerPreferences) => {
     setCurrentStep('complete');
-    
+
     // Auto-redirect after showing completion
     setTimeout(() => {
       if (onComplete) {
@@ -86,7 +86,7 @@ const PreferencesOnboarding: React.FC<PreferencesOnboardingProps> = ({
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
               What We'll Set Up Together
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -197,13 +197,13 @@ const PreferencesOnboarding: React.FC<PreferencesOnboardingProps> = ({
             All Set!
           </h1>
           <p className="text-lg text-gray-600 mb-6">
-            Your therapeutic preferences have been saved. Your personalized experience 
+            Your therapeutic preferences have been saved. Your personalized experience
             is now ready to begin.
           </p>
           <div className="bg-white rounded-lg p-6 mb-6">
             <h3 className="font-semibold text-gray-900 mb-2">What's Next?</h3>
             <p className="text-gray-600 text-sm">
-              You'll be redirected to your dashboard where you can start your first 
+              You'll be redirected to your dashboard where you can start your first
               therapeutic storytelling session with your personalized settings.
             </p>
           </div>

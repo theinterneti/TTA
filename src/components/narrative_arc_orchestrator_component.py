@@ -12,6 +12,7 @@ Classes:
     NarrativeStatus: Status information about current narrative state
 """
 
+import contextlib
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -228,9 +229,9 @@ class ScaleManager:
         }
 
         # Causal relationship tracking
-        self.causal_graph: dict[str, set[str]] = (
-            {}
-        )  # event_id -> set of caused event_ids
+        self.causal_graph: dict[
+            str, set[str]
+        ] = {}  # event_id -> set of caused event_ids
 
         # Conflict tracking
         self.active_conflicts: list[ScaleConflict] = []
@@ -404,11 +405,10 @@ class ScaleManager:
         """Get active events for a specific scale or all scales."""
         if scale:
             return self.active_events.get(scale, [])
-        else:
-            all_events = []
-            for events in self.active_events.values():
-                all_events.extend(events)
-            return all_events
+        all_events = []
+        for events in self.active_events.values():
+            all_events.extend(events)
+        return all_events
 
     # Private helper methods
 
@@ -437,7 +437,7 @@ class ScaleManager:
             # Determine temporal decay
             temporal_decay = self._calculate_temporal_decay(scale)
 
-            assessment = ImpactAssessment(
+            return ImpactAssessment(
                 scale=scale,
                 magnitude=base_magnitude,
                 affected_elements=affected_elements,
@@ -446,8 +446,6 @@ class ScaleManager:
                 confidence_score=confidence_score,
                 temporal_decay=temporal_decay,
             )
-
-            return assessment
 
         except Exception as e:
             logger.error(f"Error assessing scale impact: {e}")
@@ -622,7 +620,7 @@ class ScaleManager:
         """Create a narrative event from a choice and its impact assessment."""
         event_id = str(uuid.uuid4())
 
-        event = NarrativeEvent(
+        return NarrativeEvent(
             event_id=event_id,
             scale=scale,
             timestamp=datetime.now(),
@@ -641,8 +639,6 @@ class ScaleManager:
                 "assessment": assessment,
             },
         )
-
-        return event
 
     async def _update_causal_chains(self) -> None:
         """Update causal chains between events."""
@@ -727,10 +723,7 @@ class ScaleManager:
             cause_themes = cause_event.metadata.get("themes", [])
             effect_themes = effect_event.metadata.get("themes", [])
 
-            if set(cause_themes).intersection(set(effect_themes)):
-                return True
-
-            return False
+            return bool(set(cause_themes).intersection(set(effect_themes)))
 
         except Exception as e:
             logger.error(f"Error checking causal relationship: {e}")
@@ -919,7 +912,7 @@ class ScaleManager:
             for event in events_by_scale[NarrativeScale.SHORT_TERM]:
                 epic_impacts = [
                     elem
-                    for elem in event.impact_scope.keys()
+                    for elem in event.impact_scope
                     if elem.startswith("generational_")
                     or elem.startswith("world_history")
                 ]
@@ -932,7 +925,7 @@ class ScaleManager:
             for event in events_by_scale[NarrativeScale.EPIC_TERM]:
                 immediate_impacts = [
                     elem
-                    for elem in event.impact_scope.keys()
+                    for elem in event.impact_scope
                     if elem.startswith("current_scene") or elem.startswith("immediate_")
                 ]
                 if immediate_impacts:
@@ -1551,7 +1544,7 @@ class ScaleManager:
         # TODO: Implement sophisticated conflict resolution generation
         resolution_id = str(uuid.uuid4())
 
-        resolution = Resolution(
+        return Resolution(
             resolution_id=resolution_id,
             conflict_id=conflict.conflict_id,
             resolution_type="creative_integration",
@@ -1566,8 +1559,6 @@ class ScaleManager:
             narrative_cost=0.2,
             player_impact=0.1,
         )
-
-        return resolution
 
     async def _implement_resolution(self, resolution: Resolution) -> None:
         """Implement a conflict resolution."""
@@ -1946,7 +1937,7 @@ class NarrativeArcOrchestratorComponent(Component):
 
             # Build narrative status
             session_data = self.active_sessions[session_id]
-            status = NarrativeStatus(
+            return NarrativeStatus(
                 session_id=session_id,
                 current_scale=NarrativeScale.SHORT_TERM,  # TODO: Get actual current scale
                 active_threads=session_data.get("active_threads", []),
@@ -1954,8 +1945,6 @@ class NarrativeArcOrchestratorComponent(Component):
                 coherence_score=session_data.get("coherence_score", 0.8),
                 therapeutic_alignment=session_data.get("therapeutic_alignment", 0.7),
             )
-
-            return status
 
         except Exception as e:
             logger.error(f"Error getting narrative status: {e}")
@@ -1997,11 +1986,10 @@ class NarrativeArcOrchestratorComponent(Component):
                     f"Generated emergent event {event.event_id} for session {session_id}"
                 )
                 return event
-            else:
-                logger.debug(
-                    f"No emergent event triggered (probability: {probability:.2f})"
-                )
-                return None
+            logger.debug(
+                f"No emergent event triggered (probability: {probability:.2f})"
+            )
+            return None
 
         except Exception as e:
             logger.error(f"Error triggering emergent event: {e}")
@@ -2091,15 +2079,13 @@ class NarrativeArcOrchestratorComponent(Component):
                 "coherence_maintained": len(conflicts) == 0,
             }
 
-            response = NarrativeResponse(
+            return NarrativeResponse(
                 content=response_content,
                 response_type="narrative",
                 choices=next_choices,
                 session_id=session_id,
                 metadata=metadata,
             )
-
-            return response
 
         except Exception as e:
             logger.error(f"Error processing choice through systems: {e}")
@@ -2157,10 +2143,7 @@ class NarrativeArcOrchestratorComponent(Component):
             session_data = self.active_sessions[session_id]
             engagement_modifier = session_data.get("engagement_score", 0.5) * 0.2
 
-            probability = min(
-                1.0, base_probability + context_modifier + engagement_modifier
-            )
-            return probability
+            return min(1.0, base_probability + context_modifier + engagement_modifier)
 
         except Exception as e:
             logger.error(f"Error calculating emergent probability: {e}")
@@ -2174,7 +2157,7 @@ class NarrativeArcOrchestratorComponent(Component):
             # TODO: Implement actual emergent event generation
 
             event_id = str(uuid.uuid4())
-            event = EmergentEvent(
+            return EmergentEvent(
                 event_id=event_id,
                 event_type="character_revelation",
                 description="A character reveals an unexpected connection to your past.",
@@ -2186,8 +2169,6 @@ class NarrativeArcOrchestratorComponent(Component):
                     "generated_at": datetime.now().isoformat(),
                 },
             )
-
-            return event
 
         except Exception as e:
             logger.error(f"Error generating emergent event: {e}")
@@ -2358,11 +2339,9 @@ class NarrativeArcOrchestratorComponent(Component):
 
 
 # Facade re-exports: prefer extracted implementations
-try:
+with contextlib.suppress(Exception):
     from .narrative_arc_orchestrator.scale_manager import (
         ScaleManager as _ExtractedScaleManager,
     )
 
     ScaleManager = _ExtractedScaleManager  # type: ignore
-except Exception:
-    pass

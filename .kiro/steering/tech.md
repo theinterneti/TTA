@@ -35,13 +35,13 @@ class MyComponent(Component):
             name="component_name",  # lowercase, no spaces
             dependencies=["redis", "neo4j"]  # explicit dependencies
         )
-    
+
     def _start_impl(self) -> bool:
         # Implementation here
         return True  # MUST return boolean
-    
+
     def _stop_impl(self) -> bool:
-        # Cleanup here  
+        # Cleanup here
         return True  # MUST return boolean
 ```
 

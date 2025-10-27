@@ -1,0 +1,261 @@
+# Extended Session Configuration for TTA Quality Evaluation
+# Specialized configuration for 30-50+ turn sessions with memory management
+
+# Extended session specific settings
+extended_session_settings:
+  enabled: true
+  max_concurrent_sessions: 1 # Reduced for ultra-long sessions
+  session_timeout_minutes: 360 # 6 hours max per session
+  memory_management_enabled: true
+  context_optimization_enabled: true
+
+  # Memory management for ultra-long sessions
+  memory_management:
+    checkpoint_frequency: 5 # Save state every 5 turns for long sessions
+    context_compression_enabled: true
+    context_compression_threshold: 16000 # Compress when context exceeds 16k tokens
+    memory_pruning_enabled: true
+    memory_pruning_strategy: "importance_based" # Keep most important memories
+    max_memory_items: 100 # Maximum memories to retain
+
+    # Context window optimization
+    context_window_management:
+      sliding_window_enabled: true
+      window_size: 32000 # Use larger window for extended sessions
+      overlap_size: 4000 # Overlap between windows
+      summary_generation_enabled: true
+      summary_frequency: 10 # Generate summary every 10 turns
+
+    # Quality degradation monitoring
+    quality_monitoring:
+      enabled: true
+      degradation_threshold: 0.5 # Alert if quality drops by 0.5 points
+      consistency_tracking: true
+      memory_consistency_checks: true
+      narrative_coherence_tracking: true
+
+      # Automatic intervention thresholds
+      intervention_thresholds:
+        narrative_coherence_min: 6.5
+        world_consistency_min: 7.0
+        memory_consistency_min: 7.0
+        response_time_max: 10.0 # seconds
+
+      # Recovery strategies
+      recovery_strategies:
+        context_refresh: true
+        memory_consolidation: true
+        narrative_summary: true
+        checkpoint_rollback: true
+
+# Extended scenarios focused on ultra-long sessions
+ultra_long_scenarios:
+  fantasy_epic_journey:
+    name: "Fantasy Epic Journey - 35 Turns"
+    description: "Hero's journey across multiple kingdoms with complex character development"
+    target_turns: 35
+    estimated_duration_minutes: 210
+    scenario_type: "epic_fantasy"
+    complexity_level: "high"
+
+    # Memory-intensive story elements
+    story_elements:
+      multiple_locations: 8
+      recurring_characters: 12
+      plot_threads: 6
+      world_state_variables: 25
+
+    # Progressive complexity milestones
+    complexity_progression:
+      turns_1_10: "establishment" # Establish world and characters
+      turns_11_20: "complication" # Add complexity and conflicts
+      turns_21_30: "climax_build" # Build toward climax
+      turns_31_35: "resolution" # Resolve all threads
+
+    # Quality targets for extended sessions
+    extended_quality_targets:
+      narrative_coherence: 7.8
+      world_consistency: 8.2
+      character_development: 8.0
+      memory_consistency: 8.0
+      context_management: 7.8
+
+  therapeutic_life_journey:
+    name: "Therapeutic Life Journey - 45 Turns"
+    description: "Deep therapeutic exploration through life transitions"
+    target_turns: 45
+    estimated_duration_minutes: 270
+    scenario_type: "therapeutic_drama"
+    complexity_level: "high"
+
+    # Therapeutic depth elements
+    therapeutic_elements:
+      life_stages_explored: 5
+      therapeutic_themes: 8
+      relationship_dynamics: 10
+      growth_milestones: 12
+
+    # Therapeutic progression structure
+    therapeutic_progression:
+      turns_1_10: "exploration" # Explore current situation
+      turns_11_20: "understanding" # Develop insight and understanding
+      turns_21_30: "integration" # Integrate new perspectives
+      turns_31_40: "application" # Apply learning to life
+      turns_41_45: "consolidation" # Consolidate growth
+
+    # Therapeutic quality targets
+    therapeutic_quality_targets:
+      therapeutic_integration: 8.5
+      emotional_depth: 8.2
+      character_development: 8.0
+      memory_consistency: 8.0
+      healing_progression: 8.3
+
+# Performance optimization for extended sessions
+performance_optimization:
+  # Database optimization
+  database_optimization:
+    connection_pooling: true
+    max_connections: 10
+    query_optimization: true
+    index_optimization: true
+    batch_operations: true
+
+  # API optimization
+  api_optimization:
+    request_batching: true
+    response_caching: true
+    connection_reuse: true
+    timeout_optimization: true
+    retry_strategy: "exponential_backoff"
+
+  # Memory optimization
+  memory_optimization:
+    garbage_collection_frequency: "aggressive"
+    memory_monitoring: true
+    memory_alerts: true
+    memory_cleanup_interval: 300 # seconds
+
+  # Monitoring and alerting
+  monitoring:
+    performance_tracking: true
+    quality_tracking: true
+    error_tracking: true
+    resource_monitoring: true
+
+    # Alert thresholds
+    alert_thresholds:
+      memory_usage_percent: 80
+      response_time_seconds: 8.0
+      error_rate_percent: 5.0
+      quality_degradation: 0.5
+
+# Extended session user profiles
+extended_user_profiles:
+  marathon_user:
+    name: "Marathon User"
+    description: "User capable of very long sessions with sustained engagement"
+    behavior_pattern:
+      decision_making_style: "strategic"
+      interaction_style: "active"
+      narrative_preference: "plot_driven"
+      min_thinking_time: 3.0
+      max_thinking_time: 45.0
+      response_length_preference: "long"
+      engagement_consistency: 0.9
+      attention_span_turns: 50
+      fatigue_resistance: 0.8
+      complexity_tolerance: 0.9
+
+    # Extended session characteristics
+    extended_characteristics:
+      preferred_session_length: 180 # minutes
+      preferred_turn_count: 40
+      break_frequency: 15 # turns between breaks
+      complexity_preference: "high"
+      narrative_depth_preference: "deep"
+
+  deep_explorer:
+    name: "Deep Explorer"
+    description: "User who prefers deep, complex narratives with rich world-building"
+    behavior_pattern:
+      decision_making_style: "analytical"
+      interaction_style: "exploratory"
+      narrative_preference: "world_exploration"
+      min_thinking_time: 5.0
+      max_thinking_time: 60.0
+      response_length_preference: "long"
+      engagement_consistency: 0.85
+      attention_span_turns: 45
+      fatigue_resistance: 0.7
+      complexity_tolerance: 0.95
+
+    # Deep exploration characteristics
+    extended_characteristics:
+      preferred_session_length: 240 # minutes
+      preferred_turn_count: 45
+      break_frequency: 12
+      complexity_preference: "maximum"
+      narrative_depth_preference: "very_deep"
+      world_building_preference: "extensive"
+
+# Quality degradation thresholds for extended sessions
+quality_degradation_monitoring:
+  # Turn-based quality expectations
+  quality_by_turn_range:
+    turns_1_10:
+      narrative_coherence_min: 7.5
+      world_consistency_min: 8.0
+      user_engagement_min: 7.5
+    turns_11_25:
+      narrative_coherence_min: 7.3 # Slight degradation acceptable
+      world_consistency_min: 7.8
+      user_engagement_min: 7.2
+    turns_26_40:
+      narrative_coherence_min: 7.0 # More degradation acceptable
+      world_consistency_min: 7.5
+      user_engagement_min: 7.0
+    turns_41_50:
+      narrative_coherence_min: 6.8 # Acceptable degradation for ultra-long
+      world_consistency_min: 7.2
+      user_engagement_min: 6.8
+
+  # Intervention strategies when thresholds are breached
+  intervention_strategies:
+    context_refresh:
+      enabled: true
+      trigger_threshold: 0.3 # When quality drops by 0.3 points
+      strategy: "regenerate_context_summary"
+
+    memory_consolidation:
+      enabled: true
+      trigger_threshold: 0.5
+      strategy: "consolidate_and_prioritize_memories"
+
+    narrative_realignment:
+      enabled: true
+      trigger_threshold: 0.7
+      strategy: "realign_narrative_with_core_themes"
+
+    checkpoint_rollback:
+      enabled: true
+      trigger_threshold: 1.0 # Major quality degradation
+      strategy: "rollback_to_last_good_checkpoint"
+
+# Success criteria for extended sessions
+extended_success_criteria:
+  # Minimum acceptable performance
+  minimum_thresholds:
+    completion_rate: 0.9 # 90% of sessions must complete
+    average_quality: 7.0 # Average quality across all metrics
+    memory_consistency: 7.5 # Critical for extended sessions
+    user_satisfaction: 7.2 # Simulated user satisfaction
+
+  # Excellence targets
+  excellence_targets:
+    completion_rate: 0.95
+    average_quality: 8.0
+    memory_consistency: 8.5
+    user_satisfaction: 8.2
+    narrative_coherence: 8.0
+    world_consistency: 8.5

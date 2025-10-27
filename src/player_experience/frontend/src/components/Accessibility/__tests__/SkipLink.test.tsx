@@ -41,7 +41,7 @@ describe('SkipLink', () => {
 
     const skipLink = screen.getByText('Skip to main content');
     expect(skipLink).toHaveClass('sr-only');
-    
+
     // Focus the skip link
     skipLink.focus();
     expect(skipLink).toHaveClass('focus:not-sr-only');
@@ -50,7 +50,7 @@ describe('SkipLink', () => {
   it('focuses target element when clicked', () => {
     const mockFocus = jest.fn();
     const mockScrollIntoView = jest.fn();
-    
+
     // Mock the target element
     const target = document.getElementById('main-content');
     if (target) {
@@ -84,7 +84,7 @@ describe('SkipLink', () => {
     const skipLink = screen.getByText('Skip to main content');
     const clickEvent = new MouseEvent('click', { bubbles: true });
     const preventDefaultSpy = jest.spyOn(clickEvent, 'preventDefault');
-    
+
     fireEvent(skipLink, clickEvent);
     expect(preventDefaultSpy).toHaveBeenCalled();
   });
@@ -126,7 +126,7 @@ describe('SkipLink', () => {
     );
 
     const skipLink = screen.getByText('Skip to nonexistent');
-    
+
     // Should not throw an error when target doesn't exist
     expect(() => {
       fireEvent.click(skipLink);

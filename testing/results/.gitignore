@@ -1,0 +1,5 @@
+# Ignore test results but keep directory structure
+*.json
+*.csv
+*.log
+!.gitkeep

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  UserIcon, 
-  PlayIcon, 
-  ChartBarIcon, 
+import {
+  UserIcon,
+  PlayIcon,
+  ChartBarIcon,
   LightBulbIcon,
   ArrowRightIcon,
   CalendarIcon,

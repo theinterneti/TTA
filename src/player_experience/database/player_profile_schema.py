@@ -5,6 +5,7 @@ This module extends the existing TTA Neo4j schema to include
 player profile management with proper constraints and indexes.
 """
 
+import contextlib
 import logging
 from typing import Any
 
@@ -99,29 +100,22 @@ class PlayerProfileSchemaManager:
                 last_exc = e
                 delay = min(base_delay * (2**attempt), 8.0)
                 logger.debug(
-                    f"Neo4j connect attempt {attempt+1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
+                    f"Neo4j connect attempt {attempt + 1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
                 )
                 # Close any partially created driver before sleeping
-                try:
+                with contextlib.suppress(Exception):
                     if self.driver:
                         self.driver.close()
-                except Exception:
-                    pass
                 self.driver = None
                 import time as _t
 
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
-                else:
-                    # Exhausted attempts: re-raise with original exception type
-                    if isinstance(e, AuthError):
-                        raise PlayerProfileSchemaError(
-                            f"Failed to connect to Neo4j after retries: {e}"
-                        ) from e
-                    elif isinstance(e, _ServiceUnavailable):
-                        raise PlayerProfileSchemaError(
-                            f"Failed to connect to Neo4j after retries: {e}"
-                        ) from e
+                # Exhausted attempts: re-raise with original exception type
+                elif isinstance(e, (AuthError, _ServiceUnavailable)):
+                    raise PlayerProfileSchemaError(
+                        f"Failed to connect to Neo4j after retries: {e}"
+                    ) from e
             except _ClientError as e:
                 # Retry only on AuthenticationRateLimit variant
                 emsg = str(e)
@@ -131,13 +125,11 @@ class PlayerProfileSchemaManager:
                     last_exc = e
                     delay = min(base_delay * (2**attempt), 8.0)
                     logger.debug(
-                        f"Neo4j connect attempt {attempt+1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
+                        f"Neo4j connect attempt {attempt + 1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
                     )
-                    try:
+                    with contextlib.suppress(Exception):
                         if self.driver:
                             self.driver.close()
-                    except Exception:
-                        pass
                     self.driver = None
                     import time as _t
 

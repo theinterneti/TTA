@@ -1,6 +1,6 @@
 /**
  * Unit tests for Personalized Recommendation Engine
- * 
+ *
  * Tests comprehensive personalized recommendation functionality including
  * contextual analysis, evidence-based suggestions, and user-specific adaptations.
  */
@@ -195,7 +195,7 @@ describe('Personalized Recommendation Engine', () => {
   describe('generatePersonalizedRecommendations', () => {
     it('should generate personalized recommendations based on user context', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 5);
-      
+
       expect(result).toBeDefined();
       expect(result.recommendations).toBeInstanceOf(Array);
       expect(result.totalRecommendations).toBeGreaterThan(0);
@@ -210,18 +210,18 @@ describe('Personalized Recommendation Engine', () => {
     it('should limit recommendations to specified maximum', () => {
       const maxRecommendations = 3;
       const result = generatePersonalizedRecommendations(mockUserContext, maxRecommendations);
-      
+
       expect(result.recommendations.length).toBeLessThanOrEqual(maxRecommendations);
       expect(result.totalRecommendations).toBeLessThanOrEqual(maxRecommendations);
     });
 
     it('should prioritize recommendations correctly', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 10);
-      
+
       // Check that recommendations are sorted by priority
       const priorities = result.recommendations.map(rec => rec.priority);
       const priorityOrder = { critical: 5, high: 4, medium: 3, low: 2, optional: 1 };
-      
+
       for (let i = 1; i < priorities.length; i++) {
         expect(priorityOrder[priorities[i-1]]).toBeGreaterThanOrEqual(priorityOrder[priorities[i]]);
       }
@@ -229,7 +229,7 @@ describe('Personalized Recommendation Engine', () => {
 
     it('should include required recommendation properties', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 5);
-      
+
       result.recommendations.forEach(rec => {
         expect(rec.id).toBeDefined();
         expect(rec.type).toBeDefined();
@@ -256,7 +256,7 @@ describe('Personalized Recommendation Engine', () => {
     it('should calculate personalization score based on user data richness', () => {
       // Test with rich user context
       const richResult = generatePersonalizedRecommendations(mockUserContext, 5);
-      
+
       // Test with minimal user context
       const minimalContext: UserContext = {
         preferences: {
@@ -267,7 +267,7 @@ describe('Personalized Recommendation Engine', () => {
         goalProgresses: []
       };
       const minimalResult = generatePersonalizedRecommendations(minimalContext, 5);
-      
+
       // Rich context should have higher or equal personalization score
       expect(richResult.personalizationScore).toBeGreaterThanOrEqual(minimalResult.personalizationScore);
     });
@@ -275,7 +275,7 @@ describe('Personalized Recommendation Engine', () => {
     it('should generate appropriate recommendation summary', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 8);
       const summary = result.recommendationSummary;
-      
+
       expect(summary.totalRecommendations).toBe(result.recommendations.length);
       expect(summary.byPriority).toBeDefined();
       expect(summary.byCategory).toBeDefined();
@@ -283,12 +283,12 @@ describe('Personalized Recommendation Engine', () => {
       expect(summary.averageConfidence).toBeGreaterThanOrEqual(0);
       expect(summary.averageConfidence).toBeLessThanOrEqual(1);
       expect(['high', 'medium', 'low']).toContain(summary.personalizationStrength);
-      
+
       // Verify counts match
       const priorityCounts = Object.values(summary.byPriority).reduce((sum, count) => sum + count, 0);
       const categoryCounts = Object.values(summary.byCategory).reduce((sum, count) => sum + count, 0);
       const timeframeCounts = Object.values(summary.byTimeframe).reduce((sum, count) => sum + count, 0);
-      
+
       expect(priorityCounts).toBe(result.recommendations.length);
       expect(categoryCounts).toBe(result.recommendations.length);
       expect(timeframeCounts).toBe(result.recommendations.length);
@@ -298,10 +298,10 @@ describe('Personalized Recommendation Engine', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 5);
       const now = new Date();
       const reviewDate = result.nextReviewDate;
-      
+
       expect(reviewDate).toBeInstanceOf(Date);
       expect(reviewDate.getTime()).toBeGreaterThan(now.getTime());
-      
+
       // Should be within reasonable timeframe (1-30 days)
       const daysDifference = (reviewDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000);
       expect(daysDifference).toBeGreaterThan(0);
@@ -317,9 +317,9 @@ describe('Personalized Recommendation Engine', () => {
         },
         goalProgresses: []
       };
-      
+
       const result = generatePersonalizedRecommendations(emptyContext, 5);
-      
+
       expect(result).toBeDefined();
       expect(result.recommendations).toBeInstanceOf(Array);
       expect(result.confidenceLevel).toBe('low');
@@ -339,9 +339,9 @@ describe('Personalized Recommendation Engine', () => {
           }
         ]
       };
-      
+
       const positiveResult = generatePersonalizedRecommendations(positiveContext, 5);
-      
+
       // Test with negative feedback
       const negativeContext = {
         ...mockUserContext,
@@ -354,9 +354,9 @@ describe('Personalized Recommendation Engine', () => {
           }
         ]
       };
-      
+
       const negativeResult = generatePersonalizedRecommendations(negativeContext, 5);
-      
+
       // Both should generate recommendations, but potentially different types
       expect(positiveResult.recommendations.length).toBeGreaterThan(0);
       expect(negativeResult.recommendations.length).toBeGreaterThan(0);
@@ -374,37 +374,37 @@ describe('Personalized Recommendation Engine', () => {
           }
         ]
       };
-      
+
       const result = generatePersonalizedRecommendations(stalledContext, 5);
-      
+
       // Should include progress enhancement recommendations
-      const progressRecommendations = result.recommendations.filter(rec => 
+      const progressRecommendations = result.recommendations.filter(rec =>
         rec.type === 'progress_enhancement'
       );
-      
+
       expect(result.recommendations.length).toBeGreaterThan(0);
       // Note: Actual progress recommendations would depend on implementation details
     });
 
     it('should validate recommendation types and categories', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 10);
-      
+
       const validTypes: RecommendationType[] = [
         'goal_suggestion', 'concern_identification', 'approach_optimization',
         'progress_enhancement', 'conflict_resolution', 'milestone_adjustment',
         'therapeutic_deepening', 'integration_support'
       ];
-      
+
       const validCategories: RecommendationCategory[] = [
         'immediate_action', 'short_term_planning', 'long_term_development',
         'crisis_prevention', 'progress_optimization', 'relationship_enhancement',
         'self_care', 'skill_building'
       ];
-      
+
       const validPriorities: RecommendationPriority[] = [
         'critical', 'high', 'medium', 'low', 'optional'
       ];
-      
+
       result.recommendations.forEach(rec => {
         expect(validTypes).toContain(rec.type);
         expect(validCategories).toContain(rec.category);
@@ -423,7 +423,7 @@ describe('Personalized Recommendation Engine', () => {
         },
         goalProgresses: []
       };
-      
+
       expect(() => {
         generatePersonalizedRecommendations(noGoalsContext, 5);
       }).not.toThrow();
@@ -431,14 +431,14 @@ describe('Personalized Recommendation Engine', () => {
 
     it('should handle maximum recommendations of 0', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 0);
-      
+
       expect(result.recommendations).toHaveLength(0);
       expect(result.totalRecommendations).toBe(0);
     });
 
     it('should handle very large maximum recommendations', () => {
       const result = generatePersonalizedRecommendations(mockUserContext, 100);
-      
+
       expect(result.recommendations.length).toBeLessThanOrEqual(100);
       expect(result.totalRecommendations).toBeLessThanOrEqual(100);
     });
