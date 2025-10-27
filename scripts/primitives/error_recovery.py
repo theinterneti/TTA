@@ -388,4 +388,3 @@ class CircuitBreaker:
             logger.warning(
                 f"Circuit breaker opened after {self.failure_count} failures"
             )
-

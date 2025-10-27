@@ -13,11 +13,11 @@ from collections.abc import AsyncGenerator
 from datetime import datetime
 from typing import Any
 
-import docker.errors
-import docker.types
 import httpx
 
 import docker
+import docker.errors
+import docker.types
 
 from ..interfaces import (
     GenerationRequest,

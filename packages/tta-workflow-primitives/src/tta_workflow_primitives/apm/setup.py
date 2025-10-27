@@ -14,8 +14,7 @@ try:
 except ImportError:
     OPENTELEMETRY_AVAILABLE = False
     logging.warning(
-        "OpenTelemetry not installed. Install with: "
-        "pip install tta-workflow-primitives[apm]"
+        "OpenTelemetry not installed. Install with: pip install tta-workflow-primitives[apm]"
     )
 
 logger = logging.getLogger(__name__)
@@ -62,11 +61,13 @@ def setup_apm(
         return _tracer_provider, _meter_provider
 
     # Create resource with service info
-    resource = Resource.create({
-        "service.name": service_name,
-        "service.version": service_version,
-        "library.name": "tta-workflow-primitives",
-    })
+    resource = Resource.create(
+        {
+            "service.name": service_name,
+            "service.version": service_version,
+            "library.name": "tta-workflow-primitives",
+        }
+    )
 
     # Setup tracing
     _tracer_provider = TracerProvider(resource=resource)
@@ -84,10 +85,7 @@ def setup_apm(
     if enable_prometheus:
         # Prometheus metrics reader
         prometheus_reader = PrometheusMetricReader()
-        _meter_provider = MeterProvider(
-            resource=resource,
-            metric_readers=[prometheus_reader]
-        )
+        _meter_provider = MeterProvider(resource=resource, metric_readers=[prometheus_reader])
         metrics.set_meter_provider(_meter_provider)
         logger.info(f"Prometheus metrics enabled on port {prometheus_port}")
     else:

@@ -59,14 +59,14 @@ class APMWorkflowPrimitive(WorkflowPrimitive):
         self._execution_counter = meter.create_counter(
             f"primitive.{self.name}.executions",
             description=f"Number of executions for {self.name}",
-            unit="1"
+            unit="1",
         )
 
         # Create histogram for duration
         self._duration_histogram = meter.create_histogram(
             f"primitive.{self.name}.duration",
             description=f"Execution duration for {self.name}",
-            unit="ms"
+            unit="ms",
         )
 
     async def execute(self, input_data: Any, context: WorkflowContext) -> Any:
@@ -98,7 +98,7 @@ class APMWorkflowPrimitive(WorkflowPrimitive):
                 "primitive.type": self.__class__.__name__,
                 "workflow.id": context.workflow_id or "unknown",
                 "session.id": context.session_id or "unknown",
-            }
+            },
         ) as span:
             start_time = time.time()
 
@@ -114,16 +114,12 @@ class APMWorkflowPrimitive(WorkflowPrimitive):
 
                 # Update metrics
                 if self._execution_counter:
-                    self._execution_counter.add(1, {
-                        "status": "success",
-                        "primitive": self.name
-                    })
+                    self._execution_counter.add(1, {"status": "success", "primitive": self.name})
 
                 if self._duration_histogram:
-                    self._duration_histogram.record(duration_ms, {
-                        "status": "success",
-                        "primitive": self.name
-                    })
+                    self._duration_histogram.record(
+                        duration_ms, {"status": "success", "primitive": self.name}
+                    )
 
                 return result
 
@@ -139,22 +135,17 @@ class APMWorkflowPrimitive(WorkflowPrimitive):
 
                 # Update metrics
                 if self._execution_counter:
-                    self._execution_counter.add(1, {
-                        "status": "error",
-                        "primitive": self.name,
-                        "error_type": error_type
-                    })
+                    self._execution_counter.add(
+                        1, {"status": "error", "primitive": self.name, "error_type": error_type}
+                    )
 
                 if self._duration_histogram:
-                    self._duration_histogram.record(duration_ms, {
-                        "status": "error",
-                        "primitive": self.name,
-                        "error_type": error_type
-                    })
+                    self._duration_histogram.record(
+                        duration_ms,
+                        {"status": "error", "primitive": self.name, "error_type": error_type},
+                    )
 
-                logger.error(
-                    f"Primitive {self.name} failed after {duration_ms:.2f}ms: {e}"
-                )
+                logger.error(f"Primitive {self.name} failed after {duration_ms:.2f}ms: {e}")
                 raise
 
     async def _execute_impl(self, input_data: Any, context: WorkflowContext) -> Any:
@@ -169,6 +160,4 @@ class APMWorkflowPrimitive(WorkflowPrimitive):
         Returns:
             Output data
         """
-        raise NotImplementedError(
-            f"{self.__class__.__name__} must implement _execute_impl"
-        )
+        raise NotImplementedError(f"{self.__class__.__name__} must implement _execute_impl")

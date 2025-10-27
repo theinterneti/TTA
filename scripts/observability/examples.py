@@ -283,4 +283,3 @@ if __name__ == "__main__":
         print("  recent [operation] - View recent metrics")
         print("  cleanup [days] - Cleanup old metrics")
         print("  demo       - Run demo operations")
-

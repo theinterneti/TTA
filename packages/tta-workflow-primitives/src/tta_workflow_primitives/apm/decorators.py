@@ -11,10 +11,7 @@ from .setup import get_meter, get_tracer, is_apm_enabled
 logger = logging.getLogger(__name__)
 
 
-def trace_workflow(
-    span_name: str | None = None,
-    attributes: dict[str, Any] | None = None
-):
+def trace_workflow(span_name: str | None = None, attributes: dict[str, Any] | None = None):
     """Decorator to trace workflow function execution.
 
     Args:
@@ -26,6 +23,7 @@ def trace_workflow(
         ... async def process_data(data):
         ...     return processed_data
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -79,6 +77,7 @@ def trace_workflow(
 
         # Return appropriate wrapper based on function type
         import inspect
+
         if inspect.iscoroutinefunction(func):
             return async_wrapper
         else:
@@ -88,10 +87,7 @@ def trace_workflow(
 
 
 def track_metric(
-    metric_name: str,
-    metric_type: str = "counter",
-    description: str = "",
-    unit: str = "1"
+    metric_name: str, metric_type: str = "counter", description: str = "", unit: str = "1"
 ):
     """Decorator to track metrics for function execution.
 
@@ -106,6 +102,7 @@ def track_metric(
         ... async def call_api():
         ...     return result
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -118,17 +115,9 @@ def track_metric(
 
             # Create appropriate metric instrument
             if metric_type == "counter":
-                instrument = meter.create_counter(
-                    metric_name,
-                    description=description,
-                    unit=unit
-                )
+                instrument = meter.create_counter(metric_name, description=description, unit=unit)
             elif metric_type == "histogram":
-                instrument = meter.create_histogram(
-                    metric_name,
-                    description=description,
-                    unit=unit
-                )
+                instrument = meter.create_histogram(metric_name, description=description, unit=unit)
             else:
                 logger.warning(f"Unknown metric type: {metric_type}")
                 return await func(*args, **kwargs)
@@ -167,17 +156,9 @@ def track_metric(
 
             # Create appropriate metric instrument
             if metric_type == "counter":
-                instrument = meter.create_counter(
-                    metric_name,
-                    description=description,
-                    unit=unit
-                )
+                instrument = meter.create_counter(metric_name, description=description, unit=unit)
             elif metric_type == "histogram":
-                instrument = meter.create_histogram(
-                    metric_name,
-                    description=description,
-                    unit=unit
-                )
+                instrument = meter.create_histogram(metric_name, description=description, unit=unit)
             else:
                 logger.warning(f"Unknown metric type: {metric_type}")
                 return func(*args, **kwargs)
@@ -207,6 +188,7 @@ def track_metric(
 
         # Return appropriate wrapper based on function type
         import inspect
+
         if inspect.iscoroutinefunction(func):
             return async_wrapper
         else:

@@ -42,8 +42,8 @@ def example_new_session():
         metadata={
             "type": "feature_request",
             "phase": "planning",
-            "components": ["agent_orchestration", "development_tools"]
-        }
+            "components": ["agent_orchestration", "development_tools"],
+        },
     )
 
     # Add AI response (normal importance)
@@ -58,7 +58,7 @@ def example_new_session():
         I'll create a comprehensive Phase 1 implementation plan...
         """,
         importance=0.7,
-        metadata={"type": "response"}
+        metadata={"type": "response"},
     )
 
     # Add architectural decision (critical importance)
@@ -74,8 +74,8 @@ def example_new_session():
         metadata={
             "type": "architectural_decision",
             "component": "context_management",
-            "decision": "hybrid_pruning_strategy"
-        }
+            "decision": "hybrid_pruning_strategy",
+        },
     )
 
     print("\n" + manager.get_context_summary(session_id))
@@ -117,7 +117,7 @@ def example_continue_session():
         role="user",
         content="Let's start implementing Phase 1. What should we build first?",
         importance=0.8,
-        metadata={"type": "task_request"}
+        metadata={"type": "task_request"},
     )
 
     manager.add_message(
@@ -133,7 +133,7 @@ def example_continue_session():
         3. .augment/context/example_usage.py - This example file
         """,
         importance=0.7,
-        metadata={"type": "implementation_plan"}
+        metadata={"type": "implementation_plan"},
     )
 
     print("\n" + manager.get_context_summary(session_id))
@@ -164,7 +164,7 @@ def example_context_pruning():
         role="system",
         content="TTA Architecture: Multi-agent system with IPA, WBA, NGA",
         importance=1.0,
-        metadata={"type": "architecture_context"}
+        metadata={"type": "architecture_context"},
     )
 
     # Add many messages to trigger pruning
@@ -173,9 +173,10 @@ def example_context_pruning():
         manager.add_message(
             session_id=session_id,
             role="user" if i % 2 == 0 else "assistant",
-            content=f"Message {i}: This is a test message to demonstrate context pruning. " * 5,
+            content=f"Message {i}: This is a test message to demonstrate context pruning. "
+            * 5,
             importance=importance,
-            metadata={"message_number": i}
+            metadata={"message_number": i},
         )
 
         if i % 5 == 0:
@@ -216,8 +217,8 @@ def example_metadata_usage():
             "component": "agent_orchestration",
             "phase": "phase1",
             "priority": "high",
-            "estimated_days": 2
-        }
+            "estimated_days": 2,
+        },
     )
 
     manager.add_message(
@@ -230,8 +231,8 @@ def example_metadata_usage():
             "component": "development_tools",
             "phase": "phase1",
             "priority": "high",
-            "estimated_days": 2
-        }
+            "estimated_days": 2,
+        },
     )
 
     manager.add_message(
@@ -244,8 +245,8 @@ def example_metadata_usage():
             "component": "development_tools",
             "phase": "phase1",
             "priority": "medium",
-            "estimated_days": 2
-        }
+            "estimated_days": 2,
+        },
     )
 
     # Query messages by metadata
@@ -253,24 +254,21 @@ def example_metadata_usage():
 
     print("\nAll task requests:")
     task_requests = [
-        msg for msg in context.messages
-        if msg.metadata.get("type") == "task_request"
+        msg for msg in context.messages if msg.metadata.get("type") == "task_request"
     ]
     for msg in task_requests:
         print(f"  - {msg.content[:50]}... (priority: {msg.metadata.get('priority')})")
 
     print("\nHigh priority tasks:")
     high_priority = [
-        msg for msg in task_requests
-        if msg.metadata.get("priority") == "high"
+        msg for msg in task_requests if msg.metadata.get("priority") == "high"
     ]
     for msg in high_priority:
         print(f"  - {msg.content[:50]}...")
 
     print("\nPhase 1 tasks:")
     phase1_tasks = [
-        msg for msg in task_requests
-        if msg.metadata.get("phase") == "phase1"
+        msg for msg in task_requests if msg.metadata.get("phase") == "phase1"
     ]
     print(f"  Total: {len(phase1_tasks)} tasks")
     total_days = sum(msg.metadata.get("estimated_days", 0) for msg in phase1_tasks)
@@ -309,4 +307,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -97,9 +97,7 @@ class CustomAPIModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
         """Generate text as a stream using custom API."""
         try:
             # Prepare request based on API type
@@ -191,8 +189,7 @@ class CustomAPIModelInstance(BaseModelInstance):
         return {
             "prompt_tokens": usage.get("input_tokens", 0),
             "completion_tokens": usage.get("output_tokens", 0),
-            "total_tokens": usage.get("input_tokens", 0)
-            + usage.get("output_tokens", 0),
+            "total_tokens": usage.get("input_tokens", 0) + usage.get("output_tokens", 0),
         }
 
     async def _stream_openai_response(self, response) -> AsyncGenerator[str, None]:
@@ -258,9 +255,7 @@ class CustomAPIProvider(BaseProvider):
             base_url = provider_config.get("base_url")
 
             if not api_key or not base_url:
-                logger.error(
-                    f"Missing api_key or base_url for provider {provider_name}"
-                )
+                logger.error(f"Missing api_key or base_url for provider {provider_name}")
                 return False
 
             self._api_configs[provider_name] = provider_config
@@ -310,9 +305,7 @@ class CustomAPIProvider(BaseProvider):
 
             for provider_name, config in self._api_configs.items():
                 try:
-                    provider_models = await self._get_provider_models(
-                        provider_name, config
-                    )
+                    provider_models = await self._get_provider_models(provider_name, config)
                     models.extend(provider_models)
                 except Exception as e:
                     logger.warning(f"Failed to get models from {provider_name}: {e}")
@@ -348,13 +341,9 @@ class CustomAPIProvider(BaseProvider):
                         continue
 
                     # Determine pricing and capabilities based on provider
-                    cost_per_token, is_free = self._get_model_pricing(
-                        provider_name, model_id
-                    )
+                    cost_per_token, is_free = self._get_model_pricing(provider_name, model_id)
                     capabilities = self._get_model_capabilities(provider_name, model_id)
-                    context_length = self._get_model_context_length(
-                        provider_name, model_id
-                    )
+                    context_length = self._get_model_context_length(provider_name, model_id)
 
                     model_info = ModelInfo(
                         model_id=model_id,
@@ -382,9 +371,7 @@ class CustomAPIProvider(BaseProvider):
             )
             return self._get_predefined_models(provider_name, config)
 
-    def _get_predefined_models(
-        self, provider_name: str, config: dict[str, Any]
-    ) -> list[ModelInfo]:
+    def _get_predefined_models(self, provider_name: str, config: dict[str, Any]) -> list[ModelInfo]:
         """Get predefined models for providers that don't support model listing."""
         api_type = config.get("api_type", "openai")
 
@@ -493,9 +480,7 @@ class CustomAPIProvider(BaseProvider):
         # Consider healthy if at least half of providers are working
         return healthy_count >= (total_count / 2) if total_count > 0 else False
 
-    async def _test_provider_connection(
-        self, provider_name: str, config: dict[str, Any]
-    ):
+    async def _test_provider_connection(self, provider_name: str, config: dict[str, Any]):
         """Test connection to a provider."""
         client = self._clients.get(provider_name)
         if not client:
@@ -513,9 +498,7 @@ class CustomAPIProvider(BaseProvider):
         except httpx.TimeoutException:
             raise RuntimeError(f"Provider {provider_name} connection timeout") from None
 
-    def _get_model_pricing(
-        self, provider_name: str, model_id: str
-    ) -> tuple[float | None, bool]:
+    def _get_model_pricing(self, provider_name: str, model_id: str) -> tuple[float | None, bool]:
         """Get pricing information for a model."""
         # This would typically be configured or fetched from the provider
         # For now, return reasonable defaults
@@ -534,9 +517,7 @@ class CustomAPIProvider(BaseProvider):
 
         return capabilities
 
-    def _get_model_context_length(
-        self, provider_name: str, model_id: str
-    ) -> int | None:
+    def _get_model_context_length(self, provider_name: str, model_id: str) -> int | None:
         """Get context length for a model."""
         # Common context lengths
         if "gpt-4" in model_id.lower():
@@ -545,9 +526,7 @@ class CustomAPIProvider(BaseProvider):
             return 200000
         return 4096  # Default
 
-    def _get_therapeutic_safety_score(
-        self, provider_name: str, model_id: str
-    ) -> float | None:
+    def _get_therapeutic_safety_score(self, provider_name: str, model_id: str) -> float | None:
         """Get therapeutic safety score for a model."""
         if "claude" in model_id.lower():
             return 9.0  # Claude models are generally very safe

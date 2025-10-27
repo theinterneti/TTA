@@ -589,8 +589,11 @@ class ContextEngineeringValidator:
 
         # Check intensity level compliance
         intensity = scenario.player_preferences.intensity_level
-        if intensity == "gentle" and "gentle" in context_str or intensity == "high" and (
-            "challenge" in context_str or "intensive" in context_str
+        if (
+            intensity == "gentle"
+            and "gentle" in context_str
+            or intensity == "high"
+            and ("challenge" in context_str or "intensive" in context_str)
         ):
             score += 0.3
 

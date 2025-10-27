@@ -1,8 +1,8 @@
 # Python 3.14 Migration & Package Modernization Roadmap
 
-**Status**: Post-MVP Enhancement  
-**Timeline**: Q2-Q3 2025 (April-September)  
-**Total Effort**: 142 hours  
+**Status**: Post-MVP Enhancement
+**Timeline**: Q2-Q3 2025 (April-September)
+**Total Effort**: 142 hours
 **Epic Issue**: [#96](https://github.com/theinterneti/TTA/issues/96)
 
 ## Overview
@@ -43,7 +43,7 @@ This roadmap outlines the comprehensive plan for migrating TTA to Python 3.14 an
 - [#90](https://github.com/theinterneti/TTA/issues/90) Update Type Hints to Python 3.14 Syntax (AsyncIterator)
 
 ### 🤖 Phase 4: ML/AI Stack Upgrade (Weeks 7-8) - CONDITIONAL
-**Milestone**: [Phase 4](https://github.com/theinterneti/TTA/milestone/9) | **Effort**: 12 hours  
+**Milestone**: [Phase 4](https://github.com/theinterneti/TTA/milestone/9) | **Effort**: 12 hours
 **Status**: ⚠️ **BLOCKED** by PyTorch Python 3.14 support
 
 - [#91](https://github.com/theinterneti/TTA/issues/91) Upgrade PyTorch and Transformers to Python 3.14 (CONDITIONAL)
@@ -154,7 +154,6 @@ This roadmap outlines the comprehensive plan for migrating TTA to Python 3.14 an
 
 ---
 
-**Created**: 2025-10-27  
-**Status**: Planning  
+**Created**: 2025-10-27
+**Status**: Planning
 **Next Steps**: Begin Phase 1 in Q2 2025
-

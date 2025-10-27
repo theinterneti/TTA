@@ -34,9 +34,7 @@ logger = logging.getLogger(__name__)
 class OllamaModelInstance(BaseModelInstance):
     """Ollama model instance implementation."""
 
-    def __init__(
-        self, model_id: str, provider: "OllamaProvider", client: httpx.AsyncClient
-    ):
+    def __init__(self, model_id: str, provider: "OllamaProvider", client: httpx.AsyncClient):
         super().__init__(model_id, provider)
         self._client = client
         self._status = ModelStatus.READY
@@ -65,9 +63,7 @@ class OllamaModelInstance(BaseModelInstance):
                 payload["options"]["stop"] = request.stop_sequences
 
             # Make API request
-            response = await self._client.post(
-                "/api/generate", json=payload, timeout=60.0
-            )
+            response = await self._client.post("/api/generate", json=payload, timeout=60.0)
             response.raise_for_status()
 
             data = response.json()
@@ -84,8 +80,7 @@ class OllamaModelInstance(BaseModelInstance):
             usage = {
                 "prompt_tokens": data.get("prompt_eval_count", 0),
                 "completion_tokens": data.get("eval_count", 0),
-                "total_tokens": data.get("prompt_eval_count", 0)
-                + data.get("eval_count", 0),
+                "total_tokens": data.get("prompt_eval_count", 0) + data.get("eval_count", 0),
             }
 
             # Update metrics
@@ -117,9 +112,7 @@ class OllamaModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
         """Generate text as a stream using Ollama API."""
         try:
             # Prepare request payload
@@ -253,9 +246,7 @@ class OllamaProvider(BaseProvider):
                     name=name,
                     provider_type=ProviderType.OLLAMA,
                     description=(
-                        f"Local Ollama model ({size_gb:.1f}GB)"
-                        if size_gb
-                        else "Local Ollama model"
+                        f"Local Ollama model ({size_gb:.1f}GB)" if size_gb else "Local Ollama model"
                     ),
                     context_length=context_length,
                     cost_per_token=0.0,  # Local models are free
@@ -275,9 +266,7 @@ class OllamaProvider(BaseProvider):
             logger.error(f"Failed to refresh Ollama models: {e}")
             raise
 
-    async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
-    ) -> OllamaModelInstance:
+    async def _load_model_impl(self, model_id: str, config: dict[str, Any]) -> OllamaModelInstance:
         """Load an Ollama model instance."""
         if not self._client:
             raise RuntimeError("Ollama client not initialized")
@@ -342,9 +331,7 @@ class OllamaProvider(BaseProvider):
                 container = self._docker_client.containers.get(self._container_name)
                 if container.status != "running":
                     container.start()
-                    logger.info(
-                        f"Started existing Ollama container: {self._container_name}"
-                    )
+                    logger.info(f"Started existing Ollama container: {self._container_name}")
                 return
             except docker.errors.NotFound:
                 pass
@@ -360,9 +347,7 @@ class OllamaProvider(BaseProvider):
                 # Check if NVIDIA runtime is available
                 runtime_info = self._docker_client.info()
                 if "nvidia" in runtime_info.get("Runtimes", {}):
-                    device_requests = [
-                        docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]])
-                    ]
+                    device_requests = [docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]])]
 
             # Type ignore for docker-py API compatibility (restart_policy dict format)
             container = self._docker_client.containers.run(

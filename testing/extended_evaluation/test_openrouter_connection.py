@@ -136,9 +136,10 @@ async def test_simple_completion():
 
     try:
         print("📤 Sending test completion request...")
-        async with aiohttp.ClientSession() as session, session.post(
-            url, headers=headers, json=payload, timeout=30
-        ) as response:
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(url, headers=headers, json=payload, timeout=30) as response,
+        ):
             if response.status == 200:
                 data = await response.json()
 

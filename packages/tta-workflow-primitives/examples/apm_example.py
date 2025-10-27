@@ -23,7 +23,9 @@ from tta_workflow_primitives.core.base import WorkflowContext
 class DataProcessor(APMWorkflowPrimitive):
     """Example primitive that processes data with APM tracking."""
 
-    async def _execute_impl(self, input_data: dict[str, Any], context: WorkflowContext) -> dict[str, Any]:
+    async def _execute_impl(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
         """Process the data."""
         logger.info(f"Processing data: {input_data}")
 
@@ -33,7 +35,7 @@ class DataProcessor(APMWorkflowPrimitive):
         result = {
             "processed": True,
             "input_count": len(input_data),
-            "output": f"Processed {input_data.get('value', 'unknown')}"
+            "output": f"Processed {input_data.get('value', 'unknown')}",
         }
 
         return result
@@ -42,7 +44,9 @@ class DataProcessor(APMWorkflowPrimitive):
 class DataValidator(APMWorkflowPrimitive):
     """Example primitive that validates data with APM tracking."""
 
-    async def _execute_impl(self, input_data: dict[str, Any], context: WorkflowContext) -> dict[str, Any]:
+    async def _execute_impl(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
         """Validate the data."""
         logger.info(f"Validating data: {input_data}")
 
@@ -54,10 +58,7 @@ class DataValidator(APMWorkflowPrimitive):
         if not is_valid:
             raise ValueError("Data validation failed")
 
-        return {
-            **input_data,
-            "validated": True
-        }
+        return {**input_data, "validated": True}
 
 
 # Example 2: Using decorators for custom functions
@@ -66,11 +67,7 @@ class DataValidator(APMWorkflowPrimitive):
 async def custom_transform(data: dict[str, Any]) -> dict[str, Any]:
     """Custom transformation with decorators."""
     await asyncio.sleep(0.1)
-    return {
-        **data,
-        "transformed": True,
-        "timestamp": "2025-10-26"
-    }
+    return {**data, "transformed": True, "timestamp": "2025-10-26"}
 
 
 async def main() -> None:
@@ -81,14 +78,14 @@ async def main() -> None:
     setup_apm(
         service_name="apm-example",
         enable_prometheus=True,
-        enable_console=True  # Enable console output for demo
+        enable_console=True,  # Enable console output for demo
     )
 
     # Step 2: Create workflow context
     context = WorkflowContext(
         workflow_id="example-workflow-001",
         session_id="session-123",
-        metadata={"environment": "development"}
+        metadata={"environment": "development"},
     )
 
     # Step 3: Create and compose primitives
@@ -101,10 +98,7 @@ async def main() -> None:
     # Step 4: Execute workflow
     logger.info("Executing workflow...")
 
-    input_data = {
-        "value": "test_data",
-        "priority": "high"
-    }
+    input_data = {"value": "test_data", "priority": "high"}
 
     try:
         result = await workflow.execute(input_data, context)
@@ -136,9 +130,9 @@ if __name__ == "__main__":
     # Run the example
     asyncio.run(main())
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("APM Example Summary")
-    print("="*70)
+    print("=" * 70)
     print("\n✓ Executed workflow with APM instrumentation")
     print("✓ Collected metrics:")
     print("  - primitive.processor.executions (counter)")

@@ -109,9 +109,7 @@ class InputProcessorAgentProxy(Agent):
                         "source": ipa_result.get("source", "real_ipa"),
                     }
 
-                    await operation["publish_progress"](
-                        1.0, "Input processing completed"
-                    )
+                    await operation["publish_progress"](1.0, "Input processing completed")
                     logger.info(
                         f"IPA processed input with intent: {result['routing'].get('intent', 'unknown')}"
                     )
@@ -122,9 +120,7 @@ class InputProcessorAgentProxy(Agent):
                     if not self.fallback_to_mock:
                         raise
                     logger.warning("Falling back to mock implementation")
-                    await operation["publish_progress"](
-                        0.5, "Falling back to mock implementation"
-                    )
+                    await operation["publish_progress"](0.5, "Falling back to mock implementation")
 
             # Fallback to mock implementation
             await operation["publish_progress"](0.7, "Using mock implementation")
@@ -200,9 +196,7 @@ class InputProcessorAgentProxy(Agent):
 
         # Simple selection: prefer instances with lower load
         # In a real implementation, this could consider more factors
-        best_instance = min(
-            instances, key=lambda x: x.get("status", {}).get("load", 1.0)
-        )
+        best_instance = min(instances, key=lambda x: x.get("status", {}).get("load", 1.0))
 
         logger.debug(f"Selected IPA instance: {best_instance.get('name', 'unknown')}")
         return best_instance
@@ -306,9 +300,7 @@ class WorldBuilderAgentProxy(Agent):
         # Process through real WBA if available
         if self.enable_real_agent and self.wba_adapter:
             try:
-                wba_result = await self.wba_adapter.process_world_request(
-                    world_id, updates
-                )
+                wba_result = await self.wba_adapter.process_world_request(world_id, updates)
 
                 # Cache the result for performance
                 if wba_result.get("world_state"):
@@ -377,9 +369,7 @@ class WorldBuilderAgentProxy(Agent):
                 if version:
                     enhanced_updates["_version"] = version
 
-                result = await self.wba_adapter.process_world_request(
-                    world_id, enhanced_updates
-                )
+                result = await self.wba_adapter.process_world_request(world_id, enhanced_updates)
 
                 # Check if conflict was detected and resolved
                 if result.get("conflict_resolved"):
@@ -497,18 +487,14 @@ class NarrativeGeneratorAgentProxy(Agent):
                 enhanced_context = context.copy()
                 enhanced_context.update(
                     {
-                        "narrative_context": self._narrative_context.get(
-                            session_id, {}
-                        ),
+                        "narrative_context": self._narrative_context.get(session_id, {}),
                         "narrative_history": self._get_recent_narrative_history(
                             session_id, limit=5
                         ),
                     }
                 )
 
-                nga_result = await self.nga_adapter.generate_narrative(
-                    prompt, enhanced_context
-                )
+                nga_result = await self.nga_adapter.generate_narrative(prompt, enhanced_context)
                 story = nga_result.get("story", "")
 
                 # Track narrative state
@@ -615,9 +601,7 @@ class NarrativeGeneratorAgentProxy(Agent):
     ) -> list[dict[str, Any]]:
         """Get recent narrative history for a session."""
         session_history = [
-            entry
-            for entry in self._narrative_history
-            if entry.get("session_id") == session_id
+            entry for entry in self._narrative_history if entry.get("session_id") == session_id
         ]
         return session_history[-limit:] if session_history else []
 
@@ -638,9 +622,7 @@ class NarrativeGeneratorAgentProxy(Agent):
         self._narrative_history.append(narrative_entry)
 
         # Keep only recent history (last 100 entries per session)
-        session_entries = [
-            e for e in self._narrative_history if e.get("session_id") == session_id
-        ]
+        session_entries = [e for e in self._narrative_history if e.get("session_id") == session_id]
         if len(session_entries) > 100:
             # Remove oldest entries for this session
             entries_to_remove = session_entries[:-100]
@@ -702,13 +684,10 @@ class NarrativeGeneratorAgentProxy(Agent):
             "characters_mentioned": list(characters_mentioned),
             "locations_visited": list(locations_visited),
             "narrative_arc_length": len(recent_history),
-            "session_duration": time.time()
-            - session_context.get("session_start", time.time()),
+            "session_duration": time.time() - session_context.get("session_start", time.time()),
         }
 
-    async def format_narrative_output(
-        self, story: str, context: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def format_narrative_output(self, story: str, context: dict[str, Any]) -> dict[str, Any]:
         """
         Format narrative output with enhanced metadata and structure.
 
@@ -729,20 +708,15 @@ class NarrativeGeneratorAgentProxy(Agent):
             if len(sentences) > 3:
                 mid_point = len(sentences) // 2
                 formatted_story = (
-                    ". ".join(sentences[:mid_point])
-                    + ".\n\n"
-                    + ". ".join(sentences[mid_point:])
+                    ". ".join(sentences[:mid_point]) + ".\n\n" + ". ".join(sentences[mid_point:])
                 )
 
         # Extract narrative elements
         narrative_elements = {
             "word_count": len(formatted_story.split()),
-            "estimated_reading_time": len(formatted_story.split())
-            / 200,  # ~200 words per minute
+            "estimated_reading_time": len(formatted_story.split()) / 200,  # ~200 words per minute
             "narrative_tone": self._analyze_narrative_tone(formatted_story),
-            "therapeutic_elements": self._identify_therapeutic_elements(
-                formatted_story
-            ),
+            "therapeutic_elements": self._identify_therapeutic_elements(formatted_story),
         }
 
         return {

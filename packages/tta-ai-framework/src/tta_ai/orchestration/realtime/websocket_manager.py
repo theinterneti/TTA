@@ -113,14 +113,10 @@ class WebSocketConnectionManager:
 
         # Configuration
         self.heartbeat_interval = float(
-            config.get(
-                "agent_orchestration.realtime.websocket.heartbeat_interval", 30.0
-            )
+            config.get("agent_orchestration.realtime.websocket.heartbeat_interval", 30.0)
         )
         self.connection_timeout = float(
-            config.get(
-                "agent_orchestration.realtime.websocket.connection_timeout", 60.0
-            )
+            config.get("agent_orchestration.realtime.websocket.connection_timeout", 60.0)
         )
         self.max_connections = int(
             config.get("agent_orchestration.realtime.websocket.max_connections", 1000)
@@ -145,9 +141,7 @@ class WebSocketConnectionManager:
         self.user_subscriptions: dict[str, set[str]] = {}  # user_id -> event_types
 
         # Connection recovery
-        self.connection_history: dict[
-            str, dict[str, Any]
-        ] = {}  # user_id -> connection_info
+        self.connection_history: dict[str, dict[str, Any]] = {}  # user_id -> connection_info
         self.recovery_enabled = bool(
             config.get("agent_orchestration.realtime.recovery.enabled", True)
         )
@@ -265,9 +259,7 @@ class WebSocketConnectionManager:
             auth_data = json.loads(auth_message)
 
             if auth_data.get("type") != "auth":
-                await self._send_error(
-                    connection, "AUTH_REQUIRED", "Authentication required"
-                )
+                await self._send_error(connection, "AUTH_REQUIRED", "Authentication required")
                 return False
 
             # Extract token from message
@@ -305,9 +297,7 @@ class WebSocketConnectionManager:
 
         return None
 
-    async def _authenticate_with_token(
-        self, connection: WebSocketConnection, token: str
-    ) -> bool:
+    async def _authenticate_with_token(self, connection: WebSocketConnection, token: str) -> bool:
         """Authenticate connection with JWT token using existing auth system."""
         try:
             # Import the existing JWT verification function
@@ -380,9 +370,7 @@ class WebSocketConnectionManager:
             return True
         except Exception as e:
             logger.error(f"Token authentication error: {e}")
-            await self._send_error(
-                connection, "AUTH_ERROR", "Token authentication error"
-            )
+            await self._send_error(connection, "AUTH_ERROR", "Token authentication error")
             return False
 
     async def _handle_messages(self, connection: WebSocketConnection) -> None:
@@ -423,14 +411,10 @@ class WebSocketConnectionManager:
             except WebSocketDisconnect:
                 break
             except json.JSONDecodeError:
-                await self._send_error(
-                    connection, "INVALID_JSON", "Invalid JSON message"
-                )
+                await self._send_error(connection, "INVALID_JSON", "Invalid JSON message")
             except Exception as e:
                 logger.error(f"Message handling error: {e}")
-                await self._send_error(
-                    connection, "MESSAGE_ERROR", "Error handling message"
-                )
+                await self._send_error(connection, "MESSAGE_ERROR", "Error handling message")
 
     async def _handle_subscription(
         self, connection: WebSocketConnection, data: dict[str, Any]
@@ -574,9 +558,7 @@ class WebSocketConnectionManager:
                 connection, "UNSUBSCRIPTION_ERROR", "Error processing unsubscription"
             )
 
-    async def _handle_ping(
-        self, connection: WebSocketConnection, data: dict[str, Any]
-    ) -> None:
+    async def _handle_ping(self, connection: WebSocketConnection, data: dict[str, Any]) -> None:
         """Handle ping message and respond with pong."""
         # Send pong response
         pong_event = WebSocketEvent(
@@ -591,18 +573,14 @@ class WebSocketConnectionManager:
         )
         await self._send_to_connection(connection, pong_event)
 
-    async def _handle_pong(
-        self, connection: WebSocketConnection, data: dict[str, Any]
-    ) -> None:
+    async def _handle_pong(self, connection: WebSocketConnection, data: dict[str, Any]) -> None:
         """Handle pong response from client."""
         connection.last_pong = time.time()
         connection.pong_count += 1
 
         # Reset missed pongs counter
         if connection.missed_pongs > 0:
-            logger.info(
-                f"Connection {connection.connection_id} recovered, missed pongs reset"
-            )
+            logger.info(f"Connection {connection.connection_id} recovered, missed pongs reset")
         connection.missed_pongs = 0
 
         logger.debug(f"Received pong from connection {connection.connection_id}")
@@ -621,9 +599,7 @@ class WebSocketConnectionManager:
                 )
                 return
 
-            success = await self.subscribe_connection_to_agent(
-                connection.connection_id, agent_id
-            )
+            success = await self.subscribe_connection_to_agent(connection.connection_id, agent_id)
 
             if success:
                 await self._send_to_connection(
@@ -696,9 +672,7 @@ class WebSocketConnectionManager:
             new_filters = data.get("filters", {})
 
             # Validate and apply authorized filters
-            authorized_filters = self._filter_authorized_filters(
-                connection, new_filters
-            )
+            authorized_filters = self._filter_authorized_filters(connection, new_filters)
 
             # Update connection filters
             try:
@@ -756,12 +730,8 @@ class WebSocketConnectionManager:
     def _extract_client_info(self, websocket: WebSocket) -> dict[str, Any]:
         """Extract client information from WebSocket."""
         return {
-            "client_host": (
-                getattr(websocket.client, "host", None) if websocket.client else None
-            ),
-            "client_port": (
-                getattr(websocket.client, "port", None) if websocket.client else None
-            ),
+            "client_host": (getattr(websocket.client, "host", None) if websocket.client else None),
+            "client_port": (getattr(websocket.client, "port", None) if websocket.client else None),
             "headers": dict(websocket.headers) if hasattr(websocket, "headers") else {},
         }
 
@@ -822,9 +792,7 @@ class WebSocketConnectionManager:
 
     async def _recover_connection(self, connection: WebSocketConnection) -> bool:
         """Attempt to recover a previous connection's state."""
-        if not connection.user_id or not self._can_recover_connection(
-            connection.user_id
-        ):
+        if not connection.user_id or not self._can_recover_connection(connection.user_id):
             return False
 
         try:
@@ -866,9 +834,7 @@ class WebSocketConnectionManager:
             return True
 
         except Exception as e:
-            logger.error(
-                f"Error recovering connection for user {connection.user_id}: {e}"
-            )
+            logger.error(f"Error recovering connection for user {connection.user_id}: {e}")
             return False
 
     async def _heartbeat_loop(self) -> None:
@@ -921,9 +887,7 @@ class WebSocketConnectionManager:
                             )
 
                     except Exception as e:
-                        logger.debug(
-                            f"Error sending heartbeat to {connection.connection_id}: {e}"
-                        )
+                        logger.debug(f"Error sending heartbeat to {connection.connection_id}: {e}")
                         # Connection will be cleaned up by cleanup loop
 
             except asyncio.CancelledError:
@@ -942,10 +906,7 @@ class WebSocketConnectionManager:
 
                 for connection_id, connection in self.connections.items():
                     # Check for stale connections (no heartbeat activity)
-                    if (
-                        current_time - connection.last_heartbeat
-                        > self.connection_timeout
-                    ):
+                    if current_time - connection.last_heartbeat > self.connection_timeout:
                         stale_connections.append(connection_id)
                     # Check for unhealthy connections (too many missed pongs)
                     elif connection.missed_pongs > 5:
@@ -954,10 +915,7 @@ class WebSocketConnectionManager:
                             f"Removing unhealthy connection {connection_id} (missed {connection.missed_pongs} pongs)"
                         )
                     # Check for inactive connections (no pong responses)
-                    elif (
-                        current_time - connection.last_pong
-                        > self.connection_timeout * 2
-                    ):
+                    elif current_time - connection.last_pong > self.connection_timeout * 2:
                         stale_connections.append(connection_id)
                         logger.warning(
                             f"Removing inactive connection {connection_id} (no pong for {current_time - connection.last_pong:.1f}s)"
@@ -968,15 +926,11 @@ class WebSocketConnectionManager:
                     with contextlib.suppress(Exception):
                         connection = self.connections.get(connection_id)
                         if connection:
-                            await connection.websocket.close(
-                                code=1001, reason="timeout"
-                            )
+                            await connection.websocket.close(code=1001, reason="timeout")
                     await self._remove_connection(connection_id)
 
                 if stale_connections:
-                    logger.info(
-                        f"Cleaned up {len(stale_connections)} stale connections"
-                    )
+                    logger.info(f"Cleaned up {len(stale_connections)} stale connections")
 
             except asyncio.CancelledError:
                 break
@@ -994,10 +948,7 @@ class WebSocketConnectionManager:
 
                 for user_id, history in self.connection_history.items():
                     disconnected_at = history.get("disconnected_at")
-                    if (
-                        disconnected_at
-                        and (current_time - disconnected_at) > self.recovery_timeout
-                    ):
+                    if disconnected_at and (current_time - disconnected_at) > self.recovery_timeout:
                         expired_users.append(user_id)
 
                 # Remove expired recovery history
@@ -1005,9 +956,7 @@ class WebSocketConnectionManager:
                     del self.connection_history[user_id]
 
                 if expired_users:
-                    logger.info(
-                        f"Cleaned up recovery history for {len(expired_users)} users"
-                    )
+                    logger.info(f"Cleaned up recovery history for {len(expired_users)} users")
 
             except asyncio.CancelledError:
                 break
@@ -1078,9 +1027,7 @@ class WebSocketConnectionManager:
         # Apply connection-specific filters
         return self._apply_event_filters(connection, event)
 
-    def _apply_event_filters(
-        self, connection: WebSocketConnection, event: WebSocketEvent
-    ) -> bool:
+    def _apply_event_filters(self, connection: WebSocketConnection, event: WebSocketEvent) -> bool:
         """Apply connection-specific filters to determine if event should be sent."""
         filters = connection.filters
 
@@ -1122,17 +1069,13 @@ class WebSocketConnectionManager:
 
         return True
 
-    def _is_authorized_for_agent(
-        self, connection: WebSocketConnection, agent_id: str
-    ) -> bool:
+    def _is_authorized_for_agent(self, connection: WebSocketConnection, agent_id: str) -> bool:
         """Check if connection is authorized to receive events for a specific agent."""
         # Basic authorization - all authenticated users can see all agents
         # This can be extended with role-based access control
         return connection.is_authenticated
 
-    async def subscribe_connection_to_agent(
-        self, connection_id: str, agent_id: str
-    ) -> bool:
+    async def subscribe_connection_to_agent(self, connection_id: str, agent_id: str) -> bool:
         """Subscribe a connection to events for a specific agent."""
         connection = self.connections.get(connection_id)
         if not connection or not connection.is_authenticated:
@@ -1150,9 +1093,7 @@ class WebSocketConnectionManager:
         logger.debug(f"Connection {connection_id} subscribed to agent {agent_id}")
         return True
 
-    async def unsubscribe_connection_from_agent(
-        self, connection_id: str, agent_id: str
-    ) -> bool:
+    async def unsubscribe_connection_from_agent(self, connection_id: str, agent_id: str) -> bool:
         """Unsubscribe a connection from events for a specific agent."""
         connection = self.connections.get(connection_id)
         if not connection:
@@ -1164,9 +1105,7 @@ class WebSocketConnectionManager:
         logger.debug(f"Connection {connection_id} unsubscribed from agent {agent_id}")
         return True
 
-    async def subscribe_connection_to_user_events(
-        self, connection_id: str, user_id: str
-    ) -> bool:
+    async def subscribe_connection_to_user_events(self, connection_id: str, user_id: str) -> bool:
         """Subscribe a connection to events for a specific user."""
         connection = self.connections.get(connection_id)
         if not connection or not connection.is_authenticated:
@@ -1187,9 +1126,7 @@ class WebSocketConnectionManager:
         if user_id not in connection.filters.user_ids:
             connection.filters.user_ids.append(user_id)
 
-        logger.debug(
-            f"Connection {connection_id} subscribed to user events for {user_id}"
-        )
+        logger.debug(f"Connection {connection_id} subscribed to user events for {user_id}")
         return True
 
     def get_connection_subscriptions(self, connection_id: str) -> dict[str, Any] | None:
@@ -1201,9 +1138,7 @@ class WebSocketConnectionManager:
         return {
             "event_types": list(connection.subscriptions),
             "filters": connection.filters.model_dump() if connection.filters else {},
-            "agent_subscriptions": list(
-                getattr(connection, "agent_subscriptions", set())
-            ),
+            "agent_subscriptions": list(getattr(connection, "agent_subscriptions", set())),
         }
 
     async def shutdown(self) -> None:
@@ -1260,9 +1195,7 @@ class WebSocketConnectionManager:
             await self._event_subscriber.start()
 
             # Subscribe to all events to broadcast to WebSocket clients
-            await self._event_subscriber.subscribe_to_all_events(
-                self._handle_redis_event
-            )
+            await self._event_subscriber.subscribe_to_all_events(self._handle_redis_event)
 
             logger.info("Event subscription started for WebSocket manager")
 
@@ -1338,9 +1271,7 @@ class WebSocketConnectionManager:
         logger.debug(f"User {user_id} unsubscribed from events")
         return True
 
-    async def update_user_event_filters(
-        self, user_id: str, filters: dict[str, Any]
-    ) -> bool:
+    async def update_user_event_filters(self, user_id: str, filters: dict[str, Any]) -> bool:
         """Update event filters for a user."""
         if user_id not in self.user_subscriptions:
             return False

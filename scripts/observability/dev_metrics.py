@@ -266,4 +266,3 @@ if __name__ == "__main__":
         print(f"  Executions: {metrics['total_executions']}")
         print(f"  Success Rate: {metrics['success_rate']:.1%}")
         print(f"  Avg Duration: {metrics['avg_duration_ms']:.0f}ms")
-

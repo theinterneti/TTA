@@ -1,7 +1,7 @@
 # Ruff Linter and Formatter Configuration
 
-**Last Updated**: 2025-10-27  
-**Ruff Version**: 0.11.0+  
+**Last Updated**: 2025-10-27
+**Ruff Version**: 0.11.0+
 **Python Version**: 3.12+
 
 ## Overview
@@ -275,4 +275,3 @@ For questions or issues:
 3. Check Ruff documentation
 4. Ask in team chat
 5. Create an issue in the repository
-

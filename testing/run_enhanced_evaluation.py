@@ -215,9 +215,7 @@ class EnhancedEvaluationRunner:
         # Generate comprehensive comparison report
         print("\n📋 MULTI-MODEL COMPARISON SUMMARY")
         for result in comparison_results:
-            await self.multi_model_comparator.generate_comparison_report(
-                result
-            )
+            await self.multi_model_comparator.generate_comparison_report(result)
             print(f"   Scenario: {result.scenario_name}")
             if result.overall_ranking:
                 print(f"   Winner: {result.overall_ranking[0][0]}")

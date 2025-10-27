@@ -5,8 +5,8 @@ This directory contains long-term roadmaps and enhancement plans for the TTA pro
 ## Active Roadmaps
 
 ### 📚 [Python 3.14 Migration & Package Modernization](./python-3.14-migration-roadmap.md)
-**Status**: Post-MVP Enhancement  
-**Timeline**: Q2-Q3 2025  
+**Status**: Post-MVP Enhancement
+**Timeline**: Q2-Q3 2025
 **Epic**: [#96](https://github.com/theinterneti/TTA/issues/96)
 
 Comprehensive plan for migrating to Python 3.14 and modernizing all 100+ dependencies.
@@ -116,15 +116,14 @@ If you want to contribute to this roadmap:
 
 ## Timeline
 
-**Start**: Q2 2025 (April-June)  
-**End**: Q3 2025 (July-September)  
-**Total Duration**: 10-12 weeks  
+**Start**: Q2 2025 (April-June)
+**End**: Q3 2025 (July-September)
+**Total Duration**: 10-12 weeks
 **Total Effort**: 142 hours
 
 **Note**: Phase 4 (ML/AI Stack) is **CONDITIONAL** on PyTorch Python 3.14 support. If PyTorch doesn't support Python 3.14 by Q2 2025, this phase will be deferred to Q4 2025.
 
 ---
 
-**Last Updated**: 2025-10-27  
+**Last Updated**: 2025-10-27
 **Status**: Planning
-

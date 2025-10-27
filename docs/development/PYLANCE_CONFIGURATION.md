@@ -1,6 +1,6 @@
 # Pylance Configuration for TTA Project
 
-**Last Updated**: 2025-10-27  
+**Last Updated**: 2025-10-27
 **Status**: Active - Optimized for Python 3.12+ with workspace package support
 
 ## Overview
@@ -295,6 +295,5 @@ class AgentType(str, Enum):
 
 ---
 
-**Maintained by**: TTA Development Team  
+**Maintained by**: TTA Development Team
 **Contact**: See AGENTS.md for project context
-
