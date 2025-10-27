@@ -13,17 +13,55 @@ from src.observability_integration.primitives.timeout import (
 
 # Mock WorkflowPrimitive for testing
 class MockPrimitive:
-    """Mock primitive with controllable execution time."""
+    """Mock primitive with controllable execution time.
 
-    def __init__(self, name="mock", delay=0.0, raise_error=False):
+    This mock class simulates a workflow primitive with configurable behavior
+    for testing timeout and error handling scenarios.
+
+    Attributes:
+        name: Display name for the mock primitive
+        delay: Simulated execution delay in seconds
+        raise_error: If True, execute() will raise ValueError
+        call_count: Number of times execute() has been called
+    """
+
+    def __init__(
+        self, name: str = "mock", delay: float = 0.0, raise_error: bool = False
+    ) -> None:
+        """Initialize mock primitive with configurable behavior.
+
+        Args:
+            name: Display name for the mock primitive (default: "mock")
+            delay: Simulated execution delay in seconds, must be >= 0 (default: 0.0)
+            raise_error: If True, execute() will raise ValueError (default: False)
+
+        Raises:
+            ValueError: If delay is negative
+        """
+        if delay < 0:
+            raise ValueError("delay must be >= 0")
+
         self.name = name
         self.delay = delay
         self.raise_error = raise_error
         self.call_count = 0
-        self.__class__.__name__ = name
 
-    async def execute(self, data, context):
-        """Mock execute method with configurable delay."""
+    async def execute(self, data: dict, context) -> str:
+        """Mock execute method with configurable delay.
+
+        Simulates primitive execution with optional delay and error raising.
+        Increments call_count on each invocation.
+
+        Args:
+            data: Input data dictionary
+            context: Execution context (typically a MagicMock in tests)
+
+        Returns:
+            Result string in format "{name}_result"
+
+        Raises:
+            ValueError: If raise_error is True
+        """
         self.call_count += 1
 
         if self.raise_error:
@@ -33,6 +71,17 @@ class MockPrimitive:
             await asyncio.sleep(self.delay)
 
         return f"{self.name}_result"
+
+    def __repr__(self) -> str:
+        """String representation for debugging.
+
+        Returns:
+            Detailed string representation of the mock primitive state
+        """
+        return (
+            f"MockPrimitive(name={self.name!r}, delay={self.delay}, "
+            f"raise_error={self.raise_error}, calls={self.call_count})"
+        )
 
 
 @pytest.fixture
@@ -55,6 +104,50 @@ def timeout_primitive(fast_primitive):
         timeout_seconds=1.0,
         grace_period_seconds=0.5,
     )
+
+
+class TestMockPrimitive:
+    """Test MockPrimitive helper class."""
+
+    def test_initialization_with_defaults(self):
+        """Test MockPrimitive initialization with default values."""
+        mock = MockPrimitive()
+        assert mock.name == "mock"
+        assert mock.delay == 0.0
+        assert mock.raise_error is False
+        assert mock.call_count == 0
+
+    def test_initialization_with_custom_values(self):
+        """Test MockPrimitive initialization with custom values."""
+        mock = MockPrimitive(name="CustomMock", delay=1.5, raise_error=True)
+        assert mock.name == "CustomMock"
+        assert mock.delay == 1.5
+        assert mock.raise_error is True
+        assert mock.call_count == 0
+
+    def test_negative_delay_raises_error(self):
+        """Test that negative delay raises ValueError."""
+        with pytest.raises(ValueError, match="delay must be >= 0"):
+            MockPrimitive(delay=-1.0)
+
+    def test_repr_output(self):
+        """Test __repr__ provides useful debugging information."""
+        mock = MockPrimitive(name="TestMock", delay=0.5, raise_error=True)
+        repr_str = repr(mock)
+        assert "MockPrimitive" in repr_str
+        assert "name='TestMock'" in repr_str
+        assert "delay=0.5" in repr_str
+        assert "raise_error=True" in repr_str
+        assert "calls=0" in repr_str
+
+    @pytest.mark.asyncio
+    async def test_execute_increments_call_count(self):
+        """Test that execute increments call_count."""
+        mock = MockPrimitive()
+        await mock.execute({}, None)
+        assert mock.call_count == 1
+        await mock.execute({}, None)
+        assert mock.call_count == 2
 
 
 class TestTimeoutPrimitiveInit:
