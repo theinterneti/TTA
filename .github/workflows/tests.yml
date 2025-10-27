@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Sync deps
-        run: uv sync --group test
+        run: uv sync --all-groups
       - name: Run unit tests with metrics collection
         run: |
           uvx pytest -q --tb=short \
@@ -100,7 +100,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Sync deps
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
       - name: Run integration tests with monitoring
         run: |
           uv run pytest -q --neo4j --redis --tb=short \
@@ -128,7 +128,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
       - name: Sync deps
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
       - name: Download test results
         uses: actions/download-artifact@v4
         with:

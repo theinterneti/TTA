@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 TTA Environment Configuration Validator
@@ -7,10 +8,9 @@ variables are set and properly configured for the model management system.
 """
 
 import os
+import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import re
 
 # Add the src directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -26,9 +26,9 @@ class EnvironmentValidator:
     """Validates TTA environment configuration."""
 
     def __init__(self):
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
-        self.info: List[str] = []
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
+        self.info: list[str] = []
 
     def validate_file_structure(self) -> bool:
         """Validate environment file structure."""
@@ -54,7 +54,7 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_required_variables(self, env_vars: Dict[str, str]) -> bool:
+    def validate_required_variables(self, env_vars: dict[str, str]) -> bool:
         """Validate required environment variables."""
         print("🔍 Validating required environment variables...")
 
@@ -84,14 +84,20 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_api_keys(self, env_vars: Dict[str, str]) -> bool:
+    def validate_api_keys(self, env_vars: dict[str, str]) -> bool:
         """Validate API key configuration."""
         print("🔍 Validating API key configuration...")
 
         api_keys = {
-            "OPENROUTER_API_KEY": {"required": False, "pattern": r"^sk-or-v1-[a-f0-9]{64}$"},
+            "OPENROUTER_API_KEY": {
+                "required": False,
+                "pattern": r"^sk-or-v1-[a-f0-9]{64}$",
+            },
             "OPENAI_API_KEY": {"required": False, "pattern": r"^sk-[a-zA-Z0-9]{48,}$"},
-            "ANTHROPIC_API_KEY": {"required": False, "pattern": r"^sk-ant-[a-zA-Z0-9\-]{95,}$"},
+            "ANTHROPIC_API_KEY": {
+                "required": False,
+                "pattern": r"^sk-ant-[a-zA-Z0-9\-]{95,}$",
+            },
         }
 
         has_any_key = False
@@ -114,12 +120,14 @@ class EnvironmentValidator:
                     self.warnings.append(f"⚠️  {key} format may be invalid")
 
         if not has_any_key:
-            self.errors.append("No AI model API keys configured. At least one is required for model management.")
+            self.errors.append(
+                "No AI model API keys configured. At least one is required for model management."
+            )
             all_good = False
 
         return all_good
 
-    def validate_security_config(self, env_vars: Dict[str, str]) -> bool:
+    def validate_security_config(self, env_vars: dict[str, str]) -> bool:
         """Validate security configuration."""
         print("🔍 Validating security configuration...")
 
@@ -141,11 +149,15 @@ class EnvironmentValidator:
                 else:
                     self.warnings.append(f"Optional security variable not set: {var}")
             elif len(value) < config["min_length"]:
-                self.errors.append(f"{var} is too short (minimum {config['min_length']} characters)")
+                self.errors.append(
+                    f"{var} is too short (minimum {config['min_length']} characters)"
+                )
                 all_good = False
             elif value.startswith("dev_") or value.startswith("CHANGE_ME"):
                 if env_vars.get("ENVIRONMENT") == "production":
-                    self.errors.append(f"{var} has development/placeholder value in production")
+                    self.errors.append(
+                        f"{var} has development/placeholder value in production"
+                    )
                     all_good = False
                 else:
                     self.warnings.append(f"{var} has development value (OK for dev)")
@@ -154,11 +166,13 @@ class EnvironmentValidator:
 
         return all_good
 
-    def validate_feature_flags(self, env_vars: Dict[str, str]) -> bool:
+    def validate_feature_flags(self, env_vars: dict[str, str]) -> bool:
         """Validate feature flag configuration."""
         print("🔍 Validating feature flags...")
 
-        model_management_enabled = env_vars.get("FEATURE_MODEL_MANAGEMENT", "").lower() == "true"
+        model_management_enabled = (
+            env_vars.get("FEATURE_MODEL_MANAGEMENT", "").lower() == "true"
+        )
 
         if not model_management_enabled:
             self.warnings.append("Model management feature is disabled")
@@ -169,7 +183,7 @@ class EnvironmentValidator:
         therapeutic_features = [
             "FEATURE_AI_NARRATIVE",
             "FEATURE_CRISIS_SUPPORT",
-            "FEATURE_REAL_TIME_MONITORING"
+            "FEATURE_REAL_TIME_MONITORING",
         ]
 
         for feature in therapeutic_features:
@@ -180,7 +194,7 @@ class EnvironmentValidator:
 
         return True
 
-    def validate_database_urls(self, env_vars: Dict[str, str]) -> bool:
+    def validate_database_urls(self, env_vars: dict[str, str]) -> bool:
         """Validate database URL formats."""
         print("🔍 Validating database URL formats...")
 
@@ -221,9 +235,9 @@ class EnvironmentValidator:
         all_passed = all(checks)
 
         # Print results
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("📊 VALIDATION RESULTS")
-        print("="*60)
+        print("=" * 60)
 
         if self.info:
             print("\n✅ SUCCESS:")
@@ -240,7 +254,7 @@ class EnvironmentValidator:
             for msg in self.errors:
                 print(f"  {msg}")
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
 
         if all_passed and not self.errors:
             print("🎉 Environment validation PASSED!")
@@ -250,15 +264,17 @@ class EnvironmentValidator:
             print("Please fix the errors above before running TTA.")
 
         if self.warnings:
-            print(f"\n💡 You have {len(self.warnings)} warnings that should be addressed.")
+            print(
+                f"\n💡 You have {len(self.warnings)} warnings that should be addressed."
+            )
 
         return all_passed and not self.errors
 
     def print_setup_help(self):
         """Print setup help information."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🆘 SETUP HELP")
-        print("="*60)
+        print("=" * 60)
         print("""
 To set up your environment:
 

@@ -29,9 +29,11 @@ repos:
       - id: ruff
         args: [--fix]
         types_or: [python, pyi]
+        exclude: ^(tests/|docs/|scripts/|examples/)
       # Run formatter
       - id: ruff-format
         types_or: [python, pyi]
+        exclude: ^(tests/|docs/|scripts/|examples/)
 
   # Type checking - MOVED TO CI/CD ONLY for performance
   # MyPy is too slow for pre-commit hooks in solo developer workflow

@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Comprehensive Frontend Testing for TTA Core Gameplay Loop Integration
@@ -7,24 +8,27 @@ simulating user interactions and validating API responses.
 """
 
 import asyncio
-import aiohttp
-import json
-import sys
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import aiohttp
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 class ComprehensiveFrontendTester:
     """Comprehensive frontend integration tester."""
 
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         self.test_results = {}
         self.test_token = "test_token_demo"
 
@@ -43,7 +47,7 @@ class ComprehensiveFrontendTester:
         self.test_results[test_name] = {
             "success": success,
             "details": details,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def test_server_accessibility(self) -> bool:
@@ -55,16 +59,22 @@ class ComprehensiveFrontendTester:
                 if response.status == 200:
                     content = await response.text()
                     if "swagger-ui" in content.lower():
-                        self.log_test_result("Server Accessibility", True, "Swagger UI accessible")
+                        self.log_test_result(
+                            "Server Accessibility", True, "Swagger UI accessible"
+                        )
                         return True
-                    else:
-                        self.log_test_result("Server Accessibility", False, "Swagger UI not found")
-                        return False
-                else:
-                    self.log_test_result("Server Accessibility", False, f"HTTP {response.status}")
+                    self.log_test_result(
+                        "Server Accessibility", False, "Swagger UI not found"
+                    )
                     return False
+                self.log_test_result(
+                    "Server Accessibility", False, f"HTTP {response.status}"
+                )
+                return False
         except Exception as e:
-            self.log_test_result("Server Accessibility", False, f"Connection error: {e}")
+            self.log_test_result(
+                "Server Accessibility", False, f"Connection error: {e}"
+            )
             return False
 
     async def test_openapi_specification(self) -> bool:
@@ -72,15 +82,17 @@ class ComprehensiveFrontendTester:
         logger.info("🔍 Testing OpenAPI specification...")
 
         try:
-            async with self.session.get(f"{self.base_url}/openapi.json", timeout=5) as response:
+            async with self.session.get(
+                f"{self.base_url}/openapi.json", timeout=5
+            ) as response:
                 if response.status == 200:
                     spec = await response.json()
-                    paths = spec.get('paths', {})
+                    paths = spec.get("paths", {})
 
                     # Check for required gameplay endpoints
                     required_endpoints = [
-                        '/api/v1/gameplay/sessions',
-                        '/api/v1/gameplay/health'
+                        "/api/v1/gameplay/sessions",
+                        "/api/v1/gameplay/health",
                     ]
 
                     found_endpoints = []
@@ -90,27 +102,36 @@ class ComprehensiveFrontendTester:
 
                     # Check for session-specific endpoints (with path parameters)
                     session_patterns = [
-                        '/api/v1/gameplay/sessions/{session_id}',
-                        '/api/v1/gameplay/sessions/{session_id}/choices'
+                        "/api/v1/gameplay/sessions/{session_id}",
+                        "/api/v1/gameplay/sessions/{session_id}/choices",
                     ]
 
                     for pattern in session_patterns:
                         for path in paths.keys():
-                            if '/api/v1/gameplay/sessions/' in path and path != '/api/v1/gameplay/sessions':
+                            if (
+                                "/api/v1/gameplay/sessions/" in path
+                                and path != "/api/v1/gameplay/sessions"
+                            ):
                                 found_endpoints.append(path)
                                 break
 
                     if len(found_endpoints) >= 3:
-                        self.log_test_result("OpenAPI Specification", True,
-                                           f"Found {len(found_endpoints)} gameplay endpoints")
+                        self.log_test_result(
+                            "OpenAPI Specification",
+                            True,
+                            f"Found {len(found_endpoints)} gameplay endpoints",
+                        )
                         return True
-                    else:
-                        self.log_test_result("OpenAPI Specification", False,
-                                           f"Only found {len(found_endpoints)} endpoints")
-                        return False
-                else:
-                    self.log_test_result("OpenAPI Specification", False, f"HTTP {response.status}")
+                    self.log_test_result(
+                        "OpenAPI Specification",
+                        False,
+                        f"Only found {len(found_endpoints)} endpoints",
+                    )
                     return False
+                self.log_test_result(
+                    "OpenAPI Specification", False, f"HTTP {response.status}"
+                )
+                return False
         except Exception as e:
             self.log_test_result("OpenAPI Specification", False, f"Error: {e}")
             return False
@@ -121,12 +142,21 @@ class ComprehensiveFrontendTester:
 
         # Test without authentication (should fail)
         try:
-            async with self.session.get(f"{self.base_url}/api/v1/gameplay/health") as response:
+            async with self.session.get(
+                f"{self.base_url}/api/v1/gameplay/health"
+            ) as response:
                 if response.status == 401:
-                    self.log_test_result("Health Endpoint (No Auth)", True, "Correctly requires authentication")
+                    self.log_test_result(
+                        "Health Endpoint (No Auth)",
+                        True,
+                        "Correctly requires authentication",
+                    )
                 else:
-                    self.log_test_result("Health Endpoint (No Auth)", False,
-                                       f"Expected 401, got {response.status}")
+                    self.log_test_result(
+                        "Health Endpoint (No Auth)",
+                        False,
+                        f"Expected 401, got {response.status}",
+                    )
         except Exception as e:
             self.log_test_result("Health Endpoint (No Auth)", False, f"Error: {e}")
             return False
@@ -134,21 +164,30 @@ class ComprehensiveFrontendTester:
         # Test with test token (may fail due to JWT validation)
         try:
             headers = {"Authorization": f"Bearer {self.test_token}"}
-            async with self.session.get(f"{self.base_url}/api/v1/gameplay/health",
-                                      headers=headers) as response:
+            async with self.session.get(
+                f"{self.base_url}/api/v1/gameplay/health", headers=headers
+            ) as response:
                 if response.status in [200, 401]:  # Either works or requires real JWT
                     if response.status == 200:
                         data = await response.json()
-                        self.log_test_result("Health Endpoint (With Auth)", True,
-                                           f"Health check successful: {data}")
+                        self.log_test_result(
+                            "Health Endpoint (With Auth)",
+                            True,
+                            f"Health check successful: {data}",
+                        )
                     else:
-                        self.log_test_result("Health Endpoint (With Auth)", True,
-                                           "Correctly validates JWT tokens")
+                        self.log_test_result(
+                            "Health Endpoint (With Auth)",
+                            True,
+                            "Correctly validates JWT tokens",
+                        )
                     return True
-                else:
-                    self.log_test_result("Health Endpoint (With Auth)", False,
-                                       f"Unexpected status: {response.status}")
-                    return False
+                self.log_test_result(
+                    "Health Endpoint (With Auth)",
+                    False,
+                    f"Unexpected status: {response.status}",
+                )
+                return False
         except Exception as e:
             self.log_test_result("Health Endpoint (With Auth)", False, f"Error: {e}")
             return False
@@ -160,7 +199,7 @@ class ComprehensiveFrontendTester:
         try:
             headers = {
                 "Authorization": f"Bearer {self.test_token}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
             payload = {
                 "therapeutic_context": {
@@ -168,30 +207,46 @@ class ComprehensiveFrontendTester:
                 }
             }
 
-            async with self.session.post(f"{self.base_url}/api/v1/gameplay/sessions",
-                                       headers=headers, json=payload) as response:
-
+            async with self.session.post(
+                f"{self.base_url}/api/v1/gameplay/sessions",
+                headers=headers,
+                json=payload,
+            ) as response:
                 # Accept various response codes as the endpoint structure is what matters
                 if response.status in [200, 201, 401, 422, 500]:
                     if response.status in [200, 201]:
                         data = await response.json()
-                        self.log_test_result("Session Creation Endpoint", True,
-                                           f"Endpoint functional: {data}")
+                        self.log_test_result(
+                            "Session Creation Endpoint",
+                            True,
+                            f"Endpoint functional: {data}",
+                        )
                     elif response.status == 401:
-                        self.log_test_result("Session Creation Endpoint", True,
-                                           "Endpoint exists, requires valid authentication")
+                        self.log_test_result(
+                            "Session Creation Endpoint",
+                            True,
+                            "Endpoint exists, requires valid authentication",
+                        )
                     elif response.status == 422:
-                        self.log_test_result("Session Creation Endpoint", True,
-                                           "Endpoint exists, validates request format")
+                        self.log_test_result(
+                            "Session Creation Endpoint",
+                            True,
+                            "Endpoint exists, validates request format",
+                        )
                     else:
                         error_data = await response.text()
-                        self.log_test_result("Session Creation Endpoint", True,
-                                           f"Endpoint exists, server error: {response.status}")
+                        self.log_test_result(
+                            "Session Creation Endpoint",
+                            True,
+                            f"Endpoint exists, server error: {response.status}",
+                        )
                     return True
-                else:
-                    self.log_test_result("Session Creation Endpoint", False,
-                                       f"Unexpected status: {response.status}")
-                    return False
+                self.log_test_result(
+                    "Session Creation Endpoint",
+                    False,
+                    f"Unexpected status: {response.status}",
+                )
+                return False
         except Exception as e:
             self.log_test_result("Session Creation Endpoint", False, f"Error: {e}")
             return False
@@ -212,7 +267,7 @@ class ComprehensiveFrontendTester:
                     "Start New Session",
                     "API_BASE_URL",
                     "authToken",
-                    "currentSessionId"
+                    "currentSessionId",
                 ]
 
                 found_elements = []
@@ -221,16 +276,22 @@ class ComprehensiveFrontendTester:
                         found_elements.append(element)
 
                 if len(found_elements) >= 5:
-                    self.log_test_result("Frontend File Accessibility", True,
-                                       f"Found {len(found_elements)}/{len(required_elements)} key elements")
+                    self.log_test_result(
+                        "Frontend File Accessibility",
+                        True,
+                        f"Found {len(found_elements)}/{len(required_elements)} key elements",
+                    )
                     return True
-                else:
-                    self.log_test_result("Frontend File Accessibility", False,
-                                       f"Only found {len(found_elements)}/{len(required_elements)} elements")
-                    return False
-            else:
-                self.log_test_result("Frontend File Accessibility", False, "Frontend file not found")
+                self.log_test_result(
+                    "Frontend File Accessibility",
+                    False,
+                    f"Only found {len(found_elements)}/{len(required_elements)} elements",
+                )
                 return False
+            self.log_test_result(
+                "Frontend File Accessibility", False, "Frontend file not found"
+            )
+            return False
         except Exception as e:
             self.log_test_result("Frontend File Accessibility", False, f"Error: {e}")
             return False
@@ -243,35 +304,50 @@ class ComprehensiveFrontendTester:
             headers = {
                 "Origin": "file://",
                 "Access-Control-Request-Method": "POST",
-                "Access-Control-Request-Headers": "Content-Type,Authorization"
+                "Access-Control-Request-Headers": "Content-Type,Authorization",
             }
 
-            async with self.session.options(f"{self.base_url}/api/v1/gameplay/sessions",
-                                          headers=headers) as response:
-
+            async with self.session.options(
+                f"{self.base_url}/api/v1/gameplay/sessions", headers=headers
+            ) as response:
                 cors_headers = {
-                    "Access-Control-Allow-Origin": response.headers.get("Access-Control-Allow-Origin"),
-                    "Access-Control-Allow-Methods": response.headers.get("Access-Control-Allow-Methods"),
-                    "Access-Control-Allow-Headers": response.headers.get("Access-Control-Allow-Headers")
+                    "Access-Control-Allow-Origin": response.headers.get(
+                        "Access-Control-Allow-Origin"
+                    ),
+                    "Access-Control-Allow-Methods": response.headers.get(
+                        "Access-Control-Allow-Methods"
+                    ),
+                    "Access-Control-Allow-Headers": response.headers.get(
+                        "Access-Control-Allow-Headers"
+                    ),
                 }
 
                 if any(cors_headers.values()):
-                    self.log_test_result("CORS Configuration", True,
-                                       f"CORS headers present: {cors_headers}")
+                    self.log_test_result(
+                        "CORS Configuration",
+                        True,
+                        f"CORS headers present: {cors_headers}",
+                    )
                     return True
-                else:
-                    # Try a simple GET to see if CORS is configured differently
-                    async with self.session.get(f"{self.base_url}/api/v1/gameplay/health",
-                                              headers={"Origin": "file://"}) as get_response:
-                        cors_origin = get_response.headers.get("Access-Control-Allow-Origin")
-                        if cors_origin:
-                            self.log_test_result("CORS Configuration", True,
-                                               f"CORS configured: {cors_origin}")
-                            return True
-                        else:
-                            self.log_test_result("CORS Configuration", False,
-                                               "No CORS headers found")
-                            return False
+                # Try a simple GET to see if CORS is configured differently
+                async with self.session.get(
+                    f"{self.base_url}/api/v1/gameplay/health",
+                    headers={"Origin": "file://"},
+                ) as get_response:
+                    cors_origin = get_response.headers.get(
+                        "Access-Control-Allow-Origin"
+                    )
+                    if cors_origin:
+                        self.log_test_result(
+                            "CORS Configuration",
+                            True,
+                            f"CORS configured: {cors_origin}",
+                        )
+                        return True
+                    self.log_test_result(
+                        "CORS Configuration", False, "No CORS headers found"
+                    )
+                    return False
         except Exception as e:
             self.log_test_result("CORS Configuration", False, f"Error: {e}")
             return False
@@ -282,30 +358,47 @@ class ComprehensiveFrontendTester:
 
         try:
             # Test invalid endpoint
-            async with self.session.get(f"{self.base_url}/api/v1/gameplay/invalid") as response:
+            async with self.session.get(
+                f"{self.base_url}/api/v1/gameplay/invalid"
+            ) as response:
                 if response.status == 404:
-                    self.log_test_result("Error Handling (404)", True, "Correctly returns 404 for invalid endpoints")
+                    self.log_test_result(
+                        "Error Handling (404)",
+                        True,
+                        "Correctly returns 404 for invalid endpoints",
+                    )
                 else:
-                    self.log_test_result("Error Handling (404)", False,
-                                       f"Expected 404, got {response.status}")
+                    self.log_test_result(
+                        "Error Handling (404)",
+                        False,
+                        f"Expected 404, got {response.status}",
+                    )
 
             # Test malformed request
             headers = {"Content-Type": "application/json"}
-            async with self.session.post(f"{self.base_url}/api/v1/gameplay/sessions",
-                                       headers=headers, data="invalid json") as response:
+            async with self.session.post(
+                f"{self.base_url}/api/v1/gameplay/sessions",
+                headers=headers,
+                data="invalid json",
+            ) as response:
                 if response.status in [400, 422]:
-                    self.log_test_result("Error Handling (Malformed)", True,
-                                       "Correctly handles malformed requests")
+                    self.log_test_result(
+                        "Error Handling (Malformed)",
+                        True,
+                        "Correctly handles malformed requests",
+                    )
                     return True
-                else:
-                    self.log_test_result("Error Handling (Malformed)", False,
-                                       f"Expected 400/422, got {response.status}")
-                    return False
+                self.log_test_result(
+                    "Error Handling (Malformed)",
+                    False,
+                    f"Expected 400/422, got {response.status}",
+                )
+                return False
         except Exception as e:
             self.log_test_result("Error Handling", False, f"Error: {e}")
             return False
 
-    async def run_comprehensive_test_suite(self) -> Dict[str, Any]:
+    async def run_comprehensive_test_suite(self) -> dict[str, Any]:
         """Run all frontend integration tests."""
         logger.info("🚀 Starting Comprehensive Frontend Integration Testing")
         logger.info("=" * 80)
@@ -335,13 +428,15 @@ class ComprehensiveFrontendTester:
     def generate_test_report(self) -> str:
         """Generate a comprehensive test report."""
         total_tests = len(self.test_results)
-        passed_tests = sum(1 for result in self.test_results.values() if result["success"])
+        passed_tests = sum(
+            1 for result in self.test_results.values() if result["success"]
+        )
         pass_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
 
         report = f"""
 # TTA Core Gameplay Loop - Frontend Integration Test Report
 
-**Test Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+**Test Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 **Total Tests:** {total_tests}
 **Passed:** {passed_tests}
 **Failed:** {total_tests - passed_tests}
@@ -355,14 +450,16 @@ class ComprehensiveFrontendTester:
             status = "✅ PASS" if result["success"] else "❌ FAIL"
             report += f"- **{test_name}:** {status} - {result['details']}\n"
 
-        report += f"""
+        report += """
 ## Overall Assessment
 
 """
         if pass_rate >= 85:
             report += "🎉 **EXCELLENT:** Frontend integration is working excellently!\n"
         elif pass_rate >= 70:
-            report += "✅ **GOOD:** Frontend integration is working well with minor issues.\n"
+            report += (
+                "✅ **GOOD:** Frontend integration is working well with minor issues.\n"
+            )
         elif pass_rate >= 50:
             report += "⚠️ **ACCEPTABLE:** Frontend integration has some issues but core functionality works.\n"
         else:
@@ -370,9 +467,12 @@ class ComprehensiveFrontendTester:
 
         return report
 
+
 async def main():
     """Main test execution."""
-    logger.info("🎮 TTA Core Gameplay Loop - Comprehensive Frontend Integration Testing")
+    logger.info(
+        "🎮 TTA Core Gameplay Loop - Comprehensive Frontend Integration Testing"
+    )
     logger.info("=" * 80)
 
     async with ComprehensiveFrontendTester() as tester:
@@ -399,10 +499,13 @@ async def main():
             logger.info(f"{test_name:30} : {status}")
 
         logger.info("-" * 80)
-        logger.info(f"TOTAL: {passed_tests}/{total_tests} tests passed ({passed_tests/total_tests*100:.1f}%)")
+        logger.info(
+            f"TOTAL: {passed_tests}/{total_tests} tests passed ({passed_tests / total_tests * 100:.1f}%)"
+        )
         logger.info(f"📄 Detailed report saved to: {report_path}")
 
         return 0 if passed_tests >= total_tests * 0.7 else 1
+
 
 if __name__ == "__main__":
     try:

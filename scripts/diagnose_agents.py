@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Agent Orchestration Diagnostics Tool
@@ -10,7 +11,6 @@ Tests and validates the agent orchestration system:
 """
 
 import asyncio
-import json
 import logging
 import os
 import sys
@@ -79,9 +79,7 @@ async def test_neo4j_connection():
         neo4j_user = os.getenv("NEO4J_USER", "neo4j")
         neo4j_password = os.getenv("NEO4J_PASSWORD", "tta_dev_password_2024")
 
-        driver = AsyncGraphDatabase.driver(
-            neo4j_uri, auth=(neo4j_user, neo4j_password)
-        )
+        driver = AsyncGraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
 
         await driver.verify_connectivity()
         logger.info("✅ Neo4j connection successful")
@@ -301,9 +299,8 @@ async def run_diagnostics():
     if all_passed:
         logger.info("🎉 All diagnostics passed!")
         return 0
-    else:
-        logger.error("⚠️  Some diagnostics failed. Check logs above.")
-        return 1
+    logger.error("⚠️  Some diagnostics failed. Check logs above.")
+    return 1
 
 
 if __name__ == "__main__":

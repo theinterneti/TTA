@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --group lint
+        run: uv sync --all-groups
 
       - name: Run ruff linter
         run: |
@@ -106,7 +106,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --group type
+        run: uv sync --all-groups
 
       - name: Run Pyright type checker
         run: |
@@ -161,7 +161,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --all-extras --dev
+          uv sync --all-groups
           uv pip install radon
 
       - name: Analyze code complexity

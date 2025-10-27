@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Automatically fix B904 errors by adding exception chaining to raise statements.

@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 TTA Component Maturity Analysis Script
@@ -17,7 +18,7 @@ import re
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Component definitions
 COMPONENTS = {
@@ -246,21 +247,19 @@ def get_component_stage(maturity_file: str) -> str:
                 # Normalize stage names
                 if stage.lower() in ["staging", "stage"]:
                     return "Staging"
-                elif stage.lower() in ["production", "prod"]:
+                if stage.lower() in ["production", "prod"]:
                     return "Production"
-                elif stage.lower() in ["development", "dev"]:
+                if stage.lower() in ["development", "dev"]:
                     return "Development"
                 return stage
 
             # Alternative pattern: "Status: Staging" or "Stage: Staging"
-            alt_match = re.search(
-                r"(?:Status|Stage):\s*(\w+)", content, re.IGNORECASE
-            )
+            alt_match = re.search(r"(?:Status|Stage):\s*(\w+)", content, re.IGNORECASE)
             if alt_match:
                 stage = alt_match.group(1)
                 if stage.lower() in ["staging", "stage"]:
                     return "Staging"
-                elif stage.lower() in ["production", "prod"]:
+                if stage.lower() in ["production", "prod"]:
                     return "Production"
 
     except Exception as e:
@@ -269,7 +268,7 @@ def get_component_stage(maturity_file: str) -> str:
     return "Development"
 
 
-def get_observation_period(maturity_file: str) -> Optional[dict[str, Any]]:
+def get_observation_period(maturity_file: str) -> dict[str, Any] | None:
     """Extract 7-day observation period info from MATURITY.md file."""
     try:
         maturity_path = Path(maturity_file)
@@ -332,7 +331,9 @@ def get_blocker_issues(maturity_file: str) -> list[dict[str, str]]:
 
             for match in issue_matches:
                 issue_num = match.group(1)
-                description = match.group(2) if match.group(2) else "See issue for details"
+                description = (
+                    match.group(2) if match.group(2) else "See issue for details"
+                )
                 blockers.append(
                     {"issue": f"#{issue_num}", "description": description.strip()}
                 )

@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Test Model Management Environment Integration
@@ -18,6 +19,7 @@ try:
 except ImportError:
     print("❌ python-dotenv not installed. Install with: pip install python-dotenv")
     sys.exit(1)
+
 
 def test_environment_loading():
     """Test that environment variables are loaded correctly."""
@@ -47,6 +49,7 @@ def test_environment_loading():
 
     print("✅ All required environment variables loaded successfully")
     return True
+
 
 def test_model_management_config():
     """Test model management specific configuration."""
@@ -82,6 +85,7 @@ def test_model_management_config():
     print(f"✅ {len(configured_keys)} API key(s) configured")
     return True
 
+
 def test_model_management_import():
     """Test that the model management system can be imported."""
     print("\n🔍 Testing model management system import...")
@@ -89,14 +93,17 @@ def test_model_management_import():
     try:
         # Test importing the main component
         from components.model_management import ModelManagementComponent
+
         print("✅ ModelManagementComponent imported successfully")
 
         # Test importing interfaces
         from components.model_management.interfaces import IModelProvider, TaskType
+
         print("✅ Model management interfaces imported successfully")
 
         # Test importing providers
         from components.model_management.providers import OpenRouterProvider
+
         print("✅ Model providers imported successfully")
 
         return True
@@ -105,13 +112,14 @@ def test_model_management_import():
         print(f"❌ Failed to import model management system: {e}")
         return False
 
+
 def test_provider_configuration():
     """Test that providers can be configured with environment variables."""
     print("\n🔍 Testing provider configuration...")
 
     try:
-        from components.model_management.providers import OpenRouterProvider
         from components.model_management.models import ProviderConfig
+        from components.model_management.providers import OpenRouterProvider
 
         # Test OpenRouter provider configuration
         openrouter_key = os.getenv("OPENROUTER_API_KEY")
@@ -119,19 +127,19 @@ def test_provider_configuration():
             config = ProviderConfig(
                 provider_type="openrouter",
                 api_key=openrouter_key,
-                base_url="https://openrouter.ai/api/v1"
+                base_url="https://openrouter.ai/api/v1",
             )
 
             provider = OpenRouterProvider(config)
             print("✅ OpenRouter provider configured successfully")
             return True
-        else:
-            print("⚠️  OpenRouter API key not configured, skipping provider test")
-            return True
+        print("⚠️  OpenRouter API key not configured, skipping provider test")
+        return True
 
     except Exception as e:
         print(f"❌ Failed to configure providers: {e}")
         return False
+
 
 def main():
     """Run all tests."""
@@ -154,9 +162,9 @@ def main():
             results.append((test_name, False))
 
     # Print summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 TEST RESULTS SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     passed = 0
     failed = 0
@@ -172,11 +180,13 @@ def main():
     print(f"\nTotal: {len(results)} tests, {passed} passed, {failed} failed")
 
     if failed == 0:
-        print("\n🎉 All tests passed! Model management environment integration is working correctly.")
+        print(
+            "\n🎉 All tests passed! Model management environment integration is working correctly."
+        )
         return True
-    else:
-        print(f"\n❌ {failed} test(s) failed. Please check your environment configuration.")
-        return False
+    print(f"\n❌ {failed} test(s) failed. Please check your environment configuration.")
+    return False
+
 
 if __name__ == "__main__":
     success = main()

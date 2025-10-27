@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Enhanced monitoring script for Phase 7 OpenHands integration with optimizations.

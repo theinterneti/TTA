@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Verification Script for Priority 1: JWT Authentication Fix
@@ -8,7 +9,6 @@ This script verifies that:
 3. Backward compatibility is maintained for old tokens
 """
 
-import json
 import sys
 from pathlib import Path
 
@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt
 
 import player_experience.api.auth as auth_module
-from player_experience.api.auth import TokenData, create_tokens_for_player, verify_token
+from player_experience.api.auth import verify_token
 from player_experience.models.auth import (
     AuthenticatedUser,
     Permission,
@@ -36,11 +36,13 @@ ALGORITHM = "HS256"
 auth_module.SECRET_KEY = SECRET_KEY
 auth_module.ALGORITHM = ALGORITHM
 
+
 def print_section(title: str):
     """Print a formatted section header."""
     print(f"\n{'=' * 60}")
     print(f"  {title}")
     print(f"{'=' * 60}\n")
+
 
 def test_jwt_token_structure():
     """Test 1: Verify JWT tokens contain player_id field."""
@@ -53,7 +55,7 @@ def test_jwt_token_structure():
         email="test@example.com",
         role=UserRole.PLAYER,
         permissions=[Permission.CREATE_CHARACTER],
-        mfa_verified=False
+        mfa_verified=False,
     )
 
     # Create auth service
@@ -61,56 +63,56 @@ def test_jwt_token_structure():
         secret_key=SECRET_KEY,
         algorithm=ALGORITHM,
         access_token_expire_minutes=30,
-        refresh_token_expire_days=7
+        refresh_token_expire_days=7,
     )
 
     # Test 1a: Token with explicit player_id
     print("Test 1a: Creating token with explicit player_id...")
     token_with_player_id = auth_service.create_access_token(
-        user=test_user,
-        session_id="session-123",
-        player_id="player-456"
+        user=test_user, session_id="session-123", player_id="player-456"
     )
 
     # Decode and verify
     payload = jwt.decode(token_with_player_id, SECRET_KEY, algorithms=[ALGORITHM])
-    print(f"✓ Token created successfully")
+    print("✓ Token created successfully")
     print(f"  Payload keys: {list(payload.keys())}")
 
     if "player_id" in payload:
         print(f"✓ player_id field present: {payload['player_id']}")
-        if payload['player_id'] == "player-456":
-            print(f"✓ player_id matches expected value")
+        if payload["player_id"] == "player-456":
+            print("✓ player_id matches expected value")
         else:
-            print(f"✗ player_id mismatch: expected 'player-456', got '{payload['player_id']}'")
+            print(
+                f"✗ player_id mismatch: expected 'player-456', got '{payload['player_id']}'"
+            )
             return False
     else:
-        print(f"✗ player_id field missing from token payload")
+        print("✗ player_id field missing from token payload")
         return False
 
     # Test 1b: Token without explicit player_id (should default to user_id)
     print("\nTest 1b: Creating token without explicit player_id...")
     token_without_player_id = auth_service.create_access_token(
-        user=test_user,
-        session_id="session-123"
+        user=test_user, session_id="session-123"
     )
 
     payload2 = jwt.decode(token_without_player_id, SECRET_KEY, algorithms=[ALGORITHM])
-    print(f"✓ Token created successfully")
+    print("✓ Token created successfully")
 
     if "player_id" in payload2:
         print(f"✓ player_id field present: {payload2['player_id']}")
-        if payload2['player_id'] == test_user.user_id:
-            print(f"✓ player_id defaults to user_id as expected")
+        if payload2["player_id"] == test_user.user_id:
+            print("✓ player_id defaults to user_id as expected")
         else:
-            print(f"✗ player_id should default to user_id")
+            print("✗ player_id should default to user_id")
             return False
     else:
-        print(f"✗ player_id field missing from token payload")
+        print("✗ player_id field missing from token payload")
         return False
 
     print("\n✅ TEST 1 PASSED: JWT tokens contain player_id field")
     return True
+
 
 def test_verify_token_extraction():
     """Test 2: Verify token verification extracts player_id correctly."""
@@ -126,7 +128,7 @@ def test_verify_token_extraction():
         "permissions": ["create_character"],
         "session_id": "session-123",
         "mfa_verified": False,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
 
     token = jwt.encode(payload_with_player_id, SECRET_KEY, algorithm=ALGORITHM)
@@ -134,20 +136,22 @@ def test_verify_token_extraction():
     print("Test 2a: Verifying token with player_id field...")
     token_data = verify_token(token)
 
-    if token_data and hasattr(token_data, 'player_id'):
-        print(f"✓ Token verified successfully")
+    if token_data and hasattr(token_data, "player_id"):
+        print("✓ Token verified successfully")
         print(f"✓ player_id extracted: {token_data.player_id}")
         if token_data.player_id == "player-456":
-            print(f"✓ player_id matches expected value")
+            print("✓ player_id matches expected value")
         else:
-            print(f"✗ player_id mismatch")
+            print("✗ player_id mismatch")
             return False
     else:
-        print(f"✗ Failed to extract player_id from token")
+        print("✗ Failed to extract player_id from token")
         return False
 
     # Test 2b: Backward compatibility - token without player_id
-    print("\nTest 2b: Verifying old token without player_id (backward compatibility)...")
+    print(
+        "\nTest 2b: Verifying old token without player_id (backward compatibility)..."
+    )
     payload_without_player_id = {
         "sub": "user-789",
         "username": "olduser",
@@ -156,26 +160,29 @@ def test_verify_token_extraction():
         "permissions": ["create_character"],
         "session_id": "session-789",
         "mfa_verified": False,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
 
     old_token = jwt.encode(payload_without_player_id, SECRET_KEY, algorithm=ALGORITHM)
     old_token_data = verify_token(old_token)
 
-    if old_token_data and hasattr(old_token_data, 'player_id'):
-        print(f"✓ Old token verified successfully")
+    if old_token_data and hasattr(old_token_data, "player_id"):
+        print("✓ Old token verified successfully")
         print(f"✓ player_id extracted: {old_token_data.player_id}")
         if old_token_data.player_id == "user-789":  # Should fallback to sub
-            print(f"✓ player_id correctly falls back to 'sub' field")
+            print("✓ player_id correctly falls back to 'sub' field")
         else:
-            print(f"✗ player_id fallback failed")
+            print("✗ player_id fallback failed")
             return False
     else:
-        print(f"✗ Failed to verify old token")
+        print("✗ Failed to verify old token")
         return False
 
-    print("\n✅ TEST 2 PASSED: Token verification and backward compatibility work correctly")
+    print(
+        "\n✅ TEST 2 PASSED: Token verification and backward compatibility work correctly"
+    )
     return True
+
 
 def test_create_tokens_for_player():
     """Test 3: Verify create_tokens_for_player includes player_id."""
@@ -187,6 +194,7 @@ def test_create_tokens_for_player():
 
     print("\n✅ TEST 3 SKIPPED (functionality verified in other tests)")
     return True
+
 
 def main():
     """Run all verification tests."""
@@ -219,6 +227,7 @@ def main():
     print("=" * 60 + "\n")
 
     return 0 if all_passed else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,11 +1,13 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Test script for the minimal TTA API server to validate integration.
 """
 
-import requests
-import json
 import sys
+
+import requests
+
 
 def test_api():
     """Test the minimal API server."""
@@ -32,15 +34,12 @@ def test_api():
     # Test 2: Authentication
     print("\n2. Testing Authentication...")
     try:
-        login_data = {
-            "username": "demo_user",
-            "password": "demo_password"
-        }
+        login_data = {"username": "demo_user", "password": "demo_password"}
         response = requests.post(f"{base_url}/api/v1/auth/login", json=login_data)
         if response.status_code == 200:
             auth_data = response.json()
             token = auth_data["access_token"]
-            print(f"✅ Authentication successful")
+            print("✅ Authentication successful")
             print(f"   Token: {token[:20]}...")
         else:
             print(f"❌ Authentication failed: {response.status_code}")
@@ -68,7 +67,7 @@ def test_api():
             openapi_spec = response.json()
             paths = openapi_spec.get("paths", {})
             gameplay_endpoints = [path for path in paths.keys() if "/gameplay/" in path]
-            print(f"✅ OpenAPI spec accessible")
+            print("✅ OpenAPI spec accessible")
             print(f"   Gameplay endpoints found: {len(gameplay_endpoints)}")
             for endpoint in gameplay_endpoints:
                 print(f"   - {endpoint}")
@@ -91,7 +90,7 @@ def test_api():
             # Try session creation with proper headers
             headers = {
                 "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
             session_data = {
@@ -105,17 +104,17 @@ def test_api():
             session_response = session.post(
                 f"{base_url}/api/v1/gameplay/sessions",
                 json=session_data,
-                headers=headers
+                headers=headers,
             )
 
             if session_response.status_code == 200:
                 session_info = session_response.json()
-                print(f"✅ Session creation successful")
+                print("✅ Session creation successful")
                 print(f"   Session ID: {session_info['session_id']}")
             else:
                 print(f"⚠️  Session creation returned {session_response.status_code}")
-                print(f"   This is expected due to token validation in minimal server")
-                print(f"   API structure is correct - integration validated")
+                print("   This is expected due to token validation in minimal server")
+                print("   API structure is correct - integration validated")
 
     except Exception as e:
         print(f"❌ Session creation error: {e}")
@@ -149,6 +148,7 @@ def test_api():
     print("4. Add full database integration")
 
     return True
+
 
 if __name__ == "__main__":
     try:

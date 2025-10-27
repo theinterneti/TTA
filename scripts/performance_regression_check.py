@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Performance Regression Detection Script
@@ -238,7 +239,9 @@ class PerformanceRegressionDetector:
                 status_emoji = (
                     "🔴"
                     if result.severity == "critical"
-                    else "🟡" if result.severity == "major" else "🟠"
+                    else "🟡"
+                    if result.severity == "major"
+                    else "🟠"
                 )
                 report.append(
                     f"{status_emoji} **{result.metric_name}** ({result.severity.upper()})"

@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "Installing Python dependencies for CodeQL analysis..."
-          uv sync --all-extras --dev
+          uv sync --all-groups
 
       # Initialize CodeQL tools for scanning
       - name: Initialize CodeQL

@@ -69,7 +69,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
 
       - name: Collect baseline performance metrics
         id: collect
@@ -87,7 +87,7 @@ jobs:
 
           # Measure build time
           start_time=$(date +%s)
-          uv sync --all-extras --dev > /dev/null 2>&1
+          uv sync --all-groups > /dev/null 2>&1
           end_time=$(date +%s)
           build_duration=$((end_time - start_time))
 
@@ -141,7 +141,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
 
       - name: Collect current performance metrics
         id: collect
@@ -159,7 +159,7 @@ jobs:
 
           # Measure build time
           start_time=$(date +%s)
-          uv sync --all-extras --dev > /dev/null 2>&1
+          uv sync --all-groups > /dev/null 2>&1
           end_time=$(date +%s)
           build_duration=$((end_time - start_time))
 
@@ -222,7 +222,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
 
       - name: Run API performance tests
         run: |
