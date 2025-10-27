@@ -101,6 +101,14 @@ repos:
         files: ^tests/.*\.py$
         pass_filenames: true
 
+      # Custom hook: Validate agentic primitives frontmatter
+      - id: validate-agentic-frontmatter
+        name: Validate agentic primitives frontmatter
+        entry: python scripts/validate-agentic-frontmatter.py
+        language: system
+        files: ^\.github/(instructions|chatmodes|prompts|specs)/.*\.md$
+        pass_filenames: false
+
 # Configuration for specific tools
 ci:
   autofix_commit_msg: |
