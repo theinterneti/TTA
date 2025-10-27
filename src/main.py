@@ -70,7 +70,7 @@ try:
 
 except ImportError:
     logger.warning(
-        "Observability integration not available - install with: uv add opentelemetry-api opentelemetry-sdk"
+        "Observability integration not available - install with: uv add opentelemetry-api opentelemetry-sdk opentelemetry-exporter-prometheus"
     )
 except Exception as e:
     logger.error(f"Failed to initialize observability: {e}", exc_info=True)
