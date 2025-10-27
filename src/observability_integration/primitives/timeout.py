@@ -163,7 +163,6 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
             Exception: Any exception from the wrapped primitive
         """
         start_time = time.time()
-        success = False
 
         try:
             # Execute with timeout
@@ -173,7 +172,6 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
             )
 
             # Success - completed within timeout
-            success = True
             self._total_successes += 1
 
             duration = time.time() - start_time
@@ -203,7 +201,6 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
 
         except asyncio.TimeoutError as e:
             # Timeout - operation exceeded timeout + grace period
-            success = False
             self._total_failures += 1
 
             duration = time.time() - start_time
@@ -231,17 +228,16 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
         except Exception:
             # Other exception - still count as success (didn't timeout)
             # But record execution time if we have it
-            if not success:
-                self._total_successes += 1
-                duration = time.time() - start_time
+            self._total_successes += 1
+            duration = time.time() - start_time
 
-                if self._successes_counter:
-                    self._successes_counter.add(1, {"operation": self.operation_name})
+            if self._successes_counter:
+                self._successes_counter.add(1, {"operation": self.operation_name})
 
-                if self._execution_histogram:
-                    self._execution_histogram.record(
-                        duration, {"operation": self.operation_name}
-                    )
+            if self._execution_histogram:
+                self._execution_histogram.record(
+                    duration, {"operation": self.operation_name}
+                )
 
             # Re-raise the original exception
             raise
