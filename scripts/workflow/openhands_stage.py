@@ -217,13 +217,7 @@ class OpenHandsTestGenerationStage:
         """
 
         # Run async generation in event loop
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        return loop.run_until_complete(
+        return asyncio.run(
             generator.generate_tests(
                 module_path=str(module_path),
                 output_path=str(self._get_test_output_path(module_path)),
