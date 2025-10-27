@@ -33,10 +33,10 @@ jobs:
           path: |
             ~/.cache/uv
             .venv
-          key: ${{ runner.os }}-uv-unit-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          key: ${{ runner.os }}-uv-v2-unit-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
           restore-keys: |
-            ${{ runner.os }}-uv-unit-
-            ${{ runner.os }}-uv-
+            ${{ runner.os }}-uv-v2-unit-
+            ${{ runner.os }}-uv-v2-
 
       - name: Sync deps
         run: uv sync --all-groups
@@ -98,10 +98,10 @@ jobs:
           path: |
             ~/.cache/uv
             .venv
-          key: ${{ runner.os }}-uv-integration-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          key: ${{ runner.os }}-uv-v2-integration-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
           restore-keys: |
-            ${{ runner.os }}-uv-integration-
-            ${{ runner.os }}-uv-
+            ${{ runner.os }}-uv-v2-integration-
+            ${{ runner.os }}-uv-v2-
 
       - name: Sync deps
         run: uv sync --all-groups
