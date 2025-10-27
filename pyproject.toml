@@ -118,6 +118,9 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.0.0",
     # Docker Integration
     "docker>=7.0.0",
+    "opentelemetry-api>=1.38.0",
+    "opentelemetry-sdk>=1.38.0",
+    "opentelemetry-exporter-prometheus>=0.59b0",
 ]
 
 # DEPRECATED: Use dependency-groups instead (see below)
@@ -206,6 +209,7 @@ dev = [
     "pytest-benchmark>=4.0.0", # Performance benchmarking
     "pact-python>=2.2.0", # Contract testing
     "cosmic-ray>=8.4.3",
+    "yamale>=6.0.0",
 ]
 
 # Linting and formatting tools
@@ -431,6 +435,18 @@ unfixable = []
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "E402"]
 "tests/**/*.py" = ["S101", "ARG", "PLR2004"]  # Allow assert, unused args, magic values in tests
+"src/components/model_management/**/*.py" = [
+    "ARG002",   # Unused method arguments (interface implementations)
+    "PERF203",  # Try-except in loop (acceptable for async tasks)
+    "PERF401",  # Manual list comprehension (readability preference)
+    "SIM102",   # Collapsible if (readability preference)
+    "ERA001",   # Commented code (acceptable for development)
+    "PLC0415",  # Import outside top-level (dynamic imports needed)
+    "PLR0911",  # Too many return statements (acceptable for complex logic)
+    "PLR0912",  # Too many branches (acceptable for complex logic)
+    "PTH103",   # os.makedirs (pathlib not always better)
+    "B027",     # Empty method without abstract decorator (optional methods)
+]
 "scripts/analyze-neo4j-staging-metrics.py" = ["T201", "PLR0912", "PLR0915", "ARG001", "F841", "PTH123"]  # Reporting script needs print statements
 
 # Import sorting configuration (replaces isort)
