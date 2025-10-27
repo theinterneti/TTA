@@ -375,6 +375,17 @@ jobs:
           uv pip install cyclonedx-bom
           npm install -g @cyclonedx/cyclonedx-npm
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: src/player_experience/frontend/package-lock.json
+
+      - name: Install Node.js dependencies
+        working-directory: src/player_experience/frontend
+        run: npm ci --legacy-peer-deps
+
       - name: Generate Python SBOM
         run: |
           echo "Generating Python SBOM..."
