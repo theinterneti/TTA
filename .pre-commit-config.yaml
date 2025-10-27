@@ -30,11 +30,9 @@ repos:
       - id: ruff
         args: [--fix]
         types_or: [python, pyi]
-        exclude: ^(tests/|docs/|scripts/|examples/)
       # Run formatter
       - id: ruff-format
         types_or: [python, pyi]
-        exclude: ^(tests/|docs/|scripts/|examples/)
 
   # Type checking - MOVED TO CI/CD ONLY for performance
   # MyPy is too slow for pre-commit hooks in solo developer workflow
@@ -47,7 +45,7 @@ repos:
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
-        exclude: ^(tests/|docs/|scripts/|examples/)
+        files: ^src/
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets
@@ -82,7 +80,7 @@ repos:
             "--convention=google",
             "--add-ignore=D100,D101,D102,D103,D104,D105,D106,D107,D212",
           ]
-        exclude: ^(tests/|docs/|scripts/|examples/|tta\.prototype/|tta\.dev/|tta\.prod/)
+        files: ^src/
 
   # YAML formatting
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -125,11 +123,12 @@ ci:
   skip: []
   submodules: false
 
-# Exclude patterns
+# Exclude patterns - Only exclude generated/cache/vendor files
 exclude: |
   (?x)^(
     \.venv/|
     venv/|
+    venv-staging/|
     __pycache__/|
     \.git/|
     \.mypy_cache/|
@@ -148,16 +147,8 @@ exclude: |
     \.env|
     \.env\..*|
     uv\.lock|
+    node_modules/|
+    package-lock\.json|
     .*\.backup\.\d+|
-    tta/prod/src/utils/neo4j_utils\.py|
-    validate_live_databases\.py|
-    templates/.*\.json|
-    .*\.k8s/.*\.yaml|
-    scripts/manual_mutation_test\.py|
-    scripts/setup_mutants_env\.py|
-    tests/contract/.*|
-    tests/contracts/.*|
-    tests/integration/.*|
-    tests/unit/.*|
-    tests/performance/.*
+    templates/.*\.json
   )$
