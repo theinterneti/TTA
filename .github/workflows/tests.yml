@@ -42,7 +42,7 @@ jobs:
         run: uv sync --all-groups
       - name: Run unit tests with metrics collection
         run: |
-          uvx pytest -q --tb=short \
+          uv run pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-report=xml:coverage-unit.xml
         env:
