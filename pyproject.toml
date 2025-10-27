@@ -290,12 +290,8 @@ environments = [
 # Use project-local cache to avoid cross-filesystem overhead
 cache-dir = "./.uv_cache"
 
-# Cache invalidation keys
-# Rebuild when these files change
-cache-keys = [
-    { file = "pyproject.toml" },
-    { file = "uv.lock" },
-]
+# Note: cache-keys not supported in UV 0.8.x - removed for compatibility
+# Cache invalidation happens automatically based on pyproject.toml and uv.lock
 
 # ============================================================================
 # UV WORKSPACE CONFIGURATION

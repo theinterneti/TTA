@@ -395,3 +395,26 @@ tests/e2e-staging/*-snapshots/
 .github/workflows/gemini-*.yml
 # MkDocs build output
 site/
+
+# -------------------------------------------------
+# 24) OpenHands integration artifacts
+# -------------------------------------------------
+# OpenHands workspace (generated during integration tests)
+openhands_workspace/
+
+# Task queue and workflow state (runtime artifacts)
+task_queue.json
+workflow_sync_report.json
+
+# Test generation results (generated artifacts)
+batch*_generation_results.json
+batch*_manual_results.json
+batch*_sample_results.json
+
+# Backup directories and files (use git for version control instead)
+backups/
+*.backup
+
+# Root-level test files (should be in tests/ directory)
+/test_*.py
+!tests/test_*.py
