@@ -13,8 +13,6 @@ class MockPrimitive:
 
     def __init__(self, name="mock"):
         self.name = name
-        self.__class__.__name__ = name
-
     async def execute(self, data, context):
         """Mock execute method."""
         return f"{self.name}_result"
