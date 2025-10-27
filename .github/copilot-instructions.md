@@ -34,9 +34,15 @@ python -m pytest                  # Won't find dependencies
 
 ```bash
 # 1. Install UV package manager (if not installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Recommended: Verify the install script before running for security.
+curl -LsSf https://astral.sh/uv/install.sh -o uv-install.sh
+curl -LsSf https://astral.sh/uv/install.sh.sha256 -o uv-install.sh.sha256
+shasum -a 256 -c uv-install.sh.sha256
+# If the output is "uv-install.sh: OK", proceed to install:
+sh uv-install.sh
 export PATH="$HOME/.local/bin:$PATH"
-
+# Alternatively, you may review the script manually before running:
+# less uv-install.sh
 # 2. Install all dependencies (~2-3 minutes first time, cached thereafter)
 uv sync --all-extras --dev
 
