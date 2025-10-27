@@ -154,7 +154,6 @@ class RouterPrimitive(WorkflowPrimitive[Any, Any]):
         """
         start_time = time.time()
         selected_route = self.default_route
-        routing_reason = "default"
 
         try:
             # Execute routing function
