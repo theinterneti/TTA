@@ -81,7 +81,7 @@ def _convert_special_types(obj: Any) -> Any:
     return obj
 
 
-def deserialize_model(data: str, model_class: type[T]) -> T:
+def deserialize_model[T](data: str, model_class: type[T]) -> T:
     """
     Deserialize JSON string to data model.
 
@@ -96,7 +96,7 @@ def deserialize_model(data: str, model_class: type[T]) -> T:
     return deserialize_dict_to_model(parsed_data, model_class)
 
 
-def deserialize_dict_to_model(data: dict[str, Any], model_class: type[T]) -> T:
+def deserialize_dict_to_model[T](data: dict[str, Any], model_class: type[T]) -> T:
     """
     Deserialize dictionary to data model.
 

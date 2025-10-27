@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 API Endpoint Testing Script for TTA Core Gameplay Loop Integration
@@ -7,24 +8,26 @@ to validate the frontend-to-backend integration.
 """
 
 import asyncio
-import aiohttp
-import json
-import sys
-from typing import Dict, Any, Optional
 import logging
+import sys
+
+import aiohttp
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 class GameplayAPITester:
     """Comprehensive API tester for the TTA Gameplay Loop integration."""
 
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.session: Optional[aiohttp.ClientSession] = None
-        self.auth_token: Optional[str] = None
-        self.session_id: Optional[str] = None
+        self.session: aiohttp.ClientSession | None = None
+        self.auth_token: str | None = None
+        self.session_id: str | None = None
 
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
@@ -34,7 +37,7 @@ class GameplayAPITester:
         if self.session:
             await self.session.close()
 
-    def _get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> dict[str, str]:
         """Get headers with authentication."""
         headers = {"Content-Type": "application/json"}
         if self.auth_token:
@@ -49,7 +52,7 @@ class GameplayAPITester:
         test_credentials = [
             {"username": "demo_user", "password": "demo_password"},
             {"username": "testuser", "password": "testpass"},
-            {"username": "api_test_user", "password": "TestPassword123!"}
+            {"username": "api_test_user", "password": "TestPassword123!"},
         ]
 
         # First, try to register a test user (in case it doesn't exist)
@@ -57,13 +60,13 @@ class GameplayAPITester:
             register_payload = {
                 "username": "api_test_user",
                 "email": "apitest@example.com",
-                "password": "TestPassword123!"
+                "password": "TestPassword123!",
             }
 
             async with self.session.post(
                 f"{self.base_url}/api/v1/auth/register",
                 headers={"Content-Type": "application/json"},
-                json=register_payload
+                json=register_payload,
             ) as response:
                 if response.status == 200:
                     logger.info("✅ Test user registered successfully")
@@ -84,19 +87,24 @@ class GameplayAPITester:
                 async with self.session.post(
                     f"{self.base_url}/api/v1/auth/login",
                     headers={"Content-Type": "application/json"},
-                    json=login_payload
+                    json=login_payload,
                 ) as response:
                     if response.status == 200:
                         data = await response.json()
                         self.auth_token = data.get("access_token") or data.get("token")
-                        logger.info(f"✅ Authentication successful with {credentials['username']}")
+                        logger.info(
+                            f"✅ Authentication successful with {credentials['username']}"
+                        )
                         return True
-                    else:
-                        error_data = await response.text()
-                        logger.warning(f"⚠️  Login failed for {credentials['username']}: {response.status}")
-                        continue  # Try next credentials
+                    await response.text()
+                    logger.warning(
+                        f"⚠️  Login failed for {credentials['username']}: {response.status}"
+                    )
+                    continue  # Try next credentials
             except Exception as e:
-                logger.warning(f"⚠️  Authentication error for {credentials['username']}: {e}")
+                logger.warning(
+                    f"⚠️  Authentication error for {credentials['username']}: {e}"
+                )
                 continue  # Try next credentials
 
         logger.error("❌ All authentication attempts failed")
@@ -107,16 +115,14 @@ class GameplayAPITester:
         logger.info("🔍 Testing health endpoint...")
         try:
             async with self.session.get(
-                f"{self.base_url}/api/v1/gameplay/health",
-                headers=self._get_headers()
+                f"{self.base_url}/api/v1/gameplay/health", headers=self._get_headers()
             ) as response:
                 if response.status == 200:
                     data = await response.json()
                     logger.info(f"✅ Health check passed: {data}")
                     return True
-                else:
-                    logger.error(f"❌ Health check failed: {response.status}")
-                    return False
+                logger.error(f"❌ Health check failed: {response.status}")
+                return False
         except Exception as e:
             logger.error(f"❌ Health check error: {e}")
             return False
@@ -134,17 +140,18 @@ class GameplayAPITester:
             async with self.session.post(
                 f"{self.base_url}/api/v1/gameplay/sessions",
                 headers=self._get_headers(),
-                json=payload
+                json=payload,
             ) as response:
                 if response.status == 200:
                     data = await response.json()
                     self.session_id = data.get("session_id")
                     logger.info(f"✅ Session created: {self.session_id}")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Session creation failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(
+                    f"❌ Session creation failed: {response.status} - {error_data}"
+                )
+                return False
         except Exception as e:
             logger.error(f"❌ Session creation error: {e}")
             return False
@@ -159,16 +166,19 @@ class GameplayAPITester:
         try:
             async with self.session.get(
                 f"{self.base_url}/api/v1/gameplay/sessions/{self.session_id}",
-                headers=self._get_headers()
+                headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    logger.info(f"✅ Session status retrieved: {data.get('session_status', {}).get('is_active', 'unknown')}")
+                    logger.info(
+                        f"✅ Session status retrieved: {data.get('session_status', {}).get('is_active', 'unknown')}"
+                    )
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Session status failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(
+                    f"❌ Session status failed: {response.status} - {error_data}"
+                )
+                return False
         except Exception as e:
             logger.error(f"❌ Session status error: {e}")
             return False
@@ -181,23 +191,22 @@ class GameplayAPITester:
 
         logger.info("🔍 Testing choice processing...")
         try:
-            payload = {
-                "choice_id": "test_choice_001"
-            }
+            payload = {"choice_id": "test_choice_001"}
 
             async with self.session.post(
                 f"{self.base_url}/api/v1/gameplay/sessions/{self.session_id}/choices",
                 headers=self._get_headers(),
-                json=payload
+                json=payload,
             ) as response:
                 if response.status == 200:
-                    data = await response.json()
-                    logger.info(f"✅ Choice processed successfully")
+                    await response.json()
+                    logger.info("✅ Choice processed successfully")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Choice processing failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(
+                    f"❌ Choice processing failed: {response.status} - {error_data}"
+                )
+                return False
         except Exception as e:
             logger.error(f"❌ Choice processing error: {e}")
             return False
@@ -212,16 +221,17 @@ class GameplayAPITester:
         try:
             async with self.session.get(
                 f"{self.base_url}/api/v1/gameplay/sessions/{self.session_id}/progress",
-                headers=self._get_headers()
+                headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
-                    data = await response.json()
-                    logger.info(f"✅ Progress retrieved successfully")
+                    await response.json()
+                    logger.info("✅ Progress retrieved successfully")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Progress retrieval failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(
+                    f"❌ Progress retrieval failed: {response.status} - {error_data}"
+                )
+                return False
         except Exception as e:
             logger.error(f"❌ Progress retrieval error: {e}")
             return False
@@ -236,16 +246,17 @@ class GameplayAPITester:
         try:
             async with self.session.delete(
                 f"{self.base_url}/api/v1/gameplay/sessions/{self.session_id}",
-                headers=self._get_headers()
+                headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
-                    data = await response.json()
-                    logger.info(f"✅ Session terminated successfully")
+                    await response.json()
+                    logger.info("✅ Session terminated successfully")
                     return True
-                else:
-                    error_data = await response.text()
-                    logger.error(f"❌ Session termination failed: {response.status} - {error_data}")
-                    return False
+                error_data = await response.text()
+                logger.error(
+                    f"❌ Session termination failed: {response.status} - {error_data}"
+                )
+                return False
         except Exception as e:
             logger.error(f"❌ Session termination error: {e}")
             return False
@@ -258,19 +269,22 @@ class GameplayAPITester:
         try:
             async with self.session.get(
                 f"{self.base_url}/api/v1/gameplay/sessions/invalid_session_id",
-                headers=self._get_headers()
+                headers=self._get_headers(),
             ) as response:
                 if response.status == 404:
-                    logger.info("✅ Error handling works: Invalid session ID returns 404")
+                    logger.info(
+                        "✅ Error handling works: Invalid session ID returns 404"
+                    )
                     return True
-                else:
-                    logger.error(f"❌ Error handling failed: Expected 404, got {response.status}")
-                    return False
+                logger.error(
+                    f"❌ Error handling failed: Expected 404, got {response.status}"
+                )
+                return False
         except Exception as e:
             logger.error(f"❌ Error handling test error: {e}")
             return False
 
-    async def run_comprehensive_test(self) -> Dict[str, bool]:
+    async def run_comprehensive_test(self) -> dict[str, bool]:
         """Run all tests and return results."""
         logger.info("🚀 Starting comprehensive API testing...")
 
@@ -304,6 +318,7 @@ class GameplayAPITester:
 
         return results
 
+
 async def main():
     """Main test execution."""
     logger.info("🎮 TTA Core Gameplay Loop - API Integration Testing")
@@ -327,14 +342,16 @@ async def main():
                 passed += 1
 
         logger.info("-" * 60)
-        logger.info(f"TOTAL: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
+        logger.info(
+            f"TOTAL: {passed}/{total} tests passed ({passed / total * 100:.1f}%)"
+        )
 
         if passed == total:
             logger.info("🎉 ALL TESTS PASSED! Integration is working correctly.")
             return 0
-        else:
-            logger.error("⚠️  Some tests failed. Check the logs above for details.")
-            return 1
+        logger.error("⚠️  Some tests failed. Check the logs above for details.")
+        return 1
+
 
 if __name__ == "__main__":
     try:

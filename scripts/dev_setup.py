@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Development Environment Setup Script
@@ -6,21 +7,20 @@ This script sets up a complete development environment for testing
 the TTA Core Gameplay Loop integration.
 """
 
-import sys
 import asyncio
 import logging
 import subprocess
+import sys
 from pathlib import Path
 
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.orchestration import TTAOrchestrator, TTAConfig
+from src.orchestration import TTAConfig, TTAOrchestrator
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -30,15 +30,17 @@ def check_dependencies():
     logger.info("Checking dependencies...")
 
     dependencies = {
-        'neo4j': 'Neo4j database (required for gameplay loop)',
-        'redis-server': 'Redis cache (required for session management)',
-        'python3': 'Python 3.8+ (required for TTA system)'
+        "neo4j": "Neo4j database (required for gameplay loop)",
+        "redis-server": "Redis cache (required for session management)",
+        "python3": "Python 3.8+ (required for TTA system)",
     }
 
     missing = []
     for dep, description in dependencies.items():
         try:
-            result = subprocess.run(['which', dep], capture_output=True, text=True)
+            result = subprocess.run(
+                ["which", dep], check=False, capture_output=True, text=True
+            )
             if result.returncode == 0:
                 logger.info(f"✓ {dep} found: {result.stdout.strip()}")
             else:
@@ -62,12 +64,14 @@ def setup_databases():
 
     # Start Neo4j (if available)
     try:
-        result = subprocess.run(['neo4j', 'status'], capture_output=True, text=True)
-        if 'Neo4j is running' in result.stdout:
+        result = subprocess.run(
+            ["neo4j", "status"], check=False, capture_output=True, text=True
+        )
+        if "Neo4j is running" in result.stdout:
             logger.info("✓ Neo4j is already running")
         else:
             logger.info("Starting Neo4j...")
-            subprocess.run(['neo4j', 'start'], check=True)
+            subprocess.run(["neo4j", "start"], check=True)
             logger.info("✓ Neo4j started")
     except subprocess.CalledProcessError:
         logger.warning("⚠ Could not start Neo4j - may need manual setup")
@@ -76,12 +80,14 @@ def setup_databases():
 
     # Start Redis (if available)
     try:
-        result = subprocess.run(['redis-cli', 'ping'], capture_output=True, text=True)
-        if 'PONG' in result.stdout:
+        result = subprocess.run(
+            ["redis-cli", "ping"], check=False, capture_output=True, text=True
+        )
+        if "PONG" in result.stdout:
             logger.info("✓ Redis is already running")
         else:
             logger.info("Starting Redis...")
-            subprocess.Popen(['redis-server', '--daemonize', 'yes'])
+            subprocess.Popen(["redis-server", "--daemonize", "yes"])
             logger.info("✓ Redis started")
     except FileNotFoundError:
         logger.warning("⚠ Redis not found - install Redis for full functionality")
@@ -95,21 +101,21 @@ def validate_configuration():
         config = TTAConfig()
 
         # Check core gameplay loop configuration
-        if not config.get('core_gameplay_loop.enabled', False):
+        if not config.get("core_gameplay_loop.enabled", False):
             logger.warning("⚠ Core Gameplay Loop is disabled")
             logger.info("  Enable with: core_gameplay_loop.enabled: true")
         else:
             logger.info("✓ Core Gameplay Loop enabled")
 
         # Check Neo4j configuration
-        if not config.get('tta.prototype.components.neo4j.enabled', False):
+        if not config.get("tta.prototype.components.neo4j.enabled", False):
             logger.warning("⚠ Neo4j component is disabled")
         else:
             logger.info("✓ Neo4j component enabled")
 
         # Check other important settings
-        max_sessions = config.get('core_gameplay_loop.max_concurrent_sessions', 100)
-        timeout = config.get('core_gameplay_loop.session_timeout_minutes', 30)
+        max_sessions = config.get("core_gameplay_loop.max_concurrent_sessions", 100)
+        timeout = config.get("core_gameplay_loop.session_timeout_minutes", 30)
 
         logger.info(f"✓ Max concurrent sessions: {max_sessions}")
         logger.info(f"✓ Session timeout: {timeout} minutes")
@@ -126,14 +132,22 @@ def run_integration_tests():
     logger.info("Running integration tests...")
 
     test_commands = [
-        ['python3', '-m', 'pytest', 'tests/integration/test_gameplay_loop_integration.py', '-v'],
-        ['python3', '-m', 'pytest', 'tests/integration/test_gameplay_api.py', '-v']
+        [
+            "python3",
+            "-m",
+            "pytest",
+            "tests/integration/test_gameplay_loop_integration.py",
+            "-v",
+        ],
+        ["python3", "-m", "pytest", "tests/integration/test_gameplay_api.py", "-v"],
     ]
 
     for cmd in test_commands:
         try:
             logger.info(f"Running: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, check=False, capture_output=True, text=True, timeout=60
+            )
 
             if result.returncode == 0:
                 logger.info("✓ Tests passed")
@@ -157,20 +171,20 @@ async def test_system_startup():
         logger.info(f"Discovered {len(orchestrator.components)} components")
 
         # Check if gameplay loop component is available
-        if 'core_gameplay_loop' in orchestrator.components:
+        if "core_gameplay_loop" in orchestrator.components:
             logger.info("✓ GameplayLoopComponent discovered")
 
             # Test component startup
-            if orchestrator.start_component('core_gameplay_loop'):
+            if orchestrator.start_component("core_gameplay_loop"):
                 logger.info("✓ GameplayLoopComponent started successfully")
 
                 # Get component status
-                component = orchestrator.components['core_gameplay_loop']
+                component = orchestrator.components["core_gameplay_loop"]
                 status = component.get_status_info()
                 logger.info(f"Component status: {status}")
 
                 # Stop component
-                orchestrator.stop_component('core_gameplay_loop')
+                orchestrator.stop_component("core_gameplay_loop")
                 logger.info("✓ GameplayLoopComponent stopped successfully")
             else:
                 logger.warning("⚠ GameplayLoopComponent failed to start")
@@ -186,9 +200,9 @@ async def test_system_startup():
 
 def main():
     """Main setup function."""
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("TTA CORE GAMEPLAY LOOP - DEVELOPMENT SETUP")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     # Step 1: Check dependencies
     if not check_dependencies():
@@ -212,14 +226,16 @@ def main():
     # Step 5: Run integration tests
     run_integration_tests()
 
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("DEVELOPMENT SETUP COMPLETE")
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("Your development environment is ready!")
     logger.info("")
     logger.info("Next steps:")
     logger.info("1. Start the system: python3 scripts/start_with_gameplay.py")
-    logger.info("2. Test API endpoints: curl http://localhost:8000/api/v1/gameplay/health")
+    logger.info(
+        "2. Test API endpoints: curl http://localhost:8000/api/v1/gameplay/health"
+    )
     logger.info("3. View API docs: http://localhost:8000/docs")
     logger.info("4. Run tests: python3 -m pytest tests/integration/ -v")
 

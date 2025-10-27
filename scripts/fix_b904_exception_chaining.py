@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Automatically fix B904 errors by adding exception chaining to raise statements.
@@ -186,7 +187,7 @@ def main():
             print(f"⚠️  File not found: {filepath}")
             continue
 
-        if not filepath.suffix == ".py":
+        if filepath.suffix != ".py":
             continue
 
         total_files += 1

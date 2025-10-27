@@ -111,6 +111,14 @@ for gate in "${GATES[@]}"; do
                 echo -e "${RED}✗ mypy type checking failed${NC}"
                 FAILED_GATES+=("mypy type checking")
             fi
+
+            # Agentic primitives frontmatter validation
+            if python scripts/validate-agentic-frontmatter.py; then
+                echo -e "${GREEN}✓ Agentic primitives validation passed${NC}"
+            else
+                echo -e "${RED}✗ Agentic primitives validation failed${NC}"
+                FAILED_GATES+=("Agentic primitives validation")
+            fi
             ;;
         security)
             echo -e "${BLUE}Running: Security Scans${NC}"

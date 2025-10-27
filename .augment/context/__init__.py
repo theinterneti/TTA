@@ -28,11 +28,10 @@ For more details, see .augment/context/README.md
 """
 
 from .conversation_manager import (
+    AIConversationContextManager,
+    ConversationContext,
     # Core classes
     ConversationMessage,
-    ConversationContext,
-    AIConversationContextManager,
-    
     # Helper function
     create_tta_session,
 )
@@ -42,10 +41,8 @@ __all__ = [
     "ConversationMessage",
     "ConversationContext",
     "AIConversationContextManager",
-    
     # Helper
     "create_tta_session",
 ]
 
 __version__ = "1.0.0"
-

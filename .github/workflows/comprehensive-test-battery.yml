@@ -67,6 +67,8 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
     - name: Cache uv dependencies
       uses: actions/cache@v4
@@ -79,7 +81,7 @@ jobs:
           ${{ runner.os }}-uv-
 
     - name: Install dependencies
-      run: uv sync --all-extras --dev
+      run: uv sync --all-groups
 
     - name: Run PR validation tests
       run: |
@@ -163,6 +165,8 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
     - name: Cache uv dependencies
       uses: actions/cache@v4
@@ -175,7 +179,7 @@ jobs:
           ${{ runner.os }}-uv-
 
     - name: Install dependencies
-      run: uv sync --all-extras --dev
+      run: uv sync --all-groups
 
     - name: Wait for services and verify health
       run: |
@@ -205,26 +209,26 @@ jobs:
 
         # Final connectivity test
         echo "🧪 Running connectivity tests..."
-        python -c "
+        python -c '
 import sys
 try:
     import redis
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    r = redis.Redis(host="localhost", port=6379, decode_responses=True)
     r.ping()
-    print('✅ Redis Python client: Connected')
+    print("✅ Redis Python client: Connected")
 except Exception as e:
-    print(f'❌ Redis Python client: {e}')
+    print(f"❌ Redis Python client: {e}")
 
 try:
     import requests
-    response = requests.get('http://localhost:7474/db/data/', timeout=10)
+    response = requests.get("http://localhost:7474/db/data/", timeout=10)
     if response.status_code == 200:
-        print('✅ Neo4j HTTP: Connected')
+        print("✅ Neo4j HTTP: Connected")
     else:
-        print(f'❌ Neo4j HTTP: Status {response.status_code}')
+        print(f"❌ Neo4j HTTP: Status {response.status_code}")
 except Exception as e:
-    print(f'❌ Neo4j HTTP: {e}')
-"
+    print(f"❌ Neo4j HTTP: {e}")
+'
 
     - name: Wait for services
       run: |
@@ -356,6 +360,8 @@ except Exception as e:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
     - name: Cache uv dependencies
       uses: actions/cache@v4
@@ -368,7 +374,7 @@ except Exception as e:
           ${{ runner.os }}-uv-
 
     - name: Install dependencies
-      run: uv sync --all-extras --dev
+      run: uv sync --all-groups
 
     - name: Wait for services
       run: |

@@ -11,7 +11,6 @@ import uuid
 from datetime import datetime
 
 import pytest
-
 from tta_narrative.coherence.coherence_validator import CoherenceValidator
 from tta_narrative.coherence.contradiction_detector import (
     ContradictionDetector,

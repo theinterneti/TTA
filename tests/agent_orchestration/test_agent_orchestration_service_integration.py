@@ -10,7 +10,6 @@ from unittest.mock import Mock, patch
 import pytest
 import pytest_asyncio
 import redis.asyncio as aioredis
-
 from tta_ai.orchestration import (
     AgentContext,
     AgentId,

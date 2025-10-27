@@ -8,7 +8,7 @@ from tta_workflow_primitives.testing.mocks import MockPrimitive
 
 
 @pytest.mark.asyncio
-async def test_router_basic():
+async def test_router_basic() -> None:
     """Test basic routing."""
     route_a = MockPrimitive("a", return_value={"result": "A"})
     route_b = MockPrimitive("b", return_value={"result": "B"})
@@ -26,7 +26,7 @@ async def test_router_basic():
 
 
 @pytest.mark.asyncio
-async def test_router_context_based():
+async def test_router_context_based() -> None:
     """Test routing based on context metadata."""
     openai = MockPrimitive("openai", return_value={"provider": "openai"})
     local = MockPrimitive("local", return_value={"provider": "local"})
@@ -46,7 +46,7 @@ async def test_router_context_based():
 
 
 @pytest.mark.asyncio
-async def test_router_default():
+async def test_router_default() -> None:
     """Test default route fallback."""
     default = MockPrimitive("default", return_value={"result": "DEFAULT"})
 
@@ -62,7 +62,7 @@ async def test_router_default():
 
 
 @pytest.mark.asyncio
-async def test_router_no_route_error():
+async def test_router_no_route_error() -> None:
     """Test error when no route found."""
     router = RouterPrimitive(
         routes={"a": MockPrimitive("a", return_value={})}, router_fn=lambda data, ctx: "nonexistent"
@@ -73,7 +73,7 @@ async def test_router_no_route_error():
 
 
 @pytest.mark.asyncio
-async def test_router_tracks_history():
+async def test_router_tracks_history() -> None:
     """Test routing history is tracked in context."""
     route_a = MockPrimitive("a", return_value={"result": "A"})
     route_b = MockPrimitive("b", return_value={"result": "B"})
@@ -94,12 +94,12 @@ async def test_router_tracks_history():
 
 
 @pytest.mark.asyncio
-async def test_router_cost_optimization():
+async def test_router_cost_optimization() -> None:
     """Test routing for cost optimization."""
     expensive = MockPrimitive("expensive", return_value={"cost": 10})
     cheap = MockPrimitive("cheap", return_value={"cost": 1})
 
-    def cost_router(data, ctx):
+    def cost_router(data, ctx) -> str:
         """Route simple queries to cheap model."""
         prompt_length = len(data.get("prompt", ""))
         return "cheap" if prompt_length < 100 else "expensive"
@@ -121,7 +121,7 @@ async def test_router_cost_optimization():
 
 
 @pytest.mark.asyncio
-async def test_router_tier_based():
+async def test_router_tier_based() -> None:
     """Test routing based on user tier."""
     premium = MockPrimitive("premium", return_value={"tier": "premium"})
     free = MockPrimitive("free", return_value={"tier": "free"})

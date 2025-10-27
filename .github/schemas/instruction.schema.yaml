@@ -1,0 +1,7 @@
+# Schema for .github/instructions/*.instructions.md YAML frontmatter
+# Validates instruction files for agentic primitives
+
+applyTo: list(str(), min=1, required=True)
+priority: enum('critical', 'high', 'medium', 'low', required=True)
+category: str(required=True)
+description: str(required=True)

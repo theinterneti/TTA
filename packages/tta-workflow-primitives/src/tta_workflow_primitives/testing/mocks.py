@@ -33,7 +33,7 @@ class MockPrimitive(WorkflowPrimitive[Any, Any]):
         return_value: Any | None = None,
         side_effect: Callable | None = None,
         raise_error: Exception | None = None,
-    ):
+    ) -> None:
         """
         Initialize mock primitive.
 
@@ -131,7 +131,7 @@ class WorkflowTestCase:
         ```
     """
 
-    def __init__(self, workflow: WorkflowPrimitive):
+    def __init__(self, workflow: WorkflowPrimitive) -> None:
         """
         Initialize test case.
 

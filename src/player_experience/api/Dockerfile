@@ -17,10 +17,15 @@ RUN apt-get update && apt-get install -y \
 # Set work directory
 WORKDIR /app
 
-# Copy requirements (create a basic requirements.txt if needed)
-COPY requirements.txt* ./
-RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; else \
-    pip install fastapi uvicorn redis neo4j psycopg2-binary pydantic python-jose[cryptography] passlib[bcrypt] python-multipart; fi
+# Install UV package manager with pinned version for reproducibility
+RUN pip install --no-cache-dir uv==0.4.18
+
+# Copy dependency files
+COPY pyproject.toml uv.lock* ./
+
+# Install dependencies
+RUN uv sync --frozen --no-dev --no-install-project || \
+    uv pip install fastapi uvicorn redis neo4j psycopg2-binary pydantic python-jose[cryptography] passlib[bcrypt] python-multipart
 
 # Copy application code
 COPY . /app/src/player_experience/api/

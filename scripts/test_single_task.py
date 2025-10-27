@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python
 """
 Test a single task with detailed logging to verify the validation fix.

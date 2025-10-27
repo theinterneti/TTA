@@ -56,7 +56,7 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
         timeout_seconds: float,
         fallback: WorkflowPrimitive | None = None,
         track_timeouts: bool = True,
-    ):
+    ) -> None:
         """
         Initialize timeout primitive.
 

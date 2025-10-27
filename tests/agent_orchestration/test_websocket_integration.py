@@ -9,7 +9,6 @@ import json
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-
 from tta_ai.orchestration.realtime.models import (
     AgentStatus,
     AgentStatusEvent,

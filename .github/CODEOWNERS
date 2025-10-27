@@ -1,0 +1,46 @@
+# CODEOWNERS - Automatic PR Reviewer Assignment
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @theinterneti
+
+# Backend / Python code
+*.py @theinterneti
+/src/** @theinterneti
+/packages/** @theinterneti
+
+# Frontend / TypeScript
+*.ts @theinterneti
+*.tsx @theinterneti
+/frontend/** @theinterneti
+
+# Tests
+/tests/** @theinterneti
+**/test_*.py @theinterneti
+**/*_test.py @theinterneti
+
+# Infrastructure / DevOps
+Dockerfile* @theinterneti
+docker-compose*.yml @theinterneti
+/docker/** @theinterneti
+/.github/workflows/** @theinterneti
+
+# Documentation
+*.md @theinterneti
+/docs/** @theinterneti
+
+# Configuration
+.env* @theinterneti
+pyproject.toml @theinterneti
+uv.lock @theinterneti
+.pre-commit-config.yaml @theinterneti
+
+# Agentic primitives (require careful review)
+/.augment/** @theinterneti
+/.github/instructions/** @theinterneti
+/.github/chatmodes/** @theinterneti
+/.github/prompts/** @theinterneti
+
+# Critical security files
+/secrets/** @theinterneti
+.env* @theinterneti

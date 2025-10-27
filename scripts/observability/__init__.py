@@ -21,37 +21,33 @@ Quick Start:
 For more details, see scripts/observability/README.md
 """
 
-from .dev_metrics import (
-    # Core classes
-    ExecutionMetric,
-    DevMetricsCollector,
-    
-    # Decorator
-    track_execution,
-    
-    # Global collector
-    get_collector,
-)
-
 from .dashboard import (
     # Dashboard generation
     generate_dashboard,
+)
+from .dev_metrics import (
+    DevMetricsCollector,
+    # Core classes
+    ExecutionMetric,
+    # Global collector
+    get_collector,
+    # Decorator
+    track_execution,
 )
 
 __all__ = [
     # Core classes
     "ExecutionMetric",
     "DevMetricsCollector",
-    
+
     # Decorator
     "track_execution",
-    
+
     # Global collector
     "get_collector",
-    
+
     # Dashboard
     "generate_dashboard",
 ]
 
 __version__ = "1.0.0"
-

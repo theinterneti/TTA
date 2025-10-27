@@ -54,18 +54,18 @@ def print_framework_status(framework: ExtendedSessionTestFramework):
     # Models
     enabled_models = sum(1 for model in framework.models.values() if model.enabled)
     print(f"  Enabled Models: {enabled_models}")
-    for model_key, model in framework.models.items():
+    for _model_key, model in framework.models.items():
         if model.enabled:
             print(f"    ✓ {model.name} ({model.provider})")
 
     # Enhanced profiles
     print(f"  Enhanced User Profiles: {len(framework.profiles)}")
-    for profile_key, profile in framework.profiles.items():
+    for _profile_key, profile in framework.profiles.items():
         print(f"    • {profile.name}")
 
     # Extended scenarios
     print(f"  Extended Scenarios: {len(framework.extended_scenarios)}")
-    for scenario_key, scenario in framework.extended_scenarios.items():
+    for _scenario_key, scenario in framework.extended_scenarios.items():
         print(
             f"    • {scenario.name} ({scenario.target_turns} turns, {scenario.max_duration_minutes}min)"
         )

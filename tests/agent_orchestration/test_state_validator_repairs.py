@@ -1,9 +1,9 @@
 import os
 
 import pytest
-
 from tta_ai.orchestration.coordinators import RedisMessageCoordinator
 from tta_ai.orchestration.models import AgentId, AgentMessage, AgentType, MessageType
+
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 

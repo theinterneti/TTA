@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Enhanced monitoring script for Phase 7 OpenHands integration with optimizations.
@@ -43,7 +44,7 @@ def analyze_progress():
     task_times = []
     errors_by_type = {}
 
-    for task_id, task in tasks.items():
+    for _task_id, task in tasks.items():
         status = task.get("status", "UNKNOWN")
         status_counts[status] = status_counts.get(status, 0) + 1
 

@@ -1,11 +1,10 @@
-version: '3.8'
 services:
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5.26.1-community
     container_name: ${CONTAINER_PREFIX:-tta-test}-neo4j
     ports:
-    - 7474:7474
-    - 7687:7687
+    - 8474:7474
+    - 8687:7687
     environment:
     - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/tta_test_password_2024}
     - NEO4J_PLUGINS=["apoc"]
@@ -35,10 +34,10 @@ services:
     security_opt:
     - no-new-privileges:true
   redis:
-    image: redis:7-alpine
+    image: redis:7.2.4-alpine3.19
     container_name: ${CONTAINER_PREFIX:-tta-test}-redis
     ports:
-    - 6379:6379
+    - 7379:6379
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
       ${REDIS_AUTH:+--requirepass $REDIS_PASSWORD}
     volumes:
@@ -59,9 +58,9 @@ services:
     - no-new-privileges:true
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: tta-redis-commander
+    container_name: tta-redis-commander-test
     ports:
-    - 8081:8081
+    - 8082:8081
     environment:
     - REDIS_HOSTS=local:redis:6379
     depends_on:
