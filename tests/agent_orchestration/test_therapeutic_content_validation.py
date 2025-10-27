@@ -8,14 +8,15 @@ with integrated safety systems and crisis intervention workflows.
 import json
 
 import pytest
+import pytest_asyncio
 
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.service import AgentOrchestrationService
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisInterventionManager,
     TherapeuticValidator,
 )
@@ -27,7 +28,7 @@ from src.agent_orchestration.therapeutic_safety import (
 class TestTherapeuticContentValidation:
     """Comprehensive therapeutic content flow and safety validation."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def therapeutic_orchestration_service(
         self, redis_coordinator, neo4j_driver, event_publisher
     ):
@@ -116,9 +117,9 @@ class TestTherapeuticContentValidation:
         ]
 
         for i, scenario in enumerate(therapeutic_scenarios):
-            session_id = f"therapeutic_flow_session_{i+1:03d}"
-            world_id = f"therapeutic_flow_world_{i+1:03d}"
-            user_id = f"therapeutic_flow_user_{i+1}"
+            session_id = f"therapeutic_flow_session_{i + 1:03d}"
+            world_id = f"therapeutic_flow_world_{i + 1:03d}"
+            user_id = f"therapeutic_flow_user_{i + 1}"
 
             result = await therapeutic_orchestration_service.process_user_input(
                 user_input=scenario["input"],
@@ -177,7 +178,7 @@ class TestTherapeuticContentValidation:
             assert result.get("safety_validated", False) is True
 
             print(
-                f"Therapeutic scenario {i+1}: {scenario['expected_safety_level']} risk level validated"
+                f"Therapeutic scenario {i + 1}: {scenario['expected_safety_level']} risk level validated"
             )
 
     async def test_crisis_intervention_content_flow(
@@ -203,9 +204,9 @@ class TestTherapeuticContentValidation:
         ]
 
         for i, scenario in enumerate(crisis_scenarios):
-            session_id = f"crisis_flow_session_{i+1:03d}"
-            world_id = f"crisis_flow_world_{i+1:03d}"
-            user_id = f"crisis_flow_user_{i+1}"
+            session_id = f"crisis_flow_session_{i + 1:03d}"
+            world_id = f"crisis_flow_world_{i + 1:03d}"
+            user_id = f"crisis_flow_user_{i + 1}"
 
             result = await therapeutic_orchestration_service.process_user_input(
                 user_input=scenario["input"],
@@ -269,7 +270,7 @@ class TestTherapeuticContentValidation:
             assert not triggering_content
 
             print(
-                f"Crisis scenario {i+1}: {scenario['crisis_type']} intervention validated"
+                f"Crisis scenario {i + 1}: {scenario['crisis_type']} intervention validated"
             )
 
     async def test_therapeutic_safety_escalation_workflow(
@@ -302,8 +303,8 @@ class TestTherapeuticContentValidation:
         for i, scenario in enumerate(escalation_scenarios):
             result = await therapeutic_orchestration_service.process_user_input(
                 user_input=scenario["input"],
-                session_id=f"{session_id}_{i+1}",
-                world_id=f"{world_id}_{i+1}",
+                session_id=f"{session_id}_{i + 1}",
+                world_id=f"{world_id}_{i + 1}",
                 user_id=user_id,
             )
 
@@ -327,7 +328,7 @@ class TestTherapeuticContentValidation:
                 )
 
             print(
-                f"Escalation scenario {i+1}: Risk {scenario['expected_risk']}, Escalation: {scenario['expected_escalation']}"
+                f"Escalation scenario {i + 1}: Risk {scenario['expected_risk']}, Escalation: {scenario['expected_escalation']}"
             )
 
     async def test_therapeutic_content_consistency(
@@ -439,9 +440,9 @@ class TestTherapeuticContentValidation:
         ]
 
         for i, scenario in enumerate(boundary_test_scenarios):
-            session_id = f"boundary_session_{i+1:03d}"
-            world_id = f"boundary_world_{i+1:03d}"
-            user_id = f"boundary_user_{i+1}"
+            session_id = f"boundary_session_{i + 1:03d}"
+            world_id = f"boundary_world_{i + 1:03d}"
+            user_id = f"boundary_user_{i + 1}"
 
             result = await therapeutic_orchestration_service.process_user_input(
                 user_input=scenario["input"],
@@ -484,7 +485,7 @@ class TestTherapeuticContentValidation:
                 assert helpful_response
 
             print(
-                f"Boundary scenario {i+1}: {'Declined' if scenario['should_decline'] else 'Provided'} appropriately"
+                f"Boundary scenario {i + 1}: {'Declined' if scenario['should_decline'] else 'Provided'} appropriately"
             )
 
     async def test_therapeutic_content_personalization(
@@ -510,9 +511,9 @@ class TestTherapeuticContentValidation:
         ]
 
         for i, scenario in enumerate(personalization_scenarios):
-            session_id = f"personalization_session_{i+1:03d}"
-            world_id = f"personalization_world_{i+1:03d}"
-            user_id = f"personalization_user_{i+1}"
+            session_id = f"personalization_session_{i + 1:03d}"
+            world_id = f"personalization_world_{i + 1:03d}"
+            user_id = f"personalization_user_{i + 1}"
 
             # Establish context
             context_result = await therapeutic_orchestration_service.process_user_input(
@@ -554,5 +555,5 @@ class TestTherapeuticContentValidation:
             assert therapeutic_content
 
             print(
-                f"Personalization scenario {i+1}: Context-appropriate therapeutic response validated"
+                f"Personalization scenario {i + 1}: Context-appropriate therapeutic response validated"
             )

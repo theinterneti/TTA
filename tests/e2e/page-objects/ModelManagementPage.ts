@@ -69,7 +69,7 @@ export class ModelManagementPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Main page elements
     this.pageTitle = page.locator('h1:has-text("Model Management")');
     this.modelSelector = page.locator('[data-testid="model-selector"]');

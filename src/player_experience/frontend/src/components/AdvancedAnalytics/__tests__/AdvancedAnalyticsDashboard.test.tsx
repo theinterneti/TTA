@@ -1,6 +1,6 @@
 /**
  * Advanced Analytics Dashboard Tests - Priority 4B Implementation
- * 
+ *
  * Comprehensive test suite for the Advanced Analytics Dashboard component including:
  * - Component rendering and state management
  * - Data visualization and chart interactions
@@ -17,7 +17,7 @@ import '@testing-library/jest-dom';
 
 import { AdvancedAnalyticsDashboard } from '../AdvancedAnalyticsDashboard';
 import { TherapeuticGoal } from '../../../types/index';
-import { 
+import {
   PredictiveAnalyticsResult,
   TrendAnalysis,
   RiskPrediction,
@@ -174,7 +174,7 @@ describe('AdvancedAnalyticsDashboard', () => {
 
   beforeEach(() => {
     mockStore = createMockStore();
-    
+
     // Setup service mocks
     mockPredictiveAnalyticsService = require('../../../services/predictiveAnalyticsService').predictiveAnalyticsService;
     mockProgressTrackingService = require('../../../services/progressTrackingService').progressTrackingService;
@@ -424,7 +424,7 @@ describe('AdvancedAnalyticsDashboard', () => {
       await waitFor(() => {
         // Check for proper heading structure
         expect(screen.getByRole('heading', { name: /Advanced Analytics Dashboard/ })).toBeInTheDocument();
-        
+
         // Check for proper button roles
         const tabButtons = screen.getAllByRole('button');
         expect(tabButtons.length).toBeGreaterThan(0);

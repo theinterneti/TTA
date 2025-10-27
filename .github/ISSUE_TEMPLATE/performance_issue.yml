@@ -1,0 +1,171 @@
+name: 🐌 Performance Issue
+description: Report a performance problem or regression
+title: "[PERF]: "
+labels: ["performance", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a performance issue! Please provide as much detail as possible to help us investigate and resolve the problem.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is experiencing performance issues?
+      options:
+        - API / Backend
+        - Frontend / UI
+        - Database (Neo4j)
+        - Database (Redis)
+        - LangGraph / AI Processing
+        - Build / CI/CD
+        - Docker / Deployment
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is the performance issue?
+      options:
+        - Critical - System unusable
+        - High - Significant degradation
+        - Medium - Noticeable slowdown
+        - Low - Minor performance impact
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Performance Issue Description
+      description: Describe the performance problem you're experiencing
+      placeholder: |
+        Example: API response times have increased from 200ms to 2000ms after recent deployment
+    validations:
+      required: true
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Performance Metrics
+      description: Provide specific performance measurements if available
+      placeholder: |
+        - Response time: 2000ms (baseline: 200ms)
+        - Memory usage: 2GB (baseline: 500MB)
+        - CPU usage: 80% (baseline: 20%)
+        - Throughput: 10 req/s (baseline: 100 req/s)
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this performance issue?
+      placeholder: |
+        1. Start the application with '...'
+        2. Navigate to '...'
+        3. Perform action '...'
+        4. Observe slow response time
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Performance
+      description: What performance level did you expect?
+      placeholder: |
+        Example: API should respond within 500ms under normal load
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Performance
+      description: What performance are you actually seeing?
+      placeholder: |
+        Example: API takes 3-5 seconds to respond
+    validations:
+      required: true
+
+  - type: dropdown
+    id: regression
+    attributes:
+      label: Is this a regression?
+      description: Did this work better in a previous version?
+      options:
+        - "Yes - Performance was better before"
+        - "No - This has always been slow"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: input
+    id: regression-version
+    attributes:
+      label: Last Known Good Version
+      description: If this is a regression, what was the last version that performed well?
+      placeholder: "v1.2.3 or commit SHA"
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide details about your environment
+      value: |
+        - OS: [e.g., Ubuntu 22.04, macOS 14, Windows 11]
+        - Python version: [e.g., 3.12]
+        - Node.js version: [e.g., 18.x]
+        - Docker version: [e.g., 24.0.0]
+        - Deployment: [e.g., local, staging, production]
+        - Load: [e.g., 10 concurrent users, 100 req/s]
+    validations:
+      required: true
+
+  - type: textarea
+    id: profiling
+    attributes:
+      label: Profiling Data
+      description: Include any profiling data, logs, or traces if available
+      placeholder: |
+        Paste profiling output, flame graphs, or relevant log excerpts here
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context about the performance issue
+      placeholder: |
+        - Recent changes that might be related
+        - System resource constraints
+        - Network conditions
+        - Database size or query patterns
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided specific performance metrics where possible
+          required: false
+        - label: I have included steps to reproduce the issue
+          required: true
+        - label: I have checked the documentation for performance best practices
+          required: false

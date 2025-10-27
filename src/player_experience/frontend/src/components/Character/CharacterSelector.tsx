@@ -145,7 +145,7 @@ const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                 </div>
               )}
             </div>
-            
+
             {showCreateButton && (
               <div className="border-t border-gray-200 p-2">
                 <button

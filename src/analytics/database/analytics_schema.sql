@@ -132,7 +132,7 @@ CREATE INDEX idx_privacy_audit_operation ON analytics.privacy_audit_log(operatio
 
 -- Active High-Confidence Patterns View
 CREATE VIEW analytics.v_active_high_confidence_patterns AS
-SELECT 
+SELECT
     pattern_id,
     pattern_type,
     pattern_data,
@@ -140,13 +140,13 @@ SELECT
     user_cohort,
     created_at
 FROM analytics.user_behavior_patterns
-WHERE is_active = TRUE 
+WHERE is_active = TRUE
   AND confidence_score >= 0.7
 ORDER BY confidence_score DESC, created_at DESC;
 
 -- Cohort Performance Summary View
 CREATE VIEW analytics.v_cohort_performance_summary AS
-SELECT 
+SELECT
     user_cohort,
     COUNT(*) as total_outcomes,
     AVG(engagement_score) as avg_engagement,
@@ -159,7 +159,7 @@ ORDER BY success_rate DESC;
 
 -- Recent Alert Summary View
 CREATE VIEW analytics.v_recent_alert_summary AS
-SELECT 
+SELECT
     alert_type,
     alert_severity,
     COUNT(*) as alert_count,
@@ -181,13 +181,13 @@ BEGIN
     DELETE FROM analytics.user_behavior_patterns
     WHERE created_at < NOW() - (retention_days || ' days')::INTERVAL
       AND is_active = FALSE;
-    
+
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
-    
+
     INSERT INTO analytics.privacy_audit_log (
-        operation_type, 
-        data_anonymization_level, 
-        accessed_by, 
+        operation_type,
+        data_anonymization_level,
+        accessed_by,
         access_purpose,
         data_retention_period
     ) VALUES (
@@ -197,7 +197,7 @@ BEGIN
         'Automated data retention cleanup',
         (retention_days || ' days')::INTERVAL
     );
-    
+
     RETURN deleted_count;
 END;
 $$ LANGUAGE plpgsql;
@@ -212,7 +212,7 @@ RETURNS TABLE(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         COUNT(*)::INTEGER as total_patterns,
         AVG(confidence_score)::FLOAT as avg_confidence,
         ARRAY_AGG(DISTINCT pattern_type) as pattern_types,

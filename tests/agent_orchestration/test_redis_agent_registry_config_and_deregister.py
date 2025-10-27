@@ -3,8 +3,8 @@ import json
 
 import pytest
 
-from src.agent_orchestration.proxies import InputProcessorAgentProxy
-from src.agent_orchestration.registries import RedisAgentRegistry
+from tta_ai.orchestration.proxies import InputProcessorAgentProxy
+from tta_ai.orchestration.registries import RedisAgentRegistry
 
 
 @pytest.mark.redis

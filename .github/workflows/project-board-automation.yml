@@ -1,0 +1,250 @@
+name: Project Board Automation
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled, closed]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to update'
+        required: true
+        type: number
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  # Add new promotion requests to project board
+  add-to-project:
+    name: Add Issue to Project
+    runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'promotion:requested'
+
+    steps:
+      - name: Add to project
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/users/theinterneti/projects/11
+          github-token: ${{ secrets.GH_PROJECT_TOKEN }}
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '✅ Added to [TTA Component Maturity Tracker](https://github.com/users/theinterneti/projects/11) project board.\n\nAutomated validation will run shortly.'
+            });
+
+  # Update project fields when promotion is validated
+  update-on-validation:
+    name: Update on Validation
+    runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'labeled' &&
+      (github.event.label.name == 'promotion:validated' ||
+       github.event.label.name == 'promotion:blocked')
+
+    steps:
+      - name: Parse issue for component info
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title;
+
+            // Parse title: "[PROMOTION] Component: Stage → Stage"
+            const match = title.match(/\[PROMOTION\]\s+(.+?):\s+(\w+)\s+→\s+(\w+)/);
+
+            if (match) {
+              core.setOutput('component', match[1].trim());
+              core.setOutput('current_stage', match[2].trim());
+              core.setOutput('target_stage', match[3].trim());
+            }
+
+            // Extract test coverage from issue body or comments
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number
+            });
+
+            let coverage = 0;
+            for (const comment of comments.data) {
+              const coverageMatch = comment.body.match(/Test Coverage[:\s]+(\d+(?:\.\d+)?)%/i);
+              if (coverageMatch) {
+                coverage = parseFloat(coverageMatch[1]);
+                break;
+              }
+            }
+
+            core.setOutput('coverage', coverage);
+
+      - name: Update project fields
+        uses: ./.github/workflows/update-project-board.yml
+        with:
+          issue_number: ${{ github.event.issue.number }}
+          action: 'update_fields'
+          component_name: ${{ steps.parse.outputs.component }}
+          current_stage: ${{ steps.parse.outputs.current_stage }}
+          target_stage: ${{ steps.parse.outputs.target_stage }}
+          test_coverage: ${{ steps.parse.outputs.coverage }}
+        secrets:
+          GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
+
+  # Update project when promotion is approved
+  update-on-approval:
+    name: Update on Approval
+    runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'promotion:approved'
+
+    steps:
+      - name: Parse issue for component info
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title;
+
+            const match = title.match(/\[PROMOTION\]\s+(.+?):\s+(\w+)\s+→\s+(\w+)/);
+
+            if (match) {
+              core.setOutput('component', match[1].trim());
+              core.setOutput('current_stage', match[2].trim());
+              core.setOutput('target_stage', match[3].trim());
+            }
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ✅ Promotion Approved\n\nThis component has been approved for promotion to **${{ steps.parse.outputs.target_stage }}**.\n\n**Next Steps:**\n1. Deploy to ${{ steps.parse.outputs.target_stage }} environment\n2. Update component MATURITY.md file\n3. Add \`promotion:completed\` label when done`
+            });
+
+  # Update project when promotion is completed
+  update-on-completion:
+    name: Update on Completion
+    runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'promotion:completed'
+
+    steps:
+      - name: Parse issue for component info
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title;
+
+            const match = title.match(/\[PROMOTION\]\s+(.+?):\s+(\w+)\s+→\s+(\w+)/);
+
+            if (match) {
+              core.setOutput('component', match[1].trim());
+              core.setOutput('current_stage', match[2].trim());
+              core.setOutput('target_stage', match[3].trim());
+            }
+
+      - name: Update project to target stage
+        uses: ./.github/workflows/update-project-board.yml
+        with:
+          issue_number: ${{ github.event.issue.number }}
+          action: 'complete'
+          component_name: ${{ steps.parse.outputs.component }}
+          current_stage: ${{ steps.parse.outputs.target_stage }}
+          target_stage: ''
+        secrets:
+          GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
+
+      - name: Close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🎉 Promotion Complete!\n\nComponent **${{ steps.parse.outputs.component }}** has been successfully promoted to **${{ steps.parse.outputs.target_stage }}**.\n\nProject board has been updated.`
+            });
+
+  # Update blocker count when blocker issues are opened/closed
+  update-blocker-count:
+    name: Update Blocker Count
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.action == 'labeled' || github.event.action == 'unlabeled' || github.event.action == 'closed') &&
+      contains(github.event.issue.labels.*.name, 'blocker:')
+
+    steps:
+      - name: Find related promotion issue
+        id: find_promotion
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Extract component name from blocker issue
+            const issue = context.payload.issue;
+            const componentLabel = issue.labels.find(l => l.name.startsWith('component:'));
+
+            if (!componentLabel) {
+              console.log('No component label found');
+              return;
+            }
+
+            const component = componentLabel.name.replace('component:', '');
+
+            // Find open promotion request for this component
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'promotion:requested',
+              state: 'open'
+            });
+
+            const promotionIssue = issues.data.find(i =>
+              i.title.toLowerCase().includes(component.toLowerCase())
+            );
+
+            if (promotionIssue) {
+              core.setOutput('promotion_issue_number', promotionIssue.number);
+
+              // Count open blocker issues for this component
+              const blockers = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: `component:${component},blocker:`,
+                state: 'open'
+              });
+
+              core.setOutput('blocker_count', blockers.data.length);
+            }
+
+      - name: Update blocker count in project
+        if: steps.find_promotion.outputs.promotion_issue_number != ''
+        uses: ./.github/workflows/update-project-board.yml
+        with:
+          issue_number: ${{ steps.find_promotion.outputs.promotion_issue_number }}
+          action: 'update_fields'
+          blocker_count: ${{ steps.find_promotion.outputs.blocker_count }}
+        secrets:
+          GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}

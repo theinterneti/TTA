@@ -192,7 +192,7 @@ def test_user_persistence(neo4j_driver):
     """Test user persistence with real Neo4j database."""
     user_service = UserService(neo4j_driver)
     user = user_service.create_user("test@example.com")
-    
+
     # Verify user was actually saved to database
     retrieved = user_service.get_user(user.id)
     assert retrieved.email == "test@example.com"
@@ -252,4 +252,3 @@ pytest --ff
 - **Mock fixtures available** for unit tests that need database-like behavior
 
 The current test design is **correct and follows best practices** for separating unit tests from integration tests.
-

@@ -1,0 +1,44 @@
+# Extended Evaluation Framework Requirements
+# Additional dependencies for comprehensive TTA quality evaluation
+
+# Core async and HTTP libraries
+aiohttp>=3.8.0
+asyncio-mqtt>=0.11.0
+
+# Data analysis and visualization
+matplotlib>=3.5.0
+pandas>=1.4.0
+numpy>=1.21.0
+seaborn>=0.11.0
+
+# System monitoring
+psutil>=5.8.0
+
+# Database connectivity (if not already installed)
+redis>=4.0.0
+neo4j>=5.0.0
+
+# YAML configuration
+PyYAML>=6.0
+
+# Statistical analysis
+scipy>=1.8.0
+scikit-learn>=1.1.0
+
+# Progress bars and CLI enhancements
+tqdm>=4.64.0
+rich>=12.0.0
+
+# Testing utilities
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Optional: Advanced NLP for narrative analysis
+# Uncomment if you want enhanced narrative analysis capabilities
+# spacy>=3.4.0
+# transformers>=4.20.0
+# torch>=1.12.0
+
+# Optional: Advanced visualization
+# plotly>=5.10.0
+# bokeh>=2.4.0

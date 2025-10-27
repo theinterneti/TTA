@@ -60,14 +60,14 @@ describe('RealTimeMonitoringInterface', () => {
   describe('Component Initialization', () => {
     test('should render monitoring interface when active', () => {
       renderWithProvider(<RealTimeMonitoringInterface {...defaultProps} />);
-      
+
       expect(screen.getByText('Real-Time Monitoring')).toBeInTheDocument();
       expect(screen.getByText(/Monitoring active since/)).toBeInTheDocument();
     });
 
     test('should start monitoring on mount', () => {
       renderWithProvider(<RealTimeMonitoringInterface {...defaultProps} />);
-      
+
       expect(mockRealTimeMonitor.startMonitoring).toHaveBeenCalledWith(
         defaultProps.sessionId,
         defaultProps.userId,
@@ -81,9 +81,9 @@ describe('RealTimeMonitoringInterface', () => {
 
     test('should stop monitoring on unmount', () => {
       const { unmount } = renderWithProvider(<RealTimeMonitoringInterface {...defaultProps} />);
-      
+
       unmount();
-      
+
       expect(mockRealTimeMonitor.stopMonitoring).toHaveBeenCalledWith(defaultProps.sessionId);
       expect(mockRealTimeMonitor.unregisterCallback).toHaveBeenCalledWith(defaultProps.sessionId);
     });
@@ -414,21 +414,21 @@ describe('RealTimeMonitoringInterface', () => {
   describe('Alert Controls', () => {
     test('should toggle alerts when alert button is clicked', () => {
       renderWithProvider(<RealTimeMonitoringInterface {...defaultProps} />);
-      
+
       const alertButton = screen.getByTitle('Alerts enabled');
       fireEvent.click(alertButton);
-      
+
       expect(screen.getByTitle('Alerts disabled')).toBeInTheDocument();
     });
 
     test('should toggle details view when details button is clicked', () => {
       renderWithProvider(<RealTimeMonitoringInterface {...defaultProps} />);
-      
+
       const detailsButton = screen.getByText('Details');
       fireEvent.click(detailsButton);
-      
+
       expect(screen.getByText('Hide')).toBeInTheDocument();
-      
+
       fireEvent.click(screen.getByText('Hide'));
       expect(screen.getByText('Details')).toBeInTheDocument();
     });
@@ -438,14 +438,14 @@ describe('RealTimeMonitoringInterface', () => {
     test('should call onCrisisDetected when high risk is detected', async () => {
       const mockOnCrisisDetected = jest.fn();
       const mockCallback = jest.fn();
-      
+
       mockRealTimeMonitor.registerCallback.mockImplementation((sessionId, callback) => {
         mockCallback.mockImplementation(callback);
       });
 
       renderWithProvider(
-        <RealTimeMonitoringInterface 
-          {...defaultProps} 
+        <RealTimeMonitoringInterface
+          {...defaultProps}
           onCrisisDetected={mockOnCrisisDetected}
         />
       );
@@ -480,14 +480,14 @@ describe('RealTimeMonitoringInterface', () => {
     test('should call onInterventionTriggered when intervention is triggered', async () => {
       const mockOnInterventionTriggered = jest.fn();
       const mockCallback = jest.fn();
-      
+
       mockRealTimeMonitor.registerCallback.mockImplementation((sessionId, callback) => {
         mockCallback.mockImplementation(callback);
       });
 
       renderWithProvider(
-        <RealTimeMonitoringInterface 
-          {...defaultProps} 
+        <RealTimeMonitoringInterface
+          {...defaultProps}
           onInterventionTriggered={mockOnInterventionTriggered}
         />
       );
@@ -524,7 +524,7 @@ describe('RealTimeMonitoringInterface', () => {
       renderWithProvider(<RealTimeMonitoringInterface {...defaultProps} />);
 
       expect(consoleSpy).toHaveBeenCalledWith('Failed to start monitoring:', expect.any(Error));
-      
+
       consoleSpy.mockRestore();
     });
 
@@ -539,7 +539,7 @@ describe('RealTimeMonitoringInterface', () => {
       unmount();
 
       expect(consoleSpy).toHaveBeenCalledWith('Failed to stop monitoring:', expect.any(Error));
-      
+
       consoleSpy.mockRestore();
     });
   });

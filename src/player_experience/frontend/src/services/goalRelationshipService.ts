@@ -1,6 +1,6 @@
 /**
  * Goal Relationship Service
- * 
+ *
  * Provides goal relationship analysis, conflict detection, and complementary goal suggestions
  * for therapeutic goal management. Implements evidence-based therapeutic principles for
  * goal compatibility and synergy analysis.
@@ -196,7 +196,7 @@ export function analyzeGoalRelationships(selectedGoals: string[]): GoalRelations
 
   // Detect conflicts
   CONFLICT_PATTERNS.forEach(conflict => {
-    const conflictingGoalsInSelection = conflict.conflictingGoals.filter(goal => 
+    const conflictingGoalsInSelection = conflict.conflictingGoals.filter(goal =>
       selectedGoals.includes(goal)
     );
     if (conflictingGoalsInSelection.length >= 2) {
@@ -212,7 +212,7 @@ export function analyzeGoalRelationships(selectedGoals: string[]): GoalRelations
     const suggestions = COMPLEMENTARY_SUGGESTIONS[goal] || [];
     suggestions.forEach(suggestion => {
       if (!selectedGoals.includes(suggestion.suggestedGoal)) {
-        const isCompatible = suggestion.compatibleWith.some(compatibleGoal => 
+        const isCompatible = suggestion.compatibleWith.some(compatibleGoal =>
           selectedGoals.includes(compatibleGoal)
         );
         if (isCompatible) {
@@ -240,7 +240,7 @@ export function analyzeGoalRelationships(selectedGoals: string[]): GoalRelations
  * Calculates overall compatibility score for goal set
  */
 function calculateOverallCompatibility(
-  relationships: GoalRelationship[], 
+  relationships: GoalRelationship[],
   conflicts: GoalConflict[]
 ): number {
   if (relationships.length === 0 && conflicts.length === 0) return 0.7; // Neutral
@@ -269,12 +269,12 @@ function calculateOverallCompatibility(
  * Calculates therapeutic coherence score
  */
 function calculateTherapeuticCoherence(
-  goals: string[], 
+  goals: string[],
   relationships: GoalRelationship[]
 ): number {
   if (goals.length <= 1) return 1.0;
 
-  const synergisticRelationships = relationships.filter(rel => 
+  const synergisticRelationships = relationships.filter(rel =>
     rel.relationshipType === 'synergistic' || rel.relationshipType === 'complementary'
   );
 
@@ -296,7 +296,7 @@ function calculateTherapeuticCoherence(
  */
 export function getConflictAnalysis(goals: string[]): GoalConflict[] {
   return CONFLICT_PATTERNS.filter(conflict => {
-    const conflictingGoalsInSelection = conflict.conflictingGoals.filter(goal => 
+    const conflictingGoalsInSelection = conflict.conflictingGoals.filter(goal =>
       goals.includes(goal)
     );
     return conflictingGoalsInSelection.length >= 2;
@@ -310,7 +310,7 @@ export function getConflictAnalysis(goals: string[]): GoalConflict[] {
  * Gets complementary goal suggestions for current selection
  */
 export function getComplementaryGoalSuggestions(
-  selectedGoals: string[], 
+  selectedGoals: string[],
   maxSuggestions: number = 3
 ): ComplementaryGoalSuggestion[] {
   const allSuggestions: ComplementaryGoalSuggestion[] = [];
@@ -319,7 +319,7 @@ export function getComplementaryGoalSuggestions(
     const suggestions = COMPLEMENTARY_SUGGESTIONS[goal] || [];
     suggestions.forEach(suggestion => {
       if (!selectedGoals.includes(suggestion.suggestedGoal)) {
-        const isCompatible = suggestion.compatibleWith.some(compatibleGoal => 
+        const isCompatible = suggestion.compatibleWith.some(compatibleGoal =>
           selectedGoals.includes(compatibleGoal)
         );
         if (isCompatible) {
@@ -330,7 +330,7 @@ export function getComplementaryGoalSuggestions(
   });
 
   // Remove duplicates and sort by synergy score
-  const uniqueSuggestions = allSuggestions.filter((suggestion, index, array) => 
+  const uniqueSuggestions = allSuggestions.filter((suggestion, index, array) =>
     array.findIndex(s => s.suggestedGoal === suggestion.suggestedGoal) === index
   );
 

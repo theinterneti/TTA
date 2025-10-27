@@ -1,0 +1,127 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+    collapse-after: 10
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+    collapse-after: 10
+  - title: '🔒 Security'
+    labels:
+      - 'security'
+  - title: '📚 Documentation'
+    labels:
+      - 'documentation'
+      - 'docs'
+    collapse-after: 5
+  - title: '🧪 Testing'
+    labels:
+      - 'test'
+      - 'testing'
+    collapse-after: 5
+  - title: '⚡ Performance'
+    labels:
+      - 'performance'
+      - 'perf'
+  - title: '♻️ Refactoring'
+    labels:
+      - 'refactor'
+      - 'refactoring'
+    collapse-after: 5
+  - title: '🔧 Maintenance'
+    labels:
+      - 'chore'
+      - 'maintenance'
+      - 'dependencies'
+    collapse-after: 10
+  - title: '🚀 CI/CD'
+    labels:
+      - 'ci'
+      - 'cd'
+      - 'github-actions'
+    collapse-after: 5
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+
+version-resolver:
+  major:
+    labels:
+      - 'major'
+      - 'breaking'
+  minor:
+    labels:
+      - 'minor'
+      - 'feature'
+      - 'enhancement'
+  patch:
+    labels:
+      - 'patch'
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+      - 'documentation'
+      - 'chore'
+  default: patch
+
+autolabeler:
+  - label: 'feature'
+    title:
+      - '/^feat(\(.*\))?:/i'
+  - label: 'fix'
+    title:
+      - '/^fix(\(.*\))?:/i'
+  - label: 'documentation'
+    title:
+      - '/^docs(\(.*\))?:/i'
+  - label: 'chore'
+    title:
+      - '/^chore(\(.*\))?:/i'
+  - label: 'test'
+    title:
+      - '/^test(\(.*\))?:/i'
+  - label: 'refactor'
+    title:
+      - '/^refactor(\(.*\))?:/i'
+  - label: 'performance'
+    title:
+      - '/^perf(\(.*\))?:/i'
+  - label: 'ci'
+    title:
+      - '/^ci(\(.*\))?:/i'
+  - label: 'security'
+    title:
+      - '/^security(\(.*\))?:/i'
+  - label: 'breaking'
+    title:
+      - '/BREAKING CHANGE/i'
+    body:
+      - '/BREAKING CHANGE/i'
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  ## Contributors
+
+  $CONTRIBUTORS
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+exclude-labels:
+  - 'skip-changelog'
+  - 'duplicate'
+  - 'invalid'
+  - 'wontfix'
+
+replacers:
+  - search: '/\[([A-Z]+-\d+)\]/g'
+    replace: '[$1](https://github.com/$OWNER/$REPOSITORY/issues/$1)'

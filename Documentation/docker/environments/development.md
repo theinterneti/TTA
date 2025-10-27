@@ -193,7 +193,7 @@ To add additional development tools:
 1. Edit the Dockerfile to install the tools in the development stage:
    ```dockerfile
    FROM base as development
-   
+
    RUN /app/.venv/bin/pip install --no-cache-dir \
        your-tool-name
    ```

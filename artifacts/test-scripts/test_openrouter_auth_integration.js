@@ -2,7 +2,7 @@
 
 /**
  * OpenRouter Authentication Integration Test
- * 
+ *
  * This script tests the OpenRouter authentication system integration
  * by verifying that all components are properly connected and functional.
  */
@@ -19,14 +19,14 @@ const testFiles = [
   'src/player_experience/frontend/src/components/ModelManagement/OpenRouterAuthStatus.tsx',
   'src/player_experience/frontend/src/components/ModelManagement/ModelManagementSection.tsx',
   'src/player_experience/frontend/src/components/ModelManagement/index.ts',
-  
+
   // Redux State Management
   'src/player_experience/frontend/src/store/slices/openRouterAuthSlice.ts',
   'src/player_experience/frontend/src/store/store.ts',
-  
+
   // API Integration
   'src/player_experience/frontend/src/services/api.ts',
-  
+
   // Backend Implementation
   'src/player_experience/api/routers/openrouter_auth.py',
   'src/player_experience/api/app.py',
@@ -201,7 +201,7 @@ uiFeatures.forEach(feature => {
 // Final assessment
 console.log('\n📊 Integration Assessment:');
 
-const totalChecks = testFiles.length + requiredThunks.length + requiredActions.length + 
+const totalChecks = testFiles.length + requiredThunks.length + requiredActions.length +
                    requiredEndpoints.length + securityFeatures.length + uiFeatures.length + 5; // +5 for integration checks
 
 let passedChecks = 0;
@@ -223,13 +223,13 @@ if (successRate >= 90) {
   console.log('   • Redux state management integration');
   console.log('   • Backend API with security best practices');
   console.log('   • Seamless integration with existing TTA platform');
-  
+
   console.log('\n🚀 Next steps:');
   console.log('   1. Configure environment variables for OpenRouter');
   console.log('   2. Start the TTA application');
   console.log('   3. Navigate to Settings > AI Models');
   console.log('   4. Test authentication with your OpenRouter credentials');
-  
+
 } else if (successRate >= 70) {
   console.log('\n✅ GOOD! Most components are in place, minor issues to resolve.');
 } else {

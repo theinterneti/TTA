@@ -10,16 +10,17 @@ import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+import pytest_asyncio
 from fastapi.websockets import WebSocket
 
-from src.agent_orchestration.realtime.config_manager import (
+from tta_ai.orchestration.realtime.config_manager import (
     RealtimeEnvironment,
     get_realtime_config_manager,
 )
-from src.agent_orchestration.realtime.models import (
+from tta_ai.orchestration.realtime.models import (
     AgentStatusEvent,
 )
-from src.agent_orchestration.realtime.websocket_manager import (
+from tta_ai.orchestration.realtime.websocket_manager import (
     WebSocketConnectionManager,
 )
 
@@ -29,7 +30,7 @@ from src.agent_orchestration.realtime.websocket_manager import (
 class TestWebSocketValidation:
     """Test WebSocket connection management and authentication."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def realtime_config(self):
         """Create real-time configuration for testing."""
         config = {
@@ -56,7 +57,7 @@ class TestWebSocketValidation:
         config_manager = get_realtime_config_manager(config)
         return config_manager.get_config()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def websocket_manager(self, realtime_config, redis_client):
         """Create WebSocket manager for testing."""
         config_dict = {
@@ -76,7 +77,7 @@ class TestWebSocketValidation:
 
         return manager
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def mock_websocket(self):
         """Create mock WebSocket for testing."""
         websocket = Mock(spec=WebSocket)

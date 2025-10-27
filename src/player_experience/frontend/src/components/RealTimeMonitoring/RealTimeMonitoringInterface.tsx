@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
-import { 
-  realTimeTherapeuticMonitor, 
-  MonitoringSession, 
-  EmotionalState, 
-  RiskAssessment, 
+import {
+  realTimeTherapeuticMonitor,
+  MonitoringSession,
+  EmotionalState,
+  RiskAssessment,
   MonitoringMetrics,
-  InterventionRecord 
+  InterventionRecord
 } from '../../services/realTimeTherapeuticMonitor';
 
 interface RealTimeMonitoringInterfaceProps {
@@ -59,13 +59,13 @@ const RealTimeMonitoringInterface: React.FC<RealTimeMonitoringInterfaceProps> = 
   const startMonitoring = useCallback(() => {
     try {
       const session = realTimeTherapeuticMonitor.startMonitoring(sessionId, userId, therapeuticGoals);
-      
+
       // Register callback for real-time updates
       realTimeTherapeuticMonitor.registerCallback(sessionId, handleMonitoringUpdate);
-      
+
       setIsMonitoring(true);
       setMonitoringData(prev => ({ ...prev, isActive: true }));
-      
+
       console.log('Real-time therapeutic monitoring started for session:', sessionId);
     } catch (error) {
       console.error('Failed to start monitoring:', error);
@@ -76,10 +76,10 @@ const RealTimeMonitoringInterface: React.FC<RealTimeMonitoringInterfaceProps> = 
     try {
       realTimeTherapeuticMonitor.stopMonitoring(sessionId);
       realTimeTherapeuticMonitor.unregisterCallback(sessionId);
-      
+
       setIsMonitoring(false);
       setMonitoringData(prev => ({ ...prev, isActive: false }));
-      
+
       console.log('Real-time therapeutic monitoring stopped for session:', sessionId);
     } catch (error) {
       console.error('Failed to stop monitoring:', error);
@@ -134,14 +134,14 @@ const RealTimeMonitoringInterface: React.FC<RealTimeMonitoringInterfaceProps> = 
 
   const getEmotionalStateDescription = (emotionalState: EmotionalState): string => {
     const { valence, arousal, dominance } = emotionalState;
-    
+
     if (valence > 0.3 && arousal < 0.6) return 'Calm and positive';
     if (valence > 0.3 && arousal > 0.6) return 'Excited and energetic';
     if (valence < -0.3 && arousal > 0.6) return 'Anxious or agitated';
     if (valence < -0.3 && arousal < 0.6) return 'Sad or withdrawn';
     if (dominance < 0.3) return 'Feeling powerless';
     if (dominance > 0.7) return 'Feeling in control';
-    
+
     return 'Neutral emotional state';
   };
 
@@ -175,8 +175,8 @@ const RealTimeMonitoringInterface: React.FC<RealTimeMonitoringInterfaceProps> = 
             <button
               onClick={() => setAlertsEnabled(!alertsEnabled)}
               className={`px-2 py-1 text-xs rounded ${
-                alertsEnabled 
-                  ? 'bg-blue-100 text-blue-700' 
+                alertsEnabled
+                  ? 'bg-blue-100 text-blue-700'
                   : 'bg-gray-100 text-gray-500'
               }`}
               title={alertsEnabled ? 'Alerts enabled' : 'Alerts disabled'}

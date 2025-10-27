@@ -142,7 +142,7 @@ Based on comprehensive analysis of the TTA (Therapeutic Text Adventure) system's
 
 ### **Expected Outcomes**:
 - **Individual Users**: Complete therapeutic progress visualization
-- **System Administrators**: Real-time health and performance monitoring  
+- **System Administrators**: Real-time health and performance monitoring
 - **Researchers**: Aggregate therapeutic effectiveness analysis
 - **Clinicians**: Patient progress tracking and outcome measurement
 

@@ -33,7 +33,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
     const updatedPreferences = settings.contact_preferences.includes(preference)
       ? settings.contact_preferences.filter(p => p !== preference)
       : [...settings.contact_preferences, preference];
-    
+
     onUpdate({ contact_preferences: updatedPreferences });
   };
 
@@ -64,7 +64,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
             {showDataPolicy ? 'Hide' : 'View'} Policy
           </button>
         </div>
-        
+
         {showDataPolicy && (
           <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-700 space-y-3">
             <div>
@@ -86,12 +86,12 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
       {/* Data Sharing Consent */}
       <div className="space-y-4">
         <h4 className="font-medium text-gray-900">Data Sharing & Research</h4>
-        
+
         <div className="flex items-start justify-between p-4 bg-white border border-gray-200 rounded-lg">
           <div className="flex-1">
             <p className="font-medium text-gray-900">Research Participation</p>
             <p className="text-sm text-gray-600 mt-1">
-              Allow your anonymized data to contribute to therapeutic research and platform improvements. 
+              Allow your anonymized data to contribute to therapeutic research and platform improvements.
               This helps us develop better therapeutic interventions for everyone.
             </p>
             <div className="mt-2 text-xs text-gray-500">
@@ -115,7 +115,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
           <div className="flex-1">
             <p className="font-medium text-gray-900">Data Sharing Consent</p>
             <p className="text-sm text-gray-600 mt-1">
-              Allow sharing of anonymized therapeutic insights with qualified researchers and institutions 
+              Allow sharing of anonymized therapeutic insights with qualified researchers and institutions
               for advancing mental health treatment methods.
             </p>
           </div>
@@ -134,12 +134,12 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
       {/* Data Anonymization */}
       <div>
         <h4 className="font-medium text-gray-900 mb-4">Data Protection</h4>
-        
+
         <div className="flex items-start justify-between p-4 bg-white border border-gray-200 rounded-lg">
           <div className="flex-1">
             <p className="font-medium text-gray-900">Automatic Data Anonymization</p>
             <p className="text-sm text-gray-600 mt-1">
-              Automatically remove or encrypt personal identifiers from stored therapeutic data. 
+              Automatically remove or encrypt personal identifiers from stored therapeutic data.
               This provides an extra layer of privacy protection.
             </p>
             <div className="mt-2 text-xs text-green-600">
@@ -164,7 +164,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
         <p className="text-sm text-gray-600 mb-4">
           Choose how you'd like to be contacted for important updates, safety notifications, and platform communications.
         </p>
-        
+
         <div className="space-y-3">
           {contactPreferenceOptions.map((option) => (
             <label key={option.value} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
@@ -209,7 +209,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
             <span>10 years (maximum)</span>
           </div>
           <p className="text-sm text-gray-600 mt-3">
-            Your therapeutic data will be automatically deleted after this period. 
+            Your therapeutic data will be automatically deleted after this period.
             You can export your data before deletion if needed.
           </p>
         </div>
@@ -218,7 +218,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
       {/* Data Management Actions */}
       <div>
         <h4 className="font-medium text-gray-900 mb-4">Data Management</h4>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
             <div>
@@ -302,7 +302,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="font-medium text-blue-900 mb-2">🔒 Privacy Commitment</h4>
         <p className="text-blue-800 text-sm">
-          We are committed to protecting your privacy and maintaining the confidentiality of your therapeutic data. 
+          We are committed to protecting your privacy and maintaining the confidentiality of your therapeutic data.
           All data is encrypted, access is strictly controlled, and we never sell personal information to third parties.
         </p>
       </div>

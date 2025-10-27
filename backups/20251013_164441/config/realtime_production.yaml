@@ -1,0 +1,30 @@
+# Production-specific real-time configuration overrides
+# This file provides production-safe defaults for real-time features
+
+agent_orchestration:
+  realtime:
+    enabled: false # Disabled by default in production for safety
+    environment: production
+
+    websocket:
+      enabled: false # Require explicit enablement in production
+      auth_required: true # Always require auth in production
+      cors_origins: [] # Restrict CORS in production
+      max_connections: 500 # Lower limit for production stability
+
+    events:
+      enabled: false # Require explicit enablement
+      broadcast_system_metrics: false # Don't broadcast sensitive metrics
+      event_retention_hours: 1 # Shorter retention for privacy
+
+    progressive_feedback:
+      enabled: false # Disable by default
+      max_updates_per_workflow: 50 # Lower limit to reduce load
+
+    optimization:
+      enabled: false # Disable auto-optimization in production
+      auto_parameter_adjustment: false # Never auto-adjust in production
+
+    recovery:
+      timeout: 60.0 # Shorter timeout in production
+      max_reconnect_attempts: 3 # Fewer attempts to avoid resource exhaustion

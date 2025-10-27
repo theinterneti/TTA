@@ -1,38 +1,38 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { 
-  EmotionalState, 
-  RiskAssessment, 
-  MonitoringMetrics, 
+import {
+  EmotionalState,
+  RiskAssessment,
+  MonitoringMetrics,
   InterventionRecord,
-  MonitoringSession 
+  MonitoringSession
 } from '../../services/realTimeTherapeuticMonitor';
 
 export interface RealTimeMonitoringState {
   // Current monitoring session
   currentSession: MonitoringSession | null;
   isMonitoring: boolean;
-  
+
   // Real-time data
   currentEmotionalState: EmotionalState | null;
   currentRiskAssessment: RiskAssessment | null;
   currentMetrics: MonitoringMetrics | null;
-  
+
   // Historical data
   emotionalStateHistory: EmotionalState[];
   riskAssessmentHistory: RiskAssessment[];
   interventionHistory: InterventionRecord[];
-  
+
   // Alerts and notifications
   activeAlerts: Alert[];
   alertsEnabled: boolean;
-  
+
   // Settings
   monitoringSettings: MonitoringSettings;
-  
+
   // UI state
   showMonitoringInterface: boolean;
   showDetailedView: boolean;
-  
+
   // Error handling
   error: string | null;
   lastUpdated: number | null;
@@ -75,18 +75,18 @@ export interface MonitoringSettings {
 const initialState: RealTimeMonitoringState = {
   currentSession: null,
   isMonitoring: false,
-  
+
   currentEmotionalState: null,
   currentRiskAssessment: null,
   currentMetrics: null,
-  
+
   emotionalStateHistory: [],
   riskAssessmentHistory: [],
   interventionHistory: [],
-  
+
   activeAlerts: [],
   alertsEnabled: true,
-  
+
   monitoringSettings: {
     enableRealTimeAnalysis: true,
     enableCrisisDetection: true,
@@ -108,10 +108,10 @@ const initialState: RealTimeMonitoringState = {
       interventionHistoryLimit: 25
     }
   },
-  
+
   showMonitoringInterface: false,
   showDetailedView: false,
-  
+
   error: null,
   lastUpdated: null
 };
@@ -140,19 +140,19 @@ const realTimeMonitoringSlice = createSlice({
     // Real-time data updates
     updateEmotionalState: (state, action: PayloadAction<EmotionalState>) => {
       state.currentEmotionalState = action.payload;
-      
+
       // Add to history with limit
       state.emotionalStateHistory.push(action.payload);
       if (state.emotionalStateHistory.length > state.monitoringSettings.dataRetention.emotionalStateHistoryLimit) {
         state.emotionalStateHistory.shift();
       }
-      
+
       state.lastUpdated = Date.now();
     },
 
     updateRiskAssessment: (state, action: PayloadAction<RiskAssessment>) => {
       state.currentRiskAssessment = action.payload;
-      
+
       // Add to history with limit
       state.riskAssessmentHistory.push(action.payload);
       if (state.riskAssessmentHistory.length > state.monitoringSettings.dataRetention.riskAssessmentHistoryLimit) {
@@ -174,7 +174,7 @@ const realTimeMonitoringSlice = createSlice({
         };
         state.activeAlerts.push(alert);
       }
-      
+
       state.lastUpdated = Date.now();
     },
 
@@ -186,7 +186,7 @@ const realTimeMonitoringSlice = createSlice({
     // Intervention management
     addIntervention: (state, action: PayloadAction<InterventionRecord>) => {
       state.interventionHistory.push(action.payload);
-      
+
       // Limit history size
       if (state.interventionHistory.length > state.monitoringSettings.dataRetention.interventionHistoryLimit) {
         state.interventionHistory.shift();
@@ -205,7 +205,7 @@ const realTimeMonitoringSlice = createSlice({
         relatedData: action.payload
       };
       state.activeAlerts.push(alert);
-      
+
       state.lastUpdated = Date.now();
     },
 
@@ -297,25 +297,25 @@ const realTimeMonitoringSlice = createSlice({
       interventions?: InterventionRecord[];
     }>) => {
       const { emotionalState, riskAssessment, metrics, interventions } = action.payload;
-      
+
       if (emotionalState) {
         state.currentEmotionalState = emotionalState;
         state.emotionalStateHistory.push(emotionalState);
       }
-      
+
       if (riskAssessment) {
         state.currentRiskAssessment = riskAssessment;
         state.riskAssessmentHistory.push(riskAssessment);
       }
-      
+
       if (metrics) {
         state.currentMetrics = metrics;
       }
-      
+
       if (interventions) {
         state.interventionHistory.push(...interventions);
       }
-      
+
       state.lastUpdated = Date.now();
     }
   }

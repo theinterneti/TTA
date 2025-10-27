@@ -2,9 +2,14 @@ name: TTA Comprehensive Test Battery
 
 on:
   push:
-    branches: [ main, develop, integration/*, feat/production-deployment-infrastructure ]
+    branches:
+      - main
+      - staging
+      # Comprehensive tests only run on staging and main branches
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - staging
   schedule:
     # Run comprehensive tests daily at 2 AM UTC
     - cron: '0 2 * * *'
@@ -39,7 +44,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     services:
       redis:
         image: redis:7-alpine
@@ -50,11 +55,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -75,7 +80,7 @@ jobs:
 
     - name: Install dependencies
       run: uv sync --all-extras --dev
-        
+
     - name: Run PR validation tests
       run: |
         python tests/comprehensive_battery/run_comprehensive_tests.py \
@@ -86,7 +91,7 @@ jobs:
           --output-dir ./test-results/pr-validation
       env:
         REDIS_URL: redis://localhost:6379
-        
+
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
@@ -100,7 +105,7 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/integration/')) || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    
+
     strategy:
       matrix:
         test-suite:
@@ -113,7 +118,7 @@ jobs:
           - name: "Integration Tests"
             categories: "data_pipeline,dashboard"
             timeout: 1200
-    
+
     services:
       redis:
         image: redis:7-alpine
@@ -124,7 +129,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       neo4j:
         image: neo4j:5-community
         ports:
@@ -146,11 +151,11 @@ jobs:
           --health-timeout 15s
           --health-retries 8
           --health-start-period 60s
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -220,7 +225,7 @@ try:
 except Exception as e:
     print(f'❌ Neo4j HTTP: {e}')
 "
-        
+
     - name: Wait for services
       run: |
         # Wait for Redis
@@ -232,7 +237,7 @@ except Exception as e:
         echo "Waiting for Neo4j..."
         timeout 90 bash -c 'until wget --quiet --tries=1 --spider http://localhost:7474; do sleep 2; done' || echo "Neo4j HTTP not available"
         timeout 90 bash -c 'until nc -z localhost 7687; do sleep 2; done' || echo "Neo4j Bolt not available, will use mock"
-        
+
     - name: Run comprehensive test battery
       run: |
         FORCE_MOCK_FLAG=""
@@ -254,26 +259,26 @@ except Exception as e:
       env:
         NEO4J_AUTH: neo4j/testpassword
         FORCE_MOCK_MODE: ${{ github.event.inputs.force_mock_mode || 'false' }}
-        
+
     - name: Generate test summary
       if: always()
       run: |
         echo "## Test Results Summary - ${{ matrix.test-suite.name }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        
+
         if [ -f "./test-results/${{ matrix.test-suite.name }}/test_summary.json" ]; then
           python -c "
           import json
           with open('./test-results/${{ matrix.test-suite.name }}/test_summary.json', 'r') as f:
               data = json.load(f)
-          
+
           print(f'**Total Tests:** {data.get(\"total_tests\", 0)}')
           print(f'**Passed:** {data.get(\"passed_tests\", 0)}')
           print(f'**Failed:** {data.get(\"failed_tests\", 0)}')
           print(f'**Success Rate:** {data.get(\"success_rate\", 0):.1f}%')
           print(f'**Duration:** {data.get(\"duration_seconds\", 0):.1f}s')
           print(f'**Mock Mode:** {\"Yes\" if data.get(\"mock_mode\", False) else \"No\"}')
-          
+
           if data.get('failed_tests', 0) > 0:
               print('\n**Failed Tests:**')
               for test in data.get('failed_test_details', []):
@@ -282,7 +287,7 @@ except Exception as e:
         else
           echo "❌ Test results not found" >> $GITHUB_STEP_SUMMARY
         fi
-        
+
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
@@ -306,7 +311,7 @@ except Exception as e:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    
+
     services:
       redis:
         image: redis:7-alpine
@@ -317,7 +322,7 @@ except Exception as e:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       neo4j:
         image: neo4j:5-community
         ports:
@@ -339,11 +344,11 @@ except Exception as e:
           --health-timeout 15s
           --health-retries 8
           --health-start-period 60s
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -364,12 +369,12 @@ except Exception as e:
 
     - name: Install dependencies
       run: uv sync --all-extras --dev
-        
+
     - name: Wait for services
       run: |
         timeout 30 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
         timeout 60 bash -c 'until cypher-shell -a bolt://localhost:7687 -u neo4j -p testpassword "RETURN 1" 2>/dev/null; do sleep 2; done' || echo "Neo4j not available, will use mock"
-        
+
     - name: Run custom test battery
       run: |
         CATEGORIES="${{ github.event.inputs.test_categories || 'standard,adversarial' }}"
@@ -377,12 +382,12 @@ except Exception as e:
         if [ "${{ github.event.inputs.detailed_report }}" = "true" ]; then
           DETAILED_FLAG="--detailed-report --metrics"
         fi
-        
+
         FORCE_MOCK_FLAG=""
         if [ "${{ github.event.inputs.force_mock_mode }}" = "true" ]; then
           FORCE_MOCK_FLAG="--force-mock"
         fi
-        
+
         python tests/comprehensive_battery/run_comprehensive_tests.py \
           --categories ${CATEGORIES} \
           --max-concurrent 5 \
@@ -395,7 +400,7 @@ except Exception as e:
           --redis-url redis://localhost:6379
       env:
         NEO4J_AUTH: neo4j/testpassword
-        
+
     - name: Upload manual test results
       if: always()
       uses: actions/upload-artifact@v4
@@ -409,7 +414,7 @@ except Exception as e:
     if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'schedule')
     needs: [comprehensive-testing]
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Notify on failure
       if: needs.comprehensive-testing.result == 'failure'

@@ -120,11 +120,9 @@ class CausalityExplainer:
             )
 
             # Apply adaptation
-            adapted_explanation = await self._apply_adaptation_strategy(
+            return await self._apply_adaptation_strategy(
                 original_explanation, adaptation_strategy
             )
-
-            return adapted_explanation
 
         except Exception as e:
             logger.error(f"Failed to adapt explanation for emotional state: {e}")
@@ -258,7 +256,7 @@ class CausalityExplainer:
         template = pattern["template"]
 
         # Simple template filling - in a full implementation, this would be more sophisticated
-        explanation = template.format(
+        return template.format(
             action=user_choice.choice_text.lower(),
             result="positive change",
             causal_mechanism="therapeutic principles",
@@ -266,8 +264,6 @@ class CausalityExplainer:
             therapeutic_goal="wellbeing",
             therapeutic_process="evidence-based practices",
         )
-
-        return explanation
 
     async def _add_therapeutic_context(
         self,
@@ -329,13 +325,12 @@ class CausalityExplainer:
 
         if tone == "immediate_support":
             return f"Right now, {explanation.lower()} This supports your immediate safety and wellbeing."
-        elif tone == "gentle_support":
+        if tone == "gentle_support":
             return f"Gently, {explanation.lower()} This offers comfort and support."
-        elif tone == "simplifying":
+        if tone == "simplifying":
             return f"Simply put, {explanation.lower()}"
-        elif tone == "reassuring":
+        if tone == "reassuring":
             return f"Reassuringly, {explanation.lower()} This creates stability."
-        elif tone == "encouraging":
+        if tone == "encouraging":
             return f"Encouragingly, {explanation.lower()} This supports your growth."
-        else:
-            return explanation
+        return explanation

@@ -260,17 +260,17 @@ class TherapeuticSessionService {
     try {
       // Generate session intelligence insights
       const intelligenceInsights = await this.generateSessionIntelligence(goals, userContext);
-      
+
       // Create session objectives based on goals and insights
       const objectives = this.generateSessionObjectives(goals, intelligenceInsights);
-      
+
       // Generate therapeutic techniques and activities
       const techniques = this.selectTherapeuticTechniques(goals, userContext, intelligenceInsights);
       const activities = this.generateSessionActivities(objectives, techniques, duration);
-      
+
       // Assess session risks
       const riskAssessment = this.assessSessionRisks(goals, userContext, intelligenceInsights);
-      
+
       // Create comprehensive session plan
       const sessionPlan: SessionPlan = {
         objectives,
@@ -284,7 +284,7 @@ class TherapeuticSessionService {
 
       // Generate alternative plans
       const alternatives = await this.generateAlternativeSessionPlans(goals, userContext, sessionType);
-      
+
       return {
         sessionPlan,
         confidence: this.calculatePlanConfidence(sessionPlan, intelligenceInsights),
@@ -308,16 +308,16 @@ class TherapeuticSessionService {
     try {
       // Get goal suggestions
       const goalSuggestions = generateGoalSuggestions(userContext.primaryConcerns || [], goals);
-      
+
       // Analyze goal relationships
       const relationshipMap = analyzeGoalRelationships(goals);
-      
+
       // Detect conflicts
       const conflictWarnings = detectGoalConflicts(goals, userContext);
-      
+
       // Generate personalized recommendations
       const recommendationResult = generatePersonalizedRecommendations(userContext);
-      
+
       // Get progress insights
       const progressResult = progressTrackingService.generateProgressAnalytics(
         userContext.userId,

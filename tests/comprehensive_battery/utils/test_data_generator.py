@@ -96,7 +96,7 @@ class TestDataGenerator:
 
             scenario = TestScenario(
                 scenario_id=scenario_id,
-                name=f"{template['name']} - Test {i+1}",
+                name=f"{template['name']} - Test {i + 1}",
                 description=template["description"],
                 duration_minutes=template["duration_minutes"],
                 steps=template["steps"],

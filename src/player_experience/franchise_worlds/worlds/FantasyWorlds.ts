@@ -1,6 +1,6 @@
 /**
  * Fantasy World Configurations
- * 
+ *
  * Defines the 5 fantasy worlds adapted from popular franchises while maintaining
  * legal distinctiveness and therapeutic value.
  */
@@ -43,7 +43,7 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
   name: 'Eldermere Realms',
   genre: 'fantasy',
   inspirationSource: 'Epic fantasy with diverse cultures and ancient mysteries',
-  
+
   worldSystems: {
     cultural: {
       complexity: 0.9,
@@ -174,7 +174,7 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
       ]
     }
   },
-  
+
   therapeuticThemes: [
     'courage_and_resilience',
     'friendship_and_belonging',
@@ -183,14 +183,14 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
     'healing_from_trauma',
     'building_confidence'
   ],
-  
+
   therapeuticApproaches: [
     TherapeuticApproach.CBT,
     TherapeuticApproach.NARRATIVE_THERAPY,
     TherapeuticApproach.MINDFULNESS,
     TherapeuticApproach.GROUP_THERAPY
   ],
-  
+
   therapeuticIntegrationPoints: [
     {
       trigger: 'facing_overwhelming_challenge',
@@ -217,7 +217,7 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
       expectedOutcome: 'Develop mindfulness skills through exploration'
     }
   ],
-  
+
   narrativeFramework: {
     mainArcStructure: 'Hero\'s Journey with Fellowship Support',
     branchingPoints: [
@@ -254,7 +254,7 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
     ],
     adaptationStrategy: 'Transform classic quest narrative into therapeutic journey of personal growth'
   },
-  
+
   characterArchetypes: [
     {
       archetypeId: 'wise_mentor',
@@ -280,7 +280,7 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
       adaptationNotes: 'Original character inspired by but legally distinct from Gandalf-type mentors'
     }
   ],
-  
+
   scenarioTemplates: [
     {
       templateId: 'village_crisis',
@@ -300,7 +300,7 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
       ]
     }
   ],
-  
+
   sessionLengthSupport: {
     short: {
       targetDuration: 20,
@@ -324,14 +324,14 @@ export const ELDERMERE_REALMS: FranchiseWorldConfig = {
       exitStrategies: ['epic_achievement', 'major_revelation', 'transformation_moment']
     }
   },
-  
+
   copyrightCompliance: {
     originalElements: 0.7,
     adaptationLevel: 'high',
     legalReview: 'pending',
     riskAssessment: 'low'
   },
-  
+
   contentRatings: [
     { system: 'ESRB', rating: 'T', descriptors: ['Fantasy Violence', 'Mild Language'] },
     { system: 'PEGI', rating: '12', descriptors: ['Violence'] }

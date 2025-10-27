@@ -10,14 +10,15 @@ import asyncio
 import time
 
 import pytest
+import pytest_asyncio
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.adapters import AgentAdapterFactory, RetryConfig
-from src.agent_orchestration.enhanced_coordinator import EnhancedRedisMessageCoordinator
+from tta_ai.orchestration.adapters import AgentAdapterFactory, RetryConfig
+from tta_ai.orchestration.enhanced_coordinator import EnhancedRedisMessageCoordinator
 
 
 @pytest.mark.integration
@@ -25,7 +26,7 @@ from src.agent_orchestration.enhanced_coordinator import EnhancedRedisMessageCoo
 class TestRealAgentCommunication:
     """Test real agent communication workflows."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def adapter_factory(self):
         """Create adapter factory for testing."""
         retry_config = RetryConfig(max_retries=2, base_delay=0.1)
@@ -36,7 +37,7 @@ class TestRealAgentCommunication:
             retry_config=retry_config,
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def enhanced_coordinator(self, redis_client, adapter_factory):
         """Create enhanced coordinator with real agent support."""
         return EnhancedRedisMessageCoordinator(
@@ -46,7 +47,7 @@ class TestRealAgentCommunication:
             fallback_to_mock=True,
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def real_ipa_proxy(self, enhanced_coordinator):
         """Create IPA proxy with real agent communication enabled."""
         return InputProcessorAgentProxy(
@@ -56,7 +57,7 @@ class TestRealAgentCommunication:
             fallback_to_mock=True,
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def real_wba_proxy(self, enhanced_coordinator):
         """Create WBA proxy with real agent communication enabled."""
         return WorldBuilderAgentProxy(
@@ -67,7 +68,7 @@ class TestRealAgentCommunication:
             neo4j_manager=None,  # Mock for testing
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def real_nga_proxy(self, enhanced_coordinator):
         """Create NGA proxy with real agent communication enabled."""
         return NarrativeGeneratorAgentProxy(
@@ -306,7 +307,7 @@ class TestRealAgentCommunication:
 class TestCompleteWorkflowChains:
     """Test complete agent workflow chains with actual data flow."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def workflow_test_data(self):
         """Test data for workflow chain testing."""
         return {

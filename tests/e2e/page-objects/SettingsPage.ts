@@ -58,7 +58,7 @@ export class SettingsPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
     this.pageTitle = page.locator('h1').filter({ hasText: /settings/i });
     this.tabNavigation = page.locator('[data-testid="settings-tabs"], nav');
@@ -163,11 +163,11 @@ export class SettingsPage extends BasePage {
     crisisContact?: string;
   }) {
     await this.goToTherapeuticTab();
-    
+
     if (settings.intensity) {
       await this.intensitySelect.selectOption(settings.intensity);
     }
-    
+
     if (settings.approaches) {
       // Handle checkbox selection for approaches
       for (const approach of settings.approaches) {
@@ -175,19 +175,19 @@ export class SettingsPage extends BasePage {
         await checkbox.check();
       }
     }
-    
+
     if (settings.triggerWarnings) {
       await this.triggerWarningsInput.fill(settings.triggerWarnings.join(', '));
     }
-    
+
     if (settings.comfortTopics) {
       await this.comfortTopicsInput.fill(settings.comfortTopics.join(', '));
     }
-    
+
     if (settings.avoidTopics) {
       await this.avoidTopicsInput.fill(settings.avoidTopics.join(', '));
     }
-    
+
     if (settings.crisisContact) {
       await this.crisisContactInput.fill(settings.crisisContact);
     }
@@ -200,7 +200,7 @@ export class SettingsPage extends BasePage {
     dataRetention?: number;
   }) {
     await this.goToPrivacyTab();
-    
+
     if (settings.dataSharing !== undefined) {
       if (settings.dataSharing) {
         await this.dataSharingToggle.check();
@@ -208,7 +208,7 @@ export class SettingsPage extends BasePage {
         await this.dataSharingToggle.uncheck();
       }
     }
-    
+
     if (settings.researchParticipation !== undefined) {
       if (settings.researchParticipation) {
         await this.researchParticipationToggle.check();
@@ -216,14 +216,14 @@ export class SettingsPage extends BasePage {
         await this.researchParticipationToggle.uncheck();
       }
     }
-    
+
     if (settings.contactPreferences) {
       for (const preference of settings.contactPreferences) {
         const checkbox = this.contactPreferencesCheckboxes.filter({ hasText: preference });
         await checkbox.check();
       }
     }
-    
+
     if (settings.dataRetention) {
       await this.dataRetentionSelect.selectOption(settings.dataRetention.toString());
     }
@@ -238,7 +238,7 @@ export class SettingsPage extends BasePage {
     push?: boolean;
   }) {
     await this.goToNotificationsTab();
-    
+
     const toggles = [
       { setting: settings.sessionReminders, toggle: this.sessionRemindersToggle },
       { setting: settings.progressUpdates, toggle: this.progressUpdatesToggle },
@@ -247,7 +247,7 @@ export class SettingsPage extends BasePage {
       { setting: settings.email, toggle: this.emailNotificationsToggle },
       { setting: settings.push, toggle: this.pushNotificationsToggle },
     ];
-    
+
     for (const { setting, toggle } of toggles) {
       if (setting !== undefined) {
         if (setting) {
@@ -267,7 +267,7 @@ export class SettingsPage extends BasePage {
     keyboardNavigation?: boolean;
   }) {
     await this.goToAccessibilityTab();
-    
+
     const toggles = [
       { setting: settings.highContrast, toggle: this.highContrastToggle },
       { setting: settings.largeText, toggle: this.largeTextToggle },
@@ -275,7 +275,7 @@ export class SettingsPage extends BasePage {
       { setting: settings.reducedMotion, toggle: this.reducedMotionToggle },
       { setting: settings.keyboardNavigation, toggle: this.keyboardNavigationToggle },
     ];
-    
+
     for (const { setting, toggle } of toggles) {
       if (setting !== undefined) {
         if (setting) {
@@ -290,22 +290,22 @@ export class SettingsPage extends BasePage {
   async exportData() {
     await this.goToPrivacyTab();
     await this.exportDataButton.click();
-    
+
     // Wait for download to start
     const downloadPromise = this.page.waitForEvent('download');
     const download = await downloadPromise;
-    
+
     return download;
   }
 
   async deleteAllData() {
     await this.goToPrivacyTab();
     await this.deleteDataButton.click();
-    
+
     // Confirm deletion
     const confirmButton = this.page.locator('button').filter({ hasText: /confirm.*delete/i });
     await confirmButton.click();
-    
+
     await this.waitForLoadingToComplete();
   }
 
@@ -343,15 +343,15 @@ export class SettingsPage extends BasePage {
   // Accessibility tests
   async checkAccessibility() {
     await super.checkAccessibility();
-    
+
     // Check tab accessibility
     await expect(this.tabNavigation).toHaveRole('tablist');
     await expect(this.therapeuticTab).toHaveRole('tab');
-    
+
     // Check form accessibility
     await this.goToTherapeuticTab();
     await expect(this.intensitySelect).toHaveAttribute('aria-label');
-    
+
     // Check toggle accessibility
     await this.goToNotificationsTab();
     await expect(this.sessionRemindersToggle).toHaveRole('switch');
@@ -362,10 +362,10 @@ export class SettingsPage extends BasePage {
     await this.therapeuticTab.focus();
     await this.page.keyboard.press('ArrowRight');
     await expect(this.modelsTab).toBeFocused();
-    
+
     await this.page.keyboard.press('ArrowRight');
     await expect(this.privacyTab).toBeFocused();
-    
+
     // Test Enter key activation
     await this.page.keyboard.press('Enter');
     await this.expectTabActive('privacy');

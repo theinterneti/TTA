@@ -15,7 +15,7 @@ This guide provides step-by-step instructions for deploying the TTA E2E testing 
    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
    sudo apt update
    sudo apt install gh
-   
+
    # Authenticate
    gh auth login
    ```
@@ -140,7 +140,7 @@ Create the following environments in `Repository Settings > Environments`:
 
 #### Staging Environment
 - **Name**: `staging`
-- **Protection rules**: 
+- **Protection rules**:
   - Required reviewers: 1
   - Wait timer: 5 minutes
   - Deployment branches: `develop`, `main`

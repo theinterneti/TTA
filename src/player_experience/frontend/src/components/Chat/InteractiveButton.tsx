@@ -122,7 +122,7 @@ const InteractiveButton: React.FC<InteractiveButtonProps> = ({
 
     return (
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 rounded-b">
-        <div 
+        <div
           className={`h-full rounded-b transition-all duration-300 ${getConfidenceColor()}`}
           style={{ width: `${confidence}%` }}
         />
@@ -132,7 +132,7 @@ const InteractiveButton: React.FC<InteractiveButtonProps> = ({
 
   const handleClick = () => {
     if (disabled || loading) return;
-    
+
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 150);
     onClick(id, action);
@@ -164,14 +164,14 @@ const InteractiveButton: React.FC<InteractiveButtonProps> = ({
         onMouseEnter={() => setShowTooltip(true)}
         disabled={disabled || loading}
         className={`
-          relative w-full text-left border rounded-lg font-medium transition-all duration-200 
+          relative w-full text-left border rounded-lg font-medium transition-all duration-200
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
           touch-manipulation select-none
           ${sizeStyles}
-          ${disabled || loading 
-            ? styles.disabled 
-            : isPressed 
-              ? styles.pressed 
+          ${disabled || loading
+            ? styles.disabled
+            : isPressed
+              ? styles.pressed
               : styles.base
           }
           ${loading ? 'cursor-wait' : disabled ? 'cursor-not-allowed' : 'cursor-pointer'}

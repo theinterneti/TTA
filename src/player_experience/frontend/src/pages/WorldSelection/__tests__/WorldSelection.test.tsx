@@ -338,7 +338,7 @@ describe('WorldSelection', () => {
     renderWithProvider();
 
     const worldCards = screen.getAllByText(/% match/);
-    const compatibilityScores = worldCards.map(card => 
+    const compatibilityScores = worldCards.map(card =>
       parseInt(card.textContent?.match(/(\d+)%/)?.[1] || '0')
     );
 

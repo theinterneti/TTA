@@ -1,0 +1,86 @@
+# Prometheus configuration for TTA Home Lab QA Testing
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: "homelab"
+    cluster: "tta-qa"
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "rules/*.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+scrape_configs:
+  # Prometheus itself
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # TTA Player API metrics
+  - job_name: "tta-player-api"
+    static_configs:
+      - targets: ["player-api:8080"]
+    scrape_interval: 15s
+    metrics_path: /metrics
+    scrape_timeout: 10s
+    honor_labels: true
+
+  # Nginx metrics (requires nginx-prometheus-exporter sidecar)
+  - job_name: "nginx"
+    static_configs:
+      - targets: ["nginx:9113"]
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Redis metrics
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis:6379"]
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Neo4j metrics
+  - job_name: "neo4j"
+    static_configs:
+      - targets: ["neo4j:7474"]
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # PostgreSQL metrics
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres:5432"]
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Grafana metrics
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Custom QA testing metrics
+  - job_name: "qa-metrics"
+    static_configs:
+      - targets: ["qa-test-runner:8000"]
+    scrape_interval: 30s
+    metrics_path: /qa-metrics
+    scrape_timeout: 15s
+
+  # Load testing metrics from Locust
+  - job_name: "load-testing"
+    static_configs:
+      - targets: ["load-tester:8089"]
+    scrape_interval: 10s
+    metrics_path: /stats/requests
+    scrape_timeout: 5s
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 10GB

@@ -1,23 +1,33 @@
 #!/usr/bin/env python3
+import argparse
+import logging
 import os
 import sys
 import time
-import argparse
-import logging
 from contextlib import contextmanager
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("neo4j_probe")
 
 
-def attempt_connect(uri: str, username: str, password: str, initial_sleep: float | None = None, attempts: int = 5):
+def attempt_connect(
+    uri: str,
+    username: str,
+    password: str,
+    initial_sleep: float | None = None,
+    attempts: int = 5,
+):
     """Replicate the project's connect() logic with retries and backoff.
     Returns True/False and a summary list of (attempt_idx, elapsed, outcome, err_str).
     """
     t0 = time.time()
     try:
         from neo4j import GraphDatabase
-        from neo4j.exceptions import AuthError, ServiceUnavailable as _ServiceUnavailable, ClientError as _ClientError
+        from neo4j.exceptions import (
+            AuthError,
+        )
+        from neo4j.exceptions import ClientError as _ClientError
+        from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
     except Exception as e:
         logger.error("neo4j package not installed: %s", e)
         return False, [(0, 0.0, "no-neo4j", str(e))]
@@ -47,8 +57,14 @@ def attempt_connect(uri: str, username: str, password: str, initial_sleep: float
         except (AuthError, _ServiceUnavailable) as e:
             dt = time.time() - a_t0
             results.append((attempt + 1, dt, type(e).__name__, str(e)))
-            delay = min(base_delay * (2 ** attempt), 8.0)
-            logger.debug("Attempt %d/%d failed (%s); retry in %.1fs", attempt + 1, attempts, type(e).__name__, delay)
+            delay = min(base_delay * (2**attempt), 8.0)
+            logger.debug(
+                "Attempt %d/%d failed (%s); retry in %.1fs",
+                attempt + 1,
+                attempts,
+                type(e).__name__,
+                delay,
+            )
             try:
                 if driver:
                     driver.close()
@@ -63,10 +79,17 @@ def attempt_connect(uri: str, username: str, password: str, initial_sleep: float
             # Retry only when AuthenticationRateLimit pattern observed
             emsg = str(e)
             dt = time.time() - a_t0
-            if ("AuthenticationRateLimit" in emsg) or ("authentication details too many times" in emsg):
+            if ("AuthenticationRateLimit" in emsg) or (
+                "authentication details too many times" in emsg
+            ):
                 results.append((attempt + 1, dt, type(e).__name__, emsg))
-                delay = min(base_delay * (2 ** attempt), 8.0)
-                logger.debug("Attempt %d/%d hit AuthenticationRateLimit; retry in %.1fs", attempt + 1, attempts, delay)
+                delay = min(base_delay * (2**attempt), 8.0)
+                logger.debug(
+                    "Attempt %d/%d hit AuthenticationRateLimit; retry in %.1fs",
+                    attempt + 1,
+                    attempts,
+                    delay,
+                )
                 try:
                     if driver:
                         driver.close()
@@ -127,19 +150,31 @@ def ensure_container_if_needed(mode: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["local", "container"], default="container")
-    ap.add_argument("--initial-sleep", type=float, default=0.0, help="initial sleep seconds before first attempt")
+    ap.add_argument(
+        "--initial-sleep",
+        type=float,
+        default=0.0,
+        help="initial sleep seconds before first attempt",
+    )
     ap.add_argument("--attempts", type=int, default=5)
     args = ap.parse_args()
 
     with ensure_container_if_needed(args.mode) as (uri, username, password):
         logger.info("Testing Neo4j connect to %s with user=%s", uri, username)
-        ok, results = attempt_connect(uri, username, password, initial_sleep=args.initial_sleep, attempts=args.attempts)
+        ok, results = attempt_connect(
+            uri,
+            username,
+            password,
+            initial_sleep=args.initial_sleep,
+            attempts=args.attempts,
+        )
         logger.info("Result: %s", "SUCCESS" if ok else "FAIL")
         for i, dt, outcome, msg in results:
-            logger.info("  attempt=%d elapsed=%.3fs outcome=%s msg=%s", i, dt, outcome, msg)
+            logger.info(
+                "  attempt=%d elapsed=%.3fs outcome=%s msg=%s", i, dt, outcome, msg
+            )
         return 0 if ok else 1
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

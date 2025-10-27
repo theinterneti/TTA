@@ -10,7 +10,7 @@ test.describe('Settings Management', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     settingsPage = new SettingsPage(page);
-    
+
     // Login before each test
     await loginPage.goto();
     await loginPage.login(testUsers.default);
@@ -36,7 +36,7 @@ test.describe('Settings Management', () => {
         settingsPage.accessibilityTab,
         settingsPage.crisisTab,
       ];
-      
+
       for (const tab of tabs) {
         await expect(tab).toBeVisible();
       }
@@ -51,10 +51,10 @@ test.describe('Settings Management', () => {
     test('should navigate between tabs', async () => {
       await settingsPage.goToPrivacyTab();
       await settingsPage.expectTabActive('privacy');
-      
+
       await settingsPage.goToNotificationsTab();
       await settingsPage.expectTabActive('notifications');
-      
+
       await settingsPage.goToAccessibilityTab();
       await settingsPage.expectTabActive('accessibility');
     });
@@ -66,7 +66,7 @@ test.describe('Settings Management', () => {
     test('should warn about unsaved changes when switching tabs', async () => {
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
-      
+
       await settingsPage.goToPrivacyTab();
       await settingsPage.expectUnsavedChanges();
     });
@@ -81,7 +81,7 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ success: true }),
         });
       });
-      
+
       await settingsPage.updateTherapeuticSettings({
         intensity: 'HIGH',
         approaches: ['CBT', 'Mindfulness'],
@@ -89,7 +89,7 @@ test.describe('Settings Management', () => {
         comfortTopics: ['Nature', 'Animals'],
         avoidTopics: ['Death', 'Abuse'],
       });
-      
+
       await settingsPage.saveSettings();
       await settingsPage.expectSettingsSaved();
     });
@@ -98,7 +98,7 @@ test.describe('Settings Management', () => {
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('');
       await settingsPage.saveSettings();
-      
+
       await settingsPage.expectErrorMessage();
     });
 
@@ -106,11 +106,11 @@ test.describe('Settings Management', () => {
       await page.route('**/players/*/settings/therapeutic', route => {
         route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
       });
-      
+
       await settingsPage.updateTherapeuticSettings({
         crisisContact: 'Emergency: 911\nTherapist: Dr. Smith (555) 123-4567',
       });
-      
+
       await settingsPage.saveSettings();
       await settingsPage.expectSettingsSaved();
     });
@@ -125,14 +125,14 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ success: true }),
         });
       });
-      
+
       await settingsPage.updatePrivacySettings({
         dataSharing: false,
         researchParticipation: true,
         contactPreferences: ['email'],
         dataRetention: 365,
       });
-      
+
       await settingsPage.saveSettings();
       await settingsPage.expectSettingsSaved();
     });
@@ -148,7 +148,7 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ user_data: 'exported' }),
         });
       });
-      
+
       const download = await settingsPage.exportData();
       expect(download.suggestedFilename()).toContain('user-data');
     });
@@ -161,9 +161,9 @@ test.describe('Settings Management', () => {
           route.continue();
         }
       });
-      
+
       await settingsPage.deleteAllData();
-      
+
       // Should show confirmation
       const confirmationMessage = settingsPage.page.locator('[data-testid="delete-confirmation"]');
       await expect(confirmationMessage).toBeVisible();
@@ -179,7 +179,7 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ success: true }),
         });
       });
-      
+
       await settingsPage.updateNotificationSettings({
         sessionReminders: true,
         progressUpdates: true,
@@ -188,7 +188,7 @@ test.describe('Settings Management', () => {
         email: true,
         push: false,
       });
-      
+
       await settingsPage.saveSettings();
       await settingsPage.expectSettingsSaved();
     });
@@ -196,7 +196,7 @@ test.describe('Settings Management', () => {
     test('should require crisis alerts to be enabled', async () => {
       await settingsPage.goToNotificationsTab();
       await settingsPage.crisisAlertsToggle.uncheck();
-      
+
       // Should show warning about disabling crisis alerts
       const warningMessage = settingsPage.page.locator('[data-testid="crisis-warning"]');
       await expect(warningMessage).toBeVisible();
@@ -212,7 +212,7 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ success: true }),
         });
       });
-      
+
       await settingsPage.updateAccessibilitySettings({
         highContrast: true,
         largeText: true,
@@ -220,7 +220,7 @@ test.describe('Settings Management', () => {
         reducedMotion: false,
         keyboardNavigation: true,
       });
-      
+
       await settingsPage.saveSettings();
       await settingsPage.expectSettingsSaved();
     });
@@ -228,7 +228,7 @@ test.describe('Settings Management', () => {
     test('should apply accessibility changes immediately', async () => {
       await settingsPage.goToAccessibilityTab();
       await settingsPage.highContrastToggle.check();
-      
+
       // Should apply high contrast mode immediately
       await expect(settingsPage.page.locator('body')).toHaveClass(/high-contrast/);
     });
@@ -236,7 +236,7 @@ test.describe('Settings Management', () => {
     test('should apply large text setting', async () => {
       await settingsPage.goToAccessibilityTab();
       await settingsPage.largeTextToggle.check();
-      
+
       // Should apply large text immediately
       await expect(settingsPage.page.locator('body')).toHaveClass(/large-text/);
     });
@@ -260,10 +260,10 @@ test.describe('Settings Management', () => {
           ]),
         });
       });
-      
+
       await settingsPage.goToModelsTab();
       await settingsPage.freeModelsFilter.check();
-      
+
       // Should show only free models
       const modelCards = settingsPage.page.locator('[data-testid="model-card"]');
       await expect(modelCards).toHaveCount(2);
@@ -272,7 +272,7 @@ test.describe('Settings Management', () => {
     test('should adjust cost threshold', async () => {
       await settingsPage.goToModelsTab();
       await settingsPage.costThresholdSlider.fill('0.005');
-      
+
       // Should update model recommendations based on cost
       const affordableModels = settingsPage.page.locator('[data-testid="affordable-models"]');
       await expect(affordableModels).toBeVisible();
@@ -288,11 +288,11 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ success: true }),
         });
       });
-      
+
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
       await settingsPage.saveSettings();
-      
+
       await settingsPage.expectSettingsSaved();
     });
 
@@ -301,16 +301,16 @@ test.describe('Settings Management', () => {
       await page.route('**/players/*/settings/**', route => {
         route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
       });
-      
+
       await settingsPage.goToAccessibilityTab();
       await settingsPage.largeTextToggle.check();
       await settingsPage.saveSettings();
-      
+
       // Reload page
       await page.reload();
       await settingsPage.expectPageLoaded();
       await settingsPage.goToAccessibilityTab();
-      
+
       // Settings should be persisted
       await expect(settingsPage.largeTextToggle).toBeChecked();
     });
@@ -318,7 +318,7 @@ test.describe('Settings Management', () => {
     test('should warn about unsaved changes', async () => {
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
-      
+
       await settingsPage.expectUnsavedChanges();
     });
 
@@ -326,11 +326,11 @@ test.describe('Settings Management', () => {
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
       await settingsPage.expectUnsavedChanges();
-      
+
       // Navigate away and discard changes
       await page.reload();
       await settingsPage.expectPageLoaded();
-      
+
       // Changes should be discarded
       await expect(settingsPage.intensitySelect).not.toHaveValue('HIGH');
     });
@@ -348,7 +348,7 @@ test.describe('Settings Management', () => {
     test('should have proper ARIA labels', async () => {
       await settingsPage.goToTherapeuticTab();
       await expect(settingsPage.intensitySelect).toHaveAttribute('aria-label');
-      
+
       await settingsPage.goToNotificationsTab();
       await expect(settingsPage.sessionRemindersToggle).toHaveRole('switch');
     });
@@ -363,7 +363,7 @@ test.describe('Settings Management', () => {
     test('should work on mobile devices', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await settingsPage.expectPageLoaded();
-      
+
       // Tabs should be scrollable on mobile
       const tabsBox = await settingsPage.tabNavigation.boundingBox();
       expect(tabsBox?.width).toBeLessThan(400);
@@ -372,12 +372,12 @@ test.describe('Settings Management', () => {
     test('should stack form elements on mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await settingsPage.goToTherapeuticTab();
-      
+
       // Form elements should stack vertically
       const formElements = settingsPage.page.locator('input, select, textarea');
       const firstElement = await formElements.first().boundingBox();
       const secondElement = await formElements.nth(1).boundingBox();
-      
+
       if (firstElement && secondElement) {
         expect(secondElement.y).toBeGreaterThan(firstElement.y + firstElement.height);
       }
@@ -393,11 +393,11 @@ test.describe('Settings Management', () => {
           body: JSON.stringify({ error: 'Failed to save settings' }),
         });
       });
-      
+
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
       await settingsPage.saveSettings();
-      
+
       await settingsPage.expectErrorMessage('Failed to save settings');
     });
 
@@ -405,11 +405,11 @@ test.describe('Settings Management', () => {
       await page.route('**/players/*/settings/**', route => {
         route.abort('failed');
       });
-      
+
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
       await settingsPage.saveSettings();
-      
+
       await settingsPage.expectErrorMessage();
     });
 
@@ -423,11 +423,11 @@ test.describe('Settings Management', () => {
           route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
         }
       });
-      
+
       await settingsPage.goToTherapeuticTab();
       await settingsPage.intensitySelect.selectOption('HIGH');
       await settingsPage.saveSettings();
-      
+
       // Should eventually succeed
       await settingsPage.expectSettingsSaved();
     });

@@ -142,7 +142,7 @@ describe('SessionManagementInterface', () => {
 
     it('should display total sessions count', () => {
       mockTherapeuticSessionService.getUserSessions.mockReturnValue([mockSession]);
-      
+
       render(
         <SessionManagementInterface
           userId={mockUserId}
@@ -477,7 +477,7 @@ describe('SessionManagementInterface', () => {
       );
 
       const planButton = screen.getByText('Plan New Session');
-      
+
       // First attempt fails
       fireEvent.click(planButton);
       await waitFor(() => {

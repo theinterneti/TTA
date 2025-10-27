@@ -11,7 +11,7 @@ test.describe('Preferences Management', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     preferencesPage = new PreferencesPage(page);
-    
+
     // Mock API responses for preferences
     await mockApiResponse(page, '**/players/*/preferences', {
       player_id: 'test-player-1',
@@ -41,14 +41,14 @@ test.describe('Preferences Management', () => {
       await page.route('**/players/*/preferences', route => {
         setTimeout(() => route.continue(), 2000);
       });
-      
+
       await preferencesPage.goto();
       await preferencesPage.expectLoadingState();
     });
 
     test('should handle missing player profile', async ({ page }) => {
       await mockApiResponse(page, '**/players/*/preferences', null, 404);
-      
+
       await preferencesPage.goto();
       await expect(page.locator('text=Player Profile Required')).toBeVisible();
     });
@@ -77,7 +77,7 @@ test.describe('Preferences Management', () => {
     test('should validate intensity level bounds', async () => {
       await preferencesPage.setIntensityLevel(11); // Above max
       await preferencesPage.expectIntensityLevel(10); // Should clamp to max
-      
+
       await preferencesPage.setIntensityLevel(-1); // Below min
       await preferencesPage.expectIntensityLevel(1); // Should clamp to min
     });
@@ -93,7 +93,7 @@ test.describe('Preferences Management', () => {
       await preferencesPage.selectTherapeuticApproach('CBT');
       await preferencesPage.selectTherapeuticApproach('MINDFULNESS');
       await preferencesPage.selectTherapeuticApproach('DBT');
-      
+
       await preferencesPage.expectApproachSelected('CBT');
       await preferencesPage.expectApproachSelected('MINDFULNESS');
       await preferencesPage.expectApproachSelected('DBT');
@@ -102,7 +102,7 @@ test.describe('Preferences Management', () => {
     test('should unselect therapeutic approaches', async () => {
       await preferencesPage.selectTherapeuticApproach('CBT');
       await preferencesPage.expectApproachSelected('CBT');
-      
+
       await preferencesPage.unselectTherapeuticApproach('CBT');
       await expect(preferencesPage.cbtCheckbox).not.toBeChecked();
     });
@@ -111,7 +111,7 @@ test.describe('Preferences Management', () => {
       // Unselect all approaches
       await preferencesPage.unselectTherapeuticApproach('CBT');
       await preferencesPage.unselectTherapeuticApproach('MINDFULNESS');
-      
+
       await preferencesPage.savePreferences();
       await preferencesPage.expectValidationErrors();
     });
@@ -126,10 +126,10 @@ test.describe('Preferences Management', () => {
     test('should select conversation style', async () => {
       await preferencesPage.selectConversationStyle('SUPPORTIVE');
       await preferencesPage.expectConversationStyle('SUPPORTIVE');
-      
+
       await preferencesPage.selectConversationStyle('CHALLENGING');
       await preferencesPage.expectConversationStyle('CHALLENGING');
-      
+
       await preferencesPage.selectConversationStyle('NEUTRAL');
       await preferencesPage.expectConversationStyle('NEUTRAL');
     });
@@ -137,7 +137,7 @@ test.describe('Preferences Management', () => {
     test('should allow only one conversation style', async () => {
       await preferencesPage.selectConversationStyle('SUPPORTIVE');
       await preferencesPage.selectConversationStyle('CHALLENGING');
-      
+
       // Only challenging should be selected
       await preferencesPage.expectConversationStyle('CHALLENGING');
       await expect(preferencesPage.supportiveRadio).not.toBeChecked();
@@ -153,7 +153,7 @@ test.describe('Preferences Management', () => {
     test('should add therapeutic goals', async () => {
       await preferencesPage.addTherapeuticGoal('stress_management');
       await preferencesPage.expectGoalSelected('stress_management');
-      
+
       await preferencesPage.addTherapeuticGoal('anxiety_reduction');
       await preferencesPage.expectGoalSelected('anxiety_reduction');
     });
@@ -161,7 +161,7 @@ test.describe('Preferences Management', () => {
     test('should remove therapeutic goals', async () => {
       await preferencesPage.addTherapeuticGoal('stress_management');
       await preferencesPage.expectGoalSelected('stress_management');
-      
+
       await preferencesPage.removeTherapeuticGoal('stress_management');
       await expect(preferencesPage.selectedGoals.locator('text=stress_management')).not.toBeVisible();
     });
@@ -192,7 +192,7 @@ test.describe('Preferences Management', () => {
       await preferencesPage.setCharacterName('A'); // Too short
       await preferencesPage.savePreferences();
       await preferencesPage.expectValidationErrors();
-      
+
       await preferencesPage.setCharacterName('A'.repeat(51)); // Too long
       await preferencesPage.savePreferences();
       await preferencesPage.expectValidationErrors();
@@ -223,7 +223,7 @@ test.describe('Preferences Management', () => {
     test('should prevent overlap between comfort and avoid topics', async () => {
       await preferencesPage.setComfortTopics(['work']);
       await preferencesPage.setAvoidTopics(['work']);
-      
+
       await preferencesPage.savePreferences();
       await preferencesPage.expectValidationErrors();
     });
@@ -236,10 +236,10 @@ test.describe('Preferences Management', () => {
 
     test('should save preferences successfully', async ({ page }) => {
       await mockApiResponse(page, '**/players/*/preferences', { success: true }, 200, 'PUT');
-      
+
       await preferencesPage.setIntensityLevel(6);
       await preferencesPage.savePreferences();
-      
+
       await expect(page.locator('text=Preferences saved')).toBeVisible();
     });
 
@@ -250,16 +250,16 @@ test.describe('Preferences Management', () => {
 
     test('should handle save errors', async ({ page }) => {
       await mockApiResponse(page, '**/players/*/preferences', { error: 'Save failed' }, 500, 'PUT');
-      
+
       await preferencesPage.setIntensityLevel(6);
       await preferencesPage.savePreferences();
-      
+
       await preferencesPage.expectErrorMessage('Save failed');
     });
 
     test('should measure save performance', async ({ page }) => {
       await mockApiResponse(page, '**/players/*/preferences', { success: true }, 200, 'PUT');
-      
+
       const saveTime = await preferencesPage.measureSavePerformance();
       expect(saveTime).toBeLessThan(3000); // 3 seconds
     });
@@ -274,7 +274,7 @@ test.describe('Preferences Management', () => {
       const downloadPromise = page.waitForEvent('download');
       await preferencesPage.clickExport();
       const download = await downloadPromise;
-      
+
       expect(download.suggestedFilename()).toContain('preferences');
       expect(download.suggestedFilename()).toContain('.json');
     });
@@ -285,14 +285,14 @@ test.describe('Preferences Management', () => {
         preferred_approaches: ['DBT'],
         conversation_style: 'CHALLENGING',
       };
-      
+
       const tempFile = await createTempFile(JSON.stringify(testPreferences), 'preferences.json');
-      
+
       try {
         await mockApiResponse(page, '**/players/*/preferences/import', { success: true }, 200, 'POST');
-        
+
         await preferencesPage.importPreferences(tempFile);
-        
+
         await expect(page.locator('text=Preferences imported')).toBeVisible();
       } finally {
         await deleteTempFile(tempFile);
@@ -301,12 +301,12 @@ test.describe('Preferences Management', () => {
 
     test('should handle invalid import file', async () => {
       const tempFile = await createTempFile('invalid json', 'invalid.json');
-      
+
       try {
         await preferencesPage.clickImport();
         await preferencesPage.fileInput.setInputFiles(tempFile);
         await preferencesPage.importConfirmButton.click();
-        
+
         await expect(preferencesPage.page.locator('text=Failed to import')).toBeVisible();
       } finally {
         await deleteTempFile(tempFile);
@@ -324,20 +324,20 @@ test.describe('Preferences Management', () => {
       await preferencesPage.setIntensityLevel(8);
       await preferencesPage.clickTab('approach');
       await preferencesPage.selectTherapeuticApproach('DBT');
-      
+
       // Reset preferences
       await mockApiResponse(page, '**/players/*/preferences/reset', { success: true }, 200, 'POST');
-      
+
       await preferencesPage.clickReset();
       await preferencesPage.confirmReset();
-      
+
       await expect(page.locator('text=Preferences reset')).toBeVisible();
     });
 
     test('should cancel reset operation', async () => {
       await preferencesPage.clickReset();
       await preferencesPage.cancelModal();
-      
+
       await expect(preferencesPage.resetModal).not.toBeVisible();
     });
   });
@@ -366,7 +366,7 @@ test.describe('Preferences Management', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await preferencesPage.goto();
       await preferencesPage.expectPageLoaded();
-      
+
       // Test tab navigation on mobile
       await preferencesPage.clickTab('intensity');
       await preferencesPage.setIntensityLevel(7);
@@ -377,7 +377,7 @@ test.describe('Preferences Management', () => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await preferencesPage.goto();
       await preferencesPage.expectPageLoaded();
-      
+
       // Test form functionality on tablet
       await preferencesPage.clickTab('approach');
       await preferencesPage.selectTherapeuticApproach('CBT');
@@ -406,11 +406,11 @@ test.describe('Preferences Management', () => {
 
     test('should validate required fields', async () => {
       await preferencesPage.goto();
-      
+
       // Clear required fields
       await preferencesPage.clickTab('character');
       await preferencesPage.setCharacterName('');
-      
+
       await preferencesPage.savePreferences();
       await preferencesPage.expectValidationErrors();
     });

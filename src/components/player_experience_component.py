@@ -1,5 +1,5 @@
 """
-Player Experience Component
+Player Experience Component.
 
 This module provides a component for managing the Player Experience Interface.
 
@@ -26,11 +26,12 @@ Example:
 """
 
 import logging
-import subprocess
+import subprocess  # nosec B404  # subprocess usage is safe and necessary for Docker Compose operations
 import time
 from pathlib import Path
 from typing import Any
 
+import redis  # Import at top level to avoid PLC0415
 import requests
 
 from src.common.process_utils import run as safe_run
@@ -226,7 +227,7 @@ class PlayerExperienceComponent(Component):
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
 
         # Use subprocess.run directly so unit tests patching subprocess.run can observe the call
-        result = subprocess.run(
+        return subprocess.run(  # noqa: S603  # nosec B603  # Command is constructed from trusted sources (Docker Compose)
             full_command,
             cwd=str(self.player_experience_dir),
             text=True,
@@ -234,8 +235,6 @@ class PlayerExperienceComponent(Component):
             capture_output=True,
             check=False,
         )
-
-        return result
 
     def _is_api_running(self) -> bool:
         """
@@ -321,8 +320,6 @@ class PlayerExperienceComponent(Component):
 
         # Check Redis
         try:
-            import redis
-
             redis_client = redis.Redis(
                 host="localhost", port=6379, decode_responses=True
             )
@@ -333,8 +330,6 @@ class PlayerExperienceComponent(Component):
 
         # Check Neo4j
         try:
-            import requests
-
             response = requests.get("http://localhost:7474/db/data/", timeout=5)
             dependency_health["neo4j"] = response.status_code == 200
         except Exception:

@@ -198,19 +198,18 @@ def main() -> int:
                         f"[bold red]Failed to start component {component}[/bold red]"
                     )
             return 0 if success else 1
+        # Start all components
+        console.print("[bold blue]Starting all components...[/bold blue]")
+        success = orchestrator.start_all()
+        if success:
+            console.print(
+                "[bold green]All components started successfully![/bold green]"
+            )
         else:
-            # Start all components
-            console.print("[bold blue]Starting all components...[/bold blue]")
-            success = orchestrator.start_all()
-            if success:
-                console.print(
-                    "[bold green]All components started successfully![/bold green]"
-                )
-            else:
-                console.print("[bold red]Failed to start all components[/bold red]")
-            return 0 if success else 1
+            console.print("[bold red]Failed to start all components[/bold red]")
+        return 0 if success else 1
 
-    elif args.command == "stop":
+    if args.command == "stop":
         if args.components:
             # Stop specific components
             success = True
@@ -224,19 +223,18 @@ def main() -> int:
                         f"[bold red]Failed to stop component {component}[/bold red]"
                     )
             return 0 if success else 1
+        # Stop all components
+        console.print("[bold blue]Stopping all components...[/bold blue]")
+        success = orchestrator.stop_all()
+        if success:
+            console.print(
+                "[bold green]All components stopped successfully![/bold green]"
+            )
         else:
-            # Stop all components
-            console.print("[bold blue]Stopping all components...[/bold blue]")
-            success = orchestrator.stop_all()
-            if success:
-                console.print(
-                    "[bold green]All components stopped successfully![/bold green]"
-                )
-            else:
-                console.print("[bold red]Failed to stop all components[/bold red]")
-            return 0 if success else 1
+            console.print("[bold red]Failed to stop all components[/bold red]")
+        return 0 if success else 1
 
-    elif args.command == "restart":
+    if args.command == "restart":
         if args.components:
             # Restart specific components
             success = True
@@ -252,19 +250,18 @@ def main() -> int:
                         f"[bold red]Failed to restart component {component}[/bold red]"
                     )
             return 0 if success else 1
+        # Restart all components
+        console.print("[bold blue]Restarting all components...[/bold blue]")
+        success = orchestrator.stop_all() and orchestrator.start_all()
+        if success:
+            console.print(
+                "[bold green]All components restarted successfully![/bold green]"
+            )
         else:
-            # Restart all components
-            console.print("[bold blue]Restarting all components...[/bold blue]")
-            success = orchestrator.stop_all() and orchestrator.start_all()
-            if success:
-                console.print(
-                    "[bold green]All components restarted successfully![/bold green]"
-                )
-            else:
-                console.print("[bold red]Failed to restart all components[/bold red]")
-            return 0 if success else 1
+            console.print("[bold red]Failed to restart all components[/bold red]")
+        return 0 if success else 1
 
-    elif args.command == "status":
+    if args.command == "status":
         if args.components:
             # Get status of specific components
             for component in args.components:
@@ -280,7 +277,7 @@ def main() -> int:
             orchestrator.display_status()
         return 0
 
-    elif args.command == "docker":
+    if args.command == "docker":
         if args.docker_command == "compose":
             # Run Docker Compose command
             console.print(
@@ -334,7 +331,7 @@ def main() -> int:
             console.print(f"{args.key}: [bold green]{value}[/bold green]")
             return 0
 
-        elif args.config_command == "set":
+        if args.config_command == "set":
             # Set configuration value
             # Convert value to appropriate type
             value = args.value
@@ -351,7 +348,7 @@ def main() -> int:
             console.print(f"Set {args.key} to [bold green]{value}[/bold green]")
             return 0
 
-        elif args.config_command == "save":
+        if args.config_command == "save":
             # Save configuration
             success = orchestrator.config.save(args.path)
             if success:
@@ -368,7 +365,7 @@ def main() -> int:
             )
             return 1
         if args.admin_command == "recover":
-            from src.agent_orchestration.admin.recover import run_recovery
+            from tta_ai.orchestration.admin.recover import run_recovery
 
             try:
                 per_agent = __import__("asyncio").run(

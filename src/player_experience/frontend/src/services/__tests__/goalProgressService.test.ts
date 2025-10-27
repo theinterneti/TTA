@@ -11,7 +11,7 @@ import {
 
 describe('Goal Progress Service', () => {
   const mockDate = new Date('2024-01-15T10:00:00Z');
-  
+
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(mockDate);
@@ -141,11 +141,11 @@ describe('Goal Progress Service', () => {
     it('should estimate completion date based on progress trend', () => {
       // Add some progress history to establish a trend
       let progress = updateGoalProgress(initialProgress, 10);
-      
+
       // Advance time and add more progress
       jest.setSystemTime(new Date('2024-01-16T10:00:00Z'));
       progress = updateGoalProgress(progress, 20);
-      
+
       jest.setSystemTime(new Date('2024-01-17T10:00:00Z'));
       progress = updateGoalProgress(progress, 30);
 

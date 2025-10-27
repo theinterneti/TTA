@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  LightBulbIcon, 
-  TrendingUpIcon, 
-  TrendingDownIcon, 
+import {
+  LightBulbIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
   ArrowRightIcon,
   ChevronDownIcon,
   ChevronUpIcon
@@ -47,7 +47,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
 
   const toggleSection = (section: string) => {
     if (!expandable) return;
-    
+
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(section)) {
       newExpanded.delete(section);
@@ -151,7 +151,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
           sectionKey="insights"
           icon={<LightBulbIcon className="h-6 w-6 text-yellow-500" />}
         />
-        
+
         {expandedSections.has('insights') && (
           <div className="p-4 space-y-4">
             {/* Key Metrics */}
@@ -162,7 +162,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
                   {(progressSummary.therapeutic_momentum * 100).toFixed(0)}%
                 </div>
               </div>
-              
+
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="text-sm text-gray-600 mb-1">Progress Trend</div>
                 <div className={`flex items-center px-2 py-1 rounded ${getTrendColor(progressSummary.progress_trend)}`}>
@@ -170,7 +170,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
                   <span className="ml-2 font-medium capitalize">{progressSummary.progress_trend}</span>
                 </div>
               </div>
-              
+
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="text-sm text-gray-600 mb-1">Readiness for Advancement</div>
                 <div className={`text-lg font-semibold px-2 py-1 rounded ${getMomentumColor(progressSummary.readiness_for_advancement)}`}>
@@ -193,7 +193,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
                   </div>
                 </div>
               )}
-              
+
               {progressSummary.challenge_areas.length > 0 && (
                 <div>
                   <h4 className="font-medium text-orange-800 mb-2">🎯 Growth Areas</h4>
@@ -228,7 +228,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
           sectionKey="recommendations"
           icon={<ArrowRightIcon className="h-6 w-6 text-blue-500" />}
         />
-        
+
         {expandedSections.has('recommendations') && (
           <div className="p-4">
             {recommendations.length > 0 ? (
@@ -269,7 +269,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
             sectionKey="goals"
             icon={<ArrowRightIcon className="h-6 w-6 text-green-500" />}
           />
-          
+
           {expandedSections.has('goals') && (
             <div className="p-4">
               <div className="space-y-2">

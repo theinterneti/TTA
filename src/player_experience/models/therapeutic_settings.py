@@ -275,7 +275,7 @@ class EnhancedTherapeuticSettings:
         )
 
         # Create a copy of current settings with new version
-        new_settings = EnhancedTherapeuticSettings(
+        return EnhancedTherapeuticSettings(
             settings_id=self.settings_id,
             player_id=self.player_id,
             intensity_level=self.intensity_level,
@@ -304,8 +304,6 @@ class EnhancedTherapeuticSettings:
             updated_at=datetime.now(),
             is_active=True,
         )
-
-        return new_settings
 
 
 @dataclass
@@ -585,8 +583,7 @@ class SettingsMigrationManager:
         """Migrate settings from old format to current version."""
         if target_version == 1:
             return self._migrate_to_v1(old_settings)
-        else:
-            raise ValueError(f"Unsupported target version: {target_version}")
+        raise ValueError(f"Unsupported target version: {target_version}")
 
     def _migrate_to_v1(
         self, old_settings: dict[str, Any]
@@ -615,7 +612,7 @@ class SettingsMigrationManager:
             ]
 
         # Create enhanced settings with migrated data
-        enhanced_settings = EnhancedTherapeuticSettings(
+        return EnhancedTherapeuticSettings(
             settings_id=old_settings.get("settings_id", str(uuid.uuid4())),
             player_id=old_settings.get("player_id", ""),
             intensity_level=intensity_level,
@@ -635,5 +632,3 @@ class SettingsMigrationManager:
             comfort_topics=old_settings.get("comfort_topics", []),
             avoid_topics=old_settings.get("avoid_topics", []),
         )
-
-        return enhanced_settings

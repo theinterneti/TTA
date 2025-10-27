@@ -27,7 +27,24 @@ This directory contains the complete testing strategy, analysis, and implementat
 
 ---
 
-### 2. [TEST_COVERAGE_ANALYSIS.md](./TEST_COVERAGE_ANALYSIS.md) 📊 **DETAILED ANALYSIS**
+### 2. [ADVANCED_TESTING_METHODOLOGY.md](./ADVANCED_TESTING_METHODOLOGY.md) 🚀 **ADVANCED TESTING** (NEW)
+
+**Comprehensive guide to advanced testing strategies for Model Management**
+
+- Property-based testing with Hypothesis
+- Mutation testing with Mutmut
+- Performance regression testing with pytest-benchmark
+- Contract testing with Pact
+- Tool configuration and usage
+- CI/CD integration
+- Best practices and examples
+- Troubleshooting guide
+
+**Best for:** Understanding and implementing advanced testing techniques
+
+---
+
+### 3. [TEST_COVERAGE_ANALYSIS.md](./TEST_COVERAGE_ANALYSIS.md) 📊 **DETAILED ANALYSIS**
 
 **Comprehensive analysis and detailed roadmap**
 
@@ -45,7 +62,7 @@ This directory contains the complete testing strategy, analysis, and implementat
 
 ---
 
-### 3. [GITHUB_WORKFLOWS_RECOMMENDATIONS.md](./GITHUB_WORKFLOWS_RECOMMENDATIONS.md) 🔄 **CI/CD GUIDE**
+### 4. [GITHUB_WORKFLOWS_RECOMMENDATIONS.md](./GITHUB_WORKFLOWS_RECOMMENDATIONS.md) 🔄 **CI/CD GUIDE**
 
 **GitHub Actions workflow specifications and recommendations**
 
@@ -61,7 +78,7 @@ This directory contains the complete testing strategy, analysis, and implementat
 
 ---
 
-### 4. [QUICK_REFERENCE_TESTING_GUIDE.md](./QUICK_REFERENCE_TESTING_GUIDE.md) 🚀 **DAILY REFERENCE**
+### 5. [QUICK_REFERENCE_TESTING_GUIDE.md](./QUICK_REFERENCE_TESTING_GUIDE.md) 🚀 **DAILY REFERENCE**
 
 **Quick reference for daily development workflow**
 
@@ -92,10 +109,10 @@ This directory contains the complete testing strategy, analysis, and implementat
    ```bash
    # Install dependencies
    uv sync --all-extras --dev
-   
+
    # Start test databases
    docker-compose -f docker-compose.test.yml up -d neo4j redis
-   
+
    # Install Playwright browsers
    npx playwright install chromium firefox webkit --with-deps
    ```
@@ -104,10 +121,10 @@ This directory contains the complete testing strategy, analysis, and implementat
    ```bash
    # Unit tests (fast)
    uv run pytest -q
-   
+
    # Integration tests (with databases)
    uv run pytest -q --neo4j --redis
-   
+
    # E2E tests
    npx playwright test tests/e2e/specs/auth.spec.ts
    ```
@@ -158,8 +175,8 @@ npx playwright test tests/e2e/specs/auth.spec.ts
 
 ### Implementation Phases
 
-**Phase 1 (Weeks 1-2): Critical Path** - Authentication, story creation, database persistence, core gameplay  
-**Phase 2 (Weeks 3-4): User Experience** - Complete journeys, frontend UI/UX, error handling  
+**Phase 1 (Weeks 1-2): Critical Path** - Authentication, story creation, database persistence, core gameplay
+**Phase 2 (Weeks 3-4): User Experience** - Complete journeys, frontend UI/UX, error handling
 **Phase 3 (Weeks 5-6): Robustness** - Performance, failure scenarios, browser compatibility
 
 ### Quality Targets
@@ -172,23 +189,56 @@ npx playwright test tests/e2e/specs/auth.spec.ts
 
 ## Test Types
 
-### Unit Tests
+### Traditional Testing
+
+#### Unit Tests
 - **Purpose:** Test individual functions/classes in isolation
 - **Tools:** pytest, unittest.mock
 - **Execution:** Fast (< 1 minute)
-- **Command:** `uv run pytest -q`
+- **Command:** `uvx pytest -q`
 
-### Integration Tests
+#### Integration Tests
 - **Purpose:** Test component interactions with real databases
 - **Tools:** pytest with --neo4j and --redis markers
 - **Execution:** Moderate (5-10 minutes)
-- **Command:** `uv run pytest -q --neo4j --redis`
+- **Command:** `uvx pytest -q --neo4j --redis`
 
-### End-to-End Tests
+#### End-to-End Tests
 - **Purpose:** Test complete user journeys from frontend to backend
 - **Tools:** Playwright
 - **Execution:** Slow (15-30 minutes)
 - **Command:** `npx playwright test`
+
+### Advanced Testing (NEW)
+
+#### Property-Based Tests
+- **Purpose:** Automatically discover edge cases by testing invariants
+- **Tools:** Hypothesis
+- **Execution:** Fast (< 2 minutes)
+- **Command:** `uvx pytest -m property`
+- **Coverage Target:** 100% of critical algorithms
+
+#### Mutation Tests
+- **Purpose:** Validate test suite effectiveness by introducing code mutations
+- **Tools:** Mutmut
+- **Execution:** Very slow (30-60 minutes)
+- **Command:** `uvx mutmut run --paths-to-mutate=src/components/model_management`
+- **Mutation Score Target:** 90% overall, 100% critical paths
+- **Frequency:** Weekly in CI/CD only
+
+#### Performance Regression Tests
+- **Purpose:** Detect performance degradation over time
+- **Tools:** pytest-benchmark
+- **Execution:** Fast (< 5 minutes)
+- **Command:** `uvx pytest tests/performance/benchmarks/ --benchmark-only`
+- **Threshold:** Fail if performance degrades > 20%
+
+#### Contract Tests
+- **Purpose:** Validate API contracts between frontend and backend
+- **Tools:** Pact Python
+- **Execution:** Fast (< 2 minutes)
+- **Command:** `uvx pytest tests/contracts/`
+- **Coverage Target:** 100% of API endpoints
 
 ### Performance Tests
 - **Purpose:** Validate system performance under load
@@ -314,6 +364,17 @@ npx playwright test --debug
 
 ## Changelog
 
+### Version 1.1 (2025-10-10)
+- **NEW:** Advanced Testing Methodology documentation
+- Added property-based testing with Hypothesis
+- Added mutation testing with Mutmut
+- Added performance regression testing with pytest-benchmark
+- Added contract testing with Pact Python
+- Updated pyproject.toml with new testing dependencies
+- Added pytest markers for advanced testing types
+- Added comprehensive examples and troubleshooting guide
+- Updated test type documentation
+
 ### Version 1.0 (2025-10-03)
 - Initial comprehensive testing strategy documentation
 - Current state analysis (971 tests, 68% coverage)
@@ -330,16 +391,17 @@ This documentation is part of the TTA project and follows the same license as th
 
 ---
 
-**Documentation Version:** 1.0  
-**Last Updated:** 2025-10-03  
-**Maintained by:** The Augster (AI Development Assistant)  
+**Documentation Version:** 1.1
+**Last Updated:** 2025-10-10
+**Maintained by:** The Augster (AI Development Assistant)
 **Status:** Ready for Use
 
 ---
 
 ## Quick Links
 
+- ⭐ [Executive Summary](./TESTING_STRATEGY_SUMMARY.md)
+- 🚀 [Advanced Testing Methodology](./ADVANCED_TESTING_METHODOLOGY.md) **(NEW)**
 - 📊 [Detailed Analysis](./TEST_COVERAGE_ANALYSIS.md)
 - 🔄 [CI/CD Guide](./GITHUB_WORKFLOWS_RECOMMENDATIONS.md)
 - 🚀 [Quick Reference](./QUICK_REFERENCE_TESTING_GUIDE.md)
-- ⭐ [Executive Summary](./TESTING_STRATEGY_SUMMARY.md)

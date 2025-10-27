@@ -24,7 +24,7 @@ This is the React frontend application for the TTA (Therapeutic Text Adventure) 
 
 ### Prerequisites
 
-- Node.js 16+ 
+- Node.js 16+
 - npm or yarn
 
 ### Installation

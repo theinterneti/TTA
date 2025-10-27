@@ -54,7 +54,7 @@ const IntensityLevelSelector: React.FC<IntensityLevelSelectorProps> = ({
 
   const getColorClasses = (color: string, isSelected: boolean) => {
     const baseClasses = 'border-2 transition-all duration-200';
-    
+
     if (isSelected) {
       switch (color) {
         case 'green':
@@ -78,7 +78,7 @@ const IntensityLevelSelector: React.FC<IntensityLevelSelectorProps> = ({
           Therapeutic Intensity Level
         </h3>
         <p className="text-gray-600 mb-6">
-          Choose the level of therapeutic intervention that feels most comfortable for you. 
+          Choose the level of therapeutic intervention that feels most comfortable for you.
           This affects how direct, challenging, and intensive your therapeutic experience will be.
         </p>
       </div>
@@ -94,11 +94,11 @@ const IntensityLevelSelector: React.FC<IntensityLevelSelectorProps> = ({
               <span className="text-3xl mr-3">{item.icon}</span>
               <h4 className="text-lg font-semibold">{item.title}</h4>
             </div>
-            
+
             <p className="text-sm mb-4 opacity-90">
               {INTENSITY_DESCRIPTIONS[item.level]}
             </p>
-            
+
             <div className="space-y-2">
               <h5 className="font-medium text-sm">Key Features:</h5>
               <ul className="text-xs space-y-1">
@@ -110,7 +110,7 @@ const IntensityLevelSelector: React.FC<IntensityLevelSelectorProps> = ({
                 ))}
               </ul>
             </div>
-            
+
             {value === item.level && (
               <div className="mt-4 pt-4 border-t border-current border-opacity-20">
                 <div className="flex items-center text-sm font-medium">
@@ -172,7 +172,7 @@ const IntensityLevelSelector: React.FC<IntensityLevelSelectorProps> = ({
       {/* Flexibility Note */}
       <div className="text-center text-sm text-gray-500 border-t pt-4">
         <p>
-          Don't worry - you can change your intensity level at any time as you become more comfortable 
+          Don't worry - you can change your intensity level at any time as you become more comfortable
           or as your therapeutic needs evolve.
         </p>
       </div>

@@ -1,7 +1,7 @@
 # Database Performance Optimization Report
 
-**Date:** 2025-09-29  
-**Task:** MEDIUM Priority - Optimize Database Performance  
+**Date:** 2025-09-29
+**Task:** MEDIUM Priority - Optimize Database Performance
 **Status:** ✅ **COMPLETE**
 
 ---
@@ -179,7 +179,7 @@ def decompress_data(compressed: bytes) -> dict:
 def get_session_ttl(last_activity: datetime) -> int:
     """Calculate TTL based on session activity."""
     inactive_time = (datetime.utcnow() - last_activity).total_seconds()
-    
+
     if inactive_time < 300:  # Active in last 5 minutes
         return 3600  # 1 hour
     elif inactive_time < 1800:  # Active in last 30 minutes
@@ -248,13 +248,13 @@ async def get_character(character_id: str):
 ```python
 class CacheManager:
     """Multi-level cache with L1 (memory) and L2 (Redis)."""
-    
+
     def __init__(self):
         self.l1_cache = {}  # In-memory cache
         self.l2_cache = redis_client  # Redis cache
         self.l1_max_size = 1000
         self.l1_ttl = 60  # 1 minute
-    
+
     async def get(self, key: str):
         # Check L1 cache first
         if key in self.l1_cache:
@@ -262,14 +262,14 @@ class CacheManager:
             if time.time() < expiry:
                 return value
             del self.l1_cache[key]
-        
+
         # Check L2 cache (Redis)
         value = await self.l2_cache.get(key)
         if value:
             # Populate L1 cache
             self.l1_cache[key] = (value, time.time() + self.l1_ttl)
             return value
-        
+
         return None
 ```
 
@@ -279,7 +279,7 @@ async def warm_cache_for_player(player_id: str):
     """Pre-load frequently accessed data into cache."""
     # Load all player characters
     characters = await get_player_characters(player_id)
-    
+
     # Cache each character
     for char in characters:
         await redis_client.setex(
@@ -287,7 +287,7 @@ async def warm_cache_for_player(player_id: str):
             3600,
             json.dumps(char.to_dict())
         )
-    
+
     # Load active sessions
     sessions = await get_active_sessions(player_id)
     for session in sessions:
@@ -304,12 +304,12 @@ async def invalidate_character_cache(character_id: str):
     """Invalidate all caches related to a character."""
     # Invalidate character cache
     await redis_client.delete(f"character:{character_id}")
-    
+
     # Invalidate related session caches
     sessions = await get_character_sessions(character_id)
     for session in sessions:
         await redis_client.delete(f"session:{session.session_id}")
-    
+
     # Invalidate player dashboard cache
     character = await get_character(character_id)
     await redis_client.delete(f"player:dashboard:{character.player_id}")
@@ -463,8 +463,7 @@ The TTA database layer is well-architected with good caching strategies already 
 
 ---
 
-**Task Status:** ✅ **COMPLETE**  
-**Date Completed:** 2025-09-29  
-**Priority:** MEDIUM  
+**Task Status:** ✅ **COMPLETE**
+**Date Completed:** 2025-09-29
+**Priority:** MEDIUM
 **Next Steps:** Implement high-priority recommendations in next sprint
-

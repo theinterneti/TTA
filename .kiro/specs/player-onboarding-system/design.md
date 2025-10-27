@@ -17,42 +17,42 @@ graph TB
         Progress[Progress Tracking]
         Tutorial[Interactive Tutorial]
     end
-    
+
     subgraph "Onboarding Service Layer"
         OS[Onboarding Orchestrator]
         PS[Preference Service]
         CS[Character Creation Service]
         AS[Adventure Preparation Service]
     end
-    
+
     subgraph "Integration Layer"
         Auth[Authentication Service]
         Profile[Player Profile Service]
         Content[Content Filtering Service]
         Accessibility[Accessibility Service]
     end
-    
+
     subgraph "Data Layer"
         UserDB[(User Database)]
         PrefsDB[(Preferences Database)]
         ContentDB[(Content Database)]
         ProgressDB[(Progress Database)]
     end
-    
+
     UI --> OS
     Progress --> OS
     Tutorial --> OS
-    
+
     OS --> PS
     OS --> CS
     OS --> AS
     OS --> Auth
-    
+
     PS --> Profile
     CS --> Profile
     AS --> Content
     OS --> Accessibility
-    
+
     Auth --> UserDB
     Profile --> UserDB
     PS --> PrefsDB

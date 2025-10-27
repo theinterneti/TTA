@@ -129,7 +129,7 @@ describe('CharacterCreationForm', () => {
     // Fill in step 1
     const nameInput = screen.getByPlaceholderText('Enter your character\'s name');
     const descriptionInput = screen.getByPlaceholderText(/Describe your character's appearance/);
-    
+
     fireEvent.change(nameInput, { target: { value: 'Test Character' } });
     fireEvent.change(descriptionInput, { target: { value: 'A brave adventurer' } });
 
@@ -150,7 +150,7 @@ describe('CharacterCreationForm', () => {
     // Navigate to step 2
     const nameInput = screen.getByPlaceholderText('Enter your character\'s name');
     const descriptionInput = screen.getByPlaceholderText(/Describe your character's appearance/);
-    
+
     fireEvent.change(nameInput, { target: { value: 'Test Character' } });
     fireEvent.change(descriptionInput, { target: { value: 'A brave adventurer' } });
 
@@ -177,7 +177,7 @@ describe('CharacterCreationForm', () => {
     // Navigate to step 2 and add a trait
     const nameInput = screen.getByPlaceholderText('Enter your character\'s name');
     const descriptionInput = screen.getByPlaceholderText(/Describe your character's appearance/);
-    
+
     fireEvent.change(nameInput, { target: { value: 'Test Character' } });
     fireEvent.change(descriptionInput, { target: { value: 'A brave adventurer' } });
     fireEvent.click(screen.getByText('Next'));

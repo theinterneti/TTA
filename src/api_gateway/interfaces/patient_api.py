@@ -290,7 +290,7 @@ async def get_patient_profile(patient_id: str = Depends(get_current_patient)):
     """Get patient profile and preferences"""
     try:
         # In production, this would fetch from database
-        profile = PatientProfile(
+        return PatientProfile(
             id=patient_id,
             demographics={
                 "age": 28,
@@ -321,8 +321,6 @@ async def get_patient_profile(patient_id: str = Depends(get_current_patient)):
                 "research_participation": False,
             },
         )
-
-        return profile
 
     except Exception as e:
         logger.error(f"Failed to get patient profile: {str(e)}")

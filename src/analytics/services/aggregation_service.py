@@ -219,10 +219,9 @@ class BehaviorPatternDetector:
 
         if avg_duration > 30 and avg_interactions > 20:
             return "high"
-        elif avg_duration > 15 and avg_interactions > 10:
+        if avg_duration > 15 and avg_interactions > 10:
             return "medium"
-        else:
-            return "low"
+        return "low"
 
     def _classify_progress_category(self, progress_data: list[dict[str, Any]]) -> str:
         """Classify therapeutic progress category."""
@@ -233,12 +232,11 @@ class BehaviorPatternDetector:
 
         if avg_progress > 0.7 and avg_completion > 0.6:
             return "excellent"
-        elif avg_progress > 0.5 and avg_completion > 0.4:
+        if avg_progress > 0.5 and avg_completion > 0.4:
             return "good"
-        elif avg_progress > 0.3 and avg_completion > 0.2:
+        if avg_progress > 0.3 and avg_completion > 0.2:
             return "moderate"
-        else:
-            return "needs_attention"
+        return "needs_attention"
 
 
 class AnalyticsAggregationService:
@@ -277,7 +275,7 @@ class AnalyticsAggregationService:
 
             # Detect patterns for each cohort
             all_patterns = []
-            for _, users in cohort_data.items():
+            for users in cohort_data.values():
                 # Aggregate session data for pattern detection
                 all_sessions = []
                 all_progress = []
@@ -348,7 +346,7 @@ class AnalyticsAggregationService:
             cohort_stats[cohort]["pattern_types"].add(pattern.pattern_type)
 
         # Calculate averages and convert sets to lists
-        for _, stats in cohort_stats.items():
+        for stats in cohort_stats.values():
             if stats["pattern_count"] > 0:
                 stats["avg_confidence"] /= stats["pattern_count"]
             stats["pattern_types"] = list(stats["pattern_types"])

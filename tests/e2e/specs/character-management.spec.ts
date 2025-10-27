@@ -10,7 +10,7 @@ test.describe('Character Management', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     characterPage = new CharacterManagementPage(page);
-    
+
     // Login before each test
     await loginPage.goto();
     await loginPage.login(testUsers.default);
@@ -33,7 +33,7 @@ test.describe('Character Management', () => {
           body: JSON.stringify([]),
         });
       });
-      
+
       await characterPage.goto();
       await characterPage.expectEmptyState();
     });
@@ -49,7 +49,7 @@ test.describe('Character Management', () => {
           ]),
         });
       });
-      
+
       await characterPage.goto();
       await characterPage.expectCharacterCount(2);
     });
@@ -76,7 +76,7 @@ test.describe('Character Management', () => {
           route.continue();
         }
       });
-      
+
       const newCharacter = generateRandomCharacter();
       await characterPage.createCharacter(newCharacter);
       await characterPage.expectCharacterCreated(newCharacter.name);
@@ -106,11 +106,11 @@ test.describe('Character Management', () => {
           route.continue();
         }
       });
-      
+
       await characterPage.clickCreateCharacter();
       await characterPage.fillCharacterForm(testCharacters.warrior);
       await characterPage.saveCharacter();
-      
+
       const errorMessage = characterPage.page.locator('[data-testid="error"], .error');
       await expect(errorMessage).toBeVisible();
     });
@@ -128,7 +128,7 @@ test.describe('Character Management', () => {
           ]),
         });
       });
-      
+
       await characterPage.goto();
     });
 
@@ -148,11 +148,11 @@ test.describe('Character Management', () => {
           route.continue();
         }
       });
-      
+
       await characterPage.editCharacter('Test Character', {
         name: 'Updated Character',
       });
-      
+
       await characterPage.expectCharacterCreated('Updated Character');
     });
 
@@ -164,7 +164,7 @@ test.describe('Character Management', () => {
           route.continue();
         }
       });
-      
+
       await characterPage.deleteCharacter('Test Character');
       await characterPage.expectCharacterDeleted('Test Character');
     });
@@ -172,7 +172,7 @@ test.describe('Character Management', () => {
     test('should confirm before deleting character', async () => {
       await characterPage.selectCharacterForEdit('Test Character');
       await characterPage.deleteCharacterButton.click();
-      
+
       // Should show confirmation dialog
       await expect(characterPage.confirmDeleteButton).toBeVisible();
     });
@@ -192,7 +192,7 @@ test.describe('Character Management', () => {
           ]),
         });
       });
-      
+
       await characterPage.goto();
     });
 
@@ -214,7 +214,7 @@ test.describe('Character Management', () => {
     test('should clear search and filters', async () => {
       await characterPage.searchCharacters('Warrior');
       await characterPage.expectSearchResults('Warrior');
-      
+
       await characterPage.searchCharacters('');
       await characterPage.expectCharacterCount(3);
     });
@@ -232,14 +232,14 @@ test.describe('Character Management', () => {
           ]),
         });
       });
-      
+
       await characterPage.goto();
     });
 
     test('should switch between grid and list views', async () => {
       await characterPage.switchToListView();
       // Should change layout to list view
-      
+
       await characterPage.switchToGridView();
       // Should change layout back to grid view
     });
@@ -248,7 +248,7 @@ test.describe('Character Management', () => {
       await characterPage.switchToListView();
       await page.reload();
       await characterPage.expectPageLoaded();
-      
+
       // Should maintain list view after reload
     });
   });
@@ -266,13 +266,13 @@ test.describe('Character Management', () => {
           ]),
         });
       });
-      
+
       await characterPage.goto();
     });
 
     test('should select multiple characters', async () => {
       await characterPage.selectMultipleCharacters(['Character 1', 'Character 2']);
-      
+
       // Should show bulk action buttons
       const bulkActions = characterPage.page.locator('[data-testid="bulk-actions"]');
       await expect(bulkActions).toBeVisible();
@@ -282,7 +282,7 @@ test.describe('Character Management', () => {
       await page.route('**/characters/bulk-delete', route => {
         route.fulfill({ status: 204 });
       });
-      
+
       await characterPage.bulkDeleteCharacters(['Character 1', 'Character 2']);
       await characterPage.expectCharacterCount(1);
     });
@@ -313,7 +313,7 @@ test.describe('Character Management', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await characterPage.clickCreateCharacter();
       await characterPage.expectCharacterFormVisible();
-      
+
       // Form should be properly sized for mobile
       const formBox = await characterPage.characterForm.boundingBox();
       expect(formBox?.width).toBeLessThan(400);
@@ -336,7 +336,7 @@ test.describe('Character Management', () => {
           route.continue();
         }
       });
-      
+
       const creationTime = await characterPage.measureCharacterCreationTime();
       expect(creationTime).toBeLessThan(10000);
     });
@@ -347,7 +347,7 @@ test.describe('Character Management', () => {
         name: `Character ${i}`,
         ...testCharacters.warrior,
       }));
-      
+
       await page.route('**/players/*/characters', route => {
         route.fulfill({
           status: 200,
@@ -355,12 +355,12 @@ test.describe('Character Management', () => {
           body: JSON.stringify(manyCharacters),
         });
       });
-      
+
       const startTime = Date.now();
       await characterPage.goto();
       await characterPage.expectPageLoaded();
       const loadTime = Date.now() - startTime;
-      
+
       expect(loadTime).toBeLessThan(5000);
     });
   });
@@ -374,11 +374,11 @@ test.describe('Character Management', () => {
           route.continue();
         }
       });
-      
+
       await characterPage.clickCreateCharacter();
       await characterPage.fillCharacterForm(testCharacters.warrior);
       await characterPage.saveCharacter();
-      
+
       const errorMessage = characterPage.page.locator('[data-testid="error"], .error');
       await expect(errorMessage).toBeVisible();
     });
@@ -391,7 +391,7 @@ test.describe('Character Management', () => {
           body: JSON.stringify({ error: 'Internal server error' }),
         });
       });
-      
+
       await characterPage.goto();
       const errorMessage = characterPage.page.locator('[data-testid="error"], .error');
       await expect(errorMessage).toBeVisible();

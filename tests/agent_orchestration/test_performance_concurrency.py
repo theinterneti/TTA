@@ -11,8 +11,9 @@ import time
 from unittest.mock import patch
 
 import pytest
+import pytest_asyncio
 
-from src.agent_orchestration import (
+from tta_ai.orchestration import (
     AgentStep,
     AgentType,
     InputProcessorAgentProxy,
@@ -40,7 +41,7 @@ from tests.agent_orchestration.test_multi_agent_workflow_integration import (
 class TestConcurrentWorkflowExecution:
     """Test concurrent execution of multiple independent workflows."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def integration_helper(self, redis_client, neo4j_driver):
         """Create integration test helper."""
         return IntegrationTestHelper(redis_client, neo4j_driver)
@@ -136,24 +137,24 @@ class TestConcurrentWorkflowExecution:
             # Verify success rate meets expectations
             success_rate = len(successful_results) / len(results)
             expected_success_rate = scenario["expected_success_rate"]
-            assert (
-                success_rate >= expected_success_rate
-            ), f"Success rate {success_rate:.2f} below expected {expected_success_rate:.2f}"
+            assert success_rate >= expected_success_rate, (
+                f"Success rate {success_rate:.2f} below expected {expected_success_rate:.2f}"
+            )
 
             # Verify workflow isolation - each should have unique identifiers
             request_ids = [result["request_id"] for result in successful_results]
-            assert len(set(request_ids)) == len(
-                request_ids
-            ), "Request IDs not unique - isolation failed"
+            assert len(set(request_ids)) == len(request_ids), (
+                "Request IDs not unique - isolation failed"
+            )
 
             session_ids = [
                 result["session_id"]
                 for result in successful_results
                 if result["session_id"]
             ]
-            assert len(set(session_ids)) == len(
-                session_ids
-            ), "Session IDs not unique - isolation failed"
+            assert len(set(session_ids)) == len(session_ids), (
+                "Session IDs not unique - isolation failed"
+            )
 
             # Verify performance characteristics
             execution_times = [
@@ -162,16 +163,16 @@ class TestConcurrentWorkflowExecution:
             avg_execution_time = statistics.mean(execution_times)
             max(execution_times)
 
-            assert (
-                avg_execution_time <= scenario["expected_avg_response_time"]
-            ), f"Average execution time {avg_execution_time:.2f}s exceeds expected {scenario['expected_avg_response_time']}s"
+            assert avg_execution_time <= scenario["expected_avg_response_time"], (
+                f"Average execution time {avg_execution_time:.2f}s exceeds expected {scenario['expected_avg_response_time']}s"
+            )
 
             # Verify concurrent execution was actually concurrent (not sequential)
             theoretical_sequential_time = sum(execution_times)
             concurrency_factor = theoretical_sequential_time / total_time
-            assert (
-                concurrency_factor > 1.5
-            ), f"Low concurrency factor {concurrency_factor:.2f} - may be running sequentially"
+            assert concurrency_factor > 1.5, (
+                f"Low concurrency factor {concurrency_factor:.2f} - may be running sequentially"
+            )
 
             print(
                 f"✓ Concurrent execution: {len(successful_results)}/{len(results)} successful"
@@ -253,9 +254,9 @@ class TestConcurrentWorkflowExecution:
                 def get_agent(agent_id):
                     if agent_id.type == AgentType.WBA:
                         return resource_limited_wba
-                    elif agent_id.type == AgentType.IPA:
+                    if agent_id.type == AgentType.IPA:
                         return InputProcessorAgentProxy(instance="normal")
-                    elif agent_id.type == AgentType.NGA:
+                    if agent_id.type == AgentType.NGA:
                         return NarrativeGeneratorAgentProxy(instance="normal")
                     return None
 
@@ -320,17 +321,17 @@ class TestConcurrentWorkflowExecution:
                     )
 
                     # Verify that resource contention was handled (some requests should have been queued)
-                    assert total_requests >= len(
-                        concurrent_requests
-                    ), "Not all requests were processed"
+                    assert total_requests >= len(concurrent_requests), (
+                        "Not all requests were processed"
+                    )
 
                     # Verify execution times show contention effects
                     execution_times = [r["execution_time"] for r in successful_results]
                     if len(execution_times) > 1:
                         time_variance = statistics.stdev(execution_times)
-                        assert (
-                            time_variance > 0.1
-                        ), "Execution times too uniform - contention not evident"
+                        assert time_variance > 0.1, (
+                            "Execution times too uniform - contention not evident"
+                        )
 
                 print(
                     f"✓ Resource contention test: {len(successful_results)}/{len(results)} successful"
@@ -462,13 +463,13 @@ class TestPerformanceBenchmarks:
                 }
 
                 # Verify performance meets expectations
-                assert (
-                    success_rate >= expected_success_rate
-                ), f"{scenario_name}: Success rate {success_rate:.2%} below expected {expected_success_rate:.2%}"
+                assert success_rate >= expected_success_rate, (
+                    f"{scenario_name}: Success rate {success_rate:.2%} below expected {expected_success_rate:.2%}"
+                )
 
-                assert (
-                    avg_time <= expected_avg_time
-                ), f"{scenario_name}: Average time {avg_time:.2f}s exceeds expected {expected_avg_time}s"
+                assert avg_time <= expected_avg_time, (
+                    f"{scenario_name}: Average time {avg_time:.2f}s exceeds expected {expected_avg_time}s"
+                )
 
                 print(
                     f"✓ {scenario_name}: {completed_workflows} workflows, {success_rate:.2%} success rate"
@@ -619,9 +620,9 @@ class TestPerformanceBenchmarks:
                 avg_cpu = statistics.mean(cpu_values) if cpu_values else 0
 
                 # Resource usage assertions
-                assert (
-                    memory_increase < 500
-                ), f"Memory increase {memory_increase:.1f}MB too high - possible memory leak"
+                assert memory_increase < 500, (
+                    f"Memory increase {memory_increase:.1f}MB too high - possible memory leak"
+                )
                 assert max_memory < 2000, f"Peak memory {max_memory:.1f}MB too high"
                 assert avg_cpu < 80, f"Average CPU {avg_cpu:.1f}% too high"
 
@@ -872,15 +873,15 @@ class TestAgentPoolScaling:
             print(f"Scale-down events: {len(scale_down_events)}")
 
             # Verify scaling behavior
-            assert (
-                len(scale_up_events) > 0
-            ), "No scale-up events detected - scaling may not be working"
+            assert len(scale_up_events) > 0, (
+                "No scale-up events detected - scaling may not be working"
+            )
 
             # Verify agents scaled appropriately for high load
             high_load_events = [e for e in scale_up_events if e["trigger_load"] >= 10]
-            assert (
-                len(high_load_events) > 0
-            ), "No scaling detected for high load scenarios"
+            assert len(high_load_events) > 0, (
+                "No scaling detected for high load scenarios"
+            )
 
             # Verify scale-down occurred during low load
             if len(scale_down_events) > 0:
@@ -888,9 +889,9 @@ class TestAgentPoolScaling:
 
             # Verify maximum limits were respected
             for agent_type, pool in agent_pools.items():
-                assert (
-                    pool["active"] <= pool["max"]
-                ), f"{agent_type.value} exceeded maximum pool size"
+                assert pool["active"] <= pool["max"], (
+                    f"{agent_type.value} exceeded maximum pool size"
+                )
                 assert pool["active"] >= 1, f"{agent_type.value} scaled below minimum"
 
             print("✓ Agent pool scaling behavior verified")

@@ -56,11 +56,11 @@ class MyComponent(Component):
             name="my_component",
             dependencies=["redis", "neo4j"]  # Optional
         )
-    
+
     def _start_impl(self) -> bool:
         # Implementation here
         return True
-    
+
     def _stop_impl(self) -> bool:
         # Cleanup here
         return True

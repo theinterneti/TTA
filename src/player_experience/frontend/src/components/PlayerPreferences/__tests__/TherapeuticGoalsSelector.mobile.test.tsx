@@ -71,10 +71,10 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
   describe('Mobile Tab Navigation', () => {
     test('should render tabs with mobile-friendly styling', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const tabNavigation = screen.getByRole('tablist');
       expect(tabNavigation).toHaveClass('overflow-x-auto', 'scrollbar-hide');
-      
+
       const tabs = screen.getAllByRole('tab');
       tabs.forEach(tab => {
         expect(tab).toHaveClass('min-w-[44px]', 'min-h-[44px]');
@@ -84,7 +84,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
 
     test('should have proper touch targets for tabs', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const tabs = screen.getAllByRole('tab');
       tabs.forEach(tab => {
         const styles = window.getComputedStyle(tab);
@@ -96,7 +96,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
 
     test('should support horizontal scrolling on mobile', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const tabNavigation = screen.getByRole('tablist');
       expect(tabNavigation).toHaveClass('overflow-x-auto');
       expect(tabNavigation).toHaveClass('scrollbar-hide');
@@ -106,7 +106,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
   describe('Mobile Quick Selection Buttons', () => {
     test('should render quick selection buttons with mobile layout', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const quickSelectionButtons = screen.getAllByText(/🧘|💪|🤝|❤️/);
       quickSelectionButtons.forEach(button => {
         const buttonElement = button.closest('button');
@@ -119,12 +119,12 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const stressButton = screen.getByText(/🧘 Stress & Anxiety/);
       const buttonElement = stressButton.closest('button');
-      
+
       expect(buttonElement).toHaveClass('min-h-[44px]');
-      
+
       await user.click(buttonElement!);
       expect(onChange).toHaveBeenCalled();
     });
@@ -133,7 +133,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
   describe('Mobile Goal Selection', () => {
     test('should render goal cards with mobile-friendly spacing', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Check that goal categories use single column layout on mobile
       const goalGrids = screen.getAllByText(/Emotional Wellness|Relationships & Communication/);
       goalGrids.forEach(categoryTitle => {
@@ -145,7 +145,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
 
     test('should have larger checkboxes for mobile', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const checkboxes = screen.getAllByRole('checkbox');
       checkboxes.forEach(checkbox => {
         expect(checkbox).toHaveClass('w-5', 'h-5');
@@ -154,7 +154,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
 
     test('should have proper spacing for mobile touch interaction', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const goalLabels = screen.getAllByText(/Anxiety Reduction|Stress Management/);
       goalLabels.forEach(label => {
         const labelElement = label.closest('label');
@@ -167,11 +167,11 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
     test('should render concerns with single column layout on mobile', async () => {
       const user = userEvent.setup();
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Switch to concerns tab
       const concernsTab = screen.getByText(/📝 Primary Concerns/);
       await user.click(concernsTab);
-      
+
       // Check single column layout
       const concernsGrid = screen.getByText('Common Concerns').closest('div')?.querySelector('.grid');
       expect(concernsGrid).toHaveClass('grid-cols-1');
@@ -180,11 +180,11 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
     test('should have proper touch targets for concerns', async () => {
       const user = userEvent.setup();
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Switch to concerns tab
       const concernsTab = screen.getByText(/📝 Primary Concerns/);
       await user.click(concernsTab);
-      
+
       const concernCheckboxes = screen.getAllByRole('checkbox');
       concernCheckboxes.forEach(checkbox => {
         expect(checkbox).toHaveClass('w-5', 'h-5');
@@ -197,11 +197,11 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
   describe('Mobile Typography and Readability', () => {
     test('should use appropriate font sizes for mobile', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Check that text uses responsive sizing
       const quickSelectionTitle = screen.getByText('Quick Selection:');
       expect(quickSelectionTitle).toHaveClass('text-base', 'sm:text-lg');
-      
+
       const goalLabels = screen.getAllByText(/Anxiety Reduction|Stress Management/);
       goalLabels.forEach(label => {
         expect(label).toHaveClass('text-base', 'sm:text-sm');
@@ -210,7 +210,7 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
 
     test('should have proper line height for mobile reading', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const descriptions = screen.getAllByText(/Build skills to manage and reduce anxiety/);
       descriptions.forEach(desc => {
         expect(desc).toHaveClass('leading-relaxed');
@@ -221,10 +221,10 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
   describe('Mobile Performance', () => {
     test('should not cause layout shifts on mobile', () => {
       const { rerender } = render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Simulate props change
       rerender(<TherapeuticGoalsSelector {...mockProps} selected={['anxiety_reduction']} />);
-      
+
       // Check that layout remains stable
       const tabNavigation = screen.getByRole('tablist');
       expect(tabNavigation).toHaveClass('overflow-x-auto');
@@ -234,14 +234,14 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const stressButton = screen.getByText(/🧘 Stress & Anxiety/);
       const selfEsteemButton = screen.getByText(/💪 Self-Esteem & Growth/);
-      
+
       // Rapid clicks
       await user.click(stressButton);
       await user.click(selfEsteemButton);
-      
+
       expect(onChange).toHaveBeenCalledTimes(2);
     });
   });
@@ -249,14 +249,14 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
   describe('Mobile Accessibility', () => {
     test('should maintain accessibility on mobile', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Check ARIA attributes are preserved
       const tabs = screen.getAllByRole('tab');
       tabs.forEach(tab => {
         expect(tab).toHaveAttribute('aria-selected');
         expect(tab).toHaveAttribute('aria-controls');
       });
-      
+
       // Check touch targets have proper labels
       const checkboxes = screen.getAllByRole('checkbox');
       checkboxes.forEach(checkbox => {
@@ -266,10 +266,10 @@ describe('TherapeuticGoalsSelector - Mobile Responsiveness', () => {
 
     test('should support screen reader navigation on mobile', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const tablist = screen.getByRole('tablist');
       expect(tablist).toHaveAttribute('aria-label', 'Therapeutic goals and concerns');
-      
+
       const tabpanels = screen.getAllByRole('tabpanel');
       tabpanels.forEach(panel => {
         expect(panel).toHaveAttribute('aria-labelledby');

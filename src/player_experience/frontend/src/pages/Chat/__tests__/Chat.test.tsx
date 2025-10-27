@@ -191,7 +191,7 @@ const renderWithProviders = (
   } = {}
 ) => {
   const store = createMockStore(initialState);
-  
+
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <Provider store={store}>
       <MemoryRouter initialEntries={[route]}>
@@ -388,9 +388,9 @@ describe('Chat', () => {
 
     const input = screen.getByPlaceholderText('Type your message...');
     const longMessage = 'a'.repeat(1001);
-    
+
     fireEvent.change(input, { target: { value: longMessage } });
-    
+
     // Input should be limited to 1000 characters
     expect(input).toHaveAttribute('maxLength', '1000');
   });

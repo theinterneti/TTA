@@ -1,7 +1,7 @@
 # Security Hardening Report
 
-**Date:** 2025-09-29  
-**Task:** LOW Priority - Security Hardening  
+**Date:** 2025-09-29
+**Task:** LOW Priority - Security Hardening
 **Status:** ✅ **COMPLETE**
 
 ---
@@ -68,22 +68,22 @@ import secrets
 
 class JWTConfig:
     """Enhanced JWT security configuration."""
-    
+
     # Generate strong secret key (do this once, store in env)
     @staticmethod
     def generate_secret_key() -> str:
         """Generate a cryptographically strong secret key."""
         return secrets.token_urlsafe(64)
-    
+
     # Token configuration
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Shorter expiration
     REFRESH_TOKEN_EXPIRE_DAYS = 7
-    
+
     # Token claims
     ISSUER = "tta-player-experience"
     AUDIENCE = "tta-frontend"
-    
+
     # Security options
     VERIFY_SIGNATURE = True
     VERIFY_EXP = True
@@ -97,7 +97,7 @@ def create_access_token(data: dict) -> str:
     """Create JWT with enhanced security claims."""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=JWTConfig.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode.update({
         "exp": expire,
         "iat": datetime.utcnow(),
@@ -106,7 +106,7 @@ def create_access_token(data: dict) -> str:
         "aud": JWTConfig.AUDIENCE,
         "jti": str(uuid.uuid4()),  # Unique token ID
     })
-    
+
     return jwt.encode(to_encode, SECRET_KEY, algorithm=JWTConfig.ALGORITHM)
 ```
 
@@ -129,36 +129,36 @@ pwd_context = CryptContext(
 
 class PasswordValidator:
     """Enhanced password validation."""
-    
+
     MIN_LENGTH = 12  # Increased from 8
-    
+
     @staticmethod
     def validate_strength(password: str) -> tuple[bool, str]:
         """Validate password strength."""
         if len(password) < PasswordValidator.MIN_LENGTH:
             return False, f"Password must be at least {PasswordValidator.MIN_LENGTH} characters"
-        
+
         # Check for character variety
         has_upper = bool(re.search(r'[A-Z]', password))
         has_lower = bool(re.search(r'[a-z]', password))
         has_digit = bool(re.search(r'\d', password))
         has_special = bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password))
-        
+
         if not (has_upper and has_lower and has_digit and has_special):
             return False, "Password must contain uppercase, lowercase, digit, and special character"
-        
+
         # Check for common patterns
         common_patterns = ['password', '123456', 'qwerty', 'admin']
         if any(pattern in password.lower() for pattern in common_patterns):
             return False, "Password contains common patterns"
-        
+
         return True, "Password is strong"
-    
+
     @staticmethod
     def hash_password(password: str) -> str:
         """Hash password securely."""
         return pwd_context.hash(password)
-    
+
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify password against hash."""
@@ -172,15 +172,15 @@ class PasswordValidator:
 ```python
 class SessionManager:
     """Enhanced session security."""
-    
+
     def __init__(self, redis_client):
         self.redis = redis_client
         self.session_ttl = 1800  # 30 minutes
-    
+
     async def create_session(self, user_id: str, token_jti: str) -> str:
         """Create secure session."""
         session_id = secrets.token_urlsafe(32)
-        
+
         session_data = {
             "user_id": user_id,
             "token_jti": token_jti,
@@ -188,36 +188,36 @@ class SessionManager:
             "ip_address": request.client.host,
             "user_agent": request.headers.get("user-agent"),
         }
-        
+
         await self.redis.setex(
             f"session:{session_id}",
             self.session_ttl,
             json.dumps(session_data)
         )
-        
+
         return session_id
-    
+
     async def validate_session(self, session_id: str, token_jti: str) -> bool:
         """Validate session and detect token reuse."""
         session_data = await self.redis.get(f"session:{session_id}")
-        
+
         if not session_data:
             return False
-        
+
         data = json.loads(session_data)
-        
+
         # Check if token JTI matches
         if data["token_jti"] != token_jti:
             # Possible token theft - invalidate all sessions
             await self.invalidate_user_sessions(data["user_id"])
             return False
-        
+
         return True
-    
+
     async def invalidate_session(self, session_id: str):
         """Invalidate specific session."""
         await self.redis.delete(f"session:{session_id}")
-    
+
     async def invalidate_user_sessions(self, user_id: str):
         """Invalidate all sessions for a user."""
         pattern = f"session:*"
@@ -254,7 +254,7 @@ import os
 
 class CORSConfig:
     """Enhanced CORS configuration."""
-    
+
     # Environment-specific origins
     ALLOWED_ORIGINS = {
         "development": [
@@ -270,10 +270,10 @@ class CORSConfig:
             "https://www.tta-app.com",
         ],
     }
-    
+
     # Allowed methods (be specific)
     ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    
+
     # Allowed headers (be specific)
     ALLOWED_HEADERS = [
         "Content-Type",
@@ -281,14 +281,14 @@ class CORSConfig:
         "X-Request-ID",
         "X-CSRF-Token",
     ]
-    
+
     # Expose headers
     EXPOSE_HEADERS = [
         "X-Request-ID",
         "X-RateLimit-Limit",
         "X-RateLimit-Remaining",
     ]
-    
+
     @staticmethod
     def get_origins() -> list[str]:
         """Get allowed origins for current environment."""
@@ -320,83 +320,83 @@ import re
 
 class SecureInputMixin:
     """Mixin for secure input handling."""
-    
+
     @staticmethod
     def sanitize_html(value: str) -> str:
         """Remove potentially dangerous HTML."""
         if not value:
             return value
-        
+
         # Allow only safe tags
         allowed_tags = ['p', 'br', 'strong', 'em', 'u']
         allowed_attributes = {}
-        
+
         return bleach.clean(
             value,
             tags=allowed_tags,
             attributes=allowed_attributes,
             strip=True
         )
-    
+
     @staticmethod
     def sanitize_sql(value: str) -> str:
         """Prevent SQL injection (though we use parameterized queries)."""
         if not value:
             return value
-        
+
         # Remove SQL keywords and special characters
         dangerous_patterns = [
             r'(\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b)',
             r'(--|;|\/\*|\*\/)',
         ]
-        
+
         for pattern in dangerous_patterns:
             value = re.sub(pattern, '', value, flags=re.IGNORECASE)
-        
+
         return value.strip()
-    
+
     @staticmethod
     def sanitize_path(value: str) -> str:
         """Prevent path traversal attacks."""
         if not value:
             return value
-        
+
         # Remove path traversal patterns
         value = value.replace('..', '')
         value = value.replace('~', '')
         value = re.sub(r'[/\\]+', '/', value)
-        
+
         return value.strip('/')
 
 class SecureCharacterRequest(BaseModel, SecureInputMixin):
     """Secure character creation request."""
-    
+
     name: str = Field(..., min_length=2, max_length=50)
     backstory: str = Field(..., min_length=10, max_length=5000)
-    
+
     @field_validator('name')
     @classmethod
     def validate_name(cls, v):
         """Validate and sanitize name."""
         # Remove HTML
         v = cls.sanitize_html(v)
-        
+
         # Check pattern
         if not re.match(r"^[a-zA-Z\s\-']+$", v):
             raise ValueError("Name contains invalid characters")
-        
+
         return v.strip()
-    
+
     @field_validator('backstory')
     @classmethod
     def validate_backstory(cls, v):
         """Validate and sanitize backstory."""
         # Remove dangerous HTML
         v = cls.sanitize_html(v)
-        
+
         # Check for SQL injection attempts
         v = cls.sanitize_sql(v)
-        
+
         return v.strip()
 ```
 
@@ -409,7 +409,7 @@ import asyncio
 
 class RateLimiter:
     """Enhanced rate limiting."""
-    
+
     def __init__(self, redis_client):
         self.redis = redis_client
         self.limits = {
@@ -417,7 +417,7 @@ class RateLimiter:
             "auth": (5, 60),       # 5 auth attempts per minute
             "create": (10, 60),    # 10 creates per minute
         }
-    
+
     async def check_rate_limit(
         self,
         request: Request,
@@ -426,24 +426,24 @@ class RateLimiter:
         """Check if request exceeds rate limit."""
         # Get client identifier
         client_id = self._get_client_id(request)
-        
+
         # Get limit configuration
         max_requests, window_seconds = self.limits.get(
             limit_type,
             self.limits["default"]
         )
-        
+
         # Check rate limit
         key = f"ratelimit:{limit_type}:{client_id}"
         current = await self.redis.get(key)
-        
+
         if current is None:
             # First request in window
             await self.redis.setex(key, window_seconds, 1)
             return True
-        
+
         current = int(current)
-        
+
         if current >= max_requests:
             # Rate limit exceeded
             ttl = await self.redis.ttl(key)
@@ -452,22 +452,22 @@ class RateLimiter:
                 detail=f"Rate limit exceeded. Try again in {ttl} seconds.",
                 headers={"Retry-After": str(ttl)}
             )
-        
+
         # Increment counter
         await self.redis.incr(key)
         return True
-    
+
     def _get_client_id(self, request: Request) -> str:
         """Get unique client identifier."""
         # Try to get authenticated user ID
         if hasattr(request.state, "user"):
             return f"user:{request.state.user.id}"
-        
+
         # Fall back to IP address
         forwarded_for = request.headers.get("X-Forwarded-For")
         if forwarded_for:
             return f"ip:{forwarded_for.split(',')[0]}"
-        
+
         return f"ip:{request.client.host}"
 
 # Usage in endpoint
@@ -493,20 +493,20 @@ import os
 
 class DataEncryption:
     """Encrypt sensitive data at rest."""
-    
+
     def __init__(self):
         # Load encryption key from environment
         key = os.getenv("ENCRYPTION_KEY")
         if not key:
             # Generate key (do this once, store in env)
             key = Fernet.generate_key().decode()
-        
+
         self.cipher = Fernet(key.encode())
-    
+
     def encrypt(self, data: str) -> str:
         """Encrypt sensitive data."""
         return self.cipher.encrypt(data.encode()).decode()
-    
+
     def decrypt(self, encrypted_data: str) -> str:
         """Decrypt sensitive data."""
         return self.cipher.decrypt(encrypted_data.encode()).decode()
@@ -514,11 +514,11 @@ class DataEncryption:
 # Usage for sensitive fields
 class SecurePlayerProfile(BaseModel):
     """Player profile with encrypted sensitive data."""
-    
+
     player_id: str
     username: str
     email_encrypted: str  # Store encrypted
-    
+
     @classmethod
     def from_plain(cls, player_id: str, username: str, email: str):
         """Create profile with encrypted email."""
@@ -528,7 +528,7 @@ class SecurePlayerProfile(BaseModel):
             username=username,
             email_encrypted=encryptor.encrypt(email)
         )
-    
+
     def get_email(self) -> str:
         """Decrypt and return email."""
         encryptor = DataEncryption()
@@ -543,7 +543,7 @@ import re
 
 class SecureFormatter(logging.Formatter):
     """Logging formatter that redacts sensitive data."""
-    
+
     SENSITIVE_PATTERNS = [
         (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL]'),
         (r'\b\d{3}-\d{2}-\d{4}\b', '[SSN]'),
@@ -551,14 +551,14 @@ class SecureFormatter(logging.Formatter):
         (r'password["\']?\s*[:=]\s*["\']?([^"\'}\s]+)', 'password=[REDACTED]'),
         (r'token["\']?\s*[:=]\s*["\']?([^"\'}\s]+)', 'token=[REDACTED]'),
     ]
-    
+
     def format(self, record):
         """Format log record with sensitive data redacted."""
         message = super().format(record)
-        
+
         for pattern, replacement in self.SENSITIVE_PATTERNS:
             message = re.sub(pattern, replacement, message, flags=re.IGNORECASE)
-        
+
         return message
 
 # Configure logging
@@ -578,19 +578,19 @@ from fastapi import Response
 
 class SecurityHeadersMiddleware:
     """Add security headers to all responses."""
-    
+
     async def __call__(self, request: Request, call_next):
         response = await call_next(request)
-        
+
         # Prevent clickjacking
         response.headers["X-Frame-Options"] = "DENY"
-        
+
         # Prevent MIME sniffing
         response.headers["X-Content-Type-Options"] = "nosniff"
-        
+
         # Enable XSS protection
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        
+
         # Content Security Policy
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
@@ -601,21 +601,21 @@ class SecurityHeadersMiddleware:
             "connect-src 'self' ws: wss:; "
             "frame-ancestors 'none';"
         )
-        
+
         # Strict Transport Security (HTTPS only)
         if request.url.scheme == "https":
             response.headers["Strict-Transport-Security"] = (
                 "max-age=31536000; includeSubDomains; preload"
             )
-        
+
         # Referrer Policy
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        
+
         # Permissions Policy
         response.headers["Permissions-Policy"] = (
             "geolocation=(), microphone=(), camera=()"
         )
-        
+
         return response
 
 # Add middleware
@@ -677,13 +677,12 @@ The TTA application has a solid security foundation. The recommended enhancement
 5. **Security Headers** - Comprehensive header set
 6. **Monitoring** - Security event logging
 
-**Security Posture:** GOOD → EXCELLENT  
+**Security Posture:** GOOD → EXCELLENT
 **Risk Level:** LOW
 
 ---
 
-**Task Status:** ✅ **COMPLETE**  
-**Date Completed:** 2025-09-29  
-**Priority:** LOW  
+**Task Status:** ✅ **COMPLETE**
+**Date Completed:** 2025-09-29
+**Priority:** LOW
 **Next Steps:** Implement high-priority security enhancements
-

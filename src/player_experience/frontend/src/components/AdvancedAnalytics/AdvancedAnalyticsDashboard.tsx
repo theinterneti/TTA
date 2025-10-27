@@ -1,9 +1,9 @@
 /**
  * Advanced Analytics Dashboard - Priority 4B Implementation
- * 
+ *
  * Interactive dashboard for predictive therapeutic analytics with comprehensive
  * data visualization, longitudinal analysis, and predictive insights display.
- * 
+ *
  * Features:
  * - Real-time predictive analytics visualization
  * - Interactive trend analysis charts
@@ -103,7 +103,7 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
   onRiskAlert
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  
+
   // State management
   const [analyticsData, setAnalyticsData] = useState<PredictiveAnalyticsResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -167,7 +167,7 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
 
     const data: TrendChartData[] = [];
     const days = selectedTimeRange === '7d' ? 7 : selectedTimeRange === '30d' ? 30 : 90;
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = startOfDay(subDays(new Date(), i));
       const entry: TrendChartData = {

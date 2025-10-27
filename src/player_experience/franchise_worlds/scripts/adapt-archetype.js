@@ -2,7 +2,7 @@
 
 /**
  * Adapt Archetype Script
- * 
+ *
  * Node.js script to adapt character archetypes for specific world contexts
  * and therapeutic needs.
  */
@@ -11,11 +11,11 @@ const { getArchetypeById } = require('./get-archetypes.js');
 
 function adaptArchetypeForWorld(archetypeId, worldGenre, worldContext) {
   const baseArchetype = getArchetypeById(archetypeId);
-  
+
   if (!baseArchetype) {
     throw new Error(`Archetype not found: ${archetypeId}`);
   }
-  
+
   // Create adapted version
   const adaptedArchetype = {
     ...baseArchetype,
@@ -25,57 +25,57 @@ function adaptArchetypeForWorld(archetypeId, worldGenre, worldContext) {
       adaptationTimestamp: new Date().toISOString()
     }
   };
-  
+
   // Apply world-specific adaptations
   if (baseArchetype.worldAdaptations && baseArchetype.worldAdaptations[worldGenre]) {
     adaptedArchetype.worldSpecificForm = baseArchetype.worldAdaptations[worldGenre];
   }
-  
+
   // Adapt personality traits for world context
   adaptedArchetype.adaptedPersonality = adaptPersonalityForWorld(
-    baseArchetype.personality, 
-    worldGenre, 
+    baseArchetype.personality,
+    worldGenre,
     worldContext
   );
-  
+
   // Adapt interaction patterns for world context
   adaptedArchetype.adaptedInteractionPatterns = adaptInteractionPatternsForWorld(
     baseArchetype.interactionPatterns,
     worldGenre,
     worldContext
   );
-  
+
   // Generate world-specific dialogue examples
   adaptedArchetype.dialogueExamples = generateDialogueExamples(
     baseArchetype,
     worldGenre,
     worldContext
   );
-  
+
   // Adapt therapeutic techniques for world context
   adaptedArchetype.contextualTherapeuticTechniques = adaptTherapeuticTechniques(
     baseArchetype.interactionPatterns,
     worldGenre,
     worldContext
   );
-  
+
   return adaptedArchetype;
 }
 
 function adaptPersonalityForWorld(personality, worldGenre, worldContext) {
   const adaptedPersonality = { ...personality };
-  
+
   // Add world-specific personality elements
   const worldSpecificTraits = getWorldSpecificTraits(worldGenre, worldContext);
   adaptedPersonality.worldSpecificTraits = worldSpecificTraits;
-  
+
   // Adapt communication style for world
   adaptedPersonality.adaptedCommunicationStyle = adaptCommunicationStyle(
     personality.communicationStyle,
     worldGenre,
     worldContext
   );
-  
+
   return adaptedPersonality;
 }
 
@@ -91,7 +91,7 @@ function getWorldSpecificTraits(worldGenre, worldContext) {
       'neon_metropolis': ['street_smart', 'digitally_native', 'socially_conscious']
     }
   };
-  
+
   return traitMap[worldGenre]?.[worldContext] || ['adaptable', 'contextually_aware'];
 }
 
@@ -107,7 +107,7 @@ function adaptCommunicationStyle(baseCommunicationStyle, worldGenre, worldContex
       'neon_metropolis': 'Employs tech-savvy language and urban cultural references'
     }
   };
-  
+
   const adaptation = styleAdaptations[worldGenre]?.[worldContext];
   return adaptation ? `${baseCommunicationStyle}. ${adaptation}` : baseCommunicationStyle;
 }
@@ -132,7 +132,7 @@ function adaptResponseForWorld(response, worldGenre, worldContext) {
       'neon_metropolis': 'Incorporates digital age wisdom and urban survival skills'
     }
   };
-  
+
   const adaptation = responseAdaptations[worldGenre]?.[worldContext];
   return adaptation ? `${response} (${adaptation})` : response;
 }
@@ -159,8 +159,8 @@ function generateContextualExamples(pattern, worldGenre, worldContext) {
       }
     }
   };
-  
-  return exampleMap[worldGenre]?.[worldContext]?.[pattern.trigger] || 
+
+  return exampleMap[worldGenre]?.[worldContext]?.[pattern.trigger] ||
          `Contextual example for ${pattern.trigger} in ${worldContext}`;
 }
 
@@ -193,7 +193,7 @@ function generateDialogueExamples(archetype, worldGenre, worldContext) {
       }
     }
   };
-  
+
   return dialogueMap[archetype.archetypeId]?.[worldGenre]?.[worldContext] || [
     `"I believe in you and your ability to overcome this challenge."`,
     `"We'll face this together, one step at a time."`
@@ -202,11 +202,11 @@ function generateDialogueExamples(archetype, worldGenre, worldContext) {
 
 function adaptTherapeuticTechniques(interactionPatterns, worldGenre, worldContext) {
   const techniques = new Set();
-  
+
   interactionPatterns.forEach(pattern => {
     techniques.add(pattern.therapeuticTechnique);
   });
-  
+
   // Add world-specific therapeutic adaptations
   const worldSpecificTechniques = {
     fantasy: {
@@ -219,10 +219,10 @@ function adaptTherapeuticTechniques(interactionPatterns, worldGenre, worldContex
       'neon_metropolis': ['digital_identity_exploration', 'urban_stress_management', 'social_justice_empowerment']
     }
   };
-  
+
   const specificTechniques = worldSpecificTechniques[worldGenre]?.[worldContext] || [];
   specificTechniques.forEach(technique => techniques.add(technique));
-  
+
   return Array.from(techniques);
 }
 
@@ -230,7 +230,7 @@ function main() {
   try {
     // Parse command line arguments
     const args = process.argv.slice(2);
-    
+
     if (args.length === 0) {
       console.error(JSON.stringify({
         success: false,
@@ -238,7 +238,7 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     let requestData;
     try {
       requestData = JSON.parse(args[0]);
@@ -249,9 +249,9 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     const { archetypeId, worldGenre, worldContext } = requestData;
-    
+
     if (!archetypeId || !worldGenre || !worldContext) {
       console.error(JSON.stringify({
         success: false,
@@ -259,18 +259,18 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     // Adapt the archetype
     const adaptedArchetype = adaptArchetypeForWorld(archetypeId, worldGenre, worldContext);
-    
+
     // Return results
     const response = {
       success: true,
       adaptedArchetype: adaptedArchetype
     };
-    
+
     console.log(JSON.stringify(response, null, 2));
-    
+
   } catch (error) {
     console.error(JSON.stringify({
       success: false,

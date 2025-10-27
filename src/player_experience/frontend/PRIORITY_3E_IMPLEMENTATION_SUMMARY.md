@@ -49,12 +49,12 @@ class TherapeuticSessionService {
   // Session Planning & Intelligence
   async planSession(userId, goals, userContext, sessionType, duration): Promise<SessionPlanningResult>
   private generateSessionIntelligence(goals, userContext): Promise<SessionIntelligence>
-  
+
   // Session Lifecycle Management
   createSession(userId, sessionPlan, plannedDate, sessionType): string
   async executeSession(sessionId): Promise<SessionExecutionResult>
   async completeSession(sessionId, feedback, notes): Promise<SessionAnalysisResult>
-  
+
   // Session Management & Analytics
   getUserSessions(userId): TherapeuticSession[]
   getSession(sessionId): TherapeuticSession | undefined

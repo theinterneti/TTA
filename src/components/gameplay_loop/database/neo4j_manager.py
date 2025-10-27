@@ -77,7 +77,7 @@ class Neo4jGameplayManager:
         try:
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                CREATE (s:{self.schema.NODE_LABELS['SESSION']} {{
+                CREATE (s:{self.schema.NODE_LABELS["SESSION"]} {{
                     session_id: $session_id,
                     user_id: $user_id,
                     character_id: $character_id,
@@ -144,7 +144,7 @@ class Neo4jGameplayManager:
             # Fallback to Neo4j
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
+                MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
                 RETURN s
                 """
 
@@ -170,7 +170,7 @@ class Neo4jGameplayManager:
         try:
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{session_id: $session_id}})
+                MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
                 SET s.current_scene_id = $current_scene_id,
                     s.emotional_state = $emotional_state,
                     s.difficulty_level = $difficulty_level,
@@ -219,7 +219,7 @@ class Neo4jGameplayManager:
         try:
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                CREATE (sc:{self.schema.NODE_LABELS['SCENE']} {{
+                CREATE (sc:{self.schema.NODE_LABELS["SCENE"]} {{
                     scene_id: $scene_id,
                     title: $title,
                     description: $description,
@@ -270,7 +270,7 @@ class Neo4jGameplayManager:
         try:
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                MATCH (sc:{self.schema.NODE_LABELS['SCENE']} {{scene_id: $scene_id}})
+                MATCH (sc:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
                 RETURN sc
                 """
 
@@ -349,7 +349,7 @@ class Neo4jGameplayManager:
         try:
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                CREATE (c:{self.schema.NODE_LABELS['CHOICE']} {{
+                CREATE (c:{self.schema.NODE_LABELS["CHOICE"]} {{
                     choice_id: $choice_id,
                     scene_id: $scene_id,
                     text: $text,
@@ -406,9 +406,9 @@ class Neo4jGameplayManager:
         try:
             async with self._neo4j_driver.session() as session:
                 query = f"""
-                MATCH (sc:{self.schema.NODE_LABELS['SCENE']} {{scene_id: $scene_id}})
-                      -[:{self.schema.RELATIONSHIPS['HAS_CHOICE']}]->
-                      (c:{self.schema.NODE_LABELS['CHOICE']})
+                MATCH (sc:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
+                      -[:{self.schema.RELATIONSHIPS["HAS_CHOICE"]}]->
+                      (c:{self.schema.NODE_LABELS["CHOICE"]})
                 WHERE c.is_available = true
                 RETURN c
                 ORDER BY c.created_at

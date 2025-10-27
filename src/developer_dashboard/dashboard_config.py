@@ -200,7 +200,10 @@ async def setup_metrics_monitoring(app: FastAPI, config: DashboardConfig):
 
                         data = json.load(f)
                         recent_results.append(data)
-                except Exception:
+                except Exception as e:
+                    logger.debug(
+                        f"Skipping test result file {result_file}: {type(e).__name__}: {e}"
+                    )
                     continue
 
             if not recent_results:

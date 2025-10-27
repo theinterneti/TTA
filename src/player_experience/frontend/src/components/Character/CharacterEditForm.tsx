@@ -94,7 +94,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
 
   // Track changes
   useEffect(() => {
-    const hasFormChanges = 
+    const hasFormChanges =
       formData.name !== character.name ||
       formData.appearance.description !== character.appearance.description ||
       formData.background.story !== character.background.story ||
@@ -103,7 +103,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
       formData.therapeutic_profile.comfort_level !== character.therapeutic_profile.comfort_level ||
       formData.therapeutic_profile.preferred_intensity !== character.therapeutic_profile.preferred_intensity ||
       JSON.stringify(formData.therapeutic_profile.therapeutic_goals) !== JSON.stringify(character.therapeutic_profile.therapeutic_goals);
-    
+
     setHasChanges(hasFormChanges);
   }, [formData, character]);
 
@@ -158,7 +158,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
       }
       return prev;
     });
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -200,7 +200,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     try {
@@ -208,7 +208,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
         characterId: character.character_id,
         updates: formData,
       }) as any).unwrap();
-      
+
       onSuccess?.();
       onClose();
     } catch (error) {
@@ -247,7 +247,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
               </svg>
             </button>
           </div>
-          
+
           {hasChanges && (
             <div className="mt-2 text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-md">
               You have unsaved changes
@@ -262,7 +262,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -321,7 +321,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
             {/* Background */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Background & Personality</h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -435,7 +435,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
             {/* Therapeutic Profile */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Therapeutic Profile</h3>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
@@ -544,7 +544,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
             >
               Cancel
             </button>
-            
+
             <button
               type="submit"
               disabled={isLoading || !hasChanges}

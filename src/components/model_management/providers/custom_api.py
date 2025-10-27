@@ -1,10 +1,12 @@
 """
-Custom API Provider Implementation
+Custom API Provider Implementation.
 
 This module provides support for custom API providers like OpenAI, Anthropic,
 and other compatible APIs.
 """
 
+import contextlib
+import json
 import logging
 from collections.abc import AsyncGenerator
 from datetime import datetime
@@ -15,6 +17,7 @@ import httpx
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -203,8 +206,6 @@ class CustomAPIModelInstance(BaseModelInstance):
                     break
 
                 try:
-                    import json
-
                     data = json.loads(data_str)
 
                     if "choices" in data and data["choices"]:
@@ -222,8 +223,6 @@ class CustomAPIModelInstance(BaseModelInstance):
                 data_str = line[6:]  # Remove "data: " prefix
 
                 try:
-                    import json
-
                     data = json.loads(data_str)
 
                     if data.get("type") == "content_block_delta":
@@ -371,9 +370,8 @@ class CustomAPIProvider(BaseProvider):
                     models.append(model_info)
 
                 return models
-            else:
-                # Fallback to predefined models for this provider
-                return self._get_predefined_models(provider_name, config)
+            # Fallback to predefined models for this provider
+            return self._get_predefined_models(provider_name, config)
 
         except Exception as e:
             logger.warning(
@@ -417,37 +415,36 @@ class CustomAPIProvider(BaseProvider):
                     therapeutic_safety_score=9.5,
                 ),
             ]
-        else:
-            # OpenAI-compatible
-            return [
-                ModelInfo(
-                    model_id="gpt-4o-mini",
-                    name="GPT-4o Mini",
-                    provider_type=ProviderType.CUSTOM_API,
-                    description="Efficient GPT-4 model",
-                    context_length=128000,
-                    cost_per_token=0.00000015,  # $0.15 per million tokens
-                    is_free=False,
-                    capabilities=["chat", "instruction_following", "analysis"],
-                    therapeutic_safety_score=8.0,
-                ),
-                ModelInfo(
-                    model_id="gpt-4o",
-                    name="GPT-4o",
-                    provider_type=ProviderType.CUSTOM_API,
-                    description="Advanced GPT-4 model",
-                    context_length=128000,
-                    cost_per_token=0.000005,  # $5 per million tokens
-                    is_free=False,
-                    capabilities=[
-                        "chat",
-                        "instruction_following",
-                        "analysis",
-                        "creative_writing",
-                    ],
-                    therapeutic_safety_score=8.5,
-                ),
-            ]
+        # OpenAI-compatible
+        return [
+            ModelInfo(
+                model_id="gpt-4o-mini",
+                name="GPT-4o Mini",
+                provider_type=ProviderType.CUSTOM_API,
+                description="Efficient GPT-4 model",
+                context_length=128000,
+                cost_per_token=0.00000015,  # $0.15 per million tokens
+                is_free=False,
+                capabilities=["chat", "instruction_following", "analysis"],
+                therapeutic_safety_score=8.0,
+            ),
+            ModelInfo(
+                model_id="gpt-4o",
+                name="GPT-4o",
+                provider_type=ProviderType.CUSTOM_API,
+                description="Advanced GPT-4 model",
+                context_length=128000,
+                cost_per_token=0.000005,  # $5 per million tokens
+                is_free=False,
+                capabilities=[
+                    "chat",
+                    "instruction_following",
+                    "analysis",
+                    "creative_writing",
+                ],
+                therapeutic_safety_score=8.5,
+            ),
+        ]
 
     async def _load_model_impl(
         self, model_id: str, config: dict[str, Any]
@@ -473,7 +470,7 @@ class CustomAPIProvider(BaseProvider):
 
         return CustomAPIModelInstance(model_id, self, client, api_config)
 
-    async def _unload_model_impl(self, instance: CustomAPIModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload a custom API model instance."""
         # API models don't need explicit unloading
         pass
@@ -483,14 +480,12 @@ class CustomAPIProvider(BaseProvider):
         healthy_count = 0
         total_count = len(self._clients)
 
-        for _, client in self._clients.items():
-            try:
+        for client in self._clients.values():
+            with contextlib.suppress(Exception):
                 # Simple health check - try to get models
                 response = await client.get("/v1/models", timeout=5.0)
                 if response.status_code == 200:
                     healthy_count += 1
-            except Exception:
-                pass
 
         # Consider healthy if at least half of providers are working
         return healthy_count >= (total_count / 2) if total_count > 0 else False
@@ -543,10 +538,9 @@ class CustomAPIProvider(BaseProvider):
         # Common context lengths
         if "gpt-4" in model_id.lower():
             return 128000
-        elif "claude-3" in model_id.lower():
+        if "claude-3" in model_id.lower():
             return 200000
-        else:
-            return 4096  # Default
+        return 4096  # Default
 
     def _get_therapeutic_safety_score(
         self, provider_name: str, model_id: str
@@ -554,10 +548,9 @@ class CustomAPIProvider(BaseProvider):
         """Get therapeutic safety score for a model."""
         if "claude" in model_id.lower():
             return 9.0  # Claude models are generally very safe
-        elif "gpt-4" in model_id.lower():
+        if "gpt-4" in model_id.lower():
             return 8.0  # GPT-4 models are quite safe
-        else:
-            return 7.0  # Default moderate safety score
+        return 7.0  # Default moderate safety score
 
     async def cleanup(self):
         """Cleanup resources."""

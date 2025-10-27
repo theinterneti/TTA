@@ -37,4 +37,3 @@
 # used for API documentation purposes. They are not complete, valid JWT tokens and cannot
 # be used for authentication. Real JWT tokens are generated at runtime and never committed
 # to the repository.
-

@@ -588,8 +588,7 @@ async def resolve_alert(alert_id: str, resolved_by: str = "system"):
     )
     if success:
         return {"status": "resolved", "alert_id": alert_id}
-    else:
-        raise HTTPException(status_code=404, detail="Alert not found")
+    raise HTTPException(status_code=404, detail="Alert not found")
 
 
 @app.get("/metrics/current")
@@ -605,7 +604,9 @@ async def get_current_metrics():
             "status": (
                 "critical"
                 if metric.is_critical()
-                else "warning" if metric.is_warning() else "normal"
+                else "warning"
+                if metric.is_warning()
+                else "normal"
             ),
         }
 

@@ -1,0 +1,125 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Node Exporter - System metrics
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # cAdvisor - Container metrics
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # TTA Services - Admin API
+  - job_name: "tta-admin-api"
+    static_configs:
+      - targets: ["host.docker.internal:8001"] # Adjust port as needed
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # TTA Services - Clinical API
+  - job_name: "tta-clinical-api"
+    static_configs:
+      - targets: ["host.docker.internal:8002"] # Adjust port as needed
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # TTA Services - Developer API
+  - job_name: "tta-developer-api"
+    static_configs:
+      - targets: ["host.docker.internal:8003"] # Adjust port as needed
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # TTA Services - Patient API
+  - job_name: "tta-patient-api"
+    static_configs:
+      - targets: ["host.docker.internal:8004"] # Adjust port as needed
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # TTA Health Check Service - Centralized health monitoring
+  - job_name: "tta-health-check-staging"
+    static_configs:
+      - targets: ["tta-staging-health-check:8080"]
+        labels:
+          service: "health-check"
+          environment: "staging"
+          instance: "health-check-staging"
+    metrics_path: "/metrics"
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # TTA Services - Player API Staging (direct metrics if available)
+  - job_name: "tta-player-api-staging"
+    static_configs:
+      - targets: ["tta-staging-player-api:8080"]
+        labels:
+          service: "player-api"
+          environment: "staging"
+          instance: "player-api-staging"
+    metrics_path: "/metrics-prom"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Grafana - Dashboard service (direct metrics)
+  - job_name: "grafana-staging"
+    static_configs:
+      - targets: ["tta-staging-grafana:3000"]
+        labels:
+          service: "grafana"
+          environment: "staging"
+          instance: "grafana-staging"
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Node Exporter - System metrics (if available)
+  - job_name: "node-exporter-staging"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+        labels:
+          service: "node-exporter"
+          environment: "staging"
+          instance: "node-exporter:9100"
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # cAdvisor - Container metrics (if available)
+  - job_name: "cadvisor-staging"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+        labels:
+          service: "cadvisor"
+          environment: "staging"
+          instance: "cadvisor:8080"
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+# Alerting rules (optional - can be expanded later)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+# Remote write configuration (optional - for long-term storage)
+# remote_write:
+#   - url: "https://prometheus-remote-write-endpoint"

@@ -110,6 +110,7 @@ def retry(
                     time.sleep(current_delay)
                     current_delay *= backoff
                     attempt += 1
+            return None
 
         return cast(F, wrapper)
 

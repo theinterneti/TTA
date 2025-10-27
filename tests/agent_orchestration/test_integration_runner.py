@@ -41,7 +41,7 @@ def test_mock_workflow_execution():
     """Test basic workflow execution with mocked components."""
 
     # Mock the basic workflow components
-    from src.agent_orchestration import (
+    from tta_ai.orchestration import (
         AgentStep,
         AgentType,
         OrchestrationRequest,
@@ -175,7 +175,7 @@ def test_performance_metrics_utility():
 def test_workflow_state_verifier():
     """Test the workflow state verifier utility."""
 
-    from src.agent_orchestration import (
+    from tta_ai.orchestration import (
         AgentType,
     )
     from tests.agent_orchestration.test_multi_agent_workflow_integration import (

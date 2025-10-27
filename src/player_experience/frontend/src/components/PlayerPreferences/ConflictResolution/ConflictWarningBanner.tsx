@@ -1,6 +1,6 @@
 /**
  * Conflict Warning Banner Component
- * 
+ *
  * Displays real-time conflict warnings with severity indicators and quick actions
  * for therapeutic goal conflicts.
  */
@@ -102,7 +102,7 @@ const ConflictWarningBanner: React.FC<ConflictWarningBannerProps> = ({
             {config.icon}
           </span>
         </div>
-        
+
         <div className="ml-3 flex-1">
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
@@ -114,7 +114,7 @@ const ConflictWarningBanner: React.FC<ConflictWarningBannerProps> = ({
                 {config.urgency}
               </p>
             </div>
-            
+
             {/* Risk Score */}
             <div className="text-right">
               <div className={`text-2xl font-bold ${getRiskScoreColor(conflictResult.overallRiskScore)}`}>
@@ -133,14 +133,14 @@ const ConflictWarningBanner: React.FC<ConflictWarningBannerProps> = ({
                   conflict{conflictResult.summary.totalConflicts !== 1 ? 's' : ''}
                 </span>
               </div>
-              
+
               {conflictResult.summary.criticalConflicts > 0 && (
                 <div className="flex items-center space-x-1">
                   <span className="font-medium text-red-600">{conflictResult.summary.criticalConflicts}</span>
                   <span className="text-red-600">critical</span>
                 </div>
               )}
-              
+
               {conflictResult.summary.resolvableConflicts > 0 && (
                 <div className="flex items-center space-x-1">
                   <span className="font-medium text-green-600">{conflictResult.summary.resolvableConflicts}</span>

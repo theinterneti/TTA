@@ -1,6 +1,6 @@
 /**
  * Progress Tracking Service Tests - Priority 3D Implementation
- * 
+ *
  * Comprehensive test suite for the progress tracking and analytics system.
  * Tests progress monitoring, outcome measurement, and therapeutic analytics.
  */
@@ -29,7 +29,7 @@ describe('ProgressTrackingService', () => {
   beforeEach(() => {
     service = new ProgressTrackingService();
     mockUserId = 'test-user-123';
-    
+
     mockGoals = [
       {
         id: 'goal-1',
@@ -213,7 +213,7 @@ describe('ProgressTrackingService', () => {
       const result = service.generateProgressAnalytics(mockUserId, mockGoals, 'month');
 
       expect(result.currentProgress).toHaveLength(2); // Two goals
-      
+
       const goal1Analytics = result.currentProgress.find(p => p.goalId === 'goal-1');
       expect(goal1Analytics).toBeDefined();
       expect(goal1Analytics?.overallProgress).toBe(65); // Latest progress value
@@ -257,7 +257,7 @@ describe('ProgressTrackingService', () => {
       const result = service.generateProgressAnalytics(mockUserId, mockGoals, 'month');
 
       expect(result.therapeuticInsights).toBeInstanceOf(Array);
-      
+
       if (result.therapeuticInsights.length > 0) {
         const insight = result.therapeuticInsights[0];
         expect(insight).toMatchObject({

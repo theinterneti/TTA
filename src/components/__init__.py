@@ -14,7 +14,14 @@ Classes:
 Example:
     ```python
     from src.orchestration import TTAConfig
-    from src.components import Neo4jComponent, LLMComponent, AppComponent, DockerComponent, CarbonComponent, PlayerExperienceComponent
+    from src.components import (
+        Neo4jComponent,
+        LLMComponent,
+        AppComponent,
+        DockerComponent,
+        CarbonComponent,
+        PlayerExperienceComponent,
+    )
 
     # Create a configuration object
     config = TTAConfig()
@@ -36,6 +43,8 @@ Example:
     player_experience.start()
     ```
 """
+
+import contextlib
 
 from .agent_orchestration_component import AgentOrchestrationComponent
 from .app_component import AppComponent
@@ -61,7 +70,7 @@ __all__ = [
 
 
 # Ensure a default asyncio event loop exists for tests that call get_event_loop directly
-try:
+with contextlib.suppress(Exception):
     import asyncio
 
     try:
@@ -69,5 +78,3 @@ try:
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-except Exception:
-    pass

@@ -106,7 +106,7 @@ const ModelCostDisplay: React.FC<ModelCostDisplayProps> = ({
             {formatCost(model.cost_per_token, 1)}
           </div>
         </div>
-        
+
         {showEstimatedCost && (
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="text-sm font-medium text-gray-700">
@@ -126,10 +126,10 @@ const ModelCostDisplay: React.FC<ModelCostDisplayProps> = ({
             onClick={() => setShowCalculator(!showCalculator)}
             className="flex items-center text-sm text-primary-600 hover:text-primary-700"
           >
-            <svg 
+            <svg
               className={`mr-1 h-4 w-4 transition-transform ${showCalculator ? 'rotate-90' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7-7" />
@@ -212,9 +212,9 @@ const ModelCostDisplay: React.FC<ModelCostDisplayProps> = ({
               const cost = compareModel.cost_per_token || 0;
               const estimatedCost = cost * tokenInput;
               const isCurrentModel = compareModel.model_id === model.model_id;
-              
+
               return (
-                <div 
+                <div
                   key={compareModel.model_id}
                   className={`flex items-center justify-between py-2 px-3 rounded-lg ${
                     isCurrentModel ? 'bg-primary-50 border border-primary-200' : 'bg-gray-50'

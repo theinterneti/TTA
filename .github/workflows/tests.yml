@@ -2,9 +2,16 @@ name: Tests
 
 on:
   push:
-    branches: [main, feat/production-deployment-infrastructure]
+    branches:
+      - main
+      - staging
+      - development
+      - feat/production-deployment-infrastructure
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - staging
+      - development
 
 env:
   PROMETHEUS_ENABLED: true
@@ -17,11 +24,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-unit-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-unit-
+            ${{ runner.os }}-uv-
+
       - name: Sync deps
-        run: uv sync --all-extras --dev
+        run: uv sync --group test
       - name: Run unit tests with metrics collection
         run: |
-          uv run pytest -q --tb=short \
+          uvx pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-report=xml:coverage-unit.xml
         env:
@@ -38,6 +57,8 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
+    # Skip integration tests on development branch (unit tests only)
+    if: github.ref != 'refs/heads/development'
     services:
       neo4j:
         image: neo4j:5-community
@@ -66,6 +87,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-integration-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-integration-
+            ${{ runner.os }}-uv-
+
       - name: Sync deps
         run: uv sync --all-extras --dev
       - name: Run integration tests with monitoring
@@ -89,7 +122,8 @@ jobs:
   monitoring-validation:
     runs-on: ubuntu-latest
     needs: [unit, integration]
-    if: always()
+    # Skip monitoring validation on development branch
+    if: always() && github.ref != 'refs/heads/development'
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1

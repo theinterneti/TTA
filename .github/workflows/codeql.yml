@@ -1,0 +1,334 @@
+name: CodeQL Security Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run CodeQL analysis every Monday at 6 AM UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+env:
+  # CodeQL configuration
+  CODEQL_PYTHON_VERSION: '3.12'
+  CODEQL_NODE_VERSION: '18'
+
+jobs:
+  analyze-python:
+    name: Analyze Python Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.CODEQL_PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-codeql-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-codeql-
+            ${{ runner.os }}-uv-
+
+      - name: Install dependencies
+        run: |
+          echo "Installing Python dependencies for CodeQL analysis..."
+          uv sync --all-extras --dev
+
+      # Initialize CodeQL tools for scanning
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended,security-and-quality
+          config: |
+            paths-ignore:
+              - '**/test/**'
+              - '**/tests/**'
+              - '**/*_test.py'
+              - '**/*test*.py'
+              - '**/node_modules/**'
+              - '**/dist/**'
+              - '**/build/**'
+              - '**/.venv/**'
+            queries:
+              - uses: security-extended
+              - uses: security-and-quality
+
+      # Autobuild attempts to build any compiled languages (Python doesn't need this)
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      # Perform CodeQL Analysis
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+          output: sarif-results
+          upload: true
+
+      - name: Upload Python SARIF results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-python-sarif
+          path: sarif-results/python.sarif
+          retention-days: 30
+
+  analyze-javascript:
+    name: Analyze JavaScript/TypeScript Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.CODEQL_NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/player_experience/frontend/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: src/player_experience/frontend
+        run: npm ci
+
+      # Initialize CodeQL tools for scanning
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended,security-and-quality
+          config: |
+            paths:
+              - 'src/player_experience/frontend/**'
+              - 'testing/**/*.ts'
+              - 'testing/**/*.js'
+            paths-ignore:
+              - '**/node_modules/**'
+              - '**/dist/**'
+              - '**/build/**'
+              - '**/*.test.ts'
+              - '**/*.test.js'
+              - '**/*.spec.ts'
+              - '**/*.spec.js'
+            queries:
+              - uses: security-extended
+              - uses: security-and-quality
+
+      # Autobuild attempts to build any compiled languages
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      # Perform CodeQL Analysis
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
+          output: sarif-results
+          upload: true
+
+      - name: Upload JavaScript/TypeScript SARIF results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-javascript-sarif
+          path: sarif-results/javascript.sarif
+          retention-days: 30
+
+  # Process and report CodeQL results
+  process-results:
+    name: Process CodeQL Results
+    runs-on: ubuntu-latest
+    needs: [analyze-python, analyze-javascript]
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Python SARIF results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: codeql-python-sarif
+          path: sarif-results/python/
+
+      - name: Download JavaScript SARIF results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: codeql-javascript-sarif
+          path: sarif-results/javascript/
+
+      - name: Analyze SARIF results
+        run: |
+          echo "## 🔍 CodeQL Security Analysis Results" > codeql-summary.md
+          echo "" >> codeql-summary.md
+
+          # Process Python results
+          if [ -f "sarif-results/python/python.sarif" ]; then
+            echo "### Python Analysis" >> codeql-summary.md
+            python_issues=$(jq '.runs[0].results | length' sarif-results/python/python.sarif 2>/dev/null || echo "0")
+            echo "- **Total Issues Found**: $python_issues" >> codeql-summary.md
+
+            if [ "$python_issues" -gt 0 ]; then
+              echo "- **Severity Breakdown**:" >> codeql-summary.md
+              jq -r '.runs[0].results[] | "  - \(.level // "note"): \(.message.text)"' sarif-results/python/python.sarif | head -10 >> codeql-summary.md
+            else
+              echo "- ✅ No security issues detected" >> codeql-summary.md
+            fi
+            echo "" >> codeql-summary.md
+          fi
+
+          # Process JavaScript results
+          if [ -f "sarif-results/javascript/javascript.sarif" ]; then
+            echo "### JavaScript/TypeScript Analysis" >> codeql-summary.md
+            js_issues=$(jq '.runs[0].results | length' sarif-results/javascript/javascript.sarif 2>/dev/null || echo "0")
+            echo "- **Total Issues Found**: $js_issues" >> codeql-summary.md
+
+            if [ "$js_issues" -gt 0 ]; then
+              echo "- **Severity Breakdown**:" >> codeql-summary.md
+              jq -r '.runs[0].results[] | "  - \(.level // "note"): \(.message.text)"' sarif-results/javascript/javascript.sarif | head -10 >> codeql-summary.md
+            else
+              echo "- ✅ No security issues detected" >> codeql-summary.md
+            fi
+            echo "" >> codeql-summary.md
+          fi
+
+          echo "---" >> codeql-summary.md
+          echo "*Full results available in GitHub Security tab*" >> codeql-summary.md
+
+          cat codeql-summary.md
+
+      - name: Comment PR with CodeQL results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('codeql-summary.md', 'utf8');
+
+            // Find existing CodeQL comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('CodeQL Security Analysis Results')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: summary
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+            }
+
+      - name: Upload CodeQL summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-summary
+          path: codeql-summary.md
+          retention-days: 30
+
+  # Check for critical vulnerabilities
+  security-gate:
+    name: Security Gate Check
+    runs-on: ubuntu-latest
+    needs: [analyze-python, analyze-javascript]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Download Python SARIF results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: codeql-python-sarif
+          path: sarif-results/python/
+
+      - name: Download JavaScript SARIF results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: codeql-javascript-sarif
+          path: sarif-results/javascript/
+
+      - name: Check for critical vulnerabilities
+        run: |
+          echo "Checking for critical security vulnerabilities..."
+
+          critical_found=false
+
+          # Check Python results for critical issues
+          if [ -f "sarif-results/python/python.sarif" ]; then
+            critical_count=$(jq '[.runs[0].results[] | select(.level == "error")] | length' sarif-results/python/python.sarif 2>/dev/null || echo "0")
+            if [ "$critical_count" -gt 0 ]; then
+              echo "❌ Found $critical_count critical issues in Python code"
+              critical_found=true
+            fi
+          fi
+
+          # Check JavaScript results for critical issues
+          if [ -f "sarif-results/javascript/javascript.sarif" ]; then
+            critical_count=$(jq '[.runs[0].results[] | select(.level == "error")] | length' sarif-results/javascript/javascript.sarif 2>/dev/null || echo "0")
+            if [ "$critical_count" -gt 0 ]; then
+              echo "❌ Found $critical_count critical issues in JavaScript/TypeScript code"
+              critical_found=true
+            fi
+          fi
+
+          if [ "$critical_found" = true ]; then
+            echo "❌ Critical security vulnerabilities detected!"
+            echo "Please review and fix the issues before merging."
+            exit 1
+          else
+            echo "✅ No critical security vulnerabilities detected"
+          fi

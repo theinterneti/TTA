@@ -55,7 +55,7 @@ export async function mockWebSocketMessage(page: Page, message: any) {
   }, message);
 }
 
-export async function mockWebSocketConnection(page: Page, connected: boolean = true) {
+export async function mockWebSocketConnectionStatus(page: Page, connected: boolean = true) {
   await page.evaluate((isConnected) => {
     window.dispatchEvent(new CustomEvent(isConnected ? 'websocket-connect' : 'websocket-disconnect'));
   }, connected);
@@ -88,11 +88,11 @@ export async function waitForApiCall(page: Page, urlPattern: string | RegExp, ti
 export async function checkBasicAccessibility(page: Page) {
   // Check for main landmark
   await expect(page.locator('main, [role="main"]')).toBeVisible();
-  
+
   // Check for skip links
   const skipLinks = await page.locator('a[href^="#"]').count();
   expect(skipLinks).toBeGreaterThan(0);
-  
+
   // Check for heading hierarchy
   const headings = page.locator('h1, h2, h3, h4, h5, h6');
   await expect(headings.first()).toBeVisible();
@@ -212,38 +212,38 @@ export async function setDesktopViewport(page: Page) {
 // Error handling helpers
 export async function expectNoConsoleErrors(page: Page) {
   const errors: string[] = [];
-  
+
   page.on('console', msg => {
     if (msg.type() === 'error') {
       errors.push(msg.text());
     }
   });
-  
+
   // Wait a bit for any console errors to appear
   await page.waitForTimeout(1000);
-  
+
   expect(errors).toHaveLength(0);
 }
 
 export async function expectNoNetworkErrors(page: Page) {
   const failedRequests: string[] = [];
-  
+
   page.on('response', response => {
     if (response.status() >= 400) {
       failedRequests.push(`${response.status()} ${response.url()}`);
     }
   });
-  
+
   // Wait for any pending requests
   await page.waitForLoadState('networkidle');
-  
+
   expect(failedRequests).toHaveLength(0);
 }
 
 // Retry helpers
 export async function retryAction(action: () => Promise<void>, maxRetries: number = 3, delay: number = 1000) {
   let lastError: Error | null = null;
-  
+
   for (let i = 0; i < maxRetries; i++) {
     try {
       await action();
@@ -255,7 +255,7 @@ export async function retryAction(action: () => Promise<void>, maxRetries: numbe
       }
     }
   }
-  
+
   throw lastError;
 }
 
@@ -266,7 +266,7 @@ export async function cleanupTestData(page: Page, userId?: string) {
     await mockApiResponse(page, `**/players/${userId}/characters`, []);
     await mockApiResponse(page, `**/players/${userId}/sessions`, []);
   }
-  
+
   // Clear browser storage
   await clearLocalStorage(page);
   await clearSessionStorage(page);
@@ -363,39 +363,6 @@ export async function deleteTempFile(filePath: string): Promise<void> {
   } catch (error) {
     // Ignore errors if file doesn't exist
   }
-}
-
-// Enhanced API mocking
-export async function mockApiError(page: Page, urlPattern: string, statusCode: number, errorMessage?: string) {
-  await page.route(urlPattern, route => {
-    route.fulfill({
-      status: statusCode,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        error: errorMessage || `HTTP ${statusCode} Error`,
-        status: statusCode,
-        timestamp: new Date().toISOString(),
-      }),
-    });
-  });
-}
-
-export async function mockNetworkFailure(page: Page, urlPattern: string) {
-  await page.route(urlPattern, route => {
-    route.abort('failed');
-  });
-}
-
-export async function mockSlowResponse(page: Page, urlPattern: string, delay: number, response?: any) {
-  await page.route(urlPattern, route => {
-    setTimeout(() => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(response || { success: true }),
-      });
-    }, delay);
-  });
 }
 
 // Performance measurement helpers
@@ -523,7 +490,7 @@ export async function logNetworkActivity(page: Page) {
   page.on('request', request => {
     console.log('Request:', request.method(), request.url());
   });
-  
+
   page.on('response', response => {
     console.log('Response:', response.status(), response.url());
   });

@@ -292,8 +292,7 @@ async def delete_user_data(
         )
 
     try:
-        deletion_summary = privacy_service.delete_user_data(deletion_request)
-        return deletion_summary
+        return privacy_service.delete_user_data(deletion_request)
 
     except Exception as e:
         raise HTTPException(
@@ -316,8 +315,7 @@ async def anonymize_user_data(
         Dict: Anonymization summary
     """
     try:
-        anonymization_summary = privacy_service.anonymize_user_data(user.user_id)
-        return anonymization_summary
+        return privacy_service.anonymize_user_data(user.user_id)
 
     except Exception as e:
         raise HTTPException(
@@ -377,8 +375,7 @@ async def check_data_retention_compliance(
     Returns:
         List: Compliance issues requiring attention
     """
-    compliance_issues = privacy_service.check_data_retention_compliance()
-    return compliance_issues
+    return privacy_service.check_data_retention_compliance()
 
 
 @router.get("/admin/deletion-log", response_model=list[dict[str, Any]])

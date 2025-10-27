@@ -299,7 +299,7 @@ class GameplayLoopComponent(Component):
             }
 
             # Get detailed session information
-            for _, session in self.gameplay_controller.active_sessions.items():
+            for session in self.gameplay_controller.active_sessions.values():
                 status = "active" if session.is_active else "inactive"
                 session_stats["sessions_by_status"][status] = (
                     session_stats["sessions_by_status"].get(status, 0) + 1
@@ -372,10 +372,12 @@ class GameplayLoopComponent(Component):
             return None
 
         try:
-            next_scene, new_choices, consequences = (
-                await self.gameplay_controller.process_user_choice(
-                    session_id, choice_id
-                )
+            (
+                next_scene,
+                new_choices,
+                consequences,
+            ) = await self.gameplay_controller.process_user_choice(
+                session_id, choice_id
             )
 
             return {

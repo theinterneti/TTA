@@ -96,12 +96,11 @@ class ContainerHealthChecker:
                     message=f"Port {port} is accessible",
                     response_time_ms=response_time,
                 )
-            else:
-                return HealthCheckResult(
-                    status=HealthStatus.UNHEALTHY,
-                    message=f"Port {port} is not accessible (error code: {result})",
-                    response_time_ms=response_time,
-                )
+            return HealthCheckResult(
+                status=HealthStatus.UNHEALTHY,
+                message=f"Port {port} is not accessible (error code: {result})",
+                response_time_ms=response_time,
+            )
 
         except TimeoutError:
             response_time = (time.time() - start_time) * 1000
@@ -140,13 +139,12 @@ class ContainerHealthChecker:
                                 "headers": dict(response.headers),
                             },
                         )
-                    else:
-                        return HealthCheckResult(
-                            status=HealthStatus.UNHEALTHY,
-                            message=f"HTTP endpoint {url} returned {response.status}, expected {expected_status}",
-                            response_time_ms=response_time,
-                            details={"status_code": response.status},
-                        )
+                    return HealthCheckResult(
+                        status=HealthStatus.UNHEALTHY,
+                        message=f"HTTP endpoint {url} returned {response.status}, expected {expected_status}",
+                        response_time_ms=response_time,
+                        details={"status_code": response.status},
+                    )
 
         except asyncio.TimeoutError:
             response_time = (time.time() - start_time) * 1000
@@ -224,13 +222,12 @@ class ContainerHealthChecker:
                                 "query_test": True,
                             },
                         )
-                    else:
-                        response_time = (time.time() - start_time) * 1000
-                        return HealthCheckResult(
-                            status=HealthStatus.UNHEALTHY,
-                            message="Neo4j query test failed",
-                            response_time_ms=response_time,
-                        )
+                    response_time = (time.time() - start_time) * 1000
+                    return HealthCheckResult(
+                        status=HealthStatus.UNHEALTHY,
+                        message="Neo4j query test failed",
+                        response_time_ms=response_time,
+                    )
 
             finally:
                 await driver.close()
@@ -297,7 +294,7 @@ class ContainerHealthChecker:
                         f"✅ Neo4j authentication successful with {username}/{'*' * len(password)}"
                     )
                     return result
-                elif "rate limit" in result.message.lower():
+                if "rate limit" in result.message.lower():
                     # If rate limited, wait and try next credentials
                     logger.warning(
                         f"Rate limited with {username}, waiting before next attempt..."
@@ -305,8 +302,7 @@ class ContainerHealthChecker:
                     await asyncio.sleep(5)
                     last_error = result.message
                     continue
-                else:
-                    last_error = result.message
+                last_error = result.message
 
             except Exception as e:
                 last_error = str(e)
@@ -367,13 +363,12 @@ class ContainerHealthChecker:
                     response_time_ms=response_time,
                     details={"ping": True, "read_write_test": True},
                 )
-            else:
-                response_time = (time.time() - start_time) * 1000
-                return HealthCheckResult(
-                    status=HealthStatus.UNHEALTHY,
-                    message="Redis read/write test failed",
-                    response_time_ms=response_time,
-                )
+            response_time = (time.time() - start_time) * 1000
+            return HealthCheckResult(
+                status=HealthStatus.UNHEALTHY,
+                message="Redis read/write test failed",
+                response_time_ms=response_time,
+            )
 
         except asyncio.TimeoutError:
             response_time = (time.time() - start_time) * 1000

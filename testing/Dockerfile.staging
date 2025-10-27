@@ -1,0 +1,247 @@
+# TTA Testing Service - Staging Environment Dockerfile
+# Comprehensive testing framework for staging validation
+
+FROM python:3.11-slim
+
+# Build arguments
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_COMMIT
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    ENVIRONMENT=staging \
+    BUILD_DATE=${BUILD_DATE} \
+    VERSION=${VERSION} \
+    GIT_COMMIT=${GIT_COMMIT}
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    build-essential \
+    chromium \
+    chromium-driver \
+    firefox-esr \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js for frontend testing
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Create non-root user
+RUN groupadd -r tester && useradd -r -g tester -d /app -s /bin/bash tester
+
+# Set work directory
+WORKDIR /app
+
+# Copy requirements
+COPY requirements-testing.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements-testing.txt
+
+# Install additional testing tools
+RUN pip install --no-cache-dir \
+    pytest \
+    pytest-asyncio \
+    pytest-xdist \
+    pytest-html \
+    pytest-cov \
+    locust \
+    playwright \
+    selenium \
+    requests \
+    websockets \
+    aiohttp \
+    faker \
+    factory-boy
+
+# Install Playwright browsers
+RUN playwright install chromium firefox webkit
+
+# Copy testing framework
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/results /app/reports /app/logs /app/screenshots \
+    && chown -R tester:tester /app
+
+# Copy staging-specific test configurations
+COPY configs-staging/ ./configs/
+
+# Create test runner script
+COPY <<EOF /app/run-staging-tests.sh
+#!/bin/bash
+set -e
+
+echo "Starting TTA Staging Test Suite"
+echo "Environment: \$ENVIRONMENT"
+echo "Target API: \$TARGET_API_URL"
+echo "Target Frontend: \$TARGET_FRONTEND_URL"
+echo "Concurrent Users: \$CONCURRENT_USERS"
+
+# Wait for services to be ready
+echo "Waiting for services to be ready..."
+python -c "
+import requests
+import time
+import sys
+
+def wait_for_service(url, timeout=300):
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            response = requests.get(f'{url}/health', timeout=10)
+            if response.status_code == 200:
+                print(f'Service {url} is ready')
+                return True
+        except Exception as e:
+            print(f'Waiting for {url}: {e}')
+        time.sleep(5)
+    return False
+
+api_url = '\$TARGET_API_URL'
+frontend_url = '\$TARGET_FRONTEND_URL'
+
+if not wait_for_service(api_url):
+    print(f'API service {api_url} not ready')
+    sys.exit(1)
+
+if not wait_for_service(frontend_url):
+    print(f'Frontend service {frontend_url} not ready')
+    sys.exit(1)
+
+print('All services are ready')
+"
+
+# Run test suites
+echo "Running staging test suites..."
+
+# 1. API Integration Tests
+echo "Running API integration tests..."
+pytest tests/integration/api/ \
+    --html=reports/api-integration-report.html \
+    --cov=src \
+    --cov-report=html:reports/coverage-api \
+    --junitxml=reports/api-integration-junit.xml \
+    -v
+
+# 2. Frontend E2E Tests
+echo "Running frontend E2E tests..."
+pytest tests/e2e/frontend/ \
+    --html=reports/frontend-e2e-report.html \
+    --junitxml=reports/frontend-e2e-junit.xml \
+    --screenshot=on \
+    -v
+
+# 3. Multi-User Session Tests
+echo "Running multi-user session tests..."
+pytest tests/multi_user/ \
+    --html=reports/multi-user-report.html \
+    --junitxml=reports/multi-user-junit.xml \
+    --concurrent-users=\$CONCURRENT_USERS \
+    -v
+
+# 4. Performance Tests
+echo "Running performance tests..."
+locust -f tests/performance/locustfile.py \
+    --host=\$TARGET_API_URL \
+    --users=\$CONCURRENT_USERS \
+    --spawn-rate=5 \
+    --run-time=\${TEST_DURATION}s \
+    --html=reports/performance-report.html \
+    --csv=reports/performance \
+    --headless
+
+# 5. Database Integration Tests
+echo "Running database integration tests..."
+pytest tests/integration/database/ \
+    --html=reports/database-integration-report.html \
+    --junitxml=reports/database-integration-junit.xml \
+    -v
+
+# 6. WebSocket Tests
+echo "Running WebSocket tests..."
+pytest tests/websocket/ \
+    --html=reports/websocket-report.html \
+    --junitxml=reports/websocket-junit.xml \
+    -v
+
+# Generate comprehensive test report
+echo "Generating comprehensive test report..."
+python scripts/generate_test_report.py \
+    --input-dir=reports \
+    --output=reports/staging-test-summary.html
+
+echo "Staging test suite completed successfully"
+echo "Reports available in /app/reports/"
+EOF
+
+RUN chmod +x /app/run-staging-tests.sh
+
+# Create test data seeding script
+COPY <<EOF /app/seed-test-data.sh
+#!/bin/bash
+set -e
+
+echo "Seeding test data for staging environment..."
+
+# Create test users
+python scripts/create_test_users.py \
+    --api-url=\$TARGET_API_URL \
+    --count=50 \
+    --output=data/test-users.json
+
+# Create test characters
+python scripts/create_test_characters.py \
+    --api-url=\$TARGET_API_URL \
+    --users-file=data/test-users.json \
+    --count=100 \
+    --output=data/test-characters.json
+
+# Create test worlds
+python scripts/create_test_worlds.py \
+    --api-url=\$TARGET_API_URL \
+    --count=10 \
+    --output=data/test-worlds.json
+
+# Create test sessions
+python scripts/create_test_sessions.py \
+    --api-url=\$TARGET_API_URL \
+    --users-file=data/test-users.json \
+    --worlds-file=data/test-worlds.json \
+    --count=25 \
+    --output=data/test-sessions.json
+
+echo "Test data seeding completed"
+EOF
+
+RUN chmod +x /app/seed-test-data.sh
+
+# Switch to non-root user
+USER tester
+
+# Expose port for test results server
+EXPOSE 8000
+
+# Add health check
+HEALTHCHECK --interval=60s --timeout=30s --start-period=120s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Add labels
+LABEL maintainer="TTA Development Team" \
+      version="${VERSION}" \
+      environment="staging" \
+      build-date="${BUILD_DATE}" \
+      git-commit="${GIT_COMMIT}" \
+      description="TTA Testing Service - Staging Environment" \
+      com.tta.service="testing" \
+      com.tta.environment="staging" \
+      com.tta.purpose="validation"
+
+# Default command runs the test suite
+CMD ["/app/run-staging-tests.sh"]

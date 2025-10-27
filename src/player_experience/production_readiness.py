@@ -7,6 +7,7 @@ deployment verification.
 """
 
 import asyncio
+import contextlib
 import json
 import time
 from dataclasses import dataclass, field
@@ -726,8 +727,7 @@ class ProductionReadinessValidator:
                     "total_requests": result.total_requests,
                     "successful_requests": result.successful_requests,
                 }
-            else:
-                return {"error": "No load test results"}
+            return {"error": "No load test results"}
 
         except Exception as e:
             return {"error": str(e)}
@@ -770,7 +770,7 @@ class ProductionReadinessValidator:
             async with aiohttp.ClientSession() as session:
                 responses = []
                 for _ in range(20):  # Make 20 rapid requests
-                    try:
+                    with contextlib.suppress(Exception):
                         async with session.get(f"{self.base_url}/health") as response:
                             responses.append(
                                 {
@@ -778,8 +778,6 @@ class ProductionReadinessValidator:
                                     "headers": dict(response.headers),
                                 }
                             )
-                    except Exception:
-                        pass
 
                 # Check for rate limit headers or 429 responses
                 has_rate_limit_headers = any(
@@ -973,14 +971,12 @@ class ProductionReadinessValidator:
 
             async with aiohttp.ClientSession() as session:
                 for endpoint in health_endpoints:
-                    try:
+                    with contextlib.suppress(Exception):
                         async with session.get(
                             f"{self.base_url}{endpoint}"
                         ) as response:
                             if response.status == 200:
                                 available_endpoints.append(endpoint)
-                    except Exception:
-                        pass
 
             return {
                 "available": len(available_endpoints) > 0,
@@ -1263,9 +1259,9 @@ async def main():
     report = await validator.run_comprehensive_assessment()
 
     # Print summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("PRODUCTION READINESS ASSESSMENT SUMMARY")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Overall Level: {report.overall_level.value.upper()}")
     print(f"Overall Score: {report.overall_score:.1f}/100")
     print(f"Total Checks: {len(report.checks)}")
@@ -1287,7 +1283,7 @@ async def main():
             print(f"  ... and {len(report.recommendations) - 5} more")
 
     print("\nDetailed report saved to: ./production_readiness_reports/")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
 
 if __name__ == "__main__":

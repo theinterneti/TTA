@@ -330,9 +330,9 @@ class CharacterArcManagerComponent(Component):
             self.active_arcs[character_id] = character_arc
 
             # Initialize personality model for consistent responses
-            self.personality_models[character_id] = (
-                await self._create_personality_model(character_arc)
-            )
+            self.personality_models[
+                character_id
+            ] = await self._create_personality_model(character_arc)
 
             logger.info(
                 f"Character arc initialized for {character_id} with {len(trajectory)} milestones"
@@ -611,10 +611,11 @@ class CharacterArcManagerComponent(Component):
         """Initialize character arc with Character Development System integration."""
         if self.integration:
             try:
-                character_arc, character_state = (
-                    await self.integration.initialize_character_integration(
-                        character_id, base_personality
-                    )
+                (
+                    character_arc,
+                    character_state,
+                ) = await self.integration.initialize_character_integration(
+                    character_id, base_personality
                 )
                 logger.info(f"Initialized integrated character arc for {character_id}")
                 return character_arc
@@ -641,10 +642,9 @@ class CharacterArcManagerComponent(Component):
                         f"Updated integrated character development for {character_id}"
                     )
                     return True
-                else:
-                    logger.warning(
-                        f"Integrated update failed for {character_id}, falling back to arc-only update"
-                    )
+                logger.warning(
+                    f"Integrated update failed for {character_id}, falling back to arc-only update"
+                )
             except Exception as e:
                 logger.error(f"Error in integrated character update: {e}")
 
@@ -731,8 +731,7 @@ class CharacterArcManagerComponent(Component):
                     "reason": "Integration not available",
                 },
             }
-        else:
-            return {"error": "Character not found"}
+        return {"error": "Character not found"}
 
     # Private helper methods
 
@@ -859,11 +858,11 @@ class CharacterArcManagerComponent(Component):
                 for i in range(milestones_per_stage):
                     milestone = ArcMilestone(
                         milestone_id=str(uuid.uuid4()),
-                        name=f"{stage.value.title()} Milestone {i+1}",
+                        name=f"{stage.value.title()} Milestone {i + 1}",
                         description=f"Character development milestone for {stage.value} stage",
                         stage=stage,
-                        requirements=[f"requirement_{stage.value}_{i+1}"],
-                        rewards=[f"reward_{stage.value}_{i+1}"],
+                        requirements=[f"requirement_{stage.value}_{i + 1}"],
+                        rewards=[f"reward_{stage.value}_{i + 1}"],
                         therapeutic_themes=template.get(
                             "therapeutic_opportunities", []
                         )[:1],
@@ -1138,10 +1137,9 @@ class CharacterArcManagerComponent(Component):
                 return True
 
             # Check emotional impact alignment
-            if any(impact > 0.3 for impact in interaction.emotional_impact.values()):
-                return True
-
-            return False
+            return bool(
+                any(impact > 0.3 for impact in interaction.emotional_impact.values())
+            )
 
         except Exception as e:
             logger.error(f"Error checking milestone contribution: {e}")
@@ -1244,16 +1242,15 @@ class CharacterArcManagerComponent(Component):
             # Default emotional tones based on personality traits
             if personality.get("cheerfulness", 0.5) > 0.7:
                 return "cheerful"
-            elif personality.get("anxiety", 0.5) > 0.7:
+            if personality.get("anxiety", 0.5) > 0.7:
                 return "anxious"
-            elif personality.get("confidence", 0.5) > 0.7:
+            if personality.get("confidence", 0.5) > 0.7:
                 return "confident"
-            elif context.tension_level > 0.7:
+            if context.tension_level > 0.7:
                 return "tense"
-            elif context.mood == "sad":
+            if context.mood == "sad":
                 return "sympathetic"
-            else:
-                return "neutral"
+            return "neutral"
 
         except Exception as e:
             logger.error(f"Error determining emotional tone: {e}")
@@ -1438,10 +1435,7 @@ class CharacterArcManagerComponent(Component):
 
             # Check progress threshold
             progress = milestone.metadata.get("progress", 0.0)
-            if progress < 1.0:
-                return False
-
-            return True
+            return not progress < 1.0
 
         except Exception as e:
             logger.error(f"Error checking milestone requirements: {e}")
@@ -1457,10 +1451,10 @@ class CharacterArcManagerComponent(Component):
 
             if "interaction" in requirement:
                 return len(character_arc.character_history) > 5
-            elif "relationship" in requirement:
+            if "relationship" in requirement:
                 player_relationship = character_arc.relationship_dynamics.get("player")
                 return player_relationship and player_relationship.trust_level > 0.5
-            elif "growth" in requirement:
+            if "growth" in requirement:
                 return any(
                     value > 0.6 for value in character_arc.growth_potential.values()
                 )

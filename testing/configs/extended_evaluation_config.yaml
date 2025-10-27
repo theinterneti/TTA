@@ -1,0 +1,385 @@
+# Extended Session Quality Evaluation Configuration
+# Configuration for comprehensive TTA storytelling system evaluation
+
+# Inherit base configuration from single player testing
+base_config: "testing/model_testing_config.yaml"
+
+# Extended evaluation specific settings
+extended_evaluation:
+  enabled: true
+  max_concurrent_sessions: 2 # Reduced for extended sessions
+  session_timeout_minutes: 240 # 4 hours max per session
+  data_collection_interval_seconds: 5
+  performance_monitoring_enabled: true
+
+# Extended session scenarios (20-50+ turns)
+extended_scenarios:
+  epic_fantasy_adventure:
+    name: "Epic Fantasy Adventure"
+    description: "Extended fantasy adventure with complex world-building and character development"
+    target_turns: 35
+    max_duration_minutes: 180
+    story_genre: "fantasy"
+    world_type: "high_fantasy"
+    initial_setup:
+      setting: "medieval_fantasy"
+      character_role: "adventurer"
+      world_complexity: "high"
+      therapeutic_integration: "subtle"
+    key_decision_points:
+      - turn: 10
+        type: "moral_choice"
+        impact: "major"
+        description: "Character faces significant moral dilemma"
+      - turn: 20
+        type: "strategic_decision"
+        impact: "world_changing"
+        description: "Decision affects the broader world state"
+      - turn: 30
+        type: "character_development"
+        impact: "personal"
+        description: "Moment of significant personal growth"
+    narrative_milestones:
+      - turn: 15
+        milestone: "first_major_conflict"
+        description: "Introduction of primary conflict"
+      - turn: 25
+        milestone: "character_growth_moment"
+        description: "Significant character development"
+      - turn: 35
+        milestone: "story_resolution"
+        description: "Resolution of main story arc"
+    primary_metrics:
+      - "narrative_coherence"
+      - "world_consistency"
+      - "character_development"
+      - "choice_impact_tracking"
+    success_criteria:
+      narrative_coherence: 8.0
+      world_consistency: 8.5
+      character_development: 7.5
+      choice_meaningfulness: 7.8
+    interaction_style: "active"
+    decision_complexity: "complex"
+    pacing_preference: "moderate"
+
+  modern_mystery_investigation:
+    name: "Modern Mystery Investigation"
+    description: "Contemporary mystery with psychological elements and therapeutic integration"
+    target_turns: 28
+    max_duration_minutes: 150
+    story_genre: "mystery"
+    world_type: "contemporary"
+    initial_setup:
+      setting: "modern_city"
+      character_role: "investigator"
+      world_complexity: "medium"
+      therapeutic_integration: "moderate"
+    key_decision_points:
+      - turn: 8
+        type: "investigation_approach"
+        impact: "moderate"
+        description: "Choose investigation methodology"
+      - turn: 16
+        type: "trust_decision"
+        impact: "relationship"
+        description: "Decision about trusting key character"
+      - turn: 24
+        type: "revelation_response"
+        impact: "resolution"
+        description: "How to handle major revelation"
+    narrative_milestones:
+      - turn: 10
+        milestone: "first_clue_discovery"
+        description: "Discovery of significant clue"
+      - turn: 18
+        milestone: "plot_twist"
+        description: "Major plot revelation"
+      - turn: 28
+        milestone: "mystery_resolution"
+        description: "Resolution of mystery"
+    primary_metrics:
+      - "narrative_coherence"
+      - "world_consistency"
+      - "therapeutic_integration"
+      - "user_engagement"
+    success_criteria:
+      narrative_coherence: 7.8
+      world_consistency: 8.0
+      therapeutic_integration: 8.2
+      user_engagement: 7.5
+    interaction_style: "mixed"
+    decision_complexity: "moderate"
+    pacing_preference: "moderate"
+
+  sci_fi_exploration:
+    name: "Sci-Fi Space Exploration"
+    description: "Science fiction adventure with world-building and ethical dilemmas"
+    target_turns: 42
+    max_duration_minutes: 200
+    story_genre: "science_fiction"
+    world_type: "space_exploration"
+    initial_setup:
+      setting: "space_station"
+      character_role: "explorer"
+      world_complexity: "high"
+      therapeutic_integration: "subtle"
+    key_decision_points:
+      - turn: 12
+        type: "ethical_dilemma"
+        impact: "major"
+        description: "First contact ethical decision"
+      - turn: 25
+        type: "resource_allocation"
+        impact: "survival"
+        description: "Critical resource management decision"
+      - turn: 38
+        type: "future_direction"
+        impact: "world_changing"
+        description: "Decision affecting future exploration"
+    narrative_milestones:
+      - turn: 14
+        milestone: "first_contact"
+        description: "First alien contact"
+      - turn: 28
+        milestone: "crisis_point"
+        description: "Major crisis requiring resolution"
+      - turn: 42
+        milestone: "new_frontier"
+        description: "Opening of new exploration possibilities"
+    primary_metrics:
+      - "narrative_coherence"
+      - "world_consistency"
+      - "creative_quality"
+      - "choice_impact_tracking"
+    success_criteria:
+      narrative_coherence: 8.2
+      world_consistency: 8.8
+      creative_quality: 8.0
+      choice_meaningfulness: 8.0
+    interaction_style: "active"
+    decision_complexity: "complex"
+    pacing_preference: "slow"
+
+  slice_of_life_drama:
+    name: "Slice of Life Drama"
+    description: "Contemporary life story with strong therapeutic integration"
+    target_turns: 25
+    max_duration_minutes: 120
+    story_genre: "drama"
+    world_type: "contemporary_life"
+    initial_setup:
+      setting: "small_town"
+      character_role: "resident"
+      world_complexity: "medium"
+      therapeutic_integration: "high"
+    key_decision_points:
+      - turn: 8
+        type: "relationship_choice"
+        impact: "personal"
+        description: "Important relationship decision"
+      - turn: 16
+        type: "life_direction"
+        impact: "major"
+        description: "Career or life path choice"
+      - turn: 22
+        type: "conflict_resolution"
+        impact: "relationship"
+        description: "Resolving interpersonal conflict"
+    narrative_milestones:
+      - turn: 10
+        milestone: "relationship_development"
+        description: "Significant relationship moment"
+      - turn: 18
+        milestone: "personal_challenge"
+        description: "Facing personal obstacle"
+      - turn: 25
+        milestone: "growth_achievement"
+        description: "Personal growth milestone"
+    primary_metrics:
+      - "therapeutic_integration"
+      - "character_development"
+      - "user_engagement"
+      - "narrative_coherence"
+    success_criteria:
+      therapeutic_integration: 8.5
+      character_development: 8.0
+      user_engagement: 7.8
+      narrative_coherence: 7.5
+    interaction_style: "mixed"
+    decision_complexity: "moderate"
+    pacing_preference: "slow"
+
+# Enhanced user profiles for extended testing
+enhanced_user_profiles:
+  analytical_gamer:
+    name: "Analytical Gamer"
+    description: "Methodical player who enjoys complex decision-making"
+    behavior_pattern:
+      decision_making_style: "analytical"
+      interaction_style: "active"
+      narrative_preference: "plot_driven"
+      min_thinking_time: 5.0
+      max_thinking_time: 45.0
+      response_length_preference: "long"
+      engagement_consistency: 0.9
+      attention_span_turns: 25
+      risk_tolerance: 0.6
+      creativity_level: 0.7
+      goal_focus: 0.9
+    demographics:
+      age_range: "25-35"
+      gaming_experience: "high"
+      tech_comfort: "high"
+      time_availability: "medium"
+    therapeutic_profile:
+      primary_concerns: ["perfectionism", "decision_anxiety"]
+      comfort_zones: ["logical_analysis", "structured_problems"]
+      challenge_areas: ["uncertainty", "emotional_decisions"]
+      preferred_intensity: "medium"
+      therapeutic_goals: ["decision_confidence", "emotional_intelligence"]
+
+  creative_storyteller:
+    name: "Creative Storyteller"
+    description: "Imaginative player who adds creative elements to the narrative"
+    behavior_pattern:
+      decision_making_style: "intuitive"
+      interaction_style: "creative"
+      narrative_preference: "character_driven"
+      min_thinking_time: 3.0
+      max_thinking_time: 30.0
+      response_length_preference: "medium"
+      engagement_consistency: 0.8
+      attention_span_turns: 20
+      risk_tolerance: 0.8
+      creativity_level: 0.9
+      goal_focus: 0.6
+    demographics:
+      age_range: "22-32"
+      gaming_experience: "medium"
+      tech_comfort: "high"
+      time_availability: "high"
+    therapeutic_profile:
+      primary_concerns: ["creative_blocks", "self_expression"]
+      comfort_zones: ["storytelling", "character_development"]
+      challenge_areas: ["criticism", "perfectionism"]
+      preferred_intensity: "medium"
+      therapeutic_goals: ["creative_confidence", "self_acceptance"]
+
+  cautious_explorer:
+    name: "Cautious Explorer"
+    description: "Careful player who prefers safe choices but enjoys exploration"
+    behavior_pattern:
+      decision_making_style: "cautious"
+      interaction_style: "mixed_engagement"
+      narrative_preference: "world_exploration"
+      min_thinking_time: 8.0
+      max_thinking_time: 60.0
+      response_length_preference: "short"
+      engagement_consistency: 0.7
+      attention_span_turns: 18
+      risk_tolerance: 0.3
+      creativity_level: 0.5
+      goal_focus: 0.7
+    demographics:
+      age_range: "35-50"
+      gaming_experience: "low"
+      tech_comfort: "medium"
+      time_availability: "limited"
+    therapeutic_profile:
+      primary_concerns: ["anxiety", "change_adaptation"]
+      comfort_zones: ["familiar_environments", "gradual_progress"]
+      challenge_areas: ["risk_taking", "uncertainty"]
+      preferred_intensity: "low"
+      therapeutic_goals: ["confidence_building", "anxiety_management"]
+
+  goal_oriented_achiever:
+    name: "Goal-Oriented Achiever"
+    description: "Focused player who prioritizes objectives and efficiency"
+    behavior_pattern:
+      decision_making_style: "strategic"
+      interaction_style: "goal_oriented"
+      narrative_preference: "plot_driven"
+      min_thinking_time: 2.0
+      max_thinking_time: 20.0
+      response_length_preference: "short"
+      engagement_consistency: 0.9
+      attention_span_turns: 30
+      risk_tolerance: 0.7
+      creativity_level: 0.4
+      goal_focus: 0.95
+    demographics:
+      age_range: "28-45"
+      gaming_experience: "medium"
+      tech_comfort: "high"
+      time_availability: "limited"
+    therapeutic_profile:
+      primary_concerns: ["work_stress", "burnout"]
+      comfort_zones: ["clear_objectives", "measurable_progress"]
+      challenge_areas: ["relaxation", "process_enjoyment"]
+      preferred_intensity: "medium"
+      therapeutic_goals: ["work_life_balance", "stress_management"]
+
+# Quality evaluation metrics
+quality_metrics:
+  narrative_coherence:
+    weight: 0.35
+    components:
+      - character_consistency: 0.3
+      - plot_logic: 0.3
+      - world_consistency: 0.25
+      - temporal_consistency: 0.15
+    excellence_threshold: 8.5
+    minimum_acceptable: 6.0
+
+  world_state_management:
+    weight: 0.25
+    components:
+      - state_persistence: 0.4
+      - choice_impact_tracking: 0.3
+      - world_evolution: 0.3
+    excellence_threshold: 8.8
+    minimum_acceptable: 7.0
+
+  user_engagement:
+    weight: 0.25
+    components:
+      - choice_meaningfulness: 0.4
+      - narrative_immersion: 0.3
+      - pacing_quality: 0.3
+    excellence_threshold: 8.0
+    minimum_acceptable: 6.5
+
+  technical_performance:
+    weight: 0.15
+    components:
+      - response_time: 0.4
+      - error_rate: 0.3
+      - memory_efficiency: 0.3
+    excellence_threshold: 8.5
+    minimum_acceptable: 7.0
+
+# Data collection settings
+data_collection:
+  turn_level_logging: true
+  world_state_snapshots: true
+  performance_monitoring: true
+  error_tracking: true
+  quality_metric_calculation: true
+  real_time_analysis: true
+
+# Analysis and reporting
+analysis:
+  trend_analysis_enabled: true
+  pattern_recognition_enabled: true
+  comparative_analysis_enabled: true
+  visualization_generation: true
+  baseline_establishment: true
+
+# Output settings
+output:
+  results_directory: "testing/results/extended_evaluation"
+  reports_directory: "testing/results/extended_evaluation/reports"
+  export_formats: ["json", "csv", "html"]
+  generate_visualizations: true
+  real_time_dashboard: false # Would require additional infrastructure

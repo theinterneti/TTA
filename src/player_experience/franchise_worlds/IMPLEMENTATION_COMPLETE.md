@@ -183,7 +183,7 @@ Each archetype includes:
 
 📈 System Completeness: 8/8 (100%)
    ✅ Core Framework
-   ✅ Fantasy Worlds  
+   ✅ Fantasy Worlds
    ✅ Sci-Fi Worlds
    ✅ Character Archetypes
    ✅ TTA Integration

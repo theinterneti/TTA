@@ -80,7 +80,7 @@ export class ProgressPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Main dashboard elements
     this.pageTitle = page.locator('h1:has-text("Progress Dashboard"), h1:has-text("Your Progress")');
     this.progressOverview = page.locator('[data-testid="progress-overview"]');
@@ -361,7 +361,7 @@ export class ProgressPage extends BasePage {
     const sessionCount = await this.getSessionCount();
     const streakCount = await this.getStreakCount();
     const goalsCount = await this.getCompletedGoalsCount();
-    
+
     expect(sessionCount).toBeGreaterThanOrEqual(0);
     expect(streakCount).toBeGreaterThanOrEqual(0);
     expect(goalsCount).toBeGreaterThanOrEqual(0);

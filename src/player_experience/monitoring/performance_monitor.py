@@ -385,9 +385,7 @@ class CacheTracker:
         )
 
         # Replace numeric IDs
-        pattern = re.sub(r"\d+", "{id}", pattern)
-
-        return pattern
+        return re.sub(r"\d+", "{id}", pattern)
 
     def get_cache_optimization_suggestions(self) -> list[dict[str, Any]]:
         """Get suggestions for cache optimization."""
@@ -681,24 +679,23 @@ def track_performance(endpoint: str | None = None, track_args: bool = False):
                     return await func(*args, **kwargs)
 
             return async_wrapper
-        else:
 
-            @functools.wraps(func)
-            def sync_wrapper(*args, **kwargs):
-                request_id = f"{endpoint_str}_{int(time.time() * 1000000)}"
-                monitor = get_performance_monitor()
+        @functools.wraps(func)
+        def sync_wrapper(*args, **kwargs):
+            request_id = f"{endpoint_str}_{int(time.time() * 1000000)}"
+            monitor = get_performance_monitor()
 
-                metadata = {}
-                if track_args:
-                    metadata["args_count"] = len(args)
-                    metadata["kwargs_count"] = len(kwargs)
+            metadata = {}
+            if track_args:
+                metadata["args_count"] = len(args)
+                metadata["kwargs_count"] = len(kwargs)
 
-                with monitor.request_tracker.track_request(
-                    request_id, endpoint_str, "FUNCTION", **metadata
-                ):
-                    return func(*args, **kwargs)
+            with monitor.request_tracker.track_request(
+                request_id, endpoint_str, "FUNCTION", **metadata
+            ):
+                return func(*args, **kwargs)
 
-            return sync_wrapper
+        return sync_wrapper
 
     return decorator
 
@@ -725,17 +722,16 @@ def track_database_query(query_type: str | None = None):
                     return await func(*args, **kwargs)
 
             return async_wrapper
-        else:
 
-            @functools.wraps(func)
-            def sync_wrapper(*args, **kwargs):
-                query_id = f"{query_type_str}_{int(time.time() * 1000000)}"
-                monitor = get_performance_monitor()
+        @functools.wraps(func)
+        def sync_wrapper(*args, **kwargs):
+            query_id = f"{query_type_str}_{int(time.time() * 1000000)}"
+            monitor = get_performance_monitor()
 
-                with monitor.db_tracker.track_query(query_id, query_type_str):
-                    return func(*args, **kwargs)
+            with monitor.db_tracker.track_query(query_id, query_type_str):
+                return func(*args, **kwargs)
 
-            return sync_wrapper
+        return sync_wrapper
 
     return decorator
 

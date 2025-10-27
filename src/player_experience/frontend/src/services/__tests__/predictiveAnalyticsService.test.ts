@@ -1,6 +1,6 @@
 /**
  * Predictive Analytics Service Tests - Priority 4B Implementation
- * 
+ *
  * Comprehensive test suite for predictive analytics functionality including:
  * - Trend analysis and pattern recognition
  * - Risk prediction algorithms
@@ -9,8 +9,8 @@
  * - Model performance assessment
  */
 
-import { 
-  PredictiveAnalyticsService, 
+import {
+  PredictiveAnalyticsService,
   predictiveAnalyticsService,
   TrendAnalysis,
   RiskPrediction,
@@ -135,7 +135,7 @@ describe('PredictiveAnalyticsService', () => {
 
   beforeEach(() => {
     service = new PredictiveAnalyticsService();
-    
+
     // Create mock data
     mockGoals = [
       createMockGoal('goal1', 'Anxiety Reduction', 'anxiety_reduction'),
@@ -144,7 +144,7 @@ describe('PredictiveAnalyticsService', () => {
     ];
 
     mockProgressData = createMockProgressData(mockGoals);
-    
+
     mockMonitoringData = [
       createMockMonitoringSession('test-user', 0),
       createMockMonitoringSession('test-user', 1),
@@ -199,7 +199,7 @@ describe('PredictiveAnalyticsService', () => {
       );
 
       expect(result.trendAnalyses.length).toBeGreaterThan(0);
-      
+
       result.trendAnalyses.forEach(trend => {
         expect(trend.trendId).toBeDefined();
         expect(trend.goalId).toBeDefined();

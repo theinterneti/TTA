@@ -163,10 +163,10 @@ describe('GoalVisualizationDashboard', () => {
 
       expect(screen.getByText('2')).toBeInTheDocument(); // Active Goals
       expect(screen.getByText('Active Goals')).toBeInTheDocument();
-      
+
       expect(screen.getAllByText('85%')).toHaveLength(2); // Compatibility and Effectiveness both show 85%
       expect(screen.getByText('Compatibility')).toBeInTheDocument();
-      
+
       expect(screen.getByText('Effectiveness')).toBeInTheDocument();
       expect(screen.getByText('Avg Progress')).toBeInTheDocument();
     });
@@ -332,7 +332,7 @@ describe('GoalVisualizationDashboard', () => {
       fireEvent.click(relationshipsTab);
 
       expect(relationshipsTab).toHaveAttribute('aria-current', 'page');
-      
+
       const overviewTab = screen.getByText('Overview');
       expect(overviewTab).not.toHaveAttribute('aria-current', 'page');
     });

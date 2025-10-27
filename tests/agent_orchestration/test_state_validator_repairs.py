@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-from src.agent_orchestration.coordinators import RedisMessageCoordinator
-from src.agent_orchestration.models import AgentId, AgentMessage, AgentType, MessageType
+from tta_ai.orchestration.coordinators import RedisMessageCoordinator
+from tta_ai.orchestration.models import AgentId, AgentMessage, AgentType, MessageType
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 
@@ -44,7 +44,7 @@ async def test_state_validator_repairs_stale_reservations(redis_client):
     )
 
     # Trigger validator repair once
-    from src.agent_orchestration.state_validator import StateValidator
+    from tta_ai.orchestration.state_validator import StateValidator
 
     sv = getattr(comp, "_state_validator", None)
     assert isinstance(sv, StateValidator)

@@ -1,6 +1,6 @@
 /**
  * Character Archetype Templates
- * 
+ *
  * Defines reusable character archetypes that can be adapted across different
  * franchise worlds while maintaining therapeutic value and legal distinctiveness.
  */
@@ -222,8 +222,8 @@ export class ArchetypeTemplateManager {
    * Get archetypes suitable for specific therapeutic approaches
    */
   static getArchetypesForTherapeuticApproach(approach: string): CharacterArchetype[] {
-    return this.getAllArchetypes().filter(archetype => 
-      archetype.interactionPatterns.some(pattern => 
+    return this.getAllArchetypes().filter(archetype =>
+      archetype.interactionPatterns.some(pattern =>
         pattern.therapeutic_technique.includes(approach.toLowerCase())
       )
     );
@@ -233,22 +233,22 @@ export class ArchetypeTemplateManager {
    * Adapt archetype for specific world context
    */
   static adaptArchetypeForWorld(
-    archetype: CharacterArchetype, 
+    archetype: CharacterArchetype,
     worldGenre: 'fantasy' | 'sci-fi',
     worldContext: string
   ): CharacterArchetype {
     const adapted = { ...archetype };
-    
+
     // Customize name and appearance based on world
     if (worldGenre === 'fantasy') {
       adapted.name = this.generateFantasyName(archetype.archetypeId, worldContext);
     } else {
       adapted.name = this.generateSciFiName(archetype.archetypeId, worldContext);
     }
-    
+
     // Add world-specific adaptation notes
     adapted.adaptationNotes += ` - Adapted for ${worldContext}`;
-    
+
     return adapted;
   }
 

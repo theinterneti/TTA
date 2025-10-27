@@ -16,7 +16,7 @@ Player Input: The player enters a text command describing their desired action.
 Input Processing (IPA):
 The Input Processor Agent (IPA), parses the player's input, identifies the intent, and extracts key entities.
 IPA determines if player input is valid (is it interpretable? Can it be linked to the current context? etc.)
-The IPA uses Natural Language Processing (NLP) techniques to understand the player's command. 
+The IPA uses Natural Language Processing (NLP) techniques to understand the player's command.
 IPA updates the game state to the editor.
 AI Agent Orchestration:
 
@@ -110,4 +110,3 @@ Cross-Platform Compatibility: The game should be compatible with a variety of pl
 Dynamic Metaprompt Selection: Develop algorithms for dynamic metaprompt selection based on player profiles and game state.
 9. Conclusion
 This document provides a roadmap for the future development of the core gameplay loop in TTA. By adhering to the core principles, implementing the key components, and pursuing the long-term goals, we can create a truly unique and transformative gaming experience. This document should be treated as a living document, subject to continuous review and refinement as the project evolves.
-

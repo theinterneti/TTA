@@ -521,4 +521,3 @@ else
     log_info "  4. Review obsolete/ directory and delete after verification"
     log_info "  5. Update main README.md with new structure"
 fi
-

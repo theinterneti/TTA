@@ -1,0 +1,52 @@
+[project]
+name = "ai-dev-toolkit"
+version = "0.1.0"
+description = "Reusable AI development infrastructure and workflow primitives"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "TTA Development Team"}
+]
+keywords = [
+    "ai",
+    "development",
+    "workflow",
+    "primitives",
+    "monitoring",
+    "openhands",
+    "apm"
+]
+
+dependencies = [
+    "tta-workflow-primitives>=0.1.0",
+    "dev-primitives>=0.1.0",
+]
+
+[project.optional-dependencies]
+monitoring = [
+    "prometheus-client>=0.17.0",
+]
+apm = [
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+    "opentelemetry-exporter-prometheus>=0.41b0",
+    "opentelemetry-exporter-otlp>=1.20.0",
+]
+openhands = [
+    "docker>=6.1.0",
+    "requests>=2.31.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+]
+all = [
+    "ai-dev-toolkit[monitoring,apm,openhands,dev]"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

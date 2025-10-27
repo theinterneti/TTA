@@ -195,7 +195,7 @@ describe('InteractiveButton', () => {
 
     const button = screen.getByText('Loading Button');
     expect(button).toHaveClass('cursor-wait');
-    
+
     // Should show loading spinner
     const spinner = screen.container.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
@@ -206,7 +206,7 @@ describe('InteractiveButton', () => {
 
   it('renders with custom icon', () => {
     const customIcon = <span data-testid="custom-icon">🎯</span>;
-    
+
     render(
       <InteractiveButton
         id="test-btn"
@@ -232,7 +232,7 @@ describe('InteractiveButton', () => {
 
     const button = screen.getByText('Press Button');
     fireEvent.mouseDown(button);
-    
+
     expect(button).toHaveClass('scale-95');
   });
 
@@ -249,7 +249,7 @@ describe('InteractiveButton', () => {
     const button = screen.getByText('Press Button');
     fireEvent.mouseDown(button);
     fireEvent.mouseUp(button);
-    
+
     expect(button).not.toHaveClass('scale-95');
   });
 });
