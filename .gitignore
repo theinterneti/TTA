@@ -169,6 +169,11 @@ dump.rdb
 
 # Secrets and certificates
 .secrets/
+secrets/
+!secrets/README.md
+!secrets/production/README.md
+*.secret
+*.password.txt
 *.pem
 *.key
 *.p12

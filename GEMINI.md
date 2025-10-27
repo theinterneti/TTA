@@ -39,10 +39,8 @@ TTA is a therapeutic text adventure game that combines AI-driven storytelling wi
 ```
 
 ## Component Maturity Workflow
-Components progress through three stages:
-1. **Development (60% test coverage)** - Active development
-2. **Staging (70% test coverage)** - Pre-production validation
-3. **Production (80% test coverage)** - Live deployment
+
+**See AGENTS.md** for complete maturity workflow and quality gates.
 
 **Current Focus:** Orchestration component at 49.4% coverage, targeting 70% for staging promotion.
 
@@ -56,18 +54,12 @@ Components progress through three stages:
 - Write comprehensive docstrings (Google style)
 
 ### Testing Patterns
-- **AAA Pattern:** Arrange-Act-Assert structure
-- **Pytest Fixtures:** Reusable test setup
-- **Mocking:** Use `unittest.mock` for external dependencies
-- **Async Testing:** `pytest-asyncio` with `@pytest.mark.asyncio`
-- **Coverage:** Aim for 70%+ for staging, 80%+ for production
+
+**See AGENTS.md** for testing patterns, test pyramid, and comprehensive test battery.
 
 ### Architecture Principles
-- **SOLID Principles:** Single responsibility, open-closed, Liskov substitution, interface segregation, dependency inversion
-- **DRY:** Don't repeat yourself - reuse code and patterns
-- **Testability:** Design for testability from the start
-- **Loose Coupling:** Minimize dependencies between components
-- **Error Resilience:** Implement proper error handling and recovery
+
+**See AGENTS.md** for SOLID principles and code quality standards.
 
 ## Current Task: Orchestration Refactoring
 
@@ -121,16 +113,8 @@ python scripts/workflow/spec_to_production.py \
 ```
 
 ### AI Context Management
-```bash
-# Create new session
-python .augment/context/cli.py new session-name
 
-# Add message to session
-python .augment/context/cli.py add session-name "message" --importance 1.0
-
-# Show session
-python .augment/context/cli.py show session-name
-```
+**See AGENTS.md** for session management commands and importance scoring.
 
 ## Agentic Primitives Integration
 
@@ -153,21 +137,9 @@ python .augment/context/cli.py show session-name
 
 ## Best Practices for This Project
 
-### When Refactoring
-1. **Start Small:** Make incremental changes
-2. **Test First:** Ensure existing tests pass before refactoring
-3. **Add Tests:** Write tests for new code paths
-4. **Document:** Update docstrings and comments
-5. **Validate:** Run full test suite and quality gates
+**See AGENTS.md** for best practices (refactoring, adding tests, before/during/after implementation).
 
-### When Adding Tests
-1. **Follow AAA:** Arrange-Act-Assert pattern
-2. **Use Fixtures:** Reuse test setup via pytest fixtures
-3. **Mock External:** Mock filesystem, database, API calls
-4. **Test Edge Cases:** Cover error paths and boundary conditions
-5. **Maintain 100% Pass Rate:** Never commit failing tests
-
-### When Using Gemini CLI
+### When Using Gemini CLI (Gemini-Specific)
 1. **Provide Context:** Use `@{file}` to inject relevant code
 2. **Be Specific:** Clear, structured prompts with goals and constraints
 3. **Validate Recommendations:** Don't blindly implement suggestions
@@ -181,15 +153,11 @@ python .augment/context/cli.py show session-name
 - `pytest.ini` - Pytest configuration
 
 ## Important Notes
-- **Never commit secrets** - Use `.env` files (gitignored)
-- **Maintain backward compatibility** - Existing tests must pass
-- **Follow component maturity** - Respect quality gate thresholds
-- **Document decisions** - Update AI context sessions
-- **Test before commit** - Run pre-commit hooks
+
+**See AGENTS.md** for important notes (package management, circuit breakers, error handling, testing, documentation).
 
 ---
 
-**Last Updated:** 2025-10-20  
-**Current Session:** coverage-improvement-orchestration-2025-10-20  
+**Last Updated:** 2025-10-20
+**Current Session:** coverage-improvement-orchestration-2025-10-20
 **Current Goal:** Refactor orchestration for 70% test coverage using dependency injection
-
