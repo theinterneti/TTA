@@ -165,7 +165,7 @@ Configuration Files:
 ├── pytest.ini          # Pytest configuration
 ├── pyrightconfig.json  # Pyright type checker config
 ├── .pre-commit-config.yaml  # Pre-commit hooks
-├── docker-compose.yml  # Docker services (minimal: redis only)
+├── docker-compose.yml  # Docker services (minimal: redis and neo4j)
 ├── docker-compose.dev.yml    # Development environment
 └── Makefile            # Test tier shortcuts
 ```
