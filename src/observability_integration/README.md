@@ -279,7 +279,7 @@ except TimeoutError as e:
 # Check timeout stats
 stats = timeout.get_stats()
 print(f"Timeout rate: {stats['timeout_rate']:.1%}")
-print(f"Avg execution: {stats['total'] and sum / stats['total']:.2f}s")
+print(f"Avg execution: {(stats['total_time'] / stats['total'] if stats['total'] > 0 else 0):.2f}s")
 ```
 
 ## Metrics Reference
