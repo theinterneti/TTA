@@ -378,8 +378,8 @@ jobs:
       - name: Generate Python SBOM
         run: |
           echo "Generating Python SBOM..."
-          uv run cyclonedx-py requirements pyproject.toml -o sbom-python.json --format json
-          uv run cyclonedx-py requirements pyproject.toml -o sbom-python.xml --format xml
+          uv run cyclonedx-py environment --of JSON -o sbom-python.json
+          uv run cyclonedx-py environment --of XML -o sbom-python.xml
 
       - name: Generate Node.js SBOM
         working-directory: src/player_experience/frontend
