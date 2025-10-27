@@ -48,6 +48,33 @@ logger = logging.getLogger(__name__)
 # Configure rich console
 console = Console()
 
+# Initialize observability (APM) early in application startup
+try:
+    from observability_integration import initialize_observability
+
+    # Initialize with environment-aware configuration
+    observability_enabled = initialize_observability(
+        service_name="tta",
+        service_version="0.1.0",
+        enable_prometheus=True,
+        prometheus_port=9464,
+    )
+
+    if observability_enabled:
+        logger.info("✅ Observability (APM) initialized successfully")
+        logger.info("📊 Prometheus metrics available at http://localhost:9464/metrics")
+    else:
+        logger.warning(
+            "⚠️ Observability degraded to no-op mode (OpenTelemetry unavailable)"
+        )
+
+except ImportError:
+    logger.warning(
+        "Observability integration not available - install with: uv add opentelemetry-api opentelemetry-sdk"
+    )
+except Exception as e:
+    logger.error(f"Failed to initialize observability: {e}", exc_info=True)
+
 
 @log_entry_exit
 def parse_args() -> argparse.Namespace:
@@ -387,4 +414,17 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    exit_code = 0
+    try:
+        exit_code = main()
+    finally:
+        # Shutdown observability cleanly
+        try:
+            from observability_integration import shutdown_observability
+
+            shutdown_observability()
+            logger.info("🔌 Observability shutdown complete")
+        except Exception as e:
+            logger.debug(f"Observability shutdown failed: {e}")
+
+    sys.exit(exit_code)
