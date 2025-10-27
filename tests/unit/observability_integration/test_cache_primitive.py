@@ -16,8 +16,6 @@ class MockPrimitive:
         self.name = name
         self.return_value = return_value
         self.call_count = 0
-        self.__class__.__name__ = name
-
     async def execute(self, data, context):
         """Mock execute method that tracks calls."""
         self.call_count += 1
