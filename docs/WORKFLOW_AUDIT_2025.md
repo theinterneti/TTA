@@ -849,7 +849,7 @@ jobs:
           echo "Waiting for Redis..."
           timeout 30 bash -c 'until redis-cli -h localhost ping; do sleep 1; done'
           echo "Waiting for Neo4j..."
-          timeout 60 bash -c 'until cypher-shell -u neo4j -p testpassword "RETURN 1"; do sleep 2; done'
+          timeout 60 bash -c 'until cypher-shell -u neo4j -p testpassword "RETURN 1"; do sleep 2; done'  # pragma: allowlist secret
 
       - name: Run integration tests
         env:
