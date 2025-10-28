@@ -172,12 +172,6 @@ class AsyncWorkflowDemo:
                     "task-003": {"success": False, "error": "Timeout"},
                 }
                 failed_tasks = {"task-003": "Timeout"}
-                collection_result = AsyncOpenHandsStageResult(
-                    success=True,
-                    completed_tasks=completed_tasks,
-                    failed_tasks=failed_tasks,
-                    total_execution_time_ms=500.0,
-                )
             else:
                 collection_result = await stage.collect_results(submitted_tasks)
                 completed_tasks = collection_result.completed_tasks
