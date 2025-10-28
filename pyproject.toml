@@ -24,11 +24,11 @@ classifiers = [
 ]
 
 dependencies = [
-    # Workspace packages
-    "tta-ai-framework",
-    "tta-narrative-engine",
+    # Workspace packages (pinned for reproducible builds)
+    "tta-ai-framework==0.1.0",
+    "tta-narrative-engine==0.1.0",
     # TTA.dev packages (external repository)
-    "tta-dev-primitives",
+    "tta-dev-primitives>=0.1.0",
     # Core dependencies
     "numpy>=1.24.0",
     "pandas>=2.0.0",
