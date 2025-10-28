@@ -27,6 +27,8 @@ dependencies = [
     # Workspace packages
     "tta-ai-framework",
     "tta-narrative-engine",
+    # TTA.dev packages (external repository)
+    "tta-dev-primitives",
     # Core dependencies
     "numpy>=1.24.0",
     "pandas>=2.0.0",
@@ -307,6 +309,8 @@ members = [
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
+# External packages from TTA.dev repository (using feature branch with circuit breaker consolidation)
+tta-dev-primitives = { git = "https://github.com/theinterneti/TTA.dev.git", branch = "feat/add-workflow-primitives-package", subdirectory = "packages/tta-dev-primitives" }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
