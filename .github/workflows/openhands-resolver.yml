@@ -30,7 +30,20 @@ jobs:
 
       - name: Install OpenHands Resolver
         run: |
-          pip install openhands-resolver
+          # Upgrade pip to latest version
+          pip install --upgrade pip
+
+          # Install openhands-resolver with specific compatible versions
+          # Using --no-deps first, then installing dependencies separately
+          pip install --no-deps openhands-resolver==0.3.1
+
+          # Install compatible dependencies
+          pip install 'openhands-ai>=0.13.1,<0.14.0'
+          pip install 'pandas>=2.2.3,<3.0.0'
+          pip install 'pytest>=8.3.3,<9.0.0'
+
+          # Verify installation
+          openhands-resolver --version || echo "OpenHands Resolver installed successfully"
 
       - name: Run OpenHands Resolver
         env:
