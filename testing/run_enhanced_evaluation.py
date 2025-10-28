@@ -142,8 +142,7 @@ class EnhancedEvaluationRunner:
                 print("   Average Quality: No successful tests completed")
 
             # Save results
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            results_file = f"testing/results/extended_evaluation/enhanced_extended_sessions_{timestamp}.json"
+            datetime.now().strftime("%Y%m%d_%H%M%S")
 
             # Performance report
             perf_report = await self.performance_optimizer.get_performance_report()
@@ -216,9 +215,7 @@ class EnhancedEvaluationRunner:
         # Generate comprehensive comparison report
         print("\n📋 MULTI-MODEL COMPARISON SUMMARY")
         for result in comparison_results:
-            report = await self.multi_model_comparator.generate_comparison_report(
-                result
-            )
+            await self.multi_model_comparator.generate_comparison_report(result)
             print(f"   Scenario: {result.scenario_name}")
             if result.overall_ranking:
                 print(f"   Winner: {result.overall_ranking[0][0]}")

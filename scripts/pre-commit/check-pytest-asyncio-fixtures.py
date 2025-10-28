@@ -14,10 +14,9 @@ Exit codes:
 import re
 import sys
 from pathlib import Path
-from typing import List, Tuple
 
 
-def check_file(filepath: Path) -> List[Tuple[int, str]]:
+def check_file(filepath: Path) -> list[tuple[int, str]]:
     """
     Check a single Python file for async fixtures with wrong decorator.
 
@@ -34,7 +33,6 @@ def check_file(filepath: Path) -> List[Tuple[int, str]]:
         lines = content.split("\n")
 
         # Track if we're in an async function definition
-        in_async_def = False
         decorator_line = None
 
         for i, line in enumerate(lines, start=1):
@@ -59,7 +57,7 @@ def check_file(filepath: Path) -> List[Tuple[int, str]]:
     return violations
 
 
-def main(filenames: List[str]) -> int:
+def main(filenames: list[str]) -> int:
     """
     Main entry point for the pre-commit hook.
 
@@ -76,7 +74,7 @@ def main(filenames: List[str]) -> int:
         filepath = Path(filename)
 
         # Only check Python test files
-        if not filepath.suffix == ".py":
+        if filepath.suffix != ".py":
             continue
         if not ("test" in filepath.name or filepath.parts and "tests" in filepath.parts):
             continue
@@ -90,7 +88,7 @@ def main(filenames: List[str]) -> int:
             for line_num, line_content in violations:
                 print(f"  Line {line_num}: {line_content.strip()}")
                 print(
-                    f"    → Should use @pytest_asyncio.fixture for async functions"
+                    "    → Should use @pytest_asyncio.fixture for async functions"
                 )
 
     if total_violations > 0:

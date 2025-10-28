@@ -13,11 +13,11 @@ from tta_workflow_primitives.testing import MockPrimitive
 
 
 @pytest.mark.asyncio
-async def test_retry_success_on_second_attempt():
+async def test_retry_success_on_second_attempt() -> None:
     """Test retry succeeds on second attempt."""
     call_count = 0
 
-    def flaky_operation(x, ctx):
+    def flaky_operation(x, ctx) -> str:
         nonlocal call_count
         call_count += 1
         if call_count == 1:
@@ -37,7 +37,7 @@ async def test_retry_success_on_second_attempt():
 
 
 @pytest.mark.asyncio
-async def test_retry_exhaustion():
+async def test_retry_exhaustion() -> None:
     """Test retry exhaustion raises error."""
     mock = MockPrimitive("failing", raise_error=ValueError("Always fails"))
 
@@ -52,7 +52,7 @@ async def test_retry_exhaustion():
 
 
 @pytest.mark.asyncio
-async def test_fallback_on_failure():
+async def test_fallback_on_failure() -> None:
     """Test fallback activates on primary failure."""
     primary = MockPrimitive("primary", raise_error=ValueError("Primary fails"))
     fallback = MockPrimitive("fallback", return_value="fallback_result")
@@ -68,7 +68,7 @@ async def test_fallback_on_failure():
 
 
 @pytest.mark.asyncio
-async def test_fallback_not_used_on_success():
+async def test_fallback_not_used_on_success() -> None:
     """Test fallback is not used when primary succeeds."""
     primary = MockPrimitive("primary", return_value="primary_result")
     fallback = MockPrimitive("fallback", return_value="fallback_result")
@@ -84,7 +84,7 @@ async def test_fallback_not_used_on_success():
 
 
 @pytest.mark.asyncio
-async def test_saga_compensation_on_failure():
+async def test_saga_compensation_on_failure() -> None:
     """Test saga runs compensation on failure."""
     forward = MockPrimitive("forward", raise_error=ValueError("Forward fails"))
     compensation = MockPrimitive("compensation", return_value=None)
@@ -101,7 +101,7 @@ async def test_saga_compensation_on_failure():
 
 
 @pytest.mark.asyncio
-async def test_saga_no_compensation_on_success():
+async def test_saga_no_compensation_on_success() -> None:
     """Test saga does not run compensation on success."""
     forward = MockPrimitive("forward", return_value="success")
     compensation = MockPrimitive("compensation", return_value=None)

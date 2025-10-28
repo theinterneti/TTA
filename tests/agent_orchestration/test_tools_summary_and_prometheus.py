@@ -1,8 +1,8 @@
 import os
 
 import pytest
-
 from tta_ai.orchestration.tools.metrics import get_tool_metrics
+
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 

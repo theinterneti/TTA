@@ -6,6 +6,7 @@ including concurrent connections, high event throughput, and resource usage.
 """
 
 import asyncio
+import contextlib
 import json
 import time
 from dataclasses import dataclass
@@ -14,7 +15,6 @@ from unittest.mock import AsyncMock, Mock
 import psutil
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.realtime.event_publisher import EventPublisher
 from tta_ai.orchestration.realtime.models import AgentStatus, AgentStatusEvent
 from tta_ai.orchestration.realtime.websocket_manager import (
@@ -154,10 +154,8 @@ class TestWebSocketPerformance:
         # Cleanup
         for task in tasks:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
 
         end_time = time.time()
 
@@ -246,10 +244,8 @@ class TestWebSocketPerformance:
         # Cleanup
         for task in tasks:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
 
         # Calculate metrics
         duration = end_time - start_time
@@ -319,10 +315,8 @@ class TestWebSocketPerformance:
 
                 # Cancel remaining tasks
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
             # Brief pause between cycles
             await asyncio.sleep(0.1)
@@ -405,10 +399,8 @@ class TestWebSocketPerformance:
         # Cleanup
         for task in tasks:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
 
         # Calculate metrics
         duration = end_time - start_time
@@ -480,18 +472,14 @@ class TestWebSocketPerformance:
 
         # Stop monitoring
         memory_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await memory_task
-        except asyncio.CancelledError:
-            pass
 
         # Cleanup
         for task in tasks:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
 
         # Analyze memory usage
         if memory_samples:

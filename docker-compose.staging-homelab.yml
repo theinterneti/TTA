@@ -284,7 +284,7 @@ services:
 
   # Prometheus Metrics Collection - Staging
   prometheus-staging:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.48.1:latest
     container_name: tta-staging-prometheus
     ports:
       - "9091:9090"  # Different port for staging
@@ -318,7 +318,7 @@ services:
 
   # Grafana Dashboards - Staging
   grafana-staging:
-    image: grafana/grafana:latest
+    image: grafana/grafana:10.2.3:10.2.3
     container_name: tta-staging-grafana
     ports:
       - "3003:3000"  # Different port for staging

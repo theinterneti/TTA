@@ -6,13 +6,13 @@ workflow orchestration system, validating all components working together.
 """
 
 import asyncio
+import contextlib
 import json
 import time
 from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration.models import AgentType
 from tta_ai.orchestration.performance.optimization import IntelligentAgentCoordinator
 from tta_ai.orchestration.performance.response_time_monitor import (
@@ -482,10 +482,8 @@ class TestEndToEndValidation:
 
         # Cleanup connection
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Validate workflow completed
         assert result is not None

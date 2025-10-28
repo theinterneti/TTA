@@ -1,0 +1,78 @@
+name: OpenHands Issue Resolver
+
+# Trigger on issue comments containing @openhands-agent
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  resolve_issue:
+    # Only run if comment contains @openhands-agent mention
+    if: |
+      github.event.issue != null &&
+      contains(github.event.comment.body, '@openhands-agent')
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install OpenHands Resolver
+        run: |
+          pip install openhands-resolver
+
+      - name: Run OpenHands Resolver
+        env:
+          # OpenRouter API configuration for free LLM model
+          LLM_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LLM_MODEL: "deepseek/deepseek-chat-v3.1:free"
+          LLM_BASE_URL: "https://openrouter.ai/api/v1"
+
+          # GitHub authentication
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PAT_USERNAME: ${{ secrets.PAT_USERNAME }}
+
+          # Issue context
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO_NAME: ${{ github.repository }}
+        run: |
+          echo "🤖 OpenHands is processing issue #${ISSUE_NUMBER}..."
+          echo "📝 Comment: ${{ github.event.comment.body }}"
+
+          # Run OpenHands resolver
+          openhands-resolver \
+            --repo "${REPO_NAME}" \
+            --issue-number "${ISSUE_NUMBER}" \
+            --llm-model "${LLM_MODEL}" \
+            --llm-api-key "${LLM_API_KEY}" \
+            --llm-base-url "${LLM_BASE_URL}"
+
+      - name: Comment on issue with status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            const message = status === 'success'
+              ? 'OpenHands has completed processing this issue. Check for a new Pull Request!'
+              : 'OpenHands encountered an error while processing this issue. Check the workflow logs for details.';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `${emoji} ${message}\n\n[View workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+            });

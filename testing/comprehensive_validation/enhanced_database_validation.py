@@ -308,7 +308,7 @@ class EnhancedDatabaseValidator:
                 neo4j_ops += 1  # Neo4j operations for session creation
 
             # Test session retrieval
-            for session_id, original_context in test_sessions:
+            for session_id, _original_context in test_sessions:
                 retrieved_context = await self.session_repository.get_session(
                     session_id
                 )

@@ -146,7 +146,7 @@ class InputProcessorAgentProxy(Agent):
         while True:
             try:
                 return await self.process_with_timeout(payload)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 attempt += 1
                 if attempt > retries:
                     raise

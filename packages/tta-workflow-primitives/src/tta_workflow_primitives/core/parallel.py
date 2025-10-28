@@ -27,7 +27,7 @@ class ParallelPrimitive(WorkflowPrimitive[Any, list[Any]]):
         ```
     """
 
-    def __init__(self, primitives: list[WorkflowPrimitive]):
+    def __init__(self, primitives: list[WorkflowPrimitive]) -> None:
         """
         Initialize with a list of primitives.
 

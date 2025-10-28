@@ -7,6 +7,7 @@ quality over extended sessions.
 """
 
 import asyncio
+import contextlib
 import csv
 import json
 import logging
@@ -336,10 +337,8 @@ class ComprehensiveDataCollector:
         self.monitoring_active = False
         if self.monitoring_task:
             self.monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self.monitoring_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("Stopped performance monitoring")
 

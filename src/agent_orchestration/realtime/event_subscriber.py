@@ -173,7 +173,7 @@ class EventSubscriber:
                     # Process the message
                     await self._process_message(message)
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     continue
                 except Exception as e:
                     logger.error(f"Error in subscription loop: {e}")

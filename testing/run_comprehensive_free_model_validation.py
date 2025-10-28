@@ -160,7 +160,6 @@ class ComprehensiveFreeModelValidator:
         print("⏱️  Expected duration: ~2 hours")
 
         start_time = time.time()
-        results = []
 
         # 1. Multi-model comparison
         print("\n🔬 Phase 1: Multi-Model Comparison")

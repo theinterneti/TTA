@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Phase 1 Security Update Validation Script

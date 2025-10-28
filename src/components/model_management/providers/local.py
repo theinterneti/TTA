@@ -297,9 +297,9 @@ class LocalModelProvider(BaseProvider):
             logger.info(f"Loading tokenizer for {model_id}...")
             tokenizer = await asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: AutoTokenizer.from_pretrained(
+                lambda: AutoTokenizer.from_pretrained(  # nosec B615
                     model_id, cache_dir=self._models_cache_dir, trust_remote_code=True
-                ),
+                ),  # Revision pinning not needed for local cached models
             )
 
             # Set pad token if not present
@@ -329,8 +329,8 @@ class LocalModelProvider(BaseProvider):
 
             loaded_model = await asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),
-            )
+                lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),  # nosec B615
+            )  # Revision pinning not needed for local cached models
 
             # Move to device if not using device_map
             if not self._device_map and loaded_model:

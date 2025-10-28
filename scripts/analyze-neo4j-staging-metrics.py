@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Analyze Neo4j Staging Metrics
@@ -118,7 +119,6 @@ def generate_report(
     # Calculate downtime
     total_minutes = days * 24 * 60
     check_interval_minutes = 5  # Assuming 5-minute intervals
-    expected_checks = total_minutes / check_interval_minutes
     downtime_checks = stats["down_checks"]
     downtime_minutes = downtime_checks * check_interval_minutes
 

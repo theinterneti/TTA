@@ -1,5 +1,4 @@
 import pytest
-
 from tta_ai.orchestration import (
     AgentId,
     AgentMessage,

@@ -56,7 +56,7 @@ class ObservablePrimitive(WorkflowPrimitive[Any, Any]):
         ```
     """
 
-    def __init__(self, primitive: WorkflowPrimitive, name: str):
+    def __init__(self, primitive: WorkflowPrimitive, name: str) -> None:
         """
         Initialize observable primitive.
 

@@ -11,7 +11,6 @@ import time
 
 import pytest
 import pytest_asyncio
-
 from tta_ai.orchestration import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
@@ -420,9 +419,9 @@ class TestCompleteWorkflowChains:
 
             # Should have supportive language in therapeutic scenarios
             if nga_result.get("source") == "real_nga":
-                assert (
-                    has_supportive_language
-                ), f"Missing supportive language in {scenario['name']}"
+                assert has_supportive_language, (
+                    f"Missing supportive language in {scenario['name']}"
+                )
 
         return results
 

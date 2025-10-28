@@ -532,7 +532,7 @@ class NarrativeAnalyzer:
 
                 # Check for varied sentence length
                 sentences = dialogue.split(".")
-                if len(set(len(s.split()) for s in sentences if s.strip())) > 1:
+                if len({len(s.split()) for s in sentences if s.strip()}) > 1:
                     score += 0.1
 
         return min(10.0, score)
@@ -645,7 +645,7 @@ class NarrativeAnalyzer:
 
         # Generate character analyses
         character_data = self.character_tracking.get(session_id, {})
-        for char_name, char_info in character_data.items():
+        for char_name, _char_info in character_data.items():
             analysis = CharacterAnalysis(
                 character_id=char_name,
                 character_name=char_name,

@@ -39,6 +39,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
@@ -54,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "Installing Python dependencies for CodeQL analysis..."
-          uv sync --all-extras --dev
+          uv sync --all-groups
 
       # Initialize CodeQL tools for scanning
       - name: Initialize CodeQL
@@ -116,17 +118,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.CODEQL_NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
-            src/player_experience/frontend/package-lock.json
-
-      - name: Install root dependencies
-        run: npm ci
 
       - name: Install frontend dependencies
         working-directory: src/player_experience/frontend
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       # Initialize CodeQL tools for scanning
       - name: Initialize CodeQL

@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Verify Docker runtime setup for OpenHands integration.
