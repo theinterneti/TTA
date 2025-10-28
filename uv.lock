@@ -4468,7 +4468,7 @@ requires-dist = [
     { name = "transformers", specifier = ">=4.30.0" },
     { name = "transformers", marker = "extra == 'minimal'", specifier = ">=4.30.0" },
     { name = "tta-ai-framework", editable = "packages/tta-ai-framework" },
-    { name = "tta-dev-primitives", git = "https://github.com/theinterneti/TTA.dev.git?subdirectory=packages%2Ftta-dev-primitives&branch=feat%2Fadd-workflow-primitives-package" },
+    { name = "tta-dev-primitives", git = "https://github.com/theinterneti/TTA.dev.git?subdirectory=packages%2Ftta-dev-primitives&branch=main" },
     { name = "tta-narrative-engine", editable = "packages/tta-narrative-engine" },
     { name = "typer", specifier = ">=0.15.0" },
     { name = "uvicorn", specifier = ">=0.22.0" },
@@ -4570,7 +4570,7 @@ provides-extras = ["dev"]
 [[package]]
 name = "tta-dev-primitives"
 version = "0.1.0"
-source = { git = "https://github.com/theinterneti/TTA.dev.git?subdirectory=packages%2Ftta-dev-primitives&branch=feat%2Fadd-workflow-primitives-package#5c25fc00ae1678d6abd55744d9905e2a452c43ac" }
+source = { git = "https://github.com/theinterneti/TTA.dev.git?subdirectory=packages%2Ftta-dev-primitives&branch=main#6c126a9b17b8594d9d0175e2e4cb71ebc78d0266" }
 dependencies = [
     { name = "opentelemetry-api", marker = "sys_platform == 'linux'" },
     { name = "opentelemetry-sdk", marker = "sys_platform == 'linux'" },

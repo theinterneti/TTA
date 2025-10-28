@@ -309,8 +309,8 @@ members = [
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
-# External packages from TTA.dev repository (using feature branch with circuit breaker consolidation)
-tta-dev-primitives = { git = "https://github.com/theinterneti/TTA.dev.git", branch = "feat/add-workflow-primitives-package", subdirectory = "packages/tta-dev-primitives" }
+# External packages from TTA.dev repository
+tta-dev-primitives = { git = "https://github.com/theinterneti/TTA.dev.git", branch = "main", subdirectory = "packages/tta-dev-primitives" }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
