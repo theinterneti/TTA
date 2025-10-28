@@ -10,7 +10,7 @@ name = "tta"
 version = "0.1.0"
 description = "Therapeutic Text Adventure - AI-powered therapeutic platform"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 authors = [
     {name = "TTA Team"}
 ]

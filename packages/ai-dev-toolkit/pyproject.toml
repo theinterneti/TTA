@@ -3,7 +3,7 @@ name = "ai-dev-toolkit"
 version = "0.1.0"
 description = "Reusable AI development infrastructure and workflow primitives"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
     {name = "TTA Development Team"}
