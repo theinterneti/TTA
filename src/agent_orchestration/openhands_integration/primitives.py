@@ -12,7 +12,7 @@ Primitives:
 
 Example:
     ```python
-    from tta_workflow_primitives import WorkflowContext
+    from tta_dev_primitives.core.base import WorkflowContext
     from .primitives import (
         ModelSelectionPrimitive,
         TaskExecutionPrimitive,
@@ -41,7 +41,7 @@ import time
 from typing import Any
 
 from pydantic import BaseModel, Field
-from tta_workflow_primitives import WorkflowContext, WorkflowPrimitive
+from tta_dev_primitives.core.base import WorkflowContext, WorkflowPrimitive
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector

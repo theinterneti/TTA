@@ -1,0 +1,48 @@
+{
+  "workflow_observability": {
+    "WorkflowManager Import": {
+      "status": "PASS",
+      "details": null
+    },
+    "MetricsCollector Import": {
+      "status": "PASS",
+      "details": null
+    },
+    "Logging Configuration": {
+      "status": "PASS",
+      "details": "Handlers: 1"
+    }
+  },
+  "openhands_integration": {
+    "Files Present": {
+      "status": "PASS",
+      "details": "All 20 core files present"
+    },
+    "Module Imports": {
+      "status": "PASS",
+      "details": null
+    },
+    "API Key Configuration": {
+      "status": "PASS",
+      "details": "Key length: 73 chars"
+    },
+    "Config Loading": {
+      "status": "PASS",
+      "details": "Model: gemini-flash"
+    },
+    "Docker Client Init": {
+      "status": "PASS",
+      "details": "Image: docker.all-hands.dev/all-hands-ai/openhands:0.59"
+    },
+    "Task Execution Test": {
+      "status": "SKIP",
+      "details": "Skipped to avoid API costs - setup validated"
+    }
+  },
+  "summary": {
+    "total_checks": 9,
+    "passed": 8,
+    "failed": 0,
+    "warnings": 0
+  }
+}

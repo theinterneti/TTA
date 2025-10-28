@@ -13,7 +13,7 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_workflow_primitives.core.base import (
+    from tta_dev_primitives.core.base import (
         WorkflowContext,
         WorkflowPrimitive,
     )
