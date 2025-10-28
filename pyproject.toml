@@ -304,6 +304,8 @@ cache-dir = "./.uv_cache"
 members = [
     "packages/tta-ai-framework",
     "packages/tta-narrative-engine",
+    # Note: ai-dev-toolkit excluded until TTA.dev packages (dev-primitives, tta-workflow-primitives) are published
+    # Note: universal-agent-context is a documentation package, not a Python package
 ]
 
 [tool.uv.sources]
