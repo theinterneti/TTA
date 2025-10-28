@@ -1,0 +1,30 @@
+version: api.keploy.io/v1beta1
+kind: Http
+name: create-session-mystery
+spec:
+  metadata:
+    description: Create mystery session
+  req:
+    method: POST
+    proto_major: 1
+    proto_minor: 1
+    url: http://localhost:8000/api/v1/sessions
+    header:
+      Accept: "*/*"
+      Content-Type: application/json
+      Host: localhost:8000
+    body: '{"user_id": "player_002", "game_type": "mystery"}'
+    timestamp: 2025-10-28T21:22:12Z
+  resp:
+    status_code: 200
+    header:
+      Content-Type: application/json
+    body: '{\"session_id\":\"8464e997-c747-41fe-8bc7-0e3e670d59a4\",\"user_id\":\"player_002\",\"game_type\":\"mystery\",\"status\":\"active\"}'
+    timestamp: 2025-10-28T21:22:12Z
+  objects: []
+  assertions:
+    noise:
+      - "body.session_id"
+      - "body.timestamp"
+      - "body.created_at"
+  created: 1761686532

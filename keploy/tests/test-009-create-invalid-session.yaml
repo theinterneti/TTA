@@ -1,0 +1,30 @@
+version: api.keploy.io/v1beta1
+kind: Http
+name: create-invalid-session
+spec:
+  metadata:
+    description: Attempt invalid session creation
+  req:
+    method: POST
+    proto_major: 1
+    proto_minor: 1
+    url: http://localhost:8000/api/v1/sessions
+    header:
+      Accept: "*/*"
+      Content-Type: application/json
+      Host: localhost:8000
+    body: '{"invalid": "data"}'
+    timestamp: 2025-10-28T21:22:12Z
+  resp:
+    status_code: 422
+    header:
+      Content-Type: application/json
+    body: '{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"user_id\"],\"msg\":\"Field required\",\"input\":{\"invalid\":\"data\"}}]}'
+    timestamp: 2025-10-28T21:22:12Z
+  objects: []
+  assertions:
+    noise:
+      - "body.session_id"
+      - "body.timestamp"
+      - "body.created_at"
+  created: 1761686532
