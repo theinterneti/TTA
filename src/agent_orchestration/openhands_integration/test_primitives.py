@@ -12,7 +12,7 @@ Tests:
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from tta_workflow_primitives import WorkflowContext
+from tta_dev_primitives.core.base import WorkflowContext
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector
