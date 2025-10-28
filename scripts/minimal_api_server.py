@@ -247,7 +247,8 @@ async def create_session(
 
     sessions_store[session_id] = session_data
 
-    logger.info(f"Created session {session_id} for user {username}")
+    sanitized_username = username.replace('\n', '').replace('\r', '')
+    logger.info(f"Created session {session_id} for user {sanitized_username}")
 
     return CreateSessionResponse(
         session_id=session_id,
