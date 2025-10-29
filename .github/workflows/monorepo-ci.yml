@@ -116,6 +116,7 @@ jobs:
           source .venv/bin/activate
           uvx pytest packages/tta-ai-framework/tests/ \
             --cov=packages/tta-ai-framework/src/tta_ai \
+            --cov-branch \
             --cov-report=xml \
             --cov-report=term \
             --cov-fail-under=70
@@ -123,9 +124,11 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           flags: tta-ai-framework
           name: tta-ai-framework-py${{ matrix.python-version }}
+          fail_ci_if_error: false
 
   test-tta-narrative-engine:
     name: Test TTA Narrative Engine
@@ -180,6 +183,7 @@ jobs:
           source .venv/bin/activate
           uvx pytest packages/tta-narrative-engine/tests/ \
             --cov=packages/tta-narrative-engine/src/tta_narrative \
+            --cov-branch \
             --cov-report=xml \
             --cov-report=term \
             --cov-fail-under=70
@@ -187,9 +191,11 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           flags: tta-narrative-engine
           name: tta-narrative-engine-py${{ matrix.python-version }}
+          fail_ci_if_error: false
 
   test-tta-app:
     name: Test TTA Application
@@ -274,6 +280,7 @@ jobs:
           source .venv/bin/activate
           uvx pytest tests/unit/ \
             --cov=src \
+            --cov-branch \
             --cov-report=xml \
             --cov-report=term \
             --cov-fail-under=60
@@ -281,9 +288,11 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           flags: tta-app
           name: tta-app-py${{ matrix.python-version }}
+          fail_ci_if_error: false
 
   quality-gates:
     name: Quality Gates

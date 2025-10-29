@@ -85,6 +85,13 @@ jobs:
 
     - name: Run PR validation tests
       run: |
+        uv run pytest tests/comprehensive_battery/ \
+          --cov=src \
+          --cov-branch \
+          --cov-report=xml \
+          --cov-report=term \
+          -v
+
         python tests/comprehensive_battery/run_comprehensive_tests.py \
           --categories standard adversarial \
           --max-concurrent 3 \
@@ -93,6 +100,15 @@ jobs:
           --output-dir ./test-results/pr-validation
       env:
         REDIS_URL: redis://localhost:6379
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: comprehensive-pr-validation
+        name: comprehensive-pr-validation
+        fail_ci_if_error: false
 
     - name: Upload test results
       if: always()
@@ -244,6 +260,14 @@ except Exception as e:
 
     - name: Run comprehensive test battery
       run: |
+        # Run pytest with coverage first
+        uv run pytest tests/comprehensive_battery/ \
+          --cov=src \
+          --cov-branch \
+          --cov-report=xml \
+          --cov-report=term \
+          -v
+
         FORCE_MOCK_FLAG=""
         if [ "${{ github.event.inputs.force_mock_mode || 'false' }}" = "true" ]; then
           FORCE_MOCK_FLAG="--force-mock"
@@ -263,6 +287,15 @@ except Exception as e:
       env:
         NEO4J_AUTH: neo4j/testpassword
         FORCE_MOCK_MODE: ${{ github.event.inputs.force_mock_mode || 'false' }}
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: comprehensive-${{ matrix.test-suite.name }}
+        name: comprehensive-${{ matrix.test-suite.name }}
+        fail_ci_if_error: false
 
     - name: Generate test summary
       if: always()
@@ -383,6 +416,14 @@ except Exception as e:
 
     - name: Run custom test battery
       run: |
+        # Run pytest with coverage first
+        uv run pytest tests/comprehensive_battery/ \
+          --cov=src \
+          --cov-branch \
+          --cov-report=xml \
+          --cov-report=term \
+          -v
+
         CATEGORIES="${{ github.event.inputs.test_categories || 'standard,adversarial' }}"
         DETAILED_FLAG=""
         if [ "${{ github.event.inputs.detailed_report }}" = "true" ]; then
@@ -406,6 +447,15 @@ except Exception as e:
           --redis-url redis://localhost:6379
       env:
         NEO4J_AUTH: neo4j/testpassword
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: comprehensive-manual
+        name: comprehensive-manual
+        fail_ci_if_error: false
 
     - name: Upload manual test results
       if: always()
