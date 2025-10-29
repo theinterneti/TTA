@@ -83,6 +83,65 @@ Suite: Error Handling
    Failed: 1 (11.1%)
 
 ✅ Test suite execution complete!
+
+---
+
+## 🔗 Reusable Keploy Framework (TTA.dev)
+
+**Status**: ✅ Production-ready and tested (October 2025)
+
+We've extracted a generic, production-ready Keploy automation framework into the `TTA.dev` repository at `packages/keploy-framework`. This package is now available for any Python project that wants to add Keploy-based API testing.
+
+**What it provides:**
+
+- **One-command setup**: `keploy-setup` (creates `keploy.yml`, `scripts/`, templates)
+- **Python API**: `KeployTestRunner`, `RecordingSession`, `ResultValidator` (programmatic test runs)
+- **CLI Tools**: `keploy-setup`, `keploy-test`, `keploy-record` commands
+- **Templates**: GitHub Actions workflow, pre-commit hook, `keploy.yml` template
+- **Examples**: `examples/fastapi_example.py` with complete FastAPI demo
+- **Documentation**: Comprehensive README (400+ lines) and developer guide
+
+**Installation:**
+
+```bash
+# From PyPI (when published)
+pip install keploy-framework
+
+# From source (development)
+pip install git+https://github.com/theinterneti/TTA.dev.git#subdirectory=packages/keploy-framework
+
+# Local development install
+cd ~/repos/TTA.dev/packages/keploy-framework
+pip install -e ".[dev]"
+```
+
+**Quick Start:**
+
+```python
+from keploy_framework import KeployTestRunner, ResultValidator
+
+# Run tests with validation
+runner = KeployTestRunner(api_url="http://localhost:8000")
+results = await runner.run_all_tests(validate=True, generate_report=True)
+
+# Validate results
+validator = ResultValidator(min_pass_rate=0.8)
+validator.assert_pass_rate(results)  # Raises if <80% pass rate
+```
+
+**Reference Implementation:**
+
+TTA uses this framework and serves as the reference implementation:
+- 9 automated test cases
+- 88.9% pass rate in production
+- Complete CI/CD integration
+- Interactive menu system
+
+**Full documentation:**
+
+https://github.com/theinterneti/TTA.dev/tree/feature/keploy-framework/packages/keploy-framework
+
+---
 ```
 
 ---
@@ -175,366 +234,352 @@ TTA Simple API (Port 8000)
 │
 ├── Health & Status
 │   ├── ✅ GET /health
-│   └── ✅ GET /
-│
-├── Session Management
-│   ├── ✅ POST /api/v1/sessions (create adventure)
-│   ├── ✅ POST /api/v1/sessions (create mystery)
-│   ├── ✅ GET /api/v1/sessions (list all)
-│   ├── ✅ GET /api/v1/sessions/:id (get one)
-│   └── ⚠️  DELETE /api/v1/sessions/:id (delete)
-│
-└── Error Handling
-    ├── ✅ GET /api/v1/sessions/invalid (404)
-    └── ✅ POST /api/v1/sessions (422 validation)
 
-Player Experience API (Port 8080) [PLANNED]
-│
-├── Authentication
-│   ├── 🔜 POST /auth/login
-│   ├── 🔜 POST /auth/logout
-│   └── 🔜 GET /auth/me
-│
-├── Character Management
-│   ├── 🔜 GET /api/v1/characters
-│   ├── 🔜 POST /api/v1/characters
-│   └── 🔜 PUT /api/v1/characters/:id
-│
-└── Narrative Progression
-    ├── 🔜 GET /api/v1/narrative/state
-    └── 🔜 POST /api/v1/narrative/actions
+    # Act
+    result = await function_with_bug()
 
-Agent Orchestration API [PLANNED]
-│
-├── Health Checks
-│   ├── 🔜 GET /agents/health
-│   └── 🔜 GET /agents/:id/status
-│
-└── Message Routing
-    ├── 🔜 POST /messages/send
-    └── 🔜 GET /messages/:queue
+    # Assert
+    assert result == expected_result  # Currently fails
 ```
+**Implement Fix:**
+```python
+# Step 2: Implement fix
+async def function_with_bug():
+    # Before: Buggy implementation
+    # if condition:  # ❌ Wrong condition
 
-**Legend**:
-- ✅ Tested and passing
-- ⚠️ Tested but needs attention
-- 🔜 Planned for future testing
-
----
-
-## 📈 Coverage Dashboard
-
-Current test coverage visualization:
-
+    # After: Fixed implementation
+    if correct_condition:  # ✅ Correct condition
+        return expected_result
 ```
-Session Management   ████████░░ 80% (4/5 tests passing)
-Health & Status      ██████████ 100% (2/2 tests passing)
-Error Handling       ██████████ 100% (2/2 tests passing)
-─────────────────────────────────────────────────────────
-Overall Coverage     ████████░░ 88.9% (8/9 tests passing)
-
-Target: ≥80% ✅ ACHIEVED!
-```
-
----
-
-## 🚦 CI/CD Pipeline
-
-GitHub Actions workflow visualization:
-
-```
-Push to main/develop
-       │
-       ↓
-   Checkout Code
-       │
-       ↓
-   Setup Python 3.12
-       │
-       ↓
-   Install UV & Dependencies
-       │
-       ↓
-   Pull Keploy Docker Image
-       │
-       ↓
-   ┌──────────────┬──────────────┐
-   │              │              │
-   ↓              ↓              ↓
-Keploy Tests  Unit Tests   E2E Tests
-   │              │              │
-   └──────────────┴──────────────┘
-       │
-       ↓
-   Upload Artifacts
-       │
-       ↓
-   Comment on PR
-       │
-       ↓
-   ✅ Pipeline Complete
-```
-
-**Triggers**:
-- Every push to `main` or `develop`
-- Every pull request
-- Nightly at 2 AM UTC
-
----
-
-## 🎨 Directory Structure
-
-Visual layout of Keploy test organization:
-
-```
-recovered-tta-storytelling/
-│
-├── keploy/                           # Keploy test directory
-│   ├── tests/                        # Test cases (YAML)
-│   │   ├── test-1.yaml              # Health check
-│   │   ├── test-2.yaml              # Root endpoint
-│   │   ├── test-3.yaml              # Create adventure session
-│   │   ├── test-4.yaml              # Create mystery session
-│   │   ├── test-5.yaml              # Get session
-│   │   ├── test-6.yaml              # List sessions
-│   │   ├── test-7.yaml              # Delete session
-│   │   ├── test-8.yaml              # Error: Not found
-│   │   └── test-9.yaml              # Error: Invalid input
-│   │
-│   ├── mocks/                        # Mock responses
-│   │   └── (auto-generated)
-│   │
-│   ├── reports/                      # Test results
-│   │   ├── latest.json
-│   │   └── history/
-│   │
-│   ├── TEST_MANIFEST.md              # Coverage documentation
-│   └── PLAYER_API_TEMPLATE.md        # Expansion template
-│
-├── scripts/                          # Test automation scripts
-│   ├── master-tta-testing.sh        # Interactive menu
-│   ├── record-real-api-tests.sh     # Recording script
-│   ├── complete-keploy-workflow.sh  # Full workflow
-│   ├── run-keploy-tests.py          # Test runner
-│   └── pre-commit-keploy.sh         # Git hook
-│
-└── .github/
-    └── workflows/
-        └── keploy-tests.yml          # CI/CD pipeline
-```
-
----
-
-## 🔧 Quick Command Reference
-
-| Task | Command | Result |
-|------|---------|--------|
-| **Interactive Menu** | `./master-tta-testing.sh` | Opens control panel |
-| **Record Tests** | `./record-real-api-tests.sh` | Captures API interactions |
-| **Run Tests** | `./complete-keploy-workflow.sh` | Executes test suite |
-| **View Results** | `cat keploy/reports/latest.json` | Shows test results |
-| **Install Hook** | `./master-tta-testing.sh` → 8 | Enables pre-commit |
-| **Coverage** | `./master-tta-testing.sh` → 6 | Generates coverage report |
-| **Documentation** | `./master-tta-testing.sh` → 9 | Opens guides |
-
----
-
-## 🎯 Pre-Commit Hook Flow
-
-Visual representation of the pre-commit process:
-
-```
-Developer commits code
-       │
-       ↓
-   Pre-commit hook triggered
-       │
-       ↓
-   ┌────────────────────┐
-   │ Check formatting   │ ← Ruff format check
-   └────────────────────┘
-       │
-       ↓ (if pass)
-   ┌────────────────────┐
-   │ Run Keploy tests   │ ← API regression tests
-   └────────────────────┘
-       │
-       ├─→ All Pass ────→ ✅ Commit Allowed
-       │
-       └─→ Any Fail ────→ ❌ Commit Blocked
-                             │
-                             ↓
-                         Show errors
-                             │
-                             ↓
-                         Fix and retry
-```
-
----
-
-## 📊 Success Metrics
-
-Visual comparison of before/after Keploy:
-
-### Before Keploy
-```
-Test Writing Time:    ████████████████████░ 95 minutes/feature
-Test Coverage:        ████████░░░░░░░░░░░░ 40%
-Feedback Loop:        ████████████████████░ 2 hours
-Maintenance:          ████████████████████░ High effort
-Developer Happiness:  ████████░░░░░░░░░░░░ 40%
-```
-
-### After Keploy
-```
-Test Writing Time:    █░░░░░░░░░░░░░░░░░░░ 5 minutes/feature ✅
-Test Coverage:        ████████████████░░░░░ 80% ✅
-Feedback Loop:        ░░░░░░░░░░░░░░░░░░░░ < 1 second ✅
-Maintenance:          ██░░░░░░░░░░░░░░░░░░ Low effort ✅
-Developer Happiness:  ████████████████████░ 100% ✅
-```
-
-**Impact**:
-- 🚀 **95% faster** test creation
-- 📈 **2x coverage** increase
-- ⚡ **7200x faster** feedback
-- 😊 **2.5x happier** developers
-
----
-
-## 🎓 Learning Path
-
-Recommended progression for mastering Keploy testing:
-
-```
-1. Introduction (5 min)
-   └─→ Read: docs/development/keploy-automated-testing.md
-       └─→ Understand: Why Keploy?
-
-2. Hands-On (15 min)
-   └─→ Run: ./master-tta-testing.sh
-       └─→ Try: Options 1, 2, 3
-
-3. Recording (30 min)
-   └─→ Run: ./record-real-api-tests.sh
-       └─→ Examine: keploy/tests/*.yaml
-       └─→ Edit: Customize scenarios
-
-4. Integration (20 min)
-   └─→ Install: Pre-commit hook (option 8)
-       └─→ Test: Make a commit
-       └─→ Verify: Hook runs automatically
-
-5. CI/CD (15 min)
-   └─→ Review: .github/workflows/keploy-tests.yml
-       └─→ Push: Trigger pipeline
-       └─→ Monitor: GitHub Actions
-
-6. Expansion (60 min)
-   └─→ Plan: Player Experience API tests
-       └─→ Review: keploy/PLAYER_API_TEMPLATE.md
-       └─→ Record: New test cases
-
-Total Time: ~2.5 hours to mastery ⚡
-```
-
----
-
-## 🌟 Best Practices Checklist
-
-- [ ] ✅ Run `./master-tta-testing.sh` daily
-- [ ] ✅ Record tests after implementing features
-- [ ] ✅ Re-record after API changes
-- [ ] ✅ Install pre-commit hook
-- [ ] ✅ Review test results before merging
-- [ ] ✅ Keep test cases in version control
-- [ ] ✅ Document test scenarios
-- [ ] ✅ Expand coverage incrementally
-- [ ] ✅ Monitor CI/CD pipeline
-- [ ] ✅ Share knowledge with team
-
----
-
-**Visual guides make Keploy testing accessible to everyone!** 📊✨
-
-[← Back to Keploy Guide](keploy-automated-testing.md){ .md-button }
-[View Testing Strategy →](testing.md){ .md-button .md-button--primary }
-# Testing Strategy
-
-TTA uses a comprehensive, multi-layered testing approach that combines **automated API testing** with traditional unit, integration, and end-to-end tests. Our testing philosophy: **"Testing should never lag behind development."**
-
-## 🎯 Testing Philosophy
-
-We've built a testing infrastructure that:
-
-- ✅ **Auto-generates tests** from actual API usage (zero manual test writing)
-- ✅ **Provides instant feedback** (< 1 second test execution)
-- ✅ **Prevents broken code** from reaching the repository
-- ✅ **Scales effortlessly** as the codebase grows
-- ✅ **Requires minimal maintenance** (re-record to update)
-
-## 📊 Test Pyramid
-
-Our testing strategy follows a balanced pyramid approach:
-
-```mermaid
-graph TD
-    A[E2E Tests - 10%] --> B[Integration Tests - 20%]
-    B --> C[Unit Tests - 70%]
-
-    style A fill:#ff6b6b
-    style B fill:#ffd93d
-    style C fill:#6bcf7f
-```
-
-### Unit Tests (70%)
-**Location**: `tests/unit/`
-
-Individual functions and classes in isolation. Fast, focused, and comprehensive.
-
-**Tools**: pytest, pytest-asyncio, unittest.mock
-
-**Coverage Target**: ≥85% for production components
-
-### Integration Tests (20%)
-**Location**: `tests/integration/`
-
-Component interactions, database operations, and service integration.
-
-**Tools**: pytest, pytest-redis, pytest-neo4j
-
-**Coverage**: Critical workflows and data flows
-
-### E2E Tests (10%)
-**Location**: `tests/e2e/`
-
-Complete user workflows from UI to backend.
-
-**Tools**: Playwright, pytest-playwright
-
-**Coverage**: Core user journeys
-
-## 🚀 Automated API Testing (Keploy)
-
-**Our secret weapon for zero-lag testing!**
-
-TTA uses [Keploy](https://keploy.io) for **automated API test generation and execution**. This revolutionary approach:
-
-1. **Records** actual API interactions as you develop
-2. **Auto-generates** test cases with real request/response data
-3. **Replays** tests instantly for regression detection
-4. **Eliminates** manual test writing entirely
-
-!!! success "Zero Manual Test Writing"
-    With Keploy, you develop features naturally and tests are generated automatically. No more "I'll write tests later" - they're already written!
-
-### Quick Start
-
+**Verify Fix:**
 ```bash
-# Record tests from API usage
-./record-real-api-tests.sh
+# Step 3: Run regression test
+uv run pytest tests/test_{component}.py::test_bug_fix_regression -v
 
-# Run all automated tests
+# Step 4: Run all tests
+uv run pytest tests/{component}/ -v
+
+# Step 5: Check coverage
+uv run pytest tests/{component}/ --cov=src/{component} --cov-report=term
+
+# Step 6: Run quality gates
+uvx ruff check src/{component}/
+uvx pyright src/{component}/
+```
+**Validation Criteria:**
+- [ ] Regression test passes
+- [ ] All existing tests pass
+- [ ] Coverage maintained or improved
+- [ ] Linting clean
+- [ ] Type checking clean
+
+---
+
+### Step 5: Verify No Regressions
+
+**Goal:** Ensure fix doesn't break other functionality
+
+**Actions:**
+1. Run full test suite
+2. Run integration tests
+3. Test related functionality
+4. Check for side effects
+
+**Commands:**
+```bash
+# Run all unit tests
+uv run pytest tests/ -v
+
+# Run integration tests
+uv run pytest tests/integration/ -v -m integration
+
+# Run E2E tests (if applicable)
+uv run pytest tests/e2e/ -v -m e2e
+
+# Run full workflow
+python scripts/workflow/spec_to_production.py \
+    --spec specs/{component}.md \
+    --component {component} \
+    --target staging
+```
+**Validation Criteria:**
+- [ ] All tests pass
+- [ ] No new failures introduced
+- [ ] Integration tests pass
+- [ ] Quality gates pass
+- [ ] No performance degradation
+
+---
+
+### Step 6: Document the Fix
+
+**Goal:** Document bug and fix for future reference
+
+**Actions:**
+1. Update component failures memory
+2. Add code comments
+3. Update AI context
+4. Create/update GitHub issue
+
+**Update Memory:**
+```bash
+# Document in component failures
+cat >> .augment/memory/component-failures.memory.md << EOF
+
+## Bug: {brief description}
+
+**Date:** {date}
+**Component:** {component}
+**Severity:** {severity}
+
+**Root Cause:**
+{root cause description}
+
+**Fix:**
+{fix description}
+
+**Lesson Learned:**
+{what we learned}
+
+**Prevention:**
+{how to prevent similar bugs}
+
+EOF
+```
+**Add Code Comments:**
+```python
+# Add comment explaining the fix
+async def fixed_function():
+    # Fix for bug #{issue_number}: {brief description}
+    # Previous implementation had {problem}
+    # Now correctly handles {scenario}
+    if correct_condition:  # Fixed: was using wrong_condition
+        return expected_result
+```
+**Update AI Context:**
+```bash
+python .augment/context/cli.py add integrated-workflow-2025-10-20 \
+    "Fixed bug in {component}: {brief description}. Root cause: {root_cause}. Added regression test." \
+    --importance 0.9
+```
+**GitHub Issue:**
+```markdown
+## Bug Fix: {brief description}
+
+**Component:** {component}
+**Severity:** {severity}
+**Status:** Fixed
+
+### Description
+{detailed description}
+
+### Root Cause
+{root cause}
+
+### Fix
+{fix description}
+
+### Testing
+- [x] Regression test added
+- [x] All tests pass
+- [x] Integration tests pass
+- [x] Quality gates pass
+
+### Files Changed
+- src/{component}/{file}.py
+- tests/test_{component}.py
+
+Closes #{issue_number}
+```
+---
+
+## Validation Criteria
+
+### Overall Success Criteria
+- [ ] Bug reproduces reliably
+- [ ] Root cause identified
+- [ ] Fix implemented with regression test
+- [ ] All tests pass
+- [ ] No regressions introduced
+- [ ] Quality gates pass
+- [ ] Bug documented
+- [ ] AI context updated
+
+### Failure Criteria (Need More Work)
+- Cannot reproduce bug
+- Root cause unclear
+- Fix introduces regressions
+- Tests fail
+- Quality gates fail
+
+---
+
+## Output/Deliverables
+
+### 1. Bug Fix Report
+```json
+{
+  "bug": {
+    "description": "{description}",
+    "component": "{component}",
+    "severity": "{severity}",
+    "reported_date": "{date}"
+  },
+  "investigation": {
+    "root_cause": "{root_cause}",
+    "affected_code": ["{file1}", "{file2}"]
+  },
+  "fix": {
+    "description": "{fix_description}",
+    "files_changed": ["{file1}", "{file2}"],
+    "regression_test": "tests/test_{component}.py::test_bug_fix"
+  },
+  "validation": {
+    "all_tests_pass": true,
+    "coverage": "{coverage}%",
+    "quality_gates": "passed"
+  }
+}
+```
+### 2. Regression Test
+- New test that catches the bug
+- Prevents future regressions
+- Documents expected behavior
+
+### 3. Updated Documentation
+- Component failures memory updated
+- Code comments added
+- AI context updated
+
+### 4. GitHub Issue
+- Bug documented
+- Fix documented
+- Issue closed
+
+---
+
+## Integration with Primitives
+
+### AI Context Management
+```python
+# Track bug investigation
+context_manager.add_message(
+    session_id="integrated-workflow-2025-10-20",
+    role="user",
+    content=f"Investigating bug in {component}: {description}",
+    importance=0.9
+)
+
+# Track root cause discovery
+context_manager.add_message(
+    session_id="integrated-workflow-2025-10-20",
+    role="assistant",
+    content=f"Root cause identified: {root_cause}",
+    importance=0.9
+)
+
+# Track fix implementation
+context_manager.add_message(
+    session_id="integrated-workflow-2025-10-20",
+    role="assistant",
+    content=f"Bug fixed with regression test. All tests pass.",
+    importance=0.9
+)
+```
+### Error Recovery
+```python
+# Use error recovery for flaky tests
+@with_retry(RetryConfig(max_retries=3, base_delay=1.0))
+async def run_regression_test():
+    # Test with automatic retry for transient failures
+    pass
+```
+### Development Observability
+```python
+# Track bug fix metrics
+@track_execution("bug_fix")
+async def fix_bug(component: str, bug_id: str):
+    # Bug fix tracked automatically
+    pass
+
+# Metrics tracked:
+# - Time to reproduce
+# - Time to fix
+# - Number of files changed
+# - Test coverage impact
+```
+---
+
+## Common Bug Patterns
+
+### 1. Async/Await Issues
+```python
+# Bug: Missing await
+async def get_data():
+    result = fetch_data()  # ❌ Missing await
+    return result
+
+# Fix:
+async def get_data():
+    result = await fetch_data()  # ✅ Added await
+    return result
+```
+### 2. Database Connection Leaks
+```python
+# Bug: Connection not closed
+async def get_session(session_id):
+    redis = await create_redis_connection()
+    data = await redis.get(f"session:{session_id}")
+    return data  # ❌ Connection not closed
+
+# Fix:
+async def get_session(session_id):
+    redis = await create_redis_connection()
+    try:
+        data = await redis.get(f"session:{session_id}")
+        return data
+    finally:
+        await redis.close()  # ✅ Connection closed
+```
+### 3. Missing Error Handling
+```python
+# Bug: No error handling
+async def get_ai_response(prompt):
+    response = await ai_provider.generate(prompt)  # ❌ No error handling
+    return response
+
+# Fix:
+async def get_ai_response(prompt):
+    try:
+        response = await ai_provider.generate(prompt)
+        return response
+    except RateLimitError:  # ✅ Handle rate limits
+        logger.warning("Rate limit hit, using fallback")
+        return await fallback_provider.generate(prompt)
+    except AIProviderError as e:  # ✅ Handle other errors
+        logger.error(f"AI provider error: {e}")
+        raise
+```
+
+---
+
+## Resources
+
+### TTA Documentation
+- Debugging Context: `.augment/context/debugging.context.md`
+- Component Failures: `.augment/memory/component-failures.memory.md`
+- Testing Patterns: `.augment/memory/testing-patterns.memory.md`
+
+### Tools
+- pytest: `uv run pytest`
+- Debugger: `pdb`, `ipdb`
+- Linting: `uvx ruff check`
+- Type checking: `uvx pyright`
+
+---
+
+**Note:** Always write a regression test before fixing the bug. This ensures the bug is caught if it reappears.
 ./complete-keploy-workflow.sh
 
 # Interactive testing menu
