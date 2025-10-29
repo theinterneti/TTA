@@ -44,10 +44,19 @@ jobs:
         run: |
           uv run pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
-            --cov=src --cov-report=xml:coverage-unit.xml
+            --cov=src --cov-branch --cov-report=xml:coverage-unit.xml
         env:
           TTA_METRICS_ENABLED: true
           TTA_TEST_METRICS_COLLECTION: true
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-unit.xml
+          flags: unit
+          name: unit-tests
+          fail_ci_if_error: false
+
       - name: Upload unit test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -109,11 +118,20 @@ jobs:
         run: |
           uv run pytest -q --neo4j --redis --tb=short \
             --junitxml=test-results/integration-tests.xml \
-            --cov=src --cov-report=xml:coverage-integration.xml
+            --cov=src --cov-branch --cov-report=xml:coverage-integration.xml
         env:
           TTA_METRICS_ENABLED: true
           TTA_TEST_METRICS_COLLECTION: true
           TTA_MONITORING_INTEGRATION_TESTS: true
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-integration.xml
+          flags: integration
+          name: integration-tests
+          fail_ci_if_error: false
+
       - name: Upload integration test results
         uses: actions/upload-artifact@v4
         if: always()
