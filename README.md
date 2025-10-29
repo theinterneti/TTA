@@ -3,6 +3,7 @@
 <div align="center">
 
 [![Tests](https://github.com/theinterneti/TTA/workflows/Tests/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/theinterneti/TTA/branch/main/graph/badge.svg)](https://codecov.io/gh/theinterneti/TTA)
 [![Code Quality](https://github.com/theinterneti/TTA/workflows/Code%20Quality/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/code-quality.yml)
 [![Security Scan](https://github.com/theinterneti/TTA/workflows/Security%20Scan/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/security-scan.yml)
 [![E2E Tests](https://github.com/theinterneti/TTA/workflows/E2E%20Tests/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/e2e-tests.yml)

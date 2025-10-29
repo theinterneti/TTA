@@ -699,3 +699,6 @@ exclude_lines = [
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"
