@@ -49,6 +49,7 @@ jobs:
           TTA_METRICS_ENABLED: true
           TTA_TEST_METRICS_COLLECTION: true
       - name: Upload coverage to Codecov
+        if: always()  # Upload coverage even if tests fail
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -124,6 +125,7 @@ jobs:
           TTA_TEST_METRICS_COLLECTION: true
           TTA_MONITORING_INTEGRATION_TESTS: true
       - name: Upload coverage to Codecov
+        if: always()  # Upload coverage even if tests fail
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
