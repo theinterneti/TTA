@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: '0 2 * * 0'
 
+  # Run on PRs to staging and main
+  pull_request:
+    branches:
+      - main
+      - staging
+
   # Allow manual triggering for testing
   workflow_dispatch:
     inputs:
@@ -21,14 +27,19 @@ on:
 
 env:
   PYTHON_VERSION: '3.12'
-  MUTATION_SCORE_THRESHOLD: 85
 
 jobs:
+  # Detect branch tier for tier-based mutation testing
+  tier:
+    uses: ./.github/workflows/templates/determine-tier.yml
+
   mutation-test-model-selector:
     name: Mutation Test - ModelSelector
     runs-on: ubuntu-latest
+    needs: tier
     timeout-minutes: 60
-    if: github.event_name == 'schedule' || github.event.inputs.service == 'all' || github.event.inputs.service == 'model-selector'
+    # Run mutation testing only on tier 3+ (staging, main)
+    if: needs.tier.outputs.tier >= '3' && (github.event_name == 'schedule' || github.event.inputs.service == 'all' || github.event.inputs.service == 'model-selector')
 
     steps:
       - name: Checkout code
@@ -309,22 +320,65 @@ jobs:
   summary:
     name: Mutation Testing Summary
     runs-on: ubuntu-latest
-    needs: [mutation-test-model-selector, mutation-test-fallback-handler, mutation-test-performance-monitor]
+    needs: [tier, mutation-test-model-selector, mutation-test-fallback-handler, mutation-test-performance-monitor]
     if: always()
 
     steps:
       - name: Generate summary
         run: |
-          echo "# Mutation Testing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧬 Mutation Testing Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch Tier**: ${{ needs.tier.outputs.tier }} - ${{ needs.tier.outputs.tier_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Service | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| ModelSelector | ${{ needs.mutation-test-model-selector.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| FallbackHandler | ${{ needs.mutation-test-fallback-handler.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| PerformanceMonitor | ${{ needs.mutation-test-performance-monitor.result }} |" >> $GITHUB_STEP_SUMMARY
+
+          # Tier-based threshold info
+          TIER="${{ needs.tier.outputs.tier }}"
+          if [[ "$TIER" == "3" ]]; then
+            echo "**Required Mutation Score**: ≥75%" >> $GITHUB_STEP_SUMMARY
+          elif [[ "$TIER" == "4" ]]; then
+            echo "**Required Mutation Score**: ≥85%" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Mutation Testing**: Skipped (only runs on tier 3+ branches)" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Mutation reports have been uploaded as artifacts and are available for 30 days." >> $GITHUB_STEP_SUMMARY
+
+          if [[ "$TIER" == "1" || "$TIER" == "2" ]]; then
+            echo "⏭️ Mutation testing skipped on experimental/development branches" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Mutation testing runs only on staging and production branches to validate code quality." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Service | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+
+            if [[ "${{ needs.mutation-test-model-selector.result }}" == "success" ]]; then
+              echo "| ModelSelector | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+            elif [[ "${{ needs.mutation-test-model-selector.result }}" == "failure" ]]; then
+              echo "| ModelSelector | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| ModelSelector | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            if [[ "${{ needs.mutation-test-fallback-handler.result }}" == "success" ]]; then
+              echo "| FallbackHandler | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+            elif [[ "${{ needs.mutation-test-fallback-handler.result }}" == "failure" ]]; then
+              echo "| FallbackHandler | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| FallbackHandler | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            if [[ "${{ needs.mutation-test-performance-monitor.result }}" == "success" ]]; then
+              echo "| PerformanceMonitor | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+            elif [[ "${{ needs.mutation-test-performance-monitor.result }}" == "failure" ]]; then
+              echo "| PerformanceMonitor | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| PerformanceMonitor | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Mutation reports have been uploaded as artifacts and are available for 30 days." >> $GITHUB_STEP_SUMMARY
+          fi

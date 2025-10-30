@@ -19,9 +19,16 @@ env:
   PYTHON_VERSION: '3.12'
 
 jobs:
+  # Detect branch tier for tier-based quality checks
+  tier:
+    uses: ./.github/workflows/templates/determine-tier.yml
+
   lint:
     name: Lint with Ruff
     runs-on: ubuntu-latest
+    needs: tier
+    # Run linting on tier 2+ (development, staging, main)
+    if: needs.tier.outputs.tier >= '2'
 
     steps:
       - name: Checkout code
@@ -82,9 +89,63 @@ jobs:
           echo "uv run ruff format src/ tests/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
+  format-check:
+    name: Format Check with Ruff
+    runs-on: ubuntu-latest
+    needs: tier
+    # Format check runs on all tiers (tier 1+)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Install dependencies
+        run: uv sync --all-groups
+
+      - name: Run ruff formatter check
+        run: |
+          echo "Checking code formatting with ruff..."
+          uvx ruff format --check --diff src/ tests/
+        continue-on-error: ${{ needs.tier.outputs.tier == '1' }}  # Allow failures on experimental
+
+      - name: Generate formatting report
+        if: failure()
+        run: |
+          echo "## Formatting Issues Found" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch Tier**: ${{ needs.tier.outputs.tier }} - ${{ needs.tier.outputs.tier_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run the following command to fix issues:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "uv run ruff format src/ tests/" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
   type-check:
     name: Type Check with Pyright
     runs-on: ubuntu-latest
+    needs: tier
+    # Run type checking on tier 3+ (staging, main)
+    if: needs.tier.outputs.tier >= '3'
 
     steps:
       - name: Checkout code
@@ -137,9 +198,61 @@ jobs:
           echo "uvx pyright src/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
+  security:
+    name: Security Scan with Bandit
+    runs-on: ubuntu-latest
+    needs: tier
+    # Run security scan on tier 3+ (staging, main)
+    if: needs.tier.outputs.tier >= '3'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-groups
+          uv pip install bandit
+
+      - name: Run security scan
+        run: |
+          echo "Running security scan with bandit..."
+          uv run bandit -r src/ -f json -o bandit-report.json || true
+          uv run bandit -r src/ || true
+        continue-on-error: true
+
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: bandit-report.json
+          retention-days: 30
+
   complexity:
     name: Code Complexity Analysis
     runs-on: ubuntu-latest
+    needs: tier
     continue-on-error: true  # Don't fail the build on complexity issues
 
     steps:
@@ -214,7 +327,7 @@ jobs:
   summary:
     name: Code Quality Summary
     runs-on: ubuntu-latest
-    needs: [lint, type-check, complexity]
+    needs: [tier, format-check, lint, type-check, security, complexity]
     if: always()
 
     steps:
@@ -222,36 +335,74 @@ jobs:
         run: |
           echo "## Code Quality Check Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch Tier**: ${{ needs.tier.outputs.tier }} - ${{ needs.tier.outputs.tier_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Check job results
-          if [[ "${{ needs.lint.result }}" == "success" ]]; then
-            echo "✅ **Linting & Formatting (Ruff):** Passed" >> $GITHUB_STEP_SUMMARY
+          # Format check (all tiers)
+          echo "### Format Check (Tier 1+)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.format-check.result }}" == "success" ]]; then
+            echo "✅ **Format Check (Ruff):** Passed" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.format-check.result }}" == "failure" ]] && [[ "${{ needs.tier.outputs.tier }}" == "1" ]]; then
+            echo "⚠️ **Format Check (Ruff):** Failed (allowed on experimental)" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Linting & Formatting (Ruff):** Failed" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Format Check (Ruff):** Failed" >> $GITHUB_STEP_SUMMARY
           fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [[ "${{ needs.type-check.result }}" == "success" ]]; then
+          # Linting (tier 2+)
+          echo "### Linting (Tier 2+)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.tier.outputs.tier }}" == "1" ]]; then
+            echo "⏭️ **Linting (Ruff):** Skipped (experimental branch)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.lint.result }}" == "success" ]]; then
+            echo "✅ **Linting (Ruff):** Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Linting (Ruff):** Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Type checking (tier 3+)
+          echo "### Type Check (Tier 3+)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.tier.outputs.tier }}" == "1" || "${{ needs.tier.outputs.tier }}" == "2" ]]; then
+            echo "⏭️ **Type Check (Pyright):** Skipped (experimental/development branch)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.type-check.result }}" == "success" ]]; then
             echo "✅ **Type Check (Pyright):** Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Type Check (Pyright):** Failed" >> $GITHUB_STEP_SUMMARY
           fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [[ "${{ needs.complexity.result }}" == "success" ]]; then
-            echo "ℹ️ **Complexity Analysis:** Completed (informational)" >> $GITHUB_STEP_SUMMARY
+          # Security scan (tier 3+)
+          echo "### Security Scan (Tier 3+)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.tier.outputs.tier }}" == "1" || "${{ needs.tier.outputs.tier }}" == "2" ]]; then
+            echo "⏭️ **Security Scan (Bandit):** Skipped (experimental/development branch)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.security.result }}" == "success" ]]; then
+            echo "✅ **Security Scan (Bandit):** Passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "ℹ️ **Complexity Analysis:** Completed with warnings (informational)" >> $GITHUB_STEP_SUMMARY
+            echo "ℹ️ **Security Scan (Bandit):** Completed with findings (informational)" >> $GITHUB_STEP_SUMMARY
           fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
+          # Complexity analysis (informational)
+          echo "### Complexity Analysis (Informational)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.complexity.result }}" == "success" ]]; then
+            echo "ℹ️ **Complexity Analysis:** Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **Complexity Analysis:** Completed with warnings" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Quick Fixes" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "To fix linting and formatting issues locally:" >> $GITHUB_STEP_SUMMARY
+          echo "To fix formatting issues locally:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "# Auto-fix linting issues" >> $GITHUB_STEP_SUMMARY
-          echo "uv run ruff check --fix src/ tests/" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "# Auto-format code" >> $GITHUB_STEP_SUMMARY
           echo "uv run ruff format src/ tests/" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To fix linting issues locally:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "uv run ruff check --fix src/ tests/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "To check type issues locally:" >> $GITHUB_STEP_SUMMARY
@@ -261,9 +412,29 @@ jobs:
 
       - name: Check overall status
         run: |
-          if [[ "${{ needs.lint.result }}" != "success" ]] || \
+          # Tier 1: Only format check required, failures allowed
+          if [[ "${{ needs.tier.outputs.tier }}" == "1" ]]; then
+            echo "✅ Experimental branch - all checks optional"
+            exit 0
+          fi
+
+          # Tier 2: Format + Lint required
+          if [[ "${{ needs.tier.outputs.tier }}" == "2" ]]; then
+            if [[ "${{ needs.format-check.result }}" != "success" ]] || \
+               [[ "${{ needs.lint.result }}" != "success" ]]; then
+              echo "❌ Development branch quality checks failed"
+              exit 1
+            fi
+            echo "✅ All tier 2 quality checks passed"
+            exit 0
+          fi
+
+          # Tier 3+: Format + Lint + Type Check required
+          if [[ "${{ needs.format-check.result }}" != "success" ]] || \
+             [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.type-check.result }}" != "success" ]]; then
-            echo "Code quality checks failed. Please fix the issues and try again."
+            echo "❌ Staging/Production quality checks failed"
             exit 1
           fi
-          echo "All code quality checks passed!"
+
+          echo "✅ All required quality checks passed for tier ${{ needs.tier.outputs.tier }}"

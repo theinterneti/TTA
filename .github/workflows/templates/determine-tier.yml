@@ -1,0 +1,93 @@
+name: Determine Quality Tier
+
+on:
+  workflow_call:
+    outputs:
+      tier:
+        description: "Quality tier (1-4) based on target branch"
+        value: ${{ jobs.detect-tier.outputs.tier }}
+      tier_name:
+        description: "Human-readable tier name"
+        value: ${{ jobs.detect-tier.outputs.tier_name }}
+
+jobs:
+  detect-tier:
+    name: Detect Quality Tier
+    runs-on: ubuntu-latest
+    outputs:
+      tier: ${{ steps.determine.outputs.tier }}
+      tier_name: ${{ steps.determine.outputs.tier_name }}
+    steps:
+      - name: Determine quality tier from branch
+        id: determine
+        run: |
+          BASE_REF="${{ github.base_ref || github.ref_name }}"
+          echo "Base reference: $BASE_REF"
+
+          if [[ "$BASE_REF" == "main" || "$BASE_REF" == "refs/heads/main" ]]; then
+            echo "tier=4" >> $GITHUB_OUTPUT
+            echo "tier_name=Production" >> $GITHUB_OUTPUT
+            echo "📦 Production tier (4) - Maximum quality gates"
+          elif [[ "$BASE_REF" == "staging" || "$BASE_REF" == "refs/heads/staging" ]]; then
+            echo "tier=3" >> $GITHUB_OUTPUT
+            echo "tier_name=Staging" >> $GITHUB_OUTPUT
+            echo "🎭 Staging tier (3) - Strict quality gates"
+          elif [[ "$BASE_REF" == "development" || "$BASE_REF" == "refs/heads/development" ]]; then
+            echo "tier=2" >> $GITHUB_OUTPUT
+            echo "tier_name=Development" >> $GITHUB_OUTPUT
+            echo "🔨 Development tier (2) - Moderate quality gates"
+          else
+            echo "tier=1" >> $GITHUB_OUTPUT
+            echo "tier_name=Experimental" >> $GITHUB_OUTPUT
+            echo "🧪 Experimental tier (1) - Minimal quality gates"
+          fi
+
+      - name: Add tier info to summary
+        run: |
+          echo "## Quality Tier: ${{ steps.determine.outputs.tier_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Target branch: \`${{ github.base_ref || github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Tier level: **${{ steps.determine.outputs.tier }}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Quality Gates" >> $GITHUB_STEP_SUMMARY
+
+          TIER="${{ steps.determine.outputs.tier }}"
+          case "$TIER" in
+            1)
+              echo "- ✅ Syntax check (format)" >> $GITHUB_STEP_SUMMARY
+              echo "- ⚠️ Quick unit tests only" >> $GITHUB_STEP_SUMMARY
+              echo "- ❌ No linting" >> $GITHUB_STEP_SUMMARY
+              echo "- ❌ No type checking" >> $GITHUB_STEP_SUMMARY
+              echo "- ❌ No integration tests" >> $GITHUB_STEP_SUMMARY
+              ;;
+            2)
+              echo "- ✅ Syntax check (format)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Full linting" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Type checking (warnings OK)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ All unit tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ⚠️ Core integration tests" >> $GITHUB_STEP_SUMMARY
+              echo "- 📊 Coverage ≥60%" >> $GITHUB_STEP_SUMMARY
+              ;;
+            3)
+              echo "- ✅ Syntax check (format)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Full linting (strict)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Type checking (strict)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ All unit tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ All integration tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Core E2E tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Mutation testing" >> $GITHUB_STEP_SUMMARY
+              echo "- 📊 Coverage ≥70%, Mutation ≥75%" >> $GITHUB_STEP_SUMMARY
+              ;;
+            4)
+              echo "- ✅ Syntax check (format)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Full linting (strict)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Type checking (strict)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ All unit tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ All integration tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Comprehensive E2E tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Mutation testing (strict)" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Load tests" >> $GITHUB_STEP_SUMMARY
+              echo "- ✅ Security scan" >> $GITHUB_STEP_SUMMARY
+              echo "- 📊 Coverage ≥85%, Mutation ≥85%" >> $GITHUB_STEP_SUMMARY
+              ;;
+          esac

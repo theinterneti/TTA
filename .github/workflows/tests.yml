@@ -19,8 +19,14 @@ env:
   MONITORING_ENVIRONMENT: ci
 
 jobs:
+  # Detect branch tier for tier-based test execution
+  tier:
+    uses: ./.github/workflows/templates/determine-tier.yml
+
   unit:
     runs-on: ubuntu-latest
+    needs: tier
+    continue-on-error: ${{ needs.tier.outputs.tier == '1' }}  # Allow failures on experimental branches
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
@@ -69,8 +75,9 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
-    # Skip integration tests on development branch (unit tests only)
-    if: github.ref != 'refs/heads/development'
+    needs: tier
+    # Run integration tests only on tier 2+ (development, staging, main)
+    if: needs.tier.outputs.tier >= '2'
     services:
       neo4j:
         image: neo4j:5-community
@@ -145,9 +152,9 @@ jobs:
 
   monitoring-validation:
     runs-on: ubuntu-latest
-    needs: [unit, integration]
-    # Skip monitoring validation on development branch
-    if: always() && github.ref != 'refs/heads/development'
+    needs: [tier, unit, integration]
+    # Run monitoring validation only on tier 3+ (staging, main)
+    if: always() && needs.tier.outputs.tier >= '3'
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
@@ -349,3 +356,76 @@ jobs:
           path: |
             monitoring-report.html
             test-results/
+
+  # Summary job for tier-based test results
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [tier, unit, integration, monitoring-validation]
+    if: always()
+    steps:
+      - name: Generate test summary
+        run: |
+          echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch Tier**: ${{ needs.tier.outputs.tier }} - ${{ needs.tier.outputs.tier_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Unit tests (all tiers)
+          echo "### Unit Tests" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.unit.result }}" == "success" ]; then
+            echo "✅ **Passed**" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.unit.result }}" == "failure" ] && [ "${{ needs.tier.outputs.tier }}" == "1" ]; then
+            echo "⚠️ **Failed** (allowed on experimental branches)" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.unit.result }}" == "failure" ]; then
+            echo "❌ **Failed** (blocking)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Skipped**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Integration tests (tier 2+)
+          echo "### Integration Tests" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.tier.outputs.tier }}" == "1" ]; then
+            echo "⏭️ **Skipped** (experimental branch)" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.integration.result }}" == "success" ]; then
+            echo "✅ **Passed**" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.integration.result }}" == "failure" ]; then
+            echo "❌ **Failed** (blocking)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Skipped**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Monitoring validation (tier 3+)
+          echo "### Monitoring Validation" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.tier.outputs.tier }}" == "1" || "${{ needs.tier.outputs.tier }}" == "2" ]]; then
+            echo "⏭️ **Skipped** (experimental/development branch)" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.monitoring-validation.result }}" == "success" ]; then
+            echo "✅ **Passed**" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.monitoring-validation.result }}" == "failure" ]; then
+            echo "❌ **Failed** (blocking)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Skipped**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall result
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.unit.result }}" == "failure" ] && [ "${{ needs.tier.outputs.tier }}" != "1" ]; then
+            echo "### ❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Unit tests failed on tier ${{ needs.tier.outputs.tier }} branch. This is blocking." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          elif [ "${{ needs.integration.result }}" == "failure" ] && [ "${{ needs.tier.outputs.tier }}" != "1" ]; then
+            echo "### ❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Integration tests failed on tier ${{ needs.tier.outputs.tier }} branch. This is blocking." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          elif [ "${{ needs.monitoring-validation.result }}" == "failure" ] && [[ "${{ needs.tier.outputs.tier }}" == "3" || "${{ needs.tier.outputs.tier }}" == "4" ]]; then
+            echo "### ❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Monitoring validation failed on tier ${{ needs.tier.outputs.tier }} branch. This is blocking." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "### ✅ All Required Tests Passed" >> $GITHUB_STEP_SUMMARY
+            echo "All tests required for tier ${{ needs.tier.outputs.tier }} passed successfully." >> $GITHUB_STEP_SUMMARY
+          fi
