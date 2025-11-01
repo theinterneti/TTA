@@ -98,6 +98,15 @@ ruff_errors_grouped.txt
 # Staging-specific test results
 test-results-staging/
 
+# Batch processing and generation results
+batch*_results.json
+batch*_generation_results.json
+batch*_manual_results.json
+
+# Workflow and task queue files
+task_queue.json
+workflow_sync_report.json
+
 # -------------------------------------------------
 # 5) Tool caches (linters/type checkers/etc.)
 # -------------------------------------------------
@@ -122,6 +131,28 @@ temp/
 
 # OpenHands workspace (generated files from OpenHands SDK)
 openhands_workspace/
+
+# Temporary workspaces and development artifacts
+chrome_profile_notebooklm/
+chrome_profile_*/
+notebooklm-mcp/
+backups/
+tta-dev-codecov-setup/
+secrets/
+
+# Development output files
+*_output.txt
+query_notebook.py
+simple_query.py
+test_openhands_file_generation.py
+
+# Storybook node_modules (should use workspace root)
+src/player_experience/frontend/.storybook/node_modules/
+src/player_experience/frontend/.storybook/package-lock.json
+
+# Old/backup test files
+tests/**/*.old
+tests/**/*_v2.py
 
 # -------------------------------------------------
 # 7) Data & databases (local dev data only)
