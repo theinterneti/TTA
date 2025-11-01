@@ -287,15 +287,13 @@ class TherapeuticCharacterDevelopmentSystem:
             logger.error(f"Error creating character for user {user_id}: {e}")
 
             # Return fallback character
-            fallback_character = TherapeuticCharacter(
+            return TherapeuticCharacter(
                 character_id=f"fallback_{user_id}",
                 user_id=user_id,
                 name="Therapeutic Character",
                 attributes=CharacterAttributes(),
                 therapeutic_goals=therapeutic_goals or [],
             )
-
-            return fallback_character
 
     def _generate_character_name(self, therapeutic_goals: list[str] | None) -> str:
         """Generate a character name based on therapeutic goals."""

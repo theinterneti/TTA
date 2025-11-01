@@ -1,7 +1,7 @@
 # TTA Player Experience API Documentation
 
-**Version:** 1.0.0  
-**Base URL:** `http://localhost:8080/api/v1`  
+**Version:** 1.0.0
+**Base URL:** `http://localhost:8080/api/v1`
 **Authentication:** Bearer Token (JWT)
 
 ---
@@ -431,6 +431,5 @@ For interactive API exploration, visit:
 
 ---
 
-**Last Updated:** 2025-09-29  
+**Last Updated:** 2025-09-29
 **API Version:** 1.0.0
-

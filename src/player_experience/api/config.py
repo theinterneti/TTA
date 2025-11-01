@@ -112,6 +112,7 @@ class APISettings(BaseSettings):
         env_file=".env",
         case_sensitive=False,
         env_parse_none_str="",
+        extra="ignore",  # Allow extra environment variables not defined in model
     )
 
 
@@ -194,9 +195,8 @@ def get_settings() -> APISettings:
 
     if environment == "production":
         return ProductionSettings()
-    elif environment == "staging":
+    if environment == "staging":
         return StagingSettings()
-    elif environment == "test":
+    if environment == "test":
         return TestingSettings()
-    else:
-        return DevelopmentSettings()
+    return DevelopmentSettings()

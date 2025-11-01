@@ -9,10 +9,11 @@ import threading
 import time
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 import redis
 from redis import Redis
@@ -114,16 +115,15 @@ class RateLimiter(ABC):
         """Get rate limit identifier based on scope."""
         if self.config.scope == RateLimitScope.GLOBAL:
             return "global"
-        elif self.config.scope == RateLimitScope.IP_ADDRESS:
+        if self.config.scope == RateLimitScope.IP_ADDRESS:
             return ip_address
-        elif self.config.scope == RateLimitScope.USER and user_id:
+        if self.config.scope == RateLimitScope.USER and user_id:
             return f"user:{user_id}"
-        elif self.config.scope == RateLimitScope.ENDPOINT and endpoint:
+        if self.config.scope == RateLimitScope.ENDPOINT and endpoint:
             return f"endpoint:{endpoint}:{ip_address}"
-        elif self.config.scope == RateLimitScope.API_KEY and api_key:
+        if self.config.scope == RateLimitScope.API_KEY and api_key:
             return f"api_key:{api_key}"
-        else:
-            return ip_address  # Default to IP address
+        return ip_address  # Default to IP address
 
 
 class TokenBucketRateLimiter(RateLimiter):
@@ -187,19 +187,18 @@ class TokenBucketRateLimiter(RateLimiter):
                     reset_time=datetime.utcnow()
                     + timedelta(seconds=60 / self.config.requests_per_minute),
                 )
-            else:
-                # Calculate retry after
-                retry_after = int(
-                    (1 - bucket["tokens"]) * (60.0 / self.config.requests_per_minute)
-                )
+            # Calculate retry after
+            retry_after = int(
+                (1 - bucket["tokens"]) * (60.0 / self.config.requests_per_minute)
+            )
 
-                return RateLimitResult(
-                    allowed=False,
-                    remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(seconds=retry_after),
-                    retry_after=retry_after,
-                    limit_type="rate_limit",
-                )
+            return RateLimitResult(
+                allowed=False,
+                remaining=0,
+                reset_time=datetime.utcnow() + timedelta(seconds=retry_after),
+                retry_after=retry_after,
+                limit_type="rate_limit",
+            )
 
     def reset_limit(self, identifier: str):
         """Reset token bucket for identifier."""
@@ -540,8 +539,7 @@ def create_rate_limiter(
 
     if config.enable_adaptive:
         return AdaptiveRateLimiter(config, base_limiter)
-    else:
-        return base_limiter
+    return base_limiter
 
 
 # Backward-compat shim expected by middleware imports

@@ -1,0 +1,110 @@
+{
+  "test_run": {
+    "date": "2025-10-24T10:51:28.585613",
+    "models_tested": 2,
+    "tasks_executed": 8,
+    "overall_success_rate": 0.75
+  },
+  "models": {
+    "openrouter/deepseek/deepseek-chat": {
+      "total_tasks": 4,
+      "successful_tasks": 4,
+      "success_rate": 1.0,
+      "avg_execution_time": 4.453527748584747,
+      "avg_quality_score": 0.075,
+      "rate_limit_hits": 0,
+      "error_count": 0
+    },
+    "openrouter/qwen/qwen3-coder:free": {
+      "total_tasks": 4,
+      "successful_tasks": 2,
+      "success_rate": 0.5,
+      "avg_execution_time": 7.265305995941162,
+      "avg_quality_score": 0.0,
+      "rate_limit_hits": 0,
+      "error_count": 2
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "task1_trivial",
+      "model": "openrouter/deepseek/deepseek-chat",
+      "success": true,
+      "execution_time": 5.334618806838989,
+      "quality_score": 0.0,
+      "output": "Task completed (no output captured)",
+      "error": null,
+      "metadata": {}
+    },
+    {
+      "task_id": "task2_simple",
+      "model": "openrouter/deepseek/deepseek-chat",
+      "success": true,
+      "execution_time": 1.8784141540527344,
+      "quality_score": 0.3,
+      "output": "Task completed (no output captured)",
+      "error": null,
+      "metadata": {}
+    },
+    {
+      "task_id": "task3_moderate",
+      "model": "openrouter/deepseek/deepseek-chat",
+      "success": true,
+      "execution_time": 3.5967519283294678,
+      "quality_score": 0.0,
+      "output": "Task completed (no output captured)",
+      "error": null,
+      "metadata": {}
+    },
+    {
+      "task_id": "task4_complex",
+      "model": "openrouter/deepseek/deepseek-chat",
+      "success": true,
+      "execution_time": 7.004326105117798,
+      "quality_score": 0.0,
+      "output": "Task completed (no output captured)",
+      "error": null,
+      "metadata": {}
+    },
+    {
+      "task_id": "task1_trivial",
+      "model": "openrouter/qwen/qwen3-coder:free",
+      "success": true,
+      "execution_time": 4.168539047241211,
+      "quality_score": 0.0,
+      "output": "Task completed (no output captured)",
+      "error": null,
+      "metadata": {}
+    },
+    {
+      "task_id": "task2_simple",
+      "model": "openrouter/qwen/qwen3-coder:free",
+      "success": false,
+      "execution_time": 120.84282040596008,
+      "quality_score": 0.0,
+      "output": "",
+      "error": "Conversation run failed for id=6efd2e93-aa59-442d-a8bd-a25dec4de6a1: litellm.RateLimitError: RateLimitError: OpenrouterException - {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3-coder:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations\",\"provider_name\":\"Venice\"}},\"user_id\":\"user_2xmN4Lcs9Wwo2il6f8ZEuUEPo6p\"}",
+      "metadata": {}
+    },
+    {
+      "task_id": "task3_moderate",
+      "model": "openrouter/qwen/qwen3-coder:free",
+      "success": true,
+      "execution_time": 10.362072944641113,
+      "quality_score": 0.0,
+      "output": "Task completed (no output captured)",
+      "error": null,
+      "metadata": {}
+    },
+    {
+      "task_id": "task4_complex",
+      "model": "openrouter/qwen/qwen3-coder:free",
+      "success": false,
+      "execution_time": 119.94721937179565,
+      "quality_score": 0.0,
+      "output": "",
+      "error": "Conversation run failed for id=5c057055-0d03-4ed2-80b6-3fe90b74ede8: litellm.RateLimitError: RateLimitError: OpenrouterException - {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3-coder:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations\",\"provider_name\":\"Venice\"}},\"user_id\":\"user_2xmN4Lcs9Wwo2il6f8ZEuUEPo6p\"}",
+      "metadata": {}
+    }
+  ]
+}

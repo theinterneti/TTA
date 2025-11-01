@@ -1,6 +1,5 @@
 import pytest
-
-from src.agent_orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
+from tta_ai.orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
 
 
 def test_tool_spec_semver_and_param_limits():

@@ -8,15 +8,14 @@ AgentOrchestrationService, ensuring seamless operation and proper error handling
 from unittest.mock import Mock, patch
 
 import pytest
-
-from src.agent_orchestration.agents import AgentRegistry
-from src.agent_orchestration.interfaces import MessageCoordinator
-from src.agent_orchestration.service import (
+from tta_ai.orchestration.agents import AgentRegistry
+from tta_ai.orchestration.interfaces import MessageCoordinator
+from tta_ai.orchestration.service import (
     AgentOrchestrationService,
     TherapeuticSafetyError,
 )
-from src.agent_orchestration.state import SessionContext
-from src.agent_orchestration.therapeutic_safety import SafetyLevel, TherapeuticValidator
+from tta_ai.orchestration.state import SessionContext
+from tta_ai.orchestration.therapeutic_safety import SafetyLevel, TherapeuticValidator
 
 
 class TestTherapeuticValidatorIntegration:

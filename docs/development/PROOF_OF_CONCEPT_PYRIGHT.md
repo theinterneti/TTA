@@ -1,7 +1,7 @@
 # Proof of Concept: Pyright for Type Checking
 
-**Date:** 2025-10-02  
-**Tool:** Pyright 1.1.406  
+**Date:** 2025-10-02
+**Tool:** Pyright 1.1.406
 **Test Module:** `src/player_experience/api/auth.py`
 
 ---
@@ -279,13 +279,13 @@ def verify_token(token: str) -> dict[str, Any]:
     """Verify JWT token and return payload."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        
+
         # ❌ Pyright error: Type "Any | None" is not assignable to "str"
         player_id: str = payload.get("sub")
         username: str = payload.get("username")
         email: str = payload.get("email")
         expires_at: int = payload.get("exp")
-        
+
         return {
             "player_id": player_id,
             "username": username,
@@ -302,29 +302,29 @@ def verify_token(token: str) -> dict[str, Any]:
     """Verify JWT token and return payload."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        
+
         # ✅ Validate and extract with proper types
         player_id_raw = payload.get("sub")
         if not player_id_raw or not isinstance(player_id_raw, str):
             raise AuthenticationError("Invalid token: missing or invalid player_id")
-        
+
         username_raw = payload.get("username")
         if not username_raw or not isinstance(username_raw, str):
             raise AuthenticationError("Invalid token: missing or invalid username")
-        
+
         email_raw = payload.get("email")
         if not email_raw or not isinstance(email_raw, str):
             raise AuthenticationError("Invalid token: missing or invalid email")
-        
+
         expires_at_raw = payload.get("exp")
         if not expires_at_raw or not isinstance(expires_at_raw, int):
             raise AuthenticationError("Invalid token: missing or invalid expiration")
-        
+
         player_id: str = player_id_raw
         username: str = username_raw
         email: str = email_raw
         expires_at: int = expires_at_raw
-        
+
         return {
             "player_id": player_id,
             "username": username,
@@ -403,7 +403,6 @@ $ uv run mypy src/player_experience/api/auth.py --no-error-summary 2>&1 | head -
 
 ---
 
-**Status:** Proof of Concept COMPLETE  
-**Next Action:** Fix circular imports (Stage 1), then begin annotation with Pyright  
+**Status:** Proof of Concept COMPLETE
+**Next Action:** Fix circular imports (Stage 1), then begin annotation with Pyright
 **Tool Recommendation:** Pyright + Pylance (VS Code)
-

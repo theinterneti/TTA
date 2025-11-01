@@ -132,10 +132,9 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
             if self.fallback_to_mock:
                 logger.warning("Falling back to standard Redis message delivery")
                 return await super().send_message(sender, recipient, message)
-            else:
-                return MessageResult(
-                    message_id=message.message_id, delivered=False, error=str(e)
-                )
+            return MessageResult(
+                message_id=message.message_id, delivered=False, error=str(e)
+            )
 
     async def send_message(
         self, sender: AgentId, recipient: AgentId, message: AgentMessage
@@ -152,7 +151,6 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
             and self.message_router
             and recipient.type in [AgentType.IPA, AgentType.WBA, AgentType.NGA]
         ):
-
             try:
                 return await self.send_message_to_real_agent(sender, recipient, message)
             except Exception as e:
@@ -161,10 +159,9 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
                 if self.fallback_to_mock:
                     logger.info("Falling back to standard Redis delivery")
                     return await super().send_message(sender, recipient, message)
-                else:
-                    return MessageResult(
-                        message_id=message.message_id, delivered=False, error=str(e)
-                    )
+                return MessageResult(
+                    message_id=message.message_id, delivered=False, error=str(e)
+                )
 
         # Use standard Redis message delivery
         return await super().send_message(sender, recipient, message)
@@ -200,9 +197,8 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
 
             if translation.success:
                 return translation.translated_message
-            else:
-                logger.warning(f"Response translation failed: {translation.error}")
-                return response
+            logger.warning(f"Response translation failed: {translation.error}")
+            return response
 
         except Exception as e:
             logger.error(f"Error processing agent response: {e}")

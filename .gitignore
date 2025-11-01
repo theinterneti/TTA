@@ -55,7 +55,36 @@ junit*.xml
 .tox/
 # Test result files that may contain sensitive data (JWT tokens, etc.)
 *_test_results_*.json
+*_test_results.json
+*test_results.json
+*_results.json
 phase*_integration_test_results_*.json
+integration_test_results.txt
+test_run_output.txt
+full_test_run_results.txt
+verification-results.txt
+# Test reports and artifacts
+test-results/
+test-results-*/
+playwright-report/
+# Coverage analysis files
+coverage_*.json
+narrative_arc_coverage_*.json
+test_nao_coverage.json
+# Mutation testing
+mutation-report.html
+*-mutation-report.html
+cosmic-ray*.toml
+session*.sqlite
+
+# Batch processing and generation results
+batch*_results.json
+batch*_generation_results.json
+batch*_manual_results.json
+
+# Workflow and task queue files
+task_queue.json
+workflow_sync_report.json
 
 # -------------------------------------------------
 # 5) Tool caches (linters/type checkers/etc.)
@@ -78,6 +107,49 @@ logs/
 .tmp/*
 tmp/
 temp/
+# Temporary workspaces and artifacts
+openhands_workspace/
+chrome_profile_*/
+notebooklm-mcp/
+backups/
+archive/
+# Node modules (should not be in root)
+node_modules/
+# Build output
+site/
+# Batch processing results
+batch*_results.json
+batch*_generation_results.json
+# Misc temporary files
+emissions.csv
+docker-warnings.json
+task_queue.json
+workflow_sync_report.json
+cookies.txt
+# Version number artifacts (likely typos/accidents)
+=0.*.0
+
+# Temporary workspaces and development artifacts
+chrome_profile_notebooklm/
+chrome_profile_*/
+notebooklm-mcp/
+backups/
+tta-dev-codecov-setup/
+secrets/
+
+# Development output files
+*_output.txt
+query_notebook.py
+simple_query.py
+test_openhands_file_generation.py
+
+# Storybook node_modules (should use workspace root)
+src/player_experience/frontend/.storybook/node_modules/
+src/player_experience/frontend/.storybook/package-lock.json
+
+# Old/backup test files
+tests/**/*.old
+tests/**/*_v2.py
 
 # -------------------------------------------------
 # 7) Data & databases (local dev data only)

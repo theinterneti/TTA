@@ -1,11 +1,11 @@
 import { configureStore, createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { 
-  TherapeuticSession, 
-  PatientProfile, 
-  ProgressMetrics, 
+import {
+  TherapeuticSession,
+  PatientProfile,
+  ProgressMetrics,
   TherapeuticIntervention,
   ClinicalDashboardData,
-  ClinicalAlert 
+  ClinicalAlert
 } from '../types/therapeutic';
 
 // Async thunks for API calls
@@ -200,7 +200,7 @@ const therapeuticSlice = createSlice({
         state.loading.profile = false;
         state.error.profile = action.payload as string;
       })
-    
+
     // Session management
       .addCase(startTherapeuticSession.pending, (state) => {
         state.loading.session = true;
@@ -214,7 +214,7 @@ const therapeuticSlice = createSlice({
         state.loading.session = false;
         state.error.session = action.payload as string;
       })
-    
+
     // Progress metrics
       .addCase(updateProgressMetrics.pending, (state) => {
         state.loading.progress = true;
@@ -228,7 +228,7 @@ const therapeuticSlice = createSlice({
         state.loading.progress = false;
         state.error.progress = action.payload as string;
       })
-    
+
     // Interventions
       .addCase(triggerIntervention.pending, (state) => {
         state.loading.intervention = true;
@@ -242,7 +242,7 @@ const therapeuticSlice = createSlice({
         state.loading.intervention = false;
         state.error.intervention = action.payload as string;
       })
-    
+
     // Clinical dashboard
       .addCase(fetchClinicalDashboard.pending, (state) => {
         state.loading.dashboard = true;
@@ -260,13 +260,13 @@ const therapeuticSlice = createSlice({
   },
 });
 
-export const { 
-  clearSession, 
-  addAlert, 
-  acknowledgeAlert, 
-  removeAlert, 
-  updateFeatureFlag, 
-  updateSessionStatus 
+export const {
+  clearSession,
+  addAlert,
+  acknowledgeAlert,
+  removeAlert,
+  updateFeatureFlag,
+  updateSessionStatus
 } = therapeuticSlice.actions;
 
 export const therapeuticReducer = therapeuticSlice.reducer;

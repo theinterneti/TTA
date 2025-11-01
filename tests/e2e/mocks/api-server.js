@@ -78,28 +78,56 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Authentication endpoints
-app.post('/auth/login', (req, res) => {
+app.get('/api/v1/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+// Authentication endpoints - API v1
+app.post('/api/v1/auth/login', (req, res) => {
   const { username, password } = req.body;
-  
+
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password required' });
   }
-  
+
   // Mock authentication - accept any credentials for testing
   const player = mockPlayer();
   player.username = username;
   players.set(player.id, player);
-  
+
   res.json({
     access_token: `mock_token_${player.id}`,
     refresh_token: `mock_refresh_${player.id}`,
-    player: player
+    token_type: 'bearer',
+    expires_in: 3600,
+    user_info: {
+      user_id: player.id,
+      username: player.username,
+      email: player.email
+    }
   });
 });
 
-app.post('/auth/logout', (req, res) => {
+app.post('/api/v1/auth/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });
+});
+
+app.post('/api/v1/auth/refresh', (req, res) => {
+  const player = mockPlayer();
+  res.json({
+    access_token: `mock_token_${player.id}`,
+    token_type: 'bearer',
+    expires_in: 3600
+  });
+});
+
+app.get('/api/v1/auth/verify', (req, res) => {
+  res.json({ valid: true });
+});
+
+// Alias for verify endpoint
+app.get('/api/v1/auth/validate', (req, res) => {
+  res.json({ valid: true, authenticated: true });
 });
 
 // Player endpoints
@@ -116,11 +144,11 @@ app.put('/players/:playerId', (req, res) => {
   if (!player) {
     return res.status(404).json({ error: 'Player not found' });
   }
-  
+
   Object.assign(player, req.body);
   player.updated_at = new Date().toISOString();
   players.set(req.params.playerId, player);
-  
+
   res.json(player);
 });
 
@@ -151,11 +179,11 @@ app.put('/players/:playerId/characters/:characterId', (req, res) => {
   if (!character || character.player_id !== req.params.playerId) {
     return res.status(404).json({ error: 'Character not found' });
   }
-  
+
   Object.assign(character, req.body);
   character.updated_at = new Date().toISOString();
   characters.set(req.params.characterId, character);
-  
+
   res.json(character);
 });
 
@@ -164,7 +192,7 @@ app.delete('/players/:playerId/characters/:characterId', (req, res) => {
   if (!character || character.player_id !== req.params.playerId) {
     return res.status(404).json({ error: 'Character not found' });
   }
-  
+
   characters.delete(req.params.characterId);
   res.status(204).send();
 });
@@ -192,7 +220,7 @@ app.get('/sessions/:sessionId/messages', (req, res) => {
 app.post('/sessions/:sessionId/messages', (req, res) => {
   const sessionId = req.params.sessionId;
   const messages = chatHistory.get(sessionId) || [];
-  
+
   const message = {
     id: generateId(),
     session_id: sessionId,
@@ -200,10 +228,10 @@ app.post('/sessions/:sessionId/messages', (req, res) => {
     sender: 'user',
     timestamp: new Date().toISOString()
   };
-  
+
   messages.push(message);
   chatHistory.set(sessionId, messages);
-  
+
   // Simulate AI response
   setTimeout(() => {
     const aiResponse = {
@@ -213,10 +241,10 @@ app.post('/sessions/:sessionId/messages', (req, res) => {
       sender: 'ai',
       timestamp: new Date().toISOString()
     };
-    
+
     messages.push(aiResponse);
     chatHistory.set(sessionId, messages);
-    
+
     // Broadcast to WebSocket clients
     wss.clients.forEach(client => {
       if (client.readyState === 1) { // WebSocket.OPEN
@@ -224,7 +252,7 @@ app.post('/sessions/:sessionId/messages', (req, res) => {
       }
     });
   }, 1000);
-  
+
   res.status(201).json(message);
 });
 
@@ -248,14 +276,14 @@ app.get('/players/:playerId/data/export', (req, res) => {
     .filter(char => char.player_id === req.params.playerId);
   const playerSessions = Array.from(sessions.values())
     .filter(session => session.player_id === req.params.playerId);
-  
+
   const exportData = {
     player,
     characters: playerCharacters,
     sessions: playerSessions,
     exported_at: new Date().toISOString()
   };
-  
+
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Disposition', 'attachment; filename="user-data.json"');
   res.json(exportData);
@@ -265,14 +293,14 @@ app.get('/players/:playerId/data/export', (req, res) => {
 app.delete('/players/:playerId/data', (req, res) => {
   // Delete all player data
   players.delete(req.params.playerId);
-  
+
   // Delete characters
   for (const [id, character] of characters.entries()) {
     if (character.player_id === req.params.playerId) {
       characters.delete(id);
     }
   }
-  
+
   // Delete sessions
   for (const [id, session] of sessions.entries()) {
     if (session.player_id === req.params.playerId) {
@@ -280,19 +308,19 @@ app.delete('/players/:playerId/data', (req, res) => {
       chatHistory.delete(id);
     }
   }
-  
+
   res.status(204).send();
 });
 
 // WebSocket connection handling
 wss.on('connection', (ws) => {
   console.log('WebSocket client connected');
-  
+
   ws.on('message', (data) => {
     try {
       const message = JSON.parse(data.toString());
       console.log('Received WebSocket message:', message);
-      
+
       // Echo back for testing
       ws.send(JSON.stringify({
         type: 'echo',
@@ -303,7 +331,7 @@ wss.on('connection', (ws) => {
       console.error('WebSocket message error:', error);
     }
   });
-  
+
   ws.on('close', () => {
     console.log('WebSocket client disconnected');
   });

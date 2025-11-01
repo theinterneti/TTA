@@ -65,7 +65,7 @@ Based on your project configuration:
 gh variable set STAGING_API_URL --body "https://staging-api.tta-storytelling.com"
 gh variable set STAGING_WS_URL --body "wss://staging-ws.tta-storytelling.com"
 
-# Production Environment  
+# Production Environment
 gh variable set PRODUCTION_API_URL --body "https://api.tta-storytelling.com"
 gh variable set PRODUCTION_WS_URL --body "wss://ws.tta-storytelling.com"
 ```

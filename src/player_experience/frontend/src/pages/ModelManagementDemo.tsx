@@ -224,8 +224,8 @@ const ModelManagementDemo: React.FC = () => {
                       ? 'text-green-600 bg-green-50 border-green-200'
                       : 'text-yellow-600 bg-yellow-50 border-yellow-200'
                   }`}>
-                    {(selectedModel || selectedDemoModel)?.is_free 
-                      ? 'FREE' 
+                    {(selectedModel || selectedDemoModel)?.is_free
+                      ? 'FREE'
                       : `$${((selectedModel || selectedDemoModel)?.cost_per_token || 0).toFixed(6)}/token`
                     }
                   </div>

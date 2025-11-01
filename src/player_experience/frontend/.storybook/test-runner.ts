@@ -6,11 +6,11 @@ const config: TestRunnerConfig = {
     // Global setup for visual regression tests
     console.log('Setting up visual regression testing environment...');
   },
-  
+
   async preVisit(page, context) {
     // Configure page for consistent visual testing
     await page.setViewportSize({ width: 1200, height: 800 });
-    
+
     // Disable animations for consistent screenshots
     await page.addStyleTag({
       content: `
@@ -28,14 +28,14 @@ const config: TestRunnerConfig = {
 
     // Wait for fonts to load
     await page.waitForLoadState('networkidle');
-    
+
     // Additional wait for component stabilization
     await page.waitForTimeout(500);
   },
 
   async postVisit(page, context) {
     const storyContext = await getStoryContext(page, context);
-    
+
     // Skip visual regression for certain stories
     const skipVisualRegression = storyContext.parameters?.visualRegression?.disable;
     if (skipVisualRegression) {
@@ -44,10 +44,10 @@ const config: TestRunnerConfig = {
 
     // Take screenshot for visual regression testing
     const screenshotPath = `visual-regression/${context.id}.png`;
-    
+
     // Get the story element for focused screenshots
     const storyElement = page.locator('#storybook-root');
-    
+
     await expect(storyElement).toHaveScreenshot(screenshotPath, {
       // Configure screenshot options for consistency
       fullPage: false,

@@ -125,4 +125,3 @@ exclude-labels:
 replacers:
   - search: '/\[([A-Z]+-\d+)\]/g'
     replace: '[$1](https://github.com/$OWNER/$REPOSITORY/issues/$1)'
-

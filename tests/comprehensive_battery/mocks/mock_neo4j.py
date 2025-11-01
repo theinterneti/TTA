@@ -120,7 +120,7 @@ class MockAsyncSession:
 
             return MockResult([result_data])
 
-        elif "MATCH" in query.upper() or "RETURN" in query.upper():
+        if "MATCH" in query.upper() or "RETURN" in query.upper():
             # Read operations - return sample data
             if "User" in query:
                 return MockResult(
@@ -135,7 +135,7 @@ class MockAsyncSession:
                     ]
                 )
 
-            elif "Story" in query:
+            if "Story" in query:
                 return MockResult(
                     [
                         {
@@ -148,7 +148,7 @@ class MockAsyncSession:
                     ]
                 )
 
-            elif "Character" in query:
+            if "Character" in query:
                 return MockResult(
                     [
                         {
@@ -161,19 +161,18 @@ class MockAsyncSession:
                     ]
                 )
 
-            else:
-                # Generic response
-                return MockResult(
-                    [
-                        {
-                            "result": "success",
-                            "count": 1,
-                            "timestamp": datetime.utcnow().isoformat(),
-                        }
-                    ]
-                )
+            # Generic response
+            return MockResult(
+                [
+                    {
+                        "result": "success",
+                        "count": 1,
+                        "timestamp": datetime.utcnow().isoformat(),
+                    }
+                ]
+            )
 
-        elif "DELETE" in query.upper():
+        if "DELETE" in query.upper():
             # Delete operations
             return MockResult(
                 [
@@ -185,11 +184,10 @@ class MockAsyncSession:
                 ]
             )
 
-        else:
-            # Default response
-            return MockResult(
-                [{"executed": True, "timestamp": datetime.utcnow().isoformat()}]
-            )
+        # Default response
+        return MockResult(
+            [{"executed": True, "timestamp": datetime.utcnow().isoformat()}]
+        )
 
     async def begin_transaction(self):
         """Begin a transaction."""

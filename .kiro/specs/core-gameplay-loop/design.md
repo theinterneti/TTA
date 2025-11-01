@@ -16,23 +16,23 @@ graph TB
     A --> C[Choice Architecture Manager]
     A --> D[Consequence System]
     A --> E[Progress Tracker]
-    
+
     B --> F[Story Generator]
     B --> G[Immersion Manager]
     B --> H[Pacing Controller]
-    
+
     C --> I[Decision Presenter]
     C --> J[Choice Validator]
     C --> K[Agency Protector]
-    
+
     D --> L[Outcome Generator]
     D --> M[Learning Facilitator]
     D --> N[Causality Explainer]
-    
+
     E --> O[Character Development]
     E --> P[Therapeutic Progress]
     E --> Q[Session Management]
-    
+
     A --> R[Safety Monitor]
     A --> S[Emotional Support System]
     A --> T[Adaptive Difficulty Engine]

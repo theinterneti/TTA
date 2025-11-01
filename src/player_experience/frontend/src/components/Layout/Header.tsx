@@ -44,7 +44,7 @@ const Header: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <h2 className="text-lg font-semibold text-gray-900">{getPageTitle()}</h2>
-          
+
           {/* Connection Status */}
           {location.pathname.startsWith('/chat') && (
             <div className="flex items-center space-x-2">

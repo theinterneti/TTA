@@ -2,7 +2,7 @@
 
 /**
  * Comprehensive E2E Test Runner for TTA Application
- * 
+ *
  * This script provides various test execution modes:
  * - Full test suite
  * - Specific test categories
@@ -98,7 +98,7 @@ const BROWSER_CONFIGS = {
 class TestRunner {
   private baseCommand = 'npx playwright test';
   private testDir = 'tests/e2e/specs';
-  
+
   constructor() {
     this.validateEnvironment();
   }
@@ -225,7 +225,7 @@ class TestRunner {
     skipQuality?: boolean;
   } = {}): boolean {
     console.log('🎯 Running Complete E2E Test Suite\n');
-    
+
     const categories = Object.keys(TEST_CATEGORIES);
     if (options.skipQuality) {
       categories.splice(categories.indexOf('quality'), 1);
@@ -256,17 +256,17 @@ class TestRunner {
 
   public runCrossBrowser(categoryName?: string): boolean {
     console.log('🌐 Running Cross-Browser Tests\n');
-    
+
     const category = categoryName || 'core';
     let allPassed = true;
 
     for (const [browserKey, browserConfig] of Object.entries(BROWSER_CONFIGS)) {
       console.log(`\n🔍 Testing on ${browserConfig.name}...`);
-      
+
       const passed = this.runCategory(category, {
         browser: browserConfig.project,
       });
-      
+
       allPassed = allPassed && passed;
     }
 
@@ -276,7 +276,7 @@ class TestRunner {
 
   public runPerformance(): boolean {
     console.log('⚡ Running Performance Tests\n');
-    
+
     const command = this.buildCommand({
       specs: ['performance.spec.ts'],
       parallel: false,
@@ -291,7 +291,7 @@ class TestRunner {
 
   public runAccessibility(): boolean {
     console.log('♿ Running Accessibility Tests\n');
-    
+
     const command = this.buildCommand({
       specs: ['accessibility.spec.ts'],
       parallel: true,
@@ -306,7 +306,7 @@ class TestRunner {
 
   public runSmoke(): boolean {
     console.log('💨 Running Smoke Tests\n');
-    
+
     // Run a subset of critical tests quickly
     const smokeSpecs = [
       'authentication.spec.ts',
@@ -327,7 +327,7 @@ class TestRunner {
 
   public runDebug(specFile: string): boolean {
     console.log(`🐛 Running Debug Mode for ${specFile}\n`);
-    
+
     const command = this.buildCommand({
       specs: [specFile],
       headed: true,

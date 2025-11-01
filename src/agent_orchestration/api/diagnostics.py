@@ -174,10 +174,9 @@ class DiagnosticsAPI:
             # Return appropriate HTTP status based on health
             if health_info["status"] == "healthy":
                 return health_info
-            elif health_info["status"] == "degraded":
+            if health_info["status"] == "degraded":
                 raise HTTPException(status_code=503, detail=health_info)
-            else:
-                raise HTTPException(status_code=500, detail=health_info)
+            raise HTTPException(status_code=500, detail=health_info)
 
         @self.router.get("/discovery/status")
         async def get_discovery_status(

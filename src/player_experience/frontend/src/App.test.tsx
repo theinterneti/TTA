@@ -58,7 +58,7 @@ describe('App Component', () => {
     };
 
     renderWithProviders(<App />, { initialState });
-    
+
     expect(screen.getByText('Welcome to TTA')).toBeInTheDocument();
     expect(screen.getByText('Therapeutic Text Adventure Platform')).toBeInTheDocument();
   });
@@ -142,7 +142,7 @@ describe('App Component', () => {
     };
 
     renderWithProviders(<App />, { initialState });
-    
+
     // Should redirect to dashboard and show the main layout
     expect(screen.getByText('TTA')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();

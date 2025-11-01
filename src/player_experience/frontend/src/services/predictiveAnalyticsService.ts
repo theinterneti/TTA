@@ -1,10 +1,10 @@
 /**
  * Predictive Analytics Service - Priority 4B Implementation
- * 
+ *
  * Advanced predictive analytics engine for therapeutic intelligence.
  * Provides machine learning-inspired algorithms for trend analysis, pattern recognition,
  * risk prediction, and therapeutic outcome forecasting.
- * 
+ *
  * Features:
  * - Therapeutic progress trend analysis and prediction
  * - Risk assessment and early warning systems
@@ -154,32 +154,32 @@ export class PredictiveAnalyticsService {
 
     // Predict risks based on patterns and current state
     const riskPredictions = await this.generateRiskPredictions(
-      userId, 
-      progressData, 
-      monitoringData, 
+      userId,
+      progressData,
+      monitoringData,
       emotionalHistory
     );
 
     // Predict therapeutic outcomes
     const outcomePredictions = await this.generateOutcomePredictions(
-      userId, 
-      goals, 
-      progressData, 
+      userId,
+      goals,
+      progressData,
       trendAnalyses
     );
 
     // Generate longitudinal insights
     const longitudinalInsights = await this.generateLongitudinalInsights(
-      userId, 
-      progressData, 
-      monitoringData, 
+      userId,
+      progressData,
+      monitoringData,
       emotionalHistory
     );
 
     // Calculate overall prognosis
     const overallPrognosis = this.calculateOverallPrognosis(
-      trendAnalyses, 
-      riskPredictions, 
+      trendAnalyses,
+      riskPredictions,
       outcomePredictions
     );
 
@@ -241,23 +241,23 @@ export class PredictiveAnalyticsService {
 
     // Calculate linear regression
     const regression = this.calculateLinearRegression(timestamps, values);
-    
+
     // Determine trend type
     const trendType = this.determineTrendType(regression.slope, values);
-    
+
     // Calculate correlation coefficient
     const correlation = this.calculateCorrelation(timestamps, values);
-    
+
     // Project outcome (using default target of 100 for therapeutic goals)
     const targetValue = 100; // Default target for therapeutic goals
     const projectedOutcome = this.projectOutcome(regression, targetValue);
 
     // Calculate time to target
     const timeToTarget = this.calculateTimeToTarget(regression, targetValue);
-    
+
     // Identify risk factors
     const riskFactors = this.identifyTrendRiskFactors(trendType, correlation, values);
-    
+
     // Generate recommendations
     const recommendations = this.generateTrendRecommendations(trendType, goal, regression);
 
@@ -288,7 +288,7 @@ export class PredictiveAnalyticsService {
 
     const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
-    
+
     // Calculate R-squared
     const yMean = sumY / n;
     const ssRes = y.reduce((sum, yi, i) => {
@@ -358,10 +358,10 @@ export class PredictiveAnalyticsService {
    */
   private calculateTimeToTarget(regression: { slope: number; intercept: number }, targetValue: number): number | null {
     if (regression.slope <= 0) return null;
-    
+
     const currentTime = Date.now();
     const timeToTarget = (targetValue - regression.intercept) / regression.slope - currentTime;
-    
+
     return timeToTarget > 0 ? Math.ceil(timeToTarget / (1000 * 60 * 60 * 24)) : null;
   }
 

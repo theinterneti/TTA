@@ -18,7 +18,7 @@ const TherapeuticApproachSelector: React.FC<TherapeuticApproachSelectorProps> = 
     const updatedApproaches = selected.includes(approach)
       ? selected.filter(a => a !== approach)
       : [...selected, approach];
-    
+
     onChange(updatedApproaches);
   };
 
@@ -49,8 +49,8 @@ const TherapeuticApproachSelector: React.FC<TherapeuticApproachSelectorProps> = 
           Preferred Therapeutic Approaches
         </h3>
         <p className="text-gray-600 mb-6">
-          Select the therapeutic approaches that resonate with you. You can choose multiple approaches 
-          that will be integrated into your personalized experience. Each approach offers different 
+          Select the therapeutic approaches that resonate with you. You can choose multiple approaches
+          that will be integrated into your personalized experience. Each approach offers different
           techniques and perspectives for growth and healing.
         </p>
       </div>
@@ -121,7 +121,7 @@ const TherapeuticApproachSelector: React.FC<TherapeuticApproachSelectorProps> = 
                         <h4 className="font-semibold text-gray-900">{info.name}</h4>
                       </div>
                       <p className="text-sm text-gray-600 mb-3">{info.description}</p>
-                      
+
                       {!isCompatible && intensityLevel && (
                         <div className="text-xs text-amber-600 mb-2 flex items-center">
                           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

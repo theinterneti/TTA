@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTA Gameplay Loop - Frontend Integration Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .scene {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .choices {
+            margin: 20px 0;
+        }
+        .choice-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .choice-button:hover {
+            background: #0056b3;
+        }
+        .choice-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .auth-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 TTA Therapeutic Text Adventure</h1>
+        <p>Frontend Integration Example for Core Gameplay Loop</p>
+
+        <!-- Authentication Section -->
+        <div class="auth-section" id="authSection">
+            <h3>Authentication</h3>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Enter username" value="demo_user">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password" value="demo_pass">
+            </div>
+            <button class="btn btn-primary" onclick="authenticate()">Login</button>
+            <button class="btn btn-secondary" onclick="useTestToken()">Use Test Token</button>
+        </div>
+
+        <!-- Status Display -->
+        <div id="statusDisplay"></div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+
+        <!-- Game Session Section -->
+        <div id="gameSection" style="display: none;">
+            <h3>Therapeutic Adventure Session</h3>
+
+            <!-- Session Controls -->
+            <div style="margin: 20px 0;">
+                <button class="btn btn-success" onclick="startNewSession()">Start New Session</button>
+                <button class="btn btn-secondary" onclick="pauseSession()" id="pauseBtn" disabled>Pause Session</button>
+                <button class="btn btn-secondary" onclick="endSession()" id="endBtn" disabled>End Session</button>
+            </div>
+
+            <!-- Current Scene -->
+            <div id="currentScene" class="scene" style="display: none;">
+                <h4>Current Scene</h4>
+                <p id="sceneDescription"></p>
+            </div>
+
+            <!-- Available Choices -->
+            <div id="choicesSection" class="choices" style="display: none;">
+                <h4>What would you like to do?</h4>
+                <div id="choiceButtons"></div>
+            </div>
+
+            <!-- Therapeutic Insights -->
+            <div id="therapeuticInsights" style="display: none;">
+                <h4>💡 Therapeutic Insights</h4>
+                <div id="insightsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:8000/api/v1';
+        let authToken = null;
+        let currentSessionId = null;
+
+        // Utility functions
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusDisplay');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showLoading(show = true) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+
+        function updateUI() {
+            const gameSection = document.getElementById('gameSection');
+            const authSection = document.getElementById('authSection');
+
+            if (authToken) {
+                gameSection.style.display = 'block';
+                authSection.style.display = 'none';
+            } else {
+                gameSection.style.display = 'none';
+                authSection.style.display = 'block';
+            }
+        }
+
+        // Authentication functions
+        async function authenticate() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showStatus('Please enter username and password', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                // In a real implementation, this would call the auth endpoint
+                // For demo purposes, we'll simulate authentication
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                authToken = `demo_token_${Date.now()}`;
+                showStatus('Authentication successful!', 'success');
+                updateUI();
+            } catch (error) {
+                showStatus(`Authentication failed: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function useTestToken() {
+            authToken = 'test_token_demo';
+            showStatus('Using test token for demo', 'info');
+            updateUI();
+        }
+
+        // Gameplay functions
+        async function startNewSession() {
+            if (!authToken) {
+                showStatus('Please authenticate first', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_BASE_URL}/gameplay/sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        therapeutic_context: {
+                            goals: ['anxiety_management', 'social_skills']
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentSessionId = data.session_id;
+                    showStatus(`New session started: ${currentSessionId}`, 'success');
+
+                    // Enable session controls
+                    document.getElementById('pauseBtn').disabled = false;
+                    document.getElementById('endBtn').disabled = false;
+
+                    // Load initial scene
+                    await loadCurrentScene();
+                } else {
+                    const error = await response.json();
+                    showStatus(`Failed to start session: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Network error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadCurrentScene() {
+            if (!currentSessionId) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/gameplay/sessions/${currentSessionId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayScene(data.session_status);
+                } else {
+                    showStatus('Failed to load scene', 'error');
+                }
+            } catch (error) {
+                showStatus(`Error loading scene: ${error.message}`, 'error');
+            }
+        }
+
+        function displayScene(sessionStatus) {
+            const sceneDiv = document.getElementById('currentScene');
+            const choicesDiv = document.getElementById('choicesSection');
+            const sceneDescription = document.getElementById('sceneDescription');
+            const choiceButtons = document.getElementById('choiceButtons');
+
+            // Display scene
+            if (sessionStatus.current_scene) {
+                sceneDescription.textContent = sessionStatus.current_scene.description || 'Welcome to your therapeutic adventure...';
+                sceneDiv.style.display = 'block';
+            }
+
+            // Display choices
+            if (sessionStatus.available_choices && sessionStatus.available_choices.length > 0) {
+                choiceButtons.innerHTML = '';
+                sessionStatus.available_choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-button';
+                    button.textContent = choice.text || `Choice ${choice.id}`;
+                    button.onclick = () => makeChoice(choice.id);
+                    choiceButtons.appendChild(button);
+                });
+                choicesDiv.style.display = 'block';
+            }
+        }
+
+        async function makeChoice(choiceId) {
+            if (!currentSessionId) return;
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_BASE_URL}/gameplay/sessions/${currentSessionId}/choices`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        choice_id: choiceId
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Update scene with new content
+                    if (data.choice_result.next_scene) {
+                        document.getElementById('sceneDescription').textContent =
+                            data.choice_result.next_scene.description;
+                    }
+
+                    // Update available choices
+                    const choiceButtons = document.getElementById('choiceButtons');
+                    choiceButtons.innerHTML = '';
+
+                    if (data.choice_result.available_choices) {
+                        data.choice_result.available_choices.forEach(choice => {
+                            const button = document.createElement('button');
+                            button.className = 'choice-button';
+                            button.textContent = choice.text || `Choice ${choice.id}`;
+                            button.onclick = () => makeChoice(choice.id);
+                            choiceButtons.appendChild(button);
+                        });
+                    }
+
+                    // Show therapeutic insights
+                    if (data.choice_result.consequences) {
+                        displayTherapeuticInsights(data.choice_result.consequences);
+                    }
+
+                    showStatus('Choice processed successfully', 'success');
+                } else {
+                    const error = await response.json();
+                    showStatus(`Failed to process choice: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error processing choice: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayTherapeuticInsights(consequences) {
+            const insightsDiv = document.getElementById('therapeuticInsights');
+            const insightsContent = document.getElementById('insightsContent');
+
+            if (consequences.therapeutic_insight) {
+                insightsContent.innerHTML = `<p>${consequences.therapeutic_insight}</p>`;
+                insightsDiv.style.display = 'block';
+            }
+        }
+
+        async function pauseSession() {
+            if (!currentSessionId) return;
+
+            try {
+                // This would call a pause endpoint if implemented
+                showStatus('Session paused (demo)', 'info');
+                document.getElementById('pauseBtn').disabled = true;
+            } catch (error) {
+                showStatus(`Error pausing session: ${error.message}`, 'error');
+            }
+        }
+
+        async function endSession() {
+            if (!currentSessionId) return;
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_BASE_URL}/gameplay/sessions/${currentSessionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    showStatus('Session ended successfully', 'success');
+                    currentSessionId = null;
+
+                    // Reset UI
+                    document.getElementById('currentScene').style.display = 'none';
+                    document.getElementById('choicesSection').style.display = 'none';
+                    document.getElementById('therapeuticInsights').style.display = 'none';
+                    document.getElementById('pauseBtn').disabled = true;
+                    document.getElementById('endBtn').disabled = true;
+                } else {
+                    showStatus('Failed to end session', 'error');
+                }
+            } catch (error) {
+                showStatus(`Error ending session: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Initialize UI
+        updateUI();
+        showStatus('Welcome! Please authenticate to start your therapeutic adventure.', 'info');
+    </script>
+</body>
+</html>

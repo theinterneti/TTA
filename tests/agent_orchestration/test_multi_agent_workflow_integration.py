@@ -18,8 +18,8 @@ from typing import Any
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-
-from src.agent_orchestration import (
+import pytest_asyncio
+from tta_ai.orchestration import (
     AgentMessage,
     AgentRegistry,
     AgentStep,
@@ -181,7 +181,7 @@ def expected_narrative_outputs():
     }
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def mock_agent_coordinator():
     """Mock message coordinator for testing agent communication."""
     coordinator = Mock(spec=MessageCoordinator)
@@ -192,7 +192,7 @@ async def mock_agent_coordinator():
     return coordinator
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_agent_registry():
     """Test agent registry with mock agents."""
     registry = AgentRegistry()

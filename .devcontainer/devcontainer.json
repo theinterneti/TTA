@@ -1,0 +1,150 @@
+{
+  "name": "TTA Development Environment",
+  "dockerComposeFile": [
+    "../tta.dev/docker-compose.yml",
+    "docker-compose.dev.yml"
+  ],
+  "service": "admin-api",
+  "workspaceFolder": "/app",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "appuser",
+      "userUid": "1001",
+      "userGid": "1001"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "ppa": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "installDirectlyFromGitHubRelease": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.flake8",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.pylint",
+        "ms-toolsai.jupyter",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "redis.redis-for-vscode",
+        "neo4j.neo4j",
+        "humao.rest-client",
+        "rangav.vscode-thunder-client",
+        "redhat.vscode-yaml",
+        "ms-vscode.makefile-tools",
+        "grafana.vscode-jsonnet",
+        "ms-vscode.vscode-json",
+        "streetsidesoftware.code-spell-checker",
+        "gruntfuggly.todo-tree",
+        "aaron-bond.better-comments"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/app/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": ["tests"],
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        },
+        "editor.rulers": [88, 120],
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        },
+        "docker.showStartPage": false,
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "files.associations": {
+          "*.yml": "yaml",
+          "*.yaml": "yaml",
+          "docker-compose*.yml": "yaml",
+          "Dockerfile*": "dockerfile"
+        }
+      }
+    }
+  },
+  "forwardPorts": [
+    3000,
+    8001,
+    8002,
+    8003,
+    8004,
+    8005,
+    6379,
+    7474,
+    7687,
+    3001,
+    9090,
+    3100
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "TTA Frontend",
+      "onAutoForward": "notify"
+    },
+    "8001": {
+      "label": "Admin API",
+      "onAutoForward": "silent"
+    },
+    "8002": {
+      "label": "Clinical API",
+      "onAutoForward": "silent"
+    },
+    "8003": {
+      "label": "Developer API",
+      "onAutoForward": "silent"
+    },
+    "8004": {
+      "label": "Patient API",
+      "onAutoForward": "silent"
+    },
+    "8005": {
+      "label": "LangGraph Service",
+      "onAutoForward": "silent"
+    },
+    "3001": {
+      "label": "Grafana Dashboard",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "echo 'TTA Development Environment Ready! 🚀' && echo 'Services available:' && echo '  - Frontend: http://localhost:3000' && echo '  - APIs: http://localhost:8001-8005' && echo '  - Grafana: http://localhost:3001 (admin/admin)' && echo '  - Prometheus: http://localhost:9090'",
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "containerEnv": {
+    "PYTHONPATH": "/app/src",
+    "ENVIRONMENT": "development",
+    "DEBUG": "true"
+  },
+  "remoteUser": "appuser"
+}

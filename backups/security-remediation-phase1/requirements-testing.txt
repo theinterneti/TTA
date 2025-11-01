@@ -1,0 +1,101 @@
+# TTA Testing Framework Requirements
+# Comprehensive testing dependencies for staging validation
+
+# Core testing frameworks
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-xdist==3.3.1
+pytest-html==4.1.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-timeout==2.2.0
+
+# Web testing and automation
+playwright==1.40.0
+selenium==4.15.2
+webdriver-manager==4.0.1
+
+# API testing
+requests==2.31.0
+httpx==0.25.2
+aiohttp==3.9.1
+websockets==12.0
+
+# Load and performance testing
+locust==2.17.0
+pytest-benchmark==4.0.0
+
+# Database testing
+pytest-postgresql==5.0.0
+pytest-redis==3.0.2
+neo4j==5.14.1
+psycopg2-binary==2.9.9
+redis==5.0.1
+
+# Data generation and mocking
+faker==20.1.0
+factory-boy==3.3.0
+responses==0.24.1
+httpretty==1.1.4
+
+# Monitoring and metrics
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Utilities
+pydantic==2.5.0
+python-dotenv==1.0.0
+click==8.1.7
+rich==13.7.0
+tabulate==0.9.0
+jinja2==3.1.2
+
+# Image and screenshot comparison
+pillow==10.1.0
+opencv-python==4.8.1.78
+
+# Report generation
+jinja2==3.1.2
+markdown==3.5.1
+weasyprint==60.2
+
+# Configuration and environment
+pyyaml==6.0.1
+toml==0.10.2
+configparser==6.0.0
+
+# Async support
+asyncio==3.4.3
+aiofiles==23.2.1
+
+# JSON and data processing
+jsonschema==4.20.0
+pandas==2.1.4
+numpy==1.25.2
+
+# Network and protocol testing
+paramiko==3.4.0
+ftputil==5.0.4
+
+# Security testing
+cryptography>=41.0.0
+jwt==1.3.1
+
+# Development and debugging
+ipython==8.18.1
+ipdb==0.13.13
+memory-profiler==0.61.0
+
+# Linting and formatting (for test code quality)
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Documentation generation
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# CI/CD integration
+pytest-github-actions-annotate-failures==0.2.0
+pytest-json-report==1.5.0

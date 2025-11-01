@@ -159,10 +159,10 @@ export class WorldSelectionPage extends BasePage {
     await this.searchInput.focus();
     await this.page.keyboard.press('Tab');
     await expect(this.difficultyFilter).toBeFocused();
-    
+
     await this.page.keyboard.press('Tab');
     await expect(this.themeFilter).toBeFocused();
-    
+
     await this.page.keyboard.press('Tab');
     await expect(this.durationFilter).toBeFocused();
   }
@@ -184,7 +184,7 @@ export class WorldSelectionPage extends BasePage {
 
   async measureFilterPerformance(filterType: 'difficulty' | 'theme' | 'duration', value: string): Promise<number> {
     const startTime = Date.now();
-    
+
     switch (filterType) {
       case 'difficulty':
         await this.filterByDifficulty(value);
@@ -196,7 +196,7 @@ export class WorldSelectionPage extends BasePage {
         await this.filterByDuration(value);
         break;
     }
-    
+
     await this.page.waitForLoadState('networkidle');
     return Date.now() - startTime;
   }
@@ -214,7 +214,7 @@ export class WorldSelectionPage extends BasePage {
   async testMobileLayout() {
     await this.setMobileViewport();
     await this.expectPageLoaded();
-    
+
     // Check that grid becomes single column on mobile
     const gridClasses = await this.worldsGrid.getAttribute('class');
     expect(gridClasses).toContain('grid-cols-1');
@@ -223,7 +223,7 @@ export class WorldSelectionPage extends BasePage {
   async testTabletLayout() {
     await this.page.setViewportSize({ width: 768, height: 1024 });
     await this.expectPageLoaded();
-    
+
     // Check that grid becomes two columns on tablet
     const gridClasses = await this.worldsGrid.getAttribute('class');
     expect(gridClasses).toContain('md:grid-cols-2');
@@ -232,7 +232,7 @@ export class WorldSelectionPage extends BasePage {
   // Data validation
   async validateWorldCardData(worldName: string) {
     const worldCard = await this.getWorldByName(worldName);
-    
+
     // Check required elements are present
     await expect(worldCard.locator('h3')).toBeVisible(); // World name
     await expect(worldCard.locator('p')).toBeVisible(); // Description

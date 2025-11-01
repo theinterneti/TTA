@@ -51,9 +51,7 @@ try:
         chat,
         conversation,
         gameplay,
-    )
-    from .routers import metrics as metrics_router
-    from .routers import (
+        health,
         openrouter_auth,
         players,
         progress,
@@ -61,6 +59,7 @@ try:
         settings,
         worlds,
     )
+    from .routers import metrics as metrics_router
 except ImportError:
     from src.player_experience.api.routers import (
         auth,
@@ -68,9 +67,7 @@ except ImportError:
         chat,
         conversation,
         gameplay,
-    )
-    from src.player_experience.api.routers import metrics as metrics_router
-    from src.player_experience.api.routers import (
+        health,
         openrouter_auth,
         players,
         progress,
@@ -78,6 +75,7 @@ except ImportError:
         settings,
         worlds,
     )
+    from src.player_experience.api.routers import metrics as metrics_router
 
 try:
     from .config import get_settings
@@ -137,8 +135,10 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=[
             "http://localhost:3000",  # React development server
+            "http://localhost:3001",  # Staging frontend
             "http://localhost:8080",  # Alternative frontend port
             "https://localhost:3000",  # HTTPS development
+            "https://localhost:3001",  # HTTPS staging
             "https://localhost:8080",  # HTTPS alternative
         ],
         allow_credentials=True,
@@ -214,6 +214,8 @@ def create_app() -> FastAPI:
     # Metrics (gated by settings.debug) - now includes /metrics-prom endpoint
     app.include_router(metrics_router.router, tags=["metrics"])
     app.include_router(progress.router, prefix="/api/v1", tags=["progress"])
+    # Health checks
+    app.include_router(health.router, prefix="/api/v1", tags=["health"])
 
     # WebSocket endpoints (mounted under /ws)
     app.include_router(chat.router, prefix="/ws", tags=["chat"])
@@ -326,7 +328,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """Handle unexpected exceptions."""
         # Log and include a minimal detail for easier test debugging
-        try:
+        with contextlib.suppress(Exception):
             import logging
 
             logging.getLogger(__name__).error("Unhandled exception", exc_info=exc)
@@ -342,8 +344,6 @@ def register_exception_handlers(app: FastAPI) -> None:
                     "request_headers": dict(request.headers),
                 },
             )
-        except Exception:
-            pass
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={

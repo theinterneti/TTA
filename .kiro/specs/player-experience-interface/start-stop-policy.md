@@ -27,4 +27,3 @@ This document clarifies expected status semantics for the PlayerExperienceCompon
 
 - Using STOPPED for graceful failures keeps the orchestrator state consistent in tests and CI, while still providing a False return for start() to signal failure.
 - Unexpected failures continue to mark ERROR to surface issues.
-

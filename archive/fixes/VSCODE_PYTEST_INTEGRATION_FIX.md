@@ -59,17 +59,17 @@ Check `.vscode/settings.json` has:
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
   "python.testing.nosetestsEnabled": false,
-  
+
   "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
-  
+
   "python.testing.pytestArgs": [
     "${workspaceFolder}/tests",
     "-v",
     "--rootdir=${workspaceFolder}"
   ],
-  
+
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-  
+
   "python.testing.autoTestDiscoverOnSaveEnabled": true,
   "python.testing.promptToConfigure": false
 }
@@ -137,7 +137,7 @@ If VS Code prompts to configure tests:
 ]
 ```
 
-**Why:** 
+**Why:**
 - Absolute paths prevent path resolution issues
 - `--rootdir` ensures pytest uses correct project root
 - `-v` provides verbose output for debugging
@@ -421,4 +421,3 @@ Ctrl+Shift+U → Open Output Panel
 **Status:** ✅ Fixed
 **Tests Discovered:** 952
 **Last Updated:** 2025-10-04
-

@@ -147,7 +147,9 @@ class AgencyProtector:
             agency_level = (
                 "HIGH"
                 if empowerment_score > 0.8
-                else "MODERATE" if empowerment_score > 0.5 else "LOW"
+                else "MODERATE"
+                if empowerment_score > 0.5
+                else "LOW"
             )
 
             return AgencyAssessment(
@@ -360,9 +362,7 @@ class AgencyProtector:
             choices = [choice for choice, score in scored_choices[:optimal_count]]
 
         # Ensure difficulty balance
-        balanced_choices = await self._ensure_difficulty_balance(choices, session_state)
-
-        return balanced_choices
+        return await self._ensure_difficulty_balance(choices, session_state)
 
     async def _ensure_appropriate_choice_count(
         self, choices: list[Choice], scene: Scene, session_state: SessionState
@@ -494,17 +494,12 @@ class AgencyProtector:
             return True
 
         # Check for inappropriate pressure based on emotional state
-        if session_state.emotional_state in [
-            EmotionalState.CRISIS,
-            EmotionalState.DISTRESSED,
-        ]:
-            if choice.difficulty_level in [
-                DifficultyLevel.CHALLENGING,
-                DifficultyLevel.INTENSIVE,
-            ]:
-                return True
-
-        return False
+        return bool(
+            session_state.emotional_state
+            in [EmotionalState.CRISIS, EmotionalState.DISTRESSED]
+            and choice.difficulty_level
+            in [DifficultyLevel.CHALLENGING, DifficultyLevel.INTENSIVE]
+        )
 
     async def _enhance_single_choice_agency(
         self, choice: Choice, scene: Scene, session_state: SessionState
@@ -747,12 +742,11 @@ class AgencyProtector:
         if session_state.emotional_state in [
             EmotionalState.CRISIS,
             EmotionalState.DISTRESSED,
+        ] and choice.difficulty_level in [
+            DifficultyLevel.CHALLENGING,
+            DifficultyLevel.INTENSIVE,
         ]:
-            if choice.difficulty_level in [
-                DifficultyLevel.CHALLENGING,
-                DifficultyLevel.INTENSIVE,
-            ]:
-                concerns.append("inappropriate_difficulty_for_emotional_state")
+            concerns.append("inappropriate_difficulty_for_emotional_state")
 
         # Low meaningfulness
         if choice.meaningfulness_score < 0.4:
@@ -796,7 +790,7 @@ class AgencyProtector:
         # Check for empowering therapeutic approaches
         empowering_approaches = self.empowerment_guidelines["therapeutic_empowerment"]
 
-        for approach, _ in empowering_approaches.items():
+        for approach in empowering_approaches:
             if approach.replace("_", " ") in choice.description.lower():
                 empowerment_score += 0.1
 

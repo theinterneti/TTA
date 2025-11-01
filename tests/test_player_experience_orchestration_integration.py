@@ -201,17 +201,13 @@ class TestPlayerExperienceOrchestrationIntegration:
         assert metrics["configuration"]["dependencies"] == ["redis", "neo4j"]
 
     @patch("src.orchestration.orchestrator.TTAOrchestrator._import_core_components")
-    @patch(
-        "src.orchestration.orchestrator.TTAOrchestrator._import_repository_components"
-    )
     @patch("src.orchestration.orchestrator.TTAOrchestrator._validate_repositories")
     def test_orchestrator_integration(
-        self, mock_validate, mock_import_repo, mock_import_core, mock_config
+        self, mock_validate, mock_import_core, mock_config
     ):
         """Test that the orchestrator properly integrates the player experience component."""
         # Mock the import methods to avoid actual file system operations
         mock_validate.return_value = None
-        mock_import_repo.return_value = None
 
         # Create a mock component for the orchestrator to find
         mock_component = Mock(spec=PlayerExperienceComponent)
@@ -445,16 +441,12 @@ tta.prototype:
         return str(config_file)
 
     @patch("src.orchestration.orchestrator.TTAOrchestrator._validate_repositories")
-    @patch(
-        "src.orchestration.orchestrator.TTAOrchestrator._import_repository_components"
-    )
     def test_full_orchestration_lifecycle(
-        self, mock_import_repo, mock_validate, test_config_path
+        self, mock_validate, test_config_path
     ):
         """Test full orchestration lifecycle with player experience component."""
-        # Mock repository validation and import
+        # Mock repository validation
         mock_validate.return_value = None
-        mock_import_repo.return_value = None
 
         # Create orchestrator with test config
         orchestrator = TTAOrchestrator(test_config_path)
@@ -478,9 +470,6 @@ tta.prototype:
 
     @patch("src.orchestration.orchestrator.TTAOrchestrator._validate_repositories")
     @patch(
-        "src.orchestration.orchestrator.TTAOrchestrator._import_repository_components"
-    )
-    @patch(
         "src.components.player_experience_component.PlayerExperienceComponent._run_docker_compose"
     )
     @patch(
@@ -490,14 +479,12 @@ tta.prototype:
         self,
         mock_is_api_running,
         mock_run_docker_compose,
-        mock_import_repo,
         mock_validate,
         test_config_path,
     ):
         """Test starting player experience component through orchestrator."""
-        # Mock repository validation and import
+        # Mock repository validation
         mock_validate.return_value = None
-        mock_import_repo.return_value = None
 
         # Mock successful Docker Compose and health check
         mock_result = Mock()

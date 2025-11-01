@@ -1,0 +1,321 @@
+evaluation:
+  dimensions:
+    narrative_quality:
+      metrics:
+        - creativity_originality
+        - character_consistency
+        - plot_coherence
+        - dialogue_quality
+        - world_building_depth
+      weight: 0.4
+    technical_performance:
+      metrics:
+        - response_time
+        - consistency
+        - error_handling
+        - resource_efficiency
+        - reliability
+      weight: 0.1
+    therapeutic_integration:
+      metrics:
+        - subtlety_score
+        - growth_opportunities
+        - safety_handling
+        - progress_facilitation
+        - clinical_balance
+      weight: 0.2
+    user_engagement:
+      metrics:
+        - fun_factor
+        - immersion_level
+        - choice_meaningfulness
+        - emotional_connection
+        - continuation_desire
+      weight: 0.3
+  scoring:
+    excellence_threshold: 8.5
+    minimum_acceptable: 6.0
+    scale: 1-10
+    target_score: 7.5
+models:
+  local:
+    llama3_1_8b:
+      api_base: http://localhost:1235/v1
+      enabled: false
+      focus_areas:
+        - story_continuity
+        - character_development
+      max_tokens: 2048
+      model_id: llama-3.1-8b-instruct
+      name: Llama-3.1-8B-Instruct
+      provider: local
+      strengths:
+        - narrative_coherence
+        - character_consistency
+        - long_term_memory
+      temperature: 0.7
+      top_p: 0.9
+    qwen2_5_7b:
+      api_base: http://localhost:1234/v1
+      enabled: false
+      focus_areas:
+        - baseline_performance
+        - creative_scenarios
+      max_tokens: 2048
+      model_id: qwen2.5-7b-instruct
+      name: Qwen2.5-7B-Instruct
+      provider: local
+      strengths:
+        - creative_storytelling
+        - fast_inference
+        - character_dialogue
+      temperature: 0.7
+      top_p: 0.9
+  openrouter:
+    api_key: ${OPENROUTER_API_KEY}
+    base_url: https://openrouter.ai/api/v1
+    llama3_1_8b_openrouter:
+      enabled: false
+      focus_areas:
+        - therapeutic_balance
+        - professional_storytelling
+      max_tokens: 2048
+      model_id: meta-llama/llama-3.1-8b-instruct:free
+      name: Meta-Llama/Llama-3.1-8B-Instruct
+      provider: openrouter
+      strengths:
+        - balanced_narrative
+        - therapeutic_integration
+        - professional_quality
+      temperature: 0.7
+      top_p: 0.9
+    mistral_7b:
+      enabled: false
+      focus_areas:
+        - dialogue_quality
+        - user_engagement
+      max_tokens: 2048
+      model_id: mistralai/mistral-7b-instruct:free
+      name: Mistral-7B-Instruct-v0.3
+      provider: openrouter
+      strengths:
+        - conversational_flow
+        - creativity
+        - engaging_dialogue
+      temperature: 0.8
+      top_p: 0.9
+privacy:
+  anonymization_enabled: true
+  data_retention_days: 30
+  gdpr_compliant: true
+  hipaa_compliant: true
+  secure_storage: true
+  synthetic_profiles_only: true
+reporting:
+  dashboard_enabled: true
+  export_formats:
+    - json
+    - csv
+    - pdf
+  generate_comparative_analysis: true
+  generate_individual_reports: true
+  include_qualitative_examples: true
+  real_time_monitoring: true
+test_profiles:
+  creative_writer_depression:
+    demographics:
+      age_range: 25-35
+      creative_background: high
+      gaming_experience: medium
+    name: Creative Writer + Depression Support
+    preferences:
+      interaction_frequency: medium
+      narrative_style: character_driven
+      pacing: slow
+    therapeutic_profile:
+      challenge_areas:
+        - self_worth
+        - motivation
+      comfort_zones:
+        - storytelling
+        - character_development
+      preferred_intensity: medium
+      primary_concerns:
+        - depression
+        - creative_blocks
+  gaming_enthusiast_anxiety:
+    demographics:
+      age_range: 22-28
+      gaming_experience: high
+      tech_comfort: high
+    name: Gaming Enthusiast + Anxiety Management
+    preferences:
+      interaction_frequency: high
+      narrative_style: complex
+      pacing: moderate
+    therapeutic_profile:
+      challenge_areas:
+        - social_interaction
+        - uncertainty
+      comfort_zones:
+        - fantasy_settings
+        - problem_solving
+      preferred_intensity: medium
+      primary_concerns:
+        - anxiety
+        - stress_management
+  parent_work_life_balance:
+    demographics:
+      age_range: 28-42
+      gaming_experience: low
+      time_availability: very_limited
+    name: Parent + Work-Life Balance
+    preferences:
+      interaction_frequency: low
+      narrative_style: family_oriented
+      pacing: fast
+    therapeutic_profile:
+      challenge_areas:
+        - time_management
+        - guilt
+      comfort_zones:
+        - family_themes
+        - practical_solutions
+      preferred_intensity: medium
+      primary_concerns:
+        - work_life_balance
+        - parenting_stress
+  professional_stress:
+    demographics:
+      age_range: 30-45
+      gaming_experience: low
+      time_availability: limited
+    name: Professional + Stress Management
+    preferences:
+      interaction_frequency: low
+      narrative_style: goal_oriented
+      pacing: fast
+    therapeutic_profile:
+      challenge_areas:
+        - work_life_balance
+        - perfectionism
+      comfort_zones:
+        - structured_progress
+        - clear_goals
+      preferred_intensity: low
+      primary_concerns:
+        - work_stress
+        - burnout
+  retiree_life_transition:
+    demographics:
+      age_range: 60-75
+      gaming_experience: low
+      tech_comfort: medium
+    name: Retiree + Life Transition Support
+    preferences:
+      interaction_frequency: low
+      narrative_style: reflective
+      pacing: slow
+    therapeutic_profile:
+      challenge_areas:
+        - change_adaptation
+        - relevance
+      comfort_zones:
+        - wisdom_themes
+        - reflection
+      preferred_intensity: low
+      primary_concerns:
+        - life_transitions
+        - purpose
+  student_social_anxiety:
+    demographics:
+      age_range: 18-24
+      gaming_experience: medium
+      social_comfort: low
+    name: Student + Social Anxiety
+    preferences:
+      interaction_frequency: medium
+      narrative_style: coming_of_age
+      pacing: moderate
+    therapeutic_profile:
+      challenge_areas:
+        - social_situations
+        - public_speaking
+      comfort_zones:
+        - academic_themes
+        - gradual_challenges
+      preferred_intensity: low
+      primary_concerns:
+        - social_anxiety
+        - confidence
+test_scenarios:
+  character_development:
+    duration_minutes: 90
+    evaluation_focus:
+      - character_progression
+      - therapeutic_goals
+      - achievement_satisfaction
+    name: Character Development Journey
+    sessions: 2
+    steps:
+      - initial_character_state
+      - growth_opportunities
+      - skill_development
+      - milestone_achievement
+  choice_consequence_exploration:
+    choice_points: 5
+    duration_minutes: 60
+    evaluation_focus:
+      - choice_meaningfulness
+      - consequence_tracking
+      - replayability
+    name: Choice Consequence Tracking
+    steps:
+      - meaningful_decisions
+      - immediate_consequences
+      - long_term_impacts
+      - alternative_exploration
+  crisis_scenario_handling:
+    duration_minutes: 30
+    evaluation_focus:
+      - therapeutic_safety
+      - response_appropriateness
+      - integration_subtlety
+    name: Crisis Scenario Response
+    steps:
+      - crisis_detection
+      - appropriate_response
+      - support_integration
+      - recovery_continuation
+    trigger_conditions:
+      - emotional_distress
+      - safety_concern
+  multi_session_continuity:
+    duration_minutes: 120
+    evaluation_focus:
+      - narrative_coherence
+      - character_consistency
+      - world_persistence
+    name: Multi-Session Story Continuity
+    sessions: 3
+    steps:
+      - session_1_setup
+      - session_2_continuation
+      - session_3_progression
+  new_player_onboarding:
+    duration_minutes: 45
+    evaluation_focus:
+      - user_experience
+      - tutorial_effectiveness
+      - engagement
+    name: New Player Onboarding Journey
+    steps:
+      - character_creation
+      - first_session_tutorial
+      - initial_world_selection
+      - early_choice_demonstration
+testing:
+  enabled: true
+  max_concurrent_tests: 4
+  results_storage_path: ./testing/results
+  test_session_timeout: 1800

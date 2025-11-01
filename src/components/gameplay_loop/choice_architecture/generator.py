@@ -139,11 +139,9 @@ class ChoiceGenerator:
                 return None
 
             # Apply emotional adaptations
-            adapted_choice = await self._apply_emotional_adaptations(
+            return await self._apply_emotional_adaptations(
                 base_choice, adaptations, emotional_state
             )
-
-            return adapted_choice
 
         except Exception as e:
             logger.error(f"Failed to generate emotion-appropriate choice: {e}")
@@ -176,7 +174,7 @@ class ChoiceGenerator:
                 emotional_state, "Take your time and choose what feels right"
             )
 
-            safe_choice = Choice(
+            return Choice(
                 choice_text=choice_text,
                 description="A gentle, supportive option that honors your current state",
                 choice_type=ChoiceType.THERAPEUTIC,
@@ -187,8 +185,6 @@ class ChoiceGenerator:
                 emotional_context=[emotional_state],
                 therapeutic_value=0.8,
             )
-
-            return safe_choice
 
         except Exception as e:
             logger.error(f"Failed to generate safe choice: {e}")
@@ -390,11 +386,9 @@ class ChoiceGenerator:
         template = await self._select_template(templates, scene, session_state)
 
         # Generate choice from template
-        choice = await self._generate_from_template(
+        return await self._generate_from_template(
             template, scene, session_state, requirements
         )
-
-        return choice
 
     async def _generate_additional_choice(
         self,
@@ -496,7 +490,7 @@ class ChoiceGenerator:
         )
 
         # Create choice
-        choice = Choice(
+        return Choice(
             choice_text=choice_text,
             description=description,
             choice_type=template.choice_type,
@@ -508,8 +502,6 @@ class ChoiceGenerator:
             therapeutic_value=therapeutic_value,
         )
 
-        return choice
-
     async def _generate_base_choice(
         self, choice_type: ChoiceType, session_state: SessionState
     ) -> Choice | None:
@@ -520,7 +512,7 @@ class ChoiceGenerator:
 
         template = templates[0]  # Use first template as base
 
-        base_choice = Choice(
+        return Choice(
             choice_text="Take a meaningful action",
             description="A choice that supports your journey",
             choice_type=choice_type,
@@ -531,8 +523,6 @@ class ChoiceGenerator:
             emotional_context=[session_state.emotional_state.value],
             therapeutic_value=0.6,
         )
-
-        return base_choice
 
     async def _apply_emotional_adaptations(
         self, base_choice: Choice, adaptations: dict[str, Any], emotional_state: str
@@ -604,12 +594,11 @@ class ChoiceGenerator:
         # Enhance description based on therapeutic tags
         if "mindfulness" in template.therapeutic_tags:
             return f"{base_description} through mindful awareness"
-        elif "grounding" in template.therapeutic_tags:
+        if "grounding" in template.therapeutic_tags:
             return f"{base_description} while staying grounded and centered"
-        elif "self_compassion" in template.therapeutic_tags:
+        if "self_compassion" in template.therapeutic_tags:
             return f"{base_description} with kindness toward yourself"
-        else:
-            return base_description
+        return base_description
 
     async def _calculate_therapeutic_value(
         self, template: ChoiceTemplate, scene: Scene, session_state: SessionState
@@ -645,12 +634,11 @@ class ChoiceGenerator:
                 or "safety" in template.therapeutic_tags
             ):
                 base_value += 0.1
-        elif session_state.emotional_state == EmotionalState.ENGAGED:
-            if (
-                "exploration" in template.therapeutic_tags
-                or "growth" in template.therapeutic_tags
-            ):
-                base_value += 0.1
+        elif session_state.emotional_state == EmotionalState.ENGAGED and (
+            "exploration" in template.therapeutic_tags
+            or "growth" in template.therapeutic_tags
+        ):
+            base_value += 0.1
 
         return min(base_value, 1.0)
 
@@ -693,11 +681,7 @@ class ChoiceGenerator:
         base_meaningfulness += therapeutic_relevance * 0.1
 
         # Therapeutic choices are inherently meaningful
-        if template.choice_type == ChoiceType.THERAPEUTIC:
-            base_meaningfulness += 0.1
-
-        # Skill building choices are meaningful for growth
-        elif template.choice_type == ChoiceType.SKILL_BUILDING:
+        if template.choice_type in (ChoiceType.THERAPEUTIC, ChoiceType.SKILL_BUILDING):
             base_meaningfulness += 0.1
 
         # Adjust based on session context
@@ -710,14 +694,13 @@ class ChoiceGenerator:
         if session_state.emotional_state in [
             EmotionalState.DISTRESSED,
             EmotionalState.CRISIS,
-        ]:
-            if (
-                "safety" in template.therapeutic_tags
-                or "support" in template.therapeutic_tags
-            ):
-                base_meaningfulness += (
-                    0.2  # Safety choices are highly meaningful in distress
-                )
+        ] and (
+            "safety" in template.therapeutic_tags
+            or "support" in template.therapeutic_tags
+        ):
+            base_meaningfulness += (
+                0.2  # Safety choices are highly meaningful in distress
+            )
 
         return min(base_meaningfulness, 1.0)
 

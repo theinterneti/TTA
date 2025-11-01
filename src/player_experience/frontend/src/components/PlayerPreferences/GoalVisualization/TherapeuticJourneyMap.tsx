@@ -42,12 +42,12 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
     if (!selectedGoals.length) return [];
 
     const stages: JourneyStage[] = [];
-    
+
     // Stage 1: Foundation Building
-    const foundationGoals = selectedGoals.filter(goal => 
+    const foundationGoals = selectedGoals.filter(goal =>
       ['mindfulness_practice', 'self_esteem_building', 'emotional_regulation'].includes(goal)
     );
-    
+
     if (foundationGoals.length > 0) {
       const avgProgress = foundationGoals.reduce((sum, goalId) => {
         const progress = goalProgresses.find(gp => gp.goalId === goalId)?.progress || 0;
@@ -73,10 +73,10 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
     }
 
     // Stage 2: Skill Development
-    const skillGoals = selectedGoals.filter(goal => 
+    const skillGoals = selectedGoals.filter(goal =>
       ['anxiety_reduction', 'stress_management', 'communication_improvement', 'relationship_skills'].includes(goal)
     );
-    
+
     if (skillGoals.length > 0) {
       const avgProgress = skillGoals.reduce((sum, goalId) => {
         const progress = goalProgresses.find(gp => gp.goalId === goalId)?.progress || 0;
@@ -104,10 +104,10 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
     }
 
     // Stage 3: Integration & Application
-    const integrationGoals = selectedGoals.filter(goal => 
+    const integrationGoals = selectedGoals.filter(goal =>
       ['work_life_balance', 'perfectionism_reduction', 'anger_management'].includes(goal)
     );
-    
+
     if (integrationGoals.length > 0) {
       const avgProgress = integrationGoals.reduce((sum, goalId) => {
         const progress = goalProgresses.find(gp => gp.goalId === goalId)?.progress || 0;
@@ -135,10 +135,10 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
     }
 
     // Stage 4: Healing & Recovery
-    const healingGoals = selectedGoals.filter(goal => 
+    const healingGoals = selectedGoals.filter(goal =>
       ['trauma_recovery', 'grief_processing', 'addiction_recovery'].includes(goal)
     );
-    
+
     if (healingGoals.length > 0) {
       const avgProgress = healingGoals.reduce((sum, goalId) => {
         const progress = goalProgresses.find(gp => gp.goalId === goalId)?.progress || 0;
@@ -258,9 +258,9 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
                       {stage.status.replace('_', ' ').toUpperCase()}
                     </span>
                   </div>
-                  
+
                   <p className="text-gray-600 mb-3">{stage.description}</p>
-                  
+
                   {/* Progress bar */}
                   <div className="mb-3">
                     <div className="flex items-center justify-between text-sm mb-1">
@@ -288,7 +288,7 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
                           ))}
                         </div>
                       </div>
-                      
+
                       <div>
                         <h5 className="font-medium text-gray-900 mb-1">Therapeutic Approaches</h5>
                         <div className="flex flex-wrap gap-1">
@@ -299,7 +299,7 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
                           ))}
                         </div>
                       </div>
-                      
+
                       <div>
                         <h5 className="font-medium text-gray-900 mb-1">Key Milestones</h5>
                         <ul className="text-sm text-gray-600 space-y-1">
@@ -311,7 +311,7 @@ const TherapeuticJourneyMap: React.FC<TherapeuticJourneyMapProps> = ({
                           ))}
                         </ul>
                       </div>
-                      
+
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <span>Estimated Duration: {stage.estimatedDuration}</span>
                         {stage.status === 'blocked' && (

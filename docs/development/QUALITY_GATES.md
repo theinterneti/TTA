@@ -258,4 +258,3 @@ Quality gates should evolve with the project:
 - [Branching Strategy](./BRANCHING_STRATEGY.md) - Branch hierarchy and workflow
 - [Testing Guide](../testing-framework.md) - Comprehensive testing documentation
 - [CI/CD Workflows](../../.github/workflows/README.md) - GitHub Actions configuration
-

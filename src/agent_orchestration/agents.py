@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 import uuid
@@ -113,7 +114,9 @@ class Agent(AgentProxy):
         status = (
             "healthy"
             if self._running and not self._degraded
-            else "degraded" if self._degraded else "stopped"
+            else "degraded"
+            if self._degraded
+            else "stopped"
         )
         return {
             "agent": self.name,
@@ -160,14 +163,12 @@ class Agent(AgentProxy):
         if not self._coordinator:
             raise RuntimeError("MessageCoordinator not configured for this agent")
         # Route via router if available on coordinator owner (component)
-        try:
-            from src.agent_orchestration.router import AgentRouter  # type: ignore
+        with contextlib.suppress(Exception):
+            from tta_ai.orchestration.router import AgentRouter  # type: ignore
 
             router = getattr(self._coordinator, "_agent_router", None)
             if router and isinstance(router, AgentRouter):
                 recipient = await router.resolve_target(recipient)
-        except Exception:
-            pass
 
         msg = self.serialize(
             recipient, payload, priority=priority, message_type=message_type
@@ -220,41 +221,38 @@ class Agent(AgentProxy):
             coro = self.process(input_payload)
             result: dict = await asyncio.wait_for(coro, timeout=timeout)
             # sliding window + cumulative
-            try:
+            with contextlib.suppress(Exception):
                 self._metrics.record_success()
-            except Exception:
-                self._metrics.requests += 1
+            # Fallback if record_success fails
+            if not hasattr(self._metrics, "requests"):
+                self._metrics.requests = 0
             # perf aggregation per agent instance
-            try:
+            with contextlib.suppress(Exception):
                 get_step_aggregator().record(
                     key, (time.time() - start) * 1000.0, success=True
                 )
-            except Exception:
-                pass
             return result
         except asyncio.TimeoutError:
-            try:
+            with contextlib.suppress(Exception):
                 self._metrics.record_error()
-            except Exception:
-                self._metrics.errors += 1
-            try:
+            # Fallback if record_error fails
+            if not hasattr(self._metrics, "errors"):
+                self._metrics.errors = 0
+            with contextlib.suppress(Exception):
                 get_step_aggregator().record(
                     key, (time.time() - start) * 1000.0, success=False
                 )
-            except Exception:
-                pass
             raise
         except Exception as e:
-            try:
+            with contextlib.suppress(Exception):
                 self._metrics.record_error()
-            except Exception:
-                self._metrics.errors += 1
-            try:
+            # Fallback if record_error fails
+            if not hasattr(self._metrics, "errors"):
+                self._metrics.errors = 0
+            with contextlib.suppress(Exception):
                 get_step_aggregator().record(
                     key, (time.time() - start) * 1000.0, success=False
                 )
-            except Exception:
-                pass
             logger.exception("Agent %s processing error: %s", self.name, e)
             raise
         finally:
@@ -352,7 +350,7 @@ class Agent(AgentProxy):
         """Restore internal runtime state from a previously exported dict.
         Default is no-op; proxies may override.
         """
-        return None
+        return
 
     # ---- Capability Support ----
 
@@ -388,6 +386,17 @@ class AgentRegistry:
         self._restart_attempts: dict[tuple[str, str], int] = {}
         self._last_restart_ts: dict[tuple[str, str], float] = {}
         self._restart_backoff_s: float = 5.0
+
+        # Restart policy configuration
+        self._restart_policy: dict[str, Any] = {
+            "max_attempts_window": 5,
+            "window_seconds": 60.0,
+            "backoff_factor": 2.0,
+            "backoff_max": 60.0,
+            "circuit_breaker_failures": 3,
+        }
+        self._restart_history: dict[tuple[str, str], list[float]] = {}
+        self._circuit_open: dict[tuple[str, str], bool] = {}
 
         # Optional restart callback supplied by component for concrete restarts
         self._restart_cb: Callable[[Agent], Awaitable[bool]] | None = None
@@ -488,10 +497,8 @@ class AgentRegistry:
         if len(hist) >= max_attempts:
             return False
         self._restart_history[key] = hist
-        # Circuit breaker check
-        if self._circuit_open.get(key, False):
-            return False
-        return True
+        # Circuit breaker check - return negated condition directly
+        return not self._circuit_open.get(key, False)
 
     def _record_restart_attempt(self, agent: Agent, success: bool) -> None:
         key = self._key(agent.agent_id)

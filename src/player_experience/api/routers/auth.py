@@ -5,13 +5,20 @@ This module provides endpoints for user authentication, registration,
 token management, multi-factor authentication, and role-based access control.
 """
 
+import contextlib
+import logging
+import os
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
 
 from ...database.user_repository import UserRepository
+from ...managers.player_profile_manager import (
+    PlayerProfileManager,
+    PlayerProfileManagerError,
+)
 from ...models.auth import (
     AuthenticatedUser,
     MFAChallenge,
@@ -25,6 +32,7 @@ from ...models.auth import (
     UserRegistration,
     UserRole,
 )
+from ...models.player import PlayerProfile
 from ...services.auth_service import (
     AuthenticationError,
     AuthorizationError,
@@ -32,12 +40,15 @@ from ...services.auth_service import (
     MFAError,
 )
 from ..auth import (
+    SECRET_KEY,
     AuthService,
     LoginRequest,
     RefreshTokenRequest,
     Token,
     security,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -53,19 +64,16 @@ try:
         password=settings.neo4j_password,
     )
     user_repository.connect()
-    print("✅ UserRepository connected successfully")
+    logger.info("✅ UserRepository connected successfully")
 except Exception as e:
-    print(f"⚠️ UserRepository connection failed: {e}. Using Redis fallback.")
+    logger.warning(f"⚠️ UserRepository connection failed: {e}. Using Redis fallback.")
     # Create a simple Redis-based user repository as fallback
     try:
         from datetime import datetime
 
         import redis
 
-        from ..database.user_repository import (  # type: ignore[import-not-found]
-            User,
-            UserRole,
-        )
+        from ...database.user_repository import User
 
         class RedisUserRepository:
             def __init__(self):
@@ -142,17 +150,15 @@ except Exception as e:
                 return bool(result)
 
         user_repository = RedisUserRepository()
-        print("✅ Redis UserRepository fallback initialized")
+        logger.info("✅ Redis UserRepository fallback initialized")
 
     except Exception as redis_error:
-        print(
+        logger.error(
             f"❌ Redis fallback also failed: {redis_error}. Authentication will use in-memory storage."
         )
 
 # Initialize enhanced auth service (in production, this would be dependency injected)
 # Use the same secret key as the middleware to ensure token compatibility
-from ..auth import SECRET_KEY
-
 _AUTH_SECRET = SECRET_KEY
 
 auth_service = EnhancedAuthService(
@@ -161,6 +167,57 @@ auth_service = EnhancedAuthService(
     security_settings=SecuritySettings(),
     mfa_config=MFAConfig(enabled=True, email_enabled=True),
 )
+
+
+# Dependency to get player profile manager
+def get_player_manager() -> PlayerProfileManager:
+    """
+    Get player profile manager instance for auto-creating player profiles.
+
+    Uses the same repository pattern as the players router to ensure consistency.
+    """
+
+    # Prefer Neo4j repository if configured
+    use_neo4j = os.getenv("TTA_USE_NEO4J", "0") == "1"
+    if use_neo4j:
+        with contextlib.suppress(Exception):
+            from ...database.player_profile_repository import PlayerProfileRepository
+            from ...managers.player_profile_manager import create_player_profile_manager
+            from ..config import get_settings
+
+            settings = get_settings()
+            repository = PlayerProfileRepository(
+                uri=settings.neo4j_uri,
+                username=settings.neo4j_username,
+                password=settings.neo4j_password,
+            )
+            repository.connect()
+            return create_player_profile_manager(repository)
+
+    # Fallback to in-memory repository for testing/development
+    from ...managers.player_profile_manager import create_player_profile_manager
+
+    class _InMemoryPlayerRepo:
+        """In-memory player profile repository for testing."""
+
+        def __init__(self):
+            self.profiles = {}
+
+        def username_exists(self, username: str) -> bool:
+            return any(p.username == username for p in self.profiles.values())
+
+        def email_exists(self, email: str) -> bool:
+            return any(p.email == email for p in self.profiles.values())
+
+        def create_player_profile(self, profile: PlayerProfile) -> bool:
+            self.profiles[profile.player_id] = profile
+            return True
+
+        def get_player_profile(self, player_id: str) -> PlayerProfile | None:
+            return self.profiles.get(player_id)
+
+    repository = _InMemoryPlayerRepo()  # type: ignore
+    return create_player_profile_manager(repository)  # type: ignore[arg-type]
 
 
 class LoginResponse(BaseModel):
@@ -282,13 +339,23 @@ async def register(registration: UserRegistration, request: Request) -> dict[str
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
+async def login(
+    credentials: LoginRequest,
+    request: Request,
+    response: Response,
+    player_manager: PlayerProfileManager = Depends(get_player_manager),
+) -> LoginResponse:
     """
     Authenticate a user and return access tokens with MFA support.
+
+    Automatically creates a player profile for new users on first successful login.
+    The player_id is included in the JWT token for downstream authentication.
 
     Args:
         credentials: User login credentials
         request: HTTP request for IP tracking
+        response: HTTP response for setting cookies
+        player_manager: Player profile manager dependency
 
     Returns:
         LoginResponse: Access tokens and MFA challenge if required
@@ -315,6 +382,72 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
+        # Auto-create player profile if it doesn't exist (Issue #4 fix)
+        # This ensures every authenticated user has a player profile with a player_id
+        player_id = user.user_id  # Default: player_id matches user_id
+        autocreation_start_time = None
+        autocreation_success = False
+        autocreation_error_category = None
+
+        try:
+            logger.debug(
+                f"Checking if player profile exists for user_id={user.user_id}"
+            )
+            # Check if player profile already exists
+            existing_profile = player_manager.get_player_profile(user.user_id)
+            if existing_profile:
+                player_id = existing_profile.player_id
+                logger.debug(f"Found existing player profile: {player_id}")
+            else:
+                # Create new player profile for first-time login
+                import time
+
+                autocreation_start_time = time.time()
+                logger.debug(f"Creating new player profile for user {user.username}")
+
+                new_profile = player_manager.create_player_profile(
+                    username=user.username,
+                    email=user.email,
+                    player_id=user.user_id,  # Use user_id as player_id for consistency
+                )
+                player_id = new_profile.player_id
+                autocreation_success = True
+                logger.debug(
+                    f"Auto-created player profile for user {user.username} (player_id: {player_id})"
+                )
+        except PlayerProfileManagerError as profile_error:
+            # Log error but don't block login - player_id will default to user_id
+            autocreation_error_category = "profile_manager_error"
+            logger.error(
+                f"Failed to auto-create player profile for {user.username}: {profile_error}",
+                exc_info=True,
+            )
+            # Continue with login using user_id as player_id
+        except Exception as e:
+            autocreation_error_category = "unexpected_error"
+            logger.error(
+                f"Unexpected error during player profile auto-creation: {e}",
+                exc_info=True,
+            )
+        finally:
+            # Record player profile auto-creation metrics
+            if autocreation_start_time is not None:
+                duration = time.time() - autocreation_start_time
+                try:
+                    from src.monitoring.prometheus_metrics import get_metrics_collector
+
+                    collector = get_metrics_collector("player-experience")
+                    collector.record_player_profile_autocreation(
+                        trigger="first_login",
+                        success=autocreation_success,
+                        duration=duration,
+                        error_category=autocreation_error_category,
+                    )
+                except Exception as metrics_error:
+                    logger.debug(
+                        f"Failed to record auto-creation metrics: {metrics_error}"
+                    )
+
         # Create session
         session_id = auth_service.create_session(user, client_ip, user_agent)
 
@@ -338,8 +471,57 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
                 },
             )
 
-        # Create access token
-        access_token = auth_service.create_access_token(user, session_id)
+        # Create access token with player_id (Issue #4 fix)
+        access_token = auth_service.create_access_token(
+            user, session_id, player_id=player_id
+        )
+
+        # Create a Redis session for session persistence
+        # This allows the session to persist across page refreshes
+        import os
+
+        import redis.asyncio as aioredis
+
+        from ..session_manager import RedisSessionManager
+
+        try:
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+            logger.debug(f"Attempting to create Redis session with URL: {redis_url}")
+            redis_client = aioredis.from_url(redis_url, decode_responses=True)
+            session_manager = RedisSessionManager(redis_client)
+
+            # Create a session with user data
+            user_data = {
+                "user_id": user.user_id,
+                "username": user.username,
+                "email": user.email,
+                "role": user.role.value,
+                "permissions": [perm.value for perm in user.permissions],
+            }
+
+            # Create session in Redis
+            logger.debug(f"Creating Redis session for user: {user.user_id}")
+            redis_session_id = await session_manager.create_session(
+                user_data=user_data, auth_method="standard"
+            )
+            logger.debug(f"Redis session created: {redis_session_id}")
+
+            # Set secure session cookie for session persistence
+            is_production = os.getenv("ENVIRONMENT", "development") == "production"
+            logger.debug(f"Setting session cookie (secure={is_production})")
+            response.set_cookie(
+                key="openrouter_session_id",
+                value=redis_session_id,
+                httponly=True,
+                secure=is_production,  # Only require HTTPS in production
+                samesite="lax",
+                max_age=86400,  # 24 hours
+                path="/",  # Ensure cookie is sent for all paths
+            )
+            logger.debug("Session cookie set successfully")
+        except Exception as e:
+            logger.error(f"Failed to create Redis session: {e}", exc_info=True)
+            # Continue without Redis session - the JWT token will still work
 
         return LoginResponse(
             access_token=access_token,
@@ -366,6 +548,7 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
         # Preserve explicitly raised HTTP errors
         raise e from e
     except Exception as e:
+        logger.error(f"Login endpoint error: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Login failed: {str(e)}",

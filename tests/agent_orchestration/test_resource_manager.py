@@ -1,6 +1,5 @@
 import pytest
-
-from src.agent_orchestration.resources import ResourceManager, ResourceRequirements
+from tta_ai.orchestration.resources import ResourceManager, ResourceRequirements
 
 
 @pytest.mark.asyncio

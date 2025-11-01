@@ -314,7 +314,7 @@ categories:
     max_concurrent: 10
     timeout: 3600
     load_patterns:
-      - gradual_ramp: 
+      - gradual_ramp:
           start_users: 1
           end_users: 100
           duration: 600
@@ -555,33 +555,33 @@ from pathlib import Path
 
 def validate_config(config_path):
     """Validate comprehensive test battery configuration."""
-    
+
     try:
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
-        
+
         # Required sections
         required_sections = ['database', 'execution', 'mock_mode', 'reporting', 'categories']
         for section in required_sections:
             if section not in config:
                 print(f"❌ Missing required section: {section}")
                 return False
-        
+
         # Validate database configuration
         db_config = config['database']
         if 'neo4j' not in db_config or 'redis' not in db_config:
             print("❌ Database configuration must include neo4j and redis")
             return False
-        
+
         # Validate execution parameters
         exec_config = config['execution']
         if exec_config.get('max_concurrent_tests', 0) <= 0:
             print("❌ max_concurrent_tests must be positive")
             return False
-        
+
         print("✅ Configuration validation passed")
         return True
-        
+
     except Exception as e:
         print(f"❌ Configuration validation failed: {e}")
         return False
@@ -590,7 +590,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python validate_config.py <config_file>")
         sys.exit(1)
-    
+
     config_file = sys.argv[1]
     if not validate_config(config_file):
         sys.exit(1)

@@ -1,6 +1,6 @@
 /**
  * Adventure Settings Section
- * 
+ *
  * Entertainment-first settings interface that presents therapeutic options
  * using gaming and storytelling language while maintaining clinical accuracy
  */
@@ -93,14 +93,14 @@ const AdventureSettingsSection: React.FC<AdventureSettingsSectionProps> = ({
     const updatedStyles = settings.preferred_story_styles.includes(styleId)
       ? settings.preferred_story_styles.filter(s => s !== styleId)
       : [...settings.preferred_story_styles, styleId];
-    
+
     onUpdate({ preferred_story_styles: updatedStyles });
   };
 
   const handleCustomStyleAdd = () => {
     if (customStyle.trim() && !settings.preferred_story_styles.includes(customStyle.trim())) {
-      onUpdate({ 
-        preferred_story_styles: [...settings.preferred_story_styles, customStyle.trim()] 
+      onUpdate({
+        preferred_story_styles: [...settings.preferred_story_styles, customStyle.trim()]
       });
       setCustomStyle('');
       setShowCustomStyleInput(false);
@@ -283,10 +283,10 @@ const AdventureSettingsSection: React.FC<AdventureSettingsSectionProps> = ({
         <p className="text-sm text-red-700 mb-4">
           If you ever need immediate help during your adventures, we want to make sure you have the support you need.
         </p>
-        
+
         <div className="bg-white rounded-md p-4 border border-red-200">
           <p className="text-sm text-gray-600 mb-2">
-            <strong>Crisis Support:</strong> If you're in immediate danger or having thoughts of self-harm, 
+            <strong>Crisis Support:</strong> If you're in immediate danger or having thoughts of self-harm,
             please contact emergency services (911) or a crisis hotline immediately.
           </p>
           <p className="text-sm text-gray-600">

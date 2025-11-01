@@ -1,6 +1,6 @@
 /**
  * Unit tests for PersonalizedRecommendationInterface component
- * 
+ *
  * Tests comprehensive personalized recommendation display functionality including
  * filtering, interaction, feedback, and accessibility features.
  */
@@ -151,15 +151,15 @@ const mockRecommendationResult: RecommendationResult = {
   recommendationSummary: {
     totalRecommendations: 3,
     byPriority: { critical: 0, high: 1, medium: 1, low: 1, optional: 0 },
-    byCategory: { 
-      immediate_action: 1, 
-      short_term_planning: 0, 
-      long_term_development: 1, 
-      crisis_prevention: 0, 
-      progress_optimization: 1, 
-      relationship_enhancement: 0, 
-      self_care: 0, 
-      skill_building: 0 
+    byCategory: {
+      immediate_action: 1,
+      short_term_planning: 0,
+      long_term_development: 1,
+      crisis_prevention: 0,
+      progress_optimization: 1,
+      relationship_enhancement: 0,
+      self_care: 0,
+      skill_building: 0
     },
     byTimeframe: { immediate: 0, this_week: 1, this_month: 1, next_quarter: 1, long_term: 0 },
     averageConfidence: 0.73,
@@ -194,7 +194,7 @@ describe('PersonalizedRecommendationInterface', () => {
 
     it('should render all recommendations', () => {
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       expect(screen.getByText('Consider adding: Mindfulness Development')).toBeInTheDocument();
       expect(screen.getByText('Boost progress on: Anxiety Reduction')).toBeInTheDocument();
       expect(screen.getByText('Try a different approach: Somatic Therapy')).toBeInTheDocument();
@@ -263,9 +263,9 @@ describe('PersonalizedRecommendationInterface', () => {
           totalRecommendations: 0
         }
       };
-      
+
       render(<PersonalizedRecommendationInterface {...emptyProps} />);
-      
+
       expect(screen.getByText('You\'re doing great!')).toBeInTheDocument();
       expect(screen.getByText('No specific recommendations at this time. Continue with your current therapeutic journey.')).toBeInTheDocument();
     });
@@ -275,10 +275,10 @@ describe('PersonalizedRecommendationInterface', () => {
     it('should filter recommendations by priority', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const priorityFilter = screen.getByLabelText('Priority:');
       await user.selectOptions(priorityFilter, 'high');
-      
+
       expect(screen.getByText('Consider adding: Mindfulness Development')).toBeInTheDocument();
       expect(screen.queryByText('Boost progress on: Anxiety Reduction')).not.toBeInTheDocument();
       expect(screen.queryByText('Try a different approach: Somatic Therapy')).not.toBeInTheDocument();
@@ -287,10 +287,10 @@ describe('PersonalizedRecommendationInterface', () => {
     it('should filter recommendations by timeframe', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const timeframeFilter = screen.getByLabelText('Timeframe:');
       await user.selectOptions(timeframeFilter, 'this_week');
-      
+
       expect(screen.getByText('Consider adding: Mindfulness Development')).toBeInTheDocument();
       expect(screen.queryByText('Boost progress on: Anxiety Reduction')).not.toBeInTheDocument();
       expect(screen.queryByText('Try a different approach: Somatic Therapy')).not.toBeInTheDocument();
@@ -299,14 +299,14 @@ describe('PersonalizedRecommendationInterface', () => {
     it('should show all recommendations when filter is set to "all"', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       // First filter to high priority
       const priorityFilter = screen.getByLabelText('Priority:');
       await user.selectOptions(priorityFilter, 'high');
-      
+
       // Then reset to all
       await user.selectOptions(priorityFilter, 'all');
-      
+
       expect(screen.getByText('Consider adding: Mindfulness Development')).toBeInTheDocument();
       expect(screen.getByText('Boost progress on: Anxiety Reduction')).toBeInTheDocument();
       expect(screen.getByText('Try a different approach: Somatic Therapy')).toBeInTheDocument();
@@ -317,47 +317,47 @@ describe('PersonalizedRecommendationInterface', () => {
     it('should expand and collapse recommendation details', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const showDetailsButton = screen.getAllByText('Show Details')[0];
       await user.click(showDetailsButton);
-      
+
       expect(screen.getByText('Personalization Factors')).toBeInTheDocument();
       expect(screen.getByText('Clinical Evidence')).toBeInTheDocument();
       expect(screen.getByText('Aligns with your preference for mindfulness-based approaches')).toBeInTheDocument();
-      
+
       const showLessButton = screen.getByText('Show Less');
       await user.click(showLessButton);
-      
+
       expect(screen.queryByText('Personalization Factors')).not.toBeInTheDocument();
     });
 
     it('should call onAcceptRecommendation when accept button is clicked', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const acceptButtons = screen.getAllByText('Accept');
       await user.click(acceptButtons[0]);
-      
+
       expect(mockProps.onAcceptRecommendation).toHaveBeenCalledWith('rec-1');
     });
 
     it('should call onDismissRecommendation when dismiss button is clicked', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const dismissButtons = screen.getAllByText('Dismiss');
       await user.click(dismissButtons[0]);
-      
+
       expect(mockProps.onDismissRecommendation).toHaveBeenCalledWith('rec-1');
     });
 
     it('should call onRequestMoreInfo when more info button is clicked', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const moreInfoButtons = screen.getAllByText('More Info');
       await user.click(moreInfoButtons[0]);
-      
+
       expect(mockProps.onRequestMoreInfo).toHaveBeenCalledWith('rec-1');
     });
   });
@@ -366,10 +366,10 @@ describe('PersonalizedRecommendationInterface', () => {
     it('should show feedback form when feedback button is clicked', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const feedbackButtons = screen.getAllByText('Feedback');
       await user.click(feedbackButtons[0]);
-      
+
       expect(screen.getByDisplayValue('3 - Moderately helpful')).toBeInTheDocument();
       expect(screen.getByText('Submit')).toBeInTheDocument();
       expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -378,28 +378,28 @@ describe('PersonalizedRecommendationInterface', () => {
     it('should submit feedback with selected rating', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const feedbackButtons = screen.getAllByText('Feedback');
       await user.click(feedbackButtons[0]);
-      
+
       const ratingSelect = screen.getByDisplayValue('3 - Moderately helpful');
       await user.selectOptions(ratingSelect, '5');
-      
+
       const submitButton = screen.getByText('Submit');
       await user.click(submitButton);
-      
+
       expect(mockProps.onProvideFeedback).toHaveBeenCalledWith('rec-1', 5, '');
     });
 
     it('should cancel feedback form', async () => {
       const user = userEvent.setup();
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const feedbackButtons = screen.getAllByText('Feedback');
       await user.click(feedbackButtons[0]);
-      
+
       expect(screen.getByText('Submit')).toBeInTheDocument();
-      
+
       const cancelButton = screen.getByText('Cancel');
       await user.click(cancelButton);
 
@@ -411,16 +411,16 @@ describe('PersonalizedRecommendationInterface', () => {
   describe('Display Limits', () => {
     it('should respect maxDisplayRecommendations prop', () => {
       render(
-        <PersonalizedRecommendationInterface 
-          {...mockProps} 
+        <PersonalizedRecommendationInterface
+          {...mockProps}
           maxDisplayRecommendations={2}
         />
       );
-      
+
       expect(screen.getByText('Consider adding: Mindfulness Development')).toBeInTheDocument();
       expect(screen.getByText('Boost progress on: Anxiety Reduction')).toBeInTheDocument();
       expect(screen.queryByText('Try a different approach: Somatic Therapy')).not.toBeInTheDocument();
-      
+
       expect(screen.getByText('Showing 2 of 3 recommendations')).toBeInTheDocument();
     });
   });
@@ -438,21 +438,21 @@ describe('PersonalizedRecommendationInterface', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA labels for filters', () => {
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       expect(screen.getByLabelText('Priority:')).toBeInTheDocument();
       expect(screen.getByLabelText('Timeframe:')).toBeInTheDocument();
     });
 
     it('should have proper heading structure', () => {
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const mainHeading = screen.getByRole('heading', { level: 3 });
       expect(mainHeading).toHaveTextContent('Personalized Recommendations');
     });
 
     it('should have keyboard accessible buttons', () => {
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       const acceptButtons = screen.getAllByText('Accept');
       acceptButtons.forEach(button => {
         expect(button).toBeEnabled();
@@ -464,7 +464,7 @@ describe('PersonalizedRecommendationInterface', () => {
   describe('Visual Indicators', () => {
     it('should display appropriate icons for different recommendation types', () => {
       render(<PersonalizedRecommendationInterface {...mockProps} />);
-      
+
       // Check that emoji icons are present (they would be in the DOM as text)
       const recommendationElements = screen.getAllByText(/🎯|📈|🔄/);
       expect(recommendationElements.length).toBeGreaterThan(0);

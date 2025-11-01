@@ -1,0 +1,250 @@
+name: Development Workflow with Error Recovery
+
+on:
+  push:
+    branches: [ main, development, staging ]
+  pull_request:
+    branches: [ main, development, staging ]
+  workflow_dispatch:
+
+jobs:
+  quality-checks-with-recovery:
+    name: Quality Checks (with Error Recovery)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Add UV to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      # Install dependencies with retry (using GitHub Actions retry action)
+      - name: Install dependencies (with retry)
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: uv sync
+
+      # Run linting with retry
+      - name: Run linting (with retry)
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: uv run ruff check src/ tests/
+
+      # Run format check with retry
+      - name: Check formatting (with retry)
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: uv run ruff format --check src/ tests/
+
+      # Run type checking with retry
+      - name: Run type checking (with retry)
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: uv run pyright src/
+
+      # Run tests with retry
+      - name: Run tests (with retry)
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_wait_seconds: 10
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+          command: uv run pytest tests/ -v
+
+
+  python-error-recovery-demo:
+    name: Python Error Recovery Demo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Add UV to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: uv sync
+
+      # Run development commands using our Python wrapper with error recovery
+      - name: Run quality checks (Python with error recovery)
+        run: python scripts/dev_with_recovery.py quality
+        continue-on-error: true
+
+      - name: Run tests (Python with error recovery)
+        run: python scripts/dev_with_recovery.py test
+        continue-on-error: true
+
+      # Demonstrate error classification
+      - name: Test error recovery framework
+        run: python scripts/primitives/example_error_recovery.py
+
+
+  integration-with-fallback:
+    name: Integration Tests with Fallback
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Add UV to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: uv sync
+
+      # Try to run integration tests, fall back to unit tests if they fail
+      # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
+      - name: Run integration tests (with fallback to unit tests)
+        id: integration_tests
+        run: |
+          if uv run pytest tests/integration/ -v; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✓ Integration tests passed"
+          else
+            echo "status=fallback" >> $GITHUB_OUTPUT
+            echo "⚠ Integration tests failed, running unit tests as fallback"
+            uv run pytest tests/unit/ -v
+          fi
+        continue-on-error: true
+
+      - name: Report test status
+        run: |
+          if [ "${{ steps.integration_tests.outputs.status }}" = "success" ]; then
+            echo "✓ Integration tests passed"
+          elif [ "${{ steps.integration_tests.outputs.status }}" = "fallback" ]; then
+            echo "⚠ Fell back to unit tests"
+          else
+            echo "✗ Tests failed"
+            exit 1
+          fi
+
+
+  circuit-breaker-demo:
+    name: Circuit Breaker Pattern Demo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Add UV to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: uv sync
+
+      # Demonstrate circuit breaker pattern
+      - name: Test circuit breaker
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, 'scripts/primitives')
+          from error_recovery import CircuitBreaker
+
+          # Create circuit breaker
+          cb = CircuitBreaker(failure_threshold=3, recovery_timeout=5.0)
+
+          print('Circuit Breaker Demo:')
+          print(f'Initial state: {cb.state}')
+          print(f'Failure threshold: {cb.failure_threshold}')
+          print(f'Recovery timeout: {cb.recovery_timeout}s')
+          print('✓ Circuit breaker initialized successfully')
+          "
+
+
+  summary:
+    name: Error Recovery Summary
+    runs-on: ubuntu-latest
+    needs: [quality-checks-with-recovery, python-error-recovery-demo, integration-with-fallback, circuit-breaker-demo]
+    if: always()
+
+    steps:
+      - name: Summary
+        run: |
+          echo "=" >> $GITHUB_STEP_SUMMARY
+          echo "# Error Recovery Framework - CI/CD Demo" >> $GITHUB_STEP_SUMMARY
+          echo "=" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Quality Checks**: ${{ needs.quality-checks-with-recovery.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Python Error Recovery**: ${{ needs.python-error-recovery-demo.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Integration with Fallback**: ${{ needs.integration-with-fallback.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Circuit Breaker Demo**: ${{ needs.circuit-breaker-demo.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Features Demonstrated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Automatic retry with exponential backoff" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Error classification (network, rate limit, transient, permanent)" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Fallback strategies" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Circuit breaker pattern" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Integration with GitHub Actions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Monitor retry rates and adjust configurations" >> $GITHUB_STEP_SUMMARY
+          echo "2. Add more fallback strategies for critical operations" >> $GITHUB_STEP_SUMMARY
+          echo "3. Integrate error recovery into all development scripts" >> $GITHUB_STEP_SUMMARY

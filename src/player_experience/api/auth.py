@@ -125,8 +125,7 @@ def create_access_token(
         )
 
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def create_refresh_token(data: dict[str, Any]) -> str:
@@ -142,8 +141,7 @@ def create_refresh_token(data: dict[str, Any]) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "refresh"})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def verify_token(token: str) -> TokenData:
@@ -161,7 +159,12 @@ def verify_token(token: str) -> TokenData:
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        player_id: str | None = payload.get("sub")
+
+        # Issue #4 fix: Extract explicit player_id field with fallback to sub
+        player_id: str | None = payload.get("player_id")
+        if player_id is None:
+            player_id = payload.get("sub")  # Backward compatibility
+
         username: str | None = payload.get("username")
         email: str | None = payload.get("email")
         exp_timestamp: int | None = payload.get("exp")
@@ -192,6 +195,7 @@ def create_tokens_for_player(player: PlayerProfile) -> Token:
     """
     token_data = {
         "sub": player.player_id,
+        "player_id": player.player_id,  # Issue #4 fix: explicit player_id field
         "username": player.username,
         "email": player.email,
     }
@@ -332,7 +336,11 @@ class AuthService:
             if payload.get("type") != "refresh":
                 raise AuthenticationError("Invalid token type")
 
-            player_id = payload.get("sub")
+            # Issue #4 fix: Extract player_id with backward compatibility
+            player_id = payload.get("player_id")
+            if player_id is None:
+                player_id = payload.get("sub")  # Backward compatibility
+
             username = payload.get("username")
             email = payload.get("email")
 
@@ -342,6 +350,7 @@ class AuthService:
             # Create new tokens
             token_data = {
                 "sub": player_id,
+                "player_id": player_id,  # Issue #4 fix: explicit player_id field
                 "username": username,
                 "email": email,
             }

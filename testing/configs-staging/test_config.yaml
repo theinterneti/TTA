@@ -1,0 +1,351 @@
+# TTA Staging Test Configuration
+# Comprehensive test settings for homelab staging environment
+
+environment:
+  name: "staging"
+  description: "TTA Homelab Staging Environment"
+  base_url: "http://localhost:8081"
+  frontend_url: "http://localhost:3001"
+  websocket_url: "ws://localhost:8081"
+
+# Service endpoints
+services:
+  player_api:
+    url: "http://player-api-staging:8080"
+    health_endpoint: "/health"
+    metrics_endpoint: "/metrics"
+    timeout: 30
+
+  player_frontend:
+    url: "http://player-frontend-staging:3000"
+    health_endpoint: "/health"
+    timeout: 15
+
+  neo4j:
+    url: "bolt://neo4j-staging:7687"
+    username: "neo4j"
+    password: "staging_neo4j_secure_pass"
+    database: "tta_staging"
+    timeout: 30
+
+  redis:
+    url: "redis://redis-staging:6379"
+    password: "staging_redis_secure_pass"
+    db: 0
+    timeout: 10
+
+  postgres:
+    host: "postgres-staging"
+    port: 5432
+    database: "tta_staging"
+    username: "tta_staging_user"
+    password: "staging_postgres_secure_pass"
+    timeout: 30
+
+# Test execution settings
+execution:
+  parallel_workers: 4
+  timeout_per_test: 300 # 5 minutes
+  retry_attempts: 2
+  retry_delay: 5
+
+  # Test categories to run
+  categories:
+    - "smoke"
+    - "integration"
+    - "api"
+    - "frontend"
+    - "database"
+    - "performance"
+    - "multi_user"
+    - "websocket"
+
+# Load testing configuration
+load_testing:
+  enabled: true
+  users: 50
+  spawn_rate: 5
+  run_time: 1800 # 30 minutes
+  host: "http://player-api-staging:8080"
+
+  # Test scenarios
+  scenarios:
+    - name: "user_registration_login"
+      weight: 20
+      tasks:
+        - "register_user"
+        - "login_user"
+        - "get_profile"
+
+    - name: "character_management"
+      weight: 30
+      tasks:
+        - "create_character"
+        - "update_character"
+        - "list_characters"
+
+    - name: "story_session"
+      weight: 40
+      tasks:
+        - "start_session"
+        - "send_message"
+        - "receive_response"
+        - "end_session"
+
+    - name: "websocket_interaction"
+      weight: 10
+      tasks:
+        - "connect_websocket"
+        - "send_ws_message"
+        - "receive_ws_message"
+        - "disconnect_websocket"
+
+# Multi-user testing
+multi_user:
+  enabled: true
+  concurrent_users: 25
+  session_duration: 600 # 10 minutes
+
+  # User profiles for testing
+  user_profiles:
+    - name: "casual_player"
+      count: 10
+      behavior:
+        session_length: "short" # 5-10 minutes
+        message_frequency: "low" # 1-2 messages per minute
+        features_used: ["basic_chat", "character_creation"]
+
+    - name: "engaged_player"
+      count: 10
+      behavior:
+        session_length: "medium" # 15-30 minutes
+        message_frequency: "medium" # 3-5 messages per minute
+        features_used:
+          ["advanced_chat", "character_management", "world_exploration"]
+
+    - name: "power_user"
+      count: 5
+      behavior:
+        session_length: "long" # 30+ minutes
+        message_frequency: "high" # 5+ messages per minute
+        features_used: ["all_features", "admin_functions"]
+
+# Performance testing thresholds
+performance:
+  response_time:
+    api_endpoints:
+      p50: 500 # ms
+      p95: 2000 # ms
+      p99: 5000 # ms
+
+    websocket:
+      connection_time: 1000 # ms
+      message_latency: 200 # ms
+
+    database:
+      query_time: 1000 # ms
+      connection_time: 500 # ms
+
+  throughput:
+    api_requests_per_second: 100
+    websocket_messages_per_second: 50
+    concurrent_sessions: 100
+
+  resource_usage:
+    cpu_threshold: 80 # percentage
+    memory_threshold: 85 # percentage
+    disk_io_threshold: 80 # percentage
+
+# Test data configuration
+test_data:
+  users:
+    count: 100
+    prefix: "test_user_"
+    domains: ["staging.tta", "test.local"]
+
+  characters:
+    count: 200
+    templates:
+      - "warrior"
+      - "mage"
+      - "rogue"
+      - "healer"
+      - "custom"
+
+  worlds:
+    count: 10
+    types:
+      - "fantasy"
+      - "sci_fi"
+      - "modern"
+      - "historical"
+
+  sessions:
+    count: 50
+    duration_range: [300, 3600] # 5 minutes to 1 hour
+    message_count_range: [10, 100]
+
+# Browser testing (Playwright/Selenium)
+browser_testing:
+  enabled: true
+  browsers: ["chromium", "firefox", "webkit"]
+  headless: true
+  viewport:
+    width: 1920
+    height: 1080
+
+  # Screenshot and video settings
+  screenshots:
+    enabled: true
+    on_failure: true
+    path: "screenshots"
+
+  videos:
+    enabled: false
+    path: "videos"
+
+  # Page load timeouts
+  timeouts:
+    page_load: 30000 # ms
+    element_wait: 10000 # ms
+    navigation: 30000 # ms
+
+# API testing configuration
+api_testing:
+  base_headers:
+    "Content-Type": "application/json"
+    "Accept": "application/json"
+    "User-Agent": "TTA-Staging-Tests/1.0"
+
+  authentication:
+    method: "jwt"
+    login_endpoint: "/api/v1/auth/login"
+    token_header: "Authorization"
+    token_prefix: "Bearer "
+
+  # Request timeouts
+  timeouts:
+    connect: 10
+    read: 30
+    total: 60
+
+# Database testing
+database_testing:
+  cleanup_after_tests: true
+  backup_before_tests: false
+
+  # Test data isolation
+  use_transactions: true
+  rollback_after_test: true
+
+  # Connection pooling
+  pool_size: 10
+  max_overflow: 20
+
+# WebSocket testing
+websocket_testing:
+  connection_timeout: 10
+  message_timeout: 5
+  heartbeat_interval: 30
+
+  # Test scenarios
+  scenarios:
+    - name: "basic_connection"
+      description: "Test basic WebSocket connection and disconnection"
+
+    - name: "message_exchange"
+      description: "Test bidirectional message exchange"
+
+    - name: "concurrent_connections"
+      description: "Test multiple concurrent WebSocket connections"
+
+    - name: "connection_recovery"
+      description: "Test connection recovery after network issues"
+
+# Reporting configuration
+reporting:
+  formats: ["html", "json", "junit"]
+  output_dir: "reports"
+
+  # HTML report settings
+  html:
+    template: "custom"
+    include_screenshots: true
+    include_logs: true
+
+  # Metrics collection
+  metrics:
+    enabled: true
+    prometheus_gateway: "http://prometheus-staging:9091"
+    job_name: "tta-staging-tests"
+
+# Monitoring integration
+monitoring:
+  enabled: true
+
+  # Health checks during tests
+  health_checks:
+    interval: 60 # seconds
+    endpoints:
+      - "/health"
+      - "/metrics"
+
+  # Resource monitoring
+  resource_monitoring:
+    enabled: true
+    interval: 30 # seconds
+    metrics:
+      - "cpu_usage"
+      - "memory_usage"
+      - "disk_usage"
+      - "network_io"
+
+# Cleanup configuration
+cleanup:
+  after_test_suite: true
+  after_each_test: false
+
+  # What to clean up
+  clean_database: true
+  clean_redis: true
+  clean_uploaded_files: true
+  clean_logs: false
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # Log files
+  files:
+    main: "logs/test_execution.log"
+    performance: "logs/performance.log"
+    errors: "logs/errors.log"
+
+  # Log rotation
+  rotation:
+    max_size: "100MB"
+    backup_count: 5
+
+# Feature flags for testing
+feature_flags:
+  test_ai_responses: true
+  test_file_uploads: true
+  test_real_time_features: true
+  test_analytics: true
+  test_admin_features: false # Disabled in staging
+
+# Environment-specific overrides
+staging_overrides:
+  # Reduced load for staging environment
+  load_testing:
+    users: 25
+    run_time: 900 # 15 minutes
+
+  # Shorter timeouts for faster feedback
+  execution:
+    timeout_per_test: 180 # 3 minutes
+
+  # Limited concurrent users
+  multi_user:
+    concurrent_users: 15

@@ -69,13 +69,13 @@ const GoalProgressChart: React.FC<GoalProgressChartProps> = ({
       `rgba(168, 85, 247, ${alpha})`, // violet
       `rgba(251, 146, 60, ${alpha})`, // orange
     ];
-    
+
     const index = goalId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return colors[index];
   };
 
   // Filter progresses based on selected goals
-  const filteredProgresses = selectedGoals.length > 0 
+  const filteredProgresses = selectedGoals.length > 0
     ? goalProgresses.filter(gp => selectedGoals.includes(gp.goalId))
     : goalProgresses;
 
@@ -87,12 +87,12 @@ const GoalProgressChart: React.FC<GoalProgressChartProps> = ({
     const now = new Date();
     const labels: string[] = [];
     const dataPoints: number = timeRange === 'week' ? 7 : timeRange === 'month' ? 30 : timeRange === 'quarter' ? 90 : 365;
-    
+
     for (let i = dataPoints - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
-      labels.push(date.toLocaleDateString('en-US', { 
-        month: 'short', 
+      labels.push(date.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
         ...(timeRange === 'year' && { year: '2-digit' })
       }));
@@ -224,8 +224,8 @@ const GoalProgressChart: React.FC<GoalProgressChartProps> = ({
   };
 
   // Get chart data based on type
-  const chartData = (chartType === 'line' || chartType === 'bar') 
-    ? generateTimeBasedData() 
+  const chartData = (chartType === 'line' || chartType === 'bar')
+    ? generateTimeBasedData()
     : generateCurrentProgressData();
 
   // Get chart component
@@ -272,7 +272,7 @@ const GoalProgressChart: React.FC<GoalProgressChartProps> = ({
           )}
         </div>
       </div>
-      
+
       <div style={{ height: height - 80 }}>
         {getChartComponent()}
       </div>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
-import { 
-  fetchAvailableWorlds, 
+import {
+  fetchAvailableWorlds,
   fetchWorldDetails,
   updateFilters,
   clearFilters,
@@ -37,7 +37,7 @@ const WorldSelection: React.FC = () => {
     // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(world => 
+      filtered = filtered.filter(world =>
         world.name.toLowerCase().includes(searchLower) ||
         world.description.toLowerCase().includes(searchLower) ||
         world.therapeutic_themes.some(theme => theme.toLowerCase().includes(searchLower))
@@ -51,7 +51,7 @@ const WorldSelection: React.FC = () => {
 
     // Apply theme filter
     if (filters.themes.length > 0) {
-      filtered = filtered.filter(world => 
+      filtered = filtered.filter(world =>
         world.therapeutic_themes.some(theme => filters.themes.includes(theme))
       );
     }
@@ -180,7 +180,7 @@ const WorldSelection: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Difficulty Level
             </label>
-            <select 
+            <select
               className="input-field"
               value={filters.difficulty[0] || ''}
               onChange={(e) => handleFilterChange('difficulty', e.target.value ? [e.target.value] : [])}
@@ -195,7 +195,7 @@ const WorldSelection: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Therapeutic Theme
             </label>
-            <select 
+            <select
               className="input-field"
               value={filters.themes[0] || ''}
               onChange={(e) => handleFilterChange('themes', e.target.value ? [e.target.value] : [])}
@@ -210,7 +210,7 @@ const WorldSelection: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Duration
             </label>
-            <select 
+            <select
               className="input-field"
               value={filters.duration}
               onChange={(e) => handleFilterChange('duration', e.target.value)}
@@ -299,21 +299,21 @@ const WorldSelection: React.FC = () => {
 
                 {/* Actions */}
                 <div className="pt-3 border-t border-gray-200 flex justify-between">
-                  <button 
+                  <button
                     className="text-sm text-primary-600 hover:text-primary-700"
                     onClick={() => handleViewDetails(world.world_id)}
                   >
                     View Details
                   </button>
                   <div className="flex space-x-2">
-                    <button 
+                    <button
                       className="text-sm text-gray-600 hover:text-gray-800"
                       onClick={() => handleCustomizeWorld(world.world_id)}
                       disabled={!selectedCharacter}
                     >
                       Customize
                     </button>
-                    <button 
+                    <button
                       className="btn-primary text-sm py-1 px-3"
                       disabled={!selectedCharacter}
                     >

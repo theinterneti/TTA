@@ -1,11 +1,12 @@
 """
-Local Model Provider Implementation
+Local Model Provider Implementation.
 
 This module provides local model management with hardware optimization
 using Hugging Face Transformers.
 """
 
 import asyncio
+import gc
 import logging
 import os
 from collections.abc import AsyncGenerator
@@ -19,6 +20,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -81,8 +83,9 @@ class LocalModelInstance(BaseModelInstance):
             # Generate text
             if self._pipeline:
                 # Use pipeline for generation
+                pipeline_fn = self._pipeline
                 result = await asyncio.get_event_loop().run_in_executor(
-                    None, lambda: self._pipeline(request.prompt, **generation_kwargs)
+                    None, lambda: pipeline_fn(request.prompt, **generation_kwargs)
                 )
 
                 if result and len(result) > 0:
@@ -290,13 +293,31 @@ class LocalModelProvider(BaseProvider):
             # Determine device
             device = self._get_best_device()
 
+            # Security: Get trust_remote_code and revision from config
+            trust_remote_code = config.get("trust_remote_code", False)
+            revision = config.get("revision")
+
+            # Security validation: Require revision when trust_remote_code=True
+            if trust_remote_code and not revision:
+                raise ValueError(
+                    f"Security Error: Model '{model_id}' requires trust_remote_code=True "
+                    "but no revision is pinned. This allows arbitrary code execution. "
+                    "Please specify a trusted revision (commit hash or tag) in the model configuration."
+                )
+
             # Load tokenizer
             logger.info(f"Loading tokenizer for {model_id}...")
+            tokenizer_kwargs = {
+                "cache_dir": self._models_cache_dir,
+                "trust_remote_code": trust_remote_code,
+            }
+            if revision:
+                tokenizer_kwargs["revision"] = revision
+                logger.info(f"Using pinned revision: {revision}")
+
             tokenizer = await asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: AutoTokenizer.from_pretrained(
-                    model_id, cache_dir=self._models_cache_dir, trust_remote_code=True
-                ),
+                lambda: AutoTokenizer.from_pretrained(model_id, **tokenizer_kwargs),  # nosec B615 - revision validated above
             )
 
             # Set pad token if not present
@@ -308,10 +329,14 @@ class LocalModelProvider(BaseProvider):
 
             model_kwargs = {
                 "cache_dir": self._models_cache_dir,
-                "trust_remote_code": True,
+                "trust_remote_code": trust_remote_code,
                 "torch_dtype": torch.float16 if device != "cpu" else torch.float32,
                 "low_cpu_mem_usage": True,
             }
+
+            # Security: Add revision pinning
+            if revision:
+                model_kwargs["revision"] = revision
 
             # Add quantization if enabled and supported
             if self._auto_quantization and device != "cpu":
@@ -324,14 +349,16 @@ class LocalModelProvider(BaseProvider):
             if self._device_map and device != "cpu":
                 model_kwargs["device_map"] = self._device_map
 
-            model = await asyncio.get_event_loop().run_in_executor(
+            loaded_model = await asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),
+                lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),  # nosec B615 - revision validated above
             )
 
             # Move to device if not using device_map
-            if not self._device_map:
-                model = model.to(device)
+            if not self._device_map and loaded_model:
+                model = loaded_model.to(device)  # type: ignore
+            else:
+                model = loaded_model
 
             self._loaded_model_count += 1
 
@@ -342,20 +369,23 @@ class LocalModelProvider(BaseProvider):
             logger.error(f"Failed to load local model {model_id}: {e}")
             raise
 
-    async def _unload_model_impl(self, instance: LocalModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload a local model instance."""
         try:
+            # Cast to concrete type for attribute access
+            if not isinstance(instance, LocalModelInstance):
+                logger.warning(f"Expected LocalModelInstance, got {type(instance)}")
+                return
+
             # Clear model from memory
             if hasattr(instance, "_model"):
-                del instance._model
+                del instance._model  # type: ignore
             if hasattr(instance, "_tokenizer"):
-                del instance._tokenizer
+                del instance._tokenizer  # type: ignore
             if hasattr(instance, "_pipeline"):
-                del instance._pipeline
+                del instance._pipeline  # type: ignore
 
             # Force garbage collection
-            import gc
-
             gc.collect()
 
             # Clear CUDA cache if using GPU

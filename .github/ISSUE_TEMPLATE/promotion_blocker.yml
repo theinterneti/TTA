@@ -1,0 +1,171 @@
+name: 🚧 Component Promotion Blocker
+description: Track a blocker preventing component promotion
+title: "[BLOCKER] <component-name>: <blocker-description>"
+labels: ["promotion:blocked"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Component Promotion Blocker
+
+        Use this template to track issues blocking component promotion to the next stage.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component Name
+      description: Which component is blocked?
+      options:
+        - Neo4j
+        - Redis
+        - Docker
+        - Postgres
+        - Agent Orchestration
+        - LLM
+        - Model Management
+        - Narrative Arc Orchestrator
+        - Player Experience API
+        - Player Experience Frontend
+        - Gameplay Loop
+        - Session Management
+        - Character Management
+        - Therapeutic Systems
+        - Narrative Coherence
+        - Emotional Safety
+        - Consequence System
+        - Monitoring
+        - Analytics
+        - Developer Dashboard
+    validations:
+      required: true
+
+  - type: dropdown
+    id: blocker_type
+    attributes:
+      label: Blocker Type
+      description: What type of blocker is this?
+      options:
+        - Tests (insufficient coverage or failing tests)
+        - Documentation (missing or incomplete documentation)
+        - Performance (performance issues or unmet SLAs)
+        - Security (security vulnerabilities or review incomplete)
+        - Dependencies (dependency issues or incompatibilities)
+        - Integration (integration issues with other components)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target_stage
+    attributes:
+      label: Target Stage
+      description: What stage is this blocking promotion to?
+      options:
+        - Staging
+        - Production
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How critical is this blocker?
+      options:
+        - Critical (must be resolved before promotion)
+        - High (should be resolved before promotion)
+        - Medium (nice to have before promotion)
+        - Low (can be addressed post-promotion)
+    validations:
+      required: true
+
+  - type: textarea
+    id: blocker_description
+    attributes:
+      label: Blocker Description
+      description: Detailed description of what's blocking promotion
+      placeholder: |
+        Describe the specific issue preventing promotion
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be done to resolve this blocker?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_status
+    attributes:
+      label: Current Status
+      description: What is the current state of this blocker?
+      placeholder: |
+        - Investigation in progress
+        - Root cause identified
+        - Fix in development
+        - Testing in progress
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: How do you plan to resolve this blocker?
+      placeholder: |
+        Describe the proposed approach to resolving this issue
+
+  - type: textarea
+    id: estimated_effort
+    attributes:
+      label: Estimated Effort
+      description: How much effort is required to resolve this blocker?
+      placeholder: |
+        - Time estimate: X hours/days
+        - Complexity: Low/Medium/High
+        - Resources needed: [list]
+
+  - type: textarea
+    id: related_issues
+    attributes:
+      label: Related Issues
+      description: Link to related issues or PRs
+      placeholder: |
+        - Related to #123
+        - Depends on #456
+        - Blocks #789
+
+  - type: textarea
+    id: workarounds
+    attributes:
+      label: Workarounds
+      description: Are there any temporary workarounds available?
+      placeholder: |
+        Describe any temporary solutions or workarounds
+
+  - type: textarea
+    id: impact_analysis
+    attributes:
+      label: Impact Analysis
+      description: What is the impact if this blocker is not resolved?
+      placeholder: |
+        - Performance degradation
+        - Security risk
+        - User experience impact
+        - Technical debt
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any additional information relevant to this blocker
+      placeholder: |
+        - Screenshots
+        - Error logs
+        - Stack traces
+        - Related documentation

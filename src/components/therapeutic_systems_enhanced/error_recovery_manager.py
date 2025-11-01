@@ -7,6 +7,7 @@ and therapeutic continuity maintenance during errors.
 """
 
 import asyncio
+import contextlib
 import logging
 import traceback
 from dataclasses import dataclass, field
@@ -237,10 +238,8 @@ class TherapeuticErrorRecoveryManager:
 
         if self._health_monitoring_task:
             self._health_monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._health_monitoring_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("TherapeuticErrorRecoveryManager shutdown complete")
 
@@ -560,24 +559,23 @@ class TherapeuticErrorRecoveryManager:
         try:
             if strategy == RecoveryStrategy.RETRY:
                 return await self._execute_retry_strategy(error_context)
-            elif strategy == RecoveryStrategy.FALLBACK:
+            if strategy == RecoveryStrategy.FALLBACK:
                 return await self._execute_fallback_strategy(error_context)
-            elif strategy == RecoveryStrategy.GRACEFUL_DEGRADATION:
+            if strategy == RecoveryStrategy.GRACEFUL_DEGRADATION:
                 return await self._execute_graceful_degradation_strategy(error_context)
-            elif strategy == RecoveryStrategy.THERAPEUTIC_INTERVENTION:
+            if strategy == RecoveryStrategy.THERAPEUTIC_INTERVENTION:
                 return await self._execute_therapeutic_intervention_strategy(
                     error_context
                 )
-            elif strategy == RecoveryStrategy.SYSTEM_RESTART:
+            if strategy == RecoveryStrategy.SYSTEM_RESTART:
                 return await self._execute_system_restart_strategy(error_context)
-            elif strategy == RecoveryStrategy.ESCALATION:
+            if strategy == RecoveryStrategy.ESCALATION:
                 return await self._execute_escalation_strategy(error_context)
-            else:
-                return RecoveryResult(
-                    success=False,
-                    strategy_used=strategy,
-                    user_message="Unknown recovery strategy",
-                )
+            return RecoveryResult(
+                success=False,
+                strategy_used=strategy,
+                user_message="Unknown recovery strategy",
+            )
 
         except Exception as e:
             logger.error(f"Error executing recovery strategy {strategy.value}: {e}")

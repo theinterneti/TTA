@@ -297,12 +297,11 @@ class TherapeuticEmotionalSafetySystem:
         # Map severity to crisis level
         if total_severity >= 4:
             return CrisisLevel.CRITICAL
-        elif total_severity >= 3:
+        if total_severity >= 3:
             return CrisisLevel.HIGH
-        elif total_severity >= 2:
+        if total_severity >= 2:
             return CrisisLevel.MODERATE
-        else:
-            return CrisisLevel.LOW
+        return CrisisLevel.LOW
 
     def _identify_risk_factors(
         self, user_input: str, indicators: list[CrisisIndicator]

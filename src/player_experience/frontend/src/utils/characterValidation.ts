@@ -44,7 +44,7 @@ export const parseAPIError = (error: any): string => {
   if (typeof error === 'string') {
     return error;
   }
-  
+
   if (error?.response?.data?.detail) {
     const detail = error.response.data.detail;
     if (typeof detail === 'string') {
@@ -55,11 +55,10 @@ export const parseAPIError = (error: any): string => {
     }
     return JSON.stringify(detail);
   }
-  
+
   if (error?.message) {
     return error.message;
   }
-  
+
   return 'An unexpected error occurred';
 };
-

@@ -1,16 +1,16 @@
 /**
  * Real Analytics Service - Phase 2 Implementation
- * 
+ *
  * Connects AdvancedAnalyticsDashboard to actual TTA API endpoints
  * Replaces mock services with real data from operational backend
  */
 
-import { 
-  PredictiveAnalyticsResult, 
-  TrendAnalysis, 
-  RiskPrediction, 
+import {
+  PredictiveAnalyticsResult,
+  TrendAnalysis,
+  RiskPrediction,
   TherapeuticOutcomePrediction,
-  LongitudinalInsight 
+  LongitudinalInsight
 } from './predictiveAnalyticsService';
 import { ProgressTrackingResult } from './progressTrackingService';
 import { MonitoringSession, EmotionalState } from './realTimeTherapeuticMonitor';
@@ -90,11 +90,11 @@ class RealAnalyticsService {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    
+
     if (this.authToken) {
       headers['Authorization'] = `Bearer ${this.authToken}`;
     }
-    
+
     return headers;
   }
 
@@ -176,7 +176,7 @@ class RealAnalyticsService {
     try {
       const days = timeframe === 'week' ? 7 : timeframe === 'month' ? 30 : timeframe === 'quarter' ? 90 : 365;
       const vizData = await this.fetchApi<ApiProgressVizResponse>(`/api/v1/players/${userId}/progress/viz?days=${days}`);
-      
+
       // Transform viz data into progress tracking format
       const currentProgress = goals.map(goal => ({
         goalId: goal.id,
@@ -226,7 +226,7 @@ class RealAnalyticsService {
   async getSessionHistory(userId: string): Promise<MonitoringSession[]> {
     try {
       const playerAnalytics = await this.fetchApi<ApiPlayerAnalyticsResponse>(`/api/v1/conversation/player/analytics`);
-      
+
       return playerAnalytics.recent_sessions.map(session => ({
         sessionId: session.session_id,
         userId,
@@ -258,7 +258,7 @@ class RealAnalyticsService {
   async getEmotionalHistory(userId: string): Promise<EmotionalState[]> {
     try {
       const playerAnalytics = await this.fetchApi<ApiPlayerAnalyticsResponse>(`/api/v1/conversation/player/analytics`);
-      
+
       return playerAnalytics.unique_emotional_themes.map((theme, index) => ({
         timestamp: Date.now() - (index * 1000 * 60 * 60 * 24), // Spread over days
         primaryEmotion: theme,
@@ -281,7 +281,7 @@ class RealAnalyticsService {
   async getRecommendationHistory(userId: string): Promise<RecommendationResult[]> {
     try {
       const dashboardData = await this.fetchApi<ApiDashboardResponse>(`/api/v1/players/${userId}/dashboard`);
-      
+
       return dashboardData.recommendations.map((rec, index) => ({
         recommendationId: `rec_${index}`,
         userId,
@@ -319,7 +319,7 @@ class RealAnalyticsService {
 
   private generateRiskPredictionsFromAnalytics(analytics: ApiPlayerAnalyticsResponse): RiskPrediction[] {
     const riskLevel = analytics.total_sessions < 3 ? 'moderate' : 'low';
-    
+
     return [{
       riskId: `risk_${Date.now()}`,
       riskType: 'engagement',
@@ -369,9 +369,9 @@ class RealAnalyticsService {
   ) {
     const avgOutcome = outcomes.reduce((sum, o) => sum + o.predictedOutcome, 0) / outcomes.length;
     const avgRisk = risks.reduce((sum, r) => sum + r.probability, 0) / risks.length;
-    
+
     const score = Math.max(0, Math.min(100, avgOutcome - (avgRisk * 20)));
-    
+
     return {
       score,
       outlook: score > 80 ? 'excellent' as const : score > 60 ? 'good' as const : score > 40 ? 'fair' as const : 'concerning' as const,
@@ -384,13 +384,13 @@ class RealAnalyticsService {
   private determineTrendType(vizData: ApiProgressVizResponse): 'improving' | 'stable' | 'declining' {
     const data = vizData.series[0]?.data || [];
     if (data.length < 2) return 'stable';
-    
+
     const recent = data.slice(-3);
     const earlier = data.slice(0, 3);
-    
+
     const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
     const earlierAvg = earlier.reduce((a, b) => a + b, 0) / earlier.length;
-    
+
     if (recentAvg > earlierAvg * 1.1) return 'improving';
     if (recentAvg < earlierAvg * 0.9) return 'declining';
     return 'stable';
@@ -399,13 +399,13 @@ class RealAnalyticsService {
   private calculateSlope(vizData: ApiProgressVizResponse): number {
     const data = vizData.series[0]?.data || [];
     if (data.length < 2) return 0;
-    
+
     const n = data.length;
     const sumX = (n * (n - 1)) / 2;
     const sumY = data.reduce((a, b) => a + b, 0);
     const sumXY = data.reduce((sum, y, x) => sum + x * y, 0);
     const sumX2 = data.reduce((sum, _, x) => sum + x * x, 0);
-    
+
     return (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
   }
 
@@ -425,11 +425,11 @@ class RealAnalyticsService {
   private calculateConsistencyFromVizData(vizData: ApiProgressVizResponse): number {
     const data = vizData.series[0]?.data || [];
     if (data.length < 2) return 1.0;
-    
+
     const mean = data.reduce((a, b) => a + b, 0) / data.length;
     const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length;
     const stdDev = Math.sqrt(variance);
-    
+
     return Math.max(0, 1 - (stdDev / mean));
   }
 

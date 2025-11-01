@@ -14,12 +14,12 @@ This guide documents the comprehensive UV configuration for the TTA (Therapeutic
 
 ```
 TTA Project Root
-├── uv.toml                    # UV-specific configuration (NEW)
-├── pyproject.toml             # Project metadata + [tool.uv] section (UPDATED)
+├── pyproject.toml             # Project metadata + [tool.uv] section
+├── .python-version            # Python version pinning
 ├── .vscode/
 │   ├── settings.json          # VS Code Python interpreter config
-│   └── tasks.json             # UV operation tasks (NEW)
-├── .gitignore                 # Excludes .uv_cache and list/ (UPDATED)
+│   └── tasks.json             # UV operation tasks
+├── .gitignore                 # Excludes .uv_cache and list/
 └── ~/.bashrc or ~/.zshrc      # Shell environment variables
 ```
 
@@ -28,26 +28,25 @@ TTA Project Root
 UV checks configuration in this order (highest to lowest priority):
 
 1. **Command-line flags** (e.g., `uv sync --python 3.11`)
-2. **`uv.toml`** (project-specific, committed to git)
-3. **`pyproject.toml` [tool.uv]** (project metadata)
-4. **Environment variables** (e.g., `UV_PROJECT_ENVIRONMENT`)
-5. **Global UV config** (`~/.config/uv/uv.toml`)
-6. **UV defaults** (`.venv` for virtual environments)
+2. **`pyproject.toml` [tool.uv]** (project metadata, committed to git)
+3. **Environment variables** (e.g., `UV_PROJECT_ENVIRONMENT`)
+4. **Global UV config** (`~/.config/uv/uv.toml`)
+5. **UV defaults** (`.venv` for virtual environments)
 
 ---
 
 ## Configuration Details
 
-### `uv.toml` (NEW)
+### `pyproject.toml` [tool.uv] Section
 
 **Purpose:** Project-specific UV settings that take precedence over environment variables.
 
 **Key Settings:**
 
 ```toml
-[pip]
-system = false              # Force virtual environment usage
-strict = true               # Validate environment and detect missing deps
+[tool.uv]
+# UV configuration is in pyproject.toml [tool.uv] section
+# See pyproject.toml for actual configuration
 
 [tool.uv]
 cache-dir = "./.uv_cache"   # Project-local cache for WSL2 performance
@@ -512,4 +511,3 @@ export UV_PROJECT_ENVIRONMENT=".venv"
 **UV Version:** 0.8.17
 **Python Version:** 3.12.3
 **Environment:** WSL2 + VS Code Remote
-

@@ -79,7 +79,6 @@ class InputProcessorAgentProxy(Agent):
                 "has_context": bool(input_payload.get("context")),
             },
         ) as operation:
-
             # Safety validation (annotate only; never block)
             await operation["publish_progress"](0.1, "Performing safety validation")
             safety = get_global_safety_service()

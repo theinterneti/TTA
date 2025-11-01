@@ -83,7 +83,7 @@ describe('CrisisSupportSection', () => {
     // Find the National Suicide Prevention Lifeline contact button
     const suicidePreventionCard = screen.getByText('National Suicide Prevention Lifeline').closest('div');
     const contactButton = suicidePreventionCard?.querySelector('button');
-    
+
     if (contactButton) {
       fireEvent.click(contactButton);
       expect(mockWindowOpen).toHaveBeenCalledWith('tel:988');
@@ -99,7 +99,7 @@ describe('CrisisSupportSection', () => {
     );
 
     expect(screen.getByText('Personal Crisis Contacts')).toBeInTheDocument();
-    
+
     const emergencyContactInput = screen.getByPlaceholderText(/Name and phone number of trusted person/);
     expect(emergencyContactInput).toHaveValue('John Doe - 555-0123');
 
@@ -150,10 +150,10 @@ describe('CrisisSupportSection', () => {
     );
 
     expect(screen.getByText('Preferred Crisis Resources')).toBeInTheDocument();
-    
+
     const suicidePreventionCheckbox = screen.getByRole('checkbox', { name: /National Suicide Prevention Lifeline/ });
     const crisisTextCheckbox = screen.getByRole('checkbox', { name: /Crisis Text Line/ });
-    
+
     expect(suicidePreventionCheckbox).toBeChecked();
     expect(crisisTextCheckbox).toBeChecked();
   });
@@ -216,7 +216,7 @@ describe('CrisisSupportSection', () => {
 
     expect(screen.getByText('Crisis Detection & Response')).toBeInTheDocument();
     expect(screen.getByText('Automatic Crisis Detection')).toBeInTheDocument();
-    
+
     const crisisDetectionToggle = screen.getByRole('checkbox');
     expect(crisisDetectionToggle).toBeChecked(); // Default checked
   });
@@ -232,7 +232,7 @@ describe('CrisisSupportSection', () => {
     // Find the Crisis Text Line contact button
     const crisisTextCard = screen.getByText('Crisis Text Line').closest('div');
     const contactButton = crisisTextCard?.querySelector('button');
-    
+
     if (contactButton) {
       fireEvent.click(contactButton);
       // Should open modal for text resources
@@ -287,16 +287,16 @@ describe('CrisisSupportSection', () => {
     // Open modal by clicking on a text resource
     const crisisTextCard = screen.getByText('Crisis Text Line').closest('div');
     const contactButton = crisisTextCard?.querySelector('button');
-    
+
     if (contactButton) {
       fireEvent.click(contactButton);
-      
+
       // Modal should be open
       expect(screen.getByRole('button', { name: /Close/ })).toBeInTheDocument();
-      
+
       // Close modal
       fireEvent.click(screen.getByRole('button', { name: /Close/ }));
-      
+
       // Modal should be closed (only one Crisis Text Line text should remain)
       const crisisTextElements = screen.getAllByText('Crisis Text Line');
       expect(crisisTextElements).toHaveLength(1);
@@ -314,14 +314,14 @@ describe('CrisisSupportSection', () => {
     // Open modal by clicking on a resource
     const crisisTextCard = screen.getByText('Crisis Text Line').closest('div');
     const contactButton = crisisTextCard?.querySelector('button');
-    
+
     if (contactButton) {
       fireEvent.click(contactButton);
-      
+
       // Click visit website button
       const visitWebsiteButton = screen.getByText('Visit Website');
       fireEvent.click(visitWebsiteButton);
-      
+
       expect(mockWindowOpen).toHaveBeenCalledWith('https://crisistextline.org', '_blank');
     }
   });

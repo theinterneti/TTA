@@ -1,0 +1,203 @@
+version: "3.8"
+
+services:
+  # Development overrides for hot reloading and debugging
+  admin-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.admin-api
+      target: builder # Use builder stage for development
+    volumes:
+      - ../src:/app/src:cached # Hot reload source code
+      - ../tests:/app/tests:cached
+      - ../pyproject.toml:/app/pyproject.toml:cached
+      - ../uv.lock:/app/uv.lock:cached
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - PYTHONPATH=/app/src
+      - RELOAD=true
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "src.admin_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8001",
+        "--reload",
+        "--reload-dir",
+        "/app/src",
+      ]
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+      - neo4j
+
+  clinical-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.clinical-api
+      target: builder
+    volumes:
+      - ../src:/app/src:cached
+      - ../tests:/app/tests:cached
+      - ../pyproject.toml:/app/pyproject.toml:cached
+      - ../uv.lock:/app/uv.lock:cached
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - PYTHONPATH=/app/src
+      - RELOAD=true
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "src.clinical_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8002",
+        "--reload",
+        "--reload-dir",
+        "/app/src",
+      ]
+    ports:
+      - "8002:8002"
+    depends_on:
+      - redis
+      - neo4j
+
+  developer-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.developer-api
+      target: builder
+    volumes:
+      - ../src:/app/src:cached
+      - ../tests:/app/tests:cached
+      - ../pyproject.toml:/app/pyproject.toml:cached
+      - ../uv.lock:/app/uv.lock:cached
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - PYTHONPATH=/app/src
+      - RELOAD=true
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "src.developer_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8003",
+        "--reload",
+        "--reload-dir",
+        "/app/src",
+      ]
+    ports:
+      - "8003:8003"
+    depends_on:
+      - redis
+      - neo4j
+
+  patient-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.patient-api
+      target: builder
+    volumes:
+      - ../src:/app/src:cached
+      - ../tests:/app/tests:cached
+      - ../pyproject.toml:/app/pyproject.toml:cached
+      - ../uv.lock:/app/uv.lock:cached
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - PYTHONPATH=/app/src
+      - RELOAD=true
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "src.patient_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8004",
+        "--reload",
+        "--reload-dir",
+        "/app/src",
+      ]
+    ports:
+      - "8004:8004"
+    depends_on:
+      - redis
+      - neo4j
+
+  langgraph:
+    build:
+      context: ..
+      dockerfile: Dockerfile.langgraph
+      target: builder
+    volumes:
+      - ../src:/app/src:cached
+      - ../tests:/app/tests:cached
+      - ../pyproject.toml:/app/pyproject.toml:cached
+      - ../uv.lock:/app/uv.lock:cached
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - PYTHONPATH=/app/src
+      - RELOAD=true
+      - TOKENIZERS_PARALLELISM=false
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "src.langgraph_service.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8005",
+        "--reload",
+        "--reload-dir",
+        "/app/src",
+      ]
+    ports:
+      - "8005:8005"
+    depends_on:
+      - redis
+      - neo4j
+
+  # Development database configurations with exposed ports
+  redis:
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_ARGS=--loglevel verbose
+
+  neo4j:
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/development
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_logs_debug_level=DEBUG
+
+# Development-specific volumes for faster I/O
+volumes:
+  external-data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs

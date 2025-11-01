@@ -81,7 +81,7 @@ interface TherapeuticApproachAnalysis {
 
 ### Therapeutic Approach Alignment Service Tests (27 tests)
 - ✅ **Core Analysis Functions**: 7/7 tests passing
-- ✅ **Approach Recommendations**: 3/3 tests passing  
+- ✅ **Approach Recommendations**: 3/3 tests passing
 - ✅ **Approach Alignments**: 2/2 tests passing
 - ✅ **Approach Compatibilities**: 3/3 tests passing
 - ✅ **Integration Recommendations**: 4/4 tests passing
@@ -187,7 +187,7 @@ interface TherapeuticApproachAnalysis {
 Priority 2D completes the Enhanced Therapeutic Intelligence milestone:
 - **2A: Dynamic Goal Suggestion System** ✅ - Intelligent goal recommendations
 - **2B: Progress-Aware Goal Management** ✅ - Progress tracking and evolution
-- **2C: Goal Relationship Mapping** ✅ - Compatibility and conflict analysis  
+- **2C: Goal Relationship Mapping** ✅ - Compatibility and conflict analysis
 - **2D: Approach-Goal Alignment** ✅ - Therapeutic approach matching
 
 ### Synergistic Integration

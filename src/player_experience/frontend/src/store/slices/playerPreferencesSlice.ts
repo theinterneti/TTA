@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { 
-  PlayerPreferences, 
-  DEFAULT_PREFERENCES, 
+import {
+  PlayerPreferences,
+  DEFAULT_PREFERENCES,
   PreferenceValidationResult,
   PreferencePreviewContext
 } from '../../types/preferences';

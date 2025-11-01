@@ -34,7 +34,7 @@ test.describe('Authentication Flow', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await loginPage.expectLoginSuccess();
-      
+
       // Should redirect to dashboard
       await dashboardPage.expectDashboardLoaded();
     });
@@ -54,7 +54,7 @@ test.describe('Authentication Flow', () => {
       await loginPage.fillUsername(testUsers.default.username);
       await loginPage.fillPassword(testUsers.default.password);
       await loginPage.clickLogin();
-      
+
       // Should show loading state briefly
       await loginPage.expectLoadingState();
     });
@@ -71,7 +71,7 @@ test.describe('Authentication Flow', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Refresh page
       await dashboardPage.page.reload();
       await dashboardPage.expectDashboardLoaded();
@@ -81,7 +81,7 @@ test.describe('Authentication Flow', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       await dashboardPage.logout();
       await loginPage.expectLoginFormVisible();
     });
@@ -90,9 +90,9 @@ test.describe('Authentication Flow', () => {
       await loginPage.goto();
       await loginPage.login(testUsers.default);
       await dashboardPage.expectDashboardLoaded();
-      
+
       await dashboardPage.logout();
-      
+
       // Try to access protected route
       await dashboardPage.goto();
       await loginPage.expectLoginFormVisible();
@@ -131,11 +131,11 @@ test.describe('Authentication Flow', () => {
 
     test('should adapt to different screen sizes', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Test tablet size
       await page.setViewportSize({ width: 768, height: 1024 });
       await loginPage.expectLoginFormVisible();
-      
+
       // Test desktop size
       await page.setViewportSize({ width: 1920, height: 1080 });
       await loginPage.expectLoginFormVisible();
@@ -154,7 +154,7 @@ test.describe('Authentication Flow', () => {
       await loginPage.goto();
       await loginPage.expectLoginFormVisible();
       const loadTime = Date.now() - startTime;
-      
+
       expect(loadTime).toBeLessThan(3000);
     });
   });
@@ -162,13 +162,13 @@ test.describe('Authentication Flow', () => {
   test.describe('Security', () => {
     test('should prevent multiple rapid login attempts', async () => {
       await loginPage.goto();
-      
+
       // Attempt multiple failed logins
       for (let i = 0; i < 5; i++) {
         await loginPage.login({ username: 'invalid', password: 'invalid', email: '' });
         await loginPage.expectErrorMessage();
       }
-      
+
       // Should show rate limiting message
       const rateLimitMessage = loginPage.page.locator('[data-testid="rate-limit"], .rate-limit');
       await expect(rateLimitMessage).toBeVisible();
@@ -178,11 +178,11 @@ test.describe('Authentication Flow', () => {
       await loginPage.goto();
       await loginPage.fillUsername('testuser');
       await loginPage.fillPassword('testpass');
-      
+
       // Navigate away and back
       await page.goto('/');
       await loginPage.goto();
-      
+
       // Form should be cleared
       await expect(loginPage.usernameInput).toHaveValue('');
       await expect(loginPage.passwordInput).toHaveValue('');
@@ -192,19 +192,19 @@ test.describe('Authentication Flow', () => {
   test.describe('Error Handling', () => {
     test('should handle network errors gracefully', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Mock network failure
       await page.route('**/auth/login', route => {
         route.abort('failed');
       });
-      
+
       await loginPage.login(testUsers.default);
       await loginPage.expectErrorMessage();
     });
 
     test('should handle server errors gracefully', async ({ page }) => {
       await loginPage.goto();
-      
+
       // Mock server error
       await page.route('**/auth/login', route => {
         route.fulfill({
@@ -213,14 +213,14 @@ test.describe('Authentication Flow', () => {
           body: JSON.stringify({ error: 'Internal server error' }),
         });
       });
-      
+
       await loginPage.login(testUsers.default);
       await loginPage.expectErrorMessage();
     });
 
     test('should recover from temporary failures', async ({ page }) => {
       await loginPage.goto();
-      
+
       let attemptCount = 0;
       await page.route('**/auth/login', route => {
         attemptCount++;
@@ -236,18 +236,18 @@ test.describe('Authentication Flow', () => {
           route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({ 
+            body: JSON.stringify({
               token: 'mock-token',
               user: { id: '1', username: 'testuser', email: 'test@example.com' }
             }),
           });
         }
       });
-      
+
       // First attempt should fail
       await loginPage.login(testUsers.default);
       await loginPage.expectErrorMessage();
-      
+
       // Second attempt should succeed
       await loginPage.login(testUsers.default);
       await loginPage.expectLoginSuccess();

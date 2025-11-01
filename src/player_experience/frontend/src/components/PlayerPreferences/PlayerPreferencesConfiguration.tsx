@@ -33,13 +33,13 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
   onCancel,
 }) => {
   const dispatch = useDispatch();
-  const { 
-    preferences, 
-    isLoading, 
-    isSaving, 
-    error, 
-    hasUnsavedChanges, 
-    validationResult 
+  const {
+    preferences,
+    isLoading,
+    isSaving,
+    error,
+    hasUnsavedChanges,
+    validationResult
   } = useSelector((state: RootState) => state.playerPreferences);
 
   const [activeTab, setActiveTab] = useState('intensity');
@@ -75,16 +75,16 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
     try {
       // Validate preferences before saving
       const validation = await dispatch(validatePreferences(preferences) as any);
-      
+
       if (validation.payload?.isValid) {
-        await dispatch(savePlayerPreferences({ 
-          playerId, 
-          preferences 
+        await dispatch(savePlayerPreferences({
+          playerId,
+          preferences
         }) as any);
-        
+
         dispatch(markChangesSaved());
         setShowUnsavedWarning(false);
-        
+
         if (onComplete) {
           onComplete(preferences);
         }
@@ -148,13 +148,13 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
               {isOnboarding ? 'Welcome! Let\'s Personalize Your Experience' : 'Player Preferences'}
             </h2>
             <p className="text-gray-600 mt-1">
-              {isOnboarding 
+              {isOnboarding
                 ? 'Configure your therapeutic preferences to create a personalized experience.'
                 : 'Manage your therapeutic preferences and customization settings.'
               }
             </p>
           </div>
-          
+
           {showPreview && (
             <button
               onClick={() => setShowPreview(!showPreview)}
@@ -215,7 +215,7 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
             <div className="p-4 border-t border-gray-200">
               <div className="text-sm text-gray-600 mb-2">Setup Progress</div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${((tabs.findIndex(t => t.id === activeTab) + 1) / tabs.length) * 100}%` }}
                 ></div>
@@ -255,9 +255,9 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
               <TherapeuticGoalsSelector
                 selected={preferences.therapeutic_goals}
                 primaryConcerns={preferences.primary_concerns}
-                onChange={(goals, concerns) => handlePreferenceUpdate({ 
+                onChange={(goals, concerns) => handlePreferenceUpdate({
                   therapeutic_goals: goals,
-                  primary_concerns: concerns 
+                  primary_concerns: concerns
                 })}
               />
             )}
@@ -298,7 +298,7 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
                   Unsaved changes
                 </span>
               )}
-              
+
               <button
                 onClick={() => setShowPreview(!showPreview)}
                 className="btn-secondary text-sm"
@@ -317,7 +317,7 @@ const PlayerPreferencesConfiguration: React.FC<PlayerPreferencesConfigurationPro
                   Cancel
                 </button>
               )}
-              
+
               <button
                 onClick={handleSavePreferences}
                 disabled={isSaving || (validationResult && !validationResult.isValid)}

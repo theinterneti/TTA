@@ -1,5 +1,5 @@
+import { displayError } from '../utils/errorHandling';
 import secureStorage from '../utils/secureStorage';
-import { serializeError, displayError } from '../utils/errorHandling';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 

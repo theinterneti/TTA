@@ -93,7 +93,7 @@ export class BasePage {
   async checkAccessibility() {
     // Check for basic accessibility requirements
     await this.expectElementVisible('main, [role="main"]');
-    
+
     // Check for skip links
     const skipLinks = await this.page.locator('a[href^="#"]').count();
     expect(skipLinks).toBeGreaterThan(0);

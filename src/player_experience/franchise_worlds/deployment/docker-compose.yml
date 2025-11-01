@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   franchise-api:
     build:
@@ -6,243 +6,243 @@ services:
       dockerfile: deployment/Dockerfile.api
     container_name: tta-franchise-api
     ports:
-    - 8000:8000
+      - 8000:8000
     environment:
-    - ENVIRONMENT=production
-    - REDIS_URL=redis://redis:6379
-    - NEO4J_URI=bolt://neo4j:7687
-    - NEO4J_USER=neo4j
-    - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-    - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-    - CORS_ORIGINS=http://localhost:3000,https://tta.yourdomain.com
+      - ENVIRONMENT=production
+      - REDIS_URL=redis://redis:6379
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - CORS_ORIGINS=http://localhost:3000,https://tta.yourdomain.com
     depends_on:
-    - redis
-    - neo4j
-    - franchise-bridge
+      - redis
+      - neo4j
+      - franchise-bridge
     volumes:
-    - ./logs:/app/logs
-    - ./config:/app/config
+      - ./logs:/app/logs
+      - ./config:/app/config
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:8000/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/health
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   franchise-bridge:
     build:
       context: ..
       dockerfile: deployment/Dockerfile.bridge
     container_name: tta-franchise-bridge
     ports:
-    - 3001:3001
+      - 3001:3001
     environment:
-    - NODE_ENV=production
-    - BRIDGE_PORT=3001
-    - LOG_LEVEL=info
+      - NODE_ENV=production
+      - BRIDGE_PORT=3001
+      - LOG_LEVEL=info
     volumes:
-    - ./logs:/app/logs
-    - ../scripts:/app/scripts:ro
+      - ./logs:/app/logs
+      - ../scripts:/app/scripts:ro
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost:3001/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3001/health
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   redis:
     image: redis:7-alpine
     container_name: tta-redis
     ports:
-    - 6379:6379
+      - 6379:6379
     volumes:
-    - redis-data:/data
-    - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     healthcheck:
       test:
-      - CMD
-      - redis-cli
-      - ping
+        - CMD
+        - redis-cli
+        - ping
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   neo4j:
     image: neo4j:5.15-community
     container_name: tta-neo4j
     ports:
-    - 7474:7474
-    - 7687:7687
+      - 7474:7474
+      - 7687:7687
     environment:
-    - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
-    - NEO4J_PLUGINS=["apoc"]
-    - NEO4J_dbms_security_procedures_unrestricted=apoc.*
-    - NEO4J_dbms_memory_heap_initial__size=512m
-    - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=2G
     volumes:
-    - neo4j-data:/data
-    - neo4j-logs:/logs
-    - neo4j-import:/var/lib/neo4j/import
-    - neo4j-plugins:/plugins
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+      - neo4j-import:/var/lib/neo4j/import
+      - neo4j-plugins:/plugins
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     healthcheck:
       test:
-      - CMD
-      - cypher-shell
-      - -u
-      - neo4j
-      - -p
-      - ${NEO4J_PASSWORD}
-      - RETURN 1
+        - CMD
+        - cypher-shell
+        - -u
+        - neo4j
+        - -p
+        - ${NEO4J_PASSWORD}
+        - RETURN 1
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   nginx:
     image: nginx:alpine
     container_name: tta-nginx
     ports:
-    - 80:80
-    - 443:443
+      - 80:80
+      - 443:443
     volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    - ./ssl:/etc/nginx/ssl:ro
-    - ./logs/nginx:/var/log/nginx
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
     depends_on:
-    - franchise-api
-    - franchise-bridge
+      - franchise-api
+      - franchise-bridge
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -f
-      - http://localhost/health
+        - CMD
+        - curl
+        - -f
+        - http://localhost/health
       interval: 30s
       timeout: 10s
       retries: 3
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   prometheus:
     image: prom/prometheus:latest
     container_name: tta-prometheus
     ports:
-    - 9090:9090
+      - 9090:9090
     volumes:
-    - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    - prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
     command:
-    - --config.file=/etc/prometheus/prometheus.yml
-    - --storage.tsdb.path=/prometheus
-    - --web.console.libraries=/etc/prometheus/console_libraries
-    - --web.console.templates=/etc/prometheus/consoles
-    - --storage.tsdb.retention.time=200h
-    - --web.enable-lifecycle
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --storage.tsdb.retention.time=200h
+      - --web.enable-lifecycle
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   grafana:
     image: grafana/grafana:latest
     container_name: tta-grafana
     ports:
-    - 3000:3000
+      - 3000:3000
     environment:
-    - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-    - GF_USERS_ALLOW_SIGN_UP=false
-    - GF_INSTALL_PLUGINS=redis-datasource
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=redis-datasource
     volumes:
-    - grafana-data:/var/lib/grafana
-    - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
-    - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
     depends_on:
-    - prometheus
+      - prometheus
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   loki:
     image: grafana/loki:latest
     container_name: tta-loki
     ports:
-    - 3100:3100
+      - 3100:3100
     volumes:
-    - ./loki-config.yml:/etc/loki/local-config.yaml
-    - loki-data:/loki
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   promtail:
     image: grafana/promtail:latest
     container_name: tta-promtail
     volumes:
-    - ./promtail-config.yml:/etc/promtail/config.yml
-    - ./logs:/var/log/tta:ro
-    - /var/log:/var/log/host:ro
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - ./logs:/var/log/tta:ro
+      - /var/log:/var/log/host:ro
     command: -config.file=/etc/promtail/config.yml
     depends_on:
-    - loki
+      - loki
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
   backup:
     build:
       context: ..
       dockerfile: deployment/Dockerfile.backup
     container_name: tta-backup
     environment:
-    - BACKUP_SCHEDULE=0 2 * * *
-    - REDIS_URL=redis://redis:6379
-    - NEO4J_URI=bolt://neo4j:7687
-    - NEO4J_USER=neo4j
-    - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-    - S3_BUCKET=${BACKUP_S3_BUCKET}
-    - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-    - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - BACKUP_SCHEDULE=0 2 * * *
+      - REDIS_URL=redis://redis:6379
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     volumes:
-    - ./backups:/app/backups
-    - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./backups:/app/backups
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
-    - redis
-    - neo4j
+      - redis
+      - neo4j
     networks:
-    - tta-network
+      - tta-network
     restart: unless-stopped
     security_opt:
-    - no-new-privileges:true
+      - no-new-privileges:true
     read_only: true
 volumes:
   redis-data:
@@ -266,4 +266,4 @@ networks:
     driver: bridge
     ipam:
       config:
-      - subnet: 172.20.0.0/16
+        - subnet: 172.20.0.0/16

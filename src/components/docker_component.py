@@ -1,5 +1,5 @@
 """
-Docker Component
+Docker Component.
 
 This module provides a component for managing Docker configurations across repositories.
 
@@ -26,7 +26,6 @@ Example:
 """
 
 import logging
-import os
 import shutil
 from pathlib import Path
 from typing import Any
@@ -37,12 +36,12 @@ from src.common.process_utils import run as safe_run
 try:
     from codecarbon import track_emissions
 
-    CODECARBON_AVAILABLE = True
+    _codecarbon_available = True
 except ImportError:
-    CODECARBON_AVAILABLE = False
+    _codecarbon_available = False
 
     # Define a no-op decorator
-    def track_emissions(*args, **kwargs):
+    def track_emissions(*args, **_kwargs):
         def decorator(func):
             return func
 
@@ -239,7 +238,7 @@ class DockerComponent(Component):
             and (template_path / ".devcontainer" / "devcontainer.json").exists()
         ):
             logger.info(f"Copying devcontainer.json template to {repo_name}...")
-            os.makedirs(repo_path / ".devcontainer", exist_ok=True)
+            (repo_path / ".devcontainer").mkdir(parents=True, exist_ok=True)
             shutil.copy(
                 template_path / ".devcontainer" / "devcontainer.json",
                 repo_path / ".devcontainer" / "devcontainer.json",
@@ -262,7 +261,7 @@ class DockerComponent(Component):
 
         if docker_compose_path.exists():
             # Read the docker-compose.yml file
-            with open(docker_compose_path) as f:
+            with docker_compose_path.open() as f:
                 content = f.read()
 
             # Replace container names
@@ -272,7 +271,7 @@ class DockerComponent(Component):
             )
 
             # Write the updated content back to the file
-            with open(docker_compose_path, "w") as f:
+            with docker_compose_path.open("w") as f:
                 f.write(updated_content)
 
             logger.info(f"Standardized container names in {repo_name}")
@@ -291,7 +290,7 @@ class DockerComponent(Component):
 
         if devcontainer_path.exists():
             # Read the devcontainer.json file
-            with open(devcontainer_path) as f:
+            with devcontainer_path.open() as f:
                 content = f.read()
 
             # Check for essential extensions
@@ -305,10 +304,9 @@ class DockerComponent(Component):
                 "neo4j-extensions.neo4j-for-vscode",
             ]
 
-            missing_extensions = []
-            for ext in essential_extensions:
-                if ext not in content:
-                    missing_extensions.append(ext)
+            missing_extensions = [
+                ext for ext in essential_extensions if ext not in content
+            ]
 
             if missing_extensions:
                 logger.warning(
@@ -317,6 +315,25 @@ class DockerComponent(Component):
                 logger.warning(f"Please add these extensions to {devcontainer_path}")
             else:
                 logger.info(f"All essential extensions are present in {repo_name}")
+
+    def _get_env_var_default(self, var_name: str) -> str:
+        """
+        Get the default value for an environment variable.
+
+        Args:
+            var_name: Name of the environment variable
+
+        Returns:
+            str: Default value for the variable
+        """
+        defaults = {
+            "NEO4J_PASSWORD": "password",  # pragma: allowlist secret
+            "NEO4J_URI": "bolt://neo4j:7687",
+            "NEO4J_USERNAME": "neo4j",
+            "MODEL_CACHE_DIR": "/app/.model_cache",
+            "CODECARBON_OUTPUT_DIR": "/app/logs/codecarbon",
+        }
+        return defaults.get(var_name, "default_value")
 
     def _ensure_consistent_env_vars(self, repo_name: str) -> None:
         """
@@ -332,62 +349,68 @@ class DockerComponent(Component):
 
         # Create .env.example if it doesn't exist
         if not env_example_path.exists():
-            logger.info(f"Creating .env.example in {repo_name}...")
-
-            template_env_path = self.templates_path / repo_name / ".env.example"
-            if template_env_path.exists():
-                shutil.copy(template_env_path, env_example_path)
-            else:
-                with open(env_example_path, "w") as f:
-                    f.write("# TTA Environment Variables\n")
-                    f.write("NEO4J_PASSWORD=password\n")
-                    f.write("NEO4J_URI=bolt://neo4j:7687\n")
-                    f.write("NEO4J_USERNAME=neo4j\n")
-                    f.write("MODEL_CACHE_DIR=/app/.model_cache\n")
-                    f.write("CODECARBON_OUTPUT_DIR=/app/logs/codecarbon\n")
-
-            logger.info(f"Created .env.example in {repo_name}")
+            self._create_env_example(repo_name, env_example_path)
         else:
-            # Ensure essential environment variables are included
-            with open(env_example_path) as f:
-                content = f.read()
+            self._add_missing_env_vars(repo_name, env_example_path)
 
-            essential_vars = [
-                "NEO4J_PASSWORD",
-                "NEO4J_URI",
-                "NEO4J_USERNAME",
-                "MODEL_CACHE_DIR",
-                "CODECARBON_OUTPUT_DIR",
-            ]
+    def _create_env_example(self, repo_name: str, env_example_path: Path) -> None:
+        """
+        Create .env.example file for a repository.
 
-            missing_vars = []
-            for var in essential_vars:
-                if var not in content:
-                    missing_vars.append(var)
+        Args:
+            repo_name: Name of the repository
+            env_example_path: Path to the .env.example file
+        """
+        logger.info(f"Creating .env.example in {repo_name}...")
 
-            if missing_vars:
-                logger.info(f"Adding missing environment variables to {repo_name}...")
+        template_env_path = self.templates_path / repo_name / ".env.example"
+        if template_env_path.exists():
+            shutil.copy(template_env_path, env_example_path)
+        else:
+            with env_example_path.open("w") as f:
+                f.write("# TTA Environment Variables\n")
+                f.write("NEO4J_PASSWORD=password\n")
+                f.write("NEO4J_URI=bolt://neo4j:7687\n")
+                f.write("NEO4J_USERNAME=neo4j\n")
+                f.write("MODEL_CACHE_DIR=/app/.model_cache\n")
+                f.write("CODECARBON_OUTPUT_DIR=/app/logs/codecarbon\n")
 
-                with open(env_example_path, "a") as f:
-                    for var in missing_vars:
-                        if var == "NEO4J_PASSWORD":
-                            f.write(f"{var}=password\n")
-                        elif var == "NEO4J_URI":
-                            f.write(f"{var}=bolt://neo4j:7687\n")
-                        elif var == "NEO4J_USERNAME":
-                            f.write(f"{var}=neo4j\n")
-                        elif var == "MODEL_CACHE_DIR":
-                            f.write(f"{var}=/app/.model_cache\n")
-                        elif var == "CODECARBON_OUTPUT_DIR":
-                            f.write(f"{var}=/app/logs/codecarbon\n")
-                        else:
-                            f.write(f"{var}=default_value\n")
+        logger.info(f"Created .env.example in {repo_name}")
 
-                logger.info(f"Added missing environment variables to {repo_name}")
-            else:
-                logger.info(
-                    f"All essential environment variables are present in {repo_name}"
-                )
+    def _add_missing_env_vars(self, repo_name: str, env_example_path: Path) -> None:
+        """
+        Add missing environment variables to .env.example file.
+
+        Args:
+            repo_name: Name of the repository
+            env_example_path: Path to the .env.example file
+        """
+        with env_example_path.open() as f:
+            content = f.read()
+
+        essential_vars = [
+            "NEO4J_PASSWORD",
+            "NEO4J_URI",
+            "NEO4J_USERNAME",
+            "MODEL_CACHE_DIR",
+            "CODECARBON_OUTPUT_DIR",
+        ]
+
+        missing_vars = [var for var in essential_vars if var not in content]
+
+        if missing_vars:
+            logger.info(f"Adding missing environment variables to {repo_name}...")
+
+            with env_example_path.open("a") as f:
+                for var in missing_vars:
+                    default_value = self._get_env_var_default(var)
+                    f.write(f"{var}={default_value}\n")
+
+            logger.info(f"Added missing environment variables to {repo_name}")
+        else:
+            logger.info(
+                f"All essential environment variables are present in {repo_name}"
+            )
 
     def _ensure_consistent_services(self, repo_name: str) -> None:
         """
@@ -403,16 +426,17 @@ class DockerComponent(Component):
 
         if docker_compose_path.exists():
             # Read the docker-compose.yml file
-            with open(docker_compose_path) as f:
+            with docker_compose_path.open() as f:
                 content = f.read()
 
             # Check for essential services
             essential_services = ["neo4j:", "app:"]
 
-            missing_services = []
-            for service in essential_services:
-                if service not in content:
-                    missing_services.append(service.replace(":", ""))
+            missing_services = [
+                service.replace(":", "")
+                for service in essential_services
+                if service not in content
+            ]
 
             if missing_services:
                 logger.warning(

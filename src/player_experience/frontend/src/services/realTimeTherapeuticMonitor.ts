@@ -120,8 +120,8 @@ class RealTimeTherapeuticMonitor {
    * Analyze user input for emotional state and risk factors
    */
   async analyzeUserInput(
-    sessionId: string, 
-    userInput: string, 
+    sessionId: string,
+    userInput: string,
     context: Record<string, any> = {}
   ): Promise<{ emotionalState: EmotionalState; riskAssessment: RiskAssessment }> {
     const session = this.activeSessions.get(sessionId);
@@ -131,12 +131,12 @@ class RealTimeTherapeuticMonitor {
 
     // Analyze emotional state from user input
     const emotionalState = await this.assessEmotionalState(userInput, context);
-    
+
     // Perform risk assessment
     const riskAssessment = await this.performRiskAssessment(
-      sessionId, 
-      userInput, 
-      emotionalState, 
+      sessionId,
+      userInput,
+      emotionalState,
       context
     );
 
@@ -159,7 +159,7 @@ class RealTimeTherapeuticMonitor {
    * Assess emotional state from user input using NLP and pattern analysis
    */
   private async assessEmotionalState(
-    userInput: string, 
+    userInput: string,
     context: Record<string, any>
   ): Promise<EmotionalState> {
     // Emotional indicators based on text analysis
@@ -200,7 +200,7 @@ class RealTimeTherapeuticMonitor {
     // Calculate valence
     const negativeCount = negativeWords.filter(word => inputLower.includes(word)).length;
     const positiveCount = positiveWords.filter(word => inputLower.includes(word)).length;
-    
+
     if (negativeCount > 0) {
       valence = Math.max(-1, -0.3 * negativeCount);
       indicators.push(...negativeWords.filter(word => inputLower.includes(word)));
@@ -284,7 +284,7 @@ class RealTimeTherapeuticMonitor {
         type: 'emotional',
         severity: emotionalState.arousal > 0.9 ? 'critical' : 'high',
         description: 'High anxiety or panic state detected',
-        indicators: emotionalState.indicators.filter(i => 
+        indicators: emotionalState.indicators.filter(i =>
           ['panic', 'anxious', 'overwhelmed', 'frantic'].some(anx => i.includes(anx))
         ),
         duration: this.calculateEmotionalStateDuration(session, 'high_arousal'),
@@ -299,7 +299,7 @@ class RealTimeTherapeuticMonitor {
         type: 'cognitive',
         severity: emotionalState.dominance < 0.1 ? 'high' : 'moderate',
         description: 'Feelings of powerlessness or helplessness',
-        indicators: emotionalState.indicators.filter(i => 
+        indicators: emotionalState.indicators.filter(i =>
           ['helpless', 'powerless', 'trapped', 'stuck'].some(pow => i.includes(pow))
         ),
         duration: this.calculateEmotionalStateDuration(session, 'low_dominance'),
@@ -354,8 +354,8 @@ class RealTimeTherapeuticMonitor {
 
     // Generate intervention recommendations
     const interventionRecommendations = this.generateInterventionRecommendations(
-      riskLevel, 
-      riskFactors, 
+      riskLevel,
+      riskFactors,
       protectiveFactors
     );
 
@@ -410,16 +410,16 @@ class RealTimeTherapeuticMonitor {
    * Calculate duration of specific emotional states
    */
   private calculateEmotionalStateDuration(
-    session: MonitoringSession, 
+    session: MonitoringSession,
     stateType: 'negative' | 'high_arousal' | 'low_dominance'
   ): number {
     const recentStates = session.emotionalStates.slice(-10); // Last 10 states
     let duration = 0;
-    
+
     for (let i = recentStates.length - 1; i >= 0; i--) {
       const state = recentStates[i];
       let matches = false;
-      
+
       switch (stateType) {
         case 'negative':
           matches = state.valence < -0.3;
@@ -431,14 +431,14 @@ class RealTimeTherapeuticMonitor {
           matches = state.dominance < 0.4;
           break;
       }
-      
+
       if (matches) {
         duration += 1; // Increment by 1 interaction
       } else {
         break; // Stop counting if pattern breaks
       }
     }
-    
+
     return duration * 2; // Approximate 2 minutes per interaction
   }
 
@@ -446,21 +446,21 @@ class RealTimeTherapeuticMonitor {
    * Calculate emotional trend over recent interactions
    */
   private calculateEmotionalTrend(
-    session: MonitoringSession, 
+    session: MonitoringSession,
     dimension: 'valence' | 'arousal' | 'dominance'
   ): 'improving' | 'stable' | 'worsening' {
     const recentStates = session.emotionalStates.slice(-5);
     if (recentStates.length < 3) return 'stable';
-    
+
     const values = recentStates.map(state => state[dimension]);
     const firstHalf = values.slice(0, Math.floor(values.length / 2));
     const secondHalf = values.slice(Math.floor(values.length / 2));
-    
+
     const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
     const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
-    
+
     const difference = secondAvg - firstAvg;
-    
+
     if (dimension === 'valence' || dimension === 'dominance') {
       // For valence and dominance, higher is better
       if (difference > 0.1) return 'improving';
@@ -470,11 +470,11 @@ class RealTimeTherapeuticMonitor {
       const targetArousal = 0.5;
       const firstDistance = Math.abs(firstAvg - targetArousal);
       const secondDistance = Math.abs(secondAvg - targetArousal);
-      
+
       if (secondDistance < firstDistance - 0.1) return 'improving';
       if (secondDistance > firstDistance + 0.1) return 'worsening';
     }
-    
+
     return 'stable';
   }
 
@@ -543,7 +543,7 @@ class RealTimeTherapeuticMonitor {
    * Trigger interventions based on risk assessment
    */
   private async triggerInterventions(
-    sessionId: string, 
+    sessionId: string,
     riskAssessment: RiskAssessment
   ): Promise<void> {
     const session = this.activeSessions.get(sessionId);
@@ -624,21 +624,21 @@ class RealTimeTherapeuticMonitor {
     }
 
     const averageRiskScore = recentRisks.reduce((sum, risk) => sum + risk.riskScore, 0) / recentRisks.length;
-    
+
     const valenceVariance = this.calculateVariance(recentStates.map(s => s.valence));
     const emotionalStability = Math.max(0, 1 - valenceVariance);
-    
+
     const averageConfidence = recentStates.reduce((sum, state) => sum + state.confidence, 0) / recentStates.length;
     const engagementLevel = averageConfidence;
-    
+
     // Calculate therapeutic progress (placeholder - would integrate with actual progress data)
     const therapeuticProgress = 0.7; // Would be calculated from actual therapeutic goals progress
-    
+
     // Calculate intervention effectiveness
     const successfulInterventions = session.interventions.filter(i => i.outcome === 'successful').length;
     const totalInterventions = session.interventions.length;
     const interventionEffectiveness = totalInterventions > 0 ? successfulInterventions / totalInterventions : 0.5;
-    
+
     // Overall session quality
     const sessionQuality = (emotionalStability + engagementLevel + therapeuticProgress + interventionEffectiveness) / 4;
 
@@ -657,7 +657,7 @@ class RealTimeTherapeuticMonitor {
    */
   private calculateVariance(values: number[]): number {
     if (values.length === 0) return 0;
-    
+
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
     const squaredDifferences = values.map(val => Math.pow(val - mean, 2));
     return squaredDifferences.reduce((sum, val) => sum + val, 0) / values.length;

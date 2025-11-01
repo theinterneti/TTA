@@ -123,17 +123,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onInteractionClick, 
           role="group"
           aria-label={`${message.type} message`}
         >
-          <div 
+          <div
             className="text-sm leading-relaxed"
             dangerouslySetInnerHTML={{ __html: formatMessageContent(message.content) }}
           />
-          
+
           {/* Therapeutic technique badge */}
           {getTherapeuticTechniqueBadge()}
-          
+
           {/* Safety indicator for crisis content */}
           {getSafetyIndicator()}
-          
+
           {/* Interactive Elements - Buttons */}
           {message.metadata?.interactive_elements?.buttons && (
             <div className="mt-3 space-y-2">
@@ -171,21 +171,21 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onInteractionClick, 
             <GuidedExercise
               exercise={message.metadata.interactive_elements.guided_exercise}
               onComplete={() => onInteractionClick(message.id, 'exercise_completed')}
-              onProgress={(step, completed) => 
+              onProgress={(step, completed) =>
                 onInteractionClick(message.id, `exercise_progress:${step}:${completed}`)
               }
             />
           </div>
         )}
-        
+
         {/* Message metadata */}
         <div className={`flex items-center justify-between mt-1 px-1 ${
           message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
         }`}>
           <span className="text-xs text-gray-500">
-            {new Date(message.timestamp).toLocaleTimeString([], { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {new Date(message.timestamp).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </span>
           <div className="flex items-center space-x-1">

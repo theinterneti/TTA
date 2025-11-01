@@ -348,16 +348,15 @@ class TherapeuticAdaptiveDifficultyEngine:
         """Map capability score to appropriate difficulty level."""
         if capability_score >= 0.9:
             return DifficultyLevel.VERY_HARD
-        elif capability_score >= 0.75:
+        if capability_score >= 0.75:
             return DifficultyLevel.HARD
-        elif capability_score >= 0.6:
+        if capability_score >= 0.6:
             return DifficultyLevel.CHALLENGING
-        elif capability_score >= 0.4:
+        if capability_score >= 0.4:
             return DifficultyLevel.MODERATE
-        elif capability_score >= 0.25:
+        if capability_score >= 0.25:
             return DifficultyLevel.EASY
-        else:
-            return DifficultyLevel.VERY_EASY
+        return DifficultyLevel.VERY_EASY
 
     def _generate_assessment_reasoning(
         self,
@@ -434,13 +433,12 @@ class TherapeuticAdaptiveDifficultyEngine:
                 for i in range(len(success_rates) - 1)
             ):
                 return "improving"
-            elif all(
+            if all(
                 success_rates[i] > success_rates[i + 1]
                 for i in range(len(success_rates) - 1)
             ):
                 return "declining"
-            else:
-                return "stable"
+            return "stable"
 
         return "stable"
 
@@ -482,22 +480,19 @@ class TherapeuticAdaptiveDifficultyEngine:
         """Select appropriate adaptation strategy based on trigger and context."""
         if trigger == AdjustmentTrigger.EMOTIONAL_DISTRESS:
             return AdaptationStrategy.IMMEDIATE_ADJUSTMENT
-        elif trigger == AdjustmentTrigger.POOR_PERFORMANCE:
+        if trigger == AdjustmentTrigger.POOR_PERFORMANCE:
             if metrics.emotional_stability < 0.4:
                 return AdaptationStrategy.CONTEXTUAL_SUPPORT
-            else:
-                return AdaptationStrategy.GRADUAL_DECREASE
-        elif trigger == AdjustmentTrigger.EXCELLENT_PERFORMANCE:
+            return AdaptationStrategy.GRADUAL_DECREASE
+        if trigger == AdjustmentTrigger.EXCELLENT_PERFORMANCE:
             if metrics.engagement_level >= 0.8:
                 return AdaptationStrategy.GRADUAL_INCREASE
-            else:
-                return AdaptationStrategy.SKILL_BUILDING
-        elif trigger == AdjustmentTrigger.ENGAGEMENT_DECLINE:
+            return AdaptationStrategy.SKILL_BUILDING
+        if trigger == AdjustmentTrigger.ENGAGEMENT_DECLINE:
             return AdaptationStrategy.ALTERNATIVE_PATH
-        elif trigger == AdjustmentTrigger.THERAPEUTIC_GOAL_PROGRESS:
+        if trigger == AdjustmentTrigger.THERAPEUTIC_GOAL_PROGRESS:
             return AdaptationStrategy.GRADUAL_INCREASE
-        else:
-            return AdaptationStrategy.CONTEXTUAL_SUPPORT
+        return AdaptationStrategy.CONTEXTUAL_SUPPORT
 
     def _get_current_difficulty(self, user_id: str) -> DifficultyLevel:
         """Get current difficulty level for the user."""
@@ -517,24 +512,22 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         if adjustment_rate == 0.0:
             return current_difficulty  # No change
-        elif adjustment_rate == "variable":
+        if adjustment_rate == "variable":
             # Alternative path - choose based on performance
             if metrics.success_rate < 0.5:
                 return max(
                     DifficultyLevel.VERY_EASY,
                     DifficultyLevel(current_difficulty.value - 1),
                 )
-            else:
-                return min(
-                    DifficultyLevel.VERY_HARD,
-                    DifficultyLevel(current_difficulty.value + 1),
-                )
-        else:
-            # Calculate adjustment
-            adjustment = int(adjustment_rate * 2)  # Scale to difficulty range
-            new_value = current_difficulty.value + adjustment
-            new_value = max(1, min(6, new_value))  # Clamp to valid range
-            return DifficultyLevel(new_value)
+            return min(
+                DifficultyLevel.VERY_HARD,
+                DifficultyLevel(current_difficulty.value + 1),
+            )
+        # Calculate adjustment
+        adjustment = int(adjustment_rate * 2)  # Scale to difficulty range
+        new_value = current_difficulty.value + adjustment
+        new_value = max(1, min(6, new_value))  # Clamp to valid range
+        return DifficultyLevel(new_value)
 
     def _apply_difficulty_adjustment(
         self,
@@ -600,9 +593,8 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         if old_difficulty == new_difficulty:
             return f"Due to {trigger_desc}, applying {strategy_desc} while maintaining current difficulty level."
-        else:
-            direction = "increased" if new_difficulty > old_difficulty else "decreased"
-            return f"Due to {trigger_desc}, difficulty {direction} from {old_difficulty.name} to {new_difficulty.name} using {strategy_desc}."
+        direction = "increased" if new_difficulty > old_difficulty else "decreased"
+        return f"Due to {trigger_desc}, difficulty {direction} from {old_difficulty.name} to {new_difficulty.name} using {strategy_desc}."
 
     async def get_difficulty_calibration(
         self, user_id: str, session_context: Any | None = None

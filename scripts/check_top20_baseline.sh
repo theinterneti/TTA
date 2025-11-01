@@ -16,7 +16,7 @@ MODULES=(
     "src/player_experience/api/routers/gameplay.py"
     "src/player_experience/api/middleware.py"
     "src/player_experience/api/auth.py"
-    
+
     # Service Layer (7 modules)
     "src/player_experience/services/auth_service.py"
     "src/player_experience/services/gameplay_service.py"
@@ -25,7 +25,7 @@ MODULES=(
     "src/player_experience/managers/character_avatar_manager.py"
     "src/player_experience/services/personalization_service.py"
     "src/player_experience/services/narrative_service.py"
-    
+
     # Database Layer (5 modules)
     "src/player_experience/database/player_profile_repository.py"
     "src/player_experience/database/session_repository.py"
@@ -41,16 +41,16 @@ TOTAL_FILES=0
 for module in "${MODULES[@]}"; do
     if [ -f "$module" ]; then
         echo "Checking: $module"
-        
+
         # Run Pyright and capture JSON output
         OUTPUT=$(pyright "$module" --outputjson 2>&1)
-        
+
         # Extract error and warning counts
         ERRORS=$(echo "$OUTPUT" | jq -r '.summary.errorCount // 0' 2>/dev/null || echo "0")
         WARNINGS=$(echo "$OUTPUT" | jq -r '.summary.warningCount // 0' 2>/dev/null || echo "0")
-        
+
         echo "  Errors: $ERRORS, Warnings: $WARNINGS"
-        
+
         TOTAL_ERRORS=$((TOTAL_ERRORS + ERRORS))
         TOTAL_WARNINGS=$((TOTAL_WARNINGS + WARNINGS))
         TOTAL_FILES=$((TOTAL_FILES + 1))
@@ -67,4 +67,3 @@ echo "Total warnings: $TOTAL_WARNINGS"
 echo "Average errors per file: $(echo "scale=2; $TOTAL_ERRORS / $TOTAL_FILES" | bc)"
 echo ""
 echo "Baseline established: $(date)"
-

@@ -6,6 +6,7 @@ testing, load testing, and system capacity planning.
 """
 
 import asyncio
+import contextlib
 import csv
 import json
 import statistics
@@ -271,10 +272,8 @@ class HTTPLoadGenerator(LoadGenerator):
 
             # Wait for system metrics collection to complete
             system_metrics_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await system_metrics_task
-            except asyncio.CancelledError:
-                pass
 
             result.end_time = datetime.utcnow()
 

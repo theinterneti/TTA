@@ -1,6 +1,6 @@
 /**
  * Error Boundary Component
- * 
+ *
  * Catches React component errors and displays user-friendly fallback UI
  * instead of crashing the entire application.
  */
@@ -41,7 +41,7 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
     const serialized = serializeError(error, 'React Component Error');
-    
+
     console.error('Error Boundary caught an error:', {
       error: serialized,
       componentStack: errorInfo.componentStack,
@@ -94,11 +94,11 @@ class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            
+
             <h1 style={styles.title}>Something went wrong</h1>
-            
+
             <p style={styles.message}>{serialized.userMessage}</p>
-            
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details style={styles.details}>
                 <summary style={styles.summary}>Technical Details (Development Only)</summary>
@@ -108,7 +108,7 @@ class ErrorBoundary extends Component<Props, State> {
                 </pre>
               </details>
             )}
-            
+
             <div style={styles.actions}>
               <button
                 onClick={this.handleReset}
@@ -116,7 +116,7 @@ class ErrorBoundary extends Component<Props, State> {
               >
                 Try Again
               </button>
-              
+
               <button
                 onClick={() => window.location.href = '/'}
                 style={{ ...styles.button, ...styles.secondaryButton }}
@@ -215,4 +215,3 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 export default ErrorBoundary;
-

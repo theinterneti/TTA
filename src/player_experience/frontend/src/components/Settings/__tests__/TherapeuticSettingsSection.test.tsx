@@ -66,7 +66,7 @@ describe('TherapeuticSettingsSection', () => {
 
     const cbtCheckbox = screen.getByRole('checkbox', { name: /Cognitive Behavioral Therapy/ });
     const mindfulnessCheckbox = screen.getByRole('checkbox', { name: /Mindfulness-Based Therapy/ });
-    
+
     expect(cbtCheckbox).toBeChecked();
     expect(mindfulnessCheckbox).toBeChecked();
   });
@@ -300,11 +300,11 @@ describe('TherapeuticSettingsSection', () => {
     );
 
     expect(screen.getByText('Custom Art Therapy')).toBeInTheDocument();
-    
+
     // Find the remove button for the custom approach
     const customApproachContainer = screen.getByText('Custom Art Therapy').closest('div');
     const removeButton = customApproachContainer?.querySelector('button');
-    
+
     if (removeButton) {
       fireEvent.click(removeButton);
       expect(mockOnUpdate).toHaveBeenCalledWith({

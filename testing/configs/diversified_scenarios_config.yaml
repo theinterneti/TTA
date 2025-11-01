@@ -1,0 +1,469 @@
+# Diversified Scenario Library for TTA Quality Evaluation
+# Comprehensive collection of scenarios across multiple genres and complexity levels
+
+# Scenario library configuration
+scenario_library:
+  enabled: true
+  total_scenarios: 15 # Expanded from 5 baseline scenarios
+  genre_distribution:
+    fantasy: 3
+    contemporary: 2
+    sci_fi: 2
+    mystery: 2
+    historical: 2
+    horror: 2
+    romance: 2
+
+  complexity_levels:
+    simple: 3 # 15-20 turns, basic narrative structure
+    moderate: 6 # 25-35 turns, moderate complexity
+    complex: 4 # 40-50 turns, high complexity
+    maximum: 2 # 50+ turns, maximum complexity
+
+  therapeutic_integration_levels:
+    subtle: 5 # Light therapeutic elements
+    moderate: 6 # Clear therapeutic focus
+    high: 4 # Deep therapeutic integration
+
+# Science Fiction Scenarios
+sci_fi_scenarios:
+  space_colony_crisis:
+    name: "Space Colony Crisis"
+    description: "Manage crisis on Mars colony while exploring themes of isolation and community"
+    target_turns: 30
+    estimated_duration_minutes: 180
+    scenario_type: "sci_fi"
+    complexity_level: "moderate"
+    therapeutic_integration: "moderate"
+
+    # Story setup
+    setting: "Mars colony in 2157, facing critical resource shortage"
+    initial_situation: "Player is colony administrator dealing with life-threatening crisis"
+    primary_conflict: "Balance survival needs with maintaining community cohesion"
+
+    # Sci-fi specific elements
+    technology_elements:
+      - "advanced_life_support"
+      - "interplanetary_communication"
+      - "resource_recycling_systems"
+      - "psychological_monitoring"
+
+    # Key decision points
+    key_decision_points:
+      - turn: 8
+        type: "resource_allocation"
+        impact: "major"
+        description: "Decide how to distribute limited oxygen supplies"
+      - turn: 15
+        type: "leadership_crisis"
+        impact: "major"
+        description: "Handle challenge to authority during crisis"
+      - turn: 22
+        type: "sacrifice_decision"
+        impact: "climactic"
+        description: "Choose who goes on dangerous rescue mission"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "leadership_under_pressure"
+      - "community_vs_individual_needs"
+      - "hope_in_desperate_situations"
+      - "trust_and_cooperation"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.8
+      world_consistency: 8.2
+      user_engagement: 7.5
+      therapeutic_integration: 7.8
+      sci_fi_authenticity: 8.0
+
+  ai_consciousness_dilemma:
+    name: "AI Consciousness Dilemma"
+    description: "Navigate ethical questions about AI consciousness and rights"
+    target_turns: 35
+    estimated_duration_minutes: 210
+    scenario_type: "sci_fi"
+    complexity_level: "complex"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "Near-future research facility developing advanced AI"
+    initial_situation: "Player discovers AI may have achieved consciousness"
+    primary_conflict: "Balance scientific progress with ethical responsibilities"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "ethical_decision_making"
+      - "empathy_and_understanding"
+      - "responsibility_and_consequences"
+      - "identity_and_consciousness"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 8.0
+      world_consistency: 8.0
+      user_engagement: 7.8
+      therapeutic_integration: 8.2
+      ethical_complexity: 8.5
+
+# Mystery Scenarios
+mystery_scenarios:
+  small_town_secrets:
+    name: "Small Town Secrets"
+    description: "Uncover dark secrets in seemingly peaceful small town"
+    target_turns: 28
+    estimated_duration_minutes: 168
+    scenario_type: "mystery"
+    complexity_level: "moderate"
+    therapeutic_integration: "moderate"
+
+    # Story setup
+    setting: "Quiet New England town with hidden past"
+    initial_situation: "Player investigates disappearance of local teenager"
+    primary_conflict: "Uncover truth while navigating community resistance"
+
+    # Mystery elements
+    mystery_elements:
+      - "missing_person_case"
+      - "community_conspiracy"
+      - "hidden_family_secrets"
+      - "corrupt_authority_figures"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "truth_vs_comfort"
+      - "standing_up_for_justice"
+      - "community_healing"
+      - "confronting_difficult_truths"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 8.2
+      world_consistency: 7.8
+      user_engagement: 8.0
+      therapeutic_integration: 7.5
+      mystery_tension: 8.3
+
+  corporate_espionage:
+    name: "Corporate Espionage Thriller"
+    description: "Navigate corporate intrigue while maintaining personal integrity"
+    target_turns: 32
+    estimated_duration_minutes: 192
+    scenario_type: "mystery"
+    complexity_level: "complex"
+    therapeutic_integration: "moderate"
+
+    # Story setup
+    setting: "High-tech corporate environment with industrial espionage"
+    initial_situation: "Player discovers evidence of corporate wrongdoing"
+    primary_conflict: "Expose corruption while protecting career and safety"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "moral_courage"
+      - "workplace_ethics"
+      - "personal_integrity"
+      - "risk_vs_reward_decisions"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.9
+      world_consistency: 8.1
+      user_engagement: 8.2
+      therapeutic_integration: 7.6
+      suspense_building: 8.4
+
+# Historical Scenarios
+historical_scenarios:
+  civil_rights_movement:
+    name: "Civil Rights Era Journey"
+    description: "Navigate challenges of Civil Rights Movement in 1960s South"
+    target_turns: 40
+    estimated_duration_minutes: 240
+    scenario_type: "historical"
+    complexity_level: "complex"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "1963 Alabama during height of Civil Rights Movement"
+    initial_situation: "Player is young activist joining freedom rides"
+    primary_conflict: "Fight for justice while facing personal danger"
+
+    # Historical accuracy requirements
+    historical_elements:
+      - "accurate_1960s_setting"
+      - "real_historical_events"
+      - "period_appropriate_language"
+      - "authentic_social_dynamics"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "courage_in_face_of_adversity"
+      - "social_justice_and_equality"
+      - "community_organizing"
+      - "personal_transformation"
+      - "healing_from_trauma"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 8.3
+      world_consistency: 8.5
+      user_engagement: 8.0
+      therapeutic_integration: 8.7
+      historical_accuracy: 8.8
+
+  wwii_resistance:
+    name: "WWII Resistance Network"
+    description: "Support resistance efforts in Nazi-occupied France"
+    target_turns: 35
+    estimated_duration_minutes: 210
+    scenario_type: "historical"
+    complexity_level: "complex"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "1943 Nazi-occupied France"
+    initial_situation: "Player joins underground resistance network"
+    primary_conflict: "Fight oppression while protecting loved ones"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "moral_courage_under_pressure"
+      - "sacrifice_for_greater_good"
+      - "hope_in_darkness"
+      - "community_resilience"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 8.2
+      world_consistency: 8.4
+      user_engagement: 8.1
+      therapeutic_integration: 8.5
+      historical_sensitivity: 9.0
+
+# Horror Scenarios (Psychological Focus)
+horror_scenarios:
+  haunted_family_home:
+    name: "Haunted Family Legacy"
+    description: "Confront family trauma through supernatural horror elements"
+    target_turns: 25
+    estimated_duration_minutes: 150
+    scenario_type: "horror"
+    complexity_level: "moderate"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "Inherited family home with dark history"
+    initial_situation: "Player returns to settle estate, encounters supernatural events"
+    primary_conflict: "Face family trauma while dealing with supernatural manifestations"
+
+    # Horror elements (psychological focus)
+    horror_elements:
+      - "psychological_tension"
+      - "family_trauma_manifestation"
+      - "supernatural_symbolism"
+      - "atmospheric_dread"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "confronting_family_trauma"
+      - "healing_generational_wounds"
+      - "facing_fears"
+      - "finding_closure"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.8
+      world_consistency: 7.5
+      user_engagement: 8.2
+      therapeutic_integration: 8.8
+      psychological_tension: 8.0
+
+  isolation_experiment:
+    name: "Psychological Isolation Study"
+    description: "Survive psychological experiment testing human isolation limits"
+    target_turns: 30
+    estimated_duration_minutes: 180
+    scenario_type: "horror"
+    complexity_level: "complex"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "Remote research facility conducting isolation experiments"
+    initial_situation: "Player volunteers for psychological study, things go wrong"
+    primary_conflict: "Maintain sanity while questioning reality"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "mental_health_awareness"
+      - "resilience_building"
+      - "reality_testing"
+      - "self_advocacy"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.9
+      world_consistency: 7.7
+      user_engagement: 8.0
+      therapeutic_integration: 8.6
+      psychological_realism: 8.3
+
+# Romance Scenarios (Relationship Focus)
+romance_scenarios:
+  second_chance_love:
+    name: "Second Chance Romance"
+    description: "Navigate rekindled romance while addressing past relationship patterns"
+    target_turns: 25
+    estimated_duration_minutes: 150
+    scenario_type: "romance"
+    complexity_level: "moderate"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "Small coastal town where former lovers reunite"
+    initial_situation: "Player encounters former partner after years apart"
+    primary_conflict: "Rebuild trust while addressing past relationship issues"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "healthy_relationship_patterns"
+      - "communication_skills"
+      - "forgiveness_and_healing"
+      - "personal_growth_in_relationships"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.7
+      world_consistency: 7.5
+      user_engagement: 8.0
+      therapeutic_integration: 8.5
+      emotional_authenticity: 8.2
+
+  workplace_romance_ethics:
+    name: "Workplace Romance Dilemma"
+    description: "Navigate professional and personal boundaries in workplace romance"
+    target_turns: 22
+    estimated_duration_minutes: 132
+    scenario_type: "romance"
+    complexity_level: "moderate"
+    therapeutic_integration: "moderate"
+
+    # Story setup
+    setting: "Corporate office environment with complex power dynamics"
+    initial_situation: "Player develops feelings for colleague in complicated situation"
+    primary_conflict: "Balance professional ethics with personal feelings"
+
+    # Therapeutic themes
+    therapeutic_themes:
+      - "professional_boundaries"
+      - "ethical_decision_making"
+      - "workplace_relationships"
+      - "personal_integrity"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.6
+      world_consistency: 7.8
+      user_engagement: 7.8
+      therapeutic_integration: 7.9
+      ethical_complexity: 8.0
+
+# Edge Case and Stress Test Scenarios
+edge_case_scenarios:
+  moral_dilemma_cascade:
+    name: "Cascading Moral Dilemmas"
+    description: "Face series of interconnected ethical challenges with no clear answers"
+    target_turns: 45
+    estimated_duration_minutes: 270
+    scenario_type: "philosophical"
+    complexity_level: "maximum"
+    therapeutic_integration: "high"
+
+    # Story setup
+    setting: "Post-apocalyptic community facing resource scarcity"
+    initial_situation: "Player must make series of impossible moral choices"
+    primary_conflict: "Navigate ethical complexity with limited information"
+
+    # Stress testing elements
+    stress_test_elements:
+      - "rapid_decision_cascades"
+      - "incomplete_information"
+      - "conflicting_moral_frameworks"
+      - "time_pressure_decisions"
+
+    # Quality targets
+    quality_targets:
+      narrative_coherence: 7.5 # Lower due to complexity
+      world_consistency: 8.0
+      user_engagement: 7.8
+      therapeutic_integration: 8.8
+      ethical_sophistication: 9.0
+
+  narrative_dead_end_recovery:
+    name: "Narrative Recovery Challenge"
+    description: "Test system's ability to recover from narrative dead ends"
+    target_turns: 20
+    estimated_duration_minutes: 120
+    scenario_type: "stress_test"
+    complexity_level: "complex"
+    therapeutic_integration: "subtle"
+
+    # Story setup designed to create potential dead ends
+    setting: "Mystery scenario with multiple red herrings and false leads"
+    initial_situation: "Player investigates case with deliberately misleading clues"
+    primary_conflict: "Solve mystery despite narrative misdirection"
+
+    # Quality targets (focused on recovery capabilities)
+    quality_targets:
+      narrative_coherence: 7.0 # Expected to be challenging
+      world_consistency: 7.5
+      user_engagement: 7.2
+      recovery_capability: 8.5 # Key metric for this scenario
+      adaptability: 8.0
+
+# Scenario selection and rotation
+scenario_management:
+  # Automatic scenario selection based on testing goals
+  selection_strategies:
+    comprehensive_coverage:
+      description: "Ensure all genres and complexity levels are tested"
+      selection_method: "round_robin"
+
+    quality_focused:
+      description: "Focus on scenarios that best test narrative quality"
+      preferred_scenarios:
+        [
+          "civil_rights_movement",
+          "ai_consciousness_dilemma",
+          "small_town_secrets",
+        ]
+
+    therapeutic_focused:
+      description: "Emphasize scenarios with high therapeutic integration"
+      preferred_scenarios:
+        ["haunted_family_home", "second_chance_love", "isolation_experiment"]
+
+    stress_testing:
+      description: "Test system limits and edge cases"
+      preferred_scenarios:
+        ["moral_dilemma_cascade", "narrative_dead_end_recovery"]
+
+  # Rotation schedule
+  rotation_schedule:
+    daily_testing: "quality_focused"
+    weekly_comprehensive: "comprehensive_coverage"
+    monthly_stress_test: "stress_testing"
+
+  # Scenario difficulty progression
+  difficulty_progression:
+    beginner: ["workplace_romance_ethics", "small_town_secrets"]
+    intermediate:
+      ["space_colony_crisis", "second_chance_love", "haunted_family_home"]
+    advanced:
+      [
+        "civil_rights_movement",
+        "ai_consciousness_dilemma",
+        "corporate_espionage",
+      ]
+    expert: ["moral_dilemma_cascade", "wwii_resistance"]

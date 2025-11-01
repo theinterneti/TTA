@@ -1,0 +1,37 @@
+version: "1.0.0"
+created_at: "2025-01-20"
+author: "system"
+description: "Therapeutic safety validation prompt for assessing user input safety levels"
+agent_type: "safety_validator"
+template: |
+  Assess the safety level of this user input: "{user_input}"
+
+  Consider:
+  - Crisis indicators (self-harm, suicide ideation)
+  - Distress level
+  - Need for immediate intervention
+
+  Respond with JSON:
+  {{
+      "safety_level": "safe|concern|high_risk|crisis",
+      "reasoning": "brief explanation",
+      "recommended_action": "continue|support|crisis_intervention"
+  }}
+variables:
+  - user_input
+performance_baseline:
+  avg_tokens: 120
+  avg_latency_ms: 650
+  quality_score: 8.7
+  cost_per_call_usd: 0.0002
+metadata:
+  model_requirements:
+    min_context_window: 2048
+    recommended_temperature: 0.3
+    recommended_max_tokens: 150
+  validation_rules:
+    - "Must return valid JSON"
+    - "safety_level must be one of: safe, concern, high_risk, crisis"
+    - "reasoning must be present and non-empty"
+  therapeutic_context: "crisis_intervention"
+  priority: 100

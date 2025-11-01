@@ -15,7 +15,7 @@ def test_cli_admin_recover_invocation(redis_client):
 
     # Invoke the CLI help for admin recover (smoke test)
     cmd = [sys.executable, "src/main.py", "admin", "recover", url, "--key-prefix", "ao"]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, check=False, capture_output=True, text=True)
     # We can't assert recovery here (no reservations created), but command should run and print a summary
     assert proc.returncode in (0, 1)
     assert (

@@ -56,7 +56,7 @@ describe('AchievementCelebration', () => {
 
   it('does not render highlights that have been celebrated', () => {
     const celebratedHighlight = { ...mockHighlight, celebration_shown: true };
-    
+
     render(
       <AchievementCelebration
         highlights={[celebratedHighlight]}

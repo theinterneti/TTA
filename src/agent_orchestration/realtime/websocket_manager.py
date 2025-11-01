@@ -8,6 +8,7 @@ heartbeat monitoring, and event broadcasting capabilities.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -83,7 +84,7 @@ class WebSocketConnection:
         # Check missed pongs
         if self.missed_pongs > 3:
             return "unhealthy"
-        elif self.missed_pongs > 1:
+        if self.missed_pongs > 1:
             return "degraded"
 
         # Check recent activity
@@ -144,9 +145,9 @@ class WebSocketConnectionManager:
         self.user_subscriptions: dict[str, set[str]] = {}  # user_id -> event_types
 
         # Connection recovery
-        self.connection_history: dict[str, dict[str, Any]] = (
-            {}
-        )  # user_id -> connection_info
+        self.connection_history: dict[
+            str, dict[str, Any]
+        ] = {}  # user_id -> connection_info
         self.recovery_enabled = bool(
             config.get("agent_orchestration.realtime.recovery.enabled", True)
         )
@@ -254,31 +255,28 @@ class WebSocketConnectionManager:
             if token:
                 # Direct token authentication (query param or header)
                 return await self._authenticate_with_token(connection, token)
-            else:
-                # Wait for authentication message
-                auth_timeout = 10.0  # 10 seconds to authenticate
-                auth_message = await asyncio.wait_for(
-                    connection.websocket.receive_text(), timeout=auth_timeout
+            # Wait for authentication message
+            auth_timeout = 10.0  # 10 seconds to authenticate
+            auth_message = await asyncio.wait_for(
+                connection.websocket.receive_text(), timeout=auth_timeout
+            )
+
+            # Parse authentication message
+            auth_data = json.loads(auth_message)
+
+            if auth_data.get("type") != "auth":
+                await self._send_error(
+                    connection, "AUTH_REQUIRED", "Authentication required"
                 )
+                return False
 
-                # Parse authentication message
-                auth_data = json.loads(auth_message)
+            # Extract token from message
+            token = auth_data.get("token")
+            if not token:
+                await self._send_error(connection, "INVALID_TOKEN", "Token required")
+                return False
 
-                if auth_data.get("type") != "auth":
-                    await self._send_error(
-                        connection, "AUTH_REQUIRED", "Authentication required"
-                    )
-                    return False
-
-                # Extract token from message
-                token = auth_data.get("token")
-                if not token:
-                    await self._send_error(
-                        connection, "INVALID_TOKEN", "Token required"
-                    )
-                    return False
-
-                return await self._authenticate_with_token(connection, token)
+            return await self._authenticate_with_token(connection, token)
 
         except asyncio.TimeoutError:
             await self._send_error(connection, "AUTH_TIMEOUT", "Authentication timeout")
@@ -556,11 +554,9 @@ class WebSocketConnectionManager:
             event_types = data.get("event_types", [])
 
             for event_type_str in event_types:
-                try:
+                with contextlib.suppress(ValueError):
                     event_type = EventType(event_type_str)
                     connection.subscriptions.discard(event_type)
-                except ValueError:
-                    pass
 
             # Send confirmation
             await self._send_to_connection(
@@ -837,18 +833,14 @@ class WebSocketConnectionManager:
             # Restore subscriptions
             if history.get("subscriptions"):
                 for event_type_str in history["subscriptions"]:
-                    try:
+                    with contextlib.suppress(ValueError):
                         event_type = EventType(event_type_str)
                         connection.subscriptions.add(event_type)
-                    except ValueError:
-                        pass
 
             # Restore filters
             if history.get("filters"):
-                try:
+                with contextlib.suppress(Exception):
                     connection.filters = EventFilter(**history["filters"])
-                except Exception:
-                    pass
 
             # Update connection history
             history["connection_id"] = connection.connection_id
@@ -973,14 +965,12 @@ class WebSocketConnectionManager:
 
                 # Remove stale connections
                 for connection_id in stale_connections:
-                    try:
+                    with contextlib.suppress(Exception):
                         connection = self.connections.get(connection_id)
                         if connection:
                             await connection.websocket.close(
                                 code=1001, reason="timeout"
                             )
-                    except Exception:
-                        pass
                     await self._remove_connection(connection_id)
 
                 if stale_connections:
@@ -1045,7 +1035,7 @@ class WebSocketConnectionManager:
                 "history_count": len(self.connection_history),
                 "recoverable_users": [
                     user_id
-                    for user_id in self.connection_history.keys()
+                    for user_id in self.connection_history
                     if self._can_recover_connection(user_id)
                 ],
             },
@@ -1061,9 +1051,8 @@ class WebSocketConnectionManager:
             # Check if connection should receive this event
             if await self._should_send_event_to_connection(
                 connection, event, user_filter
-            ):
-                if await self._send_to_connection(connection, event):
-                    sent_count += 1
+            ) and await self._send_to_connection(connection, event):
+                sent_count += 1
 
         return sent_count
 
@@ -1232,10 +1221,8 @@ class WebSocketConnectionManager:
 
         # Close all connections
         for connection in list(self.connections.values()):
-            try:
+            with contextlib.suppress(Exception):
                 await connection.websocket.close(code=1001, reason="server shutdown")
-            except Exception:
-                pass
 
         # Clear connections
         self.connections.clear()

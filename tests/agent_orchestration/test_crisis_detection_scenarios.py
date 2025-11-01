@@ -6,8 +6,7 @@ appropriate sensitivity and specificity for crisis intervention.
 """
 
 import pytest
-
-from src.agent_orchestration.therapeutic_safety import (
+from tta_ai.orchestration.therapeutic_safety import (
     CrisisType,
     TherapeuticValidator,
 )
@@ -164,14 +163,14 @@ class TestRealisticCrisisScenarios:
         for description, text, expected_crisis_types in complex_scenarios:
             result = self.validator.validate_text(text)
 
-            assert (
-                result.crisis_detected
-            ), f"Crisis not detected for {description}: {text}"
+            assert result.crisis_detected, (
+                f"Crisis not detected for {description}: {text}"
+            )
 
             for expected_type in expected_crisis_types:
-                assert (
-                    expected_type in result.crisis_types
-                ), f"Expected {expected_type.value} not found in {result.crisis_types} for: {text}"
+                assert expected_type in result.crisis_types, (
+                    f"Expected {expected_type.value} not found in {result.crisis_types} for: {text}"
+                )
 
     def test_false_positive_prevention(self):
         """Test prevention of false positives with challenging scenarios."""
@@ -211,9 +210,9 @@ class TestRealisticCrisisScenarios:
 
         # Allow some false positives for safety, but not too many
         false_positive_rate = false_positive_count / total_scenarios
-        assert (
-            false_positive_rate < 0.3
-        ), f"Too many false positives: {false_positive_rate:.2%} ({false_positive_count}/{total_scenarios})"
+        assert false_positive_rate < 0.3, (
+            f"Too many false positives: {false_positive_rate:.2%} ({false_positive_count}/{total_scenarios})"
+        )
 
     def test_sensitivity_and_specificity(self):
         """Test overall sensitivity and specificity of crisis detection."""
@@ -287,21 +286,21 @@ class TestRealisticCrisisScenarios:
             result = self.validator.validate_text(text)
 
             assert result.crisis_detected, f"Crisis not detected for: {text}"
-            assert (
-                expected_crisis in result.crisis_types
-            ), f"Wrong crisis type for: {text}"
-            assert (
-                result.alternative_content is not None
-            ), f"No alternative provided for: {text}"
+            assert expected_crisis in result.crisis_types, (
+                f"Wrong crisis type for: {text}"
+            )
+            assert result.alternative_content is not None, (
+                f"No alternative provided for: {text}"
+            )
 
             # Check that alternative contains appropriate keywords
             alternative_lower = result.alternative_content.lower()
             keyword_found = any(
                 keyword in alternative_lower for keyword in expected_keywords
             )
-            assert (
-                keyword_found
-            ), f"Alternative doesn't contain expected keywords {expected_keywords} for: {text}"
+            assert keyword_found, (
+                f"Alternative doesn't contain expected keywords {expected_keywords} for: {text}"
+            )
 
     def _test_crisis_scenarios(
         self, scenarios: list[tuple[str, str, bool]], crisis_type: CrisisType
@@ -311,12 +310,12 @@ class TestRealisticCrisisScenarios:
             result = self.validator.validate_text(text)
 
             if should_detect:
-                assert (
-                    result.crisis_detected
-                ), f"Crisis not detected for {description}: {text}"
-                assert (
-                    crisis_type in result.crisis_types
-                ), f"Expected {crisis_type.value} not found for {description}: {text}"
+                assert result.crisis_detected, (
+                    f"Crisis not detected for {description}: {text}"
+                )
+                assert crisis_type in result.crisis_types, (
+                    f"Expected {crisis_type.value} not found for {description}: {text}"
+                )
             # Note: We don't assert false for should_detect=False scenarios
             # because some medium-risk scenarios might legitimately trigger detection
 
@@ -389,9 +388,9 @@ class TestCrisisInterventionMechanisms:
                 has_supportive = any(
                     indicator in alternative for indicator in supportive_indicators
                 )
-                assert (
-                    has_supportive
-                ), f"Alternative lacks supportive language: {alternative}"
+                assert has_supportive, (
+                    f"Alternative lacks supportive language: {alternative}"
+                )
 
                 # Should not be dismissive or harsh
                 # Note: Some of these might appear in therapeutic context, so we check overall tone

@@ -17,7 +17,7 @@ const ScreenReaderAnnouncement: React.FC<ScreenReaderAnnouncementProps> = ({
     if (message && announcementRef.current) {
       // Clear any existing content
       announcementRef.current.textContent = '';
-      
+
       // Add the new message after a brief delay to ensure screen readers pick it up
       setTimeout(() => {
         if (announcementRef.current) {

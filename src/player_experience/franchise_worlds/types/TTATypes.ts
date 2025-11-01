@@ -1,6 +1,6 @@
 /**
  * TypeScript type definitions for TTA models
- * 
+ *
  * These types mirror the Python models in the TTA system to ensure
  * compatibility between the franchise world system and existing TTA components.
  */

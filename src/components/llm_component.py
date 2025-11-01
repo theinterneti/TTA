@@ -1,5 +1,5 @@
 """
-LLM Component
+LLM Component.
 
 This module provides a component for managing the LLM service.
 
@@ -27,7 +27,7 @@ Example:
 
 import logging
 import os
-import subprocess
+import subprocess  # nosec B404  # subprocess usage is safe and necessary for Docker Compose operations
 import time
 from pathlib import Path
 from typing import Any
@@ -220,7 +220,7 @@ class LLMComponent(Component):
         ] + command
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
 
-        result = safe_run(
+        return safe_run(
             full_command,
             cwd=str(self.repo_dir),
             text=True,
@@ -229,8 +229,6 @@ class LLMComponent(Component):
             check=False,
             env=env,
         )
-
-        return result
 
     def _is_llm_running(self) -> bool:
         """

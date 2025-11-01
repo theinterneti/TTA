@@ -10,17 +10,17 @@ import json
 import time
 
 import pytest
-
-from src.agent_orchestration.performance.response_time_monitor import (
+import pytest_asyncio
+from tta_ai.orchestration.performance.response_time_monitor import (
     OperationType,
     ResponseTimeMonitor,
 )
-from src.agent_orchestration.proxies import (
+from tta_ai.orchestration.proxies import (
     InputProcessorAgentProxy,
     NarrativeGeneratorAgentProxy,
     WorldBuilderAgentProxy,
 )
-from src.agent_orchestration.realtime.agent_event_integration import (
+from tta_ai.orchestration.realtime.agent_event_integration import (
     AgentWorkflowCoordinator,
 )
 
@@ -31,7 +31,7 @@ from src.agent_orchestration.realtime.agent_event_integration import (
 class TestWorkflowChainValidation:
     """Detailed validation of the complete agent workflow chain."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def workflow_coordinator(
         self, redis_coordinator, neo4j_driver, event_publisher
     ):
@@ -72,7 +72,7 @@ class TestWorkflowChainValidation:
 
         return coordinator
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def response_monitor(self):
         """Create response time monitor for workflow validation."""
         monitor = ResponseTimeMonitor(
@@ -98,7 +98,6 @@ class TestWorkflowChainValidation:
             workflow_id="complete_chain_test",
             user_id="workflow_test_user",
         ):
-
             start_time = time.time()
 
             # Execute complete workflow
@@ -291,8 +290,8 @@ class TestWorkflowChainValidation:
         ]
 
         for i, problematic_input in enumerate(problematic_inputs):
-            session_id = f"error_prop_session_{i+1:03d}"
-            world_id = f"error_prop_world_{i+1:03d}"
+            session_id = f"error_prop_session_{i + 1:03d}"
+            world_id = f"error_prop_world_{i + 1:03d}"
 
             try:
                 result = await workflow_coordinator.execute_complete_workflow(
@@ -343,8 +342,8 @@ class TestWorkflowChainValidation:
         results = []
 
         for i, test_input in enumerate(test_inputs):
-            session_id = f"perf_opt_session_{i+1:03d}"
-            world_id = f"perf_opt_world_{i+1:03d}"
+            session_id = f"perf_opt_session_{i + 1:03d}"
+            world_id = f"perf_opt_world_{i + 1:03d}"
 
             start_time = time.time()
 
@@ -396,9 +395,9 @@ class TestWorkflowChainValidation:
 
         # Create concurrent workflow tasks
         for i in range(num_concurrent):
-            user_input = f"I'm user {i+1} and I need help with anxiety management."
-            session_id = f"concurrent_workflow_session_{i+1:03d}"
-            world_id = f"concurrent_workflow_world_{i+1:03d}"
+            user_input = f"I'm user {i + 1} and I need help with anxiety management."
+            session_id = f"concurrent_workflow_session_{i + 1:03d}"
+            world_id = f"concurrent_workflow_world_{i + 1:03d}"
 
             task = asyncio.create_task(
                 workflow_coordinator.execute_complete_workflow(
@@ -473,8 +472,8 @@ class TestWorkflowChainValidation:
         ]
 
         for i, scenario in enumerate(therapeutic_inputs):
-            session_id = f"therapeutic_consistency_session_{i+1:03d}"
-            world_id = f"therapeutic_consistency_world_{i+1:03d}"
+            session_id = f"therapeutic_consistency_session_{i + 1:03d}"
+            world_id = f"therapeutic_consistency_world_{i + 1:03d}"
 
             result = await workflow_coordinator.execute_complete_workflow(
                 user_input=scenario["input"], session_id=session_id, world_id=world_id

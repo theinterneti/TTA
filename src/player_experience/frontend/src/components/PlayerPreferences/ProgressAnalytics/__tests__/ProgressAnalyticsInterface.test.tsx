@@ -1,6 +1,6 @@
 /**
  * Progress Analytics Interface Tests - Priority 3D Implementation
- * 
+ *
  * Comprehensive test suite for the progress analytics interface component.
  * Tests progress visualization, outcome display, and therapeutic insights.
  */
@@ -217,7 +217,7 @@ describe('ProgressAnalyticsInterface', () => {
   describe('Component Rendering', () => {
     it('should render the progress analytics interface', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       expect(screen.getByText('Progress Analytics')).toBeInTheDocument();
       expect(screen.getByText('Data Quality:')).toBeInTheDocument();
       expect(screen.getByText('86%')).toBeInTheDocument(); // Data quality score
@@ -225,7 +225,7 @@ describe('ProgressAnalyticsInterface', () => {
 
     it('should render navigation tabs', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       expect(screen.getByRole('tab', { name: /overview/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /detailed analysis/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /therapeutic insights/i })).toBeInTheDocument();
@@ -234,7 +234,7 @@ describe('ProgressAnalyticsInterface', () => {
 
     it('should show overview panel by default', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       expect(screen.getByText('Overall Effectiveness')).toBeInTheDocument();
       expect(screen.getByText('78%')).toBeInTheDocument(); // Overall effectiveness score
       expect(screen.getByText('Risk Level')).toBeInTheDocument();
@@ -245,7 +245,7 @@ describe('ProgressAnalyticsInterface', () => {
   describe('Overview Panel', () => {
     it('should display key metrics cards', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       // Overall Effectiveness Card
       expect(screen.getByText('Overall Effectiveness')).toBeInTheDocument();
       expect(screen.getByText('78%')).toBeInTheDocument();
@@ -262,7 +262,7 @@ describe('ProgressAnalyticsInterface', () => {
 
     it('should display goal progress summary', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       expect(screen.getByText('Goal Progress Summary')).toBeInTheDocument();
       expect(screen.getByText('Goal goal-1')).toBeInTheDocument();
       expect(screen.getByText('Goal goal-2')).toBeInTheDocument();
@@ -273,12 +273,12 @@ describe('ProgressAnalyticsInterface', () => {
     it('should expand goal details when clicked', async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const goalCard = screen.getByText('Goal goal-1').closest('div');
       expect(goalCard).toBeInTheDocument();
-      
+
       await user.click(goalCard!);
-      
+
       expect(screen.getByText('Velocity:')).toBeInTheDocument();
       expect(screen.getByText('Consistency:')).toBeInTheDocument();
       expect(screen.getByText('Risk Factors:')).toBeInTheDocument();
@@ -288,16 +288,16 @@ describe('ProgressAnalyticsInterface', () => {
     it('should show/hide risk details when clicked', async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const viewRiskButton = screen.getByText('View risk factors');
       await user.click(viewRiskButton);
-      
+
       expect(screen.getByText('Risk Assessment Details')).toBeInTheDocument();
       expect(screen.getByText('Irregular progress tracking patterns detected')).toBeInTheDocument();
-      
+
       const hideRiskButton = screen.getByText('Hide details');
       await user.click(hideRiskButton);
-      
+
       expect(screen.queryByText('Risk Assessment Details')).not.toBeInTheDocument();
     });
   });
@@ -306,10 +306,10 @@ describe('ProgressAnalyticsInterface', () => {
     it('should switch to detailed analysis tab', async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const detailedTab = screen.getByRole('tab', { name: /detailed analysis/i });
       await user.click(detailedTab);
-      
+
       expect(screen.getByText('Clinical Outcome Measurements')).toBeInTheDocument();
       expect(screen.getByText('Data Quality Metrics')).toBeInTheDocument();
       expect(screen.getByText('Recent Progress Entries')).toBeInTheDocument();
@@ -328,10 +328,10 @@ describe('ProgressAnalyticsInterface', () => {
     it('should switch to recommendations tab', async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const recommendationsTab = screen.getByRole('tab', { name: /recommendations/i });
       await user.click(recommendationsTab);
-      
+
       expect(screen.getByText('Progress Recommendations')).toBeInTheDocument();
       expect(screen.getByText('Suggested Next Actions')).toBeInTheDocument();
     });
@@ -341,7 +341,7 @@ describe('ProgressAnalyticsInterface', () => {
     beforeEach(async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const detailedTab = screen.getByRole('tab', { name: /detailed analysis/i });
       await user.click(detailedTab);
     });
@@ -393,7 +393,7 @@ describe('ProgressAnalyticsInterface', () => {
     beforeEach(async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const insightsTab = screen.getByRole('tab', { name: /therapeutic insights/i });
       await user.click(insightsTab);
     });
@@ -405,26 +405,26 @@ describe('ProgressAnalyticsInterface', () => {
 
     it('should expand/collapse insight details', async () => {
       const user = userEvent.setup();
-      
+
       const moreButton = screen.getByText('More');
       await user.click(moreButton);
-      
+
       expect(screen.getByText('Clinical Relevance:')).toBeInTheDocument();
       expect(screen.getByText('high')).toBeInTheDocument();
       expect(screen.getByText('Recommendations:')).toBeInTheDocument();
-      
+
       const lessButton = screen.getByText('Less');
       await user.click(lessButton);
-      
+
       expect(screen.queryByText('Clinical Relevance:')).not.toBeInTheDocument();
     });
 
     it('should handle actionable insights', async () => {
       const user = userEvent.setup();
-      
+
       const actButton = screen.getByText('Act on This');
       await user.click(actButton);
-      
+
       expect(mockProps.onRequestDetailedInsight).toHaveBeenCalledWith('insight-1');
     });
 
@@ -452,7 +452,7 @@ describe('ProgressAnalyticsInterface', () => {
     beforeEach(async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const recommendationsTab = screen.getByRole('tab', { name: /recommendations/i });
       await user.click(recommendationsTab);
     });
@@ -465,15 +465,15 @@ describe('ProgressAnalyticsInterface', () => {
 
     it('should handle recommendation actions', async () => {
       const user = userEvent.setup();
-      
+
       const acceptButton = screen.getByText('Accept');
       await user.click(acceptButton);
-      
+
       expect(mockProps.onAcceptRecommendation).toHaveBeenCalledWith('rec-1');
-      
+
       const dismissButton = screen.getByText('Dismiss');
       await user.click(dismissButton);
-      
+
       expect(mockProps.onDismissRecommendation).toHaveBeenCalledWith('rec-1');
     });
 
@@ -485,10 +485,10 @@ describe('ProgressAnalyticsInterface', () => {
 
     it('should handle action scheduling', async () => {
       const user = userEvent.setup();
-      
+
       const scheduleButton = screen.getByText('Schedule');
       await user.click(scheduleButton);
-      
+
       expect(mockProps.onScheduleAction).toHaveBeenCalledWith('action-1', expect.any(Date));
     });
   });
@@ -496,7 +496,7 @@ describe('ProgressAnalyticsInterface', () => {
   describe('Data Quality Indicators', () => {
     it('should show high quality indicator for good data', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const dataQualityBadge = screen.getByText('86%');
       expect(dataQualityBadge).toHaveClass('bg-green-100', 'text-green-800');
     });
@@ -512,9 +512,9 @@ describe('ProgressAnalyticsInterface', () => {
           }
         }
       };
-      
+
       render(<ProgressAnalyticsInterface {...moderateQualityProps} />);
-      
+
       const dataQualityBadge = screen.getByText('65%');
       expect(dataQualityBadge).toHaveClass('bg-yellow-100', 'text-yellow-800');
     });
@@ -530,9 +530,9 @@ describe('ProgressAnalyticsInterface', () => {
           }
         }
       };
-      
+
       render(<ProgressAnalyticsInterface {...lowQualityProps} />);
-      
+
       const dataQualityBadge = screen.getByText('45%');
       expect(dataQualityBadge).toHaveClass('bg-red-100', 'text-red-800');
     });
@@ -541,7 +541,7 @@ describe('ProgressAnalyticsInterface', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA labels and roles', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       expect(screen.getByRole('tablist')).toBeInTheDocument();
       expect(screen.getAllByRole('tab')).toHaveLength(4);
       expect(screen.getByRole('tabpanel')).toBeInTheDocument();
@@ -550,28 +550,28 @@ describe('ProgressAnalyticsInterface', () => {
     it('should have proper tab navigation', async () => {
       const user = userEvent.setup();
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       const overviewTab = screen.getByRole('tab', { name: /overview/i });
       const detailedTab = screen.getByRole('tab', { name: /detailed analysis/i });
-      
+
       expect(overviewTab).toHaveAttribute('aria-selected', 'true');
       expect(detailedTab).toHaveAttribute('aria-selected', 'false');
-      
+
       await user.click(detailedTab);
-      
+
       expect(overviewTab).toHaveAttribute('aria-selected', 'false');
       expect(detailedTab).toHaveAttribute('aria-selected', 'true');
     });
 
     it('should have descriptive button labels', () => {
       render(<ProgressAnalyticsInterface {...mockProps} />);
-      
+
       expect(screen.getByText('View risk factors')).toBeInTheDocument();
-      
+
       // Switch to recommendations tab to test action buttons
       const recommendationsTab = screen.getByRole('tab', { name: /recommendations/i });
       fireEvent.click(recommendationsTab);
-      
+
       expect(screen.getByText('Accept')).toBeInTheDocument();
       expect(screen.getByText('Dismiss')).toBeInTheDocument();
       expect(screen.getByText('Schedule')).toBeInTheDocument();
@@ -591,9 +591,9 @@ describe('ProgressAnalyticsInterface', () => {
           therapeuticInsights: []
         }
       };
-      
+
       render(<ProgressAnalyticsInterface {...emptyProps} />);
-      
+
       expect(screen.getByText('0')).toBeInTheDocument(); // Active goals count
     });
 
@@ -607,9 +607,9 @@ describe('ProgressAnalyticsInterface', () => {
           therapeuticInsights: []
         }
       };
-      
+
       render(<ProgressAnalyticsInterface {...minimalProps} />);
-      
+
       expect(screen.getByText('Progress Analytics')).toBeInTheDocument();
     });
   });

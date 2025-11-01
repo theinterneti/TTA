@@ -106,4 +106,3 @@ Let's build something amazing together! 🚀
 ---
 
 *Have questions about Discussions? Check out the [GitHub Discussions documentation](https://docs.github.com/en/discussions).*
-

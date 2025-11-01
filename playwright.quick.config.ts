@@ -10,7 +10,7 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: 'list',
-  
+
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
@@ -34,4 +34,3 @@ export default defineConfig({
 
   outputDir: 'test-results/',
 });
-

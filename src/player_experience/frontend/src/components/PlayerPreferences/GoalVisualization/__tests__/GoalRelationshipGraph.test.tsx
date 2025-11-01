@@ -123,10 +123,10 @@ describe('GoalRelationshipGraph', () => {
       );
 
       const canvas = container.querySelector('canvas');
-      
+
       // Simulate click at center of canvas (where nodes would be)
       fireEvent.click(canvas, { clientX: 300, clientY: 200 });
-      
+
       // Note: Due to the complexity of testing canvas interactions,
       // we would need to mock getBoundingClientRect and test the actual
       // click detection logic separately
@@ -136,10 +136,10 @@ describe('GoalRelationshipGraph', () => {
       const { container } = render(<GoalRelationshipGraph relationshipMap={mockRelationshipMap} />);
 
       const canvas = container.querySelector('canvas');
-      
+
       // Simulate mouse move
       fireEvent.mouseMove(canvas, { clientX: 300, clientY: 200 });
-      
+
       // The hover state would be tested by checking if the tooltip appears
       // This requires more complex setup to mock the canvas coordinate system
     });

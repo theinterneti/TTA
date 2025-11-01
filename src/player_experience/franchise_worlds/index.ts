@@ -1,14 +1,14 @@
 /**
  * Franchise World System - Main Export Module
- * 
+ *
  * Comprehensive world-building and character development system for TTA that adapts
  * iconic storylines from popular fantasy and science fiction franchises while
  * maintaining legal distinctiveness and therapeutic value.
  */
 
 // Core system exports
-export { 
-  FranchiseWorldSystem, 
+export {
+  FranchiseWorldSystem,
   FranchiseWorldInstance,
   type FranchiseWorldConfig,
   type WorldSystemConfig,
@@ -63,7 +63,7 @@ export {
  */
 export const FRANCHISE_WORLD_QUICK_START = {
   description: 'TTA Franchise World System - Entertainment-first therapeutic adventures',
-  
+
   features: [
     '🏰 5 Fantasy Worlds: Epic adventures with therapeutic depth',
     '🚀 5 Sci-Fi Worlds: Space exploration with personal growth',
@@ -73,7 +73,7 @@ export const FRANCHISE_WORLD_QUICK_START = {
     '🎮 Session Flexibility: 15 minutes to 3+ hours of gameplay',
     '📊 Simulation Ready: Compatible with TTA simulation framework'
   ],
-  
+
   quickStart: {
     step1: 'Import FranchiseWorldIntegration',
     step2: 'Initialize with new FranchiseWorldIntegration()',
@@ -81,7 +81,7 @@ export const FRANCHISE_WORLD_QUICK_START = {
     step4: 'Convert to TTA format automatically',
     step5: 'Integrate with existing TTA player experience'
   },
-  
+
   examples: {
     basicUsage: `
 import { FranchiseWorldIntegration } from './franchise_worlds';
@@ -91,7 +91,7 @@ const worlds = await integration.getAllFranchiseWorlds();
 const fantasyWorlds = await integration.getFranchiseWorldsByGenre('fantasy');
 const specificWorld = await integration.getFranchiseWorld('eldermere_realms');
     `,
-    
+
     characterArchetypes: `
 import { ArchetypeTemplateManager } from './franchise_worlds';
 
@@ -101,7 +101,7 @@ const adapted = ArchetypeTemplateManager.adaptArchetypeForWorld(
   mentor, 'fantasy', 'Eldermere Realms'
 );
     `,
-    
+
     runDemo: `
 import { runFranchiseWorldDemo } from './franchise_worlds';
 
@@ -117,7 +117,7 @@ await runFranchiseWorldDemo();
 export const FRANCHISE_WORLD_STATUS = {
   version: '1.0.0',
   status: 'Production Ready',
-  
+
   implemented: {
     coreSystem: '✅ Complete',
     fantasyWorlds: '✅ 3 of 5 worlds implemented',
@@ -137,7 +137,7 @@ export const FRANCHISE_WORLD_STATUS = {
     multiplayerSupport: '🔄 Shared world experiences',
     aiNarrativeGeneration: '🔄 Dynamic story adaptation'
   },
-  
+
   testingStatus: {
     unitTests: '✅ Core functionality tested',
     integrationTests: '✅ TTA compatibility verified',
@@ -159,21 +159,21 @@ export const PRODUCTION_RECOMMENDATIONS = {
     logging: 'Use TTA logging framework',
     security: 'Follow TTA security protocols'
   },
-  
+
   performance: {
     caching: 'Cache world configurations in Redis',
     preloading: 'Preload popular worlds at startup',
     optimization: 'Lazy load character archetypes',
     scaling: 'Use existing TTA scaling strategies'
   },
-  
+
   therapeutic: {
     validation: 'Require therapeutic professional review',
     monitoring: 'Track therapeutic outcomes',
     safety: 'Implement crisis detection protocols',
     compliance: 'Ensure HIPAA compliance where applicable'
   },
-  
+
   legal: {
     copyright: 'Complete legal review of all adaptations',
     trademark: 'Verify no trademark conflicts',
@@ -187,7 +187,7 @@ export const PRODUCTION_RECOMMENDATIONS = {
  */
 export const TTA_INTEGRATION_CHECKLIST = [
   '✅ WorldDetails model compatibility',
-  '✅ TherapeuticApproach enum integration', 
+  '✅ TherapeuticApproach enum integration',
   '✅ DifficultyLevel enum integration',
   '✅ Player experience API compatibility',
   '✅ Character management integration',

@@ -45,4 +45,3 @@ Provide a high-level plan for Task 10: cache active world state, character state
 - Avoid caching sensitive player data; ensure privacy
 - Ensure cache backpressure does not degrade persistence path
 - Establish safe defaults when Redis unavailable
-

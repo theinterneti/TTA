@@ -66,4 +66,3 @@ export TTA_TOOL_TIMEOUT_MS=100
 - File config values are loaded first, then environment variables override any matching keys.
 - If YAML is used, ensure PyYAML is installed; otherwise JSON is recommended.
 - Synchronous timeouts are best-effort and cannot forcibly terminate the running work; they raise `TimeoutError` while work may continue in a background thread.
-

@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { login } from '../../store/slices/authSlice';
+import { RootState } from '../../store/store';
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
   });
+
+  // Redirect to dashboard (or intended destination) after successful login
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Get the intended destination from location state, or default to dashboard
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,21 +44,22 @@ const Login: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 data-testid="login-welcome-title" className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Welcome to TTA
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p data-testid="login-welcome-subtitle" className="mt-2 text-center text-sm text-gray-600">
             Therapeutic Text Adventure Platform
           </p>
         </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+
+        <form data-testid="login-form" className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="username" className="sr-only">
                 Username
               </label>
               <input
+                data-testid="login-username-input"
                 id="username"
                 name="username"
                 type="text"
@@ -62,6 +75,7 @@ const Login: React.FC = () => {
                 Password
               </label>
               <input
+                data-testid="login-password-input"
                 id="password"
                 name="password"
                 type="password"
@@ -75,7 +89,7 @@ const Login: React.FC = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+            <div data-testid="login-error-message" className="bg-red-50 border border-red-200 rounded-md p-3">
               <div className="flex">
                 <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -89,12 +103,13 @@ const Login: React.FC = () => {
 
           <div>
             <button
+              data-testid="login-submit-button"
               type="submit"
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <div className="flex items-center">
+                <div data-testid="login-loading-state" className="flex items-center">
                   <div className="spinner mr-2"></div>
                   Signing in...
                 </div>
@@ -107,14 +122,14 @@ const Login: React.FC = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <button type="button" className="font-medium text-primary-600 hover:text-primary-500">
+              <button data-testid="login-signup-link" type="button" className="font-medium text-primary-600 hover:text-primary-500">
                 Sign up
               </button>
             </p>
           </div>
         </form>
 
-        <div className="mt-8 text-center">
+        <div data-testid="login-demo-credentials" className="mt-8 text-center">
           <div className="bg-therapeutic-calm border border-blue-200 rounded-lg p-4">
             <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
             <p className="text-xs text-blue-800">

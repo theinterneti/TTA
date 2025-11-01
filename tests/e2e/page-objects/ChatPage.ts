@@ -39,7 +39,7 @@ export class ChatPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
     this.chatContainer = page.locator('[data-testid="chat-container"], .chat-container');
     this.messageHistory = page.locator('[data-testid="message-history"], .message-history');
@@ -51,17 +51,17 @@ export class ChatPage extends BasePage {
     this.systemMessages = page.locator('[data-testid="system-message"], .system-message');
     this.typingIndicator = page.locator('[data-testid="typing-indicator"], .typing-indicator');
     this.connectionStatus = page.locator('[data-testid="connection-status"], .connection-status');
-    
+
     // Session info
     this.sessionInfo = page.locator('[data-testid="session-info"], .session-info');
     this.characterInfo = page.locator('[data-testid="character-info"], .character-info');
     this.worldInfo = page.locator('[data-testid="world-info"], .world-info');
-    
+
     // Navigation
     this.exitChatButton = page.locator('button').filter({ hasText: /exit|leave|back/i });
     this.settingsButton = page.locator('button[data-testid="chat-settings"], .settings-button');
     this.helpButton = page.locator('button[data-testid="help"], .help-button');
-    
+
     // Interactive elements
     this.interactiveButtons = page.locator('[data-testid="interactive-button"], .interactive-button');
     this.choiceButtons = page.locator('[data-testid="choice-button"], .choice-button');
@@ -70,7 +70,7 @@ export class ChatPage extends BasePage {
     this.feedbackButtons = page.locator('[data-testid="feedback-button"], .feedback-button');
     this.crisisAlert = page.locator('[data-testid="crisis-alert"], .crisis-alert');
     this.safetyIndicator = page.locator('[data-testid="safety-indicator"], .safety-indicator');
-    
+
     // Accessibility
     this.skipLinks = page.locator('a[href^="#"]');
     this.screenReaderAnnouncements = page.locator('[aria-live], [data-testid="sr-announcement"]');
@@ -203,17 +203,17 @@ export class ChatPage extends BasePage {
   // Accessibility tests
   async checkAccessibility() {
     await super.checkAccessibility();
-    
+
     // Check skip links
     await expect(this.skipLinks.first()).toBeVisible();
-    
+
     // Check ARIA live regions
     await expect(this.screenReaderAnnouncements.first()).toHaveAttribute('aria-live');
-    
+
     // Check message accessibility
     const messages = this.page.locator('[role="article"]');
     await expect(messages.first()).toHaveRole('article');
-    
+
     // Check input accessibility
     await expect(this.messageInput).toHaveAttribute('aria-label');
   }
@@ -223,12 +223,12 @@ export class ChatPage extends BasePage {
     // Test message input focus
     await this.messageInput.focus();
     await expect(this.messageInput).toBeFocused();
-    
+
     // Test Enter key for sending
     await this.messageInput.fill('Test message');
     await this.messageInput.press('Enter');
     await this.expectMessageSent('Test message');
-    
+
     // Test Escape key for clearing input
     await this.messageInput.fill('Test');
     await this.messageInput.press('Escape');
@@ -245,11 +245,11 @@ export class ChatPage extends BasePage {
   async checkMobileLayout() {
     await this.setMobileViewport();
     await this.expectChatLoaded();
-    
+
     // Check that chat takes full screen on mobile
     const chatBox = await this.chatContainer.boundingBox();
     expect(chatBox?.width).toBeLessThan(400);
-    
+
     // Check that input is properly sized
     const inputBox = await this.messageInput.boundingBox();
     expect(inputBox?.width).toBeLessThan(350);
@@ -260,7 +260,7 @@ export class ChatPage extends BasePage {
     // Send message and expect immediate UI update
     const initialMessageCount = await this.userMessages.count();
     await this.sendMessage('Real-time test');
-    
+
     const newMessageCount = await this.userMessages.count();
     expect(newMessageCount).toBe(initialMessageCount + 1);
   }
@@ -271,10 +271,10 @@ export class ChatPage extends BasePage {
     await this.sendMessage('Performance test message');
     await this.expectAssistantResponse();
     const endTime = Date.now();
-    
+
     const responseTime = endTime - startTime;
     expect(responseTime).toBeLessThan(10000); // Should respond within 10 seconds
-    
+
     return responseTime;
   }
 
@@ -292,11 +292,11 @@ export class ChatPage extends BasePage {
   // Session management
   async expectSessionInfo(characterName?: string, worldName?: string) {
     await expect(this.sessionInfo).toBeVisible();
-    
+
     if (characterName) {
       await expect(this.characterInfo).toContainText(characterName);
     }
-    
+
     if (worldName) {
       await expect(this.worldInfo).toContainText(worldName);
     }
