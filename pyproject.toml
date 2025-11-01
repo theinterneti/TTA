@@ -114,6 +114,8 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.0.0",
     # Docker Integration
     "docker>=7.0.0",
+    "notebooklm-mcp>=2.0.11",
+    "task>=0.1.0",
 ]
 
 [project.optional-dependencies]
@@ -230,8 +232,7 @@ python-preference = "managed"
 # Dependency resolution environments
 # Restrict to Linux (WSL2) and Python 3.10+ for faster resolution
 environments = [
-    "sys_platform == 'linux'",
-    "python_version >= '3.10'",
+    "sys_platform == 'linux' and python_version >= '3.10'",
 ]
 
 # Cache configuration for WSL2 optimization
