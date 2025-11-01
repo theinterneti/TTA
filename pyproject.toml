@@ -489,6 +489,7 @@ markers = [
     "integration: Integration tests",
     "e2e: End-to-end tests",
     "property: Property-based tests using hypothesis",
+    "concrete: Concrete implementation tests for abstract components",
     "performance: Performance benchmarks using pytest-benchmark",
     "contract: Contract tests using pact-python",
     "slow: Slow-running tests (> 1 second)",
