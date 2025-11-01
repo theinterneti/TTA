@@ -118,6 +118,8 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.0.0",
     # Docker Integration
     "docker>=7.0.0",
+    "notebooklm-mcp>=2.0.11",
+    "task>=0.1.0",
 ]
 
 # DEPRECATED: Use dependency-groups instead (see below)
