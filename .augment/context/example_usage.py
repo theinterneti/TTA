@@ -101,7 +101,7 @@ def example_continue_session():
 
     if not sessions:
         print("No sessions found. Run example_new_session() first.")
-        return
+        return None
 
     # Load the most recent session
     session_file = f".augment/context/sessions/{sessions[0]}.json"

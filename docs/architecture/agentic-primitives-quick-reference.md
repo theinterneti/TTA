@@ -1,6 +1,6 @@
 # Agentic Primitives Quick Reference
 
-**For:** Developers implementing agentic primitives in TTA  
+**For:** Developers implementing agentic primitives in TTA
 **Last Updated:** 2025-10-20
 
 ## Overview
@@ -54,27 +54,27 @@ class UnifiedAgentOrchestrator:
             max_tokens=8000,
             pruning_strategy=ContextPruningStrategy.HYBRID
         )
-    
+
     async def _build_prompt(self, state: OrchestrationState) -> str:
         # Create managed context window
         window = self.context_manager.create_window()
-        
+
         # Add system prompt
         window = self.context_manager.add_message(window, {
             "role": "system",
             "content": self._get_system_prompt()
         })
-        
+
         # Add conversation history (auto-pruned)
         for msg in state.therapeutic_context.get("history", []):
             window = self.context_manager.add_message(window, msg)
-        
+
         # Add current input
         window = self.context_manager.add_message(window, {
             "role": "user",
             "content": state.user_input
         })
-        
+
         return self._format_messages(window.messages)
 ```
 
@@ -90,20 +90,20 @@ def custom_therapeutic_pruning(
     """Custom pruning that preserves therapeutic context."""
     # Always keep system message
     system_msgs = [m for m in window.messages if m.get("role") == "system"]
-    
+
     # Keep recent therapeutic insights
     therapeutic_msgs = [
-        m for m in window.messages 
+        m for m in window.messages
         if "therapeutic_insight" in m.get("metadata", {})
     ]
-    
+
     # Keep most recent conversation
     recent_msgs = window.messages[-10:]
-    
+
     # Combine and deduplicate
     preserved = system_msgs + therapeutic_msgs + recent_msgs
     # ... (implementation details)
-    
+
     return window
 ```
 
@@ -149,11 +149,11 @@ except Exception as e:
 async def recover_llm_error(context: ErrorContext) -> Any:
     """Recover from LLM errors with exponential backoff."""
     import asyncio
-    
+
     for attempt in range(3):
         # Exponential backoff
         await asyncio.sleep(2 ** attempt)
-        
+
         try:
             # Retry with same parameters
             return await retry_llm_call(context.metadata["params"])
@@ -163,7 +163,7 @@ async def recover_llm_error(context: ErrorContext) -> Any:
                 raise
             # Log and continue
             logger.warning(f"Retry {attempt + 1} failed: {e}")
-    
+
     return None
 
 async def llm_fallback(context: ErrorContext) -> Any:
@@ -182,7 +182,7 @@ async def llm_fallback(context: ErrorContext) -> Any:
 class NGAAdapter:
     def __init__(self, error_recovery: ErrorRecoveryFramework):
         self.error_recovery = error_recovery
-    
+
     async def generate_narrative(
         self,
         prompt: str,
@@ -227,7 +227,7 @@ execution_id = tool_observer.start_execution(
 try:
     # Execute tool
     result = await execute_tool(params)
-    
+
     # End tracking (success)
     tool_observer.end_execution(
         execution_id=execution_id,
@@ -262,18 +262,18 @@ def observe_tool_execution(tool_name: str):
                 tool_name=tool_name,
                 input_params=kwargs
             )
-            
+
             try:
                 # Execute function
                 result = await func(*args, **kwargs)
-                
+
                 # End tracking (success)
                 tool_observer.end_execution(
                     execution_id=execution_id,
                     status=ToolExecutionStatus.SUCCESS,
                     output_result=result
                 )
-                
+
                 return result
             except Exception as e:
                 # End tracking (failure)
@@ -283,7 +283,7 @@ def observe_tool_execution(tool_name: str):
                     error=str(e)
                 )
                 raise
-        
+
         return wrapper
     return decorator
 
@@ -300,7 +300,7 @@ async def query_neo4j(query: str, params: dict) -> list:
 class ToolInvocationService:
     def __init__(self, observer: ToolObservabilityCollector):
         self.observer = observer
-    
+
     async def invoke_tool(
         self,
         tool_name: str,
@@ -314,25 +314,25 @@ class ToolInvocationService:
             agent_id=context.get("agent_id"),
             workflow_id=context.get("workflow_id")
         )
-        
+
         try:
             # Get tool from registry
             tool = self.registry.get_tool(tool_name)
-            
+
             # Execute tool
             result = await tool.execute(params)
-            
+
             # Validate result
             if not self._validate_result(result):
                 raise ValueError(f"Invalid result from {tool_name}")
-            
+
             # End tracking (success)
             self.observer.end_execution(
                 execution_id=execution_id,
                 status=ToolExecutionStatus.SUCCESS,
                 output_result=result
             )
-            
+
             return result
         except Exception as e:
             # End tracking (failure)
@@ -353,21 +353,21 @@ class ToolInvocationService:
 ```python
 class EnhancedOrchestrator:
     """Orchestrator using all agentic primitives."""
-    
+
     def __init__(self):
         # Context management
         self.context_manager = ContextWindowManager(
             max_tokens=8000,
             pruning_strategy=ContextPruningStrategy.HYBRID
         )
-        
+
         # Error recovery
         self.error_recovery = ErrorRecoveryFramework()
         self._register_recovery_strategies()
-        
+
         # Tool observability
         self.tool_observer = ToolObservabilityCollector()
-    
+
     async def process_input(
         self,
         user_input: str,
@@ -382,25 +382,25 @@ class EnhancedOrchestrator:
                 "role": "user",
                 "content": user_input
             })
-            
+
             # 2. Execute with tool observability
             execution_id = self.tool_observer.start_execution(
                 tool_name="process_input",
                 input_params={"input": user_input}
             )
-            
+
             # 3. Process with error recovery
             result = await self._process_with_recovery(window)
-            
+
             # 4. Track success
             self.tool_observer.end_execution(
                 execution_id=execution_id,
                 status=ToolExecutionStatus.SUCCESS,
                 output_result=result
             )
-            
+
             return result
-            
+
         except Exception as e:
             # Error recovery handles this
             return await self.error_recovery.handle_error(
@@ -421,31 +421,31 @@ async def process_with_safety(
     """Process input with therapeutic safety checks."""
     # Build context
     window = orchestrator.context_manager.create_window()
-    
+
     # Add safety context
     window = orchestrator.context_manager.add_message(window, {
         "role": "system",
         "content": "Maintain therapeutic safety. Flag concerning content."
     })
-    
+
     # Add user input
     window = orchestrator.context_manager.add_message(window, {
         "role": "user",
         "content": user_input
     })
-    
+
     try:
         # Process with safety validation
         result = await orchestrator.process_input(user_input, session_id)
-        
+
         # Validate safety
         safety_level = await validate_safety(result)
         if safety_level == SafetyLevel.UNSAFE:
             # Use error recovery for safety issues
             raise ValidationError("Unsafe content detected")
-        
+
         return result
-        
+
     except ValidationError as e:
         # Recovery framework handles safety fallback
         return await orchestrator.error_recovery.handle_error(
@@ -468,16 +468,16 @@ def test_context_pruning():
         max_tokens=100,
         pruning_threshold=0.5
     )
-    
+
     window = manager.create_window()
-    
+
     # Add messages until pruning triggers
     for i in range(20):
         window = manager.add_message(window, {
             "role": "user",
             "content": f"Message {i}" * 10
         })
-    
+
     # Should have pruned
     assert window.utilization <= 1.0
     assert len(window.messages) < 20
@@ -490,7 +490,7 @@ def test_context_pruning():
 async def test_error_recovery():
     """Test error recovery with retry."""
     recovery = ErrorRecoveryFramework()
-    
+
     # Register test strategy
     recovery.register_strategy(RecoveryStrategy(
         name="test_retry",
@@ -498,11 +498,11 @@ async def test_error_recovery():
         handler=mock_retry_handler,
         max_retries=3
     ))
-    
+
     # Simulate error
     error = Exception("Rate limit exceeded")
     result = await recovery.handle_error(error)
-    
+
     # Should have recovered
     assert result is not None
 ```
@@ -513,7 +513,7 @@ async def test_error_recovery():
 def test_tool_metrics():
     """Test tool metrics collection."""
     observer = ToolObservabilityCollector()
-    
+
     # Simulate executions
     for i in range(10):
         exec_id = observer.start_execution(
@@ -524,7 +524,7 @@ def test_tool_metrics():
             execution_id=exec_id,
             status=ToolExecutionStatus.SUCCESS
         )
-    
+
     # Check metrics
     metrics = observer.get_tool_metrics("test_tool")
     assert metrics["execution_count"] == 10
@@ -563,13 +563,13 @@ agent_orchestration:
     pruning_strategy: hybrid
     pruning_threshold: 0.8
     summarization_enabled: true
-  
+
   error_recovery:
     enabled: true
     max_retries: 3
     backoff_base: 2
     fallback_enabled: true
-  
+
   tool_observability:
     enabled: true
     trace_all_tools: true
@@ -583,26 +583,26 @@ agent_orchestration:
 
 ### Context Window Issues
 
-**Problem:** Token limit exceeded  
+**Problem:** Token limit exceeded
 **Solution:** Check `pruning_threshold`, ensure auto-pruning enabled
 
-**Problem:** Important context lost  
+**Problem:** Important context lost
 **Solution:** Implement custom pruning strategy that preserves critical messages
 
 ### Error Recovery Issues
 
-**Problem:** Errors not recovering  
+**Problem:** Errors not recovering
 **Solution:** Check recovery strategy registration, verify error classification
 
-**Problem:** Too many retries  
+**Problem:** Too many retries
 **Solution:** Adjust `max_retries`, implement circuit breaker
 
 ### Tool Observability Issues
 
-**Problem:** Missing metrics  
+**Problem:** Missing metrics
 **Solution:** Ensure `start_execution` and `end_execution` called for all tools
 
-**Problem:** High overhead  
+**Problem:** High overhead
 **Solution:** Use async logging, batch metrics updates
 
 ---
@@ -616,6 +616,5 @@ agent_orchestration:
 
 ---
 
-**Last Updated:** 2025-10-20  
+**Last Updated:** 2025-10-20
 **Maintainer:** Development Team
-

@@ -248,4 +248,3 @@ test.describe('Data Persistence - Redis & Neo4j', () => {
     console.log('  ✓ Database resilience verified');
   });
 });
-

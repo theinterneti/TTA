@@ -1439,6 +1439,8 @@ class AgentOrchestrationComponent(Component):
 
                     from tta_ai.orchestration.tools.policy_config import (
                         ToolPolicyConfig as _TPC,
+                    )
+                    from tta_ai.orchestration.tools.policy_config import (
                         _load_from_file,
                         validate_tool_policy_config,
                     )
@@ -2146,6 +2148,8 @@ class AgentOrchestrationComponent(Component):
 
                 from tta_ai.orchestration.tools.policy_config import (
                     ToolPolicyConfig as _TPC,
+                )
+                from tta_ai.orchestration.tools.policy_config import (
                     load_tool_policy_config,
                     load_tool_policy_config_from,
                 )

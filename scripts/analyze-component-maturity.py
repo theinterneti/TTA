@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 TTA Component Maturity Analysis Script
@@ -142,7 +141,7 @@ def check_test_coverage(component_path: str, test_path: str) -> dict[str, Any]:
 
             # Find the specific component file in the coverage data
             component_file = None
-            for file_path in data.get("files", {}):
+            for file_path in data.get("files", {}).keys():
                 if component_path in file_path:
                     component_file = file_path
                     break

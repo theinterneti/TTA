@@ -354,4 +354,3 @@ export function generateSecurityTestReport(results: SecurityTestResult[]): strin
 
   return report;
 }
-

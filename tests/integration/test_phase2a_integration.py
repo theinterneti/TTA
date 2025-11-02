@@ -82,9 +82,8 @@ class TestPhase2AIntegration:
         }
 
         # Simulate API call to create session
-        async with (
-            aiohttp.ClientSession() as session,
-            session.post(
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
                 f"{api_base_url}/api/v1/sessions",
                 json=session_data,
                 headers={"Authorization": "Bearer test_token"},

@@ -7,7 +7,6 @@ quality over extended sessions.
 """
 
 import asyncio
-import contextlib
 import csv
 import json
 import logging
@@ -210,8 +209,9 @@ class ComprehensiveDataCollector:
         session_data.completed_turns += 1
 
         # Update peak memory usage
-        if memory_usage > session_data.peak_memory_usage_mb:
-            session_data.peak_memory_usage_mb = memory_usage
+        session_data.peak_memory_usage_mb = max(
+            session_data.peak_memory_usage_mb, memory_usage
+        )
 
         # Log turn data in real-time
         await self._log_turn_data(session_id, turn_data)
@@ -337,8 +337,10 @@ class ComprehensiveDataCollector:
         self.monitoring_active = False
         if self.monitoring_task:
             self.monitoring_task.cancel()
-            with contextlib.suppress(asyncio.CancelledError):
+            try:
                 await self.monitoring_task
+            except asyncio.CancelledError:
+                pass
 
         logger.info("Stopped performance monitoring")
 

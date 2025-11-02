@@ -55,9 +55,9 @@ class DockerOpenHandsClient:
         result = await client.execute_task("Write a Python function")
     """
 
-    # Default Docker images (OpenHands 0.59 - latest stable)
-    DEFAULT_OPENHANDS_IMAGE = "docker.all-hands.dev/all-hands-ai/openhands:0.59"
-    DEFAULT_RUNTIME_IMAGE = "docker.all-hands.dev/all-hands-ai/runtime:0.59-nikolaik"
+    # Default Docker images (OpenHands 0.54)
+    DEFAULT_OPENHANDS_IMAGE = "docker.all-hands.dev/all-hands-ai/openhands:0.54"
+    DEFAULT_RUNTIME_IMAGE = "docker.all-hands.dev/all-hands-ai/runtime:0.54-nikolaik"
 
     def __init__(
         self,
@@ -70,8 +70,8 @@ class DockerOpenHandsClient:
 
         Args:
             config: OpenHands configuration
-            openhands_image: OpenHands Docker image (default: 0.59)
-            runtime_image: Sandbox runtime image (default: 0.59-nikolaik)
+            openhands_image: OpenHands Docker image (default: 0.54)
+            runtime_image: Sandbox runtime image (default: 0.54-nikolaik)
         """
         self.config = config
         self.openhands_image = openhands_image or self.DEFAULT_OPENHANDS_IMAGE
@@ -98,86 +98,45 @@ class DockerOpenHandsClient:
         Returns:
             Docker command as list of strings
         """
-        import os
-        import sys
-        from datetime import datetime
-
         # Ensure workspace path is absolute
         workspace_abs = workspace_path.resolve()
 
-        # Generate unique container name
-        container_name = f"openhands-app-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-
-        # Detect if running in interactive terminal
-        # Use -t (TTY) only if stdout is a TTY, use -i (stdin) only if stdin is a TTY
-        tty_flags = []
-        if sys.stdout.isatty():
-            tty_flags.append("-t")
-        if sys.stdin.isatty():
-            tty_flags.append("-i")
-
-        # Build Docker command (following official OpenHands documentation)
+        # Build Docker command
         cmd = [
             "docker",
             "run",
             "--rm",  # Automatic cleanup
+            "-i",  # Interactive (for stdin)
+            # Environment variables
+            "-e",
+            f"SANDBOX_RUNTIME_CONTAINER_IMAGE={self.runtime_image}",
+            "-e",
+            f"SANDBOX_VOLUMES={workspace_abs}:/workspace:rw",
+            "-e",
+            f"LLM_API_KEY={self.config.api_key.get_secret_value()}",
+            "-e",
+            f"LLM_MODEL={self.config.model}",
+            "-e",
+            f"LLM_BASE_URL={self.config.base_url}",
+            "-e",
+            "LOG_ALL_EVENTS=true",  # Enable JSON event logging
+            # Volume mounts
+            "-v",
+            "/var/run/docker.sock:/var/run/docker.sock",  # Docker-in-Docker
+            "-v",
+            f"{Path.home()}/.openhands:/.openhands",  # OpenHands config
+            # Networking
+            "--add-host",
+            "host.docker.internal:host-gateway",
+            # Image and command
+            self.openhands_image,
+            "python",
+            "-m",
+            "openhands.core.main",
+            "-t",
+            task_description,
         ]
 
-        # Add TTY flags only if available
-        if tty_flags:
-            cmd.extend(tty_flags)
-
-        # Escape task description for shell
-        task_description.replace("'", "'\\''")
-
-        cmd.extend(
-            [
-                "--pull=always",  # Ensure latest images
-                # Environment variables
-                "-e",
-                f"SANDBOX_RUNTIME_CONTAINER_IMAGE={self.runtime_image}",
-                "-e",
-                f"SANDBOX_USER_ID={os.getuid()}",  # Match host user permissions
-                "-e",
-                f"SANDBOX_VOLUMES={workspace_abs}:/workspace:rw",
-                "-e",
-                f"LLM_API_KEY={self.config.api_key.get_secret_value()}",
-                "-e",
-                f"LLM_MODEL={self.config.model}",
-                "-e",
-                f"LLM_BASE_URL={self.config.base_url}",
-                "-e",
-                "LOG_ALL_EVENTS=true",  # Enable JSON event logging
-                "-e",
-                "MAX_ITERATIONS=100",  # Limit iterations to prevent infinite loops
-                "-e",
-                "AGENT_ENABLE_HISTORY_TRUNCATION=false",  # Disable history truncation to prevent condensation loop
-                "-e",
-                "FILE_STORE_PATH=/tmp/openhands_store",  # pragma: allowlist secret  # Use writable temp directory for file store
-                "-e",
-                "FILE_STORE=memory",  # Use memory-based file store to avoid permission issues
-                # Volume mounts
-                "-v",
-                "/var/run/docker.sock:/var/run/docker.sock",  # Docker-in-Docker
-                # Networking - Add DNS configuration for API connectivity
-                "--dns",
-                "8.8.8.8",  # Google DNS primary
-                "--dns",
-                "8.8.4.4",  # Google DNS secondary
-                "--add-host",
-                "host.docker.internal:host-gateway",
-                # Container naming
-                "--name",
-                container_name,
-                # Image and command - use sh wrapper to ensure .openhands directory exists
-                self.openhands_image,
-                "sh",
-                "-c",
-                f"mkdir -p /.openhands && python -m openhands.core.main -t {task_description!r}",
-            ]
-        )
-
-        logger.debug(f"Built Docker command with TTY flags: {tty_flags}")
         return cmd
 
     def _parse_output(
@@ -281,7 +240,7 @@ class DockerOpenHandsClient:
                 stdout_bytes, stderr_bytes = await asyncio.wait_for(
                     result.communicate(), timeout=timeout
                 )
-            except TimeoutError:
+            except asyncio.TimeoutError:
                 # Kill container on timeout
                 result.kill()
                 await result.wait()

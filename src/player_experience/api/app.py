@@ -52,7 +52,6 @@ try:
         conversation,
         gameplay,
         health,
-        metrics as metrics_router,
         openrouter_auth,
         players,
         progress,
@@ -60,6 +59,7 @@ try:
         settings,
         worlds,
     )
+    from .routers import metrics as metrics_router
 except ImportError:
     from src.player_experience.api.routers import (
         auth,
@@ -68,7 +68,6 @@ except ImportError:
         conversation,
         gameplay,
         health,
-        metrics as metrics_router,
         openrouter_auth,
         players,
         progress,
@@ -76,6 +75,7 @@ except ImportError:
         settings,
         worlds,
     )
+    from src.player_experience.api.routers import metrics as metrics_router
 
 try:
     from .config import get_settings

@@ -21,7 +21,7 @@ class ToolStatus(str, Enum):
 
 class ToolParameter(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
-    description: str | None = Field(default=None, max_length=512)
+    description: str | None = Field(default=None, max_length=1024)  # Increased from 512
     required: bool = True
     schema: dict[str, Any] = Field(
         default_factory=dict, description="JSON schema for the parameter"
@@ -31,7 +31,7 @@ class ToolParameter(BaseModel):
 class ToolSpec(BaseModel):
     name: str = Field(..., min_length=3, max_length=128)
     version: str = Field("1.0.0", description="Semver string")
-    description: str = Field(..., min_length=1, max_length=1024)
+    description: str = Field(..., min_length=1, max_length=2048)  # Increased from 1024
     parameters: list[ToolParameter] = Field(default_factory=list)
     returns_schema: dict[str, Any] = Field(default_factory=dict)
     capabilities: list[str] = Field(
@@ -45,6 +45,23 @@ class ToolSpec(BaseModel):
     created_at: float = Field(default=0.0)
     last_used_at: float = Field(default=0.0)
     status: ToolStatus = ToolStatus.ACTIVE
+
+    # New fields for Phase 3 Tool Optimization (backward compatible with defaults)
+    supports_pagination: bool = Field(
+        default=False, description="Whether this tool supports cursor-based pagination"
+    )
+    max_results_without_pagination: int | None = Field(
+        default=None, description="Maximum results returned when pagination is not used"
+    )
+    related_tools: list[str] = Field(
+        default_factory=list, description="Names of related tools (e.g., complementary operations)"
+    )
+    examples: list[dict[str, Any]] = Field(
+        default_factory=list, description="Example invocations with parameters and expected results"
+    )
+    schema_version: str = Field(
+        default="1.0.0", description="Schema version for response format compatibility"
+    )
 
     def signature_hash(self) -> str:
         payload = {
@@ -76,6 +93,40 @@ class ToolSpec(BaseModel):
         if len(params) > 16:
             raise ValueError("too many parameters (max 16)")
         return params
+
+    @field_validator("schema_version")
+    @classmethod
+    def _validate_schema_version(cls, v: str) -> str:
+        """Validate schema_version follows semver format."""
+        parts = v.split(".")
+        if not (2 <= len(parts) <= 3):
+            raise ValueError("schema_version must be in semver form e.g. 1.0.0")
+        for p in parts:
+            if not p.isdigit():
+                raise ValueError("schema_version segments must be numeric")
+        return v
+
+    @field_validator("related_tools")
+    @classmethod
+    def _validate_related_tools(cls, tools: list[str]) -> list[str]:
+        """Validate related_tools list."""
+        if len(tools) > 10:
+            raise ValueError("too many related_tools (max 10)")
+        for tool_name in tools:
+            if not tool_name or len(tool_name) > 128:
+                raise ValueError("related tool name must be 1-128 chars")
+        return tools
+
+    @field_validator("examples")
+    @classmethod
+    def _validate_examples(cls, examples: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Validate examples list."""
+        if len(examples) > 5:
+            raise ValueError("too many examples (max 5)")
+        for example in examples:
+            if "parameters" not in example:
+                raise ValueError("each example must have 'parameters' field")
+        return examples
 
 
 class ToolRegistration(BaseModel):

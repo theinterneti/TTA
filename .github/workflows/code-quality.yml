@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-groups
+        run: uv sync --all-extras
 
       - name: Run ruff linter
         run: |
@@ -61,6 +61,12 @@ jobs:
         run: |
           echo "Checking code formatting with ruff..."
           uvx ruff format --check --diff src/ tests/
+        continue-on-error: false
+
+      - name: Run ruff formatter check
+        run: |
+          echo "Checking code formatting with ruff..."
+          uv run ruff format --check --diff src/ tests/
         continue-on-error: false
 
       - name: Upload lint results
@@ -111,12 +117,12 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-groups
+        run: uv sync --all-extras
 
       - name: Run Pyright type checker
         run: |
           echo "Running Pyright type checker (10-100x faster than MyPy)..."
-          uvx pyright src/
+          uv run pyright src/
         continue-on-error: false
 
       - name: Upload Pyright results
@@ -134,7 +140,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Run the following command to see detailed type errors:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "uvx pyright src/" >> $GITHUB_STEP_SUMMARY
+          echo "uv run pyright src/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   complexity:
@@ -225,9 +231,9 @@ jobs:
 
           # Check job results
           if [[ "${{ needs.lint.result }}" == "success" ]]; then
-            echo "✅ **Linting & Formatting (Ruff):** Passed" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Linting & Formatting (ruff):** Passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Linting & Formatting (Ruff):** Failed" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Linting & Formatting (ruff):** Failed" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.type-check.result }}" == "success" ]]; then

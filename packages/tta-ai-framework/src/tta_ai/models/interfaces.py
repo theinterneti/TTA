@@ -163,9 +163,7 @@ class IModelProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_available_models(
-        self, filters: dict[str, Any] | None = None
-    ) -> list[ModelInfo]:
+    async def get_available_models(self, filters: dict[str, Any] | None = None) -> list[ModelInfo]:
         """Get list of available models from this provider."""
         pass
 
@@ -193,7 +191,8 @@ class IModelProvider(ABC):
 
     async def cleanup(self) -> None:
         """Cleanup provider resources. Optional method with default implementation."""
-        pass
+        # Default implementation: no cleanup needed
+        ...
 
     async def get_free_models(self) -> list[ModelInfo]:
         """Get list of free models. Optional method with default implementation."""
@@ -206,7 +205,8 @@ class IModelProvider(ABC):
         max_cost_per_token: float = 0.001,
     ) -> None:
         """Enable/disable free models filter. Optional method with default implementation."""
-        pass
+        # Default implementation: no filtering
+        ...
 
     async def get_filter_settings(self) -> dict[str, Any]:
         """Get current filter settings. Optional method with default implementation."""

@@ -5,7 +5,7 @@ iterative feedback and quality validation.
 """
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from ..openhands_integration.client import create_openhands_client
@@ -121,7 +121,7 @@ class UnitTestGenerationService:
         if AI_CONTEXT_AVAILABLE:
             try:
                 # Create session with format: openhands-test-gen-{target_file_stem}-{timestamp}
-                timestamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+                timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
                 target_file_stem = spec.target_file.stem
                 session_id = f"openhands-test-gen-{target_file_stem}-{timestamp}"
 

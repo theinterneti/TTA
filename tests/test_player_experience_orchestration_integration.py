@@ -441,7 +441,9 @@ tta.prototype:
         return str(config_file)
 
     @patch("src.orchestration.orchestrator.TTAOrchestrator._validate_repositories")
-    def test_full_orchestration_lifecycle(self, mock_validate, test_config_path):
+    def test_full_orchestration_lifecycle(
+        self, mock_validate, test_config_path
+    ):
         """Test full orchestration lifecycle with player experience component."""
         # Mock repository validation
         mock_validate.return_value = None

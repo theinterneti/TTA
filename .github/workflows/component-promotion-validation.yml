@@ -163,13 +163,13 @@ jobs:
           echo "Running code quality checks..."
 
           # Linting
-          uvx ruff check ${{ steps.component_path.outputs.path }} || echo "lint_failed=true" >> $GITHUB_OUTPUT
+          uv run ruff check ${{ steps.component_path.outputs.path }} || echo "lint_failed=true" >> $GITHUB_OUTPUT
 
           # Type checking
-          uvx pyright ${{ steps.component_path.outputs.path }} || echo "type_failed=true" >> $GITHUB_OUTPUT
+          uv run pyright ${{ steps.component_path.outputs.path }} || echo "type_failed=true" >> $GITHUB_OUTPUT
 
           # Security scan
-          uvx bandit -r ${{ steps.component_path.outputs.path }} -ll || echo "security_failed=true" >> $GITHUB_OUTPUT
+          uv run bandit -r ${{ steps.component_path.outputs.path }} -ll || echo "security_failed=true" >> $GITHUB_OUTPUT
 
       - name: Validate promotion criteria
         id: validate

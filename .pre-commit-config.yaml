@@ -45,7 +45,7 @@ repos:
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
-        files: ^src/
+        exclude: ^(tests/|docs/|scripts/|examples/)
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets
@@ -102,13 +102,15 @@ repos:
         files: ^tests/.*\.py$
         pass_filenames: true
 
-      # Custom hook: Validate agentic primitives frontmatter
-      - id: validate-agentic-frontmatter
-        name: Validate agentic primitives frontmatter
-        entry: python scripts/validate-agentic-frontmatter.py
+      # Custom hook: Run tests on changed files
+      - id: run-tests-on-changed-files
+        name: Run tests on changed files
+        entry: python scripts/pre-commit/run-tests-on-changed-files.py
         language: system
-        files: ^\.github/(instructions|chatmodes|prompts|specs)/.*\.md$
-        pass_filenames: false
+        types: [python]
+        files: ^src/.*\.py$
+        pass_filenames: true
+        stages: [commit]
 
 # Configuration for specific tools
 ci:
@@ -150,5 +152,15 @@ exclude: |
     node_modules/|
     package-lock\.json|
     .*\.backup\.\d+|
-    templates/.*\.json
+    tta/prod/src/utils/neo4j_utils\.py|
+    validate_live_databases\.py|
+    templates/.*\.json|
+    .*\.k8s/.*\.yaml|
+    scripts/manual_mutation_test\.py|
+    scripts/setup_mutants_env\.py|
+    tests/contract/.*|
+    tests/contracts/.*|
+    tests/integration/.*|
+    tests/unit/.*|
+    tests/performance/.*
   )$

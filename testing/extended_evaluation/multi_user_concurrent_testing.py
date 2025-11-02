@@ -406,7 +406,7 @@ class ConcurrentTestingFramework:
 
             for i, user_id in enumerate(active_users):
                 if i < len(user_profiles):
-                    user_profiles[i]
+                    profile = user_profiles[i]
                     action_content = f"User {user_id} takes action in turn {turn}"
                     task = self.world_manager.submit_user_action(
                         world_id, user_id, action_content

@@ -1,11 +1,11 @@
 # API Specification: [API Name]
 
-**API ID:** `[api_id]`  
-**Component:** `[component_name]`  
-**Author:** [Your Name]  
-**Created:** [YYYY-MM-DD]  
-**Last Updated:** [YYYY-MM-DD]  
-**Status:** [Draft | In Development | Staging | Production]  
+**API ID:** `[api_id]`
+**Component:** `[component_name]`
+**Author:** [Your Name]
+**Created:** [YYYY-MM-DD]
+**Last Updated:** [YYYY-MM-DD]
+**Status:** [Draft | In Development | Staging | Production]
 **Version:** [v1.0.0]
 
 ---
@@ -23,7 +23,7 @@ Production: https://tta.dev/api/v1
 ```
 
 ### Authentication
-**Type:** [Bearer Token | API Key | OAuth2 | None]  
+**Type:** [Bearer Token | API Key | OAuth2 | None]
 **Header:** `Authorization: Bearer <token>`
 
 ---
@@ -37,8 +37,8 @@ Production: https://tta.dev/api/v1
 [METHOD] /api/v1/[endpoint]
 ```
 
-**Method:** `[GET | POST | PUT | PATCH | DELETE]`  
-**Path:** `/api/v1/[endpoint]`  
+**Method:** `[GET | POST | PUT | PATCH | DELETE]`
+**Path:** `/api/v1/[endpoint]`
 **Authentication:** [Required | Optional | None]
 
 **Path Parameters:**
@@ -74,7 +74,7 @@ from pydantic import BaseModel, Field
 
 class [RequestModel](BaseModel):
     """[Description]."""
-    
+
     [field]: [Type] = Field(..., description="[Description]")
     [field]: [Type] = Field(default=[value], description="[Description]")
 ```
@@ -102,7 +102,7 @@ from pydantic import BaseModel
 
 class [ResponseModel](BaseModel):
     """[Description]."""
-    
+
     status: str  # "success" or "error"
     data: [DataModel]
     metadata: [MetadataModel]
@@ -212,15 +212,15 @@ async def [function_name](
 ) -> [ResponseModel]:
     """
     [Brief description].
-    
+
     Args:
         [param]: [Description]
         request: [Description]
         current_user: Authenticated user
-    
+
     Returns:
         [ResponseModel]: [Description]
-    
+
     Raises:
         HTTPException: [When and why]
     """
@@ -230,10 +230,10 @@ async def [function_name](
             status_code=400,
             detail="[Error message]"
         )
-    
+
     # Process request
     result = await process_[operation](request)
-    
+
     # Return response
     return [ResponseModel](
         status="success",
@@ -260,13 +260,13 @@ from datetime import datetime
 
 class [ModelName](BaseModel):
     """[Description]."""
-    
+
     id: str = Field(..., description="Unique identifier")
     [field]: [Type] = Field(..., description="[Description]")
     [field]: Optional[[Type]] = Field(None, description="[Description]")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -367,8 +367,8 @@ GET /api/v1/items?filter[status]=active&sort=-created_at&page=1&page_size=20
 
 ## Versioning
 
-**Strategy:** URL-based versioning  
-**Current Version:** v1  
+**Strategy:** URL-based versioning
+**Current Version:** v1
 **Deprecation Policy:** 6 months notice before deprecation
 
 **Version Header:**
@@ -437,14 +437,14 @@ def test_[endpoint]_success(client: TestClient, auth_token: str):
         headers={"Authorization": f"Bearer {auth_token}"},
         json={"[field]": "[value]"}
     )
-    
+
     assert response.status_code == 200
     assert response.json()["status"] == "success"
 
 def test_[endpoint]_unauthorized(client: TestClient):
     """Test [endpoint] without authentication."""
     response = client.[method]("/api/v1/[endpoint]")
-    
+
     assert response.status_code == 401
 ```
 
@@ -524,4 +524,3 @@ logger.info(
 
 **Notes:**
 [Any additional notes or context]
-

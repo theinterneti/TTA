@@ -374,4 +374,3 @@ export function generateChaosTestReport(results: ChaosTestResult[]): string {
 
   return report;
 }
-

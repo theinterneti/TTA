@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Complete TTA Core Gameplay Loop Integration Validation Script
@@ -186,14 +185,14 @@ class TTAIntegrationValidator:
             if startup_script.exists():
                 logger.info("Using existing startup script...")
                 # Start in background
-                subprocess.Popen(
+                process = subprocess.Popen(
                     [sys.executable, str(startup_script)],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                 )
 
                 # Wait for startup
-                for _i in range(30):  # Wait up to 30 seconds
+                for i in range(30):  # Wait up to 30 seconds
                     time.sleep(1)
                     try:
                         response = requests.get(f"{self.api_base_url}/docs", timeout=2)

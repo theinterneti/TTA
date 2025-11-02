@@ -5,11 +5,11 @@ These tests focus on testing the orchestration module with more realistic
 scenarios and less mocking to increase coverage.
 """
 
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 
-from src.orchestration import MockComponentLoader
 from src.orchestration.component import Component, ComponentStatus
 from src.orchestration.config import TTAConfig
 from src.orchestration.orchestrator import TTAOrchestrator
@@ -142,17 +142,22 @@ class TestOrchestratorIntegration:
     @pytest.fixture
     def orchestrator_minimal(self, tmp_path):
         """Create minimal orchestrator for integration testing."""
-        # Create empty mock loader (components can be added in tests)
-        loader = MockComponentLoader()
+        tta_dev = tmp_path / "tta.dev"
+        tta_prototype = tmp_path / "tta.prototype"
+        tta_dev.mkdir()
+        tta_prototype.mkdir()
 
-        # Create orchestrator with mock loader
-        orchestrator = TTAOrchestrator(component_loader=loader)
-
-        # Set paths for tests that need them
-        orchestrator.tta_dev_path = tmp_path / "tta.dev"
-        orchestrator.tta_prototype_path = tmp_path / "tta.prototype"
-
-        yield orchestrator
+        with patch.object(Path, "cwd", return_value=tmp_path):
+            with patch(
+                "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"
+            ):
+                with patch(
+                    "src.orchestration.orchestrator.TTAOrchestrator._import_components"
+                ):
+                    orchestrator = TTAOrchestrator()
+                    orchestrator.tta_dev_path = tta_dev
+                    orchestrator.tta_prototype_path = tta_prototype
+                    yield orchestrator
 
     def test_orchestrator_component_registration_flow(self, orchestrator_minimal):
         """Test complete component registration and management flow."""

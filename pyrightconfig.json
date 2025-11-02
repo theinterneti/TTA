@@ -84,19 +84,8 @@
       "pythonVersion": "3.12",
       "pythonPlatform": "Linux",
       "extraPaths": [
-        "packages/tta-ai-framework/src",
-        "packages/tta-narrative-engine/src"
+        "tta/prod/src"
       ]
-    },
-    {
-      "root": "packages/tta-ai-framework/src",
-      "pythonVersion": "3.12",
-      "pythonPlatform": "Linux"
-    },
-    {
-      "root": "packages/tta-narrative-engine/src",
-      "pythonVersion": "3.12",
-      "pythonPlatform": "Linux"
     }
   ],
   "typeCheckingMode": "standard",

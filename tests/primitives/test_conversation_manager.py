@@ -182,7 +182,7 @@ class TestPruning:
         assert len(important_messages) > 0
 
     def test_pruning_preserves_recent_messages(self):
-        """Test that recent messages are preserved."""
+        """Test that recent messages are preserved (within token limits)."""
         manager = AIConversationContextManager(max_tokens=100)
         session_id = "test-session"
         manager.create_session(session_id)
@@ -192,8 +192,24 @@ class TestPruning:
             manager.add_message(session_id, "user", f"Message {i}" * 10, importance=0.3)
 
         context = manager.contexts[session_id]
-        # Should have at least the last 5 messages
-        assert len(context.messages) >= 5
+        # Should preserve recent messages within token limit
+        # With 100 token limit and ~30 tokens per message, we can fit ~3 messages
+        assert len(context.messages) >= 2  # At least 2 recent messages
+        assert context.current_tokens <= context.max_tokens  # Respects token limit
+
+        # Verify the preserved messages are the most recent ones
+        # Get the indices of preserved messages from the original 20
+        preserved_indices = []
+        for msg in context.messages:
+            # Extract message number from content (e.g., "Message 17Message 17..." -> 17)
+            content_parts = msg.content.split("Message ")
+            if len(content_parts) > 1:
+                msg_num = int(content_parts[1].split("Message")[0])
+                preserved_indices.append(msg_num)
+
+        # The preserved messages should be from the end of the sequence (most recent)
+        if preserved_indices:
+            assert min(preserved_indices) >= 15  # Should be from the last few messages
 
     def test_pruning_respects_token_limit(self):
         """Test that pruning keeps context under token limit."""

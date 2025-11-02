@@ -12,6 +12,7 @@ validate structure but not business logic correctness.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,

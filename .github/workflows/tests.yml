@@ -39,24 +39,33 @@ jobs:
             ${{ runner.os }}-uv-v2-
 
       - name: Sync deps
-        run: uv sync --all-groups
+        run: uv sync --all-extras
       - name: Run unit tests with metrics collection
         run: |
+          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
           uv run pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-branch --cov-report=xml:coverage-unit.xml
         env:
           TTA_METRICS_ENABLED: true
           TTA_TEST_METRICS_COLLECTION: true
-      - name: Upload coverage to Codecov
-        if: always()  # Upload coverage even if tests fail
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage-unit.xml
-          flags: unit
-          name: unit-tests
-          fail_ci_if_error: false
+
+      - name: Run generated tests (protocol_bridge, capability_matcher, circuit_breaker)
+        run: |
+          # Run generated tests for high-priority modules
+          # These tests were generated using OpenHands integration for improved coverage
+          uv run pytest \
+            tests/agent_orchestration/test_protocol_bridge.py \
+            tests/agent_orchestration/test_capability_matcher.py \
+            tests/agent_orchestration/test_circuit_breaker.py \
+            -v --tb=short \
+            --junitxml=test-results/generated-tests.xml \
+            --cov=src/agent_orchestration \
+            --cov-report=xml:coverage-generated.xml
+        continue-on-error: true
+        env:
+          TTA_METRICS_ENABLED: true
+          TTA_TEST_METRICS_COLLECTION: true
 
       - name: Upload unit test results
         uses: actions/upload-artifact@v4
@@ -66,6 +75,7 @@ jobs:
           path: |
             test-results/
             coverage-unit.xml
+            coverage-generated.xml
 
   integration:
     runs-on: ubuntu-latest

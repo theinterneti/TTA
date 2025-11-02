@@ -5,7 +5,7 @@ Component Registry CLI
 Command-line interface for TTA component registry and maturity tracking.
 """
 
-# ruff: noqa: ALL
+# ruff: noqa: T201, ARG001, RET503
 
 import argparse
 import logging

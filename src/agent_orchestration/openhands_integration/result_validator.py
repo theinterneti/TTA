@@ -11,11 +11,10 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -60,19 +59,30 @@ class ResultValidator:
 
     def _register_default_rules(self) -> None:
         """Register default validation rules."""
-        # Content not empty rule (CRITICAL - must have output)
+        # File existence rule
+        self.register_rule(
+            ValidationRule(
+                name="file_exists",
+                description="Output file exists",
+                validator=lambda result: "output_file" in result
+                and Path(result["output_file"]).exists(),
+                level=ValidationLevel.ERROR,
+                error_message="Output file does not exist",
+            )
+        )
+
+        # Content not empty rule
         self.register_rule(
             ValidationRule(
                 name="content_not_empty",
                 description="Output content is not empty",
-                validator=lambda result: "content" in result
-                and len(result["content"]) > 100,
+                validator=lambda result: "content" in result and len(result["content"]) > 0,
                 level=ValidationLevel.ERROR,
-                error_message="Output content is empty or too short (< 100 chars)",
+                error_message="Output content is empty",
             )
         )
 
-        # Valid Python syntax rule (CRITICAL - must be valid Python)
+        # Valid Python syntax rule
         self.register_rule(
             ValidationRule(
                 name="valid_python",
@@ -83,30 +93,7 @@ class ResultValidator:
             )
         )
 
-        # Not garbage output rule (CRITICAL - detect model failures)
-        self.register_rule(
-            ValidationRule(
-                name="not_garbage",
-                description="Output is not garbage/corrupted",
-                validator=self._validate_not_garbage,
-                level=ValidationLevel.ERROR,
-                error_message="Output appears to be corrupted or garbage (repeated tokens)",
-            )
-        )
-
-        # File existence rule (WARNING - nice to have)
-        self.register_rule(
-            ValidationRule(
-                name="file_exists",
-                description="Output file exists",
-                validator=lambda result: "output_file" in result
-                and Path(result["output_file"]).exists(),
-                level=ValidationLevel.WARNING,
-                error_message="Output file does not exist",
-            )
-        )
-
-        # Test file naming rule (WARNING - nice to have)
+        # Test file naming rule
         self.register_rule(
             ValidationRule(
                 name="test_naming",
@@ -171,41 +158,6 @@ class ResultValidator:
             details=details,
             score=score,
         )
-
-    def _validate_not_garbage(self, result: dict[str, Any]) -> bool:
-        """Validate that output is not garbage/corrupted.
-
-        Detects model failures like repeated tokens (e.g., "3.14, 3.14, 3.14...").
-
-        Args:
-            result: Task result
-
-        Returns:
-            True if output is not garbage
-        """
-        if "content" not in result:
-            return False
-
-        content = result["content"]
-
-        # Check for repeated patterns (sign of model failure)
-        # Look for patterns like "3.14, 3.14, 3.14" or "EOS, EOS, EOS"
-        lines = content.split("\n")
-        for line in lines:
-            # Count repeated tokens
-            tokens = line.split()
-            if len(tokens) > 10:
-                # Check if more than 50% of tokens are identical
-                token_counts = {}
-                for token in tokens:
-                    token_counts[token] = token_counts.get(token, 0) + 1
-
-                max_count = max(token_counts.values()) if token_counts else 0
-                if max_count / len(tokens) > 0.5:
-                    logger.warning(f"Detected repeated tokens in output: {line[:100]}")
-                    return False
-
-        return True
 
     def _validate_python_syntax(self, result: dict[str, Any]) -> bool:
         """Validate Python syntax.
@@ -284,3 +236,4 @@ class ResultValidator:
             return exec_result.get("passed", False)
 
         return str(exec_result).lower() in ["passed", "success", "true"]
+

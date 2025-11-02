@@ -1,8 +1,8 @@
 # Example Component Specification
 
-**Component Name:** example_component  
-**Target Stage:** staging  
-**Version:** 1.0.0  
+**Component Name:** example_component
+**Target Stage:** staging
+**Version:** 1.0.0
 **Date:** 2025-10-20
 
 ---
@@ -62,19 +62,19 @@ This is an example component specification demonstrating the format expected by 
 ```python
 class Calculator:
     """Simple calculator with basic arithmetic operations."""
-    
+
     def add(self, a: float, b: float) -> float:
         """Add two numbers."""
         pass
-    
+
     def subtract(self, a: float, b: float) -> float:
         """Subtract b from a."""
         pass
-    
+
     def multiply(self, a: float, b: float) -> float:
         """Multiply two numbers."""
         pass
-    
+
     def divide(self, a: float, b: float) -> float:
         """Divide a by b. Raises ValueError if b is zero."""
         pass
@@ -171,4 +171,3 @@ except ValueError as e:
 ## Notes
 
 This is a minimal example component designed to demonstrate the workflow system. Real components would have more complex requirements and dependencies.
-

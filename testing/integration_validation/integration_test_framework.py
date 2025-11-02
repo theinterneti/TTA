@@ -293,9 +293,8 @@ class IntegrationTestFramework:
                 if record and record["s"]:
                     logger.info("✅ Data persistence to Neo4j verified")
                     return True
-                else:
-                    logger.warning("⚠️ Session not found in Neo4j - persistence failed")
-                    return False
+                logger.warning("⚠️ Session not found in Neo4j - persistence failed")
+                return False
 
         except Exception as e:
             logger.error(f"❌ Data persistence test failed: {e}")

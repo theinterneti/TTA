@@ -228,4 +228,3 @@ test.describe('Complete User Journey - OAuth to Gameplay', () => {
     console.log(`  ✓ Successfully handled ${messages.length} interactions`);
   });
 });
-

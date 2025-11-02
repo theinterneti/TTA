@@ -73,6 +73,15 @@ The Therapeutic Text Adventure (TTA) is an innovative platform that merges the e
 - **Model Flexibility**: Support for multiple LLM providers (OpenRouter, local models)
 - **RAG System**: Context-aware responses using knowledge management
 
+### 🛠️ **OpenHands Integration (Phase 6)**
+- **AI-Powered Development Automation**: Automated code generation, testing, and refactoring
+- **6 Core Components**: TaskQueue, ModelSelector, ResultValidator, MetricsCollector, ExecutionEngine, CLI
+- **Model Rotation System**: Automatic fallback strategies with 27+ free LLM models
+- **Task-Specific Optimization**: Intelligent model selection based on task requirements
+- **Quality Assurance**: Configurable validation rules and metrics tracking
+- **Production Ready**: 47 identified work items for Phase 7 execution
+- **Documentation**: Comprehensive guides for architecture, usage, and integration
+
 ### 🔒 **Security & Privacy**
 - **HIPAA Compliance**: Secure handling of therapeutic data
 - **Data Encryption**: At-rest and in-transit encryption
@@ -246,7 +255,7 @@ TTA/
 │   ├── integration/           # Integration tests
 │   ├── e2e/                   # End-to-end tests
 │   └── comprehensive_battery/ # Comprehensive test battery
-├── Documentation/             # Project documentation
+├── docs/                      # Project documentation
 │   ├── architecture/          # Architecture docs
 │   ├── api/                   # API documentation
 │   ├── development/           # Development guides
@@ -389,10 +398,12 @@ docker-compose down -v
 
 TTA includes comprehensive testing infrastructure with multiple layers of validation.
 
+> **📖 Complete Guide**: See [Testing Infrastructure Guide](docs/development/TESTING_INFRASTRUCTURE.md) for detailed documentation on running tests, viewing coverage, VS Code integration, and troubleshooting.
+
 ### Quick Testing
 
 ```bash
-# Run all tests
+# Run all tests (coverage runs by default)
 uv run pytest
 
 # Run specific test types
@@ -400,13 +411,21 @@ uv run pytest tests/unit/              # Unit tests
 uv run pytest tests/integration/       # Integration tests
 uv run pytest tests/e2e/              # End-to-end tests
 
-# Run with coverage
-uv run pytest --cov=src --cov-report=html
-
 # Run tests with specific markers
 uv run pytest -m "not slow"           # Skip slow tests
 uv run pytest -m "redis or neo4j"     # Only database tests
 ```
+
+**Coverage Reporting:**
+- Coverage runs automatically with every test execution
+- Reports generated in `htmlcov/` (HTML) and `coverage.xml` (XML)
+- Coverage thresholds: **70% (staging)**, **80% (production)**
+- View HTML report: `open htmlcov/index.html`
+
+**VS Code Integration:**
+- **Test Discovery/Execution**: Use Testing panel (beaker icon)
+- **Debugging**: Right-click test → "Debug Test"
+- **Coverage Visualization**: Install "Coverage Gutters" extension for inline coverage indicators
 
 ### Comprehensive Test Battery
 
@@ -500,26 +519,26 @@ View test results: [GitHub Actions](https://github.com/theinterneti/TTA/actions)
 
 ### Technical Documentation
 
-- **[Architecture Documentation](Documentation/architecture/)**: System design and components
-  - [System Architecture Diagram](Documentation/architecture/system-architecture-diagram.md)
-  - [Component Interactions](Documentation/architecture/component-interaction-diagram.md)
-  - [Data Flow](Documentation/architecture/data-flow-diagram.md)
-  - [CI/CD & Deployment](Documentation/architecture/cicd-deployment-diagram.md)
-- **[API Documentation](Documentation/api/)**: API reference and examples
-- **[Development Guides](Documentation/development/)**: Setup and development guides
+- **[Architecture Documentation](docs/architecture/)**: System design and components
+  - [System Architecture Diagram](docs/architecture/system-architecture-diagram.md)
+  - [Component Interactions](docs/architecture/component-interaction-diagram.md)
+  - [Data Flow](docs/architecture/data-flow-diagram.md)
+  - [CI/CD & Deployment](docs/architecture/cicd-deployment-diagram.md)
+- **[API Documentation](docs/api/)**: API reference and examples
+- **[Development Guides](docs/development/)**: Setup and development guides
 - **[Testing Framework](docs/testing-framework.md)**: Testing strategies and tools
 
 ### Therapeutic Content
 
-- **[Therapeutic Frameworks](Documentation/therapeutic-content/)**: CBT, DBT, ACT integration
-- **[Content Guidelines](Documentation/therapeutic-content/guidelines.md)**: Content creation standards
-- **[Safety Protocols](Documentation/therapeutic-content/safety.md)**: Therapeutic safety measures
+- **[Therapeutic Frameworks](docs/therapeutic-content/)**: CBT, DBT, ACT integration
+- **[Content Guidelines](docs/therapeutic-content/guidelines.md)**: Content creation standards
+- **[Safety Protocols](docs/therapeutic-content/safety.md)**: Therapeutic safety measures
 
 ### Additional Resources
 
-- **[Environment Setup](ENVIRONMENT_SETUP.md)**: Detailed environment configuration
-- **[Docker Setup](Documentation/docker/docker_setup_guide.md)**: Docker and DevContainer setup
-- **[Troubleshooting](Documentation/docker/devcontainer_troubleshooting_guide.md)**: Common issues and solutions
+- **[Environment Setup](docs/project/ENVIRONMENT_SETUP.md)**: Detailed environment configuration
+- **[Docker Setup](docs/deployment/docker_setup_guide.md)**: Docker and DevContainer setup
+- **[Troubleshooting](docs/docker/devcontainer_troubleshooting_guide.md)**: Common issues and solutions
 
 ---
 

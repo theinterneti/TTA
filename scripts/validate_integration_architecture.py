@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 TTA Core Gameplay Loop Integration Architecture Validation
@@ -130,7 +129,7 @@ class IntegrationArchitectureValidator:
                     else:
                         # Check for pattern matches (e.g., with path parameters)
                         pattern_found = False
-                        for path in paths:
+                        for path in paths.keys():
                             if endpoint.replace("{session_id}", "") in path:
                                 found_endpoints.append(path)
                                 logger.info(f"✅ Found endpoint pattern: {path}")

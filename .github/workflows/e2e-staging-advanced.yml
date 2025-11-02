@@ -213,14 +213,14 @@ jobs:
             const results = JSON.parse(fs.readFileSync('test-results-staging/results.json', 'utf8'));
             const passed = results.stats.expected;
             const failed = results.stats.unexpected;
-            
+
             const comment = `## E2E Test Results
-            
+
             ✅ Passed: ${passed}
             ❌ Failed: ${failed}
-            
+
             [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -252,4 +252,3 @@ jobs:
           TEST_RESULTS_PATH: test-results-staging/results.json
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-

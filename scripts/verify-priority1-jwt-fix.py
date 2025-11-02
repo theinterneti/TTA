@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Verification Script for Priority 1: JWT Authentication Fix
@@ -15,7 +14,7 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from jose import jwt
 
@@ -128,7 +127,7 @@ def test_verify_token_extraction():
         "permissions": ["create_character"],
         "session_id": "session-123",
         "mfa_verified": False,
-        "exp": datetime.now(UTC) + timedelta(minutes=30),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
 
     token = jwt.encode(payload_with_player_id, SECRET_KEY, algorithm=ALGORITHM)
@@ -160,7 +159,7 @@ def test_verify_token_extraction():
         "permissions": ["create_character"],
         "session_id": "session-789",
         "mfa_verified": False,
-        "exp": datetime.now(UTC) + timedelta(minutes=30),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
 
     old_token = jwt.encode(payload_without_player_id, SECRET_KEY, algorithm=ALGORITHM)

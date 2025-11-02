@@ -33,6 +33,7 @@ def check_file(filepath: Path) -> list[tuple[int, str]]:
         lines = content.split("\n")
 
         # Track if we're in an async function definition
+        in_async_def = False
         decorator_line = None
 
         for i, line in enumerate(lines, start=1):
@@ -74,9 +75,11 @@ def main(filenames: list[str]) -> int:
         filepath = Path(filename)
 
         # Only check Python test files
-        if filepath.suffix != ".py":
+        if not filepath.suffix == ".py":
             continue
-        if not ("test" in filepath.name or filepath.parts and "tests" in filepath.parts):
+        if not (
+            "test" in filepath.name or filepath.parts and "tests" in filepath.parts
+        ):
             continue
 
         violations = check_file(filepath)
@@ -87,15 +90,15 @@ def main(filenames: list[str]) -> int:
             print(f"\n❌ {filepath}:")
             for line_num, line_content in violations:
                 print(f"  Line {line_num}: {line_content.strip()}")
-                print(
-                    "    → Should use @pytest_asyncio.fixture for async functions"
-                )
+                print("    → Should use @pytest_asyncio.fixture for async functions")
 
     if total_violations > 0:
         print(
             f"\n⚠️  Found {total_violations} async fixture(s) with incorrect decorator."
         )
-        print("   Use @pytest_asyncio.fixture instead of @pytest.fixture for async functions.")
+        print(
+            "   Use @pytest_asyncio.fixture instead of @pytest.fixture for async functions."
+        )
         print("   Add 'import pytest_asyncio' at the top of the file if needed.")
     else:
         print("✅ All async fixtures use correct decorators.")

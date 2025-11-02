@@ -9,6 +9,7 @@ tests to achieve high mutation testing scores.
 from unittest.mock import AsyncMock
 
 import pytest
+
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,

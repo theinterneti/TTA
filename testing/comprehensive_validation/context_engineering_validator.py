@@ -300,14 +300,13 @@ class ContextEngineeringValidator:
         # Generate agent-specific context
         if agent_type == AgentType.NGA:
             return await self._generate_narrative_context(enhanced_context, scenario)
-        elif agent_type == AgentType.IPA:
+        if agent_type == AgentType.IPA:
             return await self._generate_therapeutic_context(enhanced_context, scenario)
-        elif agent_type == AgentType.WBA:
+        if agent_type == AgentType.WBA:
             return await self._generate_worldbuilding_context(
                 enhanced_context, scenario
             )
-        else:
-            raise ValueError(f"Unsupported agent type: {agent_type}")
+        raise ValueError(f"Unsupported agent type: {agent_type}")
 
     async def _generate_narrative_context(
         self, enhanced_context: EnhancedContext, scenario: TestScenario
@@ -558,7 +557,7 @@ class ContextEngineeringValidator:
 
         # Check therapeutic context consistency
         if scenario.therapeutic_context:
-            for _key, value in scenario.therapeutic_context.items():
+            for key, value in scenario.therapeutic_context.items():
                 context_str = json.dumps(context).lower()
                 if str(value).lower() in context_str:
                     score += 0.2
@@ -580,8 +579,7 @@ class ContextEngineeringValidator:
                 # Check if it's mentioned in safety context (acceptable)
                 if "avoid" in context_str or "trigger" in context_str:
                     continue  # Acceptable mention in safety context
-                else:
-                    score -= 2.0  # Penalty for inappropriate trigger mention
+                score -= 2.0  # Penalty for inappropriate trigger mention
 
         # Check for safety protocols
         if "safety" in context_str:

@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 API Endpoint Testing Script for TTA Core Gameplay Loop Integration
@@ -96,7 +95,7 @@ class GameplayAPITester:
                             f"✅ Authentication successful with {credentials['username']}"
                         )
                         return True
-                    await response.text()
+                    error_data = await response.text()
                     logger.warning(
                         f"⚠️  Login failed for {credentials['username']}: {response.status}"
                     )
@@ -199,7 +198,7 @@ class GameplayAPITester:
                 json=payload,
             ) as response:
                 if response.status == 200:
-                    await response.json()
+                    data = await response.json()
                     logger.info("✅ Choice processed successfully")
                     return True
                 error_data = await response.text()
@@ -224,7 +223,7 @@ class GameplayAPITester:
                 headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
-                    await response.json()
+                    data = await response.json()
                     logger.info("✅ Progress retrieved successfully")
                     return True
                 error_data = await response.text()
@@ -249,7 +248,7 @@ class GameplayAPITester:
                 headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
-                    await response.json()
+                    data = await response.json()
                     logger.info("✅ Session terminated successfully")
                     return True
                 error_data = await response.text()

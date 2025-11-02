@@ -141,18 +141,83 @@ class RedisToolRegistry:
         await self._cache.set(key, spec)
         return spec
 
-    async def list_tools(self, prefix: str | None = None) -> list[ToolSpec]:
+    async def list_tools(
+        self,
+        prefix: str | None = None,
+        cursor: str | None = None,
+        page_size: int = 50,
+    ) -> tuple[list[ToolSpec], str | None]:
+        """
+        List tools with optional pagination.
+
+        Args:
+            prefix: Optional prefix filter for tool names
+            cursor: Optional pagination cursor (from previous response)
+            page_size: Number of tools per page (default: 50, max: 100)
+
+        Returns:
+            Tuple of (tools, next_cursor). next_cursor is None if no more tools.
+
+        Example:
+            >>> # First page
+            >>> tools, next_cursor = await registry.list_tools(page_size=10)
+            >>> # Next page
+            >>> more_tools, cursor = await registry.list_tools(
+            ...     cursor=next_cursor, page_size=10
+            ... )
+        """
+        from .cursor import get_cursor_manager
+
+        # Validate page_size
+        page_size = max(1, min(100, page_size))
+
+        # Decode cursor if provided
+        offset = 0
+        filters = {}
+        if cursor:
+            cursor_manager = get_cursor_manager()
+            cursor_data = cursor_manager.decode_cursor(cursor)
+            offset = cursor_data.offset
+            filters = cursor_data.filters
+            # Restore prefix from cursor if not provided
+            if not prefix and "prefix" in filters:
+                prefix = filters["prefix"]
+
+        # Get all tool IDs
         members = await self._redis.smembers(self._idx)
-        out: list[ToolSpec] = []
+        all_ids: list[str] = []
         for b in members:
             s = b.decode() if isinstance(b, (bytes, bytearray)) else b
             nm, ver = s.split(":", 1)
             if prefix and not nm.startswith(prefix):
                 continue
+            all_ids.append(s)
+
+        # Sort for consistent ordering
+        all_ids.sort()
+
+        # Apply pagination
+        start_idx = offset
+        end_idx = offset + page_size
+        page_ids = all_ids[start_idx:end_idx]
+
+        # Fetch tool specs
+        out: list[ToolSpec] = []
+        for tool_id in page_ids:
+            nm, ver = tool_id.split(":", 1)
             spec = await self.get_tool(nm, ver)
             if spec:
                 out.append(spec)
-        return out
+
+        # Create next cursor if more tools available
+        next_cursor = None
+        if end_idx < len(all_ids):
+            cursor_manager = get_cursor_manager()
+            next_cursor = cursor_manager.create_cursor(
+                offset=end_idx, filters={"prefix": prefix} if prefix else {}
+            )
+
+        return out, next_cursor
 
     async def list_tool_ids(self) -> list[str]:
         members = await self._redis.smembers(self._idx)

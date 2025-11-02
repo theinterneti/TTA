@@ -8,7 +8,9 @@ the PerformanceMonitor service's behavior across a wide range of inputs.
 from datetime import datetime
 
 import pytest
-from hypothesis import given, settings, strategies as st
+from hypothesis import given, settings
+from hypothesis import strategies as st
+
 from tta_ai.models.models import TaskType
 from tta_ai.models.services import PerformanceMonitor
 

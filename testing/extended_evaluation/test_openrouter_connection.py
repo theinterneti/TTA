@@ -81,21 +81,19 @@ async def test_openrouter_connection():
                             )
 
                         return True
-                    else:
-                        print("❌ Llama 3.3 8B Instruct model not found")
-                        print("Available models with 'llama' in name:")
-                        for model in models:
-                            if "llama" in model.get("id", "").lower():
-                                print(f"   - {model['id']}")
-                        return False
-
-                else:
-                    print(f"❌ API request failed: {response.status}")
-                    error_text = await response.text()
-                    print(f"Error: {error_text}")
+                    print("❌ Llama 3.3 8B Instruct model not found")
+                    print("Available models with 'llama' in name:")
+                    for model in models:
+                        if "llama" in model.get("id", "").lower():
+                            print(f"   - {model['id']}")
                     return False
 
-    except TimeoutError:
+                print(f"❌ API request failed: {response.status}")
+                error_text = await response.text()
+                print(f"Error: {error_text}")
+                return False
+
+    except asyncio.TimeoutError:
         print("❌ API request timed out")
         print("💡 Check your internet connection")
         return False
@@ -136,41 +134,39 @@ async def test_simple_completion():
 
     try:
         print("📤 Sending test completion request...")
-        async with (
-            aiohttp.ClientSession() as session,
-            session.post(url, headers=headers, json=payload, timeout=30) as response,
-        ):
-            if response.status == 200:
-                data = await response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url, headers=headers, json=payload, timeout=30
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
 
-                if "choices" in data and len(data["choices"]) > 0:
-                    content = data["choices"][0]["message"]["content"]
-                    print("✅ Completion successful!")
-                    print(f"📝 Response: {content}")
+                    if "choices" in data and len(data["choices"]) > 0:
+                        content = data["choices"][0]["message"]["content"]
+                        print("✅ Completion successful!")
+                        print(f"📝 Response: {content}")
 
-                    # Check usage stats
-                    usage = data.get("usage", {})
-                    if usage:
-                        print("📊 Token usage:")
-                        print(f"   Prompt tokens: {usage.get('prompt_tokens', 0)}")
-                        print(
-                            f"   Completion tokens: {usage.get('completion_tokens', 0)}"
-                        )
-                        print(f"   Total tokens: {usage.get('total_tokens', 0)}")
+                        # Check usage stats
+                        usage = data.get("usage", {})
+                        if usage:
+                            print("📊 Token usage:")
+                            print(f"   Prompt tokens: {usage.get('prompt_tokens', 0)}")
+                            print(
+                                f"   Completion tokens: {usage.get('completion_tokens', 0)}"
+                            )
+                            print(f"   Total tokens: {usage.get('total_tokens', 0)}")
 
-                    return True
-                else:
+                        return True
                     print("❌ No completion in response")
                     print(f"Response: {data}")
                     return False
 
-            else:
                 print(f"❌ Completion request failed: {response.status}")
                 error_text = await response.text()
                 print(f"Error: {error_text}")
                 return False
 
-    except TimeoutError:
+    except asyncio.TimeoutError:
         print("❌ Completion request timed out")
         return False
     except Exception as e:
@@ -219,13 +215,12 @@ async def main():
             "2. python testing/run_extended_evaluation.py --mode comprehensive --config testing/configs/production_extended_evaluation.yaml"
         )
         return True
-    else:
-        print("\n❌ TESTS FAILED")
-        print("💡 Fix the issues above before running extended evaluation")
-        if not connection_ok:
-            print("💡 Make sure you have a valid OpenRouter API key")
-            print("💡 Run: ./testing/extended_evaluation/setup_api_key.sh")
-        return False
+    print("\n❌ TESTS FAILED")
+    print("💡 Fix the issues above before running extended evaluation")
+    if not connection_ok:
+        print("💡 Make sure you have a valid OpenRouter API key")
+        print("💡 Run: ./testing/extended_evaluation/setup_api_key.sh")
+    return False
 
 
 if __name__ == "__main__":

@@ -80,7 +80,7 @@ class RetryConfig:
         if self.jitter:
             # Add random jitter: ±20% of delay
             jitter_amount = delay * 0.2
-            delay += random.uniform(-jitter_amount, jitter_amount)  # nosec B311 - jitter for backoff, not crypto
+            delay += random.uniform(-jitter_amount, jitter_amount)
             delay = max(0, delay)  # Ensure non-negative
 
         return delay

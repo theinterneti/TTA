@@ -369,12 +369,11 @@ class MultiModelComparator:
         """Get scores for a specific metric from model result."""
         if metric == "narrative_coherence":
             return model_result.narrative_coherence_scores
-        elif metric == "world_consistency":
+        if metric == "world_consistency":
             return model_result.world_state_consistency_scores
-        elif metric == "user_engagement":
+        if metric == "user_engagement":
             return model_result.user_engagement_scores
-        else:
-            return []
+        return []
 
     def _generate_rankings(self, result: ModelComparisonResult):
         """Generate model rankings based on weighted scoring."""

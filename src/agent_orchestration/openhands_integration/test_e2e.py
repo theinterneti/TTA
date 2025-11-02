@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import sys
 from pathlib import Path
 
 from .config import OpenHandsConfig
@@ -28,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 async def test_task_queue() -> bool:
     """Test task queue functionality."""
+    print("\n=== Testing Task Queue ===")
 
     queue = TaskQueue(max_size=100)
 
@@ -55,22 +55,27 @@ async def test_task_queue() -> bool:
     for task in tasks:
         task_id = await queue.enqueue(task)
         task_ids.append(task_id)
+        print(f"✓ Enqueued task: {task_id}")
 
     # Get stats
-    await queue.get_stats()
+    stats = await queue.get_stats()
+    print(f"✓ Queue stats: {stats}")
 
     # Dequeue and verify priority
     task1 = await queue.dequeue()
     assert task1.priority == TaskPriority.HIGH, "Priority ordering failed"
+    print(f"✓ Dequeued high-priority task: {task1.task_id}")
 
     # Mark completed
     await queue.mark_completed(task1.task_id, {"result": "success"})
+    print(f"✓ Marked task completed: {task1.task_id}")
 
     return True
 
 
 async def test_model_selector() -> bool:
     """Test model selection."""
+    print("\n=== Testing Model Selector ===")
 
     selector = ModelSelector()
 
@@ -91,19 +96,25 @@ async def test_model_selector() -> bool:
 
         model = selector.select_model(requirements)
         assert model is not None, f"No model found for {category}"
+        print(
+            f"✓ Selected {model.name} for {category.value} "
+            f"(quality: {model.quality_score:.1f}/5.0)"
+        )
 
     return True
 
 
 async def test_result_validator() -> bool:
     """Test result validation."""
+    print("\n=== Testing Result Validator ===")
 
     import tempfile
+    from pathlib import Path
 
     validator = ResultValidator()
 
     # Create temporary test file
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
         f.write("import pytest\n\ndef test_auth():\n    pass")
         temp_file = f.name
 
@@ -116,9 +127,8 @@ async def test_result_validator() -> bool:
         }
 
         validation = validator.validate(valid_result)
-        assert validation.passed, (
-            f"Valid result should pass. Errors: {validation.errors}"
-        )
+        assert validation.passed, f"Valid result should pass. Errors: {validation.errors}"
+        print(f"✓ Valid result passed validation (score: {validation.score:.2f})")
 
         # Test invalid result (missing file)
         invalid_result = {
@@ -129,6 +139,7 @@ async def test_result_validator() -> bool:
 
         validation = validator.validate(invalid_result)
         assert not validation.passed, "Invalid result should fail"
+        print(f"✓ Invalid result failed validation (errors: {len(validation.errors)})")
 
         return True
     finally:
@@ -138,6 +149,7 @@ async def test_result_validator() -> bool:
 
 async def test_metrics_collector() -> bool:
     """Test metrics collection."""
+    print("\n=== Testing Metrics Collector ===")
 
     from .metrics_collector import ExecutionMetrics
 
@@ -161,6 +173,8 @@ async def test_metrics_collector() -> bool:
 
     # Get summary
     summary = collector.get_summary()
+    print(f"✓ System metrics: {summary['system']}")
+    print(f"✓ Model metrics: {list(summary['models'].keys())}")
 
     assert summary["system"]["total_tasks"] == 5, "Should have 5 tasks"
     assert summary["system"]["completed_tasks"] == 4, "Should have 4 completed"
@@ -171,10 +185,10 @@ async def test_metrics_collector() -> bool:
 
 async def test_execution_engine() -> bool:
     """Test execution engine."""
+    print("\n=== Testing Execution Engine ===")
 
     try:
         from .config import OpenHandsIntegrationConfig
-
         integration_config = OpenHandsIntegrationConfig.from_env()
         # Convert to OpenHandsConfig
         config = OpenHandsConfig(
@@ -182,13 +196,15 @@ async def test_execution_engine() -> bool:
             model=integration_config.custom_model_id or integration_config.model_preset,
             workspace_path=integration_config.workspace_root,
         )
-    except (ValueError, Exception):
+    except (ValueError, Exception) as e:
+        print(f"⚠️  Skipping execution engine test: {e}")
         return True
 
     engine = ExecutionEngine(config, max_concurrent_tasks=2)
 
     # Start engine
     await engine.start()
+    print("✓ Engine started")
 
     # Submit test task
     task = QueuedTask(
@@ -202,19 +218,23 @@ async def test_execution_engine() -> bool:
         },
     )
 
-    await engine.submit_task(task)
+    task_id = await engine.submit_task(task)
+    print(f"✓ Task submitted: {task_id}")
 
     # Get queue stats
-    await engine.get_queue_stats()
+    stats = await engine.get_queue_stats()
+    print(f"✓ Queue stats: {stats}")
 
     # Stop engine
     await engine.stop()
+    print("✓ Engine stopped")
 
     return True
 
 
 async def test_integration() -> bool:
     """Test full integration."""
+    print("\n=== Testing Full Integration ===")
 
     # Test 1: Queue
     if not await test_task_queue():
@@ -233,21 +253,35 @@ async def test_integration() -> bool:
         return False
 
     # Test 5: Execution Engine
-    return await test_execution_engine()
+    if not await test_execution_engine():
+        return False
+
+    return True
 
 
 async def main():
     """Run all tests."""
     logging.basicConfig(level=logging.INFO)
 
+    print("=" * 60)
+    print("OpenHands Integration System - End-to-End Tests")
+    print("=" * 60)
+
     try:
         success = await test_integration()
 
+        print("\n" + "=" * 60)
         if success:
+            print("✅ All tests passed!")
+            print("=" * 60)
             return 0
-        return 1
+        else:
+            print("❌ Some tests failed")
+            print("=" * 60)
+            return 1
 
-    except Exception:
+    except Exception as e:
+        print(f"\n❌ Test error: {e}")
         import traceback
 
         traceback.print_exc()
@@ -256,4 +290,5 @@ async def main():
 
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
-    sys.exit(exit_code)
+    exit(exit_code)
+

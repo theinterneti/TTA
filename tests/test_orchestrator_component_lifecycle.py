@@ -5,11 +5,11 @@ This module tests component start/stop, status retrieval, and lifecycle manageme
 to improve coverage of orchestrator.py.
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
-from src.orchestration import MockComponentLoader, TTAOrchestrator
+from src.orchestration import TTAOrchestrator
 from src.orchestration.component import Component, ComponentStatus
 
 
@@ -40,22 +40,26 @@ class TestOrchestratorComponentLifecycle:
     @pytest.fixture
     def orchestrator_with_mock_components(self):
         """Create orchestrator with mock components for testing."""
-        # Create mock components
-        mock_comp1 = MockComponent(name="component1")
-        mock_comp2 = MockComponent(name="component2")
+        # Mock the validation and import methods to prevent filesystem operations
+        with patch(
+            "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"
+        ):
+            with patch(
+                "src.orchestration.orchestrator.TTAOrchestrator._import_components"
+            ):
+                # Create orchestrator (validation and import are mocked)
+                orchestrator = TTAOrchestrator()
 
-        # Create mock loader with components
-        loader = MockComponentLoader(
-            components={
-                "component1": mock_comp1,
-                "component2": mock_comp2,
-            }
-        )
+                # Clear any components that might have been loaded
+                orchestrator.components.clear()
 
-        # Create orchestrator with injected loader (no patching needed!)
-        orchestrator = TTAOrchestrator(component_loader=loader)
+                # Add mock components
+                mock_comp1 = MockComponent(name="component1")
+                mock_comp2 = MockComponent(name="component2")
+                orchestrator.components["component1"] = mock_comp1
+                orchestrator.components["component2"] = mock_comp2
 
-        return orchestrator
+                return orchestrator
 
     def test_has_component_true(self, orchestrator_with_mock_components):
         """Test has_component returns True for existing component."""
@@ -235,7 +239,7 @@ class TestOrchestratorComponentLifecycle:
             return_value=False
         )
 
-        orchestrator_with_mock_components.start_all()
+        result = orchestrator_with_mock_components.start_all()
 
         # Should still attempt to start component2
         assert orchestrator_with_mock_components.components["component2"].start_called
@@ -250,7 +254,7 @@ class TestOrchestratorComponentLifecycle:
             return_value=False
         )
 
-        orchestrator_with_mock_components.stop_all()
+        result = orchestrator_with_mock_components.stop_all()
 
         # Should still attempt to stop component2
         assert orchestrator_with_mock_components.components["component2"].stop_called

@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Comprehensive Frontend Testing for TTA Core Gameplay Loop Integration
@@ -106,8 +105,8 @@ class ComprehensiveFrontendTester:
                         "/api/v1/gameplay/sessions/{session_id}/choices",
                     ]
 
-                    for _pattern in session_patterns:
-                        for path in paths:
+                    for pattern in session_patterns:
+                        for path in paths.keys():
                             if (
                                 "/api/v1/gameplay/sessions/" in path
                                 and path != "/api/v1/gameplay/sessions"
@@ -234,7 +233,7 @@ class ComprehensiveFrontendTester:
                             "Endpoint exists, validates request format",
                         )
                     else:
-                        await response.text()
+                        error_data = await response.text()
                         self.log_test_result(
                             "Session Creation Endpoint",
                             True,

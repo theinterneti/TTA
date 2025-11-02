@@ -50,12 +50,11 @@ yarn-error.log*
 .yarn-integrity
 .pnp
 .pnp.js
-# Exclude frontend build artifacts but keep source in the build context
-# We need to allow `src/player_experience/frontend/` so Docker can find the
-# frontend Dockerfile and source when building the frontend image.
+# Exclude frontend build artifacts and source (not needed for API container)
+src/player_experience/frontend/
 frontend/
 dist/
-# Keep the source directory (do not exclude src/player_experience/frontend/)
+build/
 
 # IDE and Editor Files
 .vscode/
@@ -104,8 +103,8 @@ pids
 *.pid.lock
 
 # Docker
-# Note: Do NOT exclude Dockerfiles or docker-compose files - they are needed
-# in the build context for CI's Docker builds.
+Dockerfile*
+docker-compose*.yml
 .dockerignore
 
 # Backup Files

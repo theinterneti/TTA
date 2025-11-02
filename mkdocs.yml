@@ -175,8 +175,6 @@ nav:
   - Development:
       - Component Maturity: development/component-maturity.md
       - Testing Strategy: development/testing.md
-      - Keploy Automated Testing: development/keploy-automated-testing.md
-      - Keploy Visual Guide: development/keploy-visual-guide.md
       - Contributing: development/contributing.md
       - Code Style: development/code-style.md
       - CI/CD: development/cicd.md

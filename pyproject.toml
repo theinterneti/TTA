@@ -18,17 +18,13 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Healthcare Industry",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 
 dependencies = [
-    # Workspace packages (pinned for reproducible builds)
-    "tta-ai-framework==0.1.0",
-    "tta-narrative-engine==0.1.0",
-    # TTA.dev packages (external repository)
-    "tta-dev-primitives>=0.1.0",
+    # Workspace packages
+    "tta-ai-framework",
+    "tta-narrative-engine",
     # Core dependencies
     "numpy>=1.24.0",
     "pandas>=2.0.0",
@@ -88,6 +84,8 @@ dependencies = [
     # MCP Integration
     "fastmcp>=0.4.1",
     "mcp>=1.6.0",
+    # Agent Integration
+    "openhands-sdk>=0.1.0",
     # LangChain and LangGraph
     "langchain-core>=0.3.0",
     "langchain-openai>=0.2.0",
@@ -103,7 +101,7 @@ dependencies = [
     "py-cpuinfo>=9.0.0",
     "pynvml>=12.0.0",
     "py3nvml>=0.2.7",
-    "codecarbon>=2.8.0",
+    # "codecarbon>=3.0.7",  # Temporarily disabled due to httpx version conflict with openhands-sdk
     "cloudpickle>=3.1.0",
     "fsspec>=2024.0.0",
     "dill>=0.3.4",
@@ -120,9 +118,8 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.0.0",
     # Docker Integration
     "docker>=7.0.0",
-    "opentelemetry-api>=1.38.0",
-    "opentelemetry-sdk>=1.38.0",
-    "opentelemetry-exporter-prometheus>=0.59b0",
+    "notebooklm-mcp>=2.0.11",
+    "task>=0.1.0",
 ]
 
 # DEPRECATED: Use dependency-groups instead (see below)
@@ -141,6 +138,7 @@ dev = [
     "pyright>=1.1.350",
     "pre-commit>=3.5.0",
     "testcontainers>=4.12.0",
+    "prospector[with_pyright]>=1.10.2",
 ]
 
 minimal = [
@@ -173,9 +171,12 @@ minimal = [
     "ruff>=0.11.0",
     "pyright>=1.1.350",
     "psutil>=7.0.0",
-    "codecarbon>=2.8.0",
+    # "codecarbon>=3.0.7",  # Temporarily disabled due to httpx version conflict with openhands-sdk
 ]
 
+# ============================================================================
+# UV DEPENDENCY GROUPS (PEP 735)
+# ============================================================================
 # ============================================================================
 # UV DEPENDENCY GROUPS (PEP 735)
 # ============================================================================
@@ -251,7 +252,7 @@ gpu = [
     # GPU Utilities
     "pynvml>=12.0.0",
     "py3nvml>=0.2.7",
-    "codecarbon>=2.8.0",
+    # "codecarbon>=3.0.7",  # Temporarily disabled due to httpx version conflict with openhands-sdk
     "ray>=2.44.0",
 ]
 
@@ -267,12 +268,15 @@ Documentation = "https://github.com/your-org/tta/docs"
 # These settings work in conjunction with uv.toml to ensure consistent
 # virtual environment management across all contexts.
 
+# Default dependency groups to install with 'uv sync'
+# Includes both dev tools and testing frameworks for productive local development
+default-groups = ["dev", "test"]
+
 # DEPRECATED: Replaced by [dependency-groups] above
 # This section is kept for backwards compatibility but is no longer the primary way to manage dev dependencies
 # The [dependency-groups] section provides more granular control and faster CI/CD
 #
-# Note: UV will automatically include all dependency-groups when running `uv sync`
-# To install specific groups: uv sync --group test --group lint
+# Note: To install specific groups: uv sync --group lint --group type
 
 # Managed project environment (ensures UV manages the virtual environment)
 managed = true
@@ -298,6 +302,9 @@ cache-dir = "./.uv_cache"
 # ============================================================================
 # UV WORKSPACE CONFIGURATION
 # ============================================================================
+# ============================================================================
+# UV WORKSPACE CONFIGURATION
+# ============================================================================
 # Monorepo workspace configuration for managing multiple packages
 
 [tool.uv.workspace]
@@ -311,8 +318,6 @@ members = [
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
-# External packages from TTA.dev repository
-tta-dev-primitives = { git = "https://github.com/theinterneti/TTA.dev.git", branch = "main", subdirectory = "packages/tta-dev-primitives" }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
@@ -320,12 +325,11 @@ tta-dev-primitives = { git = "https://github.com/theinterneti/TTA.dev.git", bran
 
 [tool.pyright]
 # Python version and platform
-# Updated to match project requirement: Python 3.12+ (see AGENTS.md)
-pythonVersion = "3.12"
+pythonVersion = "3.10"
 pythonPlatform = "Linux"
 
 # Paths
-include = ["src", "packages/tta-ai-framework/src", "packages/tta-narrative-engine/src"]
+include = ["src"]
 exclude = [
     "**/node_modules",
     "**/__pycache__",
@@ -339,14 +343,7 @@ exclude = [
     "tta.dev/",
     "tta.prod/",
     "obsolete/",
-    "artifacts/",
-    ".uv_cache/"
-]
-
-# Extra paths for workspace packages (improves import resolution)
-extraPaths = [
-    "packages/tta-ai-framework/src",
-    "packages/tta-narrative-engine/src"
+    "artifacts/"
 ]
 
 # Type checking mode (equivalent to MyPy strict settings)
@@ -404,13 +401,6 @@ reportUnusedFunction = "warning"
 reportUnusedVariable = "warning"
 reportDuplicateImport = "warning"
 
-# ============================================================================
-# RUFF CONFIGURATION
-# ============================================================================
-# Ruff is an extremely fast Python linter and formatter written in Rust.
-# It replaces Black, isort, flake8, pylint, and other tools with a single tool.
-# Configuration follows best practices for Python 3.12+ projects.
-
 [tool.ruff]
 # Target Python version - must match project.requires-python
 target-version = "py312"
@@ -418,220 +408,61 @@ target-version = "py312"
 # Line length - same as Black default for compatibility
 line-length = 88
 
-# Exclude directories from linting and formatting
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    "venv",
-    # Project-specific exclusions
-    "tta.prototype/",
-    "tta.dev/",
-    "tta.prod/",
-    "obsolete/",
-    "artifacts/",
-]
-
-# ============================================================================
-# LINTING CONFIGURATION
-# ============================================================================
+# Ruff now handles linting, formatting, AND import sorting
 [tool.ruff.lint]
-# Rule selection - comprehensive but practical for development
-# See: https://docs.astral.sh/ruff/rules/
 select = [
-    # Pyflakes (F) - Essential error detection
-    "F",
-
-    # pycodestyle (E, W) - Style consistency
-    "E4", "E7", "E9",  # Subset to avoid formatter conflicts
-    "W",
-
-    # isort (I) - Import sorting
-    "I",
-
-    # flake8-bugbear (B) - Common bugs and design problems
-    "B",
-
-    # flake8-comprehensions (C4) - Better comprehensions
-    "C4",
-
-    # pyupgrade (UP) - Upgrade syntax for newer Python versions
-    "UP",
-
-    # flake8-simplify (SIM) - Simplification suggestions
-    "SIM",
+    "E4", "E7", "E9",  # pycodestyle errors (subset to avoid formatter conflicts)
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "S",   # flake8-bandit (security)
+    "T20", # flake8-print (catch print statements)
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+    "ERA", # eradicate (commented-out code)
+    "PL",  # pylint
+    "PERF", # perflint (performance anti-patterns)
 ]
-
-# Rules to ignore globally
-# These are either handled by the formatter or too strict for practical development
 ignore = [
-    "E501",    # Line too long - handled by formatter
-    "B008",    # Function calls in argument defaults - common pattern in FastAPI
-    "SIM108",  # Use ternary operator - sometimes less readable
+    "E501",  # line too long, handled by formatter
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "PLR0913", # too many arguments
+    "PLR2004", # magic value comparison
+    "S101",  # use of assert (common in tests)
+    "SIM108", # use ternary operator (sometimes less readable)
 ]
 
-# Allow auto-fixing for all enabled rules when using --fix
+# Allow auto-fixing for all enabled rules
 fixable = ["ALL"]
-
-# Never auto-fix these rules (empty = allow all fixes)
 unfixable = []
 
-# Allow unused variables when underscore-prefixed
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-
-# ============================================================================
-# PER-FILE IGNORES
-# ============================================================================
-# Different files have different requirements - configure exceptions here
+# Per-file ignores
 [tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "E402"]
+"tests/**/*.py" = ["S101", "ARG", "PLR2004"]  # Allow assert, unused args, magic values in tests
+"scripts/analyze-neo4j-staging-metrics.py" = ["T201", "PLR0912", "PLR0915", "ARG001", "F841", "PTH123"]  # Reporting script needs print statements
 
-# __init__.py files - allow unused imports and module-level imports
-"__init__.py" = [
-    "F401",  # Unused imports (re-exports)
-    "E402",  # Module level import not at top
-]
-
-# Test files - more lenient rules for test code
-"tests/**/*.py" = [
-    "S101",    # Use of assert (required for pytest)
-    "ARG",     # Unused arguments (fixtures, parametrize)
-    "PLR2004", # Magic values (test data)
-    "T201",    # Print statements (debugging and demo scripts)
-    "S311",    # Pseudo-random generators (acceptable in tests)
-    "PLC0415", # Import outside top-level (lazy imports for test isolation)
-    "PERF203", # Try-except in loop (acceptable in test scenarios)
-]
-
-# Scripts - allow print statements and other script-specific patterns
-"scripts/**/*.py" = [
-    "T201",    # Print statements (CLI output)
-    "PLR0912", # Too many branches (complex CLI logic)
-    "PLR0915", # Too many statements (script logic)
-    "ARG001",  # Unused function arguments (CLI interfaces)
-    "PTH123",  # builtin-open (scripts often use open())
-]
-
-# Agent orchestration - dynamic imports and complex async patterns
-"src/agent_orchestration/**/*.py" = [
-    "PLC0415", # Import outside top-level (dynamic agent loading)
-    "PERF203", # Try-except in loop (async retry patterns)
-]
-
-# Components - interface implementations may have unused parameters
-"src/components/**/*.py" = [
-    "ARG002",  # Unused method arguments (interface implementations)
-    "PLC0415", # Import outside top-level (dynamic imports)
-]
-
-# Narrative coherence engine - interface-heavy with many abstract methods
-"src/components/narrative_coherence_engine.py" = [
-    "ARG002",  # Unused method arguments (interface methods)
-    "F811",    # Redefined while unused (method overloads)
-]
-
-# Model management - complex async patterns and optional methods
-"src/components/model_management/**/*.py" = [
-    "ARG002",   # Unused method arguments (interface implementations)
-    "PERF203",  # Try-except in loop (acceptable for async tasks)
-    "PERF401",  # Manual list comprehension (readability preference)
-    "SIM102",   # Collapsible if (readability preference)
-    "ERA001",   # Commented code (acceptable for development)
-    "PLC0415",  # Import outside top-level (dynamic imports needed)
-    "PLR0911",  # Too many return statements (acceptable for complex logic)
-    "PLR0912",  # Too many branches (acceptable for complex logic)
-    "PTH103",   # os.makedirs (pathlib not always better)
-    "B027",     # Empty method without abstract decorator (optional methods)
-]
-
-# Player experience API - FastAPI patterns and auth
-"src/player_experience/**/*.py" = [
-    "PLC0415", # Import outside top-level (lazy imports for performance)
-    "S106",    # Hardcoded password in function arg (FastAPI dependency injection)
-    "S105",    # Hardcoded password string (test/example credentials)
-]
-
-# WebSocket manager - complex async patterns
-"src/agent_orchestration/realtime/websocket_manager.py" = [
-    "SIM102",  # Collapsible if (readability in async code)
-    "PERF203", # Try-except in loop (WebSocket retry logic)
-]
-
-# Conftest - pytest fixtures with dynamic imports
-"tests/conftest.py" = [
-    "PLC0415", # Import outside top-level (conditional test setup)
-    "S110",    # Try-except-pass (acceptable for optional test dependencies)
-]
-
-# ============================================================================
-# IMPORT SORTING CONFIGURATION (replaces isort)
-# ============================================================================
+# Import sorting configuration (replaces isort)
 [tool.ruff.lint.isort]
-# First-party modules - adjust as needed for your project structure
 known-first-party = ["tta", "monitoring", "src", "testing"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
-# Import section order
-section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "first-party",
-    "local-folder"
-]
-
-# Force imports to be sorted into separate lines for better git diffs
-force-single-line = false
-
-# Combine "as" imports on the same line
-combine-as-imports = true
-
-# ============================================================================
-# FORMATTER CONFIGURATION (replaces Black)
-# ============================================================================
+# Formatter configuration (replaces Black)
 [tool.ruff.format]
-# Quote style - use double quotes (Black-compatible)
 quote-style = "double"
-
-# Indentation - use spaces (Black-compatible)
 indent-style = "space"
-
-# Respect magic trailing comma (Black-compatible)
 skip-magic-trailing-comma = false
-
-# Line ending style - auto-detect (Black-compatible)
 line-ending = "auto"
-
-# Format code examples in docstrings
-docstring-code-format = true
-
-# Prefer splitting lines at the outermost parentheses
-# This makes diffs cleaner and code more readable
-docstring-code-line-length = "dynamic"
+docstring-code-format = true  # Format code examples in docstrings
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q --strict-markers"
+addopts = "-ra -q --strict-markers --cov=src --cov-report=term-missing --cov-report=html --cov-report=xml"
 testpaths = [
     "tests",
 ]
@@ -639,16 +470,27 @@ python_files = [
     "test_*.py",
     "*_test.py",
 ]
+# pytest-asyncio configuration
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+# Filter warnings
+filterwarnings = [
+    "ignore:datetime.datetime.utcnow\\(\\) is deprecated:DeprecationWarning",
+    "ignore:.*'crypt' is deprecated.*:DeprecationWarning",
+    "ignore:.*pythonjsonlogger\\.jsonlogger has been moved.*:DeprecationWarning",
+]
 markers = [
     "unit: Unit tests",
     "integration: Integration tests",
     "e2e: End-to-end tests",
     "property: Property-based tests using hypothesis",
+    "concrete: Concrete implementation tests for abstract components",
     "performance: Performance benchmarks using pytest-benchmark",
     "contract: Contract tests using pact-python",
     "slow: Slow-running tests (> 1 second)",
-    "neo4j: Tests requiring Neo4j database",
-    "redis: Tests requiring Redis database",
+    "neo4j: Tests requiring Neo4j database (deselect with '-m \"not neo4j\"')",
+    "redis: Tests requiring Redis database (deselect with '-m \"not redis\"')",
+    "comprehensive: Comprehensive battery tests (deselect with '-m \"not comprehensive\"')",
 ]
 
 # Hypothesis configuration for property-based testing
@@ -686,6 +528,7 @@ branch = true                   # Measure branch coverage
 precision = 2
 show_missing = true
 skip_covered = false
+fail_under = 70.0
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -695,6 +538,15 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+]
+
+# Coverage thresholds for generated tests (OpenHands integration)
+# These modules have generated test suites targeting 70% coverage
+[tool.coverage.paths]
+source = [
+    "src/agent_orchestration/protocol_bridge.py",
+    "src/agent_orchestration/capability_matcher.py",
+    "src/agent_orchestration/circuit_breaker.py",
 ]
 
 [tool.coverage.html]

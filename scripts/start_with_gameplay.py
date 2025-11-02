@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 TTA Startup Script with Gameplay Loop Integration

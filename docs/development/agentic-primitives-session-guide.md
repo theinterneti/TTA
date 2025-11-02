@@ -1,7 +1,7 @@
-# Agentic Primitives Multi-Session Implementation Guide
+# Archived: Agentic Primitives Multi-Session Implementation Guide
 
 **Date**: 2025-10-22
-**Status**: Phase 1 Complete ✅
+**Status**: Phase 1 Complete ✅ (Archived)
 **Related Documents**:
 - `docs/development/agentic-primitives-assessment-2025-10-22.md`
 - `docs/development/agentic-primitives-implementation-plan.md`

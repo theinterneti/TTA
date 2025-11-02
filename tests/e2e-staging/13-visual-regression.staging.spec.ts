@@ -214,4 +214,3 @@ test.describe('Visual Regression Testing', () => {
     expect(true).toBeTruthy();
   });
 });
-

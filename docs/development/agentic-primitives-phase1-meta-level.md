@@ -1,8 +1,8 @@
 # Phase 1: Agentic Primitives for Development Process (Meta-Level)
 
-**Date:** 2025-10-20  
-**Status:** Planning  
-**Duration:** 1 week (7 days)  
+**Date:** 2025-10-20
+**Status:** Planning
+**Duration:** 1 week (7 days)
 **Goal:** Apply agentic primitives to our development workflow to validate patterns and deliver quick wins
 
 ---
@@ -97,7 +97,7 @@ class ConversationContext:
 class AIConversationContextManager:
     """
     Manages conversation context for AI-assisted development.
-    
+
     Features:
     - Token counting and tracking
     - Intelligent message pruning
@@ -105,12 +105,12 @@ class AIConversationContextManager:
     - Important message preservation
     - Session persistence
     """
-    
+
     def __init__(self, max_tokens: int = 8000):
         self.max_tokens = max_tokens
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.contexts: dict[str, ConversationContext] = {}
-    
+
     def create_session(self, session_id: str) -> ConversationContext:
         """Create a new conversation session."""
         context = ConversationContext(
@@ -121,7 +121,7 @@ class AIConversationContextManager:
         )
         self.contexts[session_id] = context
         return context
-    
+
     def add_message(
         self,
         session_id: str,
@@ -134,10 +134,10 @@ class AIConversationContextManager:
         context = self.contexts.get(session_id)
         if not context:
             context = self.create_session(session_id)
-        
+
         # Count tokens
         tokens = len(self.encoding.encode(content))
-        
+
         # Create message
         message = ConversationMessage(
             role=role,
@@ -147,17 +147,17 @@ class AIConversationContextManager:
             tokens=tokens,
             importance=importance
         )
-        
+
         # Check if pruning needed
         if context.current_tokens + tokens > self.max_tokens * 0.8:
             context = self._prune_context(context, tokens)
-        
+
         # Add message
         context.messages.append(message)
         context.current_tokens += tokens
-        
+
         return context
-    
+
     def _prune_context(
         self,
         context: ConversationContext,
@@ -165,16 +165,16 @@ class AIConversationContextManager:
     ) -> ConversationContext:
         """Prune context to make room for new message."""
         # Strategy: Keep high-importance messages and recent messages
-        
+
         # Always keep system messages
         system_msgs = [m for m in context.messages if m.role == "system"]
-        
+
         # Keep high-importance messages (importance > 0.8)
         important_msgs = [m for m in context.messages if m.importance > 0.8]
-        
+
         # Keep most recent messages
         recent_msgs = context.messages[-5:]
-        
+
         # Combine and deduplicate
         preserved = []
         seen_ids = set()
@@ -183,32 +183,32 @@ class AIConversationContextManager:
             if msg_id not in seen_ids:
                 preserved.append(msg)
                 seen_ids.add(msg_id)
-        
+
         # Update context
         context.messages = preserved
         context.current_tokens = sum(m.tokens for m in preserved)
-        
+
         return context
-    
+
     def get_context_summary(self, session_id: str) -> str:
         """Get a summary of the conversation context."""
         context = self.contexts.get(session_id)
         if not context:
             return "No context available"
-        
+
         summary = f"Session: {session_id}\n"
         summary += f"Messages: {len(context.messages)}\n"
         summary += f"Tokens: {context.current_tokens}/{context.max_tokens}\n"
         summary += f"Utilization: {context.current_tokens/context.max_tokens:.1%}\n"
-        
+
         return summary
-    
+
     def save_session(self, session_id: str, filepath: str) -> None:
         """Save conversation session to file."""
         context = self.contexts.get(session_id)
         if not context:
             return
-        
+
         data = {
             "session_id": context.session_id,
             "messages": [
@@ -223,18 +223,18 @@ class AIConversationContextManager:
             ],
             "metadata": context.metadata
         }
-        
+
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
-    
+
     def load_session(self, filepath: str) -> ConversationContext:
         """Load conversation session from file."""
         with open(filepath, 'r') as f:
             data = json.load(f)
-        
+
         session_id = data["session_id"]
         context = self.create_session(session_id)
-        
+
         for msg_data in data["messages"]:
             self.add_message(
                 session_id=session_id,
@@ -243,7 +243,7 @@ class AIConversationContextManager:
                 importance=msg_data.get("importance", 1.0),
                 metadata=msg_data.get("metadata")
             )
-        
+
         context.metadata = data.get("metadata", {})
         return context
 ```
@@ -443,23 +443,23 @@ class RetryConfig:
 def classify_error(error: Exception) -> ErrorCategory:
     """Classify an error into a category."""
     error_str = str(error).lower()
-    
+
     # Network errors
     if any(x in error_str for x in ["connection", "timeout", "network"]):
         return ErrorCategory.NETWORK
-    
+
     # Rate limiting
     if any(x in error_str for x in ["rate limit", "too many requests", "429"]):
         return ErrorCategory.RATE_LIMIT
-    
+
     # Resource errors
     if any(x in error_str for x in ["memory", "disk", "resource"]):
         return ErrorCategory.RESOURCE
-    
+
     # Transient errors
     if any(x in error_str for x in ["temporary", "unavailable", "503"]):
         return ErrorCategory.TRANSIENT
-    
+
     # Default to permanent
     return ErrorCategory.PERMANENT
 
@@ -468,9 +468,9 @@ def should_retry(error: Exception, attempt: int, max_retries: int) -> bool:
     """Determine if an error should be retried."""
     if attempt >= max_retries:
         return False
-    
+
     category = classify_error(error)
-    
+
     # Retry network, rate limit, and transient errors
     return category in [
         ErrorCategory.NETWORK,
@@ -485,17 +485,17 @@ def calculate_delay(
 ) -> float:
     """Calculate delay before next retry."""
     import random
-    
+
     # Exponential backoff
     delay = min(
         config.base_delay * (config.exponential_base ** attempt),
         config.max_delay
     )
-    
+
     # Add jitter
     if config.jitter:
         delay *= (0.5 + random.random())
-    
+
     return delay
 
 
@@ -505,7 +505,7 @@ def with_retry(
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator to add retry logic to a function.
-    
+
     Usage:
         @with_retry(RetryConfig(max_retries=3))
         def flaky_function():
@@ -514,38 +514,38 @@ def with_retry(
     """
     if config is None:
         config = RetryConfig()
-    
+
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             last_error = None
-            
+
             for attempt in range(config.max_retries + 1):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
                     last_error = e
-                    
+
                     if not should_retry(e, attempt, config.max_retries):
                         logger.error(f"{func.__name__} failed permanently: {e}")
                         break
-                    
+
                     delay = calculate_delay(attempt, config)
                     logger.warning(
                         f"{func.__name__} failed (attempt {attempt + 1}/{config.max_retries + 1}): {e}. "
                         f"Retrying in {delay:.1f}s..."
                     )
-                    
+
                     import time
                     time.sleep(delay)
-            
+
             # All retries exhausted
             if fallback:
                 logger.info(f"{func.__name__} using fallback after {config.max_retries} retries")
                 return fallback(*args, **kwargs)
-            
+
             raise last_error
-        
+
         return wrapper
     return decorator
 
@@ -557,37 +557,37 @@ def with_retry_async(
     """Async version of with_retry decorator."""
     if config is None:
         config = RetryConfig()
-    
+
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             last_error = None
-            
+
             for attempt in range(config.max_retries + 1):
                 try:
                     return await func(*args, **kwargs)
                 except Exception as e:
                     last_error = e
-                    
+
                     if not should_retry(e, attempt, config.max_retries):
                         logger.error(f"{func.__name__} failed permanently: {e}")
                         break
-                    
+
                     delay = calculate_delay(attempt, config)
                     logger.warning(
                         f"{func.__name__} failed (attempt {attempt + 1}/{config.max_retries + 1}): {e}. "
                         f"Retrying in {delay:.1f}s..."
                     )
-                    
+
                     await asyncio.sleep(delay)
-            
+
             # All retries exhausted
             if fallback:
                 logger.info(f"{func.__name__} using fallback after {config.max_retries} retries")
                 return await fallback(*args, **kwargs)
-            
+
             raise last_error
-        
+
         return wrapper
     return decorator
 ```
@@ -609,10 +609,10 @@ def run_tests():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Tests failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -624,10 +624,10 @@ def install_dependencies():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Dependency installation failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -661,15 +661,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
+
       - name: Install UV
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Install dependencies (with retry)
         uses: nick-fields/retry@v2
         with:
@@ -677,7 +677,7 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 30
           command: uv sync
-      
+
       - name: Run tests (with retry)
         uses: nick-fields/retry@v2
         with:
@@ -743,26 +743,26 @@ class ExecutionMetric:
 
 class DevMetricsCollector:
     """Collects development metrics."""
-    
+
     def __init__(self, metrics_dir: str = ".metrics"):
         self.metrics_dir = Path(metrics_dir)
         self.metrics_dir.mkdir(exist_ok=True)
         self.current_metrics: dict[str, ExecutionMetric] = {}
-    
+
     def start_execution(self, name: str, metadata: dict | None = None) -> str:
         """Start tracking an execution."""
         import uuid
-        
+
         exec_id = str(uuid.uuid4())
         metric = ExecutionMetric(
             name=name,
             started_at=datetime.utcnow(),
             metadata=metadata or {}
         )
-        
+
         self.current_metrics[exec_id] = metric
         return exec_id
-    
+
     def end_execution(
         self,
         exec_id: str,
@@ -773,48 +773,48 @@ class DevMetricsCollector:
         metric = self.current_metrics.get(exec_id)
         if not metric:
             return
-        
+
         metric.ended_at = datetime.utcnow()
         metric.duration_ms = (
             (metric.ended_at - metric.started_at).total_seconds() * 1000
         )
         metric.status = status
         metric.error = error
-        
+
         # Save metric
         self._save_metric(metric)
-        
+
         # Remove from current
         del self.current_metrics[exec_id]
-    
+
     def _save_metric(self, metric: ExecutionMetric) -> None:
         """Save metric to file."""
         date_str = metric.started_at.strftime("%Y-%m-%d")
         metrics_file = self.metrics_dir / f"{date_str}.jsonl"
-        
+
         with open(metrics_file, 'a') as f:
             f.write(json.dumps(asdict(metric), default=str) + '\n')
-    
+
     def get_metrics_summary(self, days: int = 7) -> dict[str, Any]:
         """Get summary of metrics for the last N days."""
         from datetime import timedelta
-        
+
         end_date = datetime.utcnow()
         start_date = end_date - timedelta(days=days)
-        
+
         metrics = []
         current_date = start_date
         while current_date <= end_date:
             date_str = current_date.strftime("%Y-%m-%d")
             metrics_file = self.metrics_dir / f"{date_str}.jsonl"
-            
+
             if metrics_file.exists():
                 with open(metrics_file, 'r') as f:
                     for line in f:
                         metrics.append(json.loads(line))
-            
+
             current_date += timedelta(days=1)
-        
+
         # Aggregate metrics
         by_name = {}
         for m in metrics:
@@ -822,13 +822,13 @@ class DevMetricsCollector:
             if name not in by_name:
                 by_name[name] = []
             by_name[name].append(m)
-        
+
         summary = {}
         for name, name_metrics in by_name.items():
             durations = [m["duration_ms"] for m in name_metrics if m.get("duration_ms")]
             successes = sum(1 for m in name_metrics if m["status"] == "success")
             failures = sum(1 for m in name_metrics if m["status"] == "failed")
-            
+
             summary[name] = {
                 "total_executions": len(name_metrics),
                 "successes": successes,
@@ -838,7 +838,7 @@ class DevMetricsCollector:
                 "min_duration_ms": min(durations) if durations else 0,
                 "max_duration_ms": max(durations) if durations else 0,
             }
-        
+
         return summary
 
 
@@ -880,10 +880,10 @@ def run_unit_tests():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Unit tests failed: {result.stderr}")
-    
+
     return result.stdout
 
 
@@ -895,21 +895,21 @@ def run_integration_tests():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Integration tests failed: {result.stderr}")
-    
+
     return result.stdout
 
 
 if __name__ == "__main__":
     run_unit_tests()
     run_integration_tests()
-    
+
     # Print summary
     from observability.dev_metrics import _collector
     summary = _collector.get_metrics_summary(days=7)
-    
+
     print("\n=== Development Metrics (Last 7 Days) ===")
     for name, metrics in summary.items():
         print(f"\n{name}:")
@@ -932,38 +932,38 @@ def generate_dashboard(output_file: str = "dev_metrics_dashboard.html"):
     """Generate HTML dashboard for development metrics."""
     collector = DevMetricsCollector()
     summary = collector.get_metrics_summary(days=30)
-    
+
     # Create visualizations
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-    
+
     # 1. Success rates
     names = list(summary.keys())
     success_rates = [summary[n]["success_rate"] * 100 for n in names]
     axes[0, 0].barh(names, success_rates)
     axes[0, 0].set_xlabel("Success Rate (%)")
     axes[0, 0].set_title("Success Rates by Operation")
-    
+
     # 2. Average durations
     avg_durations = [summary[n]["avg_duration_ms"] for n in names]
     axes[0, 1].barh(names, avg_durations)
     axes[0, 1].set_xlabel("Duration (ms)")
     axes[0, 1].set_title("Average Execution Times")
-    
+
     # 3. Execution counts
     exec_counts = [summary[n]["total_executions"] for n in names]
     axes[1, 0].barh(names, exec_counts)
     axes[1, 0].set_xlabel("Count")
     axes[1, 0].set_title("Total Executions")
-    
+
     # 4. Failure counts
     failure_counts = [summary[n]["failures"] for n in names]
     axes[1, 1].barh(names, failure_counts, color='red')
     axes[1, 1].set_xlabel("Count")
     axes[1, 1].set_title("Failures")
-    
+
     plt.tight_layout()
     plt.savefig("dev_metrics.png")
-    
+
     # Generate HTML
     html = f"""
     <!DOCTYPE html>
@@ -981,9 +981,9 @@ def generate_dashboard(output_file: str = "dev_metrics_dashboard.html"):
     <body>
         <h1>TTA Development Metrics Dashboard</h1>
         <p>Generated: {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")}</p>
-        
+
         <img src="dev_metrics.png" alt="Metrics Visualization">
-        
+
         <h2>Detailed Metrics</h2>
         {"".join([
             f'''
@@ -1000,10 +1000,10 @@ def generate_dashboard(output_file: str = "dev_metrics_dashboard.html"):
     </body>
     </html>
     """
-    
+
     with open(output_file, 'w') as f:
         f.write(html)
-    
+
     print(f"Dashboard generated: {output_file}")
 
 
@@ -1079,6 +1079,5 @@ if __name__ == "__main__":
 
 ---
 
-**Status:** Ready for implementation  
+**Status:** Ready for implementation
 **Next Steps:** Begin Day 1 implementation of AI Context Management
-

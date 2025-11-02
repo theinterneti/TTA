@@ -476,10 +476,4 @@ class OllamaProvider(BaseProvider):
             await self._client.aclose()
             self._client = None
 
-        # Optionally stop container (commented out to keep it running)
-        # if self._docker_client and self._use_docker:
-        #     try:
-        #         container = self._docker_client.containers.get(self._container_name)
-        #         container.stop()
-        #     except Exception:
-        #         pass
+        # Note: Docker container is intentionally kept running for reuse

@@ -47,7 +47,7 @@ def print_model_status(framework: SinglePlayerTestFramework):
     print("-" * 40)
 
     enabled_count = 0
-    for _model_key, model in framework.models.items():
+    for model_key, model in framework.models.items():
         status = "✓ ENABLED" if model.enabled else "✗ DISABLED"
         provider = f"({model.provider})"
         print(f"  {model.name:<30} {provider:<12} {status}")
@@ -71,7 +71,7 @@ def print_test_profiles(framework: SinglePlayerTestFramework):
     print("\nTEST PROFILES:")
     print("-" * 40)
 
-    for _profile_key, profile in framework.profiles.items():
+    for profile_key, profile in framework.profiles.items():
         concerns = profile.therapeutic_profile.get("primary_concerns", [])
         concerns_str = ", ".join(concerns[:2]) + ("..." if len(concerns) > 2 else "")
         print(f"  {profile.name:<35} [{concerns_str}]")
@@ -84,7 +84,7 @@ def print_test_scenarios(framework: SinglePlayerTestFramework):
     print("\nTEST SCENARIOS:")
     print("-" * 40)
 
-    for _scenario_key, scenario in framework.scenarios.items():
+    for scenario_key, scenario in framework.scenarios.items():
         duration = f"{scenario.duration_minutes}min"
         sessions = f"{scenario.sessions} session{'s' if scenario.sessions > 1 else ''}"
         print(f"  {scenario.name:<35} [{duration}, {sessions}]")

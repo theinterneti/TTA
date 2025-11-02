@@ -185,8 +185,8 @@ jobs:
 
       - name: Test Docker image
         run: |
-          # Use the consistent tag from the previous step
-          IMAGE_TAG="${{ steps.image-tag.outputs.tag }}"
+          # Get the first tag from the metadata
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
 
           echo "Testing image: $IMAGE_TAG"
 

@@ -19,8 +19,6 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts" / "primitives"))
 
-import contextlib
-
 from error_recovery import (
     CircuitBreaker,
     CircuitBreakerOpenError,
@@ -313,8 +311,10 @@ class TestCircuitBreaker:
 
         # Trigger failures to open circuit
         for _ in range(3):
-            with contextlib.suppress(Exception):
+            try:
                 circuit_breaker.call(failing_function)
+            except Exception:
+                pass
 
         assert circuit_breaker.state == CircuitBreakerState.OPEN
 
@@ -327,8 +327,10 @@ class TestCircuitBreaker:
 
         # Open the circuit
         for _ in range(2):
-            with contextlib.suppress(Exception):
+            try:
                 circuit_breaker.call(failing_function)
+            except Exception:
+                pass
 
         # Should reject next call
         with pytest.raises(CircuitBreakerOpenError):
@@ -343,8 +345,10 @@ class TestCircuitBreaker:
 
         # Open the circuit
         for _ in range(2):
-            with contextlib.suppress(Exception):
+            try:
                 circuit_breaker.call(failing_function)
+            except Exception:
+                pass
 
         # Wait for recovery timeout
         time.sleep(0.2)
@@ -364,8 +368,10 @@ class TestCircuitBreaker:
 
         # Open the circuit
         for _ in range(2):
-            with contextlib.suppress(Exception):
+            try:
                 circuit_breaker.call(failing_function)
+            except Exception:
+                pass
 
         # Wait for recovery timeout
         time.sleep(0.2)

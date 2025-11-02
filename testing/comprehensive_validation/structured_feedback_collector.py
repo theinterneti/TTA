@@ -389,7 +389,7 @@ class StructuredFeedbackCollector:
         report = ComprehensiveFeedbackReport(
             report_id=f"feedback_report_{int(time.time())}",
             generation_timestamp=datetime.utcnow(),
-            session_count=len({item.session_id for item in recent_feedback}),
+            session_count=len(set(item.session_id for item in recent_feedback)),
             total_feedback_items=len(recent_feedback),
             dimension_analyses=dimension_analyses,
             overall_excellence_score=overall_excellence_score,
@@ -580,7 +580,7 @@ class StructuredFeedbackCollector:
         if std_deviation > 2.0:
             key_insights.append("High variability in feedback scores")
 
-        feedback_types = {item.feedback_type for item in feedback_items}
+        feedback_types = set(item.feedback_type for item in feedback_items)
         if len(feedback_types) > 1:
             key_insights.append("Multiple feedback sources available")
 

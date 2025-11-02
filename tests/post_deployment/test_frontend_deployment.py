@@ -165,7 +165,9 @@ async def test_frontend_environment_variables_injected(
             config_content = config_response.text
 
             # Verify config contains expected values
-            assert "TTA_CONFIG" in config_content, "config.js missing TTA_CONFIG object"
+            assert "TTA_CONFIG" in config_content, (
+                "config.js missing TTA_CONFIG object"
+            )
 
             # Check for environment configuration
             assert "environment" in config_content, (
@@ -206,10 +208,7 @@ async def test_frontend_can_reach_backend_api(
         )
 
         # Verify CORS headers are present (if making cross-origin request)
-        if (
-            frontend_base_url.split("://")[1].split(":")[0]
-            != api_base_url.split("://")[1].split(":")[0]
-        ):
+        if frontend_base_url.split("://")[1].split(":")[0] != api_base_url.split("://")[1].split(":")[0]:
             # Cross-origin request - check CORS headers
             cors_headers = api_response.headers.get("access-control-allow-origin")
 
@@ -287,8 +286,7 @@ async def test_frontend_serves_react_app(
         ]
 
         found_indicators = [
-            indicator
-            for indicator in react_indicators
+            indicator for indicator in react_indicators
             if indicator.lower() in html_content.lower()
         ]
 
@@ -365,5 +363,8 @@ async def test_frontend_security_headers(
             if header_value:
                 # Header is present - verify it has expected value
                 assert any(
-                    expected.upper() in header_value for expected in expected_values
-                ), f"Security header {header} has unexpected value: {header_value}"
+                    expected.upper() in header_value
+                    for expected in expected_values
+                ), (
+                    f"Security header {header} has unexpected value: {header_value}"
+                )

@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Minimal FastAPI Server for TTA Core Gameplay Loop Integration Testing
@@ -247,8 +246,7 @@ async def create_session(
 
     sessions_store[session_id] = session_data
 
-    sanitized_username = username.replace('\n', '').replace('\r', '')
-    logger.info(f"Created session {session_id} for user {sanitized_username}")
+    logger.info(f"Created session {session_id} for user {username}")
 
     return CreateSessionResponse(
         session_id=session_id,

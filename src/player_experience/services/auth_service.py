@@ -10,7 +10,7 @@ import io
 import logging
 import secrets
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 from uuid import uuid4
 
@@ -533,7 +533,7 @@ class EnhancedAuthService:
                 "permissions": [perm.value for perm in user.permissions],
                 "session_id": session_id,
                 "mfa_verified": user.mfa_verified,
-                "exp": datetime.now(UTC)
+                "exp": datetime.now(timezone.utc)
                 + timedelta(minutes=self.access_token_expire_minutes),
             }
             token = jwt.encode(data, self.secret_key, algorithm=self.algorithm)

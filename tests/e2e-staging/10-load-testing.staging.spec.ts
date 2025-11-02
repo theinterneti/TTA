@@ -92,4 +92,3 @@ test.describe('Load Testing', () => {
     expect(result.throughput).toBeGreaterThan(1);
   });
 });
-

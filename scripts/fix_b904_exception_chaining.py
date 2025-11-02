@@ -187,7 +187,7 @@ def main():
             print(f"⚠️  File not found: {filepath}")
             continue
 
-        if filepath.suffix != ".py":
+        if not filepath.suffix == ".py":
             continue
 
         total_files += 1

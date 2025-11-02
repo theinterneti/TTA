@@ -204,12 +204,11 @@ class HealthChecker:
                         "headers": dict(response.headers),
                     },
                 }
-            else:
-                return {
-                    "status": "down",
-                    "response_time": response_time,
-                    "error": f"Unexpected status code: {response.status_code}",
-                }
+            return {
+                "status": "down",
+                "response_time": response_time,
+                "error": f"Unexpected status code: {response.status_code}",
+            }
         except Exception as e:
             response_time = time.time() - start_time
             logger.error(f"HTTP health check failed for {service_name}: {e}")
@@ -223,18 +222,17 @@ class HealthChecker:
 
         if service_type == "redis":
             return await self.check_redis_health(service_name, config)
-        elif service_type == "neo4j":
+        if service_type == "neo4j":
             return await self.check_neo4j_health(service_name, config)
-        elif service_type == "postgres":
+        if service_type == "postgres":
             return await self.check_postgres_health(service_name, config)
-        elif service_type == "http":
+        if service_type == "http":
             return await self.check_http_health(service_name, config)
-        else:
-            return {
-                "status": "down",
-                "response_time": 0,
-                "error": f"Unknown service type: {service_type}",
-            }
+        return {
+            "status": "down",
+            "response_time": 0,
+            "error": f"Unknown service type: {service_type}",
+        }
 
     async def update_metrics(self, service_name: str, result: dict[str, Any]):
         """Update Prometheus metrics based on health check result"""

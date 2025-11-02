@@ -9,6 +9,7 @@ from datetime import datetime
 from unittest.mock import AsyncMock
 
 import pytest
+
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,

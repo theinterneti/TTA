@@ -103,7 +103,8 @@ def convert_imports(file_path, dry_run=False):
         with open(file_path, "w") as f:
             f.write(modified_content)
         return True
-    return modified_content != content
+    if modified_content != content:
+        return True
 
 
 def main():

@@ -271,10 +271,9 @@ class SimulatedUserProfile:
         # Simple logic - would be more sophisticated in full implementation
         if "choices" in context:
             return "decision"
-        elif "character" in context:
+        if "character" in context:
             return "dialogue"
-        else:
-            return "exploration"
+        return "exploration"
 
     def _fill_template(self, template: str, context: dict[str, Any]) -> str:
         """Fill template with context information."""

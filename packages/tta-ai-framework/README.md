@@ -81,4 +81,3 @@ uvx pyright packages/tta-ai-framework/
 ## License
 
 MIT
-

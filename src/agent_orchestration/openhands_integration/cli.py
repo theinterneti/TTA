@@ -14,10 +14,11 @@ import json
 import logging
 import sys
 from pathlib import Path
+from typing import Optional
 
 import click
 
-from .config import OpenHandsConfig, OpenHandsIntegrationConfig, get_model_by_preset
+from .config import OpenHandsConfig, OpenHandsIntegrationConfig
 from .execution_engine import ExecutionEngine
 from .model_selector import TaskRequirements
 from .task_queue import QueuedTask, TaskPriority
@@ -36,9 +37,7 @@ def cli(debug: bool) -> None:
 
 
 @cli.command()
-@click.option(
-    "--task-type", required=True, help="Task type (unit_test, refactor, etc.)"
-)
+@click.option("--task-type", required=True, help="Task type (unit_test, refactor, etc.)")
 @click.option("--description", required=True, help="Task description")
 @click.option("--target-file", type=click.Path(), help="Target file path")
 @click.option(
@@ -48,16 +47,11 @@ def cli(debug: bool) -> None:
     help="Task priority",
 )
 @click.option("--quality-threshold", type=float, default=0.7, help="Quality threshold")
-@click.option(
-    "--complexity",
-    type=click.Choice(["simple", "moderate", "complex"]),
-    default="moderate",
-    help="Task complexity",
-)
+@click.option("--complexity", type=click.Choice(["simple", "moderate", "complex"]), default="moderate", help="Task complexity")
 def submit_task(
     task_type: str,
     description: str,
-    target_file: str | None,
+    target_file: Optional[str],
     priority: str,
     quality_threshold: float,
     complexity: str,
@@ -66,13 +60,9 @@ def submit_task(
     try:
         # Load configuration
         integration_config = OpenHandsIntegrationConfig.from_env()
-        # Use DeepSeek as default (more reliable than Gemini free tier)
-        model_id = integration_config.custom_model_id or get_model_by_preset(
-            "deepseek-v3"
-        )
         config = OpenHandsConfig(
             api_key=integration_config.api_key,
-            model=model_id,
+            model=integration_config.custom_model_id or integration_config.model_preset,
             workspace_path=integration_config.workspace_root,
         )
 
@@ -96,17 +86,14 @@ def submit_task(
             },
         )
 
-        # Create engine and submit (don't stop engine - let it run)
+        # Create engine and submit
         engine = ExecutionEngine(config)
 
         async def run():
-            # Load existing tasks from persistence
-            await engine.queue.load_from_file()
-            # Submit new task
-            task_id = await engine.queue.enqueue(task)
-            # Save to persistence file
-            await engine.queue.save_to_file()
+            await engine.start()
+            task_id = await engine.submit_task(task)
             click.echo(f"Task submitted: {task_id}")
+            await engine.stop()
 
         asyncio.run(run())
 
@@ -121,13 +108,9 @@ def get_status(task_id: str) -> None:
     """Get task status."""
     try:
         integration_config = OpenHandsIntegrationConfig.from_env()
-        # Use DeepSeek as default (more reliable than Gemini free tier)
-        model_id = integration_config.custom_model_id or get_model_by_preset(
-            "deepseek-v3"
-        )
         config = OpenHandsConfig(
             api_key=integration_config.api_key,
-            model=model_id,
+            model=integration_config.custom_model_id or integration_config.model_preset,
             workspace_path=integration_config.workspace_root,
         )
         engine = ExecutionEngine(config)
@@ -152,13 +135,9 @@ def queue_stats() -> None:
     """Get queue statistics."""
     try:
         integration_config = OpenHandsIntegrationConfig.from_env()
-        # Use DeepSeek as default (more reliable than Gemini free tier)
-        model_id = integration_config.custom_model_id or get_model_by_preset(
-            "deepseek-v3"
-        )
         config = OpenHandsConfig(
             api_key=integration_config.api_key,
-            model=model_id,
+            model=integration_config.custom_model_id or integration_config.model_preset,
             workspace_path=integration_config.workspace_root,
         )
         engine = ExecutionEngine(config)
@@ -179,13 +158,9 @@ def metrics() -> None:
     """Get metrics summary."""
     try:
         integration_config = OpenHandsIntegrationConfig.from_env()
-        # Use DeepSeek as default (more reliable than Gemini free tier)
-        model_id = integration_config.custom_model_id or get_model_by_preset(
-            "deepseek-v3"
-        )
         config = OpenHandsConfig(
             api_key=integration_config.api_key,
-            model=model_id,
+            model=integration_config.custom_model_id or integration_config.model_preset,
             workspace_path=integration_config.workspace_root,
         )
         engine = ExecutionEngine(config)
@@ -205,13 +180,9 @@ def run_engine(workers: int, duration: int) -> None:
     """Run execution engine."""
     try:
         integration_config = OpenHandsIntegrationConfig.from_env()
-        # Use DeepSeek as default (more reliable than Gemini free tier)
-        model_id = integration_config.custom_model_id or get_model_by_preset(
-            "deepseek-v3"
-        )
         config = OpenHandsConfig(
             api_key=integration_config.api_key,
-            model=model_id,
+            model=integration_config.custom_model_id or integration_config.model_preset,
             workspace_path=integration_config.workspace_root,
         )
         engine = ExecutionEngine(config, max_concurrent_tasks=workers)
@@ -232,11 +203,7 @@ def run_engine(workers: int, duration: int) -> None:
 
 @cli.command()
 @click.option("--task-type", required=True, help="Task type")
-@click.option(
-    "--complexity",
-    type=click.Choice(["simple", "moderate", "complex"]),
-    default="moderate",
-)
+@click.option("--complexity", type=click.Choice(["simple", "moderate", "complex"]), default="moderate")
 @click.option("--quality-threshold", type=float, default=0.7)
 def select_model(task_type: str, complexity: str, quality_threshold: float) -> None:
     """Select optimal model for task."""
@@ -280,3 +247,4 @@ def select_model(task_type: str, complexity: str, quality_threshold: float) -> N
 
 if __name__ == "__main__":
     cli()
+

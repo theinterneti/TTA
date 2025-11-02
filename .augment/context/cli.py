@@ -12,7 +12,7 @@ Usage:
 """
 
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from conversation_manager import AIConversationContextManager, create_tta_session
@@ -22,7 +22,7 @@ def cmd_new(args):
     """Create a new session."""
     session_id = args.session_id
     if not session_id:
-        session_id = f"tta-dev-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}"
+        session_id = f"tta-dev-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
 
     manager, session_id = create_tta_session(session_id)
 
@@ -120,7 +120,7 @@ def cmd_load(args):
         print(f"✗ Session not found: {session_id}")
         return
 
-    manager.load_session(session_file)
+    context = manager.load_session(session_file)
 
     print(f"✓ Loaded session: {session_id}")
     print()
@@ -149,7 +149,7 @@ def cmd_add(args):
         return
 
     # Load session
-    manager.load_session(session_file)
+    context = manager.load_session(session_file)
 
     # Add message
     manager.add_message(
@@ -181,7 +181,7 @@ def cmd_save(args):
         return
 
     # Load and save (to ensure consistency)
-    manager.load_session(session_file)
+    context = manager.load_session(session_file)
     filepath = manager.save_session(session_id)
 
     print(f"✓ Session saved to: {filepath}")
@@ -223,7 +223,7 @@ Examples:
     )
 
     # List command
-    subparsers.add_parser("list", help="List all sessions")
+    parser_list = subparsers.add_parser("list", help="List all sessions")
 
     # Show command
     parser_show = subparsers.add_parser("show", help="Show session summary")

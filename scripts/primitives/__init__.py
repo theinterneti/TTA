@@ -34,20 +34,16 @@ __all__ = [
     # Decorators
     "with_retry",
     "with_retry_async",
-
     # Configuration
     "RetryConfig",
-
     # Error classification
     "ErrorCategory",
     "ErrorSeverity",
     "classify_error",
     "should_retry",
     "calculate_delay",
-
     # Circuit breaker
     "CircuitBreaker",
 ]
 
 __version__ = "1.0.0"
-

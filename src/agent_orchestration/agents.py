@@ -232,7 +232,7 @@ class Agent(AgentProxy):
                     key, (time.time() - start) * 1000.0, success=True
                 )
             return result
-        except TimeoutError:
+        except asyncio.TimeoutError:
             with contextlib.suppress(Exception):
                 self._metrics.record_error()
             # Fallback if record_error fails

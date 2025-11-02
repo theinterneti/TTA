@@ -25,12 +25,13 @@ from typing import ParamSpec, TypeVar
 
 logger = logging.getLogger(__name__)
 
-P = ParamSpec('P')
-T = TypeVar('T')
+P = ParamSpec("P")
+T = TypeVar("T")
 
 
 class ErrorCategory(Enum):
     """Categories of development errors."""
+
     NETWORK = "network"  # Network/API failures
     RATE_LIMIT = "rate_limit"  # Rate limiting
     RESOURCE = "resource"  # Resource exhaustion
@@ -40,6 +41,7 @@ class ErrorCategory(Enum):
 
 class ErrorSeverity(Enum):
     """Severity levels for errors."""
+
     LOW = "low"  # Minor issues, can continue
     MEDIUM = "medium"  # Significant but recoverable
     HIGH = "high"  # Critical, requires attention
@@ -49,6 +51,7 @@ class ErrorSeverity(Enum):
 @dataclass
 class RetryConfig:
     """Configuration for retry behavior."""
+
     max_retries: int = 3
     base_delay: float = 1.0  # seconds
     max_delay: float = 60.0  # seconds
@@ -81,39 +84,39 @@ def classify_error(error: Exception) -> tuple[ErrorCategory, ErrorSeverity]:
     error_type = type(error).__name__.lower()
 
     # Network errors
-    if any(x in error_str or x in error_type for x in [
-        "connection", "timeout", "network", "unreachable",
-        "connectionerror", "timeouterror"
-    ]):
+    if any(
+        x in error_str or x in error_type
+        for x in [
+            "connection",
+            "timeout",
+            "network",
+            "unreachable",
+            "connectionerror",
+            "timeouterror",
+        ]
+    ):
         return ErrorCategory.NETWORK, ErrorSeverity.MEDIUM
 
     # Rate limiting
-    if any(x in error_str for x in [
-        "rate limit", "too many requests", "429", "quota"
-    ]):
+    if any(x in error_str for x in ["rate limit", "too many requests", "429", "quota"]):
         return ErrorCategory.RATE_LIMIT, ErrorSeverity.MEDIUM
 
     # Resource errors
-    if any(x in error_str or x in error_type for x in [
-        "memory", "disk", "resource", "out of memory", "no space"
-    ]):
+    if any(
+        x in error_str or x in error_type
+        for x in ["memory", "disk", "resource", "out of memory", "no space"]
+    ):
         return ErrorCategory.RESOURCE, ErrorSeverity.HIGH
 
     # Transient errors
-    if any(x in error_str for x in [
-        "temporary", "unavailable", "503", "502", "504"
-    ]):
+    if any(x in error_str for x in ["temporary", "unavailable", "503", "502", "504"]):
         return ErrorCategory.TRANSIENT, ErrorSeverity.MEDIUM
 
     # Default to permanent
     return ErrorCategory.PERMANENT, ErrorSeverity.HIGH
 
 
-def should_retry(
-    error: Exception,
-    attempt: int,
-    max_retries: int
-) -> bool:
+def should_retry(error: Exception, attempt: int, max_retries: int) -> bool:
     """
     Determine if an error should be retried.
 
@@ -138,14 +141,11 @@ def should_retry(
     return category in [
         ErrorCategory.NETWORK,
         ErrorCategory.RATE_LIMIT,
-        ErrorCategory.TRANSIENT
+        ErrorCategory.TRANSIENT,
     ]
 
 
-def calculate_delay(
-    attempt: int,
-    config: RetryConfig
-) -> float:
+def calculate_delay(attempt: int, config: RetryConfig) -> float:
     """
     Calculate delay before next retry using exponential backoff.
 
@@ -160,20 +160,18 @@ def calculate_delay(
 
     # Exponential backoff
     delay = min(
-        config.base_delay * (config.exponential_base ** attempt),
-        config.max_delay
+        config.base_delay * (config.exponential_base**attempt), config.max_delay
     )
 
     # Add jitter to prevent thundering herd
     if config.jitter:
-        delay *= (0.5 + random.random())
+        delay *= 0.5 + random.random()
 
     return delay
 
 
-def with_retry[T](
-    config: RetryConfig | None = None,
-    fallback: Callable[..., T] | None = None
+def with_retry(
+    config: RetryConfig | None = None, fallback: Callable[..., T] | None = None
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator to add retry logic to a function.
@@ -238,12 +236,12 @@ def with_retry[T](
             raise last_error
 
         return wrapper
+
     return decorator
 
 
-def with_retry_async[T](
-    config: RetryConfig | None = None,
-    fallback: Callable[..., T] | None = None
+def with_retry_async(
+    config: RetryConfig | None = None, fallback: Callable[..., T] | None = None
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Async version of with_retry decorator.
@@ -303,6 +301,7 @@ def with_retry_async[T](
             raise last_error
 
         return wrapper
+
     return decorator
 
 
@@ -320,7 +319,7 @@ class CircuitBreaker:
         self,
         failure_threshold: int = 5,
         recovery_timeout: float = 60.0,
-        expected_exception: type[Exception] = Exception
+        expected_exception: type[Exception] = Exception,
     ):
         """
         Initialize circuit breaker.
@@ -357,7 +356,9 @@ class CircuitBreaker:
             if self._should_attempt_reset():
                 self.state = "HALF_OPEN"
             else:
-                raise Exception(f"Circuit breaker is OPEN (failures: {self.failure_count})")
+                raise Exception(
+                    f"Circuit breaker is OPEN (failures: {self.failure_count})"
+                )
 
         try:
             result = func(*args, **kwargs)

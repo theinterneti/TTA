@@ -26,9 +26,9 @@ def attempt_connect(
         from neo4j import GraphDatabase
         from neo4j.exceptions import (
             AuthError,
-            ClientError as _ClientError,
-            ServiceUnavailable as _ServiceUnavailable,
         )
+        from neo4j.exceptions import ClientError as _ClientError
+        from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
     except Exception as e:
         logger.error("neo4j package not installed: %s", e)
         return False, [(0, 0.0, "no-neo4j", str(e))]

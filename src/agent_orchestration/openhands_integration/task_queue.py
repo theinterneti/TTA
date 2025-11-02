@@ -12,14 +12,13 @@ Provides:
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -51,15 +50,15 @@ class QueuedTask:
     task_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     task_type: str = ""  # "unit_test", "refactor", "document", etc.
     description: str = ""
-    target_file: Path | None = None
+    target_file: Optional[Path] = None
     priority: TaskPriority = TaskPriority.NORMAL
     status: TaskStatus = TaskStatus.PENDING
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-    started_at: datetime | None = None
-    completed_at: datetime | None = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
     metadata: dict[str, Any] = field(default_factory=dict)
-    result: dict[str, Any] | None = None
-    error: str | None = None
+    result: Optional[dict[str, Any]] = None
+    error: Optional[str] = None
     retry_count: int = 0
     max_retries: int = 3
 
@@ -80,9 +79,7 @@ class QueuedTask:
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat()
-            if self.completed_at
-            else None,
+            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
             "metadata": self.metadata,
             "result": self.result,
             "error": self.error,
@@ -94,15 +91,13 @@ class QueuedTask:
 class TaskQueue:
     """FIFO task queue with priority support."""
 
-    def __init__(self, max_size: int = 1000, persistence_file: str | None = None):
+    def __init__(self, max_size: int = 1000):
         """Initialize task queue.
 
         Args:
             max_size: Maximum queue size
-            persistence_file: Optional file path for persisting tasks
         """
         self.max_size = max_size
-        self.persistence_file = persistence_file or "task_queue.json"
         self._queue: asyncio.PriorityQueue[tuple[int, QueuedTask]] = (
             asyncio.PriorityQueue(maxsize=max_size)
         )
@@ -128,12 +123,10 @@ class TaskQueue:
             task.status = TaskStatus.QUEUED
             self._tasks[task.task_id] = task
             await self._queue.put((task.priority.value, task))
-            logger.info(
-                f"Task {task.task_id} enqueued (priority: {task.priority.name})"
-            )
+            logger.info(f"Task {task.task_id} enqueued (priority: {task.priority.name})")
             return task.task_id
 
-    async def dequeue(self) -> QueuedTask | None:
+    async def dequeue(self) -> Optional[QueuedTask]:
         """Get next task from queue.
 
         Returns:
@@ -143,7 +136,7 @@ class TaskQueue:
             _, task = self._queue.get_nowait()
             async with self._lock:
                 task.status = TaskStatus.RUNNING
-                task.started_at = datetime.now(UTC)
+                task.started_at = datetime.now(timezone.utc)
             logger.info(f"Task {task.task_id} dequeued")
             return task
         except asyncio.QueueEmpty:
@@ -151,7 +144,7 @@ class TaskQueue:
 
     async def mark_completed(
         self, task_id: str, result: dict[str, Any]
-    ) -> QueuedTask | None:
+    ) -> Optional[QueuedTask]:
         """Mark task as completed.
 
         Args:
@@ -165,12 +158,12 @@ class TaskQueue:
             task = self._tasks.get(task_id)
             if task:
                 task.status = TaskStatus.COMPLETED
-                task.completed_at = datetime.now(UTC)
+                task.completed_at = datetime.now(timezone.utc)
                 task.result = result
                 logger.info(f"Task {task_id} completed")
             return task
 
-    async def mark_failed(self, task_id: str, error: str) -> QueuedTask | None:
+    async def mark_failed(self, task_id: str, error: str) -> Optional[QueuedTask]:
         """Mark task as failed.
 
         Args:
@@ -189,7 +182,7 @@ class TaskQueue:
                 logger.error(f"Task {task_id} failed: {error}")
             return task
 
-    async def get_task(self, task_id: str) -> QueuedTask | None:
+    async def get_task(self, task_id: str) -> Optional[QueuedTask]:
         """Get task by ID.
 
         Args:
@@ -209,21 +202,11 @@ class TaskQueue:
         """
         async with self._lock:
             total = len(self._tasks)
-            pending = sum(
-                1 for t in self._tasks.values() if t.status == TaskStatus.PENDING
-            )
-            queued = sum(
-                1 for t in self._tasks.values() if t.status == TaskStatus.QUEUED
-            )
-            running = sum(
-                1 for t in self._tasks.values() if t.status == TaskStatus.RUNNING
-            )
-            completed = sum(
-                1 for t in self._tasks.values() if t.status == TaskStatus.COMPLETED
-            )
-            failed = sum(
-                1 for t in self._tasks.values() if t.status == TaskStatus.FAILED
-            )
+            pending = sum(1 for t in self._tasks.values() if t.status == TaskStatus.PENDING)
+            queued = sum(1 for t in self._tasks.values() if t.status == TaskStatus.QUEUED)
+            running = sum(1 for t in self._tasks.values() if t.status == TaskStatus.RUNNING)
+            completed = sum(1 for t in self._tasks.values() if t.status == TaskStatus.COMPLETED)
+            failed = sum(1 for t in self._tasks.values() if t.status == TaskStatus.FAILED)
 
             return {
                 "total_tasks": total,
@@ -236,55 +219,3 @@ class TaskQueue:
                 "max_size": self.max_size,
             }
 
-    async def save_to_file(self) -> None:
-        """Save all tasks to persistence file."""
-        try:
-            async with self._lock:
-                tasks_data = {
-                    task_id: task.to_dict() for task_id, task in self._tasks.items()
-                }
-
-            with open(self.persistence_file, "w") as f:
-                json.dump(tasks_data, f, indent=2, default=str)
-            logger.debug(f"Saved {len(tasks_data)} tasks to {self.persistence_file}")
-        except Exception as e:
-            logger.error(f"Failed to save tasks: {e}")
-
-    async def load_from_file(self) -> None:
-        """Load tasks from persistence file."""
-        try:
-            if not Path(self.persistence_file).exists():
-                logger.debug(f"No persistence file found at {self.persistence_file}")
-                return
-
-            with open(self.persistence_file) as f:
-                tasks_data = json.load(f)
-
-            async with self._lock:
-                for task_id, task_dict in tasks_data.items():
-                    # Reconstruct task from dict
-                    task = QueuedTask(
-                        task_id=task_dict["task_id"],
-                        task_type=task_dict["task_type"],
-                        description=task_dict["description"],
-                        target_file=Path(task_dict["target_file"])
-                        if task_dict.get("target_file")
-                        else None,
-                        priority=TaskPriority[task_dict["priority"]],
-                        status=TaskStatus(task_dict["status"]),
-                        metadata=task_dict.get("metadata", {}),
-                        result=task_dict.get("result"),
-                        error=task_dict.get("error"),
-                        retry_count=task_dict.get("retry_count", 0),
-                        max_retries=task_dict.get("max_retries", 3),
-                    )
-                    self._tasks[task_id] = task
-
-                    # Re-queue pending and queued tasks
-                    if task.status in (TaskStatus.PENDING, TaskStatus.QUEUED):
-                        task.status = TaskStatus.QUEUED
-                        await self._queue.put((task.priority.value, task))
-
-            logger.info(f"Loaded {len(tasks_data)} tasks from {self.persistence_file}")
-        except Exception as e:
-            logger.error(f"Failed to load tasks: {e}")

@@ -174,7 +174,7 @@ class TTAUser(HttpUser):
             "I'm feeling curious about what lies ahead.",
         ]
 
-        for _i in range(random.randint(2, 4)):
+        for i in range(random.randint(2, 4)):
             message = random.choice(messages)
             message_data = {"content": message, "message_type": "user"}
 

@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Test Model Management Environment Integration
@@ -130,7 +129,7 @@ def test_provider_configuration():
                 base_url="https://openrouter.ai/api/v1",
             )
 
-            OpenRouterProvider(config)
+            provider = OpenRouterProvider(config)
             print("✅ OpenRouter provider configured successfully")
             return True
         print("⚠️  OpenRouter API key not configured, skipping provider test")

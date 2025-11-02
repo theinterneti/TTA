@@ -278,7 +278,7 @@ class WebSocketConnectionManager:
 
             return await self._authenticate_with_token(connection, token)
 
-        except TimeoutError:
+        except asyncio.TimeoutError:
             await self._send_error(connection, "AUTH_TIMEOUT", "Authentication timeout")
             return False
         except json.JSONDecodeError:

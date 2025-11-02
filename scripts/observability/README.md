@@ -79,10 +79,10 @@ def run_unit_tests():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Tests failed: {result.stderr}")
-    
+
     return result.stdout
 ```
 
@@ -96,10 +96,10 @@ def build_docker_image():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Build failed: {result.stderr}")
-    
+
     return result.stdout
 ```
 
@@ -113,10 +113,10 @@ def run_ruff_lint():
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         raise RuntimeError(f"Lint failed: {result.stderr}")
-    
+
     return result.stdout
 ```
 
@@ -133,7 +133,7 @@ exec_id = collector.start_execution("custom_operation", metadata={"key": "value"
 try:
     # Your operation
     result = perform_operation()
-    
+
     # End tracking (success)
     collector.end_execution(exec_id, status="success")
 except Exception as e:
@@ -330,7 +330,7 @@ from observability.dev_metrics import get_collector
 def run_tests():
     collector = get_collector()
     exec_id = collector.start_execution("run_tests")
-    
+
     try:
         # Test execution code
         collector.end_execution(exec_id, status="success")
@@ -364,7 +364,7 @@ def run_tests():
    @track_execution("pytest_unit_tests")
    def run_unit_tests():
        pass
-   
+
    # Too fine: Don't track individual test functions
    # Too coarse: Don't track entire CI/CD pipeline as one operation
    ```
@@ -431,6 +431,5 @@ When integrating into TTA application (Phase 2):
 
 ---
 
-**Status:** Ready for use  
+**Status:** Ready for use
 **Next Steps:** Integrate with development scripts and CI/CD workflows
-

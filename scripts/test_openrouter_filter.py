@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 OpenRouter Free Models Filter Validation Script
@@ -123,8 +122,8 @@ def test_environment_configuration():
         )
 
         # Verify values
-        assert show_free_only, f"Expected True, got {show_free_only}"
-        assert not prefer_free, f"Expected False, got {prefer_free}"
+        assert show_free_only == True, f"Expected True, got {show_free_only}"
+        assert prefer_free == False, f"Expected False, got {prefer_free}"
         assert max_cost == 0.0005, f"Expected 0.0005, got {max_cost}"
 
         print("✅ Environment configuration successful")

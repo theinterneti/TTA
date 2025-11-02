@@ -39,13 +39,10 @@ __all__ = [
     # Core classes
     "ExecutionMetric",
     "DevMetricsCollector",
-
     # Decorator
     "track_execution",
-
     # Global collector
     "get_collector",
-
     # Dashboard
     "generate_dashboard",
 ]

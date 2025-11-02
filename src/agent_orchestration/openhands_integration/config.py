@@ -239,7 +239,7 @@ def filter_models(
 
     # Filter models
     filtered = []
-    for model in registry.models.values():
+    for model_id, model in registry.models.items():
         # Filter by compatibility status
         if model.compatibility_status not in compatibility_statuses:
             continue
@@ -751,9 +751,6 @@ class OpenHandsIntegrationConfig(BaseModel):
             api_key=SecretStr(api_key),
             base_url=os.getenv("OPENHANDS_BASE_URL", "https://openrouter.ai/api/v1"),
             model_preset=os.getenv("OPENHANDS_MODEL", "gemini-flash"),
-            custom_model_id=os.getenv(
-                "OPENHANDS_CUSTOM_MODEL_ID"
-            ),  # Full model ID override
             workspace_root=Path(
                 os.getenv("OPENHANDS_WORKSPACE_ROOT", "./openhands_workspace")
             ),

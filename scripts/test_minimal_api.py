@@ -1,4 +1,3 @@
-# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Test script for the minimal TTA API server to validate integration.
@@ -66,7 +65,7 @@ def test_api():
         if response.status_code == 200:
             openapi_spec = response.json()
             paths = openapi_spec.get("paths", {})
-            gameplay_endpoints = [path for path in paths if "/gameplay/" in path]
+            gameplay_endpoints = [path for path in paths.keys() if "/gameplay/" in path]
             print("✅ OpenAPI spec accessible")
             print(f"   Gameplay endpoints found: {len(gameplay_endpoints)}")
             for endpoint in gameplay_endpoints:

@@ -1,7 +1,7 @@
 # Agentic Primitives Implementation Plan
 
-**Date:** 2025-10-20  
-**Status:** Planning  
+**Date:** 2025-10-20
+**Status:** Planning
 **Priority:** High
 
 ## Overview
@@ -41,12 +41,12 @@ class ContextWindow:
     current_tokens: int
     messages: list[dict[str, Any]]
     metadata: dict[str, Any]
-    
+
     @property
     def utilization(self) -> float:
         """Return context window utilization (0.0 to 1.0)."""
         return self.current_tokens / self.max_tokens
-    
+
     @property
     def remaining_tokens(self) -> int:
         """Return remaining token capacity."""
@@ -61,14 +61,14 @@ class TokenCounter(Protocol):
 class ContextWindowManager:
     """
     Manages LLM context windows with automatic pruning and optimization.
-    
+
     Features:
     - Token counting and tracking
     - Automatic context pruning
     - Context summarization
     - Multi-scale context management (immediate, session, historical)
     """
-    
+
     def __init__(
         self,
         max_tokens: int = 8000,
@@ -80,37 +80,37 @@ class ContextWindowManager:
         self.token_counter = token_counter or self._default_token_counter()
         self.pruning_strategy = pruning_strategy
         self.pruning_threshold = pruning_threshold
-    
+
     def create_window(self, initial_messages: list[dict] | None = None) -> ContextWindow:
         """Create a new context window."""
         messages = initial_messages or []
         current_tokens = sum(self.token_counter.count_tokens(str(m)) for m in messages)
-        
+
         return ContextWindow(
             max_tokens=self.max_tokens,
             current_tokens=current_tokens,
             messages=messages,
             metadata={}
         )
-    
+
     def add_message(
-        self, 
-        window: ContextWindow, 
+        self,
+        window: ContextWindow,
         message: dict[str, Any],
         auto_prune: bool = True
     ) -> ContextWindow:
         """Add a message to the context window, pruning if necessary."""
         message_tokens = self.token_counter.count_tokens(str(message))
-        
+
         # Check if pruning needed
         if auto_prune and (window.current_tokens + message_tokens) / window.max_tokens > self.pruning_threshold:
             window = self._prune_context(window, message_tokens)
-        
+
         window.messages.append(message)
         window.current_tokens += message_tokens
-        
+
         return window
-    
+
     def _prune_context(self, window: ContextWindow, needed_tokens: int) -> ContextWindow:
         """Prune context based on configured strategy."""
         if self.pruning_strategy == ContextPruningStrategy.RECENCY:
@@ -121,40 +121,40 @@ class ContextWindowManager:
             return self._prune_hybrid(window, needed_tokens)
         elif self.pruning_strategy == ContextPruningStrategy.SUMMARIZE:
             return self._prune_with_summarization(window, needed_tokens)
-        
+
         return window
-    
+
     def _prune_by_recency(self, window: ContextWindow, needed_tokens: int) -> ContextWindow:
         """Keep most recent messages, remove oldest."""
         # Implementation: Remove oldest messages until we have space
         pass
-    
+
     def _prune_by_relevance(self, window: ContextWindow, needed_tokens: int) -> ContextWindow:
         """Keep most relevant messages based on semantic similarity."""
         # Implementation: Score messages by relevance, keep highest scoring
         pass
-    
+
     def _prune_hybrid(self, window: ContextWindow, needed_tokens: int) -> ContextWindow:
         """Combine recency and relevance for pruning decisions."""
         # Implementation: Weight recency and relevance scores
         pass
-    
+
     def _prune_with_summarization(self, window: ContextWindow, needed_tokens: int) -> ContextWindow:
         """Summarize older context to save tokens."""
         # Implementation: Summarize messages beyond certain age
         pass
-    
+
     def _default_token_counter(self) -> TokenCounter:
         """Default token counter using tiktoken."""
         import tiktoken
-        
+
         class TiktokenCounter:
             def __init__(self):
                 self.encoding = tiktoken.get_encoding("cl100k_base")
-            
+
             def count_tokens(self, text: str) -> int:
                 return len(self.encoding.encode(text))
-        
+
         return TiktokenCounter()
 ```
 
@@ -173,28 +173,28 @@ class UnifiedAgentOrchestrator:
             pruning_strategy=ContextPruningStrategy.HYBRID,
             pruning_threshold=0.8
         )
-    
+
     async def _build_narrative_prompt(self, state: OrchestrationState) -> str:
         """Build narrative prompt with context window management."""
         # Create context window
         window = self.context_manager.create_window()
-        
+
         # Add system message
         window = self.context_manager.add_message(window, {
             "role": "system",
             "content": "You are a therapeutic narrative generator..."
         })
-        
+
         # Add conversation history (with automatic pruning)
         for msg in state.therapeutic_context.get("history", []):
             window = self.context_manager.add_message(window, msg)
-        
+
         # Add current context
         window = self.context_manager.add_message(window, {
             "role": "user",
             "content": state.user_input
         })
-        
+
         # Build final prompt from window
         return self._format_messages(window.messages)
 ```
@@ -215,7 +215,7 @@ def test_context_window_creation():
     """Test creating a context window."""
     manager = ContextWindowManager(max_tokens=1000)
     window = manager.create_window()
-    
+
     assert window.max_tokens == 1000
     assert window.current_tokens == 0
     assert window.utilization == 0.0
@@ -225,10 +225,10 @@ def test_add_message_without_pruning():
     """Test adding messages below pruning threshold."""
     manager = ContextWindowManager(max_tokens=1000, pruning_threshold=0.8)
     window = manager.create_window()
-    
+
     # Add small message
     window = manager.add_message(window, {"role": "user", "content": "Hello"})
-    
+
     assert len(window.messages) == 1
     assert window.current_tokens > 0
 
@@ -241,14 +241,14 @@ def test_automatic_pruning():
         pruning_threshold=0.5
     )
     window = manager.create_window()
-    
+
     # Add messages until pruning triggers
     for i in range(10):
         window = manager.add_message(window, {
             "role": "user",
             "content": f"Message {i}" * 10
         })
-    
+
     # Should have pruned some messages
     assert window.utilization <= 1.0
     assert len(window.messages) < 10
@@ -312,7 +312,7 @@ class RecoveryStrategy:
 class ErrorRecoveryFramework:
     """
     Centralized error recovery framework for agent workflows.
-    
+
     Features:
     - Error classification
     - Severity assessment
@@ -320,15 +320,15 @@ class ErrorRecoveryFramework:
     - Fallback handling
     - Error metrics and logging
     """
-    
+
     def __init__(self):
         self.strategies: dict[ErrorCategory, RecoveryStrategy] = {}
         self.error_counts: dict[ErrorCategory, int] = {}
-    
+
     def register_strategy(self, strategy: RecoveryStrategy) -> None:
         """Register a recovery strategy for an error category."""
         self.strategies[strategy.category] = strategy
-    
+
     def classify_error(self, error: Exception) -> tuple[ErrorCategory, ErrorSeverity]:
         """Classify an error into category and severity."""
         # LLM errors
@@ -336,21 +336,21 @@ class ErrorRecoveryFramework:
             return ErrorCategory.LLM_ERROR, ErrorSeverity.MEDIUM
         if "timeout" in str(error).lower():
             return ErrorCategory.TIMEOUT_ERROR, ErrorSeverity.MEDIUM
-        
+
         # Validation errors
         if "safety" in str(error).lower() or "validation" in str(error).lower():
             return ErrorCategory.VALIDATION_ERROR, ErrorSeverity.HIGH
-        
+
         # State errors
         if "state" in str(error).lower() or "redis" in str(error).lower():
             return ErrorCategory.STATE_ERROR, ErrorSeverity.HIGH
-        
+
         # Tool errors
         if "tool" in str(error).lower():
             return ErrorCategory.TOOL_ERROR, ErrorSeverity.MEDIUM
-        
+
         return ErrorCategory.UNKNOWN, ErrorSeverity.MEDIUM
-    
+
     async def handle_error(
         self,
         error: Exception,
@@ -361,7 +361,7 @@ class ErrorRecoveryFramework:
         """Handle an error with appropriate recovery strategy."""
         # Classify error
         category, severity = self.classify_error(error)
-        
+
         # Create error context
         context = ErrorContext(
             error=error,
@@ -371,16 +371,16 @@ class ErrorRecoveryFramework:
             workflow_id=workflow_id,
             metadata=metadata
         )
-        
+
         # Track error
         self.error_counts[category] = self.error_counts.get(category, 0) + 1
-        
+
         # Get recovery strategy
         strategy = self.strategies.get(category)
         if not strategy:
             # No strategy registered, use default
             return await self._default_recovery(context)
-        
+
         # Attempt recovery
         try:
             result = await strategy.handler(context)
@@ -390,13 +390,13 @@ class ErrorRecoveryFramework:
             if strategy.fallback:
                 return await strategy.fallback(context)
             raise recovery_error
-    
+
     async def _default_recovery(self, context: ErrorContext) -> Any:
         """Default recovery strategy when no specific strategy registered."""
         if context.severity == ErrorSeverity.CRITICAL:
             # Critical errors should not be recovered automatically
             raise context.error
-        
+
         # Log and return None for non-critical errors
         import logging
         logger = logging.getLogger(__name__)
@@ -421,7 +421,7 @@ class UnifiedAgentOrchestrator:
         # ... existing init ...
         self.error_recovery = ErrorRecoveryFramework()
         self._register_recovery_strategies()
-    
+
     def _register_recovery_strategies(self):
         """Register error recovery strategies."""
         # LLM error recovery
@@ -432,7 +432,7 @@ class UnifiedAgentOrchestrator:
             max_retries=3,
             fallback=self._llm_fallback
         ))
-        
+
         # Validation error recovery
         self.error_recovery.register_strategy(RecoveryStrategy(
             name="validation_fallback",
@@ -441,11 +441,11 @@ class UnifiedAgentOrchestrator:
             max_retries=1,
             fallback=self._validation_fallback
         ))
-    
+
     async def _recover_llm_error(self, context: ErrorContext) -> Any:
         """Recover from LLM errors with retry and backoff."""
         import asyncio
-        
+
         for attempt in range(3):
             await asyncio.sleep(2 ** attempt)  # Exponential backoff
             try:
@@ -455,9 +455,9 @@ class UnifiedAgentOrchestrator:
             except Exception:
                 if attempt == 2:
                     raise
-        
+
         return None
-    
+
     async def _llm_fallback(self, context: ErrorContext) -> Any:
         """Fallback for LLM errors - use cached response or template."""
         # Return a safe, generic response
@@ -502,17 +502,17 @@ class ToolExecutionTrace:
     started_at: datetime
     ended_at: datetime | None = None
     duration_ms: float | None = None
-    
+
     # Input/Output
     input_params: dict[str, Any] = field(default_factory=dict)
     output_result: Any | None = None
     error: str | None = None
-    
+
     # Context
     agent_id: str | None = None
     workflow_id: str | None = None
     session_id: str | None = None
-    
+
     # Metrics
     token_usage: dict[str, int] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -521,18 +521,18 @@ class ToolExecutionTrace:
 class ToolObservabilityCollector:
     """
     Collects and manages tool execution observability data.
-    
+
     Features:
     - Execution tracing
     - Performance metrics
     - Error tracking
     - Result validation logging
     """
-    
+
     def __init__(self):
         self.traces: dict[str, ToolExecutionTrace] = {}
         self.metrics: dict[str, list[float]] = {}
-    
+
     def start_execution(
         self,
         tool_name: str,
@@ -542,7 +542,7 @@ class ToolObservabilityCollector:
     ) -> str:
         """Start tracking a tool execution."""
         import uuid
-        
+
         execution_id = str(uuid.uuid4())
         trace = ToolExecutionTrace(
             tool_name=tool_name,
@@ -553,10 +553,10 @@ class ToolObservabilityCollector:
             agent_id=agent_id,
             workflow_id=workflow_id
         )
-        
+
         self.traces[execution_id] = trace
         return execution_id
-    
+
     def end_execution(
         self,
         execution_id: str,
@@ -568,24 +568,24 @@ class ToolObservabilityCollector:
         trace = self.traces.get(execution_id)
         if not trace:
             return
-        
+
         trace.ended_at = datetime.utcnow()
         trace.duration_ms = (trace.ended_at - trace.started_at).total_seconds() * 1000
         trace.status = status
         trace.output_result = output_result
         trace.error = error
-        
+
         # Update metrics
         if trace.tool_name not in self.metrics:
             self.metrics[trace.tool_name] = []
         self.metrics[trace.tool_name].append(trace.duration_ms)
-    
+
     def get_tool_metrics(self, tool_name: str) -> dict[str, Any]:
         """Get performance metrics for a tool."""
         durations = self.metrics.get(tool_name, [])
         if not durations:
             return {}
-        
+
         return {
             "tool_name": tool_name,
             "execution_count": len(durations),
@@ -615,6 +615,5 @@ class ToolObservabilityCollector:
 
 ---
 
-**Status:** Ready for implementation  
+**Status:** Ready for implementation
 **Next Review:** After Phase 1 completion
-

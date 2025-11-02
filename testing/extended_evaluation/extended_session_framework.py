@@ -527,12 +527,12 @@ class ExtendedSessionTestFramework(SinglePlayerTestFramework):
 
         logger.info(f"Running {total_tests} extended session tests")
 
-        for _model_key, model in self.models.items():
+        for model_key, model in self.models.items():
             if not model.enabled:
                 continue
 
-            for _profile_key, profile in self.profiles.items():
-                for _scenario_key, scenario in self.extended_scenarios.items():
+            for profile_key, profile in self.profiles.items():
+                for scenario_key, scenario in self.extended_scenarios.items():
                     logger.info(
                         f"Running extended test: {model.name} + {profile.name} + {scenario.name}"
                     )

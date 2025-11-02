@@ -6,7 +6,9 @@ OpenRouter provider implementation, automatically discovering edge cases.
 """
 
 import pytest
-from hypothesis import assume, given, settings, strategies as st
+from hypothesis import assume, given, settings
+from hypothesis import strategies as st
+
 from tta_ai.models.interfaces import (
     GenerationRequest,
     ModelInfo,
@@ -320,9 +322,9 @@ class TestOpenRouterProviderProperties:
             )
 
         # Invariant: Sorting doesn't change the set of models
-        assert {m.model_id for m in sorted_models} == {
+        assert set(m.model_id for m in sorted_models) == set(
             m.model_id for m in scored_models
-        }
+        )
 
 
 # ============================================================================

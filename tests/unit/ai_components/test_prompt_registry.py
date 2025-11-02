@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from tta_ai.prompts import PromptMetrics, PromptRegistry, PromptTemplate
 
 
@@ -279,3 +280,4 @@ def test_prompt_metrics_to_dict():
     assert metrics_dict["version"] == "1.0.0"
     assert metrics_dict["total_calls"] == 1
     assert metrics_dict["avg_tokens"] == 100
+

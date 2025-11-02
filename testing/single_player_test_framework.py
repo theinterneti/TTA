@@ -210,9 +210,9 @@ class SinglePlayerTestFramework:
             total_tests = len(self.models) * len(self.profiles) * len(self.scenarios)
             completed_tests = 0
 
-            for _model_key, model in self.models.items():
-                for _profile_key, profile in self.profiles.items():
-                    for _scenario_key, scenario in self.scenarios.items():
+            for model_key, model in self.models.items():
+                for profile_key, profile in self.profiles.items():
+                    for scenario_key, scenario in self.scenarios.items():
                         logger.info(
                             f"Running test: {model.name} + {profile.name} + {scenario.name}"
                         )
@@ -332,7 +332,7 @@ class SinglePlayerTestFramework:
         scenario: TestScenario,
     ) -> dict[str, Any]:
         """Execute a single scenario step."""
-        time.time()
+        step_start = time.time()
         step_result = {"conversations": [], "response_times": [], "errors": 0}
 
         try:
