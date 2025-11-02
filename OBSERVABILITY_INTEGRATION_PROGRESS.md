@@ -1,7 +1,9 @@
 # Observability Integration - Implementation Progress
 
+> **📋 NOTE**: This file has been migrated to [`.augment/TODO-AUDIT.md`](.augment/TODO-AUDIT.md) under "Observability Integration Implementation". See that file for current phase tracking (Phases 2-5 remaining).
+
 **Date:** 2025-10-26
-**Status:** In Progress (Phase 1 Complete)
+**Status:** In Progress (Phase 1 Complete) - Migrated 2025-11-01
 **Spec:** `specs/observability-integration.md`
 
 ---

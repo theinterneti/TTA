@@ -269,8 +269,8 @@ Documentation = "https://github.com/your-org/tta/docs"
 # virtual environment management across all contexts.
 
 # Default dependency groups to install with 'uv sync'
-# Includes both dev tools and testing frameworks for productive local development
-default-groups = ["dev", "test"]
+# The 'dev' group includes both development tools and testing frameworks
+default-groups = ["dev"]
 
 # DEPRECATED: Replaced by [dependency-groups] above
 # This section is kept for backwards compatibility but is no longer the primary way to manage dev dependencies

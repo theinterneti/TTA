@@ -1,14 +1,12 @@
 # TTA Configuration
 
-This directory contains configuration files for the TTA project.
+> ⚠️ **This document has moved!**
+>
+> This content is now maintained in the TTA-notes knowledge base:
+> - **New location:** [[TTA/References/TTA Configuration]]
+> - **Path:** `.augment/kb/References/TTA Configuration.md`
+>
+> If using Logseq with TTA-notes, you can access it directly in the graph.
+> Otherwise, see: `.augment/kb/References/TTA Configuration.md`
 
-## Directories
-
-- **docker**: Docker-related configuration files
-- **config**: General configuration files
-
-## Main Configuration Files
-
-- **.env**: Environment variables for the TTA project
-- **docker-compose.yml**: Docker Compose configuration for the TTA project
-- **Dockerfile**: Dockerfile for the TTA project
+**Migration date:** 2025-11-01

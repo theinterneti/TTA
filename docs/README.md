@@ -1,18 +1,12 @@
 # TTA Documentation
 
-This directory contains documentation for the TTA project.
+> ⚠️ **This document has moved!**
+>
+> This content is now maintained in the TTA-notes knowledge base:
+> - **New location:** [[TTA/References/TTA Documentation]]
+> - **Path:** `.augment/kb/References/TTA Documentation.md`
+>
+> If using Logseq with TTA-notes, you can access it directly in the graph.
+> Otherwise, see: `.augment/kb/References/TTA Documentation.md`
 
-## Directories
-
-- **setup**: Setup and installation instructions
-- **docker**: Docker and DevContainer documentation
-- **development**: Development guidelines and processes
-- **architecture**: System architecture documentation
-- **ai-framework**: AI framework documentation
-- **therapeutic-content**: Therapeutic content documentation
-
-## Main Documentation Files
-
-- [README.md](../README.md): Main project README
-- [ENV_STRUCTURE.md](ENV_STRUCTURE.md): Environment structure documentation
-- [GITHUB_SETUP.md](GITHUB_SETUP.md): GitHub setup documentation
+**Migration date:** 2025-11-01

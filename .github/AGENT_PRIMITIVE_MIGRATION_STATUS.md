@@ -1,7 +1,9 @@
 # TTA Agent Primitive Migration - Current Status
 
+> **📋 NOTE**: This file has been migrated to [`.augment/TODO-AUDIT.md`](../.augment/TODO-AUDIT.md) under "Agent Primitive Migration". See that file for current status and next actions (Phases 5-6).
+
 **Last Updated**: 2025-10-27
-**Overall Status**: 🔄 **IN PROGRESS - Phase 4 Complete**
+**Overall Status**: 🔄 **IN PROGRESS - Phase 4 Complete** (Migrated 2025-11-01)
 
 ---
 
@@ -378,4 +380,3 @@ AGENTS.md ✅ (repository root)
 
 **Status**: Ready for Phase 5 (Human Validation Gate)
 **Approval**: Awaiting human review and approval to proceed to Phase 5
-

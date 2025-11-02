@@ -1,5 +1,12 @@
 # Contributing
 
-*Documentation coming soon*
+> ⚠️ **This document has moved!**
+>
+> This content is now maintained in the TTA-notes knowledge base:
+> - **New location:** [[TTA/Workflows/Contributing]]
+> - **Path:** `.augment/kb/Workflows/Contributing.md`
+>
+> If using Logseq with TTA-notes, you can access it directly in the graph.
+> Otherwise, see: `.augment/kb/Workflows/Contributing.md`
 
-This page is a placeholder and will be populated with content in a future update.
+**Migration date:** 2025-11-01

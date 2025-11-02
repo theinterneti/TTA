@@ -1,5 +1,7 @@
 # TTA Current Status
 
+> **📋 NOTE**: This file contains historical sprint context. For comprehensive TODO tracking and incomplete work, see [`.augment/TODO-AUDIT.md`](.augment/TODO-AUDIT.md)
+
 **Last Updated**: 2025-10-29 10:24 UTC
 **Sprint Focus**: Foundation Fixes & Test Infrastructure
 

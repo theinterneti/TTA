@@ -1,6 +1,8 @@
 # Remaining Priority Issues - E2E Validation Backlog
 
-**Status:** Ready for prioritization
+> **📋 NOTE**: This file has been migrated to [`../../.augment/TODO-AUDIT.md`](../../.augment/TODO-AUDIT.md) under "E2E Test Validation Backlog". See that file for current tracking of MEDIUM-001 and MEDIUM-002.
+
+**Status:** Ready for prioritization (Migrated 2025-11-01)
 **Date:** 2025-10-16
 **Completed:** HIGH-002 (Landing Page Redirect) ✅
 **Deferred:** CRITICAL-001 (Session Persistence) 📋
