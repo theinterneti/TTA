@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Sync deps
-        run: uv sync --group test
+        run: uv sync --all-extras
       - name: Run unit tests with metrics collection
         run: |
           # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
