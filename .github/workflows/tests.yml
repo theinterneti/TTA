@@ -67,6 +67,16 @@ jobs:
           TTA_METRICS_ENABLED: true
           TTA_TEST_METRICS_COLLECTION: true
 
+      - name: Upload coverage to Codecov
+        if: always()  # Upload coverage even if tests fail
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-unit.xml
+          flags: unit
+          name: unit-tests
+          fail_ci_if_error: false
+
       - name: Upload unit test results
         uses: actions/upload-artifact@v4
         if: always()
