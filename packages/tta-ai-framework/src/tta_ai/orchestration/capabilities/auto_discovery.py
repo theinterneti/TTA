@@ -89,9 +89,7 @@ class ComponentInfo:
 class AutoDiscoveryManager:
     """Manages auto-discovery of agent capabilities during startup."""
 
-    def __init__(
-        self, registry: RedisAgentRegistry, config: DiscoveryConfig | None = None
-    ):
+    def __init__(self, registry: RedisAgentRegistry, config: DiscoveryConfig | None = None):
         self.registry = registry
         self.config = config or DiscoveryConfig()
 
@@ -112,9 +110,7 @@ class AutoDiscoveryManager:
             self.config.enabled = False
             logger.info(f"Auto-discovery disabled for environment: {self.environment}")
 
-        logger.info(
-            f"AutoDiscoveryManager initialized (enabled: {self.config.enabled})"
-        )
+        logger.info(f"AutoDiscoveryManager initialized (enabled: {self.config.enabled})")
 
     def _detect_environment(self) -> str:
         """Detect current environment."""
@@ -246,9 +242,7 @@ class AutoDiscoveryManager:
                 and not await self._validate_component_capabilities(component)
             ):
                 component.discovery_status = DiscoveryStatus.FAILED
-                logger.warning(
-                    f"Component capability validation failed: {component_id}"
-                )
+                logger.warning(f"Component capability validation failed: {component_id}")
                 return False
 
             # Register with registry
@@ -256,9 +250,7 @@ class AutoDiscoveryManager:
 
             if success:
                 component.discovery_status = DiscoveryStatus.REGISTERED
-                logger.info(
-                    f"Component successfully discovered and registered: {component_id}"
-                )
+                logger.info(f"Component successfully discovered and registered: {component_id}")
 
                 # Notify callbacks
                 await self._notify_discovery_callbacks(component, "registered")
@@ -276,29 +268,21 @@ class AutoDiscoveryManager:
         """Validate component capabilities."""
         if not component.capabilities and component.agent_type:
             # If no capabilities specified, try to infer from agent type
-            component.capabilities = self._infer_capabilities_from_agent_type(
-                component.agent_type
-            )
+            component.capabilities = self._infer_capabilities_from_agent_type(component.agent_type)
 
         # Basic validation - ensure capabilities are properly formed
         for capability in component.capabilities:
             if not isinstance(capability, AgentCapability):
-                logger.warning(
-                    f"Invalid capability type for component {component.component_id}"
-                )
+                logger.warning(f"Invalid capability type for component {component.component_id}")
                 return False
 
             if not capability.capability_type or not capability.name:
-                logger.warning(
-                    f"Incomplete capability for component {component.component_id}"
-                )
+                logger.warning(f"Incomplete capability for component {component.component_id}")
                 return False
 
         return True
 
-    def _infer_capabilities_from_agent_type(
-        self, agent_type: AgentType
-    ) -> list[AgentCapability]:
+    def _infer_capabilities_from_agent_type(self, agent_type: AgentType) -> list[AgentCapability]:
         """Infer capabilities from agent type."""
         capability_mappings = {
             AgentType.INPUT_PROCESSOR: [
@@ -447,20 +431,14 @@ class AutoDiscoveryManager:
         """Send heartbeat for a component."""
         try:
             if component.agent_type:
-                agent_id = AgentId(
-                    agent_type=component.agent_type, instance=component.component_id
-                )
+                agent_id = AgentId(agent_type=component.agent_type, instance=component.component_id)
 
                 await self.registry.update_heartbeat(agent_id)
 
         except Exception as e:
-            logger.error(
-                f"Failed to send heartbeat for component {component.component_id}: {e}"
-            )
+            logger.error(f"Failed to send heartbeat for component {component.component_id}: {e}")
 
-    async def _notify_discovery_callbacks(
-        self, component: ComponentInfo, event: str
-    ) -> None:
+    async def _notify_discovery_callbacks(self, component: ComponentInfo, event: str) -> None:
         """Notify discovery callbacks."""
         for callback in self.discovery_callbacks:
             try:
@@ -491,9 +469,7 @@ class AutoDiscoveryManager:
             "strategy": self.config.strategy.value,
             "total_components": len(self.components),
             "status_counts": status_counts,
-            "discovery_attempts": sum(
-                c.discovery_attempts for c in self.components.values()
-            ),
+            "discovery_attempts": sum(c.discovery_attempts for c in self.components.values()),
             "is_running": self.is_running,
         }
 

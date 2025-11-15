@@ -105,8 +105,8 @@ class ComprehensiveFrontendTester:
                         "/api/v1/gameplay/sessions/{session_id}/choices",
                     ]
 
-                    for pattern in session_patterns:
-                        for path in paths.keys():
+                    for _pattern in session_patterns:
+                        for path in paths:
                             if (
                                 "/api/v1/gameplay/sessions/" in path
                                 and path != "/api/v1/gameplay/sessions"
@@ -233,7 +233,7 @@ class ComprehensiveFrontendTester:
                             "Endpoint exists, validates request format",
                         )
                     else:
-                        error_data = await response.text()
+                        await response.text()
                         self.log_test_result(
                             "Session Creation Endpoint",
                             True,

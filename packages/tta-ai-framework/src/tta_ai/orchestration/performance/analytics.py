@@ -137,9 +137,7 @@ class PerformanceAnalytics:
         trends = await self._analyze_trends(statistics)
 
         # Generate recommendations
-        recommendations = await self._generate_recommendations(
-            bottlenecks, trends, statistics
-        )
+        recommendations = await self._generate_recommendations(bottlenecks, trends, statistics)
 
         # Calculate overall health score
         overall_health = self._calculate_health_score(statistics, bottlenecks)
@@ -149,9 +147,7 @@ class PerformanceAnalytics:
         return {
             "bottlenecks": [self._bottleneck_to_dict(b) for b in bottlenecks],
             "trends": [self._trend_to_dict(t) for t in trends],
-            "recommendations": [
-                self._recommendation_to_dict(r) for r in recommendations
-            ],
+            "recommendations": [self._recommendation_to_dict(r) for r in recommendations],
             "overall_health": overall_health,
             "analysis_timestamp": current_time,
             "analysis_window_minutes": self.analysis_window_minutes,
@@ -304,9 +300,7 @@ class PerformanceAnalytics:
 
         # High variance in response times suggests contention
         if stats.total_operations > 5:
-            variance_indicator = (
-                stats.max_duration - stats.min_duration
-            ) / stats.average_duration
+            variance_indicator = (stats.max_duration - stats.min_duration) / stats.average_duration
 
             if variance_indicator > 3.0 and stats.average_duration > 1.0:
                 severity = min(1.0, variance_indicator / 10.0)
@@ -336,9 +330,7 @@ class PerformanceAnalytics:
 
         return bottlenecks
 
-    async def _analyze_trends(
-        self, statistics: dict[OperationType, Any]
-    ) -> list[PerformanceTrend]:
+    async def _analyze_trends(self, statistics: dict[OperationType, Any]) -> list[PerformanceTrend]:
         """Analyze performance trends."""
         trends = []
 
@@ -347,9 +339,7 @@ class PerformanceAnalytics:
             self.trend_history[op_type].append(stats.average_duration)
 
             if len(self.trend_history[op_type]) >= 3:
-                trend = self._calculate_trend(
-                    op_type, list(self.trend_history[op_type])
-                )
+                trend = self._calculate_trend(op_type, list(self.trend_history[op_type]))
                 if trend:
                     trends.append(trend)
 
@@ -371,8 +361,7 @@ class PerformanceAnalytics:
         y_mean = statistics.mean(data_points)
 
         numerator = sum(
-            (x - x_mean) * (y - y_mean)
-            for x, y in zip(x_values, data_points, strict=False)
+            (x - x_mean) * (y - y_mean) for x, y in zip(x_values, data_points, strict=False)
         )
         denominator = sum((x - x_mean) ** 2 for x in x_values)
 
@@ -429,18 +418,14 @@ class PerformanceAnalytics:
                     priority=1,
                     estimated_improvement=bottleneck.estimated_impact,
                     implementation_effort="medium",
-                    affected_components=[
-                        op.value for op in bottleneck.affected_operations
-                    ],
+                    affected_components=[op.value for op in bottleneck.affected_operations],
                     prerequisites=[],
                     risks=["Temporary performance impact during implementation"],
                 )
                 recommendations.append(rec)
 
         # Trend-based recommendations
-        degrading_trends = [
-            t for t in trends if t.trend_direction == TrendDirection.DEGRADING
-        ]
+        degrading_trends = [t for t in trends if t.trend_direction == TrendDirection.DEGRADING]
         if degrading_trends:
             rec = OptimizationRecommendation(
                 recommendation_id="trend_degradation",
@@ -502,9 +487,7 @@ class PerformanceAnalytics:
             return "poor"
         return "critical"
 
-    def _bottleneck_to_dict(
-        self, bottleneck: BottleneckIdentification
-    ) -> dict[str, Any]:
+    def _bottleneck_to_dict(self, bottleneck: BottleneckIdentification) -> dict[str, Any]:
         """Convert bottleneck to dictionary."""
         return {
             "type": bottleneck.bottleneck_type.value,
@@ -529,9 +512,7 @@ class PerformanceAnalytics:
             "confidence": trend.confidence,
         }
 
-    def _recommendation_to_dict(
-        self, recommendation: OptimizationRecommendation
-    ) -> dict[str, Any]:
+    def _recommendation_to_dict(self, recommendation: OptimizationRecommendation) -> dict[str, Any]:
         """Convert recommendation to dictionary."""
         return {
             "id": recommendation.recommendation_id,

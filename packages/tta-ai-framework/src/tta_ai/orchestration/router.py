@@ -119,17 +119,12 @@ class AgentRouter:
             )
         # Normalize: lower is better for q and h; higher is better for s
         nq = self._normalize(queues)
-        nh = [
-            min(1.0, (h / self._hb_fresh) if self._hb_fresh > 0 else 1.0)
-            for h in hb_ages
-        ]
+        nh = [min(1.0, (h / self._hb_fresh) if self._hb_fresh > 0 else 1.0) for h in hb_ages]
         ns = succs  # already in [0,1]
         # Compute weighted score: lower is better (penalize low success)
         for i, entry in enumerate(raw):
             penalty_success = 1.0 - ns[i]
-            score = (
-                (self._wq * nq[i]) + (self._wh * nh[i]) + (self._ws * penalty_success)
-            )
+            score = (self._wq * nq[i]) + (self._wh * nh[i]) + (self._ws * penalty_success)
             entry["score"] = float(score)
         # Choose best (min score)
         best = None
@@ -156,16 +151,12 @@ class AgentRouter:
             return None
         scored, best_agent = await self._score_candidates(candidates)
         if best_agent is not None:
-            return AgentId(
-                type=best_agent.agent_id.type, instance=best_agent.agent_id.instance
-            )
+            return AgentId(type=best_agent.agent_id.type, instance=best_agent.agent_id.instance)
         # Fallback: first candidate
         a0 = candidates[0]
         return AgentId(type=a0.agent_id.type, instance=a0.agent_id.instance)
 
-    async def resolve_target(
-        self, recipient: AgentId, exclude_degraded: bool = True
-    ) -> AgentId:
+    async def resolve_target(self, recipient: AgentId, exclude_degraded: bool = True) -> AgentId:
         """Return an AgentId with instance resolved to a healthy one when possible.
         Honors explicit instance when healthy; otherwise picks another healthy instance of the same type.
         """

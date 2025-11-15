@@ -116,9 +116,7 @@ class WorkflowProgress:
         self.milestones.append(milestone)
         return milestone_id
 
-    def complete_milestone(
-        self, milestone_id: str, metadata: dict[str, Any] | None = None
-    ) -> bool:
+    def complete_milestone(self, milestone_id: str, metadata: dict[str, Any] | None = None) -> bool:
         """Complete a milestone."""
         for milestone in self.milestones:
             if milestone.milestone_id == milestone_id:
@@ -317,9 +315,7 @@ class WorkflowProgressTracker:
                 workflow.add_milestone(
                     name=milestone_data["name"],
                     description=milestone_data.get("description", ""),
-                    stage=WorkflowStage(
-                        milestone_data.get("stage", WorkflowStage.EXECUTING)
-                    ),
+                    stage=WorkflowStage(milestone_data.get("stage", WorkflowStage.EXECUTING)),
                     weight=milestone_data.get("weight", 1.0),
                 )
 
@@ -412,12 +408,8 @@ class WorkflowProgressTracker:
 
         # Update final status
         workflow.status = WorkflowStatus.COMPLETED if success else WorkflowStatus.FAILED
-        workflow.current_stage = (
-            WorkflowStage.COMPLETED if success else WorkflowStage.FAILED
-        )
-        workflow.progress_percentage = (
-            100.0 if success else workflow.progress_percentage
-        )
+        workflow.current_stage = WorkflowStage.COMPLETED if success else WorkflowStage.FAILED
+        workflow.progress_percentage = 100.0 if success else workflow.progress_percentage
 
         if final_metadata:
             workflow.metadata.update(final_metadata)
@@ -433,9 +425,7 @@ class WorkflowProgressTracker:
         self.active_workflows.pop(workflow_id, None)
         self.workflow_callbacks.pop(workflow_id, None)
 
-        logger.info(
-            f"Completed workflow: {workflow_id} ({'success' if success else 'failed'})"
-        )
+        logger.info(f"Completed workflow: {workflow_id} ({'success' if success else 'failed'})")
         return True
 
     async def fail_workflow(
@@ -517,9 +507,7 @@ class WorkflowProgressTracker:
         except Exception as e:
             logger.error(f"Failed to publish workflow progress event: {e}")
 
-    async def _call_workflow_callbacks(
-        self, workflow_id: str, workflow: WorkflowProgress
-    ) -> None:
+    async def _call_workflow_callbacks(self, workflow_id: str, workflow: WorkflowProgress) -> None:
         """Call all registered callbacks for a workflow."""
         callbacks = self.workflow_callbacks.get(workflow_id, set())
 
@@ -600,9 +588,7 @@ class WorkflowProgressTracker:
         """Get count of workflows by stage."""
         counts = {}
         for workflow in self.active_workflows.values():
-            counts[workflow.current_stage.value] = (
-                counts.get(workflow.current_stage.value, 0) + 1
-            )
+            counts[workflow.current_stage.value] = counts.get(workflow.current_stage.value, 0) + 1
         return counts
 
     def _get_workflows_by_status(self) -> dict[str, int]:

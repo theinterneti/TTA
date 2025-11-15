@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from .adapter import OpenHandsAdapter
 from .client import OpenHandsClient
@@ -62,7 +62,9 @@ class ExecutionEngine:
             return
 
         self._running = True
-        logger.info(f"Starting execution engine with {self.max_concurrent_tasks} workers")
+        logger.info(
+            f"Starting execution engine with {self.max_concurrent_tasks} workers"
+        )
 
         # Start worker tasks
         for i in range(self.max_concurrent_tasks):
@@ -98,7 +100,7 @@ class ExecutionEngine:
         logger.info(f"Task {task_id} submitted ({task.task_type})")
         return task_id
 
-    async def get_task_status(self, task_id: str) -> Optional[QueuedTask]:
+    async def get_task_status(self, task_id: str) -> QueuedTask | None:
         """Get task status.
 
         Args:
@@ -163,6 +165,7 @@ class ExecutionEngine:
         try:
             # Select model
             from .model_selector import TaskCategory
+
             category = task.metadata.get("category", TaskCategory.CODE_GENERATION)
             if isinstance(category, str):
                 try:
@@ -226,4 +229,3 @@ class ExecutionEngine:
             Metrics summary
         """
         return self.metrics.get_summary()
-

@@ -38,7 +38,7 @@ async def setup_enhanced_coordination():
     redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
     # Create enhanced coordinator
-    coordinator = EnhancedRedisMessageCoordinator(
+    return EnhancedRedisMessageCoordinator(
         redis=redis_client,
         key_prefix="example_real_agents",
         enable_real_agents=config.enable_real_agents,
@@ -48,8 +48,6 @@ async def setup_enhanced_coordination():
         backoff_factor=config.exponential_base,
         backoff_max=config.max_delay,
     )
-
-    return coordinator
 
 
 async def create_enhanced_proxies(coordinator):

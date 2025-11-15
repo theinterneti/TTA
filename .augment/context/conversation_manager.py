@@ -11,7 +11,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -682,7 +682,7 @@ class AIConversationContextManager:
         message = ConversationMessage(
             role=role,
             content=content,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             metadata=metadata or {},
             tokens=tokens,
             importance=importance,
@@ -1097,7 +1097,7 @@ def create_tta_session(
         )
     """
     if session_id is None:
-        session_id = f"tta-dev-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
+        session_id = f"tta-dev-{datetime.now(UTC).strftime('%Y%m%d-%H%M%S')}"
 
     manager = AIConversationContextManager()
     manager.create_session(session_id)

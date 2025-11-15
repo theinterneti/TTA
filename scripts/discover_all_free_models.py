@@ -37,7 +37,6 @@ TEST_TASK = {
 def get_available_models():
     """Query OpenRouter's /models endpoint to get available models."""
     if not API_KEY:
-        print("❌ API key not set")
         return None
 
     try:
@@ -52,14 +51,12 @@ def get_available_models():
         )
 
         if response.status_code != 200:
-            print(f"❌ Failed to get models: HTTP {response.status_code}")
             return None
 
         data = response.json()
         return data.get("data", [])
 
-    except Exception as e:
-        print(f"❌ Error querying models: {e}")
+    except Exception:
         return None
 
 
@@ -128,7 +125,7 @@ async def test_model_with_free_suffix(model_id: str) -> dict:
             "time": elapsed,
         }
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return {
             "model": model_id,
             "model_with_suffix": test_model_id,
@@ -148,20 +145,12 @@ async def test_model_with_free_suffix(model_id: str) -> dict:
 
 async def main():
     """Main discovery process."""
-    print("\n" + "=" * 100)
-    print("DISCOVERING ALL AVAILABLE FREE MODELS ON OPENROUTER")
-    print("=" * 100)
-    print(f"Start Time: {datetime.now().isoformat()}\n")
 
     # Get all models
-    print("📡 Querying OpenRouter /models endpoint...")
     all_models = get_available_models()
 
     if not all_models:
-        print("❌ Failed to get models")
         return
-
-    print(f"✅ Retrieved {len(all_models)} models from OpenRouter\n")
 
     # Group by family
     models_by_family = {}
@@ -176,13 +165,10 @@ async def main():
             models_by_family[family] = []
         models_by_family[family].append(model_id)
 
-    print("📊 Models by family:")
     for family in sorted(models_by_family.keys()):
-        print(f"  {family}: {len(models_by_family[family])} models")
+        pass
 
     # Test models with :free suffix
-    print("\n🧪 Testing models with :free suffix...")
-    print("=" * 100)
 
     results = []
     successful = []
@@ -191,7 +177,6 @@ async def main():
     # Test a sample from each family
     for family in sorted(models_by_family.keys()):
         family_models = models_by_family[family]
-        print(f"\n{family.upper()} ({len(family_models)} models):")
 
         # Test first 3 models from each family
         for model_id in family_models[:3]:
@@ -200,23 +185,14 @@ async def main():
 
             if result["success"]:
                 successful.append(model_id)
-                print(f"  ✅ {model_id} - {result['time']:.2f}s")
             else:
                 failed.append(model_id)
-                print(f"  ❌ {model_id} - {result['error']}")
 
     # Summary
-    print("\n" + "=" * 100)
-    print("DISCOVERY RESULTS SUMMARY")
-    print("=" * 100)
-    print(f"Total Models Tested: {len(results)}")
-    print(f"Successful: {len(successful)}")
-    print(f"Failed: {len(failed)}")
 
     if successful:
-        print("\n✅ WORKING FREE MODELS:")
         for model_id in sorted(successful):
-            print(f"  {model_id}:free")
+            pass
 
     # Save results
     output_file = Path("free_models_discovery_results.json")
@@ -233,9 +209,6 @@ async def main():
             f,
             indent=2,
         )
-
-    print(f"\n✅ Results saved to: {output_file}")
-    print("=" * 100 + "\n")
 
 
 if __name__ == "__main__":

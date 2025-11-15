@@ -7,7 +7,7 @@ Tests test generation workflow, iterative feedback, validation, and error handli
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -211,9 +211,7 @@ class TestGenerateTests:
                 ) as mock_validate:
                     mock_validate.return_value = failed_validation
 
-                    result = await service.generate_tests(
-                        test_spec, max_iterations=3
-                    )
+                    result = await service.generate_tests(test_spec, max_iterations=3)
 
                     # Should stop after max iterations
                     assert mock_execute.call_count == 3
@@ -260,5 +258,3 @@ class TestGenerateTests:
                     assert result.syntax_valid is False
                     assert result.tests_pass is False
                     assert "All iterations failed" in result.issues[0]
-
-

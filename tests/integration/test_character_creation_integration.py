@@ -130,8 +130,6 @@ class TestCharacterCreationIntegration:
         )
 
         # Print response for debugging
-        print(f"\nResponse status: {response.status_code}")
-        print(f"Response body: {response.json()}")
 
         # Should succeed
         assert response.status_code == 201, (

@@ -80,31 +80,23 @@ async def test_app_import():
 
 async def main():
     """Main test function"""
-    print("🧪 TTA Containerized API Connectivity Test")
-    print("=" * 50)
 
     # Test app import
-    print("\n📦 Testing App Import:")
     app_result = await test_app_import()
-    print(f"   {app_result}")
 
     # Test database connections
-    print("\n🗄️  Testing Database Connections:")
     db_results = await test_database_connections()
 
-    for service, result in db_results.items():
-        print(f"   {service.upper()}: {result}")
+    for _service, _result in db_results.items():
+        pass
 
     # Summary
-    print("\n📊 Test Summary:")
     all_success = all(
         "✅" in result for result in [app_result] + list(db_results.values())
     )
 
     if all_success:
-        print("   🎉 All tests passed! Containerized API is ready.")
         return 0
-    print("   ⚠️  Some tests failed. Check the results above.")
     return 1
 
 

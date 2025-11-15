@@ -47,8 +47,7 @@ class TTAAnalyticsDemo:
                     metrics[metric_name] = []
 
             return metrics
-        except Exception as e:
-            print(f"Error getting system metrics: {e}")
+        except Exception:
             return {}
 
     def get_user_progress_data(self, user_id: str, token: str) -> dict:
@@ -92,8 +91,7 @@ class TTAAnalyticsDemo:
                     else {}
                 ),
             }
-        except Exception as e:
-            print(f"Error getting user progress data: {e}")
+        except Exception:
             return {}
 
     def create_system_health_visualization(self, metrics: dict):
@@ -103,7 +101,6 @@ class TTAAnalyticsDemo:
             health_data = metrics.get("service_health", [])
 
             if not health_data:
-                print("No health data available for visualization")
                 return
 
             services = []
@@ -147,8 +144,8 @@ class TTAAnalyticsDemo:
             plt.savefig("tta_system_health.png", dpi=300, bbox_inches="tight")
             plt.show()
 
-        except Exception as e:
-            print(f"Error creating system health visualization: {e}")
+        except Exception:
+            pass
 
     def create_user_progress_visualization(self, user_data: dict):
         """Create user progress visualization"""
@@ -156,7 +153,6 @@ class TTAAnalyticsDemo:
             viz_data = user_data.get("visualization", {})
 
             if not viz_data.get("time_buckets"):
-                print("No user progress data available for visualization")
                 return
 
             # Extract data
@@ -247,8 +243,8 @@ class TTAAnalyticsDemo:
             plt.savefig("tta_user_progress.png", dpi=300, bbox_inches="tight")
             plt.show()
 
-        except Exception as e:
-            print(f"Error creating user progress visualization: {e}")
+        except Exception:
+            pass
 
     def generate_analytics_report(self, metrics: dict, user_data: dict) -> str:
         """Generate comprehensive analytics report"""
@@ -345,11 +341,8 @@ class TTAAnalyticsDemo:
 
     async def run_demo(self):
         """Run the complete analytics demonstration"""
-        print("🚀 Starting TTA Analytics Demonstration")
-        print("=" * 50)
 
         # Get system metrics
-        print("📊 Fetching system metrics from Prometheus...")
         metrics = self.get_system_metrics()
 
         # Test user (from environment variables for security)
@@ -357,49 +350,32 @@ class TTAAnalyticsDemo:
         token = os.getenv("TEST_JWT_TOKEN")
 
         if not token:
-            print("⚠️  WARNING: TEST_JWT_TOKEN environment variable not set")
-            print("   Skipping user analytics data retrieval")
             token = None
 
         # Get user analytics
-        print("👤 Fetching user analytics data...")
         user_data = self.get_user_progress_data(user_id, token)
 
         # Create visualizations
-        print("📈 Creating system health visualization...")
         self.create_system_health_visualization(metrics)
 
-        print("📊 Creating user progress visualization...")
         self.create_user_progress_visualization(user_data)
 
         # Generate report
-        print("📋 Generating analytics report...")
         report = self.generate_analytics_report(metrics, user_data)
 
         # Save report
         with open("tta_analytics_report.md", "w") as f:
             f.write(report)
 
-        print("\n✅ Analytics demonstration complete!")
-        print("📁 Generated files:")
-        print("   - tta_system_health.png")
-        print("   - tta_user_progress.png")
-        print("   - tta_analytics_report.md")
-
         # Print summary
-        print("\n📊 Summary:")
         health_data = metrics.get("service_health", [])
         if health_data:
-            up_services = sum(
-                1 for m in health_data if float(m.get("value", [0, "0"])[1]) == 1
-            )
-            total_services = len(health_data)
-            print(f"   System Health: {up_services}/{total_services} services up")
+            sum(1 for m in health_data if float(m.get("value", [0, "0"])[1]) == 1)
+            len(health_data)
 
         progress_data = user_data.get("progress", {})
         if progress_data:
-            print(f"   User Sessions: {progress_data.get('total_sessions', 0)}")
-            print(f"   User Time: {progress_data.get('total_time_minutes', 0)} minutes")
+            pass
 
 
 if __name__ == "__main__":
@@ -409,7 +385,6 @@ if __name__ == "__main__":
         import pandas as pd
         import seaborn as sns
     except ImportError:
-        print("Installing required packages...")
         import subprocess
 
         subprocess.check_call(["pip", "install", "matplotlib", "pandas", "seaborn"])

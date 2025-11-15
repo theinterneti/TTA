@@ -49,9 +49,7 @@ class CapabilityMatchingConfig(BaseModel):
     score_threshold: float = Field(
         default=0.5, ge=0.0, le=1.0, description="Minimum match score threshold"
     )
-    prefer_exact_version: bool = Field(
-        default=True, description="Prefer exact version matches"
-    )
+    prefer_exact_version: bool = Field(default=True, description="Prefer exact version matches")
     include_deprecated: bool = Field(
         default=False, description="Include deprecated capabilities in search results"
     )
@@ -60,9 +58,7 @@ class CapabilityMatchingConfig(BaseModel):
 class AgentCapabilityConfig(BaseModel):
     """Configuration for agent capability advertisement."""
 
-    advertise: bool = Field(
-        default=True, description="Advertise capabilities for discovery"
-    )
+    advertise: bool = Field(default=True, description="Advertise capabilities for discovery")
     version: str = Field(default="1.0.0", description="Capability set version")
 
     @validator("version")
@@ -81,12 +77,8 @@ class AgentConfig(BaseModel):
     """Configuration for individual agent types."""
 
     enabled: bool = Field(default=True, description="Enable this agent type")
-    max_instances: int = Field(
-        default=1, ge=1, le=100, description="Maximum number of instances"
-    )
-    timeout: int = Field(
-        default=30, ge=1, le=300, description="Agent timeout in seconds"
-    )
+    max_instances: int = Field(default=1, ge=1, le=100, description="Maximum number of instances")
+    timeout: int = Field(default=30, ge=1, le=300, description="Agent timeout in seconds")
 
     # Auto-registration settings
     auto_register_enabled: bool = Field(
@@ -154,9 +146,7 @@ class AgentsConfig(BaseModel):
         if v is not None:
             ttl = values.get("heartbeat_ttl", 30.0)
             if v <= 0 or v >= ttl:
-                raise ValueError(
-                    "Heartbeat interval must be positive and less than heartbeat_ttl"
-                )
+                raise ValueError("Heartbeat interval must be positive and less than heartbeat_ttl")
         return v
 
     def get_effective_heartbeat_interval(self) -> float:
@@ -194,9 +184,7 @@ class AgentOrchestrationConfig(BaseModel):
     )
 
     # Agent configuration
-    agents: AgentsConfig = Field(
-        default_factory=AgentsConfig, description="Agent configuration"
-    )
+    agents: AgentsConfig = Field(default_factory=AgentsConfig, description="Agent configuration")
 
     # Other existing configurations (simplified for now)
     resources: dict[str, Any] = Field(
@@ -208,9 +196,7 @@ class AgentOrchestrationConfig(BaseModel):
     monitoring: dict[str, Any] = Field(
         default_factory=dict, description="Performance monitoring settings"
     )
-    diagnostics: dict[str, Any] = Field(
-        default_factory=dict, description="Diagnostics settings"
-    )
+    diagnostics: dict[str, Any] = Field(default_factory=dict, description="Diagnostics settings")
     realtime: dict[str, Any] = Field(
         default_factory=dict, description="Real-time interaction settings"
     )

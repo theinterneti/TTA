@@ -27,9 +27,7 @@ logger = logging.getLogger(__name__)
 class LMStudioModelInstance(BaseModelInstance):
     """LM Studio model instance implementation."""
 
-    def __init__(
-        self, model_id: str, provider: "LMStudioProvider", client: httpx.AsyncClient
-    ):
+    def __init__(self, model_id: str, provider: "LMStudioProvider", client: httpx.AsyncClient):
         super().__init__(model_id, provider)
         self._client = client
         self._status = ModelStatus.READY
@@ -53,9 +51,7 @@ class LMStudioModelInstance(BaseModelInstance):
                 payload["stop"] = request.stop_sequences
 
             # Make API request
-            response = await self._client.post(
-                "/v1/chat/completions", json=payload, timeout=60.0
-            )
+            response = await self._client.post("/v1/chat/completions", json=payload, timeout=60.0)
             response.raise_for_status()
 
             data = response.json()
@@ -92,9 +88,7 @@ class LMStudioModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
         """Generate text as a stream using LM Studio API."""
         try:
             # Prepare request payload

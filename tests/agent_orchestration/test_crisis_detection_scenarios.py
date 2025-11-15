@@ -200,13 +200,11 @@ class TestRealisticCrisisScenarios:
         false_positive_count = 0
         total_scenarios = len(challenging_non_crisis_scenarios)
 
-        for description, text in challenging_non_crisis_scenarios:
+        for _description, text in challenging_non_crisis_scenarios:
             result = self.validator.validate_text(text)
 
             if result.crisis_detected:
                 false_positive_count += 1
-                print(f"False positive for {description}: {text}")
-                print(f"  Detected types: {[ct.value for ct in result.crisis_types]}")
 
         # Allow some false positives for safety, but not too many
         false_positive_rate = false_positive_count / total_scenarios
@@ -261,10 +259,6 @@ class TestRealisticCrisisScenarios:
         # Assert minimum performance thresholds
         assert sensitivity >= 0.85, f"Sensitivity too low: {sensitivity:.2%}"
         assert specificity >= 0.85, f"Specificity too low: {specificity:.2%}"
-
-        print("Crisis Detection Performance:")
-        print(f"  Sensitivity: {sensitivity:.2%}")
-        print(f"  Specificity: {specificity:.2%}")
 
     def test_intervention_appropriateness(self):
         """Test that interventions are appropriate for crisis types."""

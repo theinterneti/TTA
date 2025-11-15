@@ -132,12 +132,9 @@ class TODOAuditor:
 
             return issues
 
-        except subprocess.CalledProcessError as e:
-            print(f"Error fetching GitHub issues: {e}")
-            print("Make sure gh CLI is installed and authenticated")
+        except subprocess.CalledProcessError:
             return []
-        except json.JSONDecodeError as e:
-            print(f"Error parsing GitHub issues: {e}")
+        except json.JSONDecodeError:
             return []
 
     def scan_code_todos(self) -> list[CodeTODO]:
@@ -155,7 +152,6 @@ class TODOAuditor:
             )
             files = result.stdout.strip().split("\n")
         except subprocess.CalledProcessError:
-            print("Error listing files, falling back to glob")
             files = [
                 str(p.relative_to(self.repo_root))
                 for p in self.repo_root.rglob("*")
@@ -205,8 +201,7 @@ class TODOAuditor:
                                 todos.append(todo)
                                 break  # Only match one pattern per line
 
-            except Exception as e:
-                print(f"Error scanning {file_path}: {e}")
+            except Exception:
                 continue
 
         return todos
@@ -228,13 +223,10 @@ class TODOAuditor:
 
     def generate_report(self) -> AuditReport:
         """Generate comprehensive audit report."""
-        print("🔍 Fetching GitHub issues...")
         github_issues = self.fetch_github_issues()
 
-        print("📝 Scanning codebase for TODOs...")
         code_todos = self.scan_code_todos()
 
-        print("🔗 Finding orphaned TODOs...")
         orphaned_todos = self.find_orphaned_todos(code_todos, github_issues)
 
         # Calculate statistics
@@ -248,15 +240,13 @@ class TODOAuditor:
             "issues_by_label": self._count_by_label(github_issues),
         }
 
-        report = AuditReport(
+        return AuditReport(
             timestamp=datetime.now(),
             github_issues=github_issues,
             code_todos=code_todos,
             orphaned_todos=orphaned_todos,
             stats=stats,
         )
-
-        return report
 
     def export_to_logseq(self, report: AuditReport):
         """Export audit report to Logseq format."""
@@ -273,8 +263,6 @@ class TODOAuditor:
 
         # Generate TODO summary page
         self._create_todo_summary_page(pages_dir, report)
-
-        print(f"✅ Exported to Logseq: {self.logseq_dir}")
 
     def _create_issue_page(
         self, pages_dir: Path, issue: GitHubIssue, todos: list[CodeTODO]
@@ -460,63 +448,34 @@ def main():
     auditor = TODOAuditor(PROJECT_ROOT)
 
     if args.command == "sync":
-        print("🔄 Syncing GitHub issues...")
         issues = auditor.fetch_github_issues()
-        print(f"✅ Fetched {len(issues)} issues")
 
     elif args.command == "scan":
-        print("📝 Scanning codebase for TODOs...")
         todos = auditor.scan_code_todos()
-        print(f"✅ Found {len(todos)} TODOs")
 
         if args.format == "text":
-            for todo in todos[:10]:  # Show first 10
-                print(
-                    f"  {todo.file_path}:{todo.line_number} [{todo.priority}] {todo.content[:60]}..."
-                )
+            for _todo in todos[:10]:  # Show first 10
+                pass
 
     elif args.command == "orphans":
-        print("🔗 Finding orphaned TODOs...")
         issues = auditor.fetch_github_issues()
         todos = auditor.scan_code_todos()
         orphaned = auditor.find_orphaned_todos(todos, issues)
 
-        print(f"⚠️  Found {len(orphaned)} orphaned TODOs")
-        for todo in orphaned:
-            print(f"  {todo.file_path}:{todo.line_number} (refs #{todo.github_issue})")
+        for _todo in orphaned:
+            pass
 
     elif args.command == "report":
-        print("📊 Generating audit report...")
         report = auditor.generate_report()
 
-        print("\n" + "=" * 60)
-        print("TTA TODO & ISSUE AUDIT REPORT")
-        print("=" * 60)
-        print(f"\nGenerated: {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}\n")
-
-        print("GitHub Issues:")
-        print(f"  Total: {report.stats['total_github_issues']}")
-        print(f"  Open: {report.stats['open_github_issues']}")
-
-        print("\nCode TODOs:")
-        print(f"  Total: {report.stats['total_code_todos']}")
-        print(f"  High Priority: {report.stats['todos_by_priority']['high']}")
-        print(f"  Medium Priority: {report.stats['todos_by_priority']['medium']}")
-        print(f"  Low Priority: {report.stats['todos_by_priority']['low']}")
-
-        print(f"\n⚠️  Orphaned TODOs: {report.stats['orphaned_todos']}")
-
-        print("\nTop Issue Labels:")
-        for label, count in sorted(
+        for _label, _count in sorted(
             report.stats["issues_by_label"].items(), key=lambda x: x[1], reverse=True
         )[:5]:
-            print(f"  {label}: {count}")
+            pass
 
     elif args.command == "export":
-        print("📤 Exporting to Logseq...")
         report = auditor.generate_report()
         auditor.export_to_logseq(report)
-        print("✅ Export complete!")
 
 
 if __name__ == "__main__":

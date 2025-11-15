@@ -71,9 +71,6 @@ async def fallback_handler(data: dict) -> dict:
 
 async def test_scenario_1_simple_query():
     """Test 1: Simple query (routes to local, should cache)."""
-    print("\n" + "=" * 80)
-    print("TEST 1: Simple Query (Should route to local LLM)")
-    print("=" * 80)
 
     workflow = create_enhanced_narrative_workflow(
         openai_handler=openai_narrative_handler,
@@ -86,41 +83,20 @@ async def test_scenario_1_simple_query():
     )
 
     # First call
-    print("\n📤 Request 1: First call (cache miss)")
-    result1 = await workflow.execute(
-        {"prompt": "Tell me a quick story about dragons"}, context
-    )
-    print(f"✓ Provider: {result1['provider']}")
-    print(f"✓ Cost: ${result1['cost']:.3f}")
-    print(f"✓ Quality: {result1['quality_score']}")
+    await workflow.execute({"prompt": "Tell me a quick story about dragons"}, context)
 
     # Second call (should hit cache)
-    print("\n📤 Request 2: Same prompt (cache hit expected)")
     context2 = WorkflowContext(
         session_id="test-session-1", player_id="player-123", metadata={"tier": "free"}
     )
-    result2 = await workflow.execute(
-        {"prompt": "Tell me a quick story about dragons"}, context2
-    )
-    print(f"✓ Provider: {result2['provider']}")
-    print(f"✓ Cost: ${result2['cost']:.3f}")
-    print(f"✓ Cache hit: {context2.state.get('cache_hits', 0) > 0}")
+    await workflow.execute({"prompt": "Tell me a quick story about dragons"}, context2)
 
     # Show stats
-    stats = workflow.get_stats()
-    print("\n📊 Cache Stats:")
-    print(
-        f"  Hits: {stats['hits']}, Misses: {stats['misses']}, Hit Rate: {stats['hit_rate']}%"
-    )
-
-    return stats
+    return workflow.get_stats()
 
 
 async def test_scenario_2_complex_query():
     """Test 2: Complex query (routes to OpenAI)."""
-    print("\n" + "=" * 80)
-    print("TEST 2: Complex Query (Should route to OpenAI)")
-    print("=" * 80)
 
     workflow = create_enhanced_narrative_workflow(
         openai_handler=openai_narrative_handler,
@@ -139,20 +115,11 @@ async def test_scenario_2_complex_query():
     political intrigue, moral dilemmas, and character development.
     """
 
-    print(f"\n📤 Request: Complex prompt ({len(complex_prompt)} characters)")
-    result = await workflow.execute({"prompt": complex_prompt}, context)
-
-    print(f"✓ Provider: {result['provider']} (routed based on complexity)")
-    print(f"✓ Cost: ${result['cost']:.3f}")
-    print(f"✓ Quality: {result['quality_score']}")
-    print(f"✓ Routing history: {context.state.get('routing_history', [])}")
+    await workflow.execute({"prompt": complex_prompt}, context)
 
 
 async def test_scenario_3_premium_user():
     """Test 3: Premium user (always routes to OpenAI)."""
-    print("\n" + "=" * 80)
-    print("TEST 3: Premium User (Should always use OpenAI)")
-    print("=" * 80)
 
     workflow = create_enhanced_narrative_workflow(
         openai_handler=openai_narrative_handler,
@@ -166,19 +133,11 @@ async def test_scenario_3_premium_user():
         metadata={"tier": "premium"},
     )
 
-    print("\n📤 Request: Simple prompt but premium tier")
-    result = await workflow.execute({"prompt": "Short story about a cat"}, context)
-
-    print(f"✓ Provider: {result['provider']} (premium tier → OpenAI)")
-    print(f"✓ Cost: ${result['cost']:.3f}")
-    print(f"✓ Quality: {result['quality_score']}")
+    await workflow.execute({"prompt": "Short story about a cat"}, context)
 
 
 async def test_scenario_4_cost_comparison():
     """Test 4: Show cost savings over multiple requests."""
-    print("\n" + "=" * 80)
-    print("TEST 4: Cost Comparison (Cache Hit Impact)")
-    print("=" * 80)
 
     workflow = create_enhanced_narrative_workflow(
         openai_handler=openai_narrative_handler,
@@ -202,8 +161,6 @@ async def test_scenario_4_cost_comparison():
 
     total_cost = 0.0
 
-    print(f"\n📤 Simulating {len(prompts)} requests...")
-
     for i, prompt in enumerate(prompts, 1):
         context = WorkflowContext(
             session_id=f"test-session-{i}",
@@ -214,30 +171,15 @@ async def test_scenario_4_cost_comparison():
         result = await workflow.execute({"prompt": prompt}, context)
         total_cost += result["cost"]
 
-        is_hit = context.state.get("cache_hits", 0) > 0
-        print(
-            f"  Request {i}: {prompt[:20]:25} | ${result['cost']:.3f} | {'💰 CACHED' if is_hit else '💸 MISS'}"
-        )
+        context.state.get("cache_hits", 0) > 0
 
     # Calculate savings
-    stats = workflow.get_stats()
-    unoptimized_cost = len(prompts) * 0.01  # All local
-
-    print("\n📊 Results:")
-    print(f"  Total requests: {len(prompts)}")
-    print(f"  Cache hits: {stats['hits']} ({stats['hit_rate']}%)")
-    print(f"  Actual cost: ${total_cost:.3f}")
-    print(f"  Unoptimized cost: ${unoptimized_cost:.3f} (no caching)")
-    print(
-        f"  Savings: ${unoptimized_cost - total_cost:.3f} ({((unoptimized_cost - total_cost) / unoptimized_cost * 100):.1f}%)"
-    )
+    workflow.get_stats()
+    len(prompts) * 0.01  # All local
 
 
 async def main():
     """Run all test scenarios."""
-    print("\n" + "╔" + "═" * 78 + "╗")
-    print("║" + " " * 20 + "MVP OPTION 1: COMPLETE WORKFLOW DEMO" + " " * 22 + "║")
-    print("╚" + "═" * 78 + "╝")
 
     # Run all tests
     await test_scenario_1_simple_query()
@@ -246,26 +188,6 @@ async def main():
     await test_scenario_4_cost_comparison()
 
     # Final summary
-    print("\n" + "=" * 80)
-    print("🎉 MVP COMPLETE - All Scenarios Passed!")
-    print("=" * 80)
-    print("\n✅ What was demonstrated:")
-    print("  • Smart routing (simple → local, complex → OpenAI)")
-    print("  • Caching working (60% hit rate in test)")
-    print("  • Timeout protection (with fallback)")
-    print("  • Cost optimization (40%+ savings)")
-    print("  • Tier-based routing (premium → always OpenAI)")
-    print("\n📈 Expected Production Benefits:")
-    print("  • 40% cost reduction")
-    print("  • 10x faster cached responses")
-    print("  • 98% reliability (timeout + fallback)")
-    print("  • Full observability (logs + metrics)")
-    print("\n📚 Next Steps:")
-    print("  1. Replace mock handlers with real LLM API calls")
-    print("  2. Integrate with existing API routes")
-    print("  3. Deploy to staging and monitor")
-    print("  4. Gradually roll out to production")
-    print()
 
 
 if __name__ == "__main__":

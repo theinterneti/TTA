@@ -50,9 +50,7 @@ class TherapeuticStoryteller:
         self.config = config or {}
 
         # Therapeutic integration mappings
-        self.approach_techniques: dict[
-            TherapeuticApproach, list[StorytellingTechnique]
-        ] = {}
+        self.approach_techniques: dict[TherapeuticApproach, list[StorytellingTechnique]] = {}
         self.metaphor_library: dict[str, dict[str, Any]] = {}
         self.character_archetypes: dict[str, dict[str, Any]] = {}
         self.therapeutic_narratives: dict[str, dict[str, Any]] = {}
@@ -91,9 +89,7 @@ class TherapeuticStoryteller:
             logger.info(f"Enhancing scene {scene.scene_id} with therapeutic elements")
 
             # Determine primary therapeutic approach
-            primary_approach = await self._determine_therapeutic_approach(
-                therapeutic_context
-            )
+            primary_approach = await self._determine_therapeutic_approach(therapeutic_context)
 
             # Select appropriate storytelling techniques
             techniques = await self._select_storytelling_techniques(
@@ -109,13 +105,9 @@ class TherapeuticStoryteller:
                 )
 
             # Add therapeutic depth without being clinical
-            enhanced_scene = await self._add_therapeutic_depth(
-                enhanced_scene, therapeutic_context
-            )
+            enhanced_scene = await self._add_therapeutic_depth(enhanced_scene, therapeutic_context)
 
-            logger.info(
-                f"Enhanced scene with therapeutic elements using {primary_approach}"
-            )
+            logger.info(f"Enhanced scene with therapeutic elements using {primary_approach}")
             return enhanced_scene
 
         except Exception as e:
@@ -160,9 +152,7 @@ class TherapeuticStoryteller:
                 enhanced_scene.narrative_content += f"\n\n{metaphors}"
 
             # Enhance with character guidance if appropriate
-            if intervention_type not in [
-                "crisis_support"
-            ]:  # Crisis support should be direct
+            if intervention_type not in ["crisis_support"]:  # Crisis support should be direct
                 guidance = await self._add_therapeutic_guidance(intervention_type)
                 if guidance:
                     enhanced_scene.narrative_content += f"\n\n{guidance}"
@@ -198,9 +188,7 @@ class TherapeuticStoryteller:
                 return None
 
             # Adapt metaphor for emotional state and difficulty
-            return await self._adapt_metaphor(
-                base_metaphor, emotional_state, difficulty_level
-            )
+            return await self._adapt_metaphor(base_metaphor, emotional_state, difficulty_level)
 
         except Exception as e:
             logger.error(f"Failed to create therapeutic metaphor: {e}")
@@ -323,20 +311,11 @@ class TherapeuticStoryteller:
         primary_goals = therapeutic_context.primary_goals
 
         # Map goals to approaches
-        if (
-            "mindfulness" in primary_goals
-            or "present_moment_awareness" in primary_goals
-        ):
+        if "mindfulness" in primary_goals or "present_moment_awareness" in primary_goals:
             return TherapeuticApproach.MINDFULNESS
-        if (
-            "cognitive_reframing" in primary_goals
-            or "thought_patterns" in primary_goals
-        ):
+        if "cognitive_reframing" in primary_goals or "thought_patterns" in primary_goals:
             return TherapeuticApproach.CBT
-        if (
-            "emotional_regulation" in primary_goals
-            or "distress_tolerance" in primary_goals
-        ):
+        if "emotional_regulation" in primary_goals or "distress_tolerance" in primary_goals:
             return TherapeuticApproach.DBT
         if "values" in primary_goals or "acceptance" in primary_goals:
             return TherapeuticApproach.ACT
@@ -356,18 +335,14 @@ class TherapeuticStoryteller:
         if scene_type == "introduction":
             selected.append(StorytellingTechnique.CHARACTER_MODELING)
         elif scene_type == "therapeutic":
-            selected.extend(
-                [StorytellingTechnique.METAPHOR, StorytellingTechnique.GUIDED_IMAGERY]
-            )
+            selected.extend([StorytellingTechnique.METAPHOR, StorytellingTechnique.GUIDED_IMAGERY])
         elif scene_type == "challenge":
             selected.append(StorytellingTechnique.EXPERIENTIAL_LEARNING)
         else:
             selected.append(StorytellingTechnique.REFLECTIVE_DIALOGUE)
 
         # Ensure selected techniques are available for the approach
-        return [tech for tech in selected if tech in available_techniques][
-            :2
-        ]  # Limit to 2
+        return [tech for tech in selected if tech in available_techniques][:2]  # Limit to 2
 
     async def _apply_storytelling_technique(
         self,
@@ -471,9 +446,13 @@ class TherapeuticStoryteller:
         elif "depression" in therapeutic_context.primary_goals:
             depth_content = "A gentle warmth fills this space, reminding you of your inherent worth and potential."
         elif "trauma" in therapeutic_context.primary_goals:
-            depth_content = "This space holds you with complete safety, honoring your strength and resilience."
+            depth_content = (
+                "This space holds you with complete safety, honoring your strength and resilience."
+            )
         else:
-            depth_content = "This environment supports your natural capacity for growth and healing."
+            depth_content = (
+                "This environment supports your natural capacity for growth and healing."
+            )
 
         scene.narrative_content += f"\n\n{depth_content}"
         return scene
@@ -546,15 +525,17 @@ class TherapeuticStoryteller:
         elif guidance_style == "structured_practice":
             addition = f"Here, you can practice {elements[0]} through {elements[1]} in a structured, supportive way."
         elif guidance_style == "direct_support":
-            addition = f"You are surrounded by {', '.join(elements)} in this completely safe environment."
+            addition = (
+                f"You are surrounded by {', '.join(elements)} in this completely safe environment."
+            )
         else:
-            addition = f"This experience offers you {', '.join(elements[:2])} through gentle practice."
+            addition = (
+                f"This experience offers you {', '.join(elements[:2])} through gentle practice."
+            )
 
         return f"{base_content}\n\n{addition}"
 
-    async def _select_intervention_metaphors(
-        self, intervention_type: str
-    ) -> str | None:
+    async def _select_intervention_metaphors(self, intervention_type: str) -> str | None:
         """Select appropriate metaphors for intervention types."""
         metaphors = {
             "mindfulness": "Like a gentle observer watching clouds pass through the sky, you can observe your thoughts and feelings with peaceful awareness.",

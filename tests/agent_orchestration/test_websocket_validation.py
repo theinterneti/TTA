@@ -71,11 +71,7 @@ class TestWebSocketValidation:
             "agent_orchestration.realtime.events.redis_channel_prefix": "test:events",
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     @pytest_asyncio.fixture
     async def mock_websocket(self):

@@ -10,7 +10,6 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from pydantic import SecretStr
 
 from src.agent_orchestration.openhands_integration.config import (
     OpenHandsIntegrationConfig,
@@ -42,9 +41,7 @@ class TestProxyInitialization:
         # Verify registration was attempted
         mock_agent_registry.register.assert_called_once_with(proxy)
 
-    def test_proxy_initialization_without_config(
-        self, monkeypatch: pytest.MonkeyPatch
-    ):
+    def test_proxy_initialization_without_config(self, monkeypatch: pytest.MonkeyPatch):
         """Test proxy initialization without config (loads from env)."""
         # Set a test API key in the environment
         monkeypatch.setenv("OPENROUTER_API_KEY", "test-api-key-12345")
@@ -155,29 +152,31 @@ class TestTaskExecution:
         """Test task execution with circuit breaker."""
         integration_config.enable_real_agent = True
 
-        with patch(
-            "src.agent_orchestration.openhands_integration.proxy.OpenHandsClient"
-        ):
-            with patch(
+        with (
+            patch(
+                "src.agent_orchestration.openhands_integration.proxy.OpenHandsClient"
+            ),
+            patch(
                 "src.agent_orchestration.openhands_integration.proxy.OpenHandsAdapter"
-            ) as mock_adapter_class:
-                mock_adapter = AsyncMock()
-                mock_adapter.execute_development_task = AsyncMock(
-                    return_value={"success": True, "output": "result"}
-                )
-                mock_adapter_class.return_value = mock_adapter
+            ) as mock_adapter_class,
+        ):
+            mock_adapter = AsyncMock()
+            mock_adapter.execute_development_task = AsyncMock(
+                return_value={"success": True, "output": "result"}
+            )
+            mock_adapter_class.return_value = mock_adapter
 
-                proxy = OpenHandsAgentProxy(
-                    instance="test-7",
-                    openhands_config=integration_config,
-                    enable_real_agent=True,
-                    circuit_breaker=mock_circuit_breaker,
-                )
+            proxy = OpenHandsAgentProxy(
+                instance="test-7",
+                openhands_config=integration_config,
+                enable_real_agent=True,
+                circuit_breaker=mock_circuit_breaker,
+            )
 
-                await proxy.execute_development_task("Write a Python function")
+            await proxy.execute_development_task("Write a Python function")
 
-                # Verify circuit breaker was used
-                mock_circuit_breaker.execute.assert_called_once()
+            # Verify circuit breaker was used
+            mock_circuit_breaker.execute.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_execute_development_task_with_events(
@@ -188,29 +187,31 @@ class TestTaskExecution:
 
         mock_event_integrator = AsyncMock()
 
-        with patch(
-            "src.agent_orchestration.openhands_integration.proxy.OpenHandsClient"
-        ):
-            with patch(
+        with (
+            patch(
+                "src.agent_orchestration.openhands_integration.proxy.OpenHandsClient"
+            ),
+            patch(
                 "src.agent_orchestration.openhands_integration.proxy.OpenHandsAdapter"
-            ) as mock_adapter_class:
-                mock_adapter = AsyncMock()
-                mock_adapter.execute_development_task = AsyncMock(
-                    return_value={"success": True, "output": "result"}
-                )
-                mock_adapter_class.return_value = mock_adapter
+            ) as mock_adapter_class,
+        ):
+            mock_adapter = AsyncMock()
+            mock_adapter.execute_development_task = AsyncMock(
+                return_value={"success": True, "output": "result"}
+            )
+            mock_adapter_class.return_value = mock_adapter
 
-                proxy = OpenHandsAgentProxy(
-                    instance="test-8",
-                    openhands_config=integration_config,
-                    enable_real_agent=True,
-                    event_publisher=mock_event_integrator,
-                )
+            proxy = OpenHandsAgentProxy(
+                instance="test-8",
+                openhands_config=integration_config,
+                enable_real_agent=True,
+                event_publisher=mock_event_integrator,
+            )
 
-                await proxy.execute_development_task("Write a Python function")
+            await proxy.execute_development_task("Write a Python function")
 
-                # Verify adapter was called
-                assert mock_adapter.execute_development_task.called
+            # Verify adapter was called
+            assert mock_adapter.execute_development_task.called
 
 
 class TestCapabilities:
@@ -236,4 +237,3 @@ class TestCapabilities:
         assert "python" in capabilities["supported_languages"]
         assert "javascript" in capabilities["supported_languages"]
         assert capabilities["timeout_seconds"] == proxy._default_timeout_s
-

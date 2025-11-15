@@ -98,8 +98,6 @@ async def generate_tests_for_module(
 ) -> dict:
     """Generate tests for a single module."""
 
-    print(f"\n[{batch_name} {index}/{total}] Generating tests for: {module_path}")
-
     task = f"""
     Generate comprehensive unit tests for the Python module at:
     {module_path}
@@ -127,7 +125,6 @@ async def generate_tests_for_module(
             timeout=1800.0,  # 30 minutes per module
         )
     except Exception as e:
-        print(f"    Exception: {str(e)[:100]}")
         return {
             "module": module_path,
             "success": False,
@@ -150,16 +147,9 @@ async def execute_batch(batch_name: str):
     """Execute test generation for a batch."""
 
     if batch_name not in BATCHES:
-        print(f"Unknown batch: {batch_name}")
-        print(f"Available batches: {', '.join(BATCHES.keys())}")
         return
 
     modules = BATCHES[batch_name]
-    print(f"\n{'=' * 80}")
-    print(f"BATCH TEST GENERATION: {batch_name.upper()}")
-    print(f"{'=' * 80}")
-    print(f"Total modules: {len(modules)}")
-    print()
 
     # Load configuration
     config = OpenHandsIntegrationConfig.from_env()
@@ -173,34 +163,23 @@ async def execute_batch(batch_name: str):
         results.append(result)
 
         # Print status
-        status = "✅ SUCCESS" if result["success"] else "❌ FAILED"
-        print(f"  {status} ({result['elapsed_seconds']:.1f}s)")
+        "✅ SUCCESS" if result["success"] else "❌ FAILED"
         if result["error"]:
-            print(f"    Error: {result['error'][:100]}")
+            pass
 
     # Summary
-    print(f"\n{'=' * 80}")
-    print(f"BATCH SUMMARY: {batch_name.upper()}")
-    print(f"{'=' * 80}")
-    successful = sum(1 for r in results if r["success"])
-    total_time = sum(r["elapsed_seconds"] for r in results)
-    print(f"Successful: {successful}/{len(modules)}")
-    print(f"Total time: {total_time:.1f} seconds ({total_time / 60:.1f} minutes)")
-    print(f"Average time per module: {total_time / len(modules):.1f} seconds")
-    print()
+    sum(1 for r in results if r["success"])
+    sum(r["elapsed_seconds"] for r in results)
 
     # Failed modules
     failed = [r for r in results if not r["success"]]
     if failed:
-        print("Failed modules:")
-        for r in failed:
-            print(f"  - {r['module']}: {r['error'][:80]}")
+        for _r in failed:
+            pass
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python scripts/execute_batch_test_generation.py <batch_name>")
-        print(f"Available batches: {', '.join(BATCHES.keys())}")
         sys.exit(1)
 
     batch_name = sys.argv[1]

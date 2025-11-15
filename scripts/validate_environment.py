@@ -17,7 +17,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 try:
     from dotenv import load_dotenv
 except ImportError:
-    print("❌ python-dotenv not installed. Install with: pip install python-dotenv")
     sys.exit(1)
 
 
@@ -31,7 +30,6 @@ class EnvironmentValidator:
 
     def validate_file_structure(self) -> bool:
         """Validate environment file structure."""
-        print("🔍 Validating environment file structure...")
 
         required_files = [".env.example"]
         recommended_files = [".env", ".env.local.example"]
@@ -55,7 +53,6 @@ class EnvironmentValidator:
 
     def validate_required_variables(self, env_vars: dict[str, str]) -> bool:
         """Validate required environment variables."""
-        print("🔍 Validating required environment variables...")
 
         required_vars = [
             "ENVIRONMENT",
@@ -85,7 +82,6 @@ class EnvironmentValidator:
 
     def validate_api_keys(self, env_vars: dict[str, str]) -> bool:
         """Validate API key configuration."""
-        print("🔍 Validating API key configuration...")
 
         api_keys = {
             "OPENROUTER_API_KEY": {
@@ -128,7 +124,6 @@ class EnvironmentValidator:
 
     def validate_security_config(self, env_vars: dict[str, str]) -> bool:
         """Validate security configuration."""
-        print("🔍 Validating security configuration...")
 
         security_vars = {
             "JWT_SECRET_KEY": {"min_length": 32, "required": True},
@@ -167,7 +162,6 @@ class EnvironmentValidator:
 
     def validate_feature_flags(self, env_vars: dict[str, str]) -> bool:
         """Validate feature flag configuration."""
-        print("🔍 Validating feature flags...")
 
         model_management_enabled = (
             env_vars.get("FEATURE_MODEL_MANAGEMENT", "").lower() == "true"
@@ -195,7 +189,6 @@ class EnvironmentValidator:
 
     def validate_database_urls(self, env_vars: dict[str, str]) -> bool:
         """Validate database URL formats."""
-        print("🔍 Validating database URL formats...")
 
         url_patterns = {
             "REDIS_URL": r"^redis://.*:\d+$",
@@ -215,7 +208,6 @@ class EnvironmentValidator:
 
     def validate_environment(self) -> bool:
         """Run all validation checks."""
-        print("🚀 Starting TTA environment validation...\n")
 
         # Load environment variables
         load_dotenv()
@@ -234,65 +226,31 @@ class EnvironmentValidator:
         all_passed = all(checks)
 
         # Print results
-        print("\n" + "=" * 60)
-        print("📊 VALIDATION RESULTS")
-        print("=" * 60)
 
         if self.info:
-            print("\n✅ SUCCESS:")
-            for msg in self.info:
-                print(f"  {msg}")
+            for _msg in self.info:
+                pass
 
         if self.warnings:
-            print("\n⚠️  WARNINGS:")
-            for msg in self.warnings:
-                print(f"  {msg}")
+            for _msg in self.warnings:
+                pass
 
         if self.errors:
-            print("\n❌ ERRORS:")
-            for msg in self.errors:
-                print(f"  {msg}")
-
-        print("\n" + "=" * 60)
+            for _msg in self.errors:
+                pass
 
         if all_passed and not self.errors:
-            print("🎉 Environment validation PASSED!")
-            print("Your TTA environment is properly configured.")
+            pass
         else:
-            print("❌ Environment validation FAILED!")
-            print("Please fix the errors above before running TTA.")
+            pass
 
         if self.warnings:
-            print(
-                f"\n💡 You have {len(self.warnings)} warnings that should be addressed."
-            )
+            pass
 
         return all_passed and not self.errors
 
     def print_setup_help(self):
         """Print setup help information."""
-        print("\n" + "=" * 60)
-        print("🆘 SETUP HELP")
-        print("=" * 60)
-        print("""
-To set up your environment:
-
-1. Copy the template:
-   cp .env.example .env
-
-2. Edit .env and set your values:
-   - Get OpenRouter API key: https://openrouter.ai
-   - Set secure passwords for databases
-   - Generate JWT secret: openssl rand -base64 64
-
-3. For personal overrides:
-   cp .env.local.example .env.local
-
-4. Run validation again:
-   python scripts/validate_environment.py
-
-For detailed setup instructions, see: ENVIRONMENT_SETUP.md
-        """)
 
 
 def main():
@@ -306,10 +264,7 @@ def main():
             validator.print_setup_help()
             sys.exit(1)
 
-        print("\n🚀 Ready to run TTA!")
-
-    except Exception as e:
-        print(f"❌ Validation failed with error: {e}")
+    except Exception:
         sys.exit(1)
 
 

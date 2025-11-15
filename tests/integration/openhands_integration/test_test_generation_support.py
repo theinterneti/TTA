@@ -7,9 +7,6 @@ Tests task builder, file extractor, result validator, and error handler.
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
-
-import pytest
 
 from src.agent_orchestration.openhands_integration.models import OpenHandsTaskResult
 from src.agent_orchestration.openhands_integration.test_error_handler import (
@@ -257,4 +254,3 @@ class TestErrorHandler:
         assert isinstance(feedback, str)
         assert len(feedback) > 0
         # Feedback should provide guidance for retry
-

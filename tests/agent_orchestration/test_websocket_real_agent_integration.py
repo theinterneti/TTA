@@ -82,7 +82,7 @@ class TestWebSocketRealAgentIntegration:
     @pytest_asyncio.fixture
     async def event_publisher(self, redis_client, realtime_config):
         """Create event publisher for testing."""
-        publisher = EventPublisher(
+        return EventPublisher(
             redis_client=redis_client,
             channel_prefix="test:events",
             enabled=True,
@@ -91,7 +91,6 @@ class TestWebSocketRealAgentIntegration:
             broadcast_workflow_progress=True,
             broadcast_system_metrics=True,
         )
-        return publisher
 
     @pytest_asyncio.fixture
     async def websocket_manager(self, realtime_config, redis_client):
@@ -107,11 +106,7 @@ class TestWebSocketRealAgentIntegration:
             "agent_orchestration.realtime.events.redis_channel_prefix": "test:events",
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     @pytest_asyncio.fixture
     async def enhanced_agent_proxies(self, redis_coordinator, event_publisher):
@@ -147,14 +142,12 @@ class TestWebSocketRealAgentIntegration:
         """Create workflow coordinator for testing."""
         ipa_proxy, wba_proxy, nga_proxy = enhanced_agent_proxies
 
-        coordinator = AgentWorkflowCoordinator(
+        return AgentWorkflowCoordinator(
             ipa_proxy=ipa_proxy,
             wba_proxy=wba_proxy,
             nga_proxy=nga_proxy,
             event_publisher=event_publisher,
         )
-
-        return coordinator
 
     @pytest_asyncio.fixture
     async def mock_websocket(self):

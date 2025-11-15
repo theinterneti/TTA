@@ -176,9 +176,8 @@ def assess_quality(content: str, task_key: str) -> int:
         score += 1
 
     # Check for tests (if test task)
-    if task_key == "complex":
-        if "@pytest" in content or "def test_" in content:
-            score += 1
+    if task_key == "complex" and ("@pytest" in content or "def test_" in content):
+        score += 1
 
     return min(5, score)
 

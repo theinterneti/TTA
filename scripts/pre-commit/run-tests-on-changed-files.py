@@ -42,7 +42,7 @@ def map_source_to_test_files(source_file: Path) -> list[Path]:
     test_files = []
 
     # Only process Python files in src/
-    if not source_file.suffix == ".py":
+    if source_file.suffix != ".py":
         return test_files
     if not source_file.parts or "src" not in source_file.parts:
         return test_files
@@ -120,16 +120,13 @@ def run_tests(test_files: set[Path], timeout: int = 60) -> int:
         Exit code from pytest (0 = success, non-zero = failure)
     """
     if not test_files:
-        print("✅ No tests found for changed files (skipping)")
         return 0
 
     # Convert to sorted list for consistent output
     test_file_list = sorted(str(f) for f in test_files)
 
-    print(f"\n🧪 Running tests for {len(test_file_list)} test file(s):")
-    for test_file in test_file_list:
-        print(f"  - {test_file}")
-    print()
+    for _test_file in test_file_list:
+        pass
 
     # Build pytest command
     cmd = ["uv", "run", "pytest"] + test_file_list + ["-v", "--tb=short"]
@@ -146,18 +143,12 @@ def run_tests(test_files: set[Path], timeout: int = 60) -> int:
         return result.returncode
 
     except subprocess.TimeoutExpired:
-        print(f"\n❌ Tests timed out after {timeout} seconds")
-        print("   Consider running tests manually or skipping this hook:")
-        print("   SKIP=run-tests-on-changed-files git commit -m 'message'")
         return 1
 
     except FileNotFoundError:
-        print("\n❌ Error: 'uv' command not found")
-        print("   Make sure uv is installed and in your PATH")
         return 1
 
-    except Exception as e:
-        print(f"\n❌ Error running tests: {e}")
+    except Exception:
         return 1
 
 
@@ -172,7 +163,6 @@ def main(filenames: list[str]) -> int:
         Exit code (0 for success, non-zero for failure)
     """
     if not filenames:
-        print("✅ No files to check")
         return 0
 
     # Collect test files for changed source files
@@ -182,11 +172,9 @@ def main(filenames: list[str]) -> int:
     exit_code = run_tests(test_files)
 
     if exit_code == 0:
-        print("\n✅ All tests passed!")
+        pass
     else:
-        print("\n❌ Tests failed")
-        print("   Fix the failing tests or skip this hook:")
-        print("   SKIP=run-tests-on-changed-files git commit -m 'message'")
+        pass
 
     return exit_code
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import time
 from enum import Enum
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -113,14 +113,14 @@ class PaginationMetadata(BaseModel):
         return v
 
 
-class PaginatedData(BaseModel, Generic[T]):
+class PaginatedData[T](BaseModel):
     """Generic paginated data container."""
 
     items: list[T] = Field(..., description="Items in this page")
     pagination: PaginationMetadata = Field(..., description="Pagination metadata")
 
 
-class ToolResponse(BaseModel, Generic[T]):
+class ToolResponse[T](BaseModel):
     """
     Generic standardized response wrapper for all MCP tools.
 

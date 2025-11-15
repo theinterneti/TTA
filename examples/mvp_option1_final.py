@@ -107,7 +107,7 @@ def create_workflow():
         router, timeout_seconds=30.0, fallback=fallback_prim, track_timeouts=True
     )
 
-    cache = CachePrimitive(
+    return CachePrimitive(
         timeout,
         cache_key_fn=lambda d, c: (
             f"{hashlib.md5(d.get('prompt', '').encode()).hexdigest()[:12]}:"
@@ -116,79 +116,40 @@ def create_workflow():
         ttl_seconds=3600.0,
     )
 
-    return cache
-
 
 # ==================== TESTS ====================
 
 
 async def test1_simple_with_cache():
-    print("\n" + "=" * 90)
-    print("TEST 1: Simple Query with Caching")
-    print("=" * 90)
-
     workflow = create_workflow()
 
-    print("\n📤 Request 1: First call (cache miss expected)")
     ctx1 = WorkflowContext(session_id="s1", player_id="p1", metadata={"tier": "free"})
-    r1 = await workflow.execute({"prompt": "Tell me a story about dragons"}, ctx1)
-    print(f"   ✓ Provider: {r1['provider']}")
-    print(f"   ✓ Cost: ${r1['cost']:.3f}")
-    print(f"   ✓ Quality: {r1['quality']}")
+    await workflow.execute({"prompt": "Tell me a story about dragons"}, ctx1)
 
-    print("\n📤 Request 2: Same prompt (cache hit expected)")
     ctx2 = WorkflowContext(session_id="s2", player_id="p1", metadata={"tier": "free"})
-    r2 = await workflow.execute({"prompt": "Tell me a story about dragons"}, ctx2)
-    print(f"   ✓ Provider: {r2['provider']}")
-    print(f"   ✓ Cost: ${r2['cost']:.3f}")
-    print(
-        f"   ✓ Cache Hit: {'YES! 💰' if ctx2.state.get('cache_hits', 0) > 0 else 'NO'}"
-    )
+    await workflow.execute({"prompt": "Tell me a story about dragons"}, ctx2)
 
-    stats = workflow.get_stats()
-    print(
-        f"\n   📊 Cache Stats: {stats['hits']} hits | {stats['misses']} misses | {stats['hit_rate']}% hit rate"
-    )
+    workflow.get_stats()
 
 
 async def test2_complex_routing():
-    print("\n" + "=" * 90)
-    print("TEST 2: Complex Query (Should Route to OpenAI)")
-    print("=" * 90)
-
     workflow = create_workflow()
 
     complex = "Create a detailed epic fantasy narrative " + "x" * 200
-    print(f"\n📤 Complex prompt ({len(complex)} characters):")
     ctx = WorkflowContext(session_id="s3", metadata={"tier": "free"})
-    r = await workflow.execute({"prompt": complex}, ctx)
-    print(f"   ✓ Provider: {r['provider']} (routed based on complexity)")
-    print(f"   ✓ Cost: ${r['cost']:.3f}")
-    print(f"   ✓ Quality: {r['quality']}")
+    await workflow.execute({"prompt": complex}, ctx)
 
 
 async def test3_premium_tier():
-    print("\n" + "=" * 90)
-    print("TEST 3: Premium Tier (Always Routes to OpenAI)")
-    print("=" * 90)
-
     workflow = create_workflow()
 
-    print("\n📤 Simple prompt but premium user:")
     ctx = WorkflowContext(
         session_id="s4", player_id="premium-user", metadata={"tier": "premium"}
     )
-    r = await workflow.execute({"prompt": "Short story about a cat"}, ctx)
-    print(f"   ✓ Provider: {r['provider']} (premium tier → OpenAI)")
-    print(f"   ✓ Cost: ${r['cost']:.3f}")
-    print(f"   ✓ Quality: {r['quality']}")
+    await workflow.execute({"prompt": "Short story about a cat"}, ctx)
 
 
 async def test4_cost_analysis():
-    print("\n" + "=" * 90)
-    print("TEST 4: Cost Analysis (10 Requests with Realistic Cache Hits)")
-    print("=" * 90)
-
     workflow = create_workflow()
 
     # Simulate realistic usage with repetition
@@ -206,43 +167,20 @@ async def test4_cost_analysis():
     ]
 
     total_cost = 0.0
-    print("\n📤 Processing 10 requests (simulating realistic workload):")
-    print(f"{'#':<3} {'Prompt':<15} {'Provider':<10} {'Cost':>10} {'Status':>10}")
-    print("-" * 52)
 
     for i, p in enumerate(prompts, 1):
         ctx = WorkflowContext(session_id=f"s{i + 10}", metadata={"tier": "free"})
         r = await workflow.execute({"prompt": f"Story about {p}"}, ctx)
-        hit = ctx.state.get("cache_hits", 0) > 0
+        ctx.state.get("cache_hits", 0) > 0
         total_cost += r["cost"]
-        print(
-            f"{i:<3} {p:<15} {r['provider']:<10} ${r['cost']:>9.3f} {'💰 HIT' if hit else '💸 MISS':>10}"
-        )
 
-    stats = workflow.get_stats()
+    workflow.get_stats()
     no_cache_cost = len(prompts) * 0.01  # All local, no caching
     savings = no_cache_cost - total_cost
-    savings_pct = (savings / no_cache_cost * 100) if no_cache_cost > 0 else 0
-
-    print("-" * 52)
-    print("\n   📊 Results:")
-    print(f"      Total requests:     {len(prompts)}")
-    print(f"      Cache hit rate:     {stats['hit_rate']}%")
-    print(f"      Actual cost:        ${total_cost:.3f}")
-    print(f"      Without caching:    ${no_cache_cost:.3f}")
-    print(f"      Savings:            ${savings:.3f} ({savings_pct:.1f}%)")
+    (savings / no_cache_cost * 100) if no_cache_cost > 0 else 0
 
 
 async def main():
-    print("\n╔" + "═" * 88 + "╗")
-    print(
-        "║" + " " * 18 + "MVP OPTION 1: COMPLETE PRODUCTION WORKFLOW" + " " * 28 + "║"
-    )
-    print(
-        "║" + " " * 20 + "Router + Timeout + Cache = 40% Cost Savings" + " " * 25 + "║"
-    )
-    print("╚" + "═" * 88 + "╝")
-
     # Run all tests
     await test1_simple_with_cache()
     await test2_complex_routing()
@@ -250,31 +188,6 @@ async def main():
     await test4_cost_analysis()
 
     # Final summary
-    print("\n" + "=" * 90)
-    print("🎉 MVP OPTION 1 COMPLETE - ALL TESTS PASSED!")
-    print("=" * 90)
-    print("\n✅ What Was Demonstrated:")
-    print("   • Smart routing (simple → local, complex → OpenAI)")
-    print("   • Caching working (40% hit rate in realistic test)")
-    print("   • Timeout protection (30s with fallback)")
-    print("   • Cost optimization (40% savings demonstrated)")
-    print("   • Tier-based routing (premium always gets OpenAI)")
-    print("\n📈 Expected Production Benefits:")
-    print("   💰 40% cost reduction (routing 30% + caching 40%)")
-    print("   ⚡ 10x faster responses for cached queries")
-    print("   🛡️  98% reliability (timeout + fallback)")
-    print("   📊 Full observability (structured logs + metrics)")
-    print("\n📚 Next Steps:")
-    print("   1. Replace mock handlers with real LLM API calls")
-    print("   2. Integrate into existing API routes")
-    print("   3. Deploy to staging and monitor metrics")
-    print("   4. Gradually roll out to production (10% → 50% → 100%)")
-    print("\n💡 Integration Example:")
-    print("   # In your API route:")
-    print("   workflow = create_workflow()")
-    print("   result = await workflow.execute({'prompt': user_prompt}, context)")
-    print("   cache_stats = workflow.get_stats()  # Monitor hit rate")
-    print()
 
 
 if __name__ == "__main__":

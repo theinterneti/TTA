@@ -73,22 +73,17 @@ class TestWebSocketPerformance:
             "agent_orchestration.realtime.events.buffer_size": 1000,
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for performance testing."""
-        publisher = EventPublisher(
+        return EventPublisher(
             redis_client=redis_client,
             channel_prefix="perf_test:events",
             enabled=True,
             buffer_size=1000,
         )
-        return publisher
 
     async def create_mock_websocket(self, connection_id: int) -> Mock:
         """Create a mock WebSocket connection for testing."""
@@ -180,13 +175,6 @@ class TestWebSocketPerformance:
             stats["active_connections"] >= successful_connections * 0.8
         )  # Most connections active
 
-        print("Concurrent Connection Test Results:")
-        print(f"  Total Connections: {metrics.total_connections}")
-        print(f"  Successful: {metrics.successful_connections}")
-        print(f"  Success Rate: {metrics.connection_success_rate:.2%}")
-        print(f"  Memory Usage: {metrics.peak_memory_mb:.1f} MB")
-        print(f"  Active Connections: {stats['active_connections']}")
-
     async def test_high_event_throughput(
         self, high_capacity_websocket_manager, event_publisher
     ):
@@ -256,13 +244,6 @@ class TestWebSocketPerformance:
         assert (
             event_publisher.events_published >= total_events * 0.9
         )  # At least 90% published
-
-        print("High Throughput Test Results:")
-        print(f"  Total Events: {total_events}")
-        print(f"  Duration: {duration:.2f}s")
-        print(f"  Events/Second: {events_per_second:.1f}")
-        print(f"  Events Published: {event_publisher.events_published}")
-        print(f"  Events Received: {events_received}")
 
     async def test_connection_churn_performance(self, high_capacity_websocket_manager):
         """Test performance under high connection churn (frequent connect/disconnect)."""
@@ -336,13 +317,6 @@ class TestWebSocketPerformance:
         assert memory_increase < 200  # Memory increase should be reasonable
         assert successful_connections / total_connections >= 0.8  # At least 80% success
 
-        print("Connection Churn Test Results:")
-        print(f"  Total Connections: {total_connections}")
-        print(f"  Duration: {duration:.2f}s")
-        print(f"  Connections/Second: {connections_per_second:.1f}")
-        print(f"  Success Rate: {successful_connections / total_connections:.2%}")
-        print(f"  Memory Increase: {memory_increase:.1f} MB")
-
     async def test_large_message_handling(self, high_capacity_websocket_manager):
         """Test performance with large WebSocket messages."""
         connection_count = 10
@@ -414,13 +388,6 @@ class TestWebSocketPerformance:
             connection_count * messages_per_connection * 0.8
         )  # 80% delivery
 
-        print("Large Message Test Results:")
-        print(f"  Message Size: {large_message_size} bytes")
-        print(f"  Total Messages: {connection_count * messages_per_connection}")
-        print(f"  Messages Received: {messages_received}")
-        print(f"  Total Bytes: {total_bytes_sent / (1024 * 1024):.1f} MB")
-        print(f"  Throughput: {throughput_mbps:.2f} MB/s")
-
     async def test_memory_usage_under_load(
         self, high_capacity_websocket_manager, event_publisher
     ):
@@ -491,11 +458,3 @@ class TestWebSocketPerformance:
             # Assertions
             assert memory_growth < 100  # Memory growth should be < 100MB
             assert peak_memory < initial_memory + 200  # Peak should be reasonable
-
-            print("Memory Usage Test Results:")
-            print(f"  Test Duration: {test_duration}s")
-            print(f"  Events Generated: {event_count}")
-            print(f"  Initial Memory: {initial_memory:.1f} MB")
-            print(f"  Peak Memory: {peak_memory:.1f} MB")
-            print(f"  Final Memory: {final_memory:.1f} MB")
-            print(f"  Memory Growth: {memory_growth:.1f} MB")

@@ -527,12 +527,12 @@ class ExtendedSessionTestFramework(SinglePlayerTestFramework):
 
         logger.info(f"Running {total_tests} extended session tests")
 
-        for model_key, model in self.models.items():
+        for model in self.models.values():
             if not model.enabled:
                 continue
 
-            for profile_key, profile in self.profiles.items():
-                for scenario_key, scenario in self.extended_scenarios.items():
+            for profile in self.profiles.values():
+                for scenario in self.extended_scenarios.values():
                     logger.info(
                         f"Running extended test: {model.name} + {profile.name} + {scenario.name}"
                     )
@@ -923,8 +923,7 @@ class ExtendedSessionTestFramework(SinglePlayerTestFramework):
         """Calculate simulated user fatigue for ultra-long sessions."""
         # Simulate user fatigue curve
         progress = turn / total_turns
-        fatigue = min(8.0, 2.0 + (progress * 6.0))  # Gradual increase from 2.0 to 8.0
-        return fatigue
+        return min(8.0, 2.0 + (progress * 6.0))  # Gradual increase from 2.0 to 8.0
 
     def _calculate_narrative_depth(
         self, turn: int, coherence_scores: list[float]
@@ -1029,8 +1028,7 @@ class ExtendedSessionTestFramework(SinglePlayerTestFramework):
             return 0.0
 
         cv = std_dev / mean_score
-        stability = max(0.0, 10.0 - (cv * 50))  # Convert to 0-10 scale
-        return stability
+        return max(0.0, 10.0 - (cv * 50))  # Convert to 0-10 scale
 
     def _calculate_recovery_success_rate(self, result: ExtendedSessionResult) -> float:
         """Calculate recovery success rate for ultra-long sessions."""

@@ -190,7 +190,7 @@ class QualityAnalysisReporter:
 
     def _organize_data_by_model_and_profile(self) -> None:
         """Organize session data by model and profile for analysis."""
-        for session_id, session_data in self.session_data.items():
+        for session_data in self.session_data.values():
             model_name = session_data.get("model_name", "unknown")
             profile_name = session_data.get("profile_name", "unknown")
 

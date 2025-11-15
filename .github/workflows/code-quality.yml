@@ -53,14 +53,8 @@ jobs:
       - name: Run ruff linter
         run: |
           echo "Running ruff linter..."
-          echo "Ruff version: $(uvx ruff --version)"
-          uvx ruff check src/ tests/ --output-format=github --statistics
-        continue-on-error: false
-
-      - name: Run ruff formatter check
-        run: |
-          echo "Checking code formatting with ruff..."
-          uvx ruff format --check --diff src/ tests/
+          echo "Ruff version: $(uv run ruff --version)"
+          uv run ruff check src/ tests/ --output-format=github --statistics
         continue-on-error: false
 
       - name: Run ruff formatter check

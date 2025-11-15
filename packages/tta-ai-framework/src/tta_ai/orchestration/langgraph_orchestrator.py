@@ -236,9 +236,7 @@ class LangGraphAgentOrchestrator:
                 "safety_level": "safe",
             }
 
-    async def _process_input_node(
-        self, state: AgentWorkflowState
-    ) -> AgentWorkflowState:
+    async def _process_input_node(self, state: AgentWorkflowState) -> AgentWorkflowState:
         """Process input and perform initial validation."""
         logger.info(f"Processing input for session {state['session_id']}")
 
@@ -289,9 +287,7 @@ class LangGraphAgentOrchestrator:
 
         return state
 
-    async def _coordinate_agents_node(
-        self, state: AgentWorkflowState
-    ) -> AgentWorkflowState:
+    async def _coordinate_agents_node(self, state: AgentWorkflowState) -> AgentWorkflowState:
         """Coordinate IPA, WBA, and NGA agents."""
         logger.info(f"Coordinating agents for session {state['session_id']}")
 
@@ -321,9 +317,7 @@ class LangGraphAgentOrchestrator:
 
         return state
 
-    async def _generate_response_node(
-        self, state: AgentWorkflowState
-    ) -> AgentWorkflowState:
+    async def _generate_response_node(self, state: AgentWorkflowState) -> AgentWorkflowState:
         """Generate final response with therapeutic framing."""
         logger.info(f"Generating response for session {state['session_id']}")
 
@@ -366,9 +360,7 @@ class LangGraphAgentOrchestrator:
 
         except Exception as e:
             logger.error(f"Response generation error: {e}")
-            state["narrative_response"] = (
-                "Thank you for sharing. How would you like to proceed?"
-            )
+            state["narrative_response"] = "Thank you for sharing. How would you like to proceed?"
             state["messages"].append(AIMessage(content=state["narrative_response"]))
 
             # Record error
@@ -382,9 +374,7 @@ class LangGraphAgentOrchestrator:
 
         return state
 
-    async def _handle_crisis_node(
-        self, state: AgentWorkflowState
-    ) -> AgentWorkflowState:
+    async def _handle_crisis_node(self, state: AgentWorkflowState) -> AgentWorkflowState:
         """Handle crisis situations with appropriate interventions."""
         logger.warning(f"Crisis intervention for session {state['session_id']}")
 

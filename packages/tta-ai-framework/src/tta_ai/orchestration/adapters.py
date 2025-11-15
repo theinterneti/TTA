@@ -24,9 +24,7 @@ try:
     from agents.ipa import IntentSchema, process_input
     from agents.narrative_generator import generate_narrative_response
 except ImportError as e:
-    logging.warning(
-        f"Could not import real agents: {e}. Using fallback implementations."
-    )
+    logging.warning(f"Could not import real agents: {e}. Using fallback implementations.")
     process_input = None
     IntentSchema = None
     generate_narrative_response = None
@@ -60,9 +58,7 @@ class RetryConfig:
         self.jitter = jitter
 
 
-async def retry_with_backoff(
-    func: callable, retry_config: RetryConfig, *args, **kwargs
-) -> Any:
+async def retry_with_backoff(func: callable, retry_config: RetryConfig, *args, **kwargs) -> Any:
     """
     Execute a function with exponential backoff retry logic.
 
@@ -105,9 +101,7 @@ async def retry_with_backoff(
             if retry_config.jitter:
                 delay *= 0.5 + random.random() * 0.5
 
-            logger.warning(
-                f"Attempt {attempt + 1} failed: {e}. Retrying in {delay:.2f}s..."
-            )
+            logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying in {delay:.2f}s...")
 
             await asyncio.sleep(delay)
 
@@ -120,9 +114,7 @@ async def retry_with_backoff(
 class IPAAdapter:
     """Adapter for communicating with the real Input Processor Agent."""
 
-    def __init__(
-        self, fallback_to_mock: bool = True, retry_config: RetryConfig | None = None
-    ):
+    def __init__(self, fallback_to_mock: bool = True, retry_config: RetryConfig | None = None):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self._available = process_input is not None and IntentSchema is not None
@@ -142,9 +134,7 @@ class IPAAdapter:
         """
         if not self._available:
             if self.fallback_to_mock:
-                logger.warning(
-                    "Real IPA not available, using fallback mock implementation"
-                )
+                logger.warning("Real IPA not available, using fallback mock implementation")
                 return self._mock_process_input(text)
             raise AgentCommunicationError("Real IPA implementation not available")
 
@@ -154,9 +144,7 @@ class IPAAdapter:
                 loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(None, process_input, text)
 
-            intent_result = await retry_with_backoff(
-                _process_with_executor, self.retry_config
-            )
+            intent_result = await retry_with_backoff(_process_with_executor, self.retry_config)
 
             # Convert IntentSchema to dict format expected by orchestration system
             if hasattr(intent_result, "dict"):
@@ -240,9 +228,7 @@ class WBAAdapter:
         """
         if not self._available or not self._wba_instance:
             if self.fallback_to_mock:
-                logger.warning(
-                    "Real WBA not available, using fallback mock implementation"
-                )
+                logger.warning("Real WBA not available, using fallback mock implementation")
                 return self._mock_process_world(world_id, updates)
             raise AgentCommunicationError("Real WBA implementation not available")
 
@@ -257,9 +243,7 @@ class WBAAdapter:
             # Run WBA processing in thread pool with retry logic
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
-                return await loop.run_in_executor(
-                    None, self._wba_instance.process, wba_input
-                )
+                return await loop.run_in_executor(None, self._wba_instance.process, wba_input)
 
             result = await retry_with_backoff(_process_with_executor, self.retry_config)
 
@@ -300,9 +284,7 @@ class WBAAdapter:
 class NGAAdapter:
     """Adapter for communicating with the real Narrative Generator Agent."""
 
-    def __init__(
-        self, fallback_to_mock: bool = True, retry_config: RetryConfig | None = None
-    ):
+    def __init__(self, fallback_to_mock: bool = True, retry_config: RetryConfig | None = None):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self._available = generate_narrative_response is not None
@@ -325,9 +307,7 @@ class NGAAdapter:
         """
         if not self._available:
             if self.fallback_to_mock:
-                logger.warning(
-                    "Real NGA not available, using fallback mock implementation"
-                )
+                logger.warning("Real NGA not available, using fallback mock implementation")
                 return self._mock_generate_narrative(prompt, context)
             raise AgentCommunicationError("Real NGA implementation not available")
 
@@ -342,9 +322,7 @@ class NGAAdapter:
             # Run NGA processing in thread pool with retry logic
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
-                return await loop.run_in_executor(
-                    None, generate_narrative_response, nga_input
-                )
+                return await loop.run_in_executor(None, generate_narrative_response, nga_input)
 
             result = await retry_with_backoff(_process_with_executor, self.retry_config)
 
@@ -400,9 +378,7 @@ class AgentAdapterFactory:
 
     def create_ipa_adapter(self) -> IPAAdapter:
         """Create an IPA adapter instance."""
-        return IPAAdapter(
-            fallback_to_mock=self.fallback_to_mock, retry_config=self.retry_config
-        )
+        return IPAAdapter(fallback_to_mock=self.fallback_to_mock, retry_config=self.retry_config)
 
     def create_wba_adapter(self) -> WBAAdapter:
         """Create a WBA adapter instance."""
@@ -415,6 +391,4 @@ class AgentAdapterFactory:
 
     def create_nga_adapter(self) -> NGAAdapter:
         """Create an NGA adapter instance."""
-        return NGAAdapter(
-            fallback_to_mock=self.fallback_to_mock, retry_config=self.retry_config
-        )
+        return NGAAdapter(fallback_to_mock=self.fallback_to_mock, retry_config=self.retry_config)

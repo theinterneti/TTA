@@ -196,13 +196,11 @@ class MultiModelComparator:
             await self.test_framework.configure_model(model_name)
 
             # Run the extended session test
-            result = await self.test_framework.run_extended_session(
+            return await self.test_framework.run_extended_session(
                 model_name=model_name,
                 scenario_name=scenario_name,
                 user_profile=user_profile,
             )
-
-            return result
 
         except Exception as e:
             logger.error(f"Failed to run test for model {model_name}: {e}")
@@ -472,11 +470,9 @@ class MultiModelComparator:
             session_result.total_turns * 300
         )  # ~300 tokens per turn output
 
-        total_cost = (estimated_input_tokens / 1000) * input_cost_per_1k + (
+        return (estimated_input_tokens / 1000) * input_cost_per_1k + (
             estimated_output_tokens / 1000
         ) * output_cost_per_1k
-
-        return total_cost
 
     def _generate_insights_and_recommendations(self, result: ModelComparisonResult):
         """Generate insights and recommendations from comparison results."""
@@ -545,7 +541,7 @@ class MultiModelComparator:
         self, comparison_result: ModelComparisonResult
     ) -> dict[str, Any]:
         """Generate comprehensive comparison report."""
-        report = {
+        return {
             "comparison_id": comparison_result.comparison_id,
             "timestamp": comparison_result.timestamp.isoformat(),
             "models_tested": comparison_result.models_tested,
@@ -572,5 +568,3 @@ class MultiModelComparator:
                 "weaknesses": comparison_result.model_weaknesses,
             },
         }
-
-        return report

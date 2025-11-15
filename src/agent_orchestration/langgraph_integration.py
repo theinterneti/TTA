@@ -22,6 +22,8 @@ except Exception:  # pragma: no cover - runtime optional
 
 from .workflow import (
     OrchestrationResponse as WorkflowOrchestrationResponse,
+)
+from .workflow import (
     WorkflowDefinition,
 )
 

@@ -219,15 +219,11 @@ class ErrorReportingManager:
             # Check if we should abandon recovery
             if error_report.recovery_attempts >= self.max_recovery_attempts:
                 error_report.recovery_status = RecoveryStatus.ABANDONED
-                await self._broadcast_recovery_event(
-                    error_report, success=False, abandoned=True
-                )
+                await self._broadcast_recovery_event(error_report, success=False, abandoned=True)
             else:
                 await self._broadcast_recovery_event(error_report, success=False)
 
-        logger.info(
-            f"Recovery attempt for {error_id}: {recovery_message}, success: {success}"
-        )
+        logger.info(f"Recovery attempt for {error_id}: {recovery_message}, success: {success}")
         return True
 
     async def _broadcast_error_event(self, error_report: ErrorReport) -> None:
@@ -361,17 +357,14 @@ class ErrorReportingManager:
 
                 # Clean up old errors from history
                 self.error_history = [
-                    error
-                    for error in self.error_history
-                    if error.timestamp > retention_cutoff
+                    error for error in self.error_history if error.timestamp > retention_cutoff
                 ]
 
                 # Clean up resolved errors from active list
                 resolved_errors = [
                     error_id
                     for error_id, error in self.active_errors.items()
-                    if error.recovery_success
-                    or error.recovery_status == RecoveryStatus.ABANDONED
+                    if error.recovery_success or error.recovery_status == RecoveryStatus.ABANDONED
                 ]
 
                 for error_id in resolved_errors:
@@ -395,8 +388,7 @@ class ErrorReportingManager:
                     if (
                         current_time - error_report.timestamp > self.escalation_timeout
                         and error_report.escalation_level == 0
-                        and error_report.severity
-                        in [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL]
+                        and error_report.severity in [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL]
                     ):
                         error_report.escalation_level = 1
                         await self._escalate_error(error_report)
@@ -410,9 +402,7 @@ class ErrorReportingManager:
 
     async def _escalate_error(self, error_report: ErrorReport) -> None:
         """Escalate an unresolved error."""
-        logger.warning(
-            f"Escalating error {error_report.error_id}: {error_report.error_message}"
-        )
+        logger.warning(f"Escalating error {error_report.error_id}: {error_report.error_message}")
 
         # Send escalation notifications
         for handler in self.notification_handlers:
@@ -459,9 +449,7 @@ class ErrorReportingManager:
 
     def _get_recovery_success_rate(self) -> float:
         """Get recovery success rate."""
-        attempted_recoveries = [
-            e for e in self.error_history if e.recovery_attempts > 0
-        ]
+        attempted_recoveries = [e for e in self.error_history if e.recovery_attempts > 0]
         if not attempted_recoveries:
             return 0.0
 
@@ -470,9 +458,7 @@ class ErrorReportingManager:
 
     def _get_average_recovery_attempts(self) -> float:
         """Get average number of recovery attempts."""
-        attempted_recoveries = [
-            e for e in self.error_history if e.recovery_attempts > 0
-        ]
+        attempted_recoveries = [e for e in self.error_history if e.recovery_attempts > 0]
         if not attempted_recoveries:
             return 0.0
 

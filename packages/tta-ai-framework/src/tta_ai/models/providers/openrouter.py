@@ -29,9 +29,7 @@ logger = logging.getLogger(__name__)
 class OpenRouterModelInstance(BaseModelInstance):
     """OpenRouter model instance implementation."""
 
-    def __init__(
-        self, model_id: str, provider: "OpenRouterProvider", client: httpx.AsyncClient
-    ):
+    def __init__(self, model_id: str, provider: "OpenRouterProvider", client: httpx.AsyncClient):
         super().__init__(model_id, provider)
         self._client = client
         self._status = ModelStatus.READY
@@ -94,9 +92,7 @@ class OpenRouterModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
         """Generate text as a stream using OpenRouter API."""
         try:
             # Prepare request payload
@@ -236,9 +232,7 @@ class OpenRouterProvider(BaseProvider):
                 "X-Title": "TTA Platform",  # Optional: your app name
             }
 
-            self._client = httpx.AsyncClient(
-                base_url=self._base_url, headers=headers, timeout=30.0
-            )
+            self._client = httpx.AsyncClient(base_url=self._base_url, headers=headers, timeout=30.0)
 
             # Test connection
             response = await self._client.get("/api/v1/models")
@@ -280,9 +274,7 @@ class OpenRouterProvider(BaseProvider):
 
                 if prompt_cost is not None and completion_cost is not None:
                     # Convert from cost per million tokens to cost per token
-                    cost_per_token = (
-                        float(prompt_cost) + float(completion_cost)
-                    ) / 2000000
+                    cost_per_token = (float(prompt_cost) + float(completion_cost)) / 2000000
                     is_free = cost_per_token == 0.0
                 elif prompt_cost == "0" and completion_cost == "0":
                     is_free = True
@@ -353,9 +345,7 @@ class OpenRouterProvider(BaseProvider):
             logger.warning(f"OpenRouter health check failed: {e}")
             return False
 
-    async def get_available_models(
-        self, filters: dict[str, Any] | None = None
-    ) -> list[ModelInfo]:
+    async def get_available_models(self, filters: dict[str, Any] | None = None) -> list[ModelInfo]:
         """Get available models with optional free models filtering."""
         # Get all models from base implementation
         all_models = await super().get_available_models(filters)
@@ -412,8 +402,7 @@ class OpenRouterProvider(BaseProvider):
 
         for model in all_models:
             if model.is_free or (
-                model.cost_per_token is not None
-                and model.cost_per_token <= max_cost_per_token
+                model.cost_per_token is not None and model.cost_per_token <= max_cost_per_token
             ):
                 affordable_models.append(model)
 

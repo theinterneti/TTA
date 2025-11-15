@@ -297,10 +297,10 @@ def main():
     repository.close()
 
     # Summary
-    logger.info(f"\n{'='*60}")
-    logger.info(f"World Seeding Complete!")
+    logger.info(f"\n{'=' * 60}")
+    logger.info("World Seeding Complete!")
     logger.info(f"Successfully seeded: {success_count}/{len(worlds)} worlds")
-    logger.info(f"{'='*60}\n")
+    logger.info(f"{'=' * 60}\n")
 
     if success_count < len(worlds):
         sys.exit(1)

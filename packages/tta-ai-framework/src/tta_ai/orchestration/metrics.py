@@ -51,9 +51,7 @@ class MessageMetrics:
     def inc_permanent(self, n: int = 1) -> None:
         self.retry.total_permanent_failures += n
 
-    def inc_retries_scheduled(
-        self, n: int = 1, last_backoff_seconds: float = 0.0
-    ) -> None:
+    def inc_retries_scheduled(self, n: int = 1, last_backoff_seconds: float = 0.0) -> None:
         self.retry.total_retries_scheduled += n
         self.retry.last_backoff_seconds = last_backoff_seconds
 

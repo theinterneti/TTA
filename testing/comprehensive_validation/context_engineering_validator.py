@@ -557,7 +557,7 @@ class ContextEngineeringValidator:
 
         # Check therapeutic context consistency
         if scenario.therapeutic_context:
-            for key, value in scenario.therapeutic_context.items():
+            for value in scenario.therapeutic_context.values():
                 context_str = json.dumps(context).lower()
                 if str(value).lower() in context_str:
                     score += 0.2
@@ -712,35 +712,14 @@ if __name__ == "__main__":
     async def main():
         results = await run_context_engineering_validation()
 
-        print("\n" + "=" * 80)
-        print("CONTEXT ENGINEERING VALIDATION RESULTS")
-        print("=" * 80)
-
-        for agent_type, metrics_list in results.items():
-            print(f"\n🤖 Agent: {agent_type.upper()}")
-            print("-" * 40)
-
+        for metrics_list in results.values():
             for metrics in metrics_list:
-                print(f"\n📊 Scenario: {metrics.test_scenario}")
-                print(f"   Context Quality: {metrics.context_quality_score:.1f}/10")
-                print(
-                    f"   Therapeutic Relevance: {metrics.therapeutic_relevance:.1f}/10"
-                )
-                print(
-                    f"   Personalization: {metrics.personalization_effectiveness:.1f}/10"
-                )
-                print(f"   Consistency: {metrics.consistency_score:.1f}/10")
-                print(f"   Safety Compliance: {metrics.safety_compliance:.1f}/10")
-                print(f"   Generation Time: {metrics.context_generation_time:.3f}s")
-
                 if metrics.issues_identified:
-                    print(f"   ❌ Issues: {len(metrics.issues_identified)}")
-                    for issue in metrics.issues_identified[:2]:
-                        print(f"      - {issue}")
+                    for _issue in metrics.issues_identified[:2]:
+                        pass
 
                 if metrics.recommendations:
-                    print("   💡 Top Recommendations:")
-                    for rec in metrics.recommendations[:2]:
-                        print(f"      - {rec}")
+                    for _rec in metrics.recommendations[:2]:
+                        pass
 
     asyncio.run(main())

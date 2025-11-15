@@ -14,25 +14,26 @@ import logging
 import os
 import sys
 import tempfile
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 # Load environment
 from dotenv import load_dotenv
+
 load_dotenv(Path(__file__).parent.parent / ".env")
+
+from pydantic import SecretStr
 
 from agent_orchestration.openhands_integration import (
     DockerOpenHandsClient,
     OpenHandsConfig,
 )
-from pydantic import SecretStr
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -42,29 +43,29 @@ async def build_redis_pool_manager():
     logger.info("=" * 80)
     logger.info("OPENHANDS COMPONENT BUILD: Redis Connection Pool Manager")
     logger.info("=" * 80)
-    
+
     # Create workspace
     workspace = Path(tempfile.mkdtemp(prefix="openhands_build_"))
     logger.info(f"Workspace: {workspace}")
-    
+
     # Get API key
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key or api_key.startswith("your_"):
         logger.error("OPENROUTER_API_KEY not set properly")
         return None
-    
+
     # Create config with extended timeout for code generation
     config = OpenHandsConfig(
         api_key=SecretStr(api_key),
         model="openrouter/deepseek/deepseek-chat-v3.1:free",
         workspace_path=workspace,
-        timeout_seconds=180  # 3 minutes for code generation
+        timeout_seconds=180,  # 3 minutes for code generation
     )
-    
+
     # Create client
     client = DockerOpenHandsClient(config)
     logger.info(f"Client initialized: {client.openhands_image}")
-    
+
     # Define detailed task
     task_description = """
 Create a Python module named 'redis_pool_manager.py' with the following requirements:
@@ -115,23 +116,25 @@ IMPORTANT: Write all code to actual files in the workspace. Create both:
 - redis_pool_manager.py (main module)
 - test_redis_pool_manager.py (test file)
 """
-    
+
     logger.info("Task Description:")
     logger.info("-" * 80)
     logger.info(task_description)
     logger.info("-" * 80)
-    
+
     # Execute task with detailed monitoring
     try:
-        logger.info(f"\n🚀 Executing OpenHands task (timeout: {config.timeout_seconds}s)...")
+        logger.info(
+            f"\n🚀 Executing OpenHands task (timeout: {config.timeout_seconds}s)..."
+        )
         logger.info(f"Start time: {datetime.now().isoformat()}")
-        
+
         result = await client.execute_task(
             task_description=task_description,
             workspace_path=workspace,
-            timeout=config.timeout_seconds
+            timeout=config.timeout_seconds,
         )
-        
+
         logger.info(f"End time: {datetime.now().isoformat()}")
         logger.info(f"\n{'=' * 80}")
         logger.info("EXECUTION RESULTS")
@@ -139,54 +142,53 @@ IMPORTANT: Write all code to actual files in the workspace. Create both:
         logger.info(f"Success: {result.success}")
         logger.info(f"Execution time: {result.execution_time:.2f}s")
         logger.info(f"Output length: {len(result.output)} chars")
-        
+
         # Log output
         logger.info(f"\n{'=' * 80}")
         logger.info("DOCKER OUTPUT")
         logger.info("=" * 80)
         logger.info(result.output)
-        
+
         # Check workspace contents
         logger.info(f"\n{'=' * 80}")
         logger.info("WORKSPACE CONTENTS")
         logger.info("=" * 80)
-        
+
         workspace_files = list(workspace.rglob("*"))
         logger.info(f"Total items in workspace: {len(workspace_files)}")
-        
+
         for item in sorted(workspace_files):
             if item.is_file():
                 size = item.stat().st_size
                 logger.info(f"  📄 {item.relative_to(workspace)} ({size} bytes)")
             elif item.is_dir():
                 logger.info(f"  📁 {item.relative_to(workspace)}/")
-        
+
         # Look for generated files
         logger.info(f"\n{'=' * 80}")
         logger.info("GENERATED FILES CHECK")
         logger.info("=" * 80)
-        
-        expected_files = [
-            "redis_pool_manager.py",
-            "test_redis_pool_manager.py"
-        ]
-        
+
+        expected_files = ["redis_pool_manager.py", "test_redis_pool_manager.py"]
+
         found_files = {}
         for expected in expected_files:
             file_path = workspace / expected
             if file_path.exists():
                 content = file_path.read_text()
                 found_files[expected] = content
-                logger.info(f"✅ Found: {expected} ({len(content)} chars, {len(content.splitlines())} lines)")
+                logger.info(
+                    f"✅ Found: {expected} ({len(content)} chars, {len(content.splitlines())} lines)"
+                )
             else:
                 logger.warning(f"❌ Missing: {expected}")
-        
+
         # If files were generated, show preview
         if found_files:
             logger.info(f"\n{'=' * 80}")
             logger.info("GENERATED CODE PREVIEW")
             logger.info("=" * 80)
-            
+
             for filename, content in found_files.items():
                 logger.info(f"\n--- {filename} (first 50 lines) ---")
                 lines = content.splitlines()[:50]
@@ -194,18 +196,19 @@ IMPORTANT: Write all code to actual files in the workspace. Create both:
                     logger.info(f"{i:3d} | {line}")
                 if len(content.splitlines()) > 50:
                     logger.info(f"... ({len(content.splitlines()) - 50} more lines)")
-        
+
         return {
             "success": result.success,
             "workspace": workspace,
             "files": found_files,
             "execution_time": result.execution_time,
-            "output": result.output
+            "output": result.output,
         }
-        
+
     except Exception as e:
         logger.error(f"❌ Task execution failed: {e}")
         import traceback
+
         traceback.print_exc()
         return None
     finally:
@@ -217,9 +220,9 @@ IMPORTANT: Write all code to actual files in the workspace. Create both:
 async def main():
     """Run the component build."""
     logger.info("\n🏗️  Starting OpenHands Component Build\n")
-    
+
     result = await build_redis_pool_manager()
-    
+
     if result:
         logger.info("\n" + "=" * 80)
         logger.info("BUILD SUMMARY")
@@ -228,23 +231,23 @@ async def main():
         logger.info(f"Execution time: {result['execution_time']:.2f}s")
         logger.info(f"Files generated: {len(result['files'])}")
         logger.info(f"Workspace: {result['workspace']}")
-        
-        if result['files']:
+
+        if result["files"]:
             logger.info("\n✅ Generated files:")
-            for filename in result['files'].keys():
+            for filename in result["files"]:
                 logger.info(f"   - {filename}")
         else:
             logger.warning("\n⚠️  No files were generated (known issue)")
             logger.info("   This is the documented file generation problem.")
-            logger.info("   The Docker container executed but didn't create output files.")
-        
+            logger.info(
+                "   The Docker container executed but didn't create output files."
+            )
+
         logger.info("=" * 80 + "\n")
-        return 0 if result['files'] else 1
-    else:
-        logger.error("\n❌ Build failed\n")
-        return 1
+        return 0 if result["files"] else 1
+    logger.error("\n❌ Build failed\n")
+    return 1
 
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main()))
-

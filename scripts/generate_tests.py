@@ -36,10 +36,7 @@ try:
     from agent_orchestration.openhands_integration.test_generation_service import (
         UnitTestGenerationService,
     )
-except ImportError as e:
-    print(f"Error importing modules: {e}")
-    print("\nThis script must be run with 'uv run python scripts/generate_tests.py'")
-    print("to ensure proper dependencies are available.")
+except ImportError:
     sys.exit(1)
 
 # Configure logging
@@ -144,9 +141,6 @@ async def main() -> int:
             )
 
             # Display results
-            print("\n" + "=" * 80)
-            print("PACKAGE TEST GENERATION RESULTS")
-            print("=" * 80)
 
             total_files = len(results)
             successful_files = sum(
@@ -157,27 +151,10 @@ async def main() -> int:
                 and r.coverage_percentage >= args.coverage
             )
 
-            for file_path, result in results.items():
-                status = (
-                    "✓"
-                    if (
-                        result.syntax_valid
-                        and result.tests_pass
-                        and result.coverage_percentage >= args.coverage
-                    )
-                    else "✗"
-                )
-                print(f"\n{status} {file_path}")
-                print(f"  Coverage: {result.coverage_percentage:.1f}%")
-                print(f"  Quality Score: {result.quality_score:.1f}/100")
+            for result in results.values():
                 if result.issues:
-                    print(f"  Issues: {len(result.issues)}")
-                    for issue in result.issues[:3]:  # Show first 3 issues
-                        print(f"    - {issue}")
-
-            print("\n" + "=" * 80)
-            print(f"Summary: {successful_files}/{total_files} files successful")
-            print("=" * 80)
+                    for _issue in result.issues[:3]:  # Show first 3 issues
+                        pass
 
             return 0 if successful_files == total_files else 1
 
@@ -193,25 +170,10 @@ async def main() -> int:
         result = await service.generate_tests(spec, max_iterations=args.max_iterations)
 
         # Display results
-        print("\n" + "=" * 80)
-        print("TEST GENERATION RESULTS")
-        print("=" * 80)
-        print(f"Target File: {args.target_file}")
-        print(f"Test File: {result.test_file_path}")
-        print(f"\nSyntax Valid: {'✓' if result.syntax_valid else '✗'}")
-        print(f"Tests Pass: {'✓' if result.tests_pass else '✗'}")
-        print(
-            f"Coverage: {result.coverage_percentage:.1f}% (threshold: {args.coverage}%)"
-        )
-        print(f"Conventions Followed: {'✓' if result.conventions_followed else '✗'}")
-        print(f"Quality Score: {result.quality_score:.1f}/100")
 
         if result.issues:
-            print(f"\nIssues ({len(result.issues)}):")
-            for issue in result.issues:
-                print(f"  - {issue}")
-
-        print("=" * 80)
+            for _issue in result.issues:
+                pass
 
         # Determine success
         success = (
@@ -222,9 +184,7 @@ async def main() -> int:
         )
 
         if success:
-            print("\n✓ Test generation successful!")
             return 0
-        print("\n✗ Test generation failed or incomplete")
         return 1
 
     except Exception as e:

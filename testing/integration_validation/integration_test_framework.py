@@ -912,9 +912,6 @@ class IntegrationTestFramework:
 
 async def main():
     """Main execution function for integration testing"""
-    print("🚀 TTA Enhanced Extended Session Quality Evaluation Framework")
-    print("📊 Phase 2: Full Integration Validation")
-    print("=" * 80)
 
     # Create integration test framework
     framework = IntegrationTestFramework()
@@ -930,21 +927,15 @@ async def main():
         with open(report_path, "w") as f:
             json.dump(validation_report, f, indent=2)
 
-        print(f"\n📄 Integration validation report saved to: {report_path}")
-
         # Print summary
         if validation_report.get("integration_validation_status") == "COMPLETE":
-            print("\n🎉 PHASE 2 INTEGRATION VALIDATION: SUCCESS")
-            print("✅ Complete TTA system validated with real database operations")
+            pass
         else:
-            print("\n⚠️ PHASE 2 INTEGRATION VALIDATION: PARTIAL SUCCESS")
-            print("❌ Some integration tests failed - check report for details")
+            pass
 
         return validation_report
 
-    except Exception as e:
-        print("\n💥 PHASE 2 INTEGRATION VALIDATION: FAILED")
-        print(f"❌ Error: {e}")
+    except Exception:
         return None
 
 

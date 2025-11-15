@@ -68,9 +68,7 @@ async def test_player_profile_auto_created_on_first_login(
             "password": test_user["password"],
         },
     )
-    assert login_response.status_code == 200, (
-        f"Login failed: {login_response.text}"
-    )
+    assert login_response.status_code == 200, f"Login failed: {login_response.text}"
 
     token_data = login_response.json()
     access_token = token_data["access_token"]
@@ -258,10 +256,7 @@ async def test_player_profile_has_required_relationships(
             # Note: This relationship might not exist in all implementations
             # If it doesn't exist, that's okay - just log it
             if therapeutic_prefs is None:
-                print(
-                    f"Note: Player profile {player_id} does not have "
-                    "TherapeuticPreferences relationship (may be optional)"
-                )
+                pass
 
     finally:
         driver.close()

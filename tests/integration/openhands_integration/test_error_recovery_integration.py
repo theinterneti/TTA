@@ -78,6 +78,7 @@ class TestErrorRecoveryIntegration:
             call_count += 1
 
             import time
+
             call_times.append(time.time())
 
             if call_count <= 2:
@@ -88,14 +89,13 @@ class TestErrorRecoveryIntegration:
                     error="Rate limit exceeded (429): Too many requests",
                     execution_time=0.1,
                 )
-            else:
-                # Third call: success
-                return OpenHandsTaskResult(
-                    success=True,
-                    output="Test file created successfully",
-                    error=None,
-                    execution_time=1.0,
-                )
+            # Third call: success
+            return OpenHandsTaskResult(
+                success=True,
+                output="Test file created successfully",
+                error=None,
+                execution_time=1.0,
+            )
 
         with patch.object(
             OpenHandsClient, "execute_task", new_callable=AsyncMock
@@ -123,7 +123,9 @@ class TestErrorRecoveryIntegration:
                     result = await service.generate_tests(test_spec, max_iterations=3)
 
         # Verify retry behavior
-        assert call_count == 3, f"Expected 3 calls (2 failures + 1 success), got {call_count}"
+        assert call_count == 3, (
+            f"Expected 3 calls (2 failures + 1 success), got {call_count}"
+        )
 
         # Note: The service retries immediately with feedback, not with exponential backoff delays.
         # The error recovery system applies delays when retrying a single operation with the
@@ -193,16 +195,15 @@ class TestErrorRecoveryIntegration:
                         quality_score=5.0,
                         issues=["Coverage below threshold (50% < 70%)"],
                     )
-                else:
-                    # Second validation: success
-                    return TestValidationResult(
-                        syntax_valid=True,
-                        tests_pass=True,
-                        coverage_percentage=75.0,
-                        conventions_followed=True,
-                        quality_score=8.0,
-                        issues=[],
-                    )
+                # Second validation: success
+                return TestValidationResult(
+                    syntax_valid=True,
+                    tests_pass=True,
+                    coverage_percentage=75.0,
+                    conventions_followed=True,
+                    quality_score=8.0,
+                    issues=[],
+                )
 
             with patch(
                 "src.agent_orchestration.openhands_integration.test_generation_service.validate_generated_tests"
@@ -219,11 +220,14 @@ class TestErrorRecoveryIntegration:
                     result = await service.generate_tests(test_spec, max_iterations=3)
 
         # Verify iterative feedback loop worked
-        assert iteration_count == 2, f"Expected 2 iterations (1 failure + 1 success), got {iteration_count}"
-        assert validation_call_count == 2, f"Expected 2 validations, got {validation_call_count}"
+        assert iteration_count == 2, (
+            f"Expected 2 iterations (1 failure + 1 success), got {iteration_count}"
+        )
+        assert validation_call_count == 2, (
+            f"Expected 2 validations, got {validation_call_count}"
+        )
 
         # Verify final success
         assert result.syntax_valid
         assert result.tests_pass
         assert result.coverage_percentage == 75.0
-

@@ -1,5 +1,6 @@
-# Schema for .github/specs/*.spec.md YAML frontmatter
-# Validates specification template files for agentic primitives
+# Schema for specification templates (specs/templates/*.spec.template.md)
+# Validates YAML frontmatter in specification documents
+# Note: Active templates are in specs/templates/, not .github/specs/ (migrated to KB)
 
 type: enum('feature', 'api', 'component', required=True)
 category: str(required=True)

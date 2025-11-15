@@ -11,15 +11,9 @@ from conversation_manager import AIConversationContextManager, create_tta_sessio
 
 def example_new_session():
     """Example: Starting a new development session."""
-    print("=" * 60)
-    print("Example 1: Starting a New Session")
-    print("=" * 60)
 
     # Create a new session with TTA architecture context
     manager, session_id = create_tta_session("tta-agentic-primitives-2025-10-20")
-
-    print(f"\nCreated session: {session_id}")
-    print(manager.get_context_summary(session_id))
 
     # Add a feature request (high importance)
     manager.add_message(
@@ -78,38 +72,27 @@ def example_new_session():
         },
     )
 
-    print("\n" + manager.get_context_summary(session_id))
-
     # Save session
-    filepath = manager.save_session(session_id)
-    print(f"\nSession saved to: {filepath}")
+    manager.save_session(session_id)
 
     return manager, session_id
 
 
 def example_continue_session():
     """Example: Continuing a previous session."""
-    print("\n" + "=" * 60)
-    print("Example 2: Continuing a Previous Session")
-    print("=" * 60)
 
     manager = AIConversationContextManager()
 
     # List available sessions
     sessions = manager.list_sessions()
-    print(f"\nAvailable sessions: {sessions}")
 
     if not sessions:
-        print("No sessions found. Run example_new_session() first.")
-        return
+        return None
 
     # Load the most recent session
     session_file = f".augment/context/sessions/{sessions[0]}.json"
     context = manager.load_session(session_file)
     session_id = context.session_id
-
-    print(f"\nLoaded session: {session_id}")
-    print(manager.get_context_summary(session_id))
 
     # Continue the conversation
     manager.add_message(
@@ -136,27 +119,19 @@ def example_continue_session():
         metadata={"type": "implementation_plan"},
     )
 
-    print("\n" + manager.get_context_summary(session_id))
-
     # Save updated session
-    filepath = manager.save_session(session_id)
-    print(f"\nSession updated and saved to: {filepath}")
+    manager.save_session(session_id)
 
     return manager, session_id
 
 
 def example_context_pruning():
     """Example: Demonstrating context pruning."""
-    print("\n" + "=" * 60)
-    print("Example 3: Context Pruning")
-    print("=" * 60)
 
     # Create a session with small context window for demonstration
     manager = AIConversationContextManager(max_tokens=500)
     session_id = "tta-pruning-demo"
     context = manager.create_session(session_id)
-
-    print("\nCreated session with max_tokens=500")
 
     # Add system message (always preserved)
     manager.add_message(
@@ -180,29 +155,18 @@ def example_context_pruning():
         )
 
         if i % 5 == 0:
-            print(f"\nAfter message {i}:")
-            print(manager.get_context_summary(session_id))
-
-    print("\n" + "=" * 60)
-    print("Final Context After Pruning:")
-    print("=" * 60)
-    print(manager.get_context_summary(session_id))
+            pass
 
     # Show which messages were preserved
     context = manager.contexts[session_id]
-    print("\nPreserved messages:")
     for msg in context.messages:
-        msg_num = msg.metadata.get("message_number", "system")
-        print(f"  - Message {msg_num} (importance={msg.importance}, role={msg.role})")
+        msg.metadata.get("message_number", "system")
 
     return manager, session_id
 
 
 def example_metadata_usage():
     """Example: Using metadata for organization."""
-    print("\n" + "=" * 60)
-    print("Example 4: Metadata Usage")
-    print("=" * 60)
 
     manager, session_id = create_tta_session("tta-metadata-demo")
 
@@ -252,36 +216,28 @@ def example_metadata_usage():
     # Query messages by metadata
     context = manager.contexts[session_id]
 
-    print("\nAll task requests:")
     task_requests = [
         msg for msg in context.messages if msg.metadata.get("type") == "task_request"
     ]
-    for msg in task_requests:
-        print(f"  - {msg.content[:50]}... (priority: {msg.metadata.get('priority')})")
+    for _msg in task_requests:
+        pass
 
-    print("\nHigh priority tasks:")
     high_priority = [
         msg for msg in task_requests if msg.metadata.get("priority") == "high"
     ]
-    for msg in high_priority:
-        print(f"  - {msg.content[:50]}...")
+    for _msg in high_priority:
+        pass
 
-    print("\nPhase 1 tasks:")
     phase1_tasks = [
         msg for msg in task_requests if msg.metadata.get("phase") == "phase1"
     ]
-    print(f"  Total: {len(phase1_tasks)} tasks")
-    total_days = sum(msg.metadata.get("estimated_days", 0) for msg in phase1_tasks)
-    print(f"  Estimated duration: {total_days} days")
+    sum(msg.metadata.get("estimated_days", 0) for msg in phase1_tasks)
 
     return manager, session_id
 
 
 def main():
     """Run all examples."""
-    print("\n" + "=" * 60)
-    print("AI Conversation Context Manager - Examples")
-    print("=" * 60)
 
     # Example 1: New session
     manager1, session1 = example_new_session()
@@ -294,15 +250,6 @@ def main():
 
     # Example 4: Metadata usage
     example_metadata_usage()
-
-    print("\n" + "=" * 60)
-    print("Examples Complete!")
-    print("=" * 60)
-    print("\nNext steps:")
-    print("1. Review saved sessions in .augment/context/sessions/")
-    print("2. Try loading a session and continuing the conversation")
-    print("3. Experiment with different importance scores and metadata")
-    print("4. Integrate with your AI-assisted development workflow")
 
 
 if __name__ == "__main__":

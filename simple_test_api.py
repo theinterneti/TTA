@@ -81,6 +81,4 @@ async def delete_session(session_id: str):
 
 
 if __name__ == "__main__":
-    print("🚀 Starting TTA Simple Test API on http://localhost:8000")
-    print("📝 API Docs: http://localhost:8000/docs")
     uvicorn.run(app, host="0.0.0.0", port=8000)

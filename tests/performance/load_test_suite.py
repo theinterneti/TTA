@@ -5,7 +5,6 @@ Tests performance under realistic healthcare usage scenarios
 
 import asyncio
 import csv
-import json
 import logging
 import random
 import statistics
@@ -469,7 +468,7 @@ class TTALoadTester:
             test_stats[result.test_name]["response_times"].append(result.response_time)
 
         # Calculate per-test statistics
-        for _, stats in test_stats.items():
+        for stats in test_stats.values():
             stats["success_rate"] = (
                 stats["successful"] / stats["total"] if stats["total"] > 0 else 0
             )
@@ -629,14 +628,7 @@ async def run_standard_load_test():
     tester = TTALoadTester(config)
     await tester.initialize()
 
-    report = await tester.run_load_test()
-
-    print("\n" + "=" * 80)
-    print("LOAD TEST REPORT")
-    print("=" * 80)
-    print(json.dumps(report, indent=2, default=str))
-
-    return report
+    return await tester.run_load_test()
 
 
 async def run_stress_test():
@@ -651,14 +643,7 @@ async def run_stress_test():
     tester = TTALoadTester(config)
     await tester.initialize()
 
-    report = await tester.run_load_test()
-
-    print("\n" + "=" * 80)
-    print("STRESS TEST REPORT")
-    print("=" * 80)
-    print(json.dumps(report, indent=2, default=str))
-
-    return report
+    return await tester.run_load_test()
 
 
 if __name__ == "__main__":

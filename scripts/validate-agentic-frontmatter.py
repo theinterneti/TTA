@@ -24,7 +24,6 @@ import yaml
 try:
     import yamale
 except ImportError:
-    print("❌ Error: yamale is not installed. Run: uv add --dev yamale")
     sys.exit(1)
 
 
@@ -40,8 +39,7 @@ def extract_frontmatter(file_path: Path) -> dict[str, Any] | None:
     try:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
-    except Exception as e:
-        print(f"❌ Error reading {file_path}: {e}")
+    except Exception:
         return None
 
     # Check for YAML frontmatter
@@ -60,8 +58,7 @@ def extract_frontmatter(file_path: Path) -> dict[str, Any] | None:
 
     try:
         return yaml.safe_load(frontmatter_text)
-    except yaml.YAMLError as e:
-        print(f"❌ Invalid YAML in {file_path}: {e}")
+    except yaml.YAMLError:
         return None
 
 
@@ -120,9 +117,6 @@ def main() -> int:
         (".github/specs/*.spec.md", "spec.schema.yaml"),
     ]
 
-    print("🔍 Validating Agentic Primitives Frontmatter...")
-    print("")
-
     all_passed = True
     total_files = 0
     passed_files = 0
@@ -131,48 +125,29 @@ def main() -> int:
         schema_path = schemas_dir / schema_name
 
         if not schema_path.exists():
-            print(f"⚠️  Warning: Schema not found: {schema_name}")
             continue
 
         # Get all matching files
         files = list(root.glob(pattern))
 
         if not files:
-            print(f"ℹ️  No files found matching: {pattern}")
             continue
-
-        print(f"📄 Validating {len(files)} file(s) with {schema_name}:")
 
         for file_path in sorted(files):
             total_files += 1
             passed, errors = validate_file(file_path, schema_path)
 
             if passed:
-                print(f"  ✅ {file_path.name}")
                 passed_files += 1
             else:
                 all_passed = False
-                print(f"  ❌ {file_path.name}")
-                for error in errors:
-                    print(f"     {error}")
-
-        print("")
+                for _error in errors:
+                    pass
 
     # Print summary
-    print("=" * 60)
-    print(f"📊 Validation Summary: {passed_files}/{total_files} files passed")
-    print("=" * 60)
 
     if all_passed:
-        print("✅ All agentic primitives frontmatter validation passed!")
         return 0
-    print("❌ Some agentic primitives frontmatter validation failed")
-    print("")
-    print("💡 Tips:")
-    print("  - Check that all required fields are present")
-    print("  - Verify field values match allowed enums")
-    print("  - Ensure YAML syntax is correct")
-    print("  - Review schema files in .github/schemas/")
     return 1
 
 

@@ -354,7 +354,7 @@ class TestCharacterAvatarManager(unittest.TestCase):
         self.assertIn("openness", traits)  # From high intensity preference
 
         # Check that all values are in valid range
-        for _, value in traits.items():
+        for value in traits.values():
             self.assertGreaterEqual(value, -1.0)
             self.assertLessEqual(value, 1.0)
 

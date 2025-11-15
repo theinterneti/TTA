@@ -4,7 +4,6 @@
 
 import re
 import time
-from datetime import datetime
 from pathlib import Path
 
 LOG_FILE = Path("phase7_batch_execution_final.log")
@@ -35,41 +34,26 @@ def get_progress():
 def print_progress(progress):
     """Print progress in a nice format."""
     if not progress:
-        print("❌ Log file not found")
         return
 
     completed = progress["completed"]
-    failed = progress["failed"]
-    started = progress["started"]
-    queued = progress["queued"]
+    progress["failed"]
+    progress["started"]
+    progress["queued"]
     total = progress["total"]
 
-    pct = (completed / total) * 100 if total > 0 else 0
-
-    print(f"\n{'=' * 60}")
-    print("📊 PHASE 7 BATCH EXECUTION PROGRESS")
-    print(f"{'=' * 60}")
-    print(f"⏱️  Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"✅ Completed: {completed}/{total} ({pct:.1f}%)")
-    print(f"❌ Failed: {failed}")
-    print(f"🔄 Started: {started}")
-    print(f"⏳ Queued: {queued}")
-    print(f"{'=' * 60}\n")
+    (completed / total) * 100 if total > 0 else 0
 
 
 if __name__ == "__main__":
-    print("🚀 Starting batch progress monitor...")
-    print("Press Ctrl+C to stop\n")
-
     try:
         while True:
             progress = get_progress()
             print_progress(progress)
 
             if progress and progress["completed"] >= TOTAL_TASKS:
-                print("✅ BATCH EXECUTION COMPLETE!")
                 break
 
             time.sleep(30)  # Check every 30 seconds
     except KeyboardInterrupt:
-        print("\n⏹️  Monitor stopped")
+        pass

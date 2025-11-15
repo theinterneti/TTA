@@ -131,11 +131,7 @@ class TestEndToEndValidation:
             "agent_orchestration.realtime.events.enabled": True,
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     async def test_complete_therapeutic_workflow(
         self, orchestration_service, performance_monitor
@@ -199,9 +195,6 @@ class TestEndToEndValidation:
         # Validate performance (should be under 2 seconds for this simple case)
         assert response_time < 5.0  # Allow some margin for test environment
 
-        print(f"Complete workflow test completed in {response_time:.2f}s")
-        print(f"Generated story length: {len(result['story'])} characters")
-
     async def test_crisis_intervention_workflow(
         self, orchestration_service, performance_monitor
     ):
@@ -252,11 +245,6 @@ class TestEndToEndValidation:
 
         # Crisis intervention should be fast
         assert response_time < 3.0  # Crisis intervention should be prioritized
-
-        print(f"Crisis intervention test completed in {response_time:.2f}s")
-        print(
-            f"Crisis intervention type: {crisis_response.get('intervention_type', 'unknown')}"
-        )
 
     async def test_session_context_persistence(
         self, orchestration_service, performance_monitor
@@ -313,10 +301,6 @@ class TestEndToEndValidation:
         # At minimum, the session should be consistent
         assert second_result["session_id"] == session_id
 
-        print(
-            f"Session context persistence validated across {len([first_result, second_result])} interactions"
-        )
-
     async def test_concurrent_workflow_handling(
         self, orchestration_service, performance_monitor
     ):
@@ -369,13 +353,8 @@ class TestEndToEndValidation:
             assert len(result["story"]) > 0
 
         # Validate performance under concurrent load
-        average_time = total_time / num_concurrent
+        total_time / num_concurrent
         assert total_time < 15.0  # All workflows should complete within reasonable time
-
-        print(
-            f"Concurrent workflow test: {num_concurrent} workflows completed in {total_time:.2f}s"
-        )
-        print(f"Average time per workflow: {average_time:.2f}s")
 
     async def test_error_handling_and_recovery(
         self, orchestration_service, performance_monitor
@@ -419,10 +398,6 @@ class TestEndToEndValidation:
             except Exception as e:
                 # If an exception is raised, it should be a controlled exception
                 assert "validation" in str(e).lower() or "input" in str(e).lower()
-
-        print(
-            f"Error handling test completed for {len(malformed_inputs)} malformed inputs"
-        )
 
     async def test_real_time_event_integration(
         self, orchestration_service, websocket_manager, performance_monitor
@@ -499,14 +474,7 @@ class TestEndToEndValidation:
         assert len(agent_events) > 0
 
         # Check for workflow progress events
-        workflow_events = [
-            e for e in received_events if e.get("event_type") == "workflow_progress"
-        ]
-
-        print(f"Real-time integration test: {len(received_events)} events captured")
-        print(
-            f"Agent events: {len(agent_events)}, Workflow events: {len(workflow_events)}"
-        )
+        [e for e in received_events if e.get("event_type") == "workflow_progress"]
 
     async def test_therapeutic_content_validation(
         self, orchestration_service, performance_monitor
@@ -563,7 +531,3 @@ class TestEndToEndValidation:
             harmful_keywords = ["harm", "hurt", "dangerous", "unsafe"]
             harmful_content = any(keyword in story for keyword in harmful_keywords)
             assert not harmful_content
-
-        print(
-            f"Therapeutic content validation completed for {len(therapeutic_scenarios)} scenarios"
-        )

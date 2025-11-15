@@ -99,7 +99,7 @@ def create_workflow():
 
     timeout = TimeoutPrimitive(router, timeout_seconds=30.0, fallback=fallback_prim)
 
-    cache = CachePrimitive(
+    return CachePrimitive(
         timeout,
         cache_key_fn=lambda d, c: (
             f"{hashlib.md5(d.get('prompt', '').encode()).hexdigest()[:16]}:"
@@ -108,71 +108,39 @@ def create_workflow():
         ttl_seconds=3600.0,
     )
 
-    return cache
-
 
 # ==================== TEST SCENARIOS ====================
 
 
 async def test1_simple_with_cache():
-    print("\n" + "=" * 80)
-    print("TEST 1: Simple Query with Caching")
-    print("=" * 80)
-
     workflow = create_workflow()
     ctx = WorkflowContext(metadata={"tier": "free"})
 
-    print("\n📤 First call (cache miss):")
-    r1 = await workflow.execute({"prompt": "Story about dragons"}, ctx)
-    print(f"  Provider: {r1['provider']}, Cost: ${r1['cost']:.3f}")
+    await workflow.execute({"prompt": "Story about dragons"}, ctx)
 
-    print("\n📤 Second call (cache hit):")
     ctx2 = WorkflowContext(metadata={"tier": "free"})
-    r2 = await workflow.execute({"prompt": "Story about dragons"}, ctx2)
-    print(f"  Provider: {r2['provider']}, Cost: ${r2['cost']:.3f}")
-    print(f"  ✓ Cache Hit: {ctx2.state.get('cache_hits', 0) > 0}")
+    await workflow.execute({"prompt": "Story about dragons"}, ctx2)
 
-    stats = workflow.get_stats()
-    print(
-        f"\n📊 Stats: {stats['hits']} hits, {stats['misses']} misses, {stats['hit_rate']}% hit rate"
-    )
+    workflow.get_stats()
 
 
 async def test2_complex_routing():
-    print("\n" + "=" * 80)
-    print("TEST 2: Complex Query Routing")
-    print("=" * 80)
-
     workflow = create_workflow()
 
     complex = "x" * 250  # Long prompt
     ctx = WorkflowContext(metadata={"tier": "free"})
 
-    print(f"\n📤 Complex prompt ({len(complex)} chars):")
-    r = await workflow.execute({"prompt": complex}, ctx)
-    print(f"  Provider: {r['provider']} (routed based on length)")
-    print(f"  Cost: ${r['cost']:.3f}")
+    await workflow.execute({"prompt": complex}, ctx)
 
 
 async def test3_premium_tier():
-    print("\n" + "=" * 80)
-    print("TEST 3: Premium Tier (Always OpenAI)")
-    print("=" * 80)
-
     workflow = create_workflow()
     ctx = WorkflowContext(metadata={"tier": "premium"})
 
-    print("\n📤 Simple prompt but premium user:")
-    r = await workflow.execute({"prompt": "Short story"}, ctx)
-    print(f"  Provider: {r['provider']} (premium → OpenAI)")
-    print(f"  Cost: ${r['cost']:.3f}")
+    await workflow.execute({"prompt": "Short story"}, ctx)
 
 
 async def test4_cost_analysis():
-    print("\n" + "=" * 80)
-    print("TEST 4: Cost Analysis (10 Requests)")
-    print("=" * 80)
-
     workflow = create_workflow()
 
     prompts = [
@@ -189,52 +157,22 @@ async def test4_cost_analysis():
     ]
 
     total_cost = 0.0
-    print("\n📤 Processing requests:")
 
-    for i, p in enumerate(prompts, 1):
+    for _i, p in enumerate(prompts, 1):
         ctx = WorkflowContext(metadata={"tier": "free"})
         r = await workflow.execute({"prompt": p}, ctx)
-        hit = ctx.state.get("cache_hits", 0) > 0
+        ctx.state.get("cache_hits", 0) > 0
         total_cost += r["cost"]
-        print(f"  {i}. {p:15} ${r['cost']:.3f} {'💰 HIT' if hit else '💸 MISS'}")
 
-    stats = workflow.get_stats()
-    no_cache_cost = len(prompts) * 0.01
-
-    print("\n📊 Results:")
-    print(f"  Requests: {len(prompts)}")
-    print(f"  Cache hit rate: {stats['hit_rate']}%")
-    print(f"  Actual cost: ${total_cost:.3f}")
-    print(f"  Without caching: ${no_cache_cost:.3f}")
-    print(
-        f"  Savings: ${no_cache_cost - total_cost:.3f} ({((no_cache_cost - total_cost) / no_cache_cost * 100):.1f}%)"
-    )
+    workflow.get_stats()
+    len(prompts) * 0.01
 
 
 async def main():
-    print("\n╔" + "═" * 78 + "╗")
-    print("║" + " " * 15 + "MVP OPTION 1: COMPLETE WORKFLOW" + " " * 30 + "║")
-    print("╚" + "═" * 78 + "╝")
-
     await test1_simple_with_cache()
     await test2_complex_routing()
     await test3_premium_tier()
     await test4_cost_analysis()
-
-    print("\n" + "=" * 80)
-    print("🎉 MVP COMPLETE!")
-    print("=" * 80)
-    print("\n✅ Demonstrated:")
-    print("  • Smart routing (simple→local, complex→OpenAI)")
-    print("  • Caching (40% hit rate in test)")
-    print("  • Timeout protection")
-    print("  • Cost optimization (40%+ savings)")
-    print("\n📈 Production Benefits:")
-    print("  • 40% cost reduction")
-    print("  • 10x faster cached responses")
-    print("  • 98% reliability")
-    print("\n📚 Next: Replace mocks with real LLM APIs and deploy!")
-    print()
 
 
 if __name__ == "__main__":

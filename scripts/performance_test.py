@@ -9,6 +9,7 @@ for the integrated gameplay loop system.
 import asyncio
 import logging
 import statistics
+import sys
 import time
 from typing import Any
 
@@ -39,7 +40,7 @@ class GameplayPerformanceTester:
         logger.info("Testing health endpoint performance...")
 
         response_times = []
-        for i in range(100):
+        for _i in range(100):
             start_time = time.time()
             async with self.session.get(
                 f"{self.base_url}/api/v1/gameplay/health"
@@ -66,7 +67,7 @@ class GameplayPerformanceTester:
         response_times = []
         success_count = 0
 
-        for i in range(50):  # Fewer requests for session creation
+        for _i in range(50):  # Fewer requests for session creation
             start_time = time.time()
             try:
                 async with self.session.post(
@@ -202,4 +203,4 @@ async def main():
 
 if __name__ == "__main__":
     success = asyncio.run(main())
-    exit(0 if success else 1)
+    sys.exit(0 if success else 1)

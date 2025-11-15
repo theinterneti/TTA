@@ -112,9 +112,7 @@ class PerformanceAlerting:
         escalation_rules: list[EscalationRule] | None = None,
     ):
         # Alert configuration
-        self.thresholds: list[AlertThreshold] = (
-            default_thresholds or self._get_default_thresholds()
-        )
+        self.thresholds: list[AlertThreshold] = default_thresholds or self._get_default_thresholds()
         self.escalation_rules: dict[tuple, EscalationRule] = {}
 
         if escalation_rules:
@@ -204,7 +202,9 @@ class PerformanceAlerting:
             return None
 
         # Create alert
-        alert_id = f"{AlertType.RESPONSE_TIME_VIOLATION.value}_{operation_type.value}_{int(time.time())}"
+        alert_id = (
+            f"{AlertType.RESPONSE_TIME_VIOLATION.value}_{operation_type.value}_{int(time.time())}"
+        )
 
         alert = Alert(
             alert_id=alert_id,
@@ -230,9 +230,7 @@ class PerformanceAlerting:
         metadata: dict[str, Any] | None = None,
     ) -> Alert:
         """Create SLA breach alert."""
-        alert_id = (
-            f"{AlertType.SLA_BREACH.value}_{operation_type.value}_{int(time.time())}"
-        )
+        alert_id = f"{AlertType.SLA_BREACH.value}_{operation_type.value}_{int(time.time())}"
 
         alert = Alert(
             alert_id=alert_id,
@@ -250,9 +248,7 @@ class PerformanceAlerting:
         await self._process_alert(alert)
         return alert
 
-    async def create_bottleneck_alert(
-        self, bottleneck: BottleneckIdentification
-    ) -> Alert:
+    async def create_bottleneck_alert(self, bottleneck: BottleneckIdentification) -> Alert:
         """Create bottleneck detection alert."""
         alert_id = f"{AlertType.BOTTLENECK_DETECTED.value}_{bottleneck.bottleneck_type.value}_{int(time.time())}"
 
@@ -273,18 +269,14 @@ class PerformanceAlerting:
             title=f"Performance Bottleneck Detected - {bottleneck.bottleneck_type.value}",
             description=bottleneck.description,
             operation_type=(
-                bottleneck.affected_operations[0]
-                if bottleneck.affected_operations
-                else None
+                bottleneck.affected_operations[0] if bottleneck.affected_operations else None
             ),
             metric_value=bottleneck.severity,
             threshold_value=0.3,  # Minimum severity for alerting
             timestamp=time.time(),
             metadata={
                 "bottleneck_type": bottleneck.bottleneck_type.value,
-                "affected_operations": [
-                    op.value for op in bottleneck.affected_operations
-                ],
+                "affected_operations": [op.value for op in bottleneck.affected_operations],
                 "evidence": bottleneck.evidence,
                 "recommendations": bottleneck.recommendations,
                 "confidence": bottleneck.confidence,
@@ -390,9 +382,7 @@ class PerformanceAlerting:
         # Send to handlers
         await self._send_alert(alert)
 
-        logger.warning(
-            f"Alert generated: {alert.title} (Severity: {alert.severity.value})"
-        )
+        logger.warning(f"Alert generated: {alert.title} (Severity: {alert.severity.value})")
 
     async def _send_alert(self, alert: Alert) -> None:
         """Send alert to all registered handlers."""
@@ -439,9 +429,7 @@ class PerformanceAlerting:
 
         # Escalate
         alert.escalation_count += 1
-        alert.escalation_level = EscalationLevel(
-            min(4, alert.escalation_level.value + 1)
-        )
+        alert.escalation_level = EscalationLevel(min(4, alert.escalation_level.value + 1))
         alert.last_escalation_time = current_time
 
         self.escalation_counts[alert.escalation_level] += 1
@@ -449,13 +437,9 @@ class PerformanceAlerting:
         # Send escalation notifications
         await self._send_escalation(alert, escalation_rule)
 
-        logger.warning(
-            f"Alert escalated: {alert.alert_id} to level {alert.escalation_level.value}"
-        )
+        logger.warning(f"Alert escalated: {alert.alert_id} to level {alert.escalation_level.value}")
 
-    async def _send_escalation(
-        self, alert: Alert, escalation_rule: EscalationRule
-    ) -> None:
+    async def _send_escalation(self, alert: Alert, escalation_rule: EscalationRule) -> None:
         """Send escalation notifications."""
         for target in escalation_rule.escalation_targets:
             handler = self.escalation_handlers.get(target)
@@ -496,18 +480,12 @@ class PerformanceAlerting:
         """Find applicable threshold for operation type and metric."""
         # Look for specific threshold first
         for threshold in self.thresholds:
-            if (
-                threshold.operation_type == operation_type
-                and threshold.metric_name == metric_name
-            ):
+            if threshold.operation_type == operation_type and threshold.metric_name == metric_name:
                 return threshold
 
         # Look for global threshold
         for threshold in self.thresholds:
-            if (
-                threshold.operation_type is None
-                and threshold.metric_name == metric_name
-            ):
+            if threshold.operation_type is None and threshold.metric_name == metric_name:
                 return threshold
 
         return None

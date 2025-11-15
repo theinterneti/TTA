@@ -61,9 +61,7 @@ class MonitoringEventIntegrator:
         self.event_publisher = event_publisher
         self.system_monitor = system_monitor
         self.alert_manager = alert_manager
-        self.response_time_monitor = (
-            response_time_monitor or get_response_time_monitor()
-        )
+        self.response_time_monitor = response_time_monitor or get_response_time_monitor()
         self.performance_analytics = performance_analytics
         self.performance_alerting = performance_alerting
         self.config = config or MonitoringConfig()
@@ -79,9 +77,7 @@ class MonitoringEventIntegrator:
         # Alert handlers
         self.alert_handlers: list[Callable] = []
 
-        logger.info(
-            f"MonitoringEventIntegrator initialized, enabled: {self.config.enabled}"
-        )
+        logger.info(f"MonitoringEventIntegrator initialized, enabled: {self.config.enabled}")
 
     async def start(self) -> None:
         """Start monitoring integration."""
@@ -89,9 +85,7 @@ class MonitoringEventIntegrator:
             return
 
         if not self.event_publisher:
-            logger.warning(
-                "No event publisher available, monitoring integration disabled"
-            )
+            logger.warning("No event publisher available, monitoring integration disabled")
             return
 
         self.is_running = True
@@ -131,10 +125,7 @@ class MonitoringEventIntegrator:
                 current_time = time.time()
 
                 # Check if it's time to broadcast metrics
-                if (
-                    current_time - self.last_metrics_time
-                    >= self.config.metrics_interval
-                ):
+                if current_time - self.last_metrics_time >= self.config.metrics_interval:
                     await self._broadcast_system_metrics()
                     await self._broadcast_agent_metrics()
                     await self._broadcast_performance_metrics()
@@ -307,9 +298,7 @@ class MonitoringEventIntegrator:
                     ),
                     "sla_compliance": performance_summary.get("sla_compliance", 0.0),
                     "operation_types": performance_summary.get("operation_types", 0),
-                    "statistics_by_type": performance_summary.get(
-                        "statistics_by_type", {}
-                    ),
+                    "statistics_by_type": performance_summary.get("statistics_by_type", {}),
                 },
             )
 
@@ -375,9 +364,7 @@ class MonitoringEventIntegrator:
         except Exception as e:
             logger.error(f"Failed to broadcast performance alert: {e}")
 
-    async def broadcast_performance_analysis(
-        self, analysis_results: dict[str, Any]
-    ) -> None:
+    async def broadcast_performance_analysis(self, analysis_results: dict[str, Any]) -> None:
         """Broadcast performance analysis results."""
         if not self.event_publisher:
             return
@@ -391,15 +378,11 @@ class MonitoringEventIntegrator:
                 queue_depth=0,
                 metadata={
                     "performance_analysis": True,
-                    "analysis_timestamp": analysis_results.get(
-                        "analysis_timestamp", time.time()
-                    ),
+                    "analysis_timestamp": analysis_results.get("analysis_timestamp", time.time()),
                     "overall_health": analysis_results.get("overall_health", "unknown"),
                     "bottlenecks_count": len(analysis_results.get("bottlenecks", [])),
                     "trends_count": len(analysis_results.get("trends", [])),
-                    "recommendations_count": len(
-                        analysis_results.get("recommendations", [])
-                    ),
+                    "recommendations_count": len(analysis_results.get("recommendations", [])),
                     "bottlenecks": analysis_results.get("bottlenecks", []),
                     "trends": analysis_results.get("trends", []),
                     "recommendations": analysis_results.get("recommendations", []),
@@ -448,9 +431,7 @@ class MonitoringEventIntegrator:
                         "current_value": current_value,
                         "threshold_value": threshold_value,
                         "breach_ratio": (
-                            current_value / threshold_value
-                            if threshold_value > 0
-                            else 0
+                            current_value / threshold_value if threshold_value > 0 else 0
                         ),
                     },
                     source="performance_monitor",

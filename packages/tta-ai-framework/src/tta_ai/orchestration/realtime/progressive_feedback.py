@@ -255,9 +255,7 @@ class ProgressiveFeedbackManager:
 
         # Update final status
         operation.status = "completed" if success else "failed"
-        operation.progress_percentage = (
-            100.0 if success else operation.progress_percentage
-        )
+        operation.progress_percentage = 100.0 if success else operation.progress_percentage
 
         if final_result:
             operation.intermediate_results.update(final_result)
@@ -273,9 +271,7 @@ class ProgressiveFeedbackManager:
         self.operation_update_counts.pop(operation_id, None)
         self.operation_callbacks.pop(operation_id, None)
 
-        logger.info(
-            f"Completed operation: {operation_id} ({'success' if success else 'failed'})"
-        )
+        logger.info(f"Completed operation: {operation_id} ({'success' if success else 'failed'})")
         return True
 
     async def fail_operation(
@@ -335,9 +331,7 @@ class ProgressiveFeedbackManager:
 
         return operations
 
-    async def _send_progress_event(
-        self, operation: OperationProgress, message: str
-    ) -> None:
+    async def _send_progress_event(self, operation: OperationProgress, message: str) -> None:
         """Send a progressive feedback event."""
         if not self.event_publisher:
             return
@@ -429,9 +423,7 @@ class ProgressiveFeedbackManager:
         """Get count of operations by type."""
         counts = {}
         for operation in self.active_operations.values():
-            counts[operation.operation_type] = (
-                counts.get(operation.operation_type, 0) + 1
-            )
+            counts[operation.operation_type] = counts.get(operation.operation_type, 0) + 1
         return counts
 
     def _get_operations_by_user(self) -> dict[str, int]:

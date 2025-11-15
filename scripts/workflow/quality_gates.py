@@ -21,6 +21,8 @@ from typing import Any
 # Add parent directories to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import contextlib
+
 from scripts.observability.dev_metrics import track_execution
 from scripts.primitives.error_recovery import RetryConfig, with_retry
 
@@ -137,7 +139,7 @@ class TestCoverageGate(QualityGateValidator):
 
         try:
             # Run pytest with coverage using project environment
-            result = subprocess.run(
+            subprocess.run(
                 [
                     "uv",
                     "run",
@@ -321,10 +323,8 @@ class LintingGate(QualityGateValidator):
             # Parse JSON output
             issues = []
             if result.stdout:
-                try:
+                with contextlib.suppress(json.JSONDecodeError):
                     issues = json.loads(result.stdout)
-                except json.JSONDecodeError:
-                    pass
 
             return QualityGateResult(
                 passed=passed,
@@ -707,22 +707,19 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python quality_gates.py <component_path>")
         sys.exit(1)
 
     component_path = sys.argv[1]
     results = run_quality_gates(component_path)
 
-    print("\n=== Quality Gate Results ===\n")
-    for gate_name, result in results.items():
+    for result in results.values():
         status = "✓ PASS" if result.passed else "✗ FAIL"
-        print(f"{status} {gate_name}")
         if result.errors:
-            for error in result.errors:
-                print(f"  ERROR: {error}")
+            for _error in result.errors:
+                pass
         if result.warnings:
-            for warning in result.warnings:
-                print(f"  WARN: {warning}")
+            for _warning in result.warnings:
+                pass
 
     # Exit with error if any gate failed
     if not all(r.passed for r in results.values()):

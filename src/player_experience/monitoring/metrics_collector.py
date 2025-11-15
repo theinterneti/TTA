@@ -234,10 +234,8 @@ class MetricsCollector:
     def _aggregation_loop(self):
         """Background loop for metric aggregation."""
         while not self.stop_aggregation.wait(self.aggregation_interval):
-            try:
+            with contextlib.suppress(Exception):
                 self._aggregate_metrics()
-            except Exception as e:
-                print(f"Error in metrics aggregation: {e}")
 
     def _aggregate_metrics(self):
         """Aggregate metrics and trigger callbacks."""
@@ -267,10 +265,8 @@ class MetricsCollector:
             # Trigger callbacks
             for metric_name, callbacks in self.metric_callbacks.items():
                 for callback in callbacks:
-                    try:
+                    with contextlib.suppress(Exception):
                         callback(metric_name, self.get_metric_value(metric_name))
-                    except Exception as e:
-                        print(f"Error in metric callback for {metric_name}: {e}")
 
     def record_counter(
         self, name: str, value: int = 1, tags: dict[str, str] | None = None

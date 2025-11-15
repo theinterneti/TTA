@@ -13,8 +13,6 @@ from pathlib import Path
 
 def run_command(cmd, description):
     """Run a command and return success status."""
-    print(f"\n🔍 {description}")
-    print(f"Command: {cmd}")
 
     try:
         result = subprocess.run(
@@ -27,29 +25,23 @@ def run_command(cmd, description):
         )
 
         if result.returncode == 0:
-            print(f"✅ SUCCESS: {description}")
             if result.stdout.strip():
                 # Show test count from output
                 lines = result.stdout.strip().split("\n")
                 for line in lines:
                     if ".py:" in line and any(char.isdigit() for char in line):
-                        print(f"   {line}")
+                        pass
             return True
-        print(f"❌ FAILED: {description}")
         if result.stderr:
-            print(f"Error: {result.stderr}")
+            pass
         return False
 
-    except Exception as e:
-        print(f"❌ ERROR: {description} - {e}")
+    except Exception:
         return False
 
 
 def validate_test_files():
     """Validate that all test files exist and are properly structured."""
-    print("\n" + "=" * 60)
-    print("📁 VALIDATING TEST FILE STRUCTURE")
-    print("=" * 60)
 
     test_files = [
         "test_multi_agent_workflow_integration.py",
@@ -67,9 +59,8 @@ def validate_test_files():
     for test_file in test_files:
         file_path = base_path / test_file
         if file_path.exists():
-            print(f"✅ {test_file}")
+            pass
         else:
-            print(f"❌ {test_file} - NOT FOUND")
             all_exist = False
 
     return all_exist
@@ -77,9 +68,6 @@ def validate_test_files():
 
 def validate_test_discovery():
     """Validate that pytest can discover all integration tests."""
-    print("\n" + "=" * 60)
-    print("🔍 VALIDATING TEST DISCOVERY")
-    print("=" * 60)
 
     commands = [
         (
@@ -120,15 +108,11 @@ def validate_test_discovery():
             except Exception:
                 pass
 
-    print(f"\n📊 TOTAL INTEGRATION TESTS DISCOVERED: {total_tests}")
     return all_success
 
 
 def validate_three_tier_execution():
     """Validate three-tier test execution pattern."""
-    print("\n" + "=" * 60)
-    print("🎯 VALIDATING THREE-TIER EXECUTION")
-    print("=" * 60)
 
     test_file = "tests/agent_orchestration/test_end_to_end_workflows.py"
 
@@ -159,17 +143,12 @@ def validate_three_tier_execution():
 
 def validate_ci_cd_compatibility():
     """Validate CI/CD configuration compatibility."""
-    print("\n" + "=" * 60)
-    print("🚀 VALIDATING CI/CD COMPATIBILITY")
-    print("=" * 60)
 
     # Check if GitHub Actions workflow exists
     workflow_path = (
         Path(__file__).parent.parent.parent / ".github" / "workflows" / "tests.yml"
     )
     if workflow_path.exists():
-        print("✅ GitHub Actions workflow found")
-
         # Check if integration job exists
         with open(workflow_path) as f:
             content = f.read()
@@ -182,23 +161,18 @@ def validate_ci_cd_compatibility():
         ]
 
         all_good = True
-        for check, desc in checks:
+        for check, _desc in checks:
             if check:
-                print(f"✅ {desc}")
+                pass
             else:
-                print(f"❌ {desc}")
                 all_good = False
 
         return all_good
-    print("❌ GitHub Actions workflow not found")
     return False
 
 
 def validate_pytest_markers():
     """Validate that tests have proper pytest markers."""
-    print("\n" + "=" * 60)
-    print("🏷️  VALIDATING PYTEST MARKERS")
-    print("=" * 60)
 
     test_files = [
         "test_end_to_end_workflows.py",
@@ -223,18 +197,16 @@ def validate_pytest_markers():
             ]
 
             file_good = True
-            for marker, desc in markers:
+            for marker, _desc in markers:
                 if marker in content:
-                    print(f"✅ {test_file}: {desc}")
+                    pass
                 else:
-                    print(f"❌ {test_file}: Missing {desc}")
                     file_good = False
                     all_good = False
 
             if file_good:
-                print(f"✅ {test_file}: All markers present")
+                pass
         else:
-            print(f"❌ {test_file}: File not found")
             all_good = False
 
     return all_good
@@ -242,9 +214,6 @@ def validate_pytest_markers():
 
 def main():
     """Main validation function."""
-    print("🧪 INTEGRATION TEST VALIDATION")
-    print("Task 12.2: Multi-Agent Workflow Integration Tests")
-    print("=" * 60)
 
     validations = [
         ("Test File Structure", validate_test_files),
@@ -258,32 +227,18 @@ def main():
     for name, validator in validations:
         try:
             results[name] = validator()
-        except Exception as e:
-            print(f"❌ ERROR in {name}: {e}")
+        except Exception:
             results[name] = False
 
     # Summary
-    print("\n" + "=" * 60)
-    print("📋 VALIDATION SUMMARY")
-    print("=" * 60)
 
     all_passed = True
     for name, passed in results.items():
-        status = "✅ PASS" if passed else "❌ FAIL"
-        print(f"{status}: {name}")
         if not passed:
             all_passed = False
 
-    print("\n" + "=" * 60)
     if all_passed:
-        print("🎉 ALL VALIDATIONS PASSED!")
-        print("✅ Task 12.2 integration tests are ready for production")
-        print("✅ CI/CD pipeline will execute tests correctly")
-        print("✅ Three-tier execution pattern is working")
-        print("✅ All test infrastructure is properly configured")
         return 0
-    print("❌ SOME VALIDATIONS FAILED")
-    print("Please review the failed validations above")
     return 1
 
 

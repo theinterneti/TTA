@@ -20,19 +20,19 @@ class TestDockerCommands:
     def orchestrator(self):
         """Create orchestrator with mocked dependencies for testing."""
         # Mock the validation and import methods to prevent filesystem operations
-        with patch(
-            "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"
+        with (
+            patch(
+                "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"
+            ),
+            patch("src.orchestration.orchestrator.TTAOrchestrator._import_components"),
         ):
-            with patch(
-                "src.orchestration.orchestrator.TTAOrchestrator._import_components"
-            ):
-                # Create orchestrator (validation and import are mocked)
-                orchestrator = TTAOrchestrator()
+            # Create orchestrator (validation and import are mocked)
+            orchestrator = TTAOrchestrator()
 
-                # Clear any components
-                orchestrator.components.clear()
+            # Clear any components
+            orchestrator.components.clear()
 
-                return orchestrator
+            return orchestrator
 
     @patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_command_success(self, mock_safe_run, orchestrator):
@@ -220,7 +220,7 @@ class TestDockerCommands:
         mock_result.stderr = ""
         mock_safe_run.return_value = mock_result
 
-        results = orchestrator.run_docker_compose_command(
+        orchestrator.run_docker_compose_command(
             ["up", "-d", "--build"], repository="tta.dev"
         )
 

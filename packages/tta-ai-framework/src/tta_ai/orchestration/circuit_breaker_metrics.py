@@ -47,9 +47,7 @@ class CircuitBreakerMetricsCollector:
     ) -> None:
         """Record a circuit breaker state transition."""
         transition_key = f"{from_state.value}_to_{to_state.value}"
-        self.state_transitions[transition_key] = (
-            self.state_transitions.get(transition_key, 0) + 1
-        )
+        self.state_transitions[transition_key] = self.state_transitions.get(transition_key, 0) + 1
         self.last_update = time.time()
 
         # Structured logging with correlation ID
@@ -358,6 +356,4 @@ def record_degraded_mode_activation(
     circuit_breaker_name: str, reason: str, correlation_id: str | None = None
 ) -> None:
     """Convenience function to record degraded mode activation."""
-    _global_logger.log_degraded_mode_activation(
-        circuit_breaker_name, reason, correlation_id
-    )
+    _global_logger.log_degraded_mode_activation(circuit_breaker_name, reason, correlation_id)

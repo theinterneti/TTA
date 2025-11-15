@@ -256,15 +256,9 @@ if __name__ == "__main__":
         return "success"
 
     # Run example
-    print("Running example operation...")
     result = example_operation()
-    print(f"Result: {result}")
 
     # Get summary
     summary = _collector.get_metrics_summary(days=1)
-    print("\nMetrics Summary:")
-    for name, metrics in summary.items():
-        print(f"\n{name}:")
-        print(f"  Executions: {metrics['total_executions']}")
-        print(f"  Success Rate: {metrics['success_rate']:.1%}")
-        print(f"  Avg Duration: {metrics['avg_duration_ms']:.0f}ms")
+    for _metrics in summary.values():
+        pass

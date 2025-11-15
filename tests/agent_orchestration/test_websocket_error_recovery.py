@@ -43,19 +43,14 @@ class TestWebSocketErrorRecovery:
             "agent_orchestration.realtime.recovery.timeout": 10.0,
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for testing."""
-        publisher = EventPublisher(
+        return EventPublisher(
             redis_client=redis_client, channel_prefix="test:events", enabled=True
         )
-        return publisher
 
     @pytest_asyncio.fixture
     async def error_manager(self, event_publisher):

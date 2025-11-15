@@ -1,0 +1,46 @@
+Agentic memory is formalized and maintained primarily through persistent files designed to act as architectural specifications, instructions, and collective knowledge for the agent.
+A. Repository Custom Instructions (Static Context Memory)
+GitHub Copilot relies heavily on Custom Instructions to give the agent persistent, long-term memory about a repository. These files function as memory assets that accrue compound intelligence over time.
+1. Repository-Wide Instructions: Defined in the .github/copilot-instructions.md file located in the root of the repository, these instructions apply to virtually all requests made within the repository context. These instructions are automatically added to the prompt submitted to Copilot Chat.
+    ◦ Content: Effective instructions should provide an overview of the project (purpose, goals), include the folder structure, specify coding standards/conventions, and list specific tools, libraries, or frameworks in use (including version numbers).
+    ◦ Onboarding: The primary goal of these files is to onboard an agent efficiently, minimizing exploration time (using grep, find, etc.) and reducing the chance of generating code that fails validation or CI builds.
+2. Path-Specific Instructions (Modular Memory): These memory files (NAME.instructions.md) are stored within the .github/instructions directory and use the applyTo keyword with glob syntax (e.g., applyTo: "**/ *.ts,* */* .tsx") to apply only to files matching a specified path. This allows for modular memory where knowledge is only loaded when relevant, conserving the limited context space.
+3. Agent Instructions (LLM-Specific Memory): Specific instruction files are recognized by several agents for hierarchical context loading:
+    ◦ AGENTS.md: Can be stored anywhere, with the nearest file in the directory tree taking precedence.
+    ◦ CLAUDE.md or GEMINI.md: These files, stored in the repository root, are used as persistent instructions/context for specific models. Gemini CLI specifically uses GEMINI.md to provide persistent context.
+B. Conversation Memory and Checkpointing
+Agents also manage session-level memory for continuity:
+• Checkpointing/Resuming: Gemini CLI supports checkpointing to save and resume conversations. GitHub Copilot CLI allows resuming the previous session using --continue or choosing a specific session with --resume.
+• Augment Memories: Augment automatically creates Augment Memories during agent operation. Users can import information from these memories into user guidelines or permanent rules.
+2. Advanced Agentic Memory Platforms (Eion, DevContext, A-mem)
+Building on the foundation of TTA.dev's use of LangGraph (agent orchestration) and Neo4j/Redis (data persistence) (previous conversation knowledge), these platforms offer dedicated memory layers:
+Platform
+Specialization
+Agentic Memory Features
+A-mem
+Dynamic Memory Evolution
+Uses ChromaDB for vector storage. Generates comprehensive notes, contextual tags, and links based on historical memories, allowing for dynamic memory evolution and updates.
+DevContext
+Context Lifecycle Management
+Implemented as an MCP server, it exposes tools for explicit memory control: initialize_conversation_context, update_conversation_context, record_milestone_context (for saving critical decisions/bugs), and finalize_conversation_context. It focuses on Automatic pattern learning and cross-session pattern promotion.
+Redis Agent Memory Server
+Dedicated Backend Storage
+A Python repository providing a backend for agent memory, which would integrate smoothly with TTA.dev's existing Redis infrastructure (previous conversation knowledge) for fast session or knowledge storage.
+3. Active Context Engineering Mechanisms
+Active context engineering involves dynamically gathering, prioritizing, and injecting the most relevant data into the LLM's context window to ensure reliability and focus.
+A. Context Selection and Prioritization (The "Wishes" System)
+In platforms like GitHub Copilot, intelligent context selection is crucial because the context window is limited, and irrelevant data degrades accuracy.
+• Snippet Generation: Source code files are often too long to fit completely. Files are cut into natural, overlapping snippets, usually no longer than 60 lines.
+• Relevance Scoring: These snippets are scored for relevance using metrics like Jaccard similarity (which is fast to compute).
+• Priority Ranking ("Wishes"): Context pieces (known as "wishes") are assigned priorities. For instance, lines directly above the cursor have maximum priority. The total wishlist is sorted by priority, and lower-priority wishes are discarded until the remaining context fits the token limit.
+B. Explicit Context Injection (Manual Retrieval-Augmented Generation)
+Users and agents can explicitly manage context using mentions:
+• Local File Mentions: Use # followed by the file or folder name (e.g., #src/app.js) to inject its content into the prompt context.
+• Web Retrieval: Use #fetch <URL> to retrieve content from a specific web page (e.g., API references or documentation).
+• Repository Search: Use #githubRepo <repo name> to perform a code search within a specified GitHub repository.
+C. Agent Skills (Modular Context and Capabilities)
+Anthropic’s Agent Skills provide a structured way to package expertise and context for Claude.
+• Skills as Memory: Skills are folders that include instructions, scripts, and resources that Claude loads only when relevant to the task.
+• Examples: Skills can range from creative applications to enterprise workflows like handling brand guidelines, technical testing, or document creation (Word, Excel, PDF, PowerPoint).
+• Mechanism: Each skill contains a SKILL.md file with instructions and metadata that Claude follows when the skill is active. This allows Claude to become a specialist on specific subjects. Skills are available via the Messages API and via the new /v1/skills endpoint.
+These systems demonstrate that advanced agent development relies heavily on externalizing memory and context away from the core LLM call, ensuring that the model receives precisely the relevant, pre-processed information it needs to execute a task reliably.

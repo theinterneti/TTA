@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import time
 from enum import Enum
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -131,14 +131,14 @@ class PaginationMetadata(BaseModel):
         return v
 
 
-class PaginatedData(BaseModel, Generic[T]):
+class PaginatedData[T](BaseModel):
     """Generic paginated data container."""
 
     items: list[T] = Field(..., description="Items in this page")
     pagination: PaginationMetadata = Field(..., description="Pagination metadata")
 
 
-class ToolResponse(BaseModel, Generic[T]):
+class ToolResponse[T](BaseModel):
     """
     Generic standardized response wrapper for all MCP tools.
 
@@ -234,10 +234,7 @@ def check_schema_compatibility(response_version: str, expected_version: str) -> 
             return False
 
         # Minor version must be >= (backward compatible)
-        if resp_minor < exp_minor:
-            return False
-
-        return True
+        return not resp_minor < exp_minor
 
     except (ValueError, IndexError):
         # Invalid version format

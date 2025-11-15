@@ -774,48 +774,16 @@ if __name__ == "__main__":
             therapeutic_context=test_context,
         )
 
-        print("\n" + "=" * 80)
-        print("EXCELLENCE NARRATIVE QUALITY ASSESSMENT RESULTS")
-        print("=" * 80)
-
-        print(f"\n🎯 Session: {metrics.session_id}")
-        print(f"   Excellence Score: {metrics.excellence_score:.1f}/10")
-        print(
-            f"   Meets Excellence Standards: {'✅ YES' if metrics.meets_excellence_standards else '❌ NO'}"
-        )
-
-        print("\n📊 Core Quality Scores:")
-        print(
-            f"   Narrative Coherence: {metrics.narrative_coherence_score:.1f}/10 (Target: ≥8.5)"
-        )
-        print(
-            f"   Therapeutic Relevance: {metrics.therapeutic_relevance_score:.1f}/10 (Target: ≥8.0)"
-        )
-        print(
-            f"   User Engagement: {metrics.user_engagement_score:.1f}/10 (Target: ≥8.5)"
-        )
-
-        print("\n🔍 Detailed Quality Dimensions:")
-        print(f"   Character Consistency: {metrics.character_consistency_score:.1f}/10")
-        print(f"   Plot Logic: {metrics.plot_logic_score:.1f}/10")
-        print(f"   Emotional Resonance: {metrics.emotional_resonance_score:.1f}/10")
-        print(
-            f"   Therapeutic Integration: {metrics.therapeutic_integration_score:.1f}/10"
-        )
-
         if metrics.excellence_indicators:
-            print("\n🌟 Excellence Indicators:")
-            for indicator in metrics.excellence_indicators:
-                print(f"   ✨ {indicator}")
+            for _indicator in metrics.excellence_indicators:
+                pass
 
         if metrics.quality_highlights:
-            print("\n💎 Quality Highlights:")
-            for highlight in metrics.quality_highlights:
-                print(f"   🔥 {highlight}")
+            for _highlight in metrics.quality_highlights:
+                pass
 
         if metrics.excellence_recommendations:
-            print("\n💡 Excellence Recommendations:")
-            for rec in metrics.excellence_recommendations[:5]:
-                print(f"   📈 {rec}")
+            for _rec in metrics.excellence_recommendations[:5]:
+                pass
 
     asyncio.run(main())

@@ -53,9 +53,7 @@ class WorkflowTransaction:
             tx.savepoints.append(Savepoint(name=name, created_at=created_at))
         await self._persist(tx)
 
-    async def add_cleanup(
-        self, run_id: str, savepoint: str, *, kind: str, value: str
-    ) -> None:
+    async def add_cleanup(self, run_id: str, savepoint: str, *, kind: str, value: str) -> None:
         tx = await self._load(run_id) or TxState(run_id=run_id)
         items = tx.cleanup.setdefault(savepoint, [])
         # idempotent: avoid duplicate (kind,value)
@@ -115,9 +113,7 @@ class WorkflowTransaction:
         if not raw:
             return None
         try:
-            return self._from_dump(
-                json.loads(raw if isinstance(raw, str) else raw.decode())
-            )
+            return self._from_dump(json.loads(raw if isinstance(raw, str) else raw.decode()))
         except Exception:
             return None
 
@@ -125,9 +121,7 @@ class WorkflowTransaction:
     def _dump(self, tx: TxState) -> dict[str, Any]:
         return {
             "run_id": tx.run_id,
-            "savepoints": [
-                {"name": s.name, "created_at": s.created_at} for s in tx.savepoints
-            ],
+            "savepoints": [{"name": s.name, "created_at": s.created_at} for s in tx.savepoints],
             "cleanup": {
                 sp: [{"kind": c.kind, "value": c.value, "done": c.done} for c in items]
                 for sp, items in tx.cleanup.items()
@@ -138,9 +132,7 @@ class WorkflowTransaction:
         tx = TxState(run_id=d.get("run_id"))
         for s in d.get("savepoints", []) or []:
             tx.savepoints.append(
-                Savepoint(
-                    name=s.get("name"), created_at=float(s.get("created_at") or 0)
-                )
+                Savepoint(name=s.get("name"), created_at=float(s.get("created_at") or 0))
             )
         for sp, items in (d.get("cleanup") or {}).items():
             tx.cleanup[sp] = [

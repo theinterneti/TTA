@@ -182,9 +182,7 @@ class TestCursorManagerPropertyBased:
         if len(cursor) > tamper_index:
             # Tamper with cursor
             cursor_list = list(cursor)
-            cursor_list[tamper_index] = (
-                "X" if cursor_list[tamper_index] != "X" else "Y"
-            )
+            cursor_list[tamper_index] = "X" if cursor_list[tamper_index] != "X" else "Y"
             tampered = "".join(cursor_list)
 
             with pytest.raises(ValueError):
@@ -210,4 +208,3 @@ class TestGlobalCursorManager:
 
         # Reset for other tests
         set_cursor_manager(CursorManager())
-

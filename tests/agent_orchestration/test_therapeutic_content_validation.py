@@ -176,10 +176,6 @@ class TestTherapeuticContentValidation:
             # Validate safety validation flag
             assert result.get("safety_validated", False) is True
 
-            print(
-                f"Therapeutic scenario {i + 1}: {scenario['expected_safety_level']} risk level validated"
-            )
-
     async def test_crisis_intervention_content_flow(
         self, therapeutic_orchestration_service
     ):
@@ -268,10 +264,6 @@ class TestTherapeuticContentValidation:
             )
             assert not triggering_content
 
-            print(
-                f"Crisis scenario {i + 1}: {scenario['crisis_type']} intervention validated"
-            )
-
     async def test_therapeutic_safety_escalation_workflow(
         self, therapeutic_orchestration_service
     ):
@@ -326,10 +318,6 @@ class TestTherapeuticContentValidation:
                     "crisis_response" not in result or result["crisis_response"] is None
                 )
 
-            print(
-                f"Escalation scenario {i + 1}: Risk {scenario['expected_risk']}, Escalation: {scenario['expected_escalation']}"
-            )
-
     async def test_therapeutic_content_consistency(
         self, therapeutic_orchestration_service
     ):
@@ -360,7 +348,7 @@ class TestTherapeuticContentValidation:
         ipa_intent = ipa_result.get("intent", "")
         safety_assessment = ipa_result.get("safety_assessment", {})
 
-        anxiety_identified = any(
+        any(
             "anxiety" in str(entity).lower() or "panic" in str(entity).lower()
             for entity in ipa_entities
         ) or any(word in ipa_intent.lower() for word in ["anxiety", "panic", "stress"])
@@ -369,7 +357,7 @@ class TestTherapeuticContentValidation:
         world_state = wba_result.get("world_state", {})
         world_state_text = json.dumps(world_state).lower()
 
-        anxiety_in_world = any(
+        any(
             word in world_state_text
             for word in ["anxiety", "panic", "stress", "daily", "life"]
         )
@@ -378,7 +366,7 @@ class TestTherapeuticContentValidation:
         narrative = nga_result.get("narrative", "")
         therapeutic_elements = nga_result.get("therapeutic_elements", [])
 
-        anxiety_therapeutic_response = (
+        (
             any(
                 word in narrative.lower()
                 for word in [
@@ -396,21 +384,13 @@ class TestTherapeuticContentValidation:
         # Final story should be therapeutically appropriate for anxiety
         story = result["story"].lower()
 
-        anxiety_appropriate_story = any(
+        any(
             word in story
             for word in ["manage", "techniques", "breathing", "calm", "support"]
         )
 
         # Validate safety assessment is appropriate
         assert safety_assessment.get("risk_level") in ["LOW", "MEDIUM"]
-
-        print("Therapeutic consistency validation:")
-        print(f"  Anxiety identified by IPA: {anxiety_identified}")
-        print(f"  Anxiety context in WBA: {anxiety_in_world}")
-        print(
-            f"  Anxiety therapeutic response from NGA: {anxiety_therapeutic_response}"
-        )
-        print(f"  Anxiety-appropriate final story: {anxiety_appropriate_story}")
 
     async def test_therapeutic_safety_boundary_validation(
         self, therapeutic_orchestration_service
@@ -483,10 +463,6 @@ class TestTherapeuticContentValidation:
                 )
                 assert helpful_response
 
-            print(
-                f"Boundary scenario {i + 1}: {'Declined' if scenario['should_decline'] else 'Provided'} appropriately"
-            )
-
     async def test_therapeutic_content_personalization(
         self, therapeutic_orchestration_service
     ):
@@ -552,7 +528,3 @@ class TestTherapeuticContentValidation:
                 keyword in story for keyword in therapeutic_keywords
             )
             assert therapeutic_content
-
-            print(
-                f"Personalization scenario {i + 1}: Context-appropriate therapeutic response validated"
-            )

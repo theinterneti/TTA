@@ -19,8 +19,7 @@ def test_app():
 
     config_module.settings = TestingSettings()
 
-    app = create_app()
-    return app
+    return create_app()
 
 
 @pytest.fixture

@@ -170,7 +170,7 @@ def calculate_delay(attempt: int, config: RetryConfig) -> float:
     return delay
 
 
-def with_retry(
+def with_retry[T](
     config: RetryConfig | None = None, fallback: Callable[..., T] | None = None
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
@@ -240,7 +240,7 @@ def with_retry(
     return decorator
 
 
-def with_retry_async(
+def with_retry_async[T](
     config: RetryConfig | None = None, fallback: Callable[..., T] | None = None
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """

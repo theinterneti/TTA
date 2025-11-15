@@ -127,7 +127,11 @@ class TestWorldValidationInSessionCreation:
     """Tests for world validation in session creation."""
 
     def test_session_creation_with_valid_world(
-        self, test_client, auth_headers, sample_character_request, sample_session_request
+        self,
+        test_client,
+        auth_headers,
+        sample_character_request,
+        sample_session_request,
     ):
         """Test session creation with a valid world ID."""
         # First create a character
@@ -153,7 +157,11 @@ class TestWorldValidationInSessionCreation:
         assert data["world_id"] == "world_mindfulness_garden"
 
     def test_session_creation_with_invalid_world(
-        self, test_client, auth_headers, sample_character_request, sample_session_request
+        self,
+        test_client,
+        auth_headers,
+        sample_character_request,
+        sample_session_request,
     ):
         """Test session creation with an invalid world ID."""
         # First create a character
@@ -182,7 +190,11 @@ class TestEndToEndUserJourney:
     """Tests for complete end-to-end user journey."""
 
     def test_complete_character_world_session_flow(
-        self, test_client, auth_headers, sample_character_request, sample_session_request
+        self,
+        test_client,
+        auth_headers,
+        sample_character_request,
+        sample_session_request,
     ):
         """Test complete flow: character creation → world selection → session creation."""
         # Step 1: Create a character
@@ -257,4 +269,3 @@ class TestEndToEndUserJourney:
         assert isinstance(worlds, list)
         # Worlds should be returned (compatibility filtering is optional)
         assert len(worlds) >= 0
-

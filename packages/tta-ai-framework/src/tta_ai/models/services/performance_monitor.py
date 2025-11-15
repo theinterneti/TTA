@@ -193,23 +193,17 @@ class PerformanceMonitor(IPerformanceMonitor):
                         )
 
                     if model_stats.get("success_rate"):
-                        total_success_rates.extend(
-                            [model_stats["success_rate"]] * model_requests
-                        )
+                        total_success_rates.extend([model_stats["success_rate"]] * model_requests)
 
                     system_stats["models"][model_id] = {
                         "requests": model_requests,
-                        "avg_response_time_ms": model_stats.get(
-                            "average_response_time_ms"
-                        ),
+                        "avg_response_time_ms": model_stats.get("average_response_time_ms"),
                         "success_rate": model_stats.get("success_rate"),
                     }
 
             # Calculate system averages
             if request_count > 0:
-                system_stats["average_response_time_ms"] = (
-                    total_response_time / request_count
-                )
+                system_stats["average_response_time_ms"] = total_response_time / request_count
 
             if total_quality_scores:
                 system_stats["average_quality_score"] = sum(total_quality_scores) / len(
@@ -229,9 +223,7 @@ class PerformanceMonitor(IPerformanceMonitor):
             logger.error(f"Failed to get system performance: {e}")
             return {"error": str(e)}
 
-    def _calculate_aggregated_stats(
-        self, metrics: list[PerformanceMetrics]
-    ) -> dict[str, Any]:
+    def _calculate_aggregated_stats(self, metrics: list[PerformanceMetrics]) -> dict[str, Any]:
         """Calculate aggregated statistics from metrics."""
         if not metrics:
             return {}
@@ -241,18 +233,12 @@ class PerformanceMonitor(IPerformanceMonitor):
 
         # Token statistics
         total_tokens = sum(m.total_tokens for m in metrics)
-        tokens_per_second = [
-            m.tokens_per_second for m in metrics if m.tokens_per_second > 0
-        ]
+        tokens_per_second = [m.tokens_per_second for m in metrics if m.tokens_per_second > 0]
 
         # Quality scores
-        quality_scores = [
-            m.quality_score for m in metrics if m.quality_score is not None
-        ]
+        quality_scores = [m.quality_score for m in metrics if m.quality_score is not None]
         safety_scores = [
-            m.therapeutic_safety_score
-            for m in metrics
-            if m.therapeutic_safety_score is not None
+            m.therapeutic_safety_score for m in metrics if m.therapeutic_safety_score is not None
         ]
 
         # Success rates
@@ -260,15 +246,11 @@ class PerformanceMonitor(IPerformanceMonitor):
         error_counts = [m.error_count for m in metrics]
 
         # Resource usage
-        memory_usage = [
-            m.memory_usage_mb for m in metrics if m.memory_usage_mb is not None
-        ]
+        memory_usage = [m.memory_usage_mb for m in metrics if m.memory_usage_mb is not None]
         gpu_memory_usage = [
             m.gpu_memory_usage_mb for m in metrics if m.gpu_memory_usage_mb is not None
         ]
-        cpu_usage = [
-            m.cpu_usage_percent for m in metrics if m.cpu_usage_percent is not None
-        ]
+        cpu_usage = [m.cpu_usage_percent for m in metrics if m.cpu_usage_percent is not None]
 
         stats: dict[str, Any] = {
             "total_requests": len(metrics),
@@ -280,8 +262,7 @@ class PerformanceMonitor(IPerformanceMonitor):
         if response_times:
             stats.update(
                 {
-                    "average_response_time_ms": sum(response_times)
-                    / len(response_times),
+                    "average_response_time_ms": sum(response_times) / len(response_times),
                     "min_response_time_ms": min(response_times),
                     "max_response_time_ms": max(response_times),
                     "p95_response_time_ms": self._percentile(response_times, 95),
@@ -293,8 +274,7 @@ class PerformanceMonitor(IPerformanceMonitor):
         if tokens_per_second:
             stats.update(
                 {
-                    "average_tokens_per_second": sum(tokens_per_second)
-                    / len(tokens_per_second),
+                    "average_tokens_per_second": sum(tokens_per_second) / len(tokens_per_second),
                     "max_tokens_per_second": max(tokens_per_second),
                 }
             )
@@ -334,8 +314,7 @@ class PerformanceMonitor(IPerformanceMonitor):
         if gpu_memory_usage:
             stats.update(
                 {
-                    "average_gpu_memory_usage_mb": sum(gpu_memory_usage)
-                    / len(gpu_memory_usage),
+                    "average_gpu_memory_usage_mb": sum(gpu_memory_usage) / len(gpu_memory_usage),
                     "peak_gpu_memory_usage_mb": max(gpu_memory_usage),
                 }
             )
@@ -502,9 +481,7 @@ class PerformanceMonitor(IPerformanceMonitor):
 
         logger.debug(f"Cleaned up metrics older than {cutoff_time}")
 
-    async def get_model_usage_stats(
-        self, model_id: str, period_hours: int = 24
-    ) -> ModelUsageStats:
+    async def get_model_usage_stats(self, model_id: str, period_hours: int = 24) -> ModelUsageStats:
         """Get usage statistics for a model."""
         end_time = datetime.now()
         start_time = end_time - timedelta(hours=period_hours)
@@ -522,9 +499,7 @@ class PerformanceMonitor(IPerformanceMonitor):
             total_tokens_generated=performance_data.get("total_tokens", 0),
             average_tokens_per_request=performance_data.get("total_tokens", 0)
             / max(performance_data.get("total_requests", 1), 1),
-            average_response_time_ms=performance_data.get(
-                "average_response_time_ms", 0
-            ),
+            average_response_time_ms=performance_data.get("average_response_time_ms", 0),
             p95_response_time_ms=performance_data.get("p95_response_time_ms", 0),
             average_quality_score=performance_data.get("average_quality_score"),
             peak_memory_usage_mb=performance_data.get("peak_memory_usage_mb"),

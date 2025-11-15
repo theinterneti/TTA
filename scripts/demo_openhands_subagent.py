@@ -22,9 +22,8 @@ repo_root = Path(__file__).parent.parent
 env_file = repo_root / ".env"
 if env_file.exists():
     load_dotenv(env_file)
-    print(f"✅ Loaded environment variables from {env_file}")
 else:
-    print(f"⚠️  .env file not found at {env_file}")
+    pass
 
 # Add src to path
 sys.path.insert(0, str(repo_root / "src"))
@@ -37,15 +36,11 @@ from agent_orchestration.openhands_integration.docker_client import (
 
 async def demo_simple_task():
     """Demo: Use OpenHands to create a simple Python utility function"""
-    print("\n" + "=" * 80)
-    print("DEMO: Using OpenHands as a Sub-Agent")
-    print("=" * 80)
-    
+
     # Setup workspace
     workspace = Path("/tmp/openhands_demo")
     workspace.mkdir(exist_ok=True)
-    print(f"\n📁 Workspace: {workspace}")
-    
+
     # Configure OpenHands
     config = OpenHandsConfig(
         api_key=SecretStr(os.getenv("OPENROUTER_API_KEY")),
@@ -53,11 +48,10 @@ async def demo_simple_task():
         base_url="https://openrouter.ai/api/v1",
         workspace_path=workspace,
     )
-    
+
     # Create client
-    print("\n🤖 Creating OpenHands sub-agent...")
     client = DockerOpenHandsClient(config)
-    
+
     # Task: Create a simple utility function
     task = """
 Create a Python file named string_utils.py with the following utility functions:
@@ -79,108 +73,55 @@ Include:
 - Docstrings with examples
 - Clean, readable code
 """
-    
-    print(f"\n📝 Task for sub-agent:")
-    print(task)
-    
-    print("\n⏳ Executing task (this may take 30-60 seconds)...")
-    
+
     try:
         result = await client.execute_task(task, timeout=120)
-        
+
         if result.success:
-            print("\n✅ Task completed successfully!")
-            print(f"⏱️  Duration: {result.duration:.2f}s")
-            print(f"🔢 Exit Code: {result.exit_code}")
-            
             # Check if file was created
             output_file = workspace / "string_utils.py"
             if output_file.exists():
-                print(f"\n✅ File created: {output_file}")
-                content = output_file.read_text()
-                print(f"\n📄 Generated code ({len(content)} bytes):")
-                print("-" * 80)
-                print(content)
-                print("-" * 80)
-                
+                output_file.read_text()
+
                 # Test the generated code
-                print("\n🧪 Testing generated code...")
                 try:
                     # Import the module
                     sys.path.insert(0, str(workspace))
-                    import string_utils
-                    
+
                     # Test functions
-                    print(f"reverse_string('hello'): {string_utils.reverse_string('hello')}")
-                    print(f"is_palindrome('racecar'): {string_utils.is_palindrome('racecar')}")
-                    print(f"count_vowels('hello'): {string_utils.count_vowels('hello')}")
-                    
-                    print("\n✅ All functions work correctly!")
-                    
-                except Exception as e:
-                    print(f"\n⚠️  Error testing code: {e}")
-                
+
+                except Exception:
+                    pass
+
                 return True
-            else:
-                print(f"\n❌ File was NOT created")
-                print(f"Output: {result.output[:500]}")
-                return False
-        else:
-            print(f"\n❌ Task failed")
-            print(f"Exit Code: {result.exit_code}")
-            print(f"Output: {result.output[:500]}")
             return False
-            
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
+        return False
+
+    except Exception:
         import traceback
+
         traceback.print_exc()
         return False
 
 
 async def main():
     """Run the demo"""
-    print("\n" + "=" * 80)
-    print("OpenHands Sub-Agent Demo")
-    print("=" * 80)
-    print("\nThis demo shows how to use OpenHands as a development assistant")
-    print("sub-agent to perform simple tasks like generating code.")
-    
+
     # Check API key
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key or api_key == "your_openrouter_api_key_here":
-        print("\n❌ ERROR: OPENROUTER_API_KEY is not set or is using placeholder value")
-        print(f"Please set it in your .env file at: {env_file}")
         return
-    
-    print(f"\n✅ API key is set")
-    
+
     # Run demo
     success = await demo_simple_task()
-    
+
     # Summary
-    print("\n" + "=" * 80)
-    print("DEMO SUMMARY")
-    print("=" * 80)
-    
+
     if success:
-        print("\n🎉 SUCCESS! OpenHands sub-agent completed the task.")
-        print("\n✅ What this demonstrates:")
-        print("  - OpenHands can be used as a sub-agent for development tasks")
-        print("  - It automatically loads .env file (no manual export needed)")
-        print("  - It can generate code, create files, and perform other tasks")
-        print("  - The generated code is functional and ready to use")
-        print("\n💡 Use cases:")
-        print("  - Generate utility functions")
-        print("  - Create test files")
-        print("  - Scaffold new components")
-        print("  - Refactor existing code")
-        print("  - Generate documentation")
+        pass
     else:
-        print("\n⚠️  Demo did not complete successfully.")
-        print("Check the output above for details.")
+        pass
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-

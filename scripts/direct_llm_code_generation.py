@@ -9,12 +9,12 @@ Usage:
     python scripts/direct_llm_code_generation.py "Create a Redis connection pool manager"
 """
 
+import asyncio
+import json
 import os
 import sys
-import json
-import asyncio
 from pathlib import Path
-from typing import Optional
+
 import httpx
 from dotenv import load_dotenv
 
@@ -27,7 +27,7 @@ class DirectLLMCodeGenerator:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         model: str = "openrouter/deepseek/deepseek-chat-v3.1:free",
         base_url: str = "https://openrouter.ai/api/v1",
     ):
@@ -41,7 +41,9 @@ class DirectLLMCodeGenerator:
         """
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
         if not self.api_key:
-            raise ValueError("API key required (set OPENROUTER_API_KEY environment variable)")
+            raise ValueError(
+                "API key required (set OPENROUTER_API_KEY environment variable)"
+            )
 
         self.model = model
         self.base_url = base_url.rstrip("/")
@@ -50,8 +52,8 @@ class DirectLLMCodeGenerator:
     async def generate_code(
         self,
         task_description: str,
-        output_file: Optional[Path] = None,
-        context: Optional[str] = None,
+        output_file: Path | None = None,
+        context: str | None = None,
     ) -> dict:
         """
         Generate code based on task description.
@@ -90,7 +92,7 @@ class DirectLLMCodeGenerator:
                 "explanation": None,
             }
 
-    def _build_prompt(self, task_description: str, context: Optional[str] = None) -> str:
+    def _build_prompt(self, task_description: str, context: str | None = None) -> str:
         """Build the prompt for code generation."""
         prompt = f"""You are an expert Python developer. Generate clean, well-documented code based on the following task.
 
@@ -177,7 +179,7 @@ Generate the code now:"""
             # Find the last closing brace
             last_brace = json_str.rfind("}")
             if last_brace != -1:
-                json_str = json_str[:last_brace + 1]
+                json_str = json_str[: last_brace + 1]
 
             result = json.loads(json_str)
 
@@ -203,19 +205,13 @@ Generate the code now:"""
 async def main():
     """Main entry point for CLI usage."""
     if len(sys.argv) < 2:
-        print("Usage: python scripts/direct_llm_code_generation.py 'task description' [output_file]")
-        print("\nExample:")
-        print("  python scripts/direct_llm_code_generation.py 'Create a Redis connection pool manager' src/utils/redis_pool.py")
         sys.exit(1)
 
     task_description = sys.argv[1]
     output_file = Path(sys.argv[2]) if len(sys.argv) > 2 else None
 
-    print(f"🤖 Generating code for: {task_description}")
-    print(f"📝 Model: openrouter/deepseek/deepseek-chat-v3.1:free")
     if output_file:
-        print(f"💾 Output file: {output_file}")
-    print()
+        pass
 
     generator = DirectLLMCodeGenerator()
 
@@ -226,21 +222,9 @@ async def main():
         )
 
         if result["success"]:
-            print("✅ Code generation successful!")
-            print()
-            print(f"📄 Filename: {result['filename']}")
-            print(f"📝 Explanation: {result['explanation']}")
-            print()
-            print("=" * 80)
-            print("GENERATED CODE:")
-            print("=" * 80)
-            print(result["code"])
-            print("=" * 80)
-
             if "saved_to" in result:
-                print(f"\n💾 Code saved to: {result['saved_to']}")
+                pass
         else:
-            print(f"❌ Code generation failed: {result['error']}")
             sys.exit(1)
 
     finally:
@@ -249,4 +233,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

@@ -21,9 +21,8 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent / ".env"
 if env_path.exists():
     load_dotenv(env_path, override=False)
-    print(f"✓ Loaded .env from: {env_path}")
 else:
-    print(f"⚠ .env not found at: {env_path}")
+    pass
 
 # Setup logging
 logging.basicConfig(
@@ -183,7 +182,7 @@ async def main():
     logger.info("╚" + "=" * 78 + "╝")
 
     try:
-        result = await execute_test_generation_demo()
+        await execute_test_generation_demo()
         logger.info("\n✓ Demonstration completed successfully")
         return 0
     except Exception as e:

@@ -29,9 +29,6 @@ from agent_orchestration.openhands_integration.docker_client import (
 
 def check_docker_available():
     """Check if Docker is available."""
-    print("\n" + "=" * 80)
-    print("✓ STEP 1: Verify Docker is Available")
-    print("=" * 80)
 
     try:
         result = subprocess.run(
@@ -41,25 +38,16 @@ def check_docker_available():
             text=True,
             timeout=5,
         )
-        if result.returncode == 0:
-            print(f"✅ Docker available: {result.stdout.strip()}")
-            return True
-        print(f"❌ Docker error: {result.stderr}")
-        return False
-    except Exception as e:
-        print(f"❌ Docker not available: {e}")
+        return result.returncode == 0
+    except Exception:
         return False
 
 
 def check_env_configuration():
     """Check .env configuration."""
-    print("\n" + "=" * 80)
-    print("✓ STEP 2: Verify .env Configuration")
-    print("=" * 80)
 
     env_file = Path(".env")
     if not env_file.exists():
-        print("❌ .env file not found")
         return False
 
     with open(env_file) as f:
@@ -74,9 +62,7 @@ def check_env_configuration():
     }
 
     all_passed = True
-    for check_name, passed in checks.items():
-        status = "✅" if passed else "❌"
-        print(f"{status} {check_name}")
+    for passed in checks.values():
         all_passed = all_passed and passed
 
     return all_passed
@@ -84,32 +70,14 @@ def check_env_configuration():
 
 def check_config_loading():
     """Check if configuration loads correctly."""
-    print("\n" + "=" * 80)
-    print("✓ STEP 3: Verify Configuration Loading")
-    print("=" * 80)
 
     try:
         config = OpenHandsIntegrationConfig.from_env()
 
-        print("✅ Configuration loaded successfully")
-        print(f"   Model preset: {config.model_preset}")
-        print(f"   Base URL: {config.base_url}")
-        print(f"   Workspace root: {config.workspace_root}")
-        print(f"   Docker runtime enabled: {config.use_docker_runtime}")
-        print(f"   Docker image: {config.docker_image}")
-        print(f"   Docker runtime image: {config.docker_runtime_image}")
-        print(f"   Docker timeout: {config.docker_timeout}s")
-
         if config.use_docker_runtime:
-            print("\n✅ Docker runtime is ENABLED in configuration")
             return True
-        print("\n⚠️  Docker runtime is DISABLED in configuration")
-        print(
-            "   (This is expected if OPENHANDS_USE_DOCKER_RUNTIME is not set to 'true')"
-        )
         return True
-    except Exception as e:
-        print(f"❌ Configuration loading failed: {e}")
+    except Exception:
         import traceback
 
         traceback.print_exc()
@@ -118,9 +86,6 @@ def check_config_loading():
 
 def check_docker_client_init():
     """Check if Docker client can be initialized."""
-    print("\n" + "=" * 80)
-    print("✓ STEP 4: Verify Docker Client Initialization")
-    print("=" * 80)
 
     try:
         integration_config = OpenHandsIntegrationConfig.from_env()
@@ -133,17 +98,10 @@ def check_docker_client_init():
             workspace_path=integration_config.workspace_root,
         )
 
-        client = DockerOpenHandsClient(config)
-
-        print("✅ Docker client initialized successfully")
-        print(f"   OpenHands image: {client.openhands_image}")
-        print(f"   Runtime image: {client.runtime_image}")
-        print(f"   Config model: {client.config.model}")
-        print(f"   Config workspace: {client.config.workspace_path}")
+        DockerOpenHandsClient(config)
 
         return True
-    except Exception as e:
-        print(f"❌ Docker client initialization failed: {e}")
+    except Exception:
         import traceback
 
         traceback.print_exc()
@@ -152,9 +110,6 @@ def check_docker_client_init():
 
 def check_execution_engine():
     """Check if execution engine can use Docker runtime."""
-    print("\n" + "=" * 80)
-    print("✓ STEP 5: Verify Execution Engine Configuration")
-    print("=" * 80)
 
     try:
         from agent_orchestration.openhands_integration.execution_engine import (
@@ -168,29 +123,11 @@ def check_execution_engine():
 
         # Check which client is being used
         client_type = type(engine.client).__name__
-        adapter_fallback = engine.adapter.fallback_to_mock
-
-        print("✅ Execution engine initialized successfully")
-        print(f"   Client type: {client_type}")
-        print(f"   Adapter fallback to mock: {adapter_fallback}")
 
         if integration_config.use_docker_runtime:
-            if client_type == "DockerOpenHandsClient":
-                print("\n✅ Docker runtime is properly configured in execution engine")
-                print("   - Using DockerOpenHandsClient")
-                print("   - Mock fallback disabled (Docker has full tool access)")
-                return True
-            print(f"\n⚠️  Docker runtime enabled but using {client_type}")
-            return False
-        if client_type == "OptimizedOpenHandsClient":
-            print("\n✅ SDK mode is properly configured in execution engine")
-            print("   - Using OptimizedOpenHandsClient")
-            print("   - Mock fallback enabled (SDK has limited tools)")
-            return True
-        print(f"\n⚠️  Unexpected client type: {client_type}")
-        return False
-    except Exception as e:
-        print(f"❌ Execution engine check failed: {e}")
+            return client_type == "DockerOpenHandsClient"
+        return client_type == "OptimizedOpenHandsClient"
+    except Exception:
         import traceback
 
         traceback.print_exc()
@@ -199,9 +136,6 @@ def check_execution_engine():
 
 def main():
     """Run all verification checks."""
-    print("\n" + "=" * 80)
-    print("DOCKER RUNTIME SETUP VERIFICATION")
-    print("=" * 80)
 
     results = {
         "Docker Available": check_docker_available(),
@@ -211,28 +145,14 @@ def main():
         "Execution Engine": check_execution_engine(),
     }
 
-    print("\n" + "=" * 80)
-    print("VERIFICATION SUMMARY")
-    print("=" * 80)
-
-    for check_name, passed in results.items():
-        status = "✅ PASS" if passed else "❌ FAIL"
-        print(f"{status}: {check_name}")
+    for _check_name, _passed in results.items():
+        pass
 
     passed_count = sum(1 for v in results.values() if v)
     total_count = len(results)
 
-    print(f"\nTotal: {passed_count}/{total_count} checks passed")
-
     if passed_count == total_count:
-        print("\n🚀 Docker runtime setup is complete and verified!")
-        print("\nNext steps:")
-        print("1. Run a single test task: python scripts/test_single_task.py")
-        print("2. Compare Docker runtime vs mock fallback quality")
-        print("3. Update batch execution to use Docker runtime")
         return 0
-    print(f"\n⚠️  {total_count - passed_count} check(s) failed")
-    print("Please review the errors above and fix the configuration")
     return 1
 
 

@@ -16,7 +16,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 def test_imports():
     """Test that all required modules can be imported."""
-    print("🔍 Testing imports...")
 
     try:
         # Test basic imports
@@ -24,16 +23,13 @@ def test_imports():
         from components.model_management.models import ProviderConfig
         from components.model_management.providers.openrouter import OpenRouterProvider
 
-        print("✅ All imports successful")
         return True
-    except ImportError as e:
-        print(f"❌ Import failed: {e}")
+    except ImportError:
         return False
 
 
 def test_provider_configuration():
     """Test OpenRouter provider configuration with filter settings."""
-    print("\n🔧 Testing provider configuration...")
 
     try:
         from components.model_management.interfaces import ProviderType
@@ -66,22 +62,14 @@ def test_provider_configuration():
             if not hasattr(provider, method):
                 missing_methods.append(method)
 
-        if missing_methods:
-            print(f"❌ Missing methods: {missing_methods}")
-            return False
+        return not missing_methods
 
-        print("✅ Provider configuration successful")
-        print("✅ All expected methods present")
-        return True
-
-    except Exception as e:
-        print(f"❌ Configuration failed: {e}")
+    except Exception:
         return False
 
 
 def test_environment_configuration():
     """Test environment variable configuration."""
-    print("\n🌍 Testing environment configuration...")
 
     # Test environment variables
     test_env_vars = {
@@ -122,19 +110,13 @@ def test_environment_configuration():
         )
 
         # Verify values
-        assert show_free_only == True, f"Expected True, got {show_free_only}"
-        assert prefer_free == False, f"Expected False, got {prefer_free}"
+        assert show_free_only, f"Expected True, got {show_free_only}"
+        assert not prefer_free, f"Expected False, got {prefer_free}"
         assert max_cost == 0.0005, f"Expected 0.0005, got {max_cost}"
-
-        print("✅ Environment configuration successful")
-        print(f"   show_free_only: {show_free_only}")
-        print(f"   prefer_free: {prefer_free}")
-        print(f"   max_cost: {max_cost}")
 
         return True
 
-    except Exception as e:
-        print(f"❌ Environment configuration failed: {e}")
+    except Exception:
         return False
 
     finally:
@@ -148,7 +130,6 @@ def test_environment_configuration():
 
 def test_filter_methods():
     """Test filter methods functionality."""
-    print("\n🔍 Testing filter methods...")
 
     try:
         from components.model_management.interfaces import ProviderType
@@ -181,23 +162,16 @@ def test_filter_methods():
 
         for key, expected_value in expected_settings.items():
             if settings.get(key) != expected_value:
-                print(
-                    f"❌ Setting mismatch for {key}: expected {expected_value}, got {settings.get(key)}"
-                )
                 return False
 
-        print("✅ Filter methods working correctly")
-        print(f"   Settings: {settings}")
         return True
 
-    except Exception as e:
-        print(f"❌ Filter methods test failed: {e}")
+    except Exception:
         return False
 
 
 def test_api_integration():
     """Test API integration points."""
-    print("\n🌐 Testing API integration...")
 
     try:
         # Test that API endpoints can be imported
@@ -219,23 +193,14 @@ def test_api_integration():
             if not any(endpoint in route for route in routes):
                 missing_endpoints.append(endpoint)
 
-        if missing_endpoints:
-            print(f"❌ Missing API endpoints: {missing_endpoints}")
-            return False
+        return not missing_endpoints
 
-        print("✅ API integration successful")
-        print(f"   Available routes: {len(routes)}")
-        return True
-
-    except Exception as e:
-        print(f"❌ API integration test failed: {e}")
+    except Exception:
         return False
 
 
 def main():
     """Run all validation tests."""
-    print("🎯 OpenRouter Free Models Filter Validation")
-    print("=" * 50)
 
     tests = [
         ("Imports", test_imports),
@@ -248,32 +213,19 @@ def main():
     passed = 0
     failed = 0
 
-    for test_name, test_func in tests:
+    for _test_name, test_func in tests:
         try:
             if test_func():
                 passed += 1
             else:
                 failed += 1
-        except Exception as e:
-            print(f"❌ {test_name} test crashed: {e}")
+        except Exception:
             failed += 1
 
-    print("\n📊 Validation Results")
-    print("=" * 30)
-    print(f"✅ Passed: {passed}")
-    print(f"❌ Failed: {failed}")
-    print(f"📈 Success Rate: {passed / (passed + failed) * 100:.1f}%")
-
     if failed == 0:
-        print("\n🎉 All validation tests passed!")
-        print("The OpenRouter Free Models Filter is ready to use.")
-        print("\nNext steps:")
-        print("1. Set your OPENROUTER_API_KEY environment variable")
-        print("2. Configure filter settings in .env file")
-        print("3. Run: python examples/free_models_filter_demo.py")
+        pass
     else:
-        print(f"\n⚠️  {failed} validation test(s) failed.")
-        print("Please check the implementation and try again.")
+        pass
 
     return failed == 0
 

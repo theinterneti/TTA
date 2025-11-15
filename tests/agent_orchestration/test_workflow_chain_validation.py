@@ -63,14 +63,12 @@ class TestWorkflowChainValidation:
         )
 
         # Create workflow coordinator
-        coordinator = AgentWorkflowCoordinator(
+        return AgentWorkflowCoordinator(
             ipa_proxy=ipa_proxy,
             wba_proxy=wba_proxy,
             nga_proxy=nga_proxy,
             event_publisher=event_publisher,
         )
-
-        return coordinator
 
     @pytest_asyncio.fixture
     async def response_monitor(self):
@@ -201,10 +199,6 @@ class TestWorkflowChainValidation:
         # Performance validation
         assert execution_time < 10.0  # Should complete within reasonable time
 
-        print(f"Complete workflow chain executed in {execution_time:.2f}s")
-        print(f"Generated story length: {len(final_story)} characters")
-        print(f"Therapeutic elements: {len(therapeutic_elements)}")
-
     async def test_workflow_data_flow_integrity(
         self, workflow_coordinator, response_monitor
     ):
@@ -233,7 +227,7 @@ class TestWorkflowChainValidation:
         world_state_text = json.dumps(wba_world_state).lower()
 
         # At least some entities should be incorporated
-        entity_incorporation = any(
+        any(
             entity in world_state_text
             for entity in entity_strings
             if len(entity) > 3  # Skip very short entities
@@ -251,7 +245,7 @@ class TestWorkflowChainValidation:
             world_elements.append(str(wba_world_state["setting"]).lower())
 
         narrative_lower = nga_narrative.lower()
-        world_state_incorporation = any(
+        any(
             element in narrative_lower for element in world_elements if len(element) > 3
         )
 
@@ -261,7 +255,7 @@ class TestWorkflowChainValidation:
         therapeutic_elements = nga_result.get("therapeutic_elements", [])
 
         # Intent should be reflected in therapeutic approach
-        intent_therapeutic_alignment = len(therapeutic_elements) > 0
+        len(therapeutic_elements) > 0
 
         # Validate session consistency
         assert result["session_id"] == session_id
@@ -269,13 +263,6 @@ class TestWorkflowChainValidation:
         # All components should reference the same workflow
         workflow_id = result.get("workflow_id")
         assert workflow_id is not None
-
-        print("Data flow validation completed:")
-        print(f"  Entity incorporation (IPA→WBA): {entity_incorporation}")
-        print(f"  World state incorporation (WBA→NGA): {world_state_incorporation}")
-        print(
-            f"  Intent-therapeutic alignment (IPA→NGA): {intent_therapeutic_alignment}"
-        )
 
     async def test_workflow_error_propagation(
         self, workflow_coordinator, response_monitor
@@ -320,10 +307,6 @@ class TestWorkflowChainValidation:
                     keyword in error_message
                     for keyword in ["validation", "input", "format", "length"]
                 )
-
-        print(
-            f"Error propagation test completed for {len(problematic_inputs)} problematic inputs"
-        )
 
     async def test_workflow_performance_optimization(
         self, workflow_coordinator, response_monitor
@@ -380,12 +363,6 @@ class TestWorkflowChainValidation:
             assert workflow_stats.total_operations >= len(test_inputs)
             assert workflow_stats.success_rate > 0.8  # At least 80% success rate
 
-        print("Performance optimization test results:")
-        print(f"  Average execution time: {avg_execution_time:.2f}s")
-        print(f"  Min execution time: {min_execution_time:.2f}s")
-        print(f"  Max execution time: {max_execution_time:.2f}s")
-        print(f"  Total workflows: {len(test_inputs)}")
-
     async def test_workflow_concurrent_execution(
         self, workflow_coordinator, response_monitor
     ):
@@ -430,12 +407,8 @@ class TestWorkflowChainValidation:
             assert len(result["story"]) > 0
 
         # Performance validation for concurrent execution
-        average_time = total_time / num_concurrent
+        total_time / num_concurrent
         assert total_time < 20.0  # All should complete within reasonable time
-
-        print("Concurrent workflow execution:")
-        print(f"  {num_concurrent} workflows completed in {total_time:.2f}s")
-        print(f"  Average time per workflow: {average_time:.2f}s")
 
     async def test_workflow_therapeutic_consistency(
         self, workflow_coordinator, response_monitor
@@ -509,7 +482,3 @@ class TestWorkflowChainValidation:
             harmful_keywords = ["hopeless", "give up", "no point", "worthless"]
             harmful_content = any(keyword in story for keyword in harmful_keywords)
             assert not harmful_content
-
-        print(
-            f"Therapeutic consistency validated across {len(therapeutic_inputs)} scenarios"
-        )

@@ -100,11 +100,9 @@ def analyze_file(file_path: Path) -> list[dict]:
         analyzer.visit(tree)
 
         return analyzer.fixes
-    except SyntaxError as e:
-        print(f"Syntax error in {file_path}: {e}", file=sys.stderr)
+    except SyntaxError:
         return []
-    except Exception as e:
-        print(f"Error analyzing {file_path}: {e}", file=sys.stderr)
+    except Exception:
         return []
 
 
@@ -161,22 +159,19 @@ def apply_fixes(file_path: Path, fixes: list[dict], dry_run: bool = False) -> in
                 f.writelines(lines)
 
         return changes_made
-    except Exception as e:
-        print(f"Error applying fixes to {file_path}: {e}", file=sys.stderr)
+    except Exception:
         return 0
 
 
 def main():
     """Main entry point."""
     if len(sys.argv) < 2:
-        print("Usage: python scripts/fix_b007_loop_variables.py [--dry-run] <files>")
         sys.exit(1)
 
     dry_run = "--dry-run" in sys.argv
     file_args = [arg for arg in sys.argv[1:] if arg != "--dry-run"]
 
     if not file_args:
-        print("Error: No files specified")
         sys.exit(1)
 
     total_fixes = 0
@@ -192,7 +187,6 @@ def main():
     for file_arg in file_args:
         file_path = Path(file_arg)
         if not file_path.exists():
-            print(f"Warning: File not found: {file_path}", file=sys.stderr)
             continue
 
         if file_path.suffix != ".py":
@@ -220,14 +214,12 @@ def main():
 
     # Print report
     report = "\n".join(report_lines)
-    print(report)
 
     # Save report to file
     if not dry_run and total_fixes > 0:
         report_file = Path("B007_FIXES_REPORT.txt")
         with open(report_file, "w", encoding="utf-8") as f:
             f.write(report)
-        print(f"\nReport saved to: {report_file}")
 
     return 0 if total_fixes > 0 else 1
 

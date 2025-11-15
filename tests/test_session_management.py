@@ -548,8 +548,7 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
                     current_node["status"] = params["status"]
                 if params and "last_interaction" in params:
                     current_node["last_interaction"] = params["last_interaction"]
-                m = AsyncMock()
-                return m
+                return AsyncMock()
             if query and "RETURN s" in query:
                 m = AsyncMock()
                 m.single = AsyncMock(return_value={"s": current_node})

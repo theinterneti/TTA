@@ -24,7 +24,6 @@ class TestPhase1DependencyVersions:
             assert jose_version >= "3.4.0", (
                 f"python-jose version {jose_version} < 3.4.0"
             )
-            print(f"✅ python-jose: {jose_version}")
         except Exception as e:
             pytest.skip(f"python-jose not installed: {e}")
 
@@ -35,7 +34,6 @@ class TestPhase1DependencyVersions:
             assert gunicorn_version >= "22.0.0", (
                 f"gunicorn version {gunicorn_version} < 22.0.0"
             )
-            print(f"✅ gunicorn: {gunicorn_version}")
         except Exception as e:
             pytest.skip(f"gunicorn not installed: {e}")
 
@@ -46,7 +44,6 @@ class TestPhase1DependencyVersions:
             assert multipart_version >= "0.0.18", (
                 f"python-multipart version {multipart_version} < 0.0.18"
             )
-            print(f"✅ python-multipart: {multipart_version}")
         except Exception as e:
             pytest.skip(f"python-multipart not installed: {e}")
 
@@ -57,7 +54,6 @@ class TestPhase1DependencyVersions:
             assert aiohttp_version >= "3.12.14", (
                 f"aiohttp version {aiohttp_version} < 3.12.14"
             )
-            print(f"✅ aiohttp: {aiohttp_version}")
         except Exception as e:
             pytest.skip(f"aiohttp not installed: {e}")
 
@@ -68,7 +64,6 @@ class TestPhase1DependencyVersions:
             assert pillow_version >= "10.3.0", (
                 f"Pillow version {pillow_version} < 10.3.0"
             )
-            print(f"✅ Pillow: {pillow_version}")
         except Exception as e:
             pytest.skip(f"Pillow not installed: {e}")
 
@@ -98,7 +93,6 @@ class TestPythonJoseFunctionality:
             decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
             assert decoded["sub"] == "test-user"
 
-            print("✅ JWT token generation and verification works")
         except Exception as e:
             pytest.skip(f"python-jose not available: {e}")
 
@@ -117,7 +111,6 @@ class TestPythonJoseFunctionality:
             with pytest.raises(Exception):
                 jwt.decode(token, secret_key, algorithms=["RS256"])
 
-            print("✅ Algorithm confusion protection works")
         except Exception as e:
             pytest.skip(f"python-jose not available: {e}")
 
@@ -135,7 +128,6 @@ class TestAiohttpFunctionality:
                 assert session is not None
                 assert isinstance(session, aiohttp.ClientSession)
 
-            print("✅ aiohttp ClientSession creation works")
         except Exception as e:
             pytest.skip(f"aiohttp not available: {e}")
 
@@ -153,7 +145,6 @@ class TestAiohttpFunctionality:
             app.router.add_get("/", hello)
 
             assert app is not None
-            print("✅ aiohttp web application creation works")
         except Exception as e:
             pytest.skip(f"aiohttp not available: {e}")
 
@@ -167,7 +158,6 @@ class TestPythonMultipartFunctionality:
             from multipart import multipart
 
             assert multipart is not None
-            print("✅ python-multipart import works")
         except Exception as e:
             pytest.skip(f"python-multipart not available: {e}")
 
@@ -183,7 +173,6 @@ class TestPythonMultipartFunctionality:
             assert main_type == "multipart/form-data"
             assert "boundary" in options
 
-            print("✅ Content-Type parsing works (ReDoS fix validated)")
         except Exception as e:
             pytest.skip(f"python-multipart not available: {e}")
 
@@ -197,7 +186,6 @@ class TestPillowFunctionality:
             from PIL import Image
 
             assert Image is not None
-            print("✅ Pillow import works")
         except Exception as e:
             pytest.skip(f"Pillow not available: {e}")
 
@@ -211,7 +199,6 @@ class TestPillowFunctionality:
             assert img is not None
             assert img.size == (100, 100)
 
-            print("✅ Pillow image creation works")
         except Exception as e:
             pytest.skip(f"Pillow not available: {e}")
 
@@ -225,7 +212,6 @@ class TestGunicornFunctionality:
             import gunicorn
 
             assert gunicorn is not None
-            print("✅ gunicorn import works")
         except Exception as e:
             pytest.skip(f"gunicorn not available: {e}")
 
@@ -235,7 +221,6 @@ class TestGunicornFunctionality:
             from gunicorn.app.base import BaseApplication
 
             assert BaseApplication is not None
-            print("✅ gunicorn BaseApplication available")
         except Exception as e:
             pytest.skip(f"gunicorn not available: {e}")
 

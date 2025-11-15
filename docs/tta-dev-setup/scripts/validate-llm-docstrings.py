@@ -21,7 +21,6 @@ from pathlib import Path
 try:
     from openai import OpenAI
 except ImportError:
-    print("❌ openai package not installed. Run: uv add openai")
     sys.exit(1)
 
 
@@ -145,14 +144,10 @@ def validate_docstring_with_llm(
 
 def main() -> int:
     """Main validation function."""
-    print("🔍 Validating LLM-Friendly Docstrings\n")
 
     # Check for API key
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        print("❌ OPENAI_API_KEY environment variable not set")
-        print("   This validation requires an OpenAI API key")
-        print("   Set it with: export OPENAI_API_KEY=sk-...")
         return 1
 
     client = OpenAI(api_key=api_key)
@@ -160,11 +155,9 @@ def main() -> int:
     # Find all Python files in src/
     src_dir = Path("src")
     if not src_dir.exists():
-        print(f"❌ Source directory not found: {src_dir}")
         return 1
 
     python_files = list(src_dir.rglob("*.py"))
-    print(f"Found {len(python_files)} Python files\n")
 
     total_functions = 0
     passed = 0
@@ -177,8 +170,6 @@ def main() -> int:
         if not functions:
             continue
 
-        print(f"\n📄 {file_path.relative_to(src_dir)}")
-
         for func_name, signature, docstring in functions:
             total_functions += 1
 
@@ -187,11 +178,7 @@ def main() -> int:
             )
 
             recommendation = result.get("recommendation", "Unknown")
-            score = result.get("overall_score", 0)
-
-            icon = "✅" if recommendation == "Pass" else "⚠️" if recommendation == "Needs Improvement" else "❌"
-
-            print(f"  {icon} {func_name} - {score}/10 ({recommendation})")
+            result.get("overall_score", 0)
 
             if recommendation == "Pass":
                 passed += 1
@@ -201,26 +188,13 @@ def main() -> int:
                 failed += 1
 
     # Print summary
-    print("\n" + "=" * 60)
-    print("Summary")
-    print("=" * 60)
-    print(f"Total functions: {total_functions}")
-    print(f"✅ Passed: {passed}")
-    print(f"⚠️  Needs improvement: {needs_improvement}")
-    print(f"❌ Failed: {failed}")
 
     # Determine exit code
     if failed > 0:
-        print("\n❌ Validation failed - some docstrings need improvement")
         return 1
-    elif needs_improvement > 0:
-        print(
-            "\n⚠️  Validation passed with warnings - consider improving docstrings"
-        )
+    if needs_improvement > 0:
         return 0
-    else:
-        print("\n✅ All docstrings are LLM-friendly!")
-        return 0
+    return 0
 
 
 if __name__ == "__main__":

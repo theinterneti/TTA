@@ -33,7 +33,6 @@ def check_file(filepath: Path) -> list[tuple[int, str]]:
         lines = content.split("\n")
 
         # Track if we're in an async function definition
-        in_async_def = False
         decorator_line = None
 
         for i, line in enumerate(lines, start=1):
@@ -52,8 +51,8 @@ def check_file(filepath: Path) -> list[tuple[int, str]]:
             elif decorator_line and stripped and not stripped.startswith("@"):
                 decorator_line = None
 
-    except Exception as e:
-        print(f"Error reading {filepath}: {e}", file=sys.stderr)
+    except Exception:
+        pass
 
     return violations
 
@@ -75,7 +74,7 @@ def main(filenames: list[str]) -> int:
         filepath = Path(filename)
 
         # Only check Python test files
-        if not filepath.suffix == ".py":
+        if filepath.suffix != ".py":
             continue
         if not (
             "test" in filepath.name or filepath.parts and "tests" in filepath.parts
@@ -87,21 +86,13 @@ def main(filenames: list[str]) -> int:
         if violations:
             exit_code = 1
             total_violations += len(violations)
-            print(f"\n❌ {filepath}:")
-            for line_num, line_content in violations:
-                print(f"  Line {line_num}: {line_content.strip()}")
-                print("    → Should use @pytest_asyncio.fixture for async functions")
+            for _line_num, _line_content in violations:
+                pass
 
     if total_violations > 0:
-        print(
-            f"\n⚠️  Found {total_violations} async fixture(s) with incorrect decorator."
-        )
-        print(
-            "   Use @pytest_asyncio.fixture instead of @pytest.fixture for async functions."
-        )
-        print("   Add 'import pytest_asyncio' at the top of the file if needed.")
+        pass
     else:
-        print("✅ All async fixtures use correct decorators.")
+        pass
 
     return exit_code
 

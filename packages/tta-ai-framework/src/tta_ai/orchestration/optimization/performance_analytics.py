@@ -115,9 +115,7 @@ class PerformanceAnalytics:
         # Analytics data storage
         self.performance_trends: dict[str, PerformanceTrend] = {}
         self.optimization_effectiveness: dict[str, OptimizationEffectiveness] = {}
-        self.system_health_history: deque = deque(
-            maxlen=1440
-        )  # 24 hours of minute-by-minute data
+        self.system_health_history: deque = deque(maxlen=1440)  # 24 hours of minute-by-minute data
 
         # Cached analytics
         self.cached_analytics: dict[str, Any] = {}
@@ -138,9 +136,7 @@ class PerformanceAnalytics:
 
         self._is_running = True
         self._analytics_task = asyncio.create_task(self._analytics_loop())
-        self._effectiveness_task = asyncio.create_task(
-            self._effectiveness_analysis_loop()
-        )
+        self._effectiveness_task = asyncio.create_task(self._effectiveness_analysis_loop())
         logger.info("PerformanceAnalytics started")
 
     async def stop(self) -> None:
@@ -159,9 +155,7 @@ class PerformanceAnalytics:
 
         logger.info("PerformanceAnalytics stopped")
 
-    async def get_performance_dashboard(
-        self, force_refresh: bool = False
-    ) -> dict[str, Any]:
+    async def get_performance_dashboard(self, force_refresh: bool = False) -> dict[str, Any]:
         """Get comprehensive performance dashboard data."""
         current_time = time.time()
 
@@ -226,9 +220,7 @@ class PerformanceAnalytics:
                 score = 20.0
             success_rate_scores.append(score)
 
-        success_rate_health = (
-            statistics.mean(success_rate_scores) if success_rate_scores else 50.0
-        )
+        success_rate_health = statistics.mean(success_rate_scores) if success_rate_scores else 50.0
 
         # Calculate resource utilization health
         resource_health = 75.0  # Default if no resource manager
@@ -256,8 +248,7 @@ class PerformanceAnalytics:
         optimization_health = 75.0  # Default if no optimization engine
         if self.optimization_engine and self.optimization_effectiveness:
             effectiveness_scores = [
-                eff.effectiveness_score * 100.0
-                for eff in self.optimization_effectiveness.values()
+                eff.effectiveness_score * 100.0 for eff in self.optimization_effectiveness.values()
             ]
             optimization_health = (
                 statistics.mean(effectiveness_scores) if effectiveness_scores else 75.0
@@ -314,9 +305,7 @@ class PerformanceAnalytics:
                 }
 
         # Find slowest operations
-        slowest_operations = sorted(
-            stats.values(), key=lambda s: s.p95_duration, reverse=True
-        )[:10]
+        slowest_operations = sorted(stats.values(), key=lambda s: s.p95_duration, reverse=True)[:10]
 
         return {
             "category_summaries": category_summaries,
@@ -346,19 +335,14 @@ class PerformanceAnalytics:
         effectiveness_summary = {}
         if self.optimization_effectiveness:
             effectiveness_scores = [
-                eff.effectiveness_score
-                for eff in self.optimization_effectiveness.values()
+                eff.effectiveness_score for eff in self.optimization_effectiveness.values()
             ]
             effectiveness_summary = {
                 "total_optimizations": len(self.optimization_effectiveness),
                 "avg_effectiveness": statistics.mean(effectiveness_scores),
                 "median_effectiveness": statistics.median(effectiveness_scores),
-                "successful_optimizations": len(
-                    [e for e in effectiveness_scores if e >= 0.8]
-                ),
-                "failed_optimizations": len(
-                    [e for e in effectiveness_scores if e < 0.5]
-                ),
+                "successful_optimizations": len([e for e in effectiveness_scores if e >= 0.8]),
+                "failed_optimizations": len([e for e in effectiveness_scores if e < 0.5]),
             }
 
         return {
@@ -391,9 +375,7 @@ class PerformanceAnalytics:
 
         # Calculate resource efficiency metrics
         efficiency_metrics = {}
-        for resource_type, pool_stats in resource_stats.get(
-            "resource_pools", {}
-        ).items():
+        for resource_type, pool_stats in resource_stats.get("resource_pools", {}).items():
             utilization = pool_stats.get("utilization_percent", 0.0)
 
             # Efficiency score based on utilization (sweet spot around 70-80%)
@@ -419,10 +401,7 @@ class PerformanceAnalytics:
             "efficiency_metrics": efficiency_metrics,
             "overall_efficiency": (
                 statistics.mean(
-                    [
-                        metrics["efficiency_score"]
-                        for metrics in efficiency_metrics.values()
-                    ]
+                    [metrics["efficiency_score"] for metrics in efficiency_metrics.values()]
                 )
                 if efficiency_metrics
                 else 0.0
@@ -435,34 +414,20 @@ class PerformanceAnalytics:
 
         for period in self.trend_analysis_periods:
             period_trends = {
-                k: v
-                for k, v in self.performance_trends.items()
-                if v.time_period == period
+                k: v for k, v in self.performance_trends.items() if v.time_period == period
             }
 
             if period_trends:
                 trends_by_period[period] = {
                     "total_trends": len(period_trends),
                     "improving_trends": len(
-                        [
-                            t
-                            for t in period_trends.values()
-                            if t.trend_direction == "improving"
-                        ]
+                        [t for t in period_trends.values() if t.trend_direction == "improving"]
                     ),
                     "degrading_trends": len(
-                        [
-                            t
-                            for t in period_trends.values()
-                            if t.trend_direction == "degrading"
-                        ]
+                        [t for t in period_trends.values() if t.trend_direction == "degrading"]
                     ),
                     "stable_trends": len(
-                        [
-                            t
-                            for t in period_trends.values()
-                            if t.trend_direction == "stable"
-                        ]
+                        [t for t in period_trends.values() if t.trend_direction == "stable"]
                     ),
                     "trends": [
                         {
@@ -500,8 +465,7 @@ class PerformanceAnalytics:
                     "description": f"{len(slow_operations)} operations have P95 response times > 5 seconds",
                     "action": "Consider optimizing these operations or increasing timeout values",
                     "affected_operations": [
-                        f"{op.category.value}:{op.operation}"
-                        for op in slow_operations[:5]
+                        f"{op.category.value}:{op.operation}" for op in slow_operations[:5]
                     ],
                 }
             )
@@ -517,8 +481,7 @@ class PerformanceAnalytics:
                     "description": f"{len(failing_operations)} operations have success rates < 90%",
                     "action": "Investigate error causes and consider increasing retry limits or timeouts",
                     "affected_operations": [
-                        f"{op.category.value}:{op.operation}"
-                        for op in failing_operations[:5]
+                        f"{op.category.value}:{op.operation}" for op in failing_operations[:5]
                     ],
                 }
             )
@@ -528,9 +491,7 @@ class PerformanceAnalytics:
             resource_stats = self.resource_manager.get_statistics()
             high_util_resources = []
 
-            for resource_type, pool_stats in resource_stats.get(
-                "resource_pools", {}
-            ).items():
+            for resource_type, pool_stats in resource_stats.get("resource_pools", {}).items():
                 if pool_stats.get("utilization_percent", 0.0) > 90.0:
                     high_util_resources.append(resource_type)
 
@@ -702,14 +663,10 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
     async def get_dashboard(force_refresh: bool = False):
         """Get comprehensive performance dashboard."""
         try:
-            return await analytics.get_performance_dashboard(
-                force_refresh=force_refresh
-            )
+            return await analytics.get_performance_dashboard(force_refresh=force_refresh)
         except Exception as e:
             logger.error(f"Error getting dashboard: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to get dashboard data"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to get dashboard data") from e
 
     @router.get("/health")
     async def get_system_health():
@@ -719,9 +676,7 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             return health.to_dict()
         except Exception as e:
             logger.error(f"Error getting system health: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to get system health"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to get system health") from e
 
     @router.get("/trends/{period}")
     async def get_performance_trends(period: str):
@@ -731,9 +686,7 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             return trends.get(period, {})
         except Exception as e:
             logger.error(f"Error getting trends: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to get performance trends"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to get performance trends") from e
 
     @router.get("/recommendations")
     async def get_recommendations():
@@ -742,9 +695,7 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             return await analytics._generate_recommendations()
         except Exception as e:
             logger.error(f"Error getting recommendations: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to get recommendations"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to get recommendations") from e
 
     @router.get("/statistics")
     async def get_analytics_statistics():
@@ -753,8 +704,6 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             return analytics.get_statistics()
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
-            raise HTTPException(
-                status_code=500, detail="Failed to get analytics statistics"
-            ) from e
+            raise HTTPException(status_code=500, detail="Failed to get analytics statistics") from e
 
     return router

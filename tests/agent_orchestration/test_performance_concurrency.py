@@ -174,13 +174,6 @@ class TestConcurrentWorkflowExecution:
                 f"Low concurrency factor {concurrency_factor:.2f} - may be running sequentially"
             )
 
-            print(
-                f"✓ Concurrent execution: {len(successful_results)}/{len(results)} successful"
-            )
-            print(f"✓ Success rate: {success_rate:.2%}")
-            print(f"✓ Average execution time: {avg_execution_time:.2f}s")
-            print(f"✓ Concurrency factor: {concurrency_factor:.2f}x")
-
         finally:
             # Cleanup all concurrent sessions
             cleanup_tasks = []
@@ -313,12 +306,8 @@ class TestConcurrentWorkflowExecution:
                 # Verify resource limits were respected
                 wba_key = "WBA:limited"
                 if wba_key in resource_usage:
-                    max_concurrent = resource_usage[wba_key]["max_concurrent"]
+                    resource_usage[wba_key]["max_concurrent"]
                     total_requests = resource_usage[wba_key]["total_requests"]
-
-                    print(
-                        f"✓ Resource usage - Max concurrent: {max_concurrent}, Total requests: {total_requests}"
-                    )
 
                     # Verify that resource contention was handled (some requests should have been queued)
                     assert total_requests >= len(concurrent_requests), (
@@ -332,10 +321,6 @@ class TestConcurrentWorkflowExecution:
                         assert time_variance > 0.1, (
                             "Execution times too uniform - contention not evident"
                         )
-
-                print(
-                    f"✓ Resource contention test: {len(successful_results)}/{len(results)} successful"
-                )
 
         finally:
             await integration_helper.cleanup_test_data(
@@ -381,8 +366,6 @@ class TestPerformanceBenchmarks:
             for scenario_name, scenario in performance_test_scenarios.items():
                 if scenario_name == "stress_test":
                     continue  # Skip stress test in regular benchmarks
-
-                print(f"\n--- Testing {scenario_name} scenario ---")
 
                 concurrent_count = scenario["concurrent_workflows"]
                 duration = scenario["duration_seconds"]
@@ -471,23 +454,9 @@ class TestPerformanceBenchmarks:
                     f"{scenario_name}: Average time {avg_time:.2f}s exceeds expected {expected_avg_time}s"
                 )
 
-                print(
-                    f"✓ {scenario_name}: {completed_workflows} workflows, {success_rate:.2%} success rate"
-                )
-                print(
-                    f"✓ Average time: {avg_time:.2f}s, Throughput: {throughput:.2f} workflows/sec"
-                )
-
             # Generate benchmark report
-            print("\n=== PERFORMANCE BENCHMARK REPORT ===")
-            for scenario_name, results in benchmark_results.items():
-                print(f"\n{scenario_name.upper()}:")
-                print(
-                    f"  Completed: {results['completed_workflows']}/{results['total_attempts']}"
-                )
-                print(f"  Success Rate: {results['success_rate']:.2%}")
-                print(f"  Avg Time: {results['avg_execution_time']:.2f}s")
-                print(f"  Throughput: {results['throughput']:.2f} workflows/sec")
+            for scenario_name in benchmark_results:
+                pass
 
         finally:
             await integration_helper.cleanup_test_data(
@@ -616,7 +585,7 @@ class TestPerformanceBenchmarks:
                 statistics.mean(memory_values)
                 memory_increase = max_memory - initial_memory
 
-                max_cpu = max(cpu_values) if cpu_values else 0
+                max(cpu_values) if cpu_values else 0
                 avg_cpu = statistics.mean(cpu_values) if cpu_values else 0
 
                 # Resource usage assertions
@@ -626,22 +595,12 @@ class TestPerformanceBenchmarks:
                 assert max_memory < 2000, f"Peak memory {max_memory:.1f}MB too high"
                 assert avg_cpu < 80, f"Average CPU {avg_cpu:.1f}% too high"
 
-                print(
-                    f"✓ Resource monitoring: {successful_workflows}/{workflow_id} workflows successful"
-                )
-                print(
-                    f"✓ Memory: {initial_memory:.1f}MB → {max_memory:.1f}MB (Δ{memory_increase:.1f}MB)"
-                )
-                print(f"✓ CPU: Avg {avg_cpu:.1f}%, Max {max_cpu:.1f}%")
-
                 # Verify system stability
                 final_memory = process.memory_info().rss / 1024 / 1024
                 memory_cleanup = max_memory - final_memory
 
                 if memory_cleanup > 50:  # Significant memory was freed
-                    print(
-                        f"✓ Memory cleanup: {memory_cleanup:.1f}MB freed after load test"
-                    )
+                    pass
 
         except ImportError:
             pytest.skip("psutil not available for resource monitoring")
@@ -780,8 +739,6 @@ class TestAgentPoolScaling:
 
             # Execute load patterns and monitor scaling
             for pattern in load_patterns:
-                print(f"\n--- Testing {pattern['description']} pattern ---")
-
                 concurrent_requests = pattern["concurrent_requests"]
                 duration = pattern["duration"]
 
@@ -853,24 +810,16 @@ class TestAgentPoolScaling:
                     await asyncio.gather(*active_workflows, return_exceptions=True)
 
                 # Report scaling results for this pattern
-                total_agents = sum(pool["active"] for pool in agent_pools.values())
-                print(
-                    f"✓ {pattern['description']}: {completed_workflows} workflows completed"
-                )
-                print(f"✓ Total active agents: {total_agents}")
+                sum(pool["active"] for pool in agent_pools.values())
 
                 for agent_type, pool in agent_pools.items():
-                    print(f"  {agent_type.value}: {pool['active']} active agents")
+                    pass
 
             # Analyze scaling behavior
             scale_up_events = [e for e in scaling_events if e["event"] == "scale_up"]
             scale_down_events = [
                 e for e in scaling_events if e["event"] == "scale_down"
             ]
-
-            print("\n=== SCALING ANALYSIS ===")
-            print(f"Scale-up events: {len(scale_up_events)}")
-            print(f"Scale-down events: {len(scale_down_events)}")
 
             # Verify scaling behavior
             assert len(scale_up_events) > 0, (
@@ -885,7 +834,7 @@ class TestAgentPoolScaling:
 
             # Verify scale-down occurred during low load
             if len(scale_down_events) > 0:
-                print("✓ Scale-down behavior detected")
+                pass
 
             # Verify maximum limits were respected
             for agent_type, pool in agent_pools.items():
@@ -893,8 +842,6 @@ class TestAgentPoolScaling:
                     f"{agent_type.value} exceeded maximum pool size"
                 )
                 assert pool["active"] >= 1, f"{agent_type.value} scaled below minimum"
-
-            print("✓ Agent pool scaling behavior verified")
 
         finally:
             await integration_helper.cleanup_test_data(

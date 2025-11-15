@@ -179,15 +179,11 @@ def main():
     errors = []
     all_fixes = []
 
-    print(f"{'DRY RUN: ' if args.dry_run else ''}Processing {len(args.files)} files...")
-    print()
-
     for filepath in args.files:
         if not filepath.exists():
-            print(f"⚠️  File not found: {filepath}")
             continue
 
-        if not filepath.suffix == ".py":
+        if filepath.suffix != ".py":
             continue
 
         total_files += 1
@@ -195,33 +191,19 @@ def main():
 
         if error:
             errors.append((filepath, error))
-            print(f"❌ {filepath}: {error}")
         elif changed:
             changed_files.append(filepath)
             total_fixes += num_fixes
             all_fixes.extend(fixes)
-            print(f"✅ {filepath}: {num_fixes} fix(es)")
         else:
-            print(f"⏭️  {filepath}: No changes needed")
-
-    print()
-    print("=" * 70)
-    print("Summary:")
-    print(f"  Files processed: {total_files}")
-    print(f"  Files changed: {len(changed_files)}")
-    print(f"  Total fixes: {total_fixes}")
-    print(f"  Errors: {len(errors)}")
+            pass
 
     if args.dry_run:
-        print()
-        print("⚠️  DRY RUN: No files were modified")
-        print("   Run without --dry-run to apply changes")
+        pass
 
     if errors:
-        print()
-        print("Errors encountered:")
         for filepath, error in errors:
-            print(f"  {filepath}: {error}")
+            pass
         return 1
 
     # Save detailed report
@@ -237,7 +219,6 @@ def main():
                 f.write(
                     f"  {fix['file']}:{fix['line']} - Added 'from {fix['exception_var']}'\n"
                 )
-        print(f"\n📝 Detailed report saved to: {report_path}")
 
     return 0
 

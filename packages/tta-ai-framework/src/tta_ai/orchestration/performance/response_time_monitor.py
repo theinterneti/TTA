@@ -107,9 +107,7 @@ class ResponseTimeMonitor:
         self.enable_real_time_analysis = enable_real_time_analysis
 
         # Metrics storage
-        self.metrics_history: deque[ResponseTimeMetric] = deque(
-            maxlen=max_metrics_history
-        )
+        self.metrics_history: deque[ResponseTimeMetric] = deque(maxlen=max_metrics_history)
         self.active_operations: dict[str, dict[str, Any]] = {}
 
         # Statistics cache
@@ -287,9 +285,7 @@ class ResponseTimeMonitor:
 
         if operation_type:
             recent_metrics = [
-                metric
-                for metric in recent_metrics
-                if metric.operation_type == operation_type
+                metric for metric in recent_metrics if metric.operation_type == operation_type
             ]
 
         # Group metrics by operation type
@@ -310,9 +306,7 @@ class ResponseTimeMonitor:
     ) -> PerformanceStatistics:
         """Calculate performance statistics for a set of metrics."""
         durations = [metric.duration for metric in metrics]
-        successful_operations = [
-            metric for metric in metrics if not metric.metadata.get("error")
-        ]
+        successful_operations = [metric for metric in metrics if not metric.metadata.get("error")]
 
         # Performance level distribution
         performance_distribution = defaultdict(int)
@@ -349,9 +343,7 @@ class ResponseTimeMonitor:
         if upper_index >= len(sorted_data):
             return sorted_data[lower_index]
 
-        return (
-            sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
-        )
+        return sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
 
     async def _cleanup_loop(self) -> None:
         """Background task to clean up old metrics."""
@@ -402,10 +394,7 @@ class ResponseTimeMonitor:
                 await self._trigger_sla_violation_alert(op_type, stats)
 
             # Check for performance degradation
-            if (
-                stats.average_duration
-                > self.performance_thresholds[PerformanceLevel.ACCEPTABLE]
-            ):
+            if stats.average_duration > self.performance_thresholds[PerformanceLevel.ACCEPTABLE]:
                 await self._trigger_degradation_alert(op_type, stats)
 
     async def _trigger_sla_violation_alert(
@@ -435,9 +424,7 @@ class ResponseTimeMonitor:
             "type": "performance_degradation",
             "operation_type": operation_type.value,
             "average_duration": statistics.average_duration,
-            "acceptable_threshold": self.performance_thresholds[
-                PerformanceLevel.ACCEPTABLE
-            ],
+            "acceptable_threshold": self.performance_thresholds[PerformanceLevel.ACCEPTABLE],
             "total_operations": statistics.total_operations,
             "timestamp": time.time(),
         }

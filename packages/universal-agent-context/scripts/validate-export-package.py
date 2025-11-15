@@ -18,17 +18,16 @@ import argparse
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 try:
     import yaml
 except ImportError:
-    print("Error: PyYAML not installed. Install with: pip install pyyaml")
     sys.exit(1)
 
 
 class ValidationError(Exception):
     """Custom exception for validation errors."""
+
     pass
 
 
@@ -38,12 +37,11 @@ class ExportPackageValidator:
     def __init__(self, root_dir: Path, strict: bool = False):
         self.root_dir = root_dir
         self.strict = strict
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
 
     def validate_all(self) -> bool:
         """Run all validations."""
-        print("🔍 Validating Universal Agent Context System export package...\n")
 
         # Validate file structure
         self.validate_file_structure()
@@ -67,7 +65,6 @@ class ExportPackageValidator:
 
     def validate_file_structure(self):
         """Validate required directory structure."""
-        print("📁 Validating file structure...")
 
         required_dirs = [
             ".github/instructions",
@@ -99,7 +96,6 @@ class ExportPackageValidator:
 
     def validate_instruction_files(self):
         """Validate instruction files with YAML frontmatter."""
-        print("📝 Validating instruction files...")
 
         instructions_dir = self.root_dir / ".github" / "instructions"
         if not instructions_dir.exists():
@@ -127,7 +123,9 @@ class ExportPackageValidator:
             required_fields = ["applyTo", "tags", "description"]
             for field in required_fields:
                 if field not in frontmatter:
-                    self.errors.append(f"{file_path.name}: Missing required field '{field}'")
+                    self.errors.append(
+                        f"{file_path.name}: Missing required field '{field}'"
+                    )
 
             # Validate applyTo patterns
             if "applyTo" in frontmatter:
@@ -136,7 +134,9 @@ class ExportPackageValidator:
                 else:
                     for item in frontmatter["applyTo"]:
                         if not isinstance(item, dict) or "pattern" not in item:
-                            self.errors.append(f"{file_path.name}: Invalid 'applyTo' item format")
+                            self.errors.append(
+                                f"{file_path.name}: Invalid 'applyTo' item format"
+                            )
 
             # Validate tags
             if "tags" in frontmatter:
@@ -144,27 +144,34 @@ class ExportPackageValidator:
                     self.errors.append(f"{file_path.name}: 'tags' must be a list")
                 else:
                     for tag in frontmatter["tags"]:
-                        if not isinstance(tag, str) or not re.match(r'^[a-z0-9-]+$', tag):
-                            self.errors.append(f"{file_path.name}: Invalid tag format '{tag}'")
+                        if not isinstance(tag, str) or not re.match(
+                            r"^[a-z0-9-]+$", tag
+                        ):
+                            self.errors.append(
+                                f"{file_path.name}: Invalid tag format '{tag}'"
+                            )
 
             # Validate priority (if present)
             if "priority" in frontmatter:
                 priority = frontmatter["priority"]
                 if not isinstance(priority, int) or not (1 <= priority <= 10):
-                    self.errors.append(f"{file_path.name}: Priority must be integer 1-10")
+                    self.errors.append(
+                        f"{file_path.name}: Priority must be integer 1-10"
+                    )
 
             # Validate version (if present)
             if "version" in frontmatter:
                 version = frontmatter["version"]
-                if not re.match(r'^\d+\.\d+\.\d+$', str(version)):
-                    self.errors.append(f"{file_path.name}: Invalid version format (use semver)")
+                if not re.match(r"^\d+\.\d+\.\d+$", str(version)):
+                    self.errors.append(
+                        f"{file_path.name}: Invalid version format (use semver)"
+                    )
 
         except Exception as e:
             self.errors.append(f"{file_path.name}: Validation error - {str(e)}")
 
     def validate_chat_mode_files(self):
         """Validate chat mode files with YAML frontmatter."""
-        print("🤖 Validating chat mode files...")
 
         chatmodes_dir = self.root_dir / ".github" / "chatmodes"
         if not chatmodes_dir.exists():
@@ -189,22 +196,33 @@ class ExportPackageValidator:
                 return
 
             # Validate required fields
-            required_fields = ["mode", "description", "cognitive_focus", "security_level"]
+            required_fields = [
+                "mode",
+                "description",
+                "cognitive_focus",
+                "security_level",
+            ]
             for field in required_fields:
                 if field not in frontmatter:
-                    self.errors.append(f"{file_path.name}: Missing required field '{field}'")
+                    self.errors.append(
+                        f"{file_path.name}: Missing required field '{field}'"
+                    )
 
             # Validate mode format
             if "mode" in frontmatter:
                 mode = frontmatter["mode"]
-                if not re.match(r'^[a-z0-9-]+$', mode):
-                    self.errors.append(f"{file_path.name}: Invalid mode format (use lowercase-with-hyphens)")
+                if not re.match(r"^[a-z0-9-]+$", mode):
+                    self.errors.append(
+                        f"{file_path.name}: Invalid mode format (use lowercase-with-hyphens)"
+                    )
 
             # Validate security level
             if "security_level" in frontmatter:
                 security_level = frontmatter["security_level"]
                 if security_level not in ["LOW", "MEDIUM", "HIGH"]:
-                    self.errors.append(f"{file_path.name}: Invalid security_level (must be LOW, MEDIUM, or HIGH)")
+                    self.errors.append(
+                        f"{file_path.name}: Invalid security_level (must be LOW, MEDIUM, or HIGH)"
+                    )
 
             # Validate tool lists (if present)
             if "allowed_tools" in frontmatter and "denied_tools" in frontmatter:
@@ -212,21 +230,24 @@ class ExportPackageValidator:
                 denied = set(frontmatter["denied_tools"])
                 overlap = allowed & denied
                 if overlap:
-                    self.errors.append(f"{file_path.name}: Tools in both allowed and denied: {overlap}")
+                    self.errors.append(
+                        f"{file_path.name}: Tools in both allowed and denied: {overlap}"
+                    )
 
         except Exception as e:
             self.errors.append(f"{file_path.name}: Validation error - {str(e)}")
 
     def validate_core_files(self):
         """Validate core files (AGENTS.md, apm.yml, etc.)."""
-        print("📄 Validating core files...")
 
         # Validate AGENTS.md
         agents_md = self.root_dir / "AGENTS.md"
         if agents_md.exists():
             content = agents_md.read_text()
             if "# TTA" in content and self.strict:
-                self.warnings.append("AGENTS.md contains TTA-specific content (should be generic for export)")
+                self.warnings.append(
+                    "AGENTS.md contains TTA-specific content (should be generic for export)"
+                )
 
         # Validate apm.yml
         apm_yml = self.root_dir / "apm.yml"
@@ -245,7 +266,6 @@ class ExportPackageValidator:
 
     def validate_cross_references(self):
         """Validate cross-references between files."""
-        print("🔗 Validating cross-references...")
 
         # Check that referenced files exist
         agents_md = self.root_dir / "AGENTS.md"
@@ -263,11 +283,13 @@ class ExportPackageValidator:
                 if ref_text in content:
                     ref_path = self.root_dir / ref_file
                     if not ref_path.exists():
-                        self.warnings.append(f"AGENTS.md references {ref_file} but file doesn't exist")
+                        self.warnings.append(
+                            f"AGENTS.md references {ref_file} but file doesn't exist"
+                        )
 
-    def extract_frontmatter(self, content: str) -> Tuple[Dict, str]:
+    def extract_frontmatter(self, content: str) -> tuple[dict, str]:
         """Extract YAML frontmatter from markdown content."""
-        match = re.match(r'^---\s*\n(.*?)\n---\s*\n(.*)$', content, re.DOTALL)
+        match = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)$", content, re.DOTALL)
         if not match:
             return {}, content
 
@@ -282,38 +304,32 @@ class ExportPackageValidator:
 
     def print_results(self):
         """Print validation results."""
-        print("\n" + "=" * 60)
-        print("VALIDATION RESULTS")
-        print("=" * 60 + "\n")
 
         if self.errors:
-            print(f"❌ {len(self.errors)} ERROR(S) FOUND:\n")
-            for error in self.errors:
-                print(f"  ❌ {error}")
-            print()
+            for _error in self.errors:
+                pass
 
         if self.warnings:
-            print(f"⚠️  {len(self.warnings)} WARNING(S) FOUND:\n")
-            for warning in self.warnings:
-                print(f"  ⚠️  {warning}")
-            print()
+            for _warning in self.warnings:
+                pass
 
-        if not self.errors and not self.warnings:
-            print("✅ ALL VALIDATIONS PASSED!\n")
-            print("Export package is ready for distribution.\n")
-        elif not self.errors:
-            print("✅ NO ERRORS FOUND (warnings can be ignored)\n")
-            print("Export package is ready for distribution.\n")
+        if not self.errors and not self.warnings or not self.errors:
+            pass
         else:
-            print("❌ VALIDATION FAILED\n")
-            print("Please fix errors before exporting.\n")
+            pass
 
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(description="Validate Universal Agent Context System export package")
-    parser.add_argument("--root", type=Path, default=Path.cwd(), help="Root directory of export package")
-    parser.add_argument("--strict", action="store_true", help="Enable strict validation mode")
+    parser = argparse.ArgumentParser(
+        description="Validate Universal Agent Context System export package"
+    )
+    parser.add_argument(
+        "--root", type=Path, default=Path.cwd(), help="Root directory of export package"
+    )
+    parser.add_argument(
+        "--strict", action="store_true", help="Enable strict validation mode"
+    )
     args = parser.parse_args()
 
     validator = ExportPackageValidator(args.root, strict=args.strict)
@@ -324,4 +340,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -389,7 +389,7 @@ class StructuredFeedbackCollector:
         report = ComprehensiveFeedbackReport(
             report_id=f"feedback_report_{int(time.time())}",
             generation_timestamp=datetime.utcnow(),
-            session_count=len(set(item.session_id for item in recent_feedback)),
+            session_count=len({item.session_id for item in recent_feedback}),
             total_feedback_items=len(recent_feedback),
             dimension_analyses=dimension_analyses,
             overall_excellence_score=overall_excellence_score,
@@ -580,7 +580,7 @@ class StructuredFeedbackCollector:
         if std_deviation > 2.0:
             key_insights.append("High variability in feedback scores")
 
-        feedback_types = set(item.feedback_type for item in feedback_items)
+        feedback_types = {item.feedback_type for item in feedback_items}
         if len(feedback_types) > 1:
             key_insights.append("Multiple feedback sources available")
 
@@ -771,9 +771,7 @@ async def run_structured_feedback_collection(
             )
 
         # Analyze collected feedback
-        report = await collector.analyze_feedback_comprehensive()
-
-        return report
+        return await collector.analyze_feedback_comprehensive()
 
     except Exception as e:
         logger.error(f"❌ Structured feedback collection failed: {e}")
@@ -833,41 +831,19 @@ if __name__ == "__main__":
 
         report = await run_structured_feedback_collection(test_sessions)
 
-        print("\n" + "=" * 80)
-        print("STRUCTURED FEEDBACK COLLECTION RESULTS")
-        print("=" * 80)
-
-        print(f"\n📊 Report: {report.report_id}")
-        print(f"   Sessions Analyzed: {report.session_count}")
-        print(f"   Total Feedback Items: {report.total_feedback_items}")
-        print(f"   Overall Excellence Score: {report.overall_excellence_score:.1f}/10")
-        print(
-            f"   Meets Excellence Standards: {'✅ YES' if report.meets_excellence_standards else '❌ NO'}"
-        )
-
-        print("\n🔍 Dimension Analysis:")
-        for dimension_name, analysis in report.dimension_analyses.items():
-            print(f"   {dimension_name.replace('_', ' ').title()}:")
-            print(f"      Score: {analysis.confidence_weighted_score:.1f}/10")
-            print(
-                f"      Excellence: {'✅' if analysis.excellence_achievement else '❌'}"
-            )
-            print(f"      Trend: {analysis.trend_direction}")
-            print(f"      Sample Size: {analysis.sample_size}")
+        for _analysis in report.dimension_analyses.values():
+            pass
 
         if report.improvement_trends:
-            print("\n📈 Improvement Trends:")
-            for trend in report.improvement_trends:
-                print(f"   ✨ {trend}")
+            for _trend in report.improvement_trends:
+                pass
 
         if report.concern_areas:
-            print("\n⚠️ Concern Areas:")
-            for concern in report.concern_areas:
-                print(f"   🔍 {concern}")
+            for _concern in report.concern_areas:
+                pass
 
         if report.feedback_recommendations:
-            print("\n💡 Recommendations:")
-            for rec in report.feedback_recommendations[:5]:
-                print(f"   📋 {rec}")
+            for _rec in report.feedback_recommendations[:5]:
+                pass
 
     asyncio.run(main())

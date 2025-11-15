@@ -134,10 +134,8 @@ class ResponseTimeCollector:
         self.metric_retention_seconds = metric_retention_hours * 3600
 
         # Metric storage: category -> operation -> deque of metrics
-        self.metrics: dict[
-            ResponseTimeCategory, dict[str, deque[ResponseTimeMetric]]
-        ] = defaultdict(
-            lambda: defaultdict(lambda: deque(maxlen=max_metrics_per_operation))
+        self.metrics: dict[ResponseTimeCategory, dict[str, deque[ResponseTimeMetric]]] = (
+            defaultdict(lambda: defaultdict(lambda: deque(maxlen=max_metrics_per_operation)))
         )
 
         # Active timing contexts
@@ -321,9 +319,7 @@ class ResponseTimeCollector:
 
         return stats
 
-    def get_all_stats(
-        self, force_refresh: bool = False
-    ) -> dict[str, ResponseTimeStats]:
+    def get_all_stats(self, force_refresh: bool = False) -> dict[str, ResponseTimeStats]:
         """Get statistics for all operations."""
         all_stats = {}
 
@@ -427,10 +423,7 @@ class ResponseTimeCollector:
                 # Clean up orphaned active timings (older than 1 hour)
                 orphaned_contexts = []
                 for context_id, start_time in self.active_timings.items():
-                    if (
-                        isinstance(start_time, float)
-                        and current_time - start_time > 3600
-                    ):
+                    if isinstance(start_time, float) and current_time - start_time > 3600:
                         orphaned_contexts.append(context_id)
 
                 for context_id in orphaned_contexts:
@@ -453,9 +446,7 @@ class ResponseTimeCollector:
     def get_statistics(self) -> dict[str, Any]:
         """Get collector statistics."""
         total_metrics = sum(
-            len(operations[op])
-            for operations in self.metrics.values()
-            for op in operations
+            len(operations[op]) for operations in self.metrics.values() for op in operations
         )
 
         return {

@@ -49,7 +49,6 @@ ATTEMPTED_MODELS = [
 def get_available_models():
     """Query OpenRouter's /models endpoint to get available models."""
     if not API_KEY:
-        print("❌ API key not set")
         return None
 
     try:
@@ -64,26 +63,19 @@ def get_available_models():
         )
 
         if response.status_code != 200:
-            print(f"❌ Failed to get models: HTTP {response.status_code}")
             return None
 
         data = response.json()
         return data.get("data", [])
 
-    except Exception as e:
-        print(f"❌ Error querying models: {e}")
+    except Exception:
         return None
 
 
 def analyze_models(models):
     """Analyze available models and categorize them."""
     if not models:
-        print("❌ No models returned")
         return None
-
-    print("\n" + "=" * 100)
-    print("OPENROUTER AVAILABLE MODELS ANALYSIS")
-    print("=" * 100)
 
     # Categorize models
     free_models = []
@@ -115,26 +107,15 @@ def analyze_models(models):
             paid_models.append(model_id)
             model_families[family]["paid"].append(model_id)
 
-    print("\n📊 SUMMARY")
-    print(f"Total Models: {len(models)}")
-    print(f"Free Models: {len(free_models)}")
-    print(f"Paid Models: {len(paid_models)}")
-    print(f"Model Families: {len(model_families)}")
-
     # Show free models by family
-    print("\n🆓 FREE MODELS BY FAMILY")
-    print("=" * 100)
     for family in sorted(model_families.keys()):
         free_count = len(model_families[family]["free"])
-        paid_count = len(model_families[family]["paid"])
+        len(model_families[family]["paid"])
         if free_count > 0:
-            print(f"\n{family.upper()} ({free_count} free, {paid_count} paid):")
             for model_id in sorted(model_families[family]["free"]):
-                print(f"  ✅ {model_id}")
+                pass
 
     # Check which attempted models are available
-    print("\n🔍 ATTEMPTED MODELS STATUS")
-    print("=" * 100)
     available_attempted = []
     unavailable_attempted = []
 
@@ -144,7 +125,7 @@ def analyze_models(models):
         found = False
 
         for model_id in free_models:
-            if model_id == attempted_base or model_id == attempted:
+            if model_id in (attempted_base, attempted):
                 available_attempted.append((attempted, model_id))
                 found = True
                 break
@@ -152,17 +133,13 @@ def analyze_models(models):
         if not found:
             unavailable_attempted.append(attempted)
 
-    print(f"\n✅ AVAILABLE ({len(available_attempted)}):")
-    for attempted, actual in available_attempted:
-        print(f"  {attempted} → {actual}")
+    for attempted, _actual in available_attempted:
+        pass
 
-    print(f"\n❌ UNAVAILABLE ({len(unavailable_attempted)}):")
     for attempted in unavailable_attempted:
-        print(f"  {attempted}")
+        pass
 
     # Look for similar models
-    print("\n🔎 SIMILAR MODELS FOUND")
-    print("=" * 100)
     for attempted in unavailable_attempted:
         attempted_base = attempted.replace(":free", "").lower()
         similar = []
@@ -174,9 +151,8 @@ def analyze_models(models):
                 similar.append(model_id)
 
         if similar:
-            print(f"\n{attempted}:")
             for model_id in similar:
-                print(f"  → {model_id}")
+                pass
 
     # Save detailed results
     output_file = Path("openrouter_models_analysis.json")
@@ -202,9 +178,6 @@ def analyze_models(models):
             indent=2,
         )
 
-    print(f"\n✅ Detailed results saved to: {output_file}")
-    print("=" * 100 + "\n")
-
     return {
         "free_models": free_models,
         "model_families": model_families,
@@ -215,19 +188,13 @@ def analyze_models(models):
 
 def main():
     """Main investigation."""
-    print("\n" + "=" * 100)
-    print("INVESTIGATING OPENROUTER AVAILABLE MODELS")
-    print("=" * 100)
-    print(f"Start Time: {__import__('datetime').datetime.now().isoformat()}\n")
 
-    print("📡 Querying OpenRouter /models endpoint...")
     models = get_available_models()
 
     if models:
-        print(f"✅ Retrieved {len(models)} models from OpenRouter")
         analyze_models(models)
     else:
-        print("❌ Failed to retrieve models")
+        pass
 
 
 if __name__ == "__main__":

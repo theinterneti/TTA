@@ -204,10 +204,6 @@ class TestPerformanceValidation:
                 f"Response time {response_time:.2f}s exceeded target {scenario['target_time']}s for {scenario['complexity']} query"
             )
 
-            print(
-                f"{scenario['complexity'].capitalize()} query: {response_time:.2f}s (target: {scenario['target_time']}s)"
-            )
-
         # Validate overall performance statistics
         avg_response_time = statistics.mean(response_times)
         max_response_time = max(response_times)
@@ -235,12 +231,6 @@ class TestPerformanceValidation:
             assert workflow_stats.success_rate >= 1.0, (
                 "Not all workflows completed successfully"
             )
-
-        print("Performance validation summary:")
-        print(f"  Average response time: {avg_response_time:.2f}s")
-        print(f"  Maximum response time: {max_response_time:.2f}s")
-        print(f"  P95 response time: {p95_response_time:.2f}s")
-        print(f"  All scenarios met SLA: {max_response_time < 2.0}")
 
     async def test_performance_optimization_effectiveness(
         self, optimized_orchestration_service
@@ -289,7 +279,7 @@ class TestPerformanceValidation:
         second_half_avg = statistics.mean(second_half)
 
         # Performance should improve or remain stable
-        improvement_ratio = (first_half_avg - second_half_avg) / first_half_avg
+        (first_half_avg - second_half_avg) / first_half_avg
 
         # All response times should meet SLA
         max_response_time = max(response_times)
@@ -302,13 +292,6 @@ class TestPerformanceValidation:
 
         assert optimization_stats["registered_agents"] == 3
         assert optimization_stats["system_load"] >= 0.0
-
-        print("Optimization effectiveness test:")
-        print(f"  First half average: {first_half_avg:.2f}s")
-        print(f"  Second half average: {second_half_avg:.2f}s")
-        print(f"  Improvement ratio: {improvement_ratio:.2%}")
-        print(f"  System load: {optimization_stats['system_load']:.2%}")
-        print(f"  Optimization strategy: {optimization_stats['optimization_strategy']}")
 
     async def test_performance_under_load(self, optimized_orchestration_service):
         """Test performance under concurrent load."""
@@ -389,13 +372,6 @@ class TestPerformanceValidation:
             f"Concurrency efficiency {concurrency_efficiency:.1f}x is too low"
         )
 
-        print("Performance under load test:")
-        print(f"  Concurrent requests: {concurrent_requests}")
-        print(f"  Total time: {total_time:.2f}s")
-        print(f"  Average individual time: {avg_individual_time:.2f}s")
-        print(f"  Maximum individual time: {max_individual_time:.2f}s")
-        print(f"  Concurrency efficiency: {concurrency_efficiency:.1f}x")
-
     async def test_performance_analytics_validation(
         self, optimized_orchestration_service
     ):
@@ -473,13 +449,6 @@ class TestPerformanceValidation:
         assert performance_summary["total_operations"] >= len(test_scenarios) * 3
         assert performance_summary["overall_performance"] != "no_data"
 
-        print("Performance analytics validation:")
-        print(f"  Overall health: {overall_health}")
-        print(f"  Total bottlenecks: {len(analysis_results['bottlenecks'])}")
-        print(f"  Total trends: {len(analysis_results['trends'])}")
-        print(f"  Total recommendations: {len(analysis_results['recommendations'])}")
-        print(f"  Total operations analyzed: {performance_summary['total_operations']}")
-
     async def test_performance_alerting_validation(
         self, optimized_orchestration_service
     ):
@@ -554,12 +523,6 @@ class TestPerformanceValidation:
         assert alert_stats["configured_thresholds"] > 0
         assert alert_stats["escalation_rules"] > 0
 
-        print("Performance alerting validation:")
-        print(f"  Normal operations alerts: {len(performance_alerts)}")
-        print(f"  Slow operation alert generated: {slow_alert is not None}")
-        print(f"  Alert severity: {slow_alert.severity.value if slow_alert else 'N/A'}")
-        print(f"  Configured thresholds: {alert_stats['configured_thresholds']}")
-
     async def test_end_to_end_performance_validation(
         self, optimized_orchestration_service
     ):
@@ -625,14 +588,3 @@ class TestPerformanceValidation:
         assert (
             optimization_stats["system_load"] < 0.8
         )  # System should not be overloaded
-
-        print("End-to-end performance validation:")
-        print(f"  Total response time: {total_response_time:.2f}s")
-        print(f"  Story length: {len(result['story'])} characters")
-        print(f"  Overall performance: {performance_summary['overall_performance']}")
-        print(f"  System load: {optimization_stats['system_load']:.2%}")
-        print(f"  SLA compliance: {total_response_time < 2.0}")
-        print(f"  Safety validated: {result.get('safety_validated', False)}")
-        print(
-            f"  Therapeutic content: {len(result.get('nga_result', {}).get('therapeutic_elements', []))} elements"
-        )

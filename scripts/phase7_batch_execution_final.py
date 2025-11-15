@@ -13,12 +13,13 @@ Configuration:
 """
 
 import asyncio
-import json
 import logging
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+import contextlib
 
 from agent_orchestration.openhands_integration.config import (
     OpenHandsConfig,
@@ -101,10 +102,6 @@ def create_task(file_path: str, index: int) -> QueuedTask:
 
 async def main():
     """Execute Phase 7 batch tasks with mock fallback."""
-    print("=" * 80)
-    print("🚀 PHASE 7 BATCH EXECUTION - MOCK FALLBACK APPROACH")
-    print("=" * 80)
-    print()
 
     # Load configuration
     try:
@@ -121,90 +118,47 @@ async def main():
     # Create execution engine with mock fallback enabled
     engine = ExecutionEngine(config, max_concurrent_tasks=5)
 
-    print("📋 Phase 7 Configuration:")
-    print(f"   Tasks: {len(PHASE7_TASKS)}")
-    print(f"   Model: {config.model}")
-    print(f"   Workspace: {config.workspace_path}")
-    print("   Mock Fallback: ENABLED ✅")
-    print()
-
     try:
         # Start engine
-        print("🔧 Starting execution engine...")
         await engine.start()
-        print("✅ Engine started")
-        print()
 
         # Create tasks
-        print(f"📋 Creating {len(PHASE7_TASKS)} unit test tasks...")
         tasks = [
             create_task(file_path, i + 1) for i, file_path in enumerate(PHASE7_TASKS)
         ]
-        print(f"✅ Created {len(tasks)} tasks")
-        print()
 
         # Submit tasks
-        print("📤 Submitting tasks to queue...")
         task_ids = []
         for i, task in enumerate(tasks, 1):
             try:
                 task_id = await engine.submit_task(task)
                 task_ids.append(task_id)
                 if i % 10 == 0:
-                    print(f"   [{i}/{len(tasks)}] Tasks submitted")
+                    pass
             except Exception as e:
                 logger.error(f"Failed to submit task {i}: {e}")
 
-        print(f"✅ Submitted {len(task_ids)}/{len(tasks)} tasks")
-        print()
-
         # Get initial queue stats
-        stats = await engine.get_queue_stats()
-        print("📊 Initial Queue Statistics:")
-        print(f"   Queued: {stats.get('queued', 0)}")
-        print(f"   Running: {stats.get('running', 0)}")
-        print(f"   Completed: {stats.get('completed', 0)}")
-        print()
+        await engine.get_queue_stats()
 
         # Run engine
         duration = 3600  # 1 hour
-        print(f"⏱️  Running engine for {duration}s ({duration // 60} minutes)...")
-        print("   (Press Ctrl+C to stop early)")
-        print()
 
-        try:
+        with contextlib.suppress(KeyboardInterrupt):
             await asyncio.sleep(duration)
-        except KeyboardInterrupt:
-            print("\n⏹️  Interrupted by user")
 
         # Get final stats
-        print()
-        print("=" * 80)
-        print("📊 FINAL EXECUTION STATISTICS")
-        print("=" * 80)
-        final_stats = await engine.get_queue_stats()
-        print(json.dumps(final_stats, indent=2))
+        await engine.get_queue_stats()
 
         # Get metrics summary
-        print()
-        print("📈 Metrics Summary:")
-        summary = engine.get_metrics_summary()
-        print(json.dumps(summary, indent=2))
+        engine.get_metrics_summary()
 
         # Stop engine
-        print()
-        print("🛑 Stopping execution engine...")
         await engine.stop()
-        print("✅ Engine stopped")
 
     except Exception as e:
         logger.error(f"Execution error: {e}", exc_info=True)
         sys.exit(1)
-
-    print()
-    print("=" * 80)
-    print("✅ PHASE 7 BATCH EXECUTION COMPLETE")
-    print("=" * 80)
 
 
 if __name__ == "__main__":

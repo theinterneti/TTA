@@ -39,9 +39,7 @@ class NarrativeEngine:
     narrative experiences.
     """
 
-    def __init__(
-        self, db_manager: Neo4jGameplayManager, config: dict[str, Any] | None = None
-    ):
+    def __init__(self, db_manager: Neo4jGameplayManager, config: dict[str, Any] | None = None):
         self.db_manager = db_manager
         self.config = config or {}
 
@@ -90,9 +88,7 @@ class NarrativeEngine:
             Generated opening scene or None if generation failed
         """
         try:
-            logger.info(
-                f"Generating opening scene for session {session_state.session_id}"
-            )
+            logger.info(f"Generating opening scene for session {session_state.session_id}")
 
             # Determine therapeutic context and goals
             therapeutic_context = session_state.therapeutic_context
@@ -120,14 +116,10 @@ class NarrativeEngine:
                 )
 
                 # Adapt complexity based on user profile
-                scene = await self.complexity_adapter.adapt_scene_complexity(
-                    scene, session_state
-                )
+                scene = await self.complexity_adapter.adapt_scene_complexity(scene, session_state)
 
                 # Apply immersion enhancements
-                scene = await self.immersion_manager.enhance_scene_immersion(
-                    scene, session_state
-                )
+                scene = await self.immersion_manager.enhance_scene_immersion(scene, session_state)
 
                 # Store scene in database and cache
                 await self.db_manager.create_scene(scene)
@@ -168,14 +160,10 @@ class NarrativeEngine:
             )
 
             # Determine scene type based on narrative flow
-            scene_type = await self._determine_next_scene_type(
-                session_state, narrative_direction
-            )
+            scene_type = await self._determine_next_scene_type(session_state, narrative_direction)
 
             # Check pacing and adjust if needed
-            pacing_adjustment = await self.pacing_controller.analyze_session_pacing(
-                session_state
-            )
+            pacing_adjustment = await self.pacing_controller.analyze_session_pacing(session_state)
 
             # Generate scene parameters
             scene_params = await self._determine_scene_parameters(
@@ -200,14 +188,10 @@ class NarrativeEngine:
                 )
 
                 # Adapt complexity
-                scene = await self.complexity_adapter.adapt_scene_complexity(
-                    scene, session_state
-                )
+                scene = await self.complexity_adapter.adapt_scene_complexity(scene, session_state)
 
                 # Enhance immersion
-                scene = await self.immersion_manager.enhance_scene_immersion(
-                    scene, session_state
-                )
+                scene = await self.immersion_manager.enhance_scene_immersion(scene, session_state)
 
                 # Apply pacing adjustments
                 scene = await self.pacing_controller.apply_pacing_adjustments(
@@ -268,10 +252,8 @@ class NarrativeEngine:
                 adapted_scene = await self._apply_crisis_adaptations(adapted_scene)
 
             # Re-enhance with therapeutic storytelling
-            adapted_scene = (
-                await self.therapeutic_storyteller.enhance_scene_with_therapy(
-                    adapted_scene, session_state.therapeutic_context
-                )
+            adapted_scene = await self.therapeutic_storyteller.enhance_scene_with_therapy(
+                adapted_scene, session_state.therapeutic_context
             )
 
             # Update immersion for new emotional context
@@ -300,9 +282,7 @@ class NarrativeEngine:
             Generated intervention scene or None if generation failed
         """
         try:
-            logger.info(
-                f"Generating therapeutic intervention scene: {intervention_type}"
-            )
+            logger.info(f"Generating therapeutic intervention scene: {intervention_type}")
 
             # Generate intervention-specific scene
             scene = await self.scene_generator.generate_intervention_scene(
@@ -348,9 +328,7 @@ class NarrativeEngine:
             "setting": "peaceful_garden",  # Default safe setting
             "atmosphere": "welcoming",
             "safety_level": "high",
-            "therapeutic_elements": therapeutic_context.primary_goals[
-                :2
-            ],  # Limit to top 2 goals
+            "therapeutic_elements": therapeutic_context.primary_goals[:2],  # Limit to top 2 goals
         }
 
         # Adjust based on emotional state

@@ -1,15 +1,12 @@
-# TTA Development Environment Override
-# Usage: docker-compose -f docker/compose/docker-compose.base.yml -f docker/compose/docker-compose.dev.yml up
-
 services:
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # Neo4j - Development Configuration
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   neo4j:
+    image: neo4j:5.26.1-community
+    container_name: ${CONTAINER_PREFIX:-tta-dev}-neo4j
     ports:
-      - "7474:7474" # HTTP
-      - "7687:7687" # Bolt
+      - 7474:7474
+      - 7687:7687
     environment:
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/tta_dev_password_2024}
       - NEO4J_PLUGINS=["apoc", "graph-data-science"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
       - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
@@ -20,85 +17,127 @@ services:
       - NEO4J_dbms_memory_pagecache_size=512m
       - NEO4J_dbms_logs_debug_level=${LOG_LEVEL:-INFO}
     volumes:
-      - tta_neo4j_dev_data:/data
-      - tta_neo4j_dev_logs:/logs
-      - tta_neo4j_dev_import:/var/lib/neo4j/import
-      - tta_neo4j_dev_plugins:/plugins
-    secrets:
-      - neo4j_auth
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 4G
-        reservations:
-          cpus: "0.5"
-          memory: 1G
-
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # Redis - Development Configuration
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      - neo4j_dev_data:/data
+      - neo4j_dev_logs:/logs
+      - neo4j_dev_import:/var/lib/neo4j/import
+      - neo4j_dev_plugins:/plugins
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
   redis:
+    image: redis:7.2.4-alpine3.19
+    container_name: ${CONTAINER_PREFIX:-tta-dev}-redis
     ports:
-      - "6379:6379"
-    command: >
-      redis-server
-      --appendonly yes
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-      --requirepass ${REDIS_PASSWORD:-dev_redis_password}
+      - 6379:6379
+    command:
+      redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+      ${REDIS_AUTH:+--requirepass $REDIS_PASSWORD}
     volumes:
-      - tta_redis_dev_data:/data
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.25"
-          memory: 128M
-
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # Prometheus - Development Configuration
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  prometheus:
+      - redis_dev_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: tta-redis-commander-dev
     ports:
-      - "9090:9090"
-    volumes:
-      - ../../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ../../monitoring/prometheus/alerts:/etc/prometheus/alerts:ro
-      - tta_prometheus_dev_data:/prometheus
-
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # Grafana - Development Configuration
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  grafana:
-    ports:
-      - "3000:3000"
+      - 8081:8081
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      - GF_SERVER_ROOT_URL=http://localhost:3000
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_INSTALL_PLUGINS=redis-datasource,neo4j-datasource
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
+  neo4j-browser:
+    image: neo4j/neo4j-browser:latest
+    container_name: tta-neo4j-browser
+    ports:
+      - 8080:8080
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+    depends_on:
+      - neo4j
+    profiles:
+      - tools
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
+  grafana:
+    image: grafana/grafana:10.2.3:10.2.3
+    container_name: tta-grafana-dev
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - tta_grafana_dev_data:/var/lib/grafana
-      - ../../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ../../monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
-    secrets:
-      - grafana_admin_password
-
+      - grafana_dev_data:/var/lib/grafana
+    profiles:
+      - monitoring
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
+  prometheus:
+    image: prom/prometheus:v2.48.1:latest
+    container_name: tta-prometheus-dev
+    ports:
+      - 9090:9090
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_dev_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    profiles:
+      - monitoring
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
 volumes:
-  tta_neo4j_dev_data:
-  tta_neo4j_dev_logs:
-  tta_neo4j_dev_import:
-  tta_neo4j_dev_plugins:
-  tta_redis_dev_data:
-  tta_prometheus_dev_data:
-  tta_grafana_dev_data:
-
-secrets:
-  neo4j_auth:
-    file: ../../secrets/dev/neo4j_auth.txt
-  grafana_admin_password:
-    file: ../../secrets/dev/grafana_admin_password.txt
+  neo4j_dev_data:
+    name: tta_neo4j_dev_data
+  neo4j_dev_logs:
+    name: tta_neo4j_dev_logs
+  neo4j_dev_import:
+    name: tta_neo4j_dev_import
+  neo4j_dev_plugins:
+    name: tta_neo4j_dev_plugins
+  redis_dev_data:
+    name: tta_redis_dev_data
+  grafana_dev_data:
+    name: tta_grafana_dev_data
+  prometheus_dev_data:
+    name: tta_prometheus_dev_data
+networks:
+  tta-dev-network:
+    name: tta-dev-network
+    driver: bridge

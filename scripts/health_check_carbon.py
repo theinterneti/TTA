@@ -21,11 +21,9 @@ def health_check():
         # Check output directory
         output_dir = Path(carbon.output_dir)
         if not output_dir.exists():
-            print(f"❌ Output directory does not exist: {output_dir}")
             return False
 
         if not output_dir.is_dir():
-            print(f"❌ Output path is not a directory: {output_dir}")
             return False
 
         # Check write permissions
@@ -33,43 +31,28 @@ def health_check():
         try:
             test_file.touch()
             test_file.unlink()
-        except Exception as e:
-            print(f"❌ Cannot write to output directory: {e}")
+        except Exception:
             return False
 
         # Check codecarbon availability
         try:
             from codecarbon import EmissionsTracker
 
-            print("✅ codecarbon library: Available")
             codecarbon_available = True
         except ImportError:
-            print("⚠️  codecarbon library: Not available (graceful degradation)")
             codecarbon_available = False
 
         # Test component start/stop
         if codecarbon_available:
             if not carbon.start():
-                print("❌ Component failed to start")
                 return False
-            print("✅ Component started successfully")
 
             if not carbon.stop():
-                print("❌ Component failed to stop")
                 return False
-            print("✅ Component stopped successfully")
-
-        print("✅ Carbon component: OK")
-        print(f"✅ Output directory writable: {output_dir}")
-        print("✅ Configuration: Valid")
-        print(f"✅ Project name: {carbon.project_name}")
-        print(f"✅ Log level: {carbon.log_level}")
-        print(f"✅ Measurement interval: {carbon.measurement_interval}s")
 
         return True
 
-    except Exception as e:
-        print(f"❌ Health check failed: {e}")
+    except Exception:
         import traceback
 
         traceback.print_exc()

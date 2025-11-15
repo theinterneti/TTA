@@ -58,12 +58,11 @@ class TestCapabilitySystemIntegration:
     @pytest_asyncio.fixture
     async def diagnostics_api(self, redis_registry, auto_discovery_manager):
         """Create diagnostics API for testing."""
-        api = DiagnosticsAPI(
+        return DiagnosticsAPI(
             registry=redis_registry,
             auto_discovery_manager=auto_discovery_manager,
             require_auth=False,  # Disable auth for testing
         )
-        return api
 
     async def test_agent_registration_and_discovery(
         self, redis_registry, auto_discovery_manager

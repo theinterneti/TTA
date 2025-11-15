@@ -116,9 +116,7 @@ class RealtimeConfigManager:
         try:
             return RealtimeEnvironment(env_name)
         except ValueError:
-            logger.warning(
-                f"Unknown environment '{env_name}', defaulting to development"
-            )
+            logger.warning(f"Unknown environment '{env_name}', defaulting to development")
             return RealtimeEnvironment.DEVELOPMENT
 
     def load_config(self) -> RealtimeConfig:
@@ -127,24 +125,18 @@ class RealtimeConfigManager:
             return self._config
 
         # Extract real-time config from base config
-        realtime_config = self.base_config.get("agent_orchestration", {}).get(
-            "realtime", {}
-        )
+        realtime_config = self.base_config.get("agent_orchestration", {}).get("realtime", {})
 
         # Create configuration with environment-specific defaults
         config = RealtimeConfig(
-            enabled=self._get_bool_config(
-                "enabled", realtime_config, self._get_default_enabled()
-            ),
+            enabled=self._get_bool_config("enabled", realtime_config, self._get_default_enabled()),
             environment=self._environment,
             websocket=self._load_websocket_config(realtime_config.get("websocket", {})),
             events=self._load_event_config(realtime_config.get("events", {})),
             progressive_feedback=self._load_progressive_feedback_config(
                 realtime_config.get("progressive_feedback", {})
             ),
-            optimization=self._load_optimization_config(
-                realtime_config.get("optimization", {})
-            ),
+            optimization=self._load_optimization_config(realtime_config.get("optimization", {})),
         )
 
         # Validate configuration
@@ -154,9 +146,7 @@ class RealtimeConfigManager:
         self._apply_feature_flags(config)
 
         self._config = config
-        logger.info(
-            f"Real-time configuration loaded for environment: {self._environment}"
-        )
+        logger.info(f"Real-time configuration loaded for environment: {self._environment}")
         return config
 
     def _get_default_enabled(self) -> bool:
@@ -171,9 +161,7 @@ class RealtimeConfigManager:
     def _load_websocket_config(self, ws_config: dict[str, Any]) -> WebSocketConfig:
         """Load WebSocket configuration."""
         return WebSocketConfig(
-            enabled=self._get_bool_config(
-                "enabled", ws_config, self._get_default_enabled()
-            ),
+            enabled=self._get_bool_config("enabled", ws_config, self._get_default_enabled()),
             path=ws_config.get("path", "/ws"),
             heartbeat_interval=float(ws_config.get("heartbeat_interval", 30.0)),
             connection_timeout=float(ws_config.get("connection_timeout", 60.0)),
@@ -185,9 +173,7 @@ class RealtimeConfigManager:
     def _load_event_config(self, event_config: dict[str, Any]) -> EventConfig:
         """Load event configuration."""
         return EventConfig(
-            enabled=self._get_bool_config(
-                "enabled", event_config, self._get_default_enabled()
-            ),
+            enabled=self._get_bool_config("enabled", event_config, self._get_default_enabled()),
             redis_channel_prefix=event_config.get("redis_channel_prefix", "ao:events"),
             buffer_size=int(event_config.get("buffer_size", 1000)),
             broadcast_agent_status=self._get_bool_config(
@@ -207,13 +193,9 @@ class RealtimeConfigManager:
     ) -> ProgressiveFeedbackConfig:
         """Load progressive feedback configuration."""
         return ProgressiveFeedbackConfig(
-            enabled=self._get_bool_config(
-                "enabled", pf_config, self._get_default_enabled()
-            ),
+            enabled=self._get_bool_config("enabled", pf_config, self._get_default_enabled()),
             update_interval=float(pf_config.get("update_interval", 1.0)),
-            max_updates_per_workflow=int(
-                pf_config.get("max_updates_per_workflow", 100)
-            ),
+            max_updates_per_workflow=int(pf_config.get("max_updates_per_workflow", 100)),
             stream_intermediate_results=self._get_bool_config(
                 "stream_intermediate_results", pf_config, True
             ),
@@ -221,24 +203,18 @@ class RealtimeConfigManager:
             batch_size=int(pf_config.get("batch_size", 10)),
         )
 
-    def _load_optimization_config(
-        self, opt_config: dict[str, Any]
-    ) -> OptimizationConfig:
+    def _load_optimization_config(self, opt_config: dict[str, Any]) -> OptimizationConfig:
         """Load optimization configuration."""
         return OptimizationConfig(
             enabled=self._get_bool_config("enabled", opt_config, False),
             response_time_monitoring=self._get_bool_config(
                 "response_time_monitoring", opt_config, True
             ),
-            statistical_analysis=self._get_bool_config(
-                "statistical_analysis", opt_config, True
-            ),
+            statistical_analysis=self._get_bool_config("statistical_analysis", opt_config, True),
             auto_parameter_adjustment=self._get_bool_config(
                 "auto_parameter_adjustment", opt_config, False
             ),
-            speed_creativity_balance=float(
-                opt_config.get("speed_creativity_balance", 0.5)
-            ),
+            speed_creativity_balance=float(opt_config.get("speed_creativity_balance", 0.5)),
         )
 
     def _get_bool_config(self, key: str, config: dict[str, Any], default: bool) -> bool:
@@ -274,32 +250,23 @@ class RealtimeConfigManager:
             errors.append("Event retention_hours must be positive")
 
         # Progressive feedback validation
-        if (
-            config.progressive_feedback.enabled
-            and config.progressive_feedback.update_interval <= 0
-        ):
+        if config.progressive_feedback.enabled and config.progressive_feedback.update_interval <= 0:
             errors.append("Progressive feedback update_interval must be positive")
 
         if (
             config.progressive_feedback.enabled
             and config.progressive_feedback.max_updates_per_workflow <= 0
         ):
-            errors.append(
-                "Progressive feedback max_updates_per_workflow must be positive"
-            )
+            errors.append("Progressive feedback max_updates_per_workflow must be positive")
 
         # Optimization validation
         if config.optimization.enabled:
             if not (0.0 <= config.optimization.speed_creativity_balance <= 1.0):
-                errors.append(
-                    "Optimization speed_creativity_balance must be between 0.0 and 1.0"
-                )
+                errors.append("Optimization speed_creativity_balance must be between 0.0 and 1.0")
 
         # Dependency validation
         if config.websocket.enabled and not config.events.enabled:
-            logger.warning(
-                "WebSocket enabled but events disabled - limited functionality"
-            )
+            logger.warning("WebSocket enabled but events disabled - limited functionality")
 
         if config.progressive_feedback.enabled and not config.events.enabled:
             errors.append("Progressive feedback requires events to be enabled")

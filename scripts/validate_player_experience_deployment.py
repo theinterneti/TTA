@@ -460,7 +460,7 @@ class PlayerExperienceDeploymentValidator:
         passed_tests = sum(1 for result in self.test_results if result["success"])
         success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
 
-        summary = {
+        return {
             "environment": self.environment,
             "config_path": self.config_path,
             "total_tests": total_tests,
@@ -472,34 +472,19 @@ class PlayerExperienceDeploymentValidator:
             "timestamp": datetime.now().isoformat(),
         }
 
-        return summary
-
     def print_summary(self, summary: dict[str, Any]):
         """Print test summary."""
-        print("\n" + "=" * 70)
-        print("PLAYER EXPERIENCE DEPLOYMENT VALIDATION SUMMARY")
-        print("=" * 70)
-        print(f"Environment: {summary['environment']}")
-        print(f"Config Path: {summary['config_path'] or 'default'}")
-        print(f"Total Tests: {summary['total_tests']}")
-        print(f"Passed: {summary['passed_tests']}")
-        print(f"Failed: {summary['failed_tests']}")
-        print(f"Success Rate: {summary['success_rate']:.1f}%")
 
-        overall_status = (
+        (
             "✅ DEPLOYMENT READY"
             if summary["overall_success"]
             else "❌ DEPLOYMENT NOT READY"
         )
-        print(f"\nOverall Status: {overall_status}")
 
         if not summary["overall_success"]:
-            print("\nFailed Tests:")
             for result in summary["test_results"]:
                 if not result["success"]:
-                    print(f"  - {result['test_name']}: {result['message']}")
-
-        print("=" * 70)
+                    pass
 
 
 def main():

@@ -74,9 +74,7 @@ class EventPublisher:
     def remove_websocket_manager(self, manager: Any) -> None:
         """Remove a WebSocket manager."""
         self.websocket_managers.discard(manager)
-        logger.debug(
-            f"Removed WebSocket manager: {len(self.websocket_managers)} remaining"
-        )
+        logger.debug(f"Removed WebSocket manager: {len(self.websocket_managers)} remaining")
 
     async def publish_agent_status_event(
         self,
@@ -330,9 +328,7 @@ class EventPublisher:
 
         # Create tasks for concurrent broadcasting
         tasks = []
-        for manager in list(
-            self.websocket_managers
-        ):  # Copy to avoid modification during iteration
+        for manager in list(self.websocket_managers):  # Copy to avoid modification during iteration
             task = asyncio.create_task(self._broadcast_to_manager(manager, event))
             tasks.append(task)
 
@@ -341,9 +337,7 @@ class EventPublisher:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             success_count = sum(1 for result in results if result is True)
 
-        logger.debug(
-            f"Broadcasted event to {success_count}/{total_count} WebSocket managers"
-        )
+        logger.debug(f"Broadcasted event to {success_count}/{total_count} WebSocket managers")
         return success_count == total_count
 
     async def _broadcast_to_manager(self, manager: Any, event: WebSocketEvent) -> bool:
@@ -379,9 +373,7 @@ class EventPublisher:
     async def get_recent_events(self, count: int = 10) -> list[dict[str, Any]]:
         """Get recent events from the buffer."""
         async with self.buffer_lock:
-            recent_events = (
-                self.event_buffer[-count:] if count > 0 else self.event_buffer[:]
-            )
+            recent_events = self.event_buffer[-count:] if count > 0 else self.event_buffer[:]
             return [event.model_dump() for event in recent_events]
 
     async def shutdown(self) -> None:

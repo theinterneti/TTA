@@ -57,15 +57,11 @@ class PacingController:
         self.config = config or {}
 
         # Pacing configuration
-        self.pacing_rules: dict[
-            SessionPhase, dict[PacingDimension, PacingStrategy]
-        ] = {}
+        self.pacing_rules: dict[SessionPhase, dict[PacingDimension, PacingStrategy]] = {}
         self.emotional_pacing_adjustments: dict[
             EmotionalState, dict[PacingDimension, PacingStrategy]
         ] = {}
-        self.optimal_durations: dict[
-            SceneType, tuple[int, int]
-        ] = {}  # (min, max) seconds
+        self.optimal_durations: dict[SceneType, tuple[int, int]] = {}  # (min, max) seconds
         self.fatigue_thresholds: dict[str, int] = {}
 
         logger.info("PacingController initialized")
@@ -85,9 +81,7 @@ class PacingController:
             logger.error(f"PacingController initialization failed: {e}")
             return False
 
-    async def analyze_session_pacing(
-        self, session_state: SessionState
-    ) -> dict[str, Any]:
+    async def analyze_session_pacing(self, session_state: SessionState) -> dict[str, Any]:
         """
         Analyze current session pacing and recommend adjustments.
 
@@ -98,9 +92,7 @@ class PacingController:
             Dictionary with pacing analysis and recommendations
         """
         try:
-            logger.info(
-                f"Analyzing session pacing for session {session_state.session_id}"
-            )
+            logger.info(f"Analyzing session pacing for session {session_state.session_id}")
 
             # Determine current session phase
             current_phase = await self._determine_session_phase(session_state)
@@ -128,13 +120,10 @@ class PacingController:
                 == PacingStrategy.ACCELERATE,
                 "needs_deceleration": adjustments.get("overall_strategy")
                 == PacingStrategy.DECELERATE,
-                "needs_pause": adjustments.get("overall_strategy")
-                == PacingStrategy.PAUSE,
+                "needs_pause": adjustments.get("overall_strategy") == PacingStrategy.PAUSE,
             }
 
-            logger.info(
-                f"Session pacing analysis completed: {adjustments.get('overall_strategy')}"
-            )
+            logger.info(f"Session pacing analysis completed: {adjustments.get('overall_strategy')}")
             return analysis
 
         except Exception as e:
@@ -168,9 +157,7 @@ class PacingController:
                     )
 
             # Apply overall pacing strategy
-            overall_strategy = adjustments.get(
-                "overall_strategy", PacingStrategy.MAINTAIN
-            )
+            overall_strategy = adjustments.get("overall_strategy", PacingStrategy.MAINTAIN)
             adjusted_scene = await self._apply_overall_pacing_strategy(
                 adjusted_scene, overall_strategy
             )
@@ -182,9 +169,7 @@ class PacingController:
             logger.error(f"Failed to apply pacing adjustments: {e}")
             return scene
 
-    async def optimize_scene_duration(
-        self, scene: Scene, session_context: dict[str, Any]
-    ) -> Scene:
+    async def optimize_scene_duration(self, scene: Scene, session_context: dict[str, Any]) -> Scene:
         """
         Optimize scene duration based on type and context.
 
@@ -202,9 +187,7 @@ class PacingController:
 
             # Adjust based on session context
             fatigue_level = session_context.get("fatigue_level", 0.0)
-            emotional_state = session_context.get(
-                "emotional_state", EmotionalState.CALM
-            )
+            emotional_state = session_context.get("emotional_state", EmotionalState.CALM)
 
             # Calculate optimal duration
             if fatigue_level > 0.7:
@@ -334,9 +317,7 @@ class PacingController:
         }
 
     # Analysis Methods
-    async def _determine_session_phase(
-        self, session_state: SessionState
-    ) -> SessionPhase:
+    async def _determine_session_phase(self, session_state: SessionState) -> SessionPhase:
         """Determine the current phase of the therapeutic session."""
         choice_count = len(session_state.choice_history)
         session_duration = choice_count * 300  # Estimate based on choices
@@ -351,9 +332,7 @@ class PacingController:
             return SessionPhase.INTEGRATION
         return SessionPhase.CLOSURE
 
-    async def _calculate_pacing_metrics(
-        self, session_state: SessionState
-    ) -> dict[str, float]:
+    async def _calculate_pacing_metrics(self, session_state: SessionState) -> dict[str, float]:
         """Calculate current pacing metrics for the session."""
         choice_count = len(session_state.choice_history)
         estimated_duration = choice_count * 300  # Rough estimate
@@ -362,9 +341,7 @@ class PacingController:
             "session_duration": estimated_duration,
             "choice_frequency": choice_count
             / max(estimated_duration / 60, 1),  # Choices per minute
-            "therapeutic_intensity": self._calculate_therapeutic_intensity(
-                session_state
-            ),
+            "therapeutic_intensity": self._calculate_therapeutic_intensity(session_state),
             "cognitive_load": self._calculate_cognitive_load(session_state),
             "emotional_engagement": self._calculate_emotional_engagement(session_state),
             "narrative_momentum": self._calculate_narrative_momentum(session_state),
@@ -380,17 +357,14 @@ class PacingController:
 
         if estimated_duration > self.fatigue_thresholds["session_duration"]:
             duration_fatigue = min(
-                (estimated_duration - self.fatigue_thresholds["session_duration"])
-                / 1800,
+                (estimated_duration - self.fatigue_thresholds["session_duration"]) / 1800,
                 1.0,
             )
             fatigue_score += duration_fatigue * 0.4
 
         # Choice count fatigue
         if choice_count > self.fatigue_thresholds["choice_count"]:
-            choice_fatigue = min(
-                (choice_count - self.fatigue_thresholds["choice_count"]) / 10, 1.0
-            )
+            choice_fatigue = min((choice_count - self.fatigue_thresholds["choice_count"]) / 10, 1.0)
             fatigue_score += choice_fatigue * 0.3
 
         # Emotional state fatigue
@@ -414,14 +388,10 @@ class PacingController:
         base_adjustments = self.pacing_rules.get(current_phase, {}).copy()
 
         # Apply emotional state adjustments
-        emotional_adjustments = self.emotional_pacing_adjustments.get(
-            emotional_state, {}
-        )
+        emotional_adjustments = self.emotional_pacing_adjustments.get(emotional_state, {})
         for dimension, strategy in emotional_adjustments.items():
             if strategy in [PacingStrategy.PAUSE, PacingStrategy.RESET]:
-                base_adjustments[dimension] = (
-                    strategy  # Override with more urgent strategies
-                )
+                base_adjustments[dimension] = strategy  # Override with more urgent strategies
 
         # Apply fatigue adjustments
         if fatigue_level > 0.7:
@@ -470,9 +440,9 @@ class PacingController:
 
         # Recent choices indicate current load
         recent_choices = session_state.choice_history[-3:]
-        avg_complexity = sum(
-            choice.get("complexity", 0.5) for choice in recent_choices
-        ) / len(recent_choices)
+        avg_complexity = sum(choice.get("complexity", 0.5) for choice in recent_choices) / len(
+            recent_choices
+        )
 
         return min(avg_complexity, 1.0)
 
@@ -524,9 +494,7 @@ class PacingController:
             return await self._adjust_interaction_frequency(scene, strategy)
         return scene
 
-    async def _apply_overall_pacing_strategy(
-        self, scene: Scene, strategy: PacingStrategy
-    ) -> Scene:
+    async def _apply_overall_pacing_strategy(self, scene: Scene, strategy: PacingStrategy) -> Scene:
         """Apply overall pacing strategy to the scene."""
         if strategy == PacingStrategy.ACCELERATE:
             scene.narrative_content += " The energy of this moment invites you to engage more fully and explore with greater depth."
@@ -545,44 +513,30 @@ class PacingController:
 
         return scene
 
-    async def _adjust_narrative_flow(
-        self, scene: Scene, strategy: PacingStrategy
-    ) -> Scene:
+    async def _adjust_narrative_flow(self, scene: Scene, strategy: PacingStrategy) -> Scene:
         """Adjust narrative flow pacing."""
         if strategy == PacingStrategy.ACCELERATE:
-            scene.narrative_content += (
-                " The story moves forward with engaging momentum."
-            )
+            scene.narrative_content += " The story moves forward with engaging momentum."
         elif strategy == PacingStrategy.DECELERATE:
-            scene.narrative_content += (
-                " The narrative unfolds at a gentle, contemplative pace."
-            )
+            scene.narrative_content += " The narrative unfolds at a gentle, contemplative pace."
         elif strategy == PacingStrategy.PAUSE:
-            scene.narrative_content += (
-                " The story pauses here, giving you space to reflect."
-            )
+            scene.narrative_content += " The story pauses here, giving you space to reflect."
 
         return scene
 
-    async def _adjust_therapeutic_intensity(
-        self, scene: Scene, strategy: PacingStrategy
-    ) -> Scene:
+    async def _adjust_therapeutic_intensity(self, scene: Scene, strategy: PacingStrategy) -> Scene:
         """Adjust therapeutic intensity pacing."""
         if strategy == PacingStrategy.ACCELERATE:
             if "self_awareness" not in scene.therapeutic_focus:
                 scene.therapeutic_focus.append("self_awareness")
         elif strategy == PacingStrategy.DECELERATE:
-            scene.therapeutic_focus = scene.therapeutic_focus[
-                :2
-            ]  # Limit therapeutic focus
+            scene.therapeutic_focus = scene.therapeutic_focus[:2]  # Limit therapeutic focus
         elif strategy == PacingStrategy.RESET:
             scene.therapeutic_focus = ["safety", "grounding"]  # Reset to basics
 
         return scene
 
-    async def _adjust_cognitive_load(
-        self, scene: Scene, strategy: PacingStrategy
-    ) -> Scene:
+    async def _adjust_cognitive_load(self, scene: Scene, strategy: PacingStrategy) -> Scene:
         """Adjust cognitive load pacing."""
         if strategy in (PacingStrategy.DECELERATE, PacingStrategy.PAUSE):
             # Simplify content
@@ -593,9 +547,7 @@ class PacingController:
 
         return scene
 
-    async def _adjust_emotional_pacing(
-        self, scene: Scene, strategy: PacingStrategy
-    ) -> Scene:
+    async def _adjust_emotional_pacing(self, scene: Scene, strategy: PacingStrategy) -> Scene:
         """Adjust emotional pacing."""
         if strategy == PacingStrategy.DECELERATE:
             scene.emotional_tone = "gentle"
@@ -606,9 +558,7 @@ class PacingController:
 
         return scene
 
-    async def _adjust_interaction_frequency(
-        self, scene: Scene, strategy: PacingStrategy
-    ) -> Scene:
+    async def _adjust_interaction_frequency(self, scene: Scene, strategy: PacingStrategy) -> Scene:
         """Adjust interaction frequency (affects future choice generation)."""
         # Store preference for choice generation
         if not hasattr(scene, "interaction_frequency_preference"):

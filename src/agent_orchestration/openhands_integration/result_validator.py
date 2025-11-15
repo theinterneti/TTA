@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,8 @@ class ResultValidator:
             ValidationRule(
                 name="content_not_empty",
                 description="Output content is not empty",
-                validator=lambda result: "content" in result and len(result["content"]) > 0,
+                validator=lambda result: "content" in result
+                and len(result["content"]) > 0,
                 level=ValidationLevel.ERROR,
                 error_message="Output content is empty",
             )
@@ -236,4 +238,3 @@ class ResultValidator:
             return exec_result.get("passed", False)
 
         return str(exec_result).lower() in ["passed", "success", "true"]
-

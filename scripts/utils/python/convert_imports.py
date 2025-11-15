@@ -93,9 +93,6 @@ def convert_imports(file_path, dry_run=False):
         rel_import_path = get_relative_import(file_path, f"src.{import_path}")
         rel_import = f"from {rel_import_path} import {imported_items}"
 
-        print(f"Converting in {file_path}:")
-        print(f"  {abs_import} -> {rel_import}")
-
         # Replace the absolute import with the relative import
         modified_content = modified_content.replace(abs_import, rel_import)
 
@@ -105,19 +102,18 @@ def convert_imports(file_path, dry_run=False):
         return True
     if modified_content != content:
         return True
+    return None
 
 
 def main():
     """Main function."""
     if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <directory> [--dry-run]")
         sys.exit(1)
 
     directory = sys.argv[1]
     dry_run = "--dry-run" in sys.argv
 
     if not os.path.isdir(directory):
-        print(f"Error: {directory} is not a directory")
         sys.exit(1)
 
     modified_files = []
@@ -129,16 +125,14 @@ def main():
                 try:
                     if convert_imports(file_path, dry_run):
                         modified_files.append(os.path.relpath(file_path, directory))
-                except Exception as e:
-                    print(f"Error processing {file_path}: {e}")
+                except Exception:
+                    pass
 
     if not modified_files:
-        print("No files were modified.")
         return
 
-    print(f"Modified {len(modified_files)} files:")
     for file_path in modified_files:
-        print(f"  {file_path}")
+        pass
 
 
 if __name__ == "__main__":

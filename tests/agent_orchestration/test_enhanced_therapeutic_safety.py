@@ -116,10 +116,7 @@ class TestValidationAlgorithms:
             assert expected_crisis in result.crisis_types, (
                 f"Wrong crisis type for: {text}"
             )
-            assert (
-                result.level == SafetyLevel.BLOCKED
-                or result.level == SafetyLevel.WARNING
-            )
+            assert result.level in (SafetyLevel.BLOCKED, SafetyLevel.WARNING)
             assert result.escalation_recommended
 
     def test_therapeutic_appropriateness_scoring(self):

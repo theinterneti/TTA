@@ -182,7 +182,7 @@ async def test_model(model: str, task_key: str, task_data: dict) -> dict:
             "content_length": len(content),
         }
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return {
             "success": False,
             "error": "Timeout",
@@ -202,20 +202,12 @@ async def test_model(model: str, task_key: str, task_data: dict) -> dict:
 
 async def main():
     """Run alternative model tests."""
-    print("\n" + "=" * 80)
-    print("Alternative Model IDs Testing")
-    print("=" * 80)
-    print(f"Models: {len(ALTERNATIVE_MODELS)}")
-    print(f"Tasks: {len(TASKS)}")
-    print(f"Total Tests: {len(ALTERNATIVE_MODELS) * len(TASKS)}")
-    print(f"Start Time: {datetime.now().isoformat()}\n")
 
     results = []
     test_count = 0
     success_count = 0
 
     for model in ALTERNATIVE_MODELS:
-        print(f"\n📦 Testing: {model}")
         for task_key, task_data in TASKS.items():
             test_count += 1
             result = await test_model(model, task_key, task_data)
@@ -223,25 +215,12 @@ async def main():
 
             if result["success"]:
                 success_count += 1
-                print(
-                    f"  ✅ {task_key:10} | {result['time']:6.2f}s | "
-                    f"{result['tokens']['total']:4} tokens | ⭐ {result['quality']}/5"
-                )
             else:
-                print(f"  ❌ {task_key:10} | {result['error']}")
+                pass
 
     # Summary
-    print("\n" + "=" * 80)
-    print("ALTERNATIVE MODELS RESULTS SUMMARY")
-    print("=" * 80)
-    print(f"Total Tests: {test_count}")
-    print(
-        f"Successful: {success_count}/{test_count} ({100 * success_count / test_count:.1f}%)"
-    )
-    print(f"Failed: {test_count - success_count}")
 
     # Per-model summary
-    print("\n📊 Per-Model Summary:")
     model_stats = {}
     for result in results:
         model = result["model"]
@@ -259,20 +238,9 @@ async def main():
             model_stats[model]["qualities"].append(result["quality"])
 
     for model, stats in model_stats.items():
-        success_rate = 100 * stats["success"] / stats["total"]
-        avg_time = sum(stats["times"]) / len(stats["times"]) if stats["times"] else 0
-        avg_quality = (
-            sum(stats["qualities"]) / len(stats["qualities"])
-            if stats["qualities"]
-            else 0
-        )
-        status = "✅" if success_rate == 100 else "⚠️" if success_rate >= 66 else "❌"
-        print(
-            f"  {status} {model:50} | "
-            f"Success: {stats['success']}/{stats['total']} ({success_rate:5.1f}%) | "
-            f"Avg Time: {avg_time:6.2f}s | "
-            f"Avg Quality: {avg_quality:3.1f}/5"
-        )
+        100 * stats["success"] / stats["total"]
+        sum(stats["times"]) / len(stats["times"]) if stats["times"] else 0
+        (sum(stats["qualities"]) / len(stats["qualities"]) if stats["qualities"] else 0)
 
     # Save results
     output_file = Path("alternative_models_test_results.json")
@@ -301,9 +269,6 @@ async def main():
             f,
             indent=2,
         )
-
-    print(f"\n✅ Results saved to: {output_file}")
-    print("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

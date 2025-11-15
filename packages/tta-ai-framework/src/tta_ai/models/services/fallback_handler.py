@@ -59,20 +59,14 @@ class FallbackHandler(IFallbackHandler):
                 return None
 
             # Filter out the failed model and recently failed models
-            candidate_models = self._filter_failed_models(
-                available_models, failed_model_id
-            )
+            candidate_models = self._filter_failed_models(available_models, failed_model_id)
 
             if not candidate_models:
-                logger.warning(
-                    "No candidate models available after filtering failed models"
-                )
+                logger.warning("No candidate models available after filtering failed models")
                 return None
 
             # Filter models based on requirements
-            compatible_models = await self._filter_compatible_models(
-                candidate_models, requirements
-            )
+            compatible_models = await self._filter_compatible_models(candidate_models, requirements)
 
             if not compatible_models:
                 logger.warning("No compatible fallback models found")
@@ -150,9 +144,7 @@ class FallbackHandler(IFallbackHandler):
                 healthy_models.extend(models)
 
             except Exception as e:
-                logger.warning(
-                    f"Failed to get models from provider {provider_name}: {e}"
-                )
+                logger.warning(f"Failed to get models from provider {provider_name}: {e}")
                 self._provider_health[provider_name] = False
 
         return healthy_models
@@ -206,8 +198,7 @@ class FallbackHandler(IFallbackHandler):
                 continue
 
             if (
-                requirements.therapeutic_safety_required
-                and model.therapeutic_safety_score
+                requirements.therapeutic_safety_required and model.therapeutic_safety_score
             ) and model.therapeutic_safety_score < 7.0:  # Minimum safety threshold
                 continue
 
@@ -245,9 +236,7 @@ class FallbackHandler(IFallbackHandler):
             models,
             key=lambda m: (
                 m.performance_score or 5.0,  # Default score for unknown performance
-                -self._failure_counts.get(
-                    m.model_id, 0
-                ),  # Prefer models with fewer failures
+                -self._failure_counts.get(m.model_id, 0),  # Prefer models with fewer failures
                 m.therapeutic_safety_score or 7.0,  # Prefer safer models
             ),
             reverse=True,
@@ -256,9 +245,7 @@ class FallbackHandler(IFallbackHandler):
         # Apply provider preference if configured
         if self.config.prefer_different_provider:
             # Try to find a model from a different provider than the failed one
-            failed_provider = self._get_model_provider(
-                models[0].model_id
-            )  # Approximate
+            failed_provider = self._get_model_provider(models[0].model_id)  # Approximate
 
             for model in sorted_models:
                 if model.provider_type.value != failed_provider:
@@ -276,9 +263,7 @@ class FallbackHandler(IFallbackHandler):
             key=lambda m: (
                 m.cost_per_token or 0.0,  # Prefer lower cost
                 -(m.performance_score or 5.0),  # Then by performance (descending)
-                -self._failure_counts.get(
-                    m.model_id, 0
-                ),  # Prefer models with fewer failures
+                -self._failure_counts.get(m.model_id, 0),  # Prefer models with fewer failures
             ),
         )
 
@@ -292,9 +277,7 @@ class FallbackHandler(IFallbackHandler):
         sorted_models = sorted(
             models,
             key=lambda m: (
-                self._failure_counts.get(
-                    m.model_id, 0
-                ),  # Prefer models with fewer failures
+                self._failure_counts.get(m.model_id, 0),  # Prefer models with fewer failures
                 -(m.performance_score or 5.0),  # Then by performance (descending)
                 m.cost_per_token or 0.0,  # Then by cost (ascending)
             ),
@@ -350,9 +333,7 @@ class FallbackHandler(IFallbackHandler):
                         )
 
                 except Exception as e:
-                    logger.error(
-                        f"Failed to check health of provider {provider_name}: {e}"
-                    )
+                    logger.error(f"Failed to check health of provider {provider_name}: {e}")
                     self._provider_health[provider_name] = False
 
         except Exception as e:
@@ -384,10 +365,7 @@ class FallbackHandler(IFallbackHandler):
                 recent_failures[model_id] = {
                     "last_failure": failure_time.isoformat(),
                     "total_failures": self._failure_counts[model_id],
-                    "minutes_since_failure": (
-                        current_time - failure_time
-                    ).total_seconds()
-                    / 60,
+                    "minutes_since_failure": (current_time - failure_time).total_seconds() / 60,
                 }
 
         return {

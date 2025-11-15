@@ -20,7 +20,6 @@ def test_integration_test_structure():
         import tests.agent_orchestration.test_multi_agent_workflow_integration
         import tests.agent_orchestration.test_state_persistence_aggregation
 
-        print("✓ All integration test modules imported successfully")
     except ImportError as e:
         pytest.fail(f"Failed to import integration test modules: {e}")
 
@@ -32,7 +31,6 @@ def test_integration_test_structure():
             WorkflowStateVerifier,
         )
 
-        print("✓ Test utilities imported successfully")
     except ImportError as e:
         pytest.fail(f"Failed to import test utilities: {e}")
 
@@ -82,8 +80,6 @@ def test_mock_workflow_execution():
     assert response is not None, "No response received"
     assert run_id is not None, "No run ID returned"
 
-    print("✓ Mock workflow execution successful")
-
 
 def test_test_data_fixtures():
     """Test that test data fixtures are properly structured."""
@@ -114,8 +110,6 @@ def test_test_data_fixtures():
     assert "expected_intent" in inputs[0], (
         "Sample input should have 'expected_intent' field"
     )
-
-    print("✓ Test data fixtures are properly structured")
 
 
 def test_performance_metrics_utility():
@@ -168,8 +162,6 @@ def test_performance_metrics_utility():
     error_stats = stats["error_stats"]
     assert error_stats["timeout"] == 1, "Incorrect timeout error count"
     assert error_stats["connection_failure"] == 1, "Incorrect connection failure count"
-
-    print("✓ Performance metrics utility working correctly")
 
 
 def test_workflow_state_verifier():
@@ -233,31 +225,12 @@ def test_workflow_state_verifier():
         "Therapeutic validation missing"
     )
 
-    print("✓ Workflow state verifier working correctly")
-
 
 if __name__ == "__main__":
     """Run basic integration test validation."""
-    print("Running integration test structure validation...")
 
     test_integration_test_structure()
     test_mock_workflow_execution()
     test_test_data_fixtures()
     test_performance_metrics_utility()
     test_workflow_state_verifier()
-
-    print("\n✅ All integration test structure validations passed!")
-    print("\nTo run the full integration test suite:")
-    print(
-        "  uv run pytest tests/agent_orchestration/test_*integration*.py --redis --neo4j"
-    )
-    print("\nTo run individual test categories:")
-    print(
-        "  uv run pytest tests/agent_orchestration/test_end_to_end_workflows.py --redis --neo4j"
-    )
-    print(
-        "  uv run pytest tests/agent_orchestration/test_error_handling_recovery.py --redis"
-    )
-    print(
-        "  uv run pytest tests/agent_orchestration/test_state_persistence_aggregation.py --neo4j --redis"
-    )

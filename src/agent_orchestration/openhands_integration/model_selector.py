@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class TaskRequirements:
     quality_threshold: float = 0.7  # 0-1 scale
     max_latency_ms: int = 5000
     max_tokens: int = 4000
-    specialization: Optional[ModelSpecialization] = None
+    specialization: ModelSpecialization | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -69,7 +69,7 @@ class ModelCapability:
     max_tokens: int
     supported_categories: list[TaskCategory]
     is_available: bool = True
-    last_used: Optional[float] = None
+    last_used: float | None = None
     failure_count: int = 0
 
 
@@ -143,7 +143,7 @@ class ModelSelector:
         """Initialize model selector."""
         self.models = self.MODELS.copy()
 
-    def select_model(self, requirements: TaskRequirements) -> Optional[ModelCapability]:
+    def select_model(self, requirements: TaskRequirements) -> ModelCapability | None:
         """Select optimal model for task.
 
         Args:
@@ -173,7 +173,9 @@ class ModelSelector:
         )
         return selected
 
-    def _filter_candidates(self, requirements: TaskRequirements) -> list[ModelCapability]:
+    def _filter_candidates(
+        self, requirements: TaskRequirements
+    ) -> list[ModelCapability]:
         """Filter models by requirements.
 
         Args:
@@ -259,5 +261,6 @@ class ModelSelector:
             model_id: Model ID
         """
         if model_id in self.models:
-            self.models[model_id].failure_count = max(0, self.models[model_id].failure_count - 1)
-
+            self.models[model_id].failure_count = max(
+                0, self.models[model_id].failure_count - 1
+            )

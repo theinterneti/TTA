@@ -137,7 +137,11 @@ def neo4j_container(pytestconfig):
             from neo4j import GraphDatabase
             from neo4j.exceptions import (
                 AuthError,
+            )
+            from neo4j.exceptions import (
                 ClientError as _ClientError,
+            )
+            from neo4j.exceptions import (
                 ServiceUnavailable as _ServiceUnavailable,
             )
         except Exception:
@@ -234,7 +238,11 @@ def neo4j_driver(neo4j_container):
     try:
         from neo4j.exceptions import (
             AuthError,
+        )
+        from neo4j.exceptions import (
             ClientError as _ClientError,
+        )
+        from neo4j.exceptions import (
             ServiceUnavailable as _ServiceUnavailable,
         )
     except Exception:

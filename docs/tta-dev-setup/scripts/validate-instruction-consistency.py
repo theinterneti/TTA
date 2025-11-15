@@ -27,55 +27,48 @@ def parse_frontmatter(content: str) -> dict[str, Any] | None:
 
     try:
         return yaml.safe_load(match.group(1))
-    except yaml.YAMLError as e:
-        print(f"❌ YAML parse error: {e}")
+    except yaml.YAMLError:
         return None
 
 
 def validate_instruction_file(file_path: Path) -> bool:
     """Validate a single instruction file."""
-    print(f"\n🔍 Validating: {file_path.name}")
 
     content = file_path.read_text()
 
     # Check for frontmatter
     frontmatter = parse_frontmatter(content)
     if not frontmatter:
-        print(f"  ❌ Missing or invalid YAML frontmatter")
         return False
 
     # Validate applyTo field
     if "applyTo" not in frontmatter:
-        print(f"  ❌ Missing 'applyTo' field in frontmatter")
         return False
 
     apply_to = frontmatter.get("applyTo")
     if not isinstance(apply_to, (str, list)):
-        print(f"  ❌ 'applyTo' must be string or list")
         return False
 
     # Validate tags (optional but recommended)
     if "tags" in frontmatter:
         tags = frontmatter.get("tags")
         if not isinstance(tags, list):
-            print(f"  ⚠️  'tags' should be a list")
+            pass
 
     # Check for required sections (basic heuristics)
     if len(content) < 100:
-        print(f"  ⚠️  File is very short (may not be comprehensive)")
+        pass
 
     # Check for markdown structure
     headers = re.findall(r"^#+\s+(.+)$", content, re.MULTILINE)
     if not headers:
-        print(f"  ⚠️  No markdown headers found")
+        pass
 
-    print(f"  ✅ {file_path.name} is valid")
     return True
 
 
 def check_for_conflicts(instruction_files: list[Path]) -> bool:
     """Check for conflicting instructions across files."""
-    print("\n🔍 Checking for conflicts...")
 
     # Build pattern → file mapping
     pattern_map: dict[str, list[Path]] = {}
@@ -100,34 +93,28 @@ def check_for_conflicts(instruction_files: list[Path]) -> bool:
     conflicts_found = False
     for pattern, files in pattern_map.items():
         if len(files) > 1:
-            print(f"  ⚠️  Pattern '{pattern}' matches multiple files:")
-            for f in files:
-                print(f"     - {f.name}")
+            for _f in files:
+                pass
             conflicts_found = True
 
     if not conflicts_found:
-        print("  ✅ No conflicts detected")
+        pass
 
     return not conflicts_found
 
 
 def main() -> int:
     """Main validation function."""
-    print("🔍 Validating Agent Instruction Consistency\n")
 
     # Find all instruction files
     instructions_dir = Path(".github/instructions")
     if not instructions_dir.exists():
-        print(f"❌ Directory not found: {instructions_dir}")
         return 1
 
     instruction_files = list(instructions_dir.glob("*.instructions.md"))
 
     if not instruction_files:
-        print("⚠️  No instruction files found")
         return 0
-
-    print(f"Found {len(instruction_files)} instruction files")
 
     # Validate each file
     all_valid = True
@@ -140,11 +127,8 @@ def main() -> int:
         all_valid = False
 
     if all_valid:
-        print("\n✅ All instruction files are consistent!")
         return 0
-    else:
-        print("\n❌ Instruction validation failed")
-        return 1
+    return 1
 
 
 if __name__ == "__main__":

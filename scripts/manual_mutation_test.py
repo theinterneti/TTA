@@ -107,14 +107,10 @@ def apply_mutation(file_path: Path, mutation: Mutation) -> bool:
 
         # Check if the line matches (accounting for line numbers being 1-indexed)
         if mutation.line_number > len(lines):
-            print(f"  ❌ Line number {mutation.line_number} out of range")
             return False
 
         actual_line = lines[mutation.line_number - 1]
         if mutation.original_line.strip() not in actual_line:
-            print(f"  ❌ Line content mismatch at line {mutation.line_number}")
-            print(f"     Expected substring: {mutation.original_line.strip()}")
-            print(f"     Actual line: {actual_line.strip()}")
             return False
 
         # Apply mutation
@@ -124,8 +120,7 @@ def apply_mutation(file_path: Path, mutation: Mutation) -> bool:
             f.writelines(lines)
 
         return True
-    except Exception as e:
-        print(f"  ❌ Error applying mutation: {e}")
+    except Exception:
         return False
 
 
@@ -137,37 +132,19 @@ def main():
     )
     backup_file = target_file.with_suffix(".py.backup")
 
-    print("=" * 80)
-    print("MANUAL MUTATION TESTING - ModelSelector")
-    print("=" * 80)
-    print()
-
     # Create backup
-    print("📋 Creating backup...")
     shutil.copy2(target_file, backup_file)
-    print(f"   Backup created: {backup_file}")
-    print()
 
     # Run baseline tests
-    print("🧪 Running baseline tests (no mutations)...")
     baseline_pass = run_tests()
     if not baseline_pass:
-        print("   ❌ BASELINE TESTS FAILED - Cannot proceed with mutation testing")
-        print("   Please fix failing tests before running mutation testing.")
         shutil.copy2(backup_file, target_file)
         backup_file.unlink()
         return
-    print("   ✅ Baseline tests PASSED")
-    print()
 
     # Test each mutation
     results = []
-    for i, mutation in enumerate(MUTATIONS, 1):
-        print(f"🧬 Mutation {i}/{len(MUTATIONS)}: {mutation.name}")
-        print(f"   Description: {mutation.description}")
-        print(f"   Line {mutation.line_number}: {mutation.original_line.strip()}")
-        print(f"   Mutated to: {mutation.mutated_line.strip()}")
-
+    for _i, mutation in enumerate(MUTATIONS, 1):
         # Apply mutation
         if not apply_mutation(target_file, mutation):
             results.append((mutation, "ERROR", "Failed to apply mutation"))
@@ -175,75 +152,48 @@ def main():
             continue
 
         # Run tests
-        print("   Running tests...")
         tests_pass = run_tests()
 
         # Determine result
         if tests_pass:
             status = "SURVIVED"
-            symbol = "⚠️"
             message = "Tests still pass - mutation not detected!"
         else:
             status = "KILLED"
-            symbol = "✅"
             message = "Tests failed - mutation detected!"
-
-        print(f"   {symbol} {status}: {message}")
 
         # Check if result matches expectation
         if status == mutation.expected_result:
-            print(f"   ✓ Result matches expectation ({mutation.expected_result})")
+            pass
         else:
-            print(
-                f"   ⚠️  Unexpected result! Expected {mutation.expected_result}, got {status}"
-            )
+            pass
 
         results.append((mutation, status, message))
 
         # Restore original file
         shutil.copy2(backup_file, target_file)
-        print()
 
     # Print summary
-    print("=" * 80)
-    print("MUTATION TESTING SUMMARY")
-    print("=" * 80)
-    print()
 
     killed = sum(1 for _, status, _ in results if status == "KILLED")
     survived = sum(1 for _, status, _ in results if status == "SURVIVED")
-    errors = sum(1 for _, status, _ in results if status == "ERROR")
+    sum(1 for _, status, _ in results if status == "ERROR")
     total = len(results)
 
-    print(f"Total Mutations: {total}")
-    print(f"Killed: {killed} ({killed / total * 100:.1f}%)")
-    print(f"Survived: {survived} ({survived / total * 100:.1f}%)")
-    print(f"Errors: {errors}")
-    print()
-
     if survived > 0:
-        print("⚠️  SURVIVING MUTANTS (Test Gaps):")
         for mutation, status, message in results:
             if status == "SURVIVED":
-                print(f"   - {mutation.name}")
-                print(f"     {mutation.description}")
-        print()
+                pass
 
     mutation_score = (killed / total * 100) if total > 0 else 0
-    print(f"Mutation Score: {mutation_score:.1f}%")
 
-    if mutation_score >= 80:
-        print("✅ EXCELLENT - Test suite has strong mutation coverage!")
-    elif mutation_score >= 60:
-        print("⚠️  GOOD - Test suite has decent coverage, but could be improved")
+    if mutation_score >= 80 or mutation_score >= 60:
+        pass
     else:
-        print("❌ POOR - Test suite needs significant improvement")
-
-    print()
+        pass
 
     # Cleanup
     backup_file.unlink()
-    print("🧹 Cleanup complete - original file restored")
 
 
 if __name__ == "__main__":

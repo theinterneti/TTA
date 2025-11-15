@@ -83,7 +83,11 @@ class PlayerProfileRepository:
         try:
             from neo4j.exceptions import (
                 AuthError,
+            )
+            from neo4j.exceptions import (
                 ClientError as _ClientError,
+            )
+            from neo4j.exceptions import (
                 ServiceUnavailable as _ServiceUnavailable,
             )
         except Exception:  # pragma: no cover - neo4j not installed path

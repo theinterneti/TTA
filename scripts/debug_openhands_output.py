@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import contextlib
+
 from src.agent_orchestration.openhands_integration.config import (
     OpenHandsIntegrationConfig,
 )
@@ -29,16 +31,12 @@ from src.agent_orchestration.openhands_integration.optimized_client import (
 
 async def debug_conversation_structure():
     """Debug the conversation history structure."""
-    print("\n" + "=" * 80)
-    print("OPENHANDS SDK CONVERSATION STRUCTURE DEBUG")
-    print("=" * 80)
 
     # Load config
     try:
         integration_config = OpenHandsIntegrationConfig.from_env()
         config = integration_config.to_client_config()
-    except ValueError as e:
-        print(f"\n❌ Configuration Error: {e}")
+    except ValueError:
         return False
 
     # Create client
@@ -51,79 +49,54 @@ async def debug_conversation_structure():
 
     # Send a simple task
     task = "Write a simple Python function that adds two numbers"
-    print(f"\n📝 Task: {task}")
-    print("⏳ Executing task...")
 
     client._conversation.send_message(task)
     client._conversation.run()
 
-    print("\n✅ Task completed")
-
     # Inspect conversation structure
-    print("\n🔍 Inspecting conversation structure...")
-    print(f"   Conversation type: {type(client._conversation)}")
-    print(f"   Conversation attributes: {dir(client._conversation)}")
 
     # Check for history
     if hasattr(client._conversation, "history"):
         history = client._conversation.history
-        print("\n📋 History found!")
-        print(f"   History type: {type(history)}")
-        print(f"   History length: {len(history)}")
 
         # Inspect each event
-        for i, event in enumerate(history):
-            print(f"\n   Event {i}:")
-            print(f"      Type: {type(event)}")
-            print(f"      Attributes: {dir(event)}")
-
+        for _i, event in enumerate(history):
             # Try to extract useful info
             if hasattr(event, "source"):
-                print(f"      Source: {event.source}")
+                pass
             if hasattr(event, "message"):
-                print(f"      Message: {str(event.message)[:200]}")
+                pass
             if hasattr(event, "content"):
-                print(f"      Content: {str(event.content)[:200]}")
+                pass
             if hasattr(event, "action"):
-                print(f"      Action: {event.action}")
+                pass
             if hasattr(event, "observation"):
-                print(f"      Observation: {str(event.observation)[:200]}")
+                pass
 
             # Print all attributes with values
-            print("      All attributes:")
             for attr in dir(event):
                 if not attr.startswith("_"):
                     try:
                         value = getattr(event, attr)
                         if not callable(value):
-                            print(f"         {attr}: {str(value)[:100]}")
-                    except Exception as e:
-                        print(f"         {attr}: <error: {e}>")
-    else:
-        print("\n❌ No history attribute found")
+                            pass
+                    except Exception:
+                        pass
 
-        # Check for agent_final_response (it's a method!)
-        if hasattr(client._conversation, "agent_final_response"):
-            print("\n📋 agent_final_response found!")
-            try:
-                response = client._conversation.agent_final_response()
-                print(f"   Type: {type(response)}")
-                print(f"   Value: {str(response)[:500]}")
-            except Exception as e:
-                print(f"   Error calling agent_final_response(): {e}")
+    # Check for agent_final_response (it's a method!)
+    elif hasattr(client._conversation, "agent_final_response"):
+        with contextlib.suppress(Exception):
+            client._conversation.agent_final_response()
 
     # Check for other output methods
-    print("\n🔍 Checking for other output methods...")
     if hasattr(client._conversation, "messages"):
-        print(f"   Messages found: {len(client._conversation.messages)}")
-        for i, msg in enumerate(client._conversation.messages[:3]):
-            print(f"      Message {i}: {str(msg)[:200]}")
+        for _i, _msg in enumerate(client._conversation.messages[:3]):
+            pass
 
     if hasattr(client._conversation, "state"):
-        print(f"   State found: {client._conversation.state}")
+        pass
 
     # Try to get the last agent message
-    print("\n🔍 Extracting agent output...")
     output_lines = []
     if hasattr(client._conversation, "history"):
         for event in reversed(client._conversation.history):
@@ -136,13 +109,12 @@ async def debug_conversation_structure():
                     break
 
     if output_lines:
-        print(f"   ✅ Found {len(output_lines)} agent messages")
-        for i, line in enumerate(output_lines):
-            print(f"      Message {i}: {str(line)[:200]}")
+        for _i, _line in enumerate(output_lines):
+            pass
     else:
-        print("   ❌ No agent messages found")
+        pass
 
-    print("\n" + "=" * 80)
+    return None
 
 
 if __name__ == "__main__":

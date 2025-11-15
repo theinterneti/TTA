@@ -70,9 +70,7 @@ class ImmersionManager:
             logger.error(f"ImmersionManager initialization failed: {e}")
             return False
 
-    async def enhance_scene_immersion(
-        self, scene: Scene, session_state: SessionState
-    ) -> Scene:
+    async def enhance_scene_immersion(self, scene: Scene, session_state: SessionState) -> Scene:
         """
         Enhance scene immersion based on therapeutic needs and user state.
 
@@ -129,9 +127,7 @@ class ImmersionManager:
                 "sensory_richness": await self._assess_sensory_richness(scene),
                 "atmospheric_depth": await self._assess_atmospheric_depth(scene),
                 "emotional_engagement": await self._assess_emotional_engagement(scene),
-                "interactive_potential": await self._assess_interactive_potential(
-                    scene
-                ),
+                "interactive_potential": await self._assess_interactive_potential(scene),
                 "personal_relevance": await self._assess_personal_relevance(scene),
                 "continuity_strength": await self._assess_continuity_strength(scene),
             }
@@ -370,9 +366,7 @@ class ImmersionManager:
         scene.narrative_content += f"\n\n{character_enhancement}"
         return scene
 
-    async def _apply_emotional_resonance(
-        self, scene: Scene, session_state: SessionState
-    ) -> Scene:
+    async def _apply_emotional_resonance(self, scene: Scene, session_state: SessionState) -> Scene:
         """Enhance emotional resonance based on current emotional state."""
         emotional_state = session_state.emotional_state
 
@@ -399,9 +393,7 @@ class ImmersionManager:
         scene.narrative_content += f"\n\n{interactive_enhancement}"
         return scene
 
-    async def _apply_continuity_weaving(
-        self, scene: Scene, session_state: SessionState
-    ) -> Scene:
+    async def _apply_continuity_weaving(self, scene: Scene, session_state: SessionState) -> Scene:
         """Weave continuity elements from previous experiences."""
         if session_state.choice_history:
             continuity_enhancement = (
@@ -414,9 +406,7 @@ class ImmersionManager:
 
         return scene
 
-    async def _apply_personal_connection(
-        self, scene: Scene, session_state: SessionState
-    ) -> Scene:
+    async def _apply_personal_connection(self, scene: Scene, session_state: SessionState) -> Scene:
         """Enhance personal connection and relevance."""
         therapeutic_goals = session_state.therapeutic_context.primary_goals
 
@@ -492,9 +482,7 @@ class ImmersionManager:
         ]
 
         content_lower = scene.narrative_content.lower()
-        atmospheric_count = sum(
-            1 for keyword in atmospheric_keywords if keyword in content_lower
-        )
+        atmospheric_count = sum(1 for keyword in atmospheric_keywords if keyword in content_lower)
 
         # Also check for descriptive adjectives that create atmosphere
         descriptive_keywords = [
@@ -510,9 +498,7 @@ class ImmersionManager:
             "healing",
         ]
 
-        descriptive_count = sum(
-            1 for keyword in descriptive_keywords if keyword in content_lower
-        )
+        descriptive_count = sum(1 for keyword in descriptive_keywords if keyword in content_lower)
 
         total_atmospheric = atmospheric_count + descriptive_count
         word_count = len(scene.narrative_content.split())
@@ -541,9 +527,7 @@ class ImmersionManager:
         ]
 
         content_lower = scene.narrative_content.lower()
-        emotional_count = sum(
-            1 for keyword in emotional_keywords if keyword in content_lower
-        )
+        emotional_count = sum(1 for keyword in emotional_keywords if keyword in content_lower)
 
         # Check for emotional tone indicators
         tone_indicators = [
@@ -556,13 +540,9 @@ class ImmersionManager:
             "resonates with",
         ]
 
-        tone_count = sum(
-            1 for indicator in tone_indicators if indicator in content_lower
-        )
+        tone_count = sum(1 for indicator in tone_indicators if indicator in content_lower)
 
-        total_emotional = emotional_count + (
-            tone_count * 2
-        )  # Weight tone indicators more
+        total_emotional = emotional_count + (tone_count * 2)  # Weight tone indicators more
         word_count = len(scene.narrative_content.split())
 
         if word_count == 0:
@@ -588,9 +568,7 @@ class ImmersionManager:
         ]
 
         content_lower = scene.narrative_content.lower()
-        interactive_count = sum(
-            1 for keyword in interactive_keywords if keyword in content_lower
-        )
+        interactive_count = sum(1 for keyword in interactive_keywords if keyword in content_lower)
 
         # Check for direct invitations to interact
         invitation_phrases = [
@@ -603,9 +581,7 @@ class ImmersionManager:
             "how will you",
         ]
 
-        invitation_count = sum(
-            1 for phrase in invitation_phrases if phrase in content_lower
-        )
+        invitation_count = sum(1 for phrase in invitation_phrases if phrase in content_lower)
 
         total_interactive = interactive_count + (invitation_count * 2)
         word_count = len(scene.narrative_content.split())
@@ -633,9 +609,7 @@ class ImmersionManager:
         ]
 
         content_lower = scene.narrative_content.lower()
-        personal_count = sum(
-            1 for keyword in personal_keywords if keyword in content_lower
-        )
+        personal_count = sum(1 for keyword in personal_keywords if keyword in content_lower)
 
         # Check for therapeutic relevance
         therapeutic_keywords = [
@@ -650,9 +624,7 @@ class ImmersionManager:
             "understanding",
         ]
 
-        therapeutic_count = sum(
-            1 for keyword in therapeutic_keywords if keyword in content_lower
-        )
+        therapeutic_count = sum(1 for keyword in therapeutic_keywords if keyword in content_lower)
 
         total_relevance = personal_count + therapeutic_count
         word_count = len(scene.narrative_content.split())
@@ -680,9 +652,7 @@ class ImmersionManager:
         ]
 
         content_lower = scene.narrative_content.lower()
-        continuity_count = sum(
-            1 for keyword in continuity_keywords if keyword in content_lower
-        )
+        continuity_count = sum(1 for keyword in continuity_keywords if keyword in content_lower)
 
         # Check for explicit continuity references
         continuity_phrases = [
@@ -695,9 +665,7 @@ class ImmersionManager:
             "your progress",
         ]
 
-        phrase_count = sum(
-            1 for phrase in continuity_phrases if phrase in content_lower
-        )
+        phrase_count = sum(1 for phrase in continuity_phrases if phrase in content_lower)
 
         total_continuity = continuity_count + (phrase_count * 2)
         word_count = len(scene.narrative_content.split())

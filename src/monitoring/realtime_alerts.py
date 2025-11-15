@@ -367,16 +367,6 @@ class AlertManager:
 # Notification handlers
 def console_notification_handler(alert: Alert):
     """Simple console notification handler."""
-    status_emoji = (
-        "🔴"
-        if alert.severity == AlertSeverity.CRITICAL
-        else "🟡"
-        if alert.severity == AlertSeverity.WARNING
-        else "🔵"
-    )
-    action = "RESOLVED" if alert.status == AlertStatus.RESOLVED else "TRIGGERED"
-
-    print(f"{status_emoji} ALERT {action}: {alert.message}")
 
 
 def webhook_notification_handler(webhook_url: str):

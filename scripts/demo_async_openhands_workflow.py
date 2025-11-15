@@ -69,19 +69,15 @@ class AsyncWorkflowDemo:
         Args:
             duration_seconds: How long to simulate work
         """
-        print(f"🔄 Simulating other workflow stages ({duration_seconds}s)...")
 
         # Simulate refactoring stage
         await asyncio.sleep(duration_seconds / 3)
-        print("  ✓ Refactoring stage completed")
 
         # Simulate quality checks
         await asyncio.sleep(duration_seconds / 3)
-        print("  ✓ Quality checks completed")
 
         # Simulate staging deployment prep
         await asyncio.sleep(duration_seconds / 3)
-        print("  ✓ Staging deployment prep completed")
 
     async def run_async_workflow(self) -> dict[str, Any]:
         """
@@ -90,12 +86,6 @@ class AsyncWorkflowDemo:
         Returns:
             Dictionary with execution results and timings
         """
-        print("=" * 80)
-        print("ASYNC OPENHANDS WORKFLOW DEMO")
-        print("=" * 80)
-        print(f"Component: {self.component_path}")
-        print(f"Dry Run: {self.dry_run}")
-        print("")
 
         workflow_start = datetime.utcnow()
         results = {
@@ -111,7 +101,6 @@ class AsyncWorkflowDemo:
 
         try:
             # Stage 1: Submit OpenHands tasks (non-blocking)
-            print("📤 Stage 1: Submitting OpenHands test generation tasks...")
             submission_start = datetime.utcnow()
 
             if self.dry_run:
@@ -140,15 +129,10 @@ class AsyncWorkflowDemo:
             results["timings"]["submission_ms"] = submission_time
             results["submitted_tasks"] = submitted_tasks
 
-            print(
-                f"  ✓ Submitted {len(submitted_tasks)} tasks in {submission_time:.0f}ms"
-            )
-            for module_path, task_id in submitted_tasks.items():
-                print(f"    - {module_path} → {task_id}")
-            print("")
+            for _module_path, _task_id in submitted_tasks.items():
+                pass
 
             # Stage 2: Run other workflow stages in parallel
-            print("⚡ Stage 2: Running other stages in parallel...")
             parallel_start = datetime.utcnow()
 
             # Simulate other stages running while OpenHands generates tests
@@ -156,11 +140,8 @@ class AsyncWorkflowDemo:
 
             parallel_time = (datetime.utcnow() - parallel_start).total_seconds() * 1000
             results["timings"]["parallel_stages_ms"] = parallel_time
-            print(f"  ✓ Parallel stages completed in {parallel_time:.0f}ms")
-            print("")
 
             # Stage 3: Collect OpenHands results
-            print("📥 Stage 3: Collecting OpenHands test generation results...")
             collection_start = datetime.utcnow()
 
             if self.dry_run:
@@ -184,11 +165,6 @@ class AsyncWorkflowDemo:
             results["completed_tasks"] = completed_tasks
             results["failed_tasks"] = failed_tasks
 
-            print(f"  ✓ Collected results in {collection_time:.0f}ms")
-            print(f"    - Completed: {len(completed_tasks)}")
-            print(f"    - Failed: {len(failed_tasks)}")
-            print("")
-
             # Calculate total time and savings
             workflow_time = (datetime.utcnow() - workflow_start).total_seconds() * 1000
             results["timings"]["total_workflow_ms"] = workflow_time
@@ -207,27 +183,6 @@ class AsyncWorkflowDemo:
             results["success"] = len(completed_tasks) > 0
 
             # Print summary
-            print("=" * 80)
-            print("WORKFLOW SUMMARY")
-            print("=" * 80)
-            print(f"✅ Success: {results['success']}")
-            print(f"📊 Tasks Submitted: {len(submitted_tasks)}")
-            print(f"✓ Tasks Completed: {len(completed_tasks)}")
-            print(f"✗ Tasks Failed: {len(failed_tasks)}")
-            print("")
-            print("⏱️  TIMING BREAKDOWN:")
-            print(f"  Submission:      {submission_time:>8.0f}ms")
-            print(f"  Parallel Stages: {parallel_time:>8.0f}ms")
-            print(f"  Collection:      {collection_time:>8.0f}ms")
-            print(f"  Total (Async):   {workflow_time:>8.0f}ms")
-            print("")
-            print("📈 PERFORMANCE COMPARISON:")
-            print(f"  Estimated Sync:  {estimated_sync_time:>8.0f}ms")
-            print(f"  Actual Async:    {workflow_time:>8.0f}ms")
-            print(
-                f"  Time Savings:    {time_savings:>8.0f}ms ({savings_percentage:.1f}%)"
-            )
-            print("=" * 80)
 
             return results
 

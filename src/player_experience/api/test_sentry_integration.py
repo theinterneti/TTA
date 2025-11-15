@@ -23,14 +23,11 @@ from src.player_experience.api.sentry_config import (
 
 def test_sentry_configuration():
     """Test that Sentry is properly configured."""
-    print("🔧 Testing Sentry Configuration...")
 
     # Set up test environment
     # Note: In production, set SENTRY_DSN as an environment variable or GitHub secret
     # For testing, you can set it here temporarily or via environment
     if not os.getenv("SENTRY_DSN"):
-        print("⚠️  SENTRY_DSN not set. Please set it as an environment variable.")
-        print("   Example: export SENTRY_DSN='https://your-dsn@sentry.io/project-id'")
         return None
 
     os.environ["SENTRY_ENVIRONMENT"] = "development"
@@ -38,19 +35,15 @@ def test_sentry_configuration():
 
     # Get settings and initialize Sentry
     settings = get_settings()
-    print(f"✅ Settings loaded: environment={settings.sentry_environment}")
-    print(f"✅ Sentry DSN configured: {settings.sentry_dsn is not None}")
 
     # Initialize Sentry
     init_sentry(settings)
-    print("✅ Sentry initialized successfully")
 
     return settings
 
 
 def test_error_capture():
     """Test error capture functionality."""
-    print("\n🚨 Testing Error Capture...")
 
     try:
         # Create a test error
@@ -68,12 +61,10 @@ def test_error_capture():
             user_id="test_user_123",
             session_id="test_session_456",
         )
-        print("✅ Error captured with therapeutic filtering")
 
 
 def test_message_capture():
     """Test message capture functionality."""
-    print("\n📝 Testing Message Capture...")
 
     # Test info message
     capture_therapeutic_message(
@@ -81,7 +72,6 @@ def test_message_capture():
         level="info",
         context={"test_phase": "message_capture", "message_type": "info"},
     )
-    print("✅ Info message captured")
 
     # Test warning message
     capture_therapeutic_message(
@@ -89,12 +79,10 @@ def test_message_capture():
         level="warning",
         context={"test_phase": "message_capture", "message_type": "warning"},
     )
-    print("✅ Warning message captured")
 
 
 def test_data_filtering():
     """Test that sensitive data is properly filtered."""
-    print("\n🔒 Testing Data Filtering...")
 
     try:
         # Create an error with sensitive data
@@ -114,12 +102,10 @@ def test_data_filtering():
                 "method": "POST",
             },
         )
-        print("✅ Error with sensitive data captured (should be filtered)")
 
 
 def test_performance_tracking():
     """Test performance tracking functionality."""
-    print("\n⚡ Testing Performance Tracking...")
 
     import time
 
@@ -139,19 +125,14 @@ def test_performance_tracking():
         transaction.set_tag("test_type", "performance")
         transaction.set_data("test_data", "integration_test")
 
-    print("✅ Performance transaction captured")
-
 
 def main():
     """Run all Sentry integration tests."""
-    print("🎯 TTA Sentry Integration Test")
-    print("=" * 50)
 
     try:
         # Test configuration
         settings = test_sentry_configuration()
         if settings is None:
-            print("❌ Sentry configuration failed. Exiting.")
             sys.exit(1)
 
         # Test error capture
@@ -166,18 +147,7 @@ def main():
         # Test performance tracking
         test_performance_tracking()
 
-        print("\n" + "=" * 50)
-        print("🎉 All Sentry integration tests completed successfully!")
-        print("\n📊 Check your Sentry dashboard at:")
-        print("   https://sentry.io/organizations/your-org/projects/")
-        print("\n💡 You should see:")
-        print("   - Test errors with filtered sensitive data")
-        print("   - Info and warning messages")
-        print("   - Performance transaction data")
-        print("   - Proper environment tagging")
-
-    except Exception as e:
-        print(f"\n❌ Test failed: {e}")
+    except Exception:
         import traceback
 
         traceback.print_exc()

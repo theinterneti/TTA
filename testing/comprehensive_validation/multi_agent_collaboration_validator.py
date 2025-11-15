@@ -670,9 +670,7 @@ async def run_multi_agent_collaboration_validation(
             logger.warning("⚠️ Validator initialization failed, using simulation mode")
 
         # Run collaboration validation
-        results = await validator.validate_multi_agent_collaboration()
-
-        return results
+        return await validator.validate_multi_agent_collaboration()
 
     except Exception as e:
         logger.error(f"❌ Collaboration validation failed: {e}")
@@ -685,38 +683,13 @@ if __name__ == "__main__":
     async def main():
         results = await run_multi_agent_collaboration_validation()
 
-        print("\n" + "=" * 80)
-        print("MULTI-AGENT COLLABORATION VALIDATION RESULTS")
-        print("=" * 80)
-
         for metrics in results:
-            print(f"\n🤝 Workflow: {metrics.workflow_id}")
-            print(f"   Scenario: {metrics.test_scenario}")
-            print(f"   Duration: {metrics.total_duration:.2f}s")
-            print(
-                f"   Collaboration Quality: {metrics.collaboration_quality_score:.1f}/10"
-            )
-            print(
-                f"   Narrative Continuity: {metrics.narrative_continuity_score:.1f}/10"
-            )
-            print(
-                f"   Therapeutic Effectiveness: {metrics.therapeutic_effectiveness_score:.1f}/10"
-            )
-            print(f"   Workflow Efficiency: {metrics.workflow_efficiency_score:.1f}/10")
-
-            print("\n   📊 Handoff Analysis:")
-            print(f"      Successful: {metrics.successful_handoffs}")
-            print(f"      Failed: {metrics.failed_handoffs}")
-            print(f"      Agents Involved: {', '.join(metrics.agents_involved)}")
-
             if metrics.issues_identified:
-                print(f"\n   ❌ Issues ({len(metrics.issues_identified)}):")
-                for issue in metrics.issues_identified[:3]:
-                    print(f"      - {issue}")
+                for _issue in metrics.issues_identified[:3]:
+                    pass
 
             if metrics.recommendations:
-                print("\n   💡 Recommendations:")
-                for rec in metrics.recommendations[:3]:
-                    print(f"      - {rec}")
+                for _rec in metrics.recommendations[:3]:
+                    pass
 
     asyncio.run(main())

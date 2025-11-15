@@ -115,7 +115,6 @@ class DocumentScanner:
 
     def scan(self) -> list[DocMetadata]:
         """Scan repository for markdown files."""
-        print("🔍 Scanning repository for documentation...")
 
         markdown_files = list(REPO_ROOT.rglob("*.md"))
         self.stats.total_files = len(markdown_files)
@@ -135,11 +134,9 @@ class DocumentScanner:
                     self.stats, priority_attr, getattr(self.stats, priority_attr) + 1
                 )
 
-            except Exception as e:
-                print(f"⚠️  Error scanning {md_file}: {e}")
+            except Exception:
                 continue
 
-        print(f"✅ Scanned {self.stats.scanned_files} files")
         return self.docs
 
     def _should_exclude(self, path: Path) -> bool:
@@ -340,7 +337,7 @@ class DocumentScanner:
         # Add default TTA tag
         tags.add("TTA")
 
-        return sorted(list(tags))
+        return sorted(tags)
 
     def _determine_target_path(self, path: Path, category: str) -> Path:
         """Determine target path in KB structure using Logseq naming convention.
@@ -525,9 +522,7 @@ class DocumentConverter:
             return match.group(0)
 
         # Pattern: [text](link)
-        converted = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", replace_link, content)
-
-        return converted
+        return re.sub(r"\[([^\]]+)\]\(([^)]+)\)", replace_link, content)
 
     def _add_wiki_link(self, content: str, metadata: DocMetadata) -> str:
         """Add wiki-link to title if not present."""
@@ -584,7 +579,6 @@ class MigrationManager:
     def load_docs(self) -> list[DocMetadata]:
         """Load scanned documents from cache or scan fresh."""
         if MIGRATION_DB.exists():
-            print("📂 Loading cached scan results...")
             data = json.loads(MIGRATION_DB.read_text())
             self.docs = [
                 DocMetadata(
@@ -607,9 +601,7 @@ class MigrationManager:
                 )
                 for d in data["docs"]
             ]
-            print(f"✅ Loaded {len(self.docs)} documents")
         else:
-            print("🔍 No cache found, scanning...")
             self.docs = self.scanner.scan()
             self._save_scan_results()
 
@@ -643,7 +635,6 @@ class MigrationManager:
 
         MIGRATION_DB.parent.mkdir(parents=True, exist_ok=True)
         MIGRATION_DB.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        print(f"💾 Saved scan results to {MIGRATION_DB}")
 
     def migrate(self, priority: int | None = None, dry_run: bool = False):
         """Migrate documents to KB."""
@@ -659,35 +650,24 @@ class MigrationManager:
         docs_to_migrate = [d for d in docs_to_migrate if not d.migrated]
 
         if not docs_to_migrate:
-            print("✅ No documents to migrate")
             return
 
-        print(f"📦 Migrating {len(docs_to_migrate)} documents...")
         if dry_run:
-            print("🔍 DRY RUN - No files will be modified")
+            pass
 
         for doc in docs_to_migrate:
-            print(f"\n📄 {doc.relative_path}")
-            print(f"   → {doc.target_path.relative_to(REPO_ROOT)}")
-
             success, message = self.converter.convert(doc, dry_run=dry_run)
 
             if success:
-                print(f"   ✅ {message}")
                 if not dry_run:
                     doc.migrated = True
                     doc.migration_date = datetime.now().strftime("%Y-%m-%d")
                     self.stats.migrated += 1
             else:
-                print(f"   ❌ {message}")
                 self.stats.failed += 1
 
         if not dry_run:
             self._save_scan_results()
-
-        print("\n📊 Migration complete:")
-        print(f"   ✅ Migrated: {self.stats.migrated}")
-        print(f"   ❌ Failed: {self.stats.failed}")
 
 
 def cmd_scan(args):
@@ -696,17 +676,6 @@ def cmd_scan(args):
     docs = manager.scanner.scan()
     manager.docs = docs  # Assign scanned docs to manager
     manager._save_scan_results()
-
-    print("\n📊 Scan Results:")
-    print(f"   Total files: {manager.scanner.stats.total_files}")
-    print(f"   Scanned: {manager.scanner.stats.scanned_files}")
-    print(f"   Priority 1 (Core): {manager.scanner.stats.priority_1}")
-    print(f"   Priority 2 (Architecture): {manager.scanner.stats.priority_2}")
-    print(f"   Priority 3 (Components): {manager.scanner.stats.priority_3}")
-    print(f"   Priority 4 (Workflows): {manager.scanner.stats.priority_4}")
-    print(f"   Priority 5 (Status): {manager.scanner.stats.priority_5}")
-    print(f"   Priority 6 (References): {manager.scanner.stats.priority_6}")
-    print(f"   Priority 7 (Archive): {manager.scanner.stats.priority_7}")
 
 
 def cmd_plan(args):
@@ -726,18 +695,12 @@ def cmd_plan(args):
             by_category[doc.category] = []
         by_category[doc.category].append(doc)
 
-    print(f"\n📋 Migration Plan (Priority {args.priority or 'All'}):\n")
-
     for category in sorted(by_category.keys()):
-        print(f"## {category} ({len(by_category[category])} files)")
         for doc in by_category[category][:10]:  # Show first 10
-            status = "✅ Migrated" if doc.migrated else "📝 Pending"
-            print(f"   {status} {doc.relative_path}")
-            print(f"      → {doc.target_path.relative_to(REPO_ROOT)}")
+            pass
 
         if len(by_category[category]) > 10:
-            print(f"   ... and {len(by_category[category]) - 10} more")
-        print()
+            pass
 
 
 def cmd_migrate(args):
@@ -748,10 +711,8 @@ def cmd_migrate(args):
 
 def cmd_validate(args):
     """Validate KB structure and content."""
-    print("🔍 Validating KB structure...")
 
     if not KB_ROOT.exists():
-        print("❌ KB directory not found. Run setup first.")
         return
 
     # Check namespace directories
@@ -768,12 +729,9 @@ def cmd_validate(args):
     for namespace in expected_namespaces:
         ns_path = KB_ROOT / namespace
         if ns_path.exists():
-            file_count = len(list(ns_path.rglob("*.md")))
-            print(f"   ✅ {namespace}: {file_count} files")
+            len(list(ns_path.rglob("*.md")))
         else:
-            print(f"   ⚠️  {namespace}: missing")
-
-    print("\n✅ Validation complete")
+            pass
 
 
 def cmd_report(args):
@@ -783,31 +741,18 @@ def cmd_report(args):
 
     total = len(manager.docs)
     migrated = len([d for d in manager.docs if d.migrated])
-    pending = total - migrated
-
-    print("\n📊 Migration Report\n")
-    print(f"Total documents: {total}")
-    print(f"Migrated: {migrated} ({migrated / total * 100:.1f}%)")
-    print(f"Pending: {pending} ({pending / total * 100:.1f}%)")
-    print()
+    total - migrated
 
     # By priority
-    print("By Priority:")
     for priority in range(1, 8):
         priority_docs = [d for d in manager.docs if d.priority == priority]
-        priority_migrated = [d for d in priority_docs if d.migrated]
-        print(
-            f"   Priority {priority}: {len(priority_migrated)}/{len(priority_docs)} migrated"
-        )
-    print()
+        [d for d in priority_docs if d.migrated]
 
     # By category
-    print("By Category:")
-    categories = set(d.category for d in manager.docs)
+    categories = {d.category for d in manager.docs}
     for category in sorted(categories):
         category_docs = [d for d in manager.docs if d.category == category]
-        category_migrated = [d for d in category_docs if d.migrated]
-        print(f"   {category}: {len(category_migrated)}/{len(category_docs)} migrated")
+        [d for d in category_docs if d.migrated]
 
 
 def main():
@@ -819,9 +764,7 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Scan command
-    parser_scan = subparsers.add_parser(
-        "scan", help="Scan repository for documentation"
-    )
+    subparsers.add_parser("scan", help="Scan repository for documentation")
 
     # Plan command
     parser_plan = subparsers.add_parser("plan", help="Show migration plan")
@@ -837,10 +780,10 @@ def main():
     )
 
     # Validate command
-    parser_validate = subparsers.add_parser("validate", help="Validate KB structure")
+    subparsers.add_parser("validate", help="Validate KB structure")
 
     # Report command
-    parser_report = subparsers.add_parser("report", help="Generate migration report")
+    subparsers.add_parser("report", help="Generate migration report")
 
     args = parser.parse_args()
 

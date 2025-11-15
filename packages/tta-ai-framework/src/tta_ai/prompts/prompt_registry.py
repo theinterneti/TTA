@@ -182,9 +182,7 @@ class PromptRegistry:
         self.registry_file = prompts_dir / "registry.yaml"
 
         # Loaded prompts and metrics
-        self.prompts: dict[
-            str, dict[str, PromptTemplate]
-        ] = {}  # {prompt_id: {version: template}}
+        self.prompts: dict[str, dict[str, PromptTemplate]] = {}  # {prompt_id: {version: template}}
         self.active_versions: dict[str, str] = {}  # {prompt_id: active_version}
         self.metrics: dict[str, PromptMetrics] = {}  # {prompt_id:version: metrics}
 
@@ -280,9 +278,7 @@ class PromptRegistry:
             raise ValueError(f"No active version found for prompt '{prompt_id}'")
         return version
 
-    def render_prompt(
-        self, prompt_id: str, version: str | None = None, **kwargs: Any
-    ) -> str:
+    def render_prompt(self, prompt_id: str, version: str | None = None, **kwargs: Any) -> str:
         """
         Render a prompt with variables.
 
@@ -340,9 +336,7 @@ class PromptRegistry:
 
         return self.metrics[cache_key]
 
-    def get_baseline_scores(
-        self, prompt_id: str, version: str | None = None
-    ) -> dict[str, Any]:
+    def get_baseline_scores(self, prompt_id: str, version: str | None = None) -> dict[str, Any]:
         """Get baseline performance scores for a prompt."""
         template = self.load_prompt(prompt_id, version)
         return template.performance_baseline
@@ -366,6 +360,4 @@ class PromptRegistry:
 
     def export_metrics(self) -> dict[str, Any]:
         """Export all metrics as a dictionary."""
-        return {
-            cache_key: metrics.to_dict() for cache_key, metrics in self.metrics.items()
-        }
+        return {cache_key: metrics.to_dict() for cache_key, metrics in self.metrics.items()}

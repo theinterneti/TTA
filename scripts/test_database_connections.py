@@ -16,54 +16,40 @@ def test_redis_connection() -> bool:
     try:
         import redis
     except ImportError:
-        print("❌ Redis library not installed. Run: uv add redis")
         return False
 
     redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    print("\n🔴 Testing Redis Connection")
-    print(f"   URL: {redis_url}")
 
     try:
         client = redis.from_url(redis_url, decode_responses=True)
-        info = client.info("server")
-
-        print("   ✅ Connected successfully!")
-        print(f"   📊 Redis Version: {info.get('redis_version', 'unknown')}")
-        print(f"   💾 Used Memory: {info.get('used_memory_human', 'unknown')}")
+        client.info("server")
 
         # Test basic operations
         client.set("test:connection", "OK", ex=60)
         value = client.get("test:connection")
 
         if value == "OK":
-            print("   ✅ Read/Write test passed")
+            pass
 
         # Show some stats
-        db_size = client.dbsize()
-        print(f"   🔢 Keys in database: {db_size}")
+        client.dbsize()
 
         # Show sample keys by namespace
-        print("\n   📋 Key Namespaces:")
         all_keys = client.keys("*")
         namespaces = {}
         for key in all_keys[:100]:  # Limit to first 100
             namespace = key.split(":")[0] if ":" in key else "no-namespace"
             namespaces[namespace] = namespaces.get(namespace, 0) + 1
 
-        for ns, count in sorted(namespaces.items(), key=lambda x: x[1], reverse=True):
-            print(f"      {ns}: {count} keys")
+        for _ns, _count in sorted(namespaces.items(), key=lambda x: x[1], reverse=True):
+            pass
 
         client.close()
         return True
 
-    except redis.ConnectionError as e:
-        print(f"   ❌ Connection failed: {e}")
-        print(
-            "   💡 Ensure Redis is running: docker-compose -f docker-compose.dev.yml up -d redis"
-        )
+    except redis.ConnectionError:
         return False
-    except Exception as e:
-        print(f"   ❌ Unexpected error: {e}")
+    except Exception:
         return False
 
 
@@ -72,16 +58,11 @@ def test_neo4j_connection() -> bool:
     try:
         from neo4j import GraphDatabase
     except ImportError:
-        print("❌ Neo4j library not installed. Run: uv add neo4j")
         return False
 
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     user = os.getenv("NEO4J_USER", "neo4j")
     password = os.getenv("NEO4J_PASSWORD", "tta_dev_password_2024")
-
-    print("\n🗄️  Testing Neo4j Connection")
-    print(f"   URI: {uri}")
-    print(f"   User: {user}")
 
     try:
         driver = GraphDatabase.driver(uri, auth=(user, password))
@@ -92,15 +73,11 @@ def test_neo4j_connection() -> bool:
             test_value = result.single()[0]
 
             if test_value == 1:
-                print("   ✅ Connected successfully!")
-
                 # Get database info
                 result = session.run(
                     "CALL dbms.components() YIELD name, versions, edition"
                 )
-                component = result.single()
-                print(f"   📊 Neo4j Edition: {component['edition']}")
-                print(f"   📊 Version: {component['versions'][0]}")
+                result.single()
 
                 # Count nodes by label
                 result = session.run("""
@@ -110,41 +87,31 @@ def test_neo4j_connection() -> bool:
                     LIMIT 10
                 """)
 
-                print("\n   📋 Node Statistics:")
                 records = list(result)
                 if records:
                     for record in records:
-                        labels = (
+                        (
                             ", ".join(record["labels"])
                             if record["labels"]
                             else "no-label"
                         )
-                        print(f"      {labels}: {record['count']} nodes")
                 else:
-                    print("      (empty database)")
+                    pass
 
                 # Count relationships
                 result = session.run("MATCH ()-[r]->() RETURN count(r) as count")
-                rel_count = result.single()["count"]
-                print(f"\n   🔗 Total Relationships: {rel_count}")
+                result.single()["count"]
 
         driver.close()
         return True
 
-    except Exception as e:
-        print(f"   ❌ Connection failed: {e}")
-        print(
-            "   💡 Ensure Neo4j is running: docker-compose -f docker-compose.dev.yml up -d neo4j"
-        )
-        print("   💡 Wait 30-40s for Neo4j to fully start")
+    except Exception:
         return False
 
 
 def check_docker_services() -> None:
     """Check if Docker services are running."""
     import subprocess
-
-    print("\n🐳 Checking Docker Services")
 
     try:
         result = subprocess.run(
@@ -162,47 +129,27 @@ def check_docker_services() -> None:
         )
 
         if result.stdout.strip():
-            print("   ✅ Docker services running:")
             for line in result.stdout.strip().split("\n"):
                 name, status = line.split("\t")
-                print(f"      {name}: {status}")
         else:
-            print("   ⚠️  No TTA Docker services running")
-            print(
-                "   💡 Start services: docker-compose -f docker-compose.dev.yml up -d"
-            )
+            pass
 
     except subprocess.CalledProcessError:
-        print("   ❌ Docker not available or error running docker ps")
+        pass
     except FileNotFoundError:
-        print("   ❌ Docker not installed")
+        pass
 
 
 def main():
     """Run all database connection tests."""
-    print("=" * 60)
-    print("🧪 TTA Database Connection Test")
-    print("=" * 60)
 
     check_docker_services()
 
     redis_ok = test_redis_connection()
     neo4j_ok = test_neo4j_connection()
 
-    print("\n" + "=" * 60)
-    print("📊 Summary")
-    print("=" * 60)
-    print(f"   Redis:  {'✅ OK' if redis_ok else '❌ FAILED'}")
-    print(f"   Neo4j:  {'✅ OK' if neo4j_ok else '❌ FAILED'}")
-
     if redis_ok and neo4j_ok:
-        print("\n✅ All database connections are working!")
-        print("   You can now use the VS Code database panels:")
-        print("   - Click 🗄️  icon for Neo4j")
-        print("   - Click 🔴 icon for Redis")
         return 0
-    print("\n❌ Some database connections failed")
-    print("   See error messages above for troubleshooting")
     return 1
 
 

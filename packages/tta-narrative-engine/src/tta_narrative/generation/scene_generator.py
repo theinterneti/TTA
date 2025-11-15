@@ -76,16 +76,12 @@ class SceneGenerator:
             Generated Scene object or None if generation failed
         """
         try:
-            logger.info(
-                f"Generating {scene_type} scene with focus: {therapeutic_focus}"
-            )
+            logger.info(f"Generating {scene_type} scene with focus: {therapeutic_focus}")
 
             # Select appropriate template
             template = await self._select_scene_template(scene_type, therapeutic_focus)
             if not template:
-                logger.warning(
-                    f"No template found for {scene_type} with focus {therapeutic_focus}"
-                )
+                logger.warning(f"No template found for {scene_type} with focus {therapeutic_focus}")
                 return None
 
             # Generate scene content
@@ -455,11 +451,7 @@ class SceneGenerator:
         # Select setting
         setting_key = kwargs.get(
             "setting",
-            (
-                template.setting_options[0]
-                if template.setting_options
-                else "peaceful_garden"
-            ),
+            (template.setting_options[0] if template.setting_options else "peaceful_garden"),
         )
         setting = self.therapeutic_settings.get(
             setting_key, self.therapeutic_settings["peaceful_garden"]
@@ -467,9 +459,7 @@ class SceneGenerator:
 
         # Select narrative pattern
         pattern_key = (
-            template.narrative_patterns[0]
-            if template.narrative_patterns
-            else "welcoming_guide"
+            template.narrative_patterns[0] if template.narrative_patterns else "welcoming_guide"
         )
         pattern = self.narrative_patterns.get(
             pattern_key, self.narrative_patterns["welcoming_guide"]
@@ -737,6 +727,4 @@ class SceneGenerator:
             },
         }
 
-        return intervention_content.get(
-            intervention_type, intervention_content["mindfulness"]
-        )
+        return intervention_content.get(intervention_type, intervention_content["mindfulness"])

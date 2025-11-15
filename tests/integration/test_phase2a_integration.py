@@ -87,12 +87,11 @@ class TestPhase2AIntegration:
                 f"{api_base_url}/api/v1/sessions",
                 json=session_data,
                 headers={"Authorization": "Bearer test_token"},
-            ) as response,
-        ):
-            assert response.status == 200
-            session_response = await response.json()
-            assert session_response["patient_id"] == patient_id
-            assert session_response["status"] == "active"
+            ) as response:
+                assert response.status == 200
+                session_response = await response.json()
+                assert session_response["patient_id"] == patient_id
+                assert session_response["status"] == "active"
             assert "current_scenario" in session_response
 
     @pytest.mark.asyncio

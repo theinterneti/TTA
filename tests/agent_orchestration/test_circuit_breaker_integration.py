@@ -402,11 +402,9 @@ if __name__ == "__main__":
         async def test_func():
             return "Hello, Circuit Breaker!"
 
-        result = await cb.call(test_func)
-        print(f"Circuit breaker test result: {result}")
+        await cb.call(test_func)
 
-        metrics = await cb.get_metrics()
-        print(f"Circuit breaker metrics: {metrics}")
+        await cb.get_metrics()
 
         await redis_client.close()
 
