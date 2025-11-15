@@ -16,7 +16,7 @@ selenium==4.15.2
 webdriver-manager==4.0.1
 
 # API testing
-requests==2.31.0
+requests==2.32.4
 httpx==0.25.2
 aiohttp==3.12.14
 websockets==12.0
