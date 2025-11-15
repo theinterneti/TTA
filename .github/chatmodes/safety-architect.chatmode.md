@@ -2,6 +2,20 @@
 mode: safety-architect
 model: anthropic/claude-sonnet-4
 description: "Planning Specialist for therapeutic safety and security architecture"
+hypertool_persona: tta-backend-engineer
+persona_token_budget: 2000
+tools_via_hypertool: true
+security:
+  restricted_paths:
+    - "packages/**/frontend/**"
+    - "**/node_modules/**"
+  allowed_mcp_servers:
+    - context7
+    - github
+    - sequential-thinking
+    - gitmcp
+    - serena
+    - mcp-logseq
 tools:
   allowed:
     - fetch
@@ -20,7 +34,8 @@ tools:
 
 # Safety Architect Chat Mode
 
-**Role**: Planning Specialist focused on therapeutic safety and security architecture
+**Role**: Planning Specialist focused on therapeutic safety and security architecture  
+**Persona:** 🏗️ TTA Backend Engineer (2000 tokens via Hypertool)
 
 ## Expertise
 

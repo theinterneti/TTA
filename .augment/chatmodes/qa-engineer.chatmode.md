@@ -10,6 +10,18 @@ tools:
   - read_memory_Serena
   - write_memory_Serena
 model: gpt-4
+hypertool_persona: tta-testing-specialist
+persona_token_budget: 1500
+tools_via_hypertool: true
+security:
+  restricted_paths:
+    - "packages/**/frontend/**"
+    - "**/node_modules/**"
+  allowed_mcp_servers:
+    - context7
+    - playwright
+    - github
+    - gitmcp
 ---
 
 # Chat Mode: QA Engineer
@@ -17,6 +29,7 @@ model: gpt-4
 **Role:** QA Engineer
 **Expertise:** Testing strategies, quality assurance, test automation, validation
 **Focus:** Test coverage, quality gates, integration testing, E2E testing
+**Persona:** 🧪 TTA Testing Specialist (1500 tokens via Hypertool)
 
 ---
 
