@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Neo4j Browser Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 15px; margin: 5px; }
+        #results { margin-top: 20px; padding: 10px; background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>Neo4j Browser Connectivity Test</h1>
+
+    <div class="test-section">
+        <h3>Test 1: Basic Connectivity</h3>
+        <button onclick="testConnectivity()">Test Connection</button>
+        <div id="connectivity-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Authentication</h3>
+        <input type="text" id="username" placeholder="Username" value="tta_integration">
+        <input type="password" id="password" placeholder="Password" value="tta_integration_password_2024">
+        <button onclick="testAuth()">Test Auth</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Safe Character Creation</h3>
+        <button onclick="testSafeCharacter()">Create Safe Character</button>
+        <div id="character-result"></div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        async function testConnectivity() {
+            try {
+                const response = await fetch('http://localhost:7474');
+                const data = await response.json();
+                document.getElementById('connectivity-result').innerHTML =
+                    '<span class="success">✅ Connected: ' + data.neo4j_version + '</span>';
+            } catch (error) {
+                document.getElementById('connectivity-result').innerHTML =
+                    '<span class="error">❌ Connection failed: ' + error.message + '</span>';
+            }
+        }
+
+        async function testAuth() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:7474/db/neo4j/tx/commit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(username + ':' + password)
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            statement: 'RETURN "Auth successful" as message',
+                            resultDataContents: ['row']
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('auth-result').innerHTML =
+                        '<span class="success">✅ Authentication successful</span>';
+                } else {
+                    document.getElementById('auth-result').innerHTML =
+                        '<span class="error">❌ Authentication failed</span>';
+                }
+            } catch (error) {
+                document.getElementById('auth-result').innerHTML =
+                    '<span class="error">❌ Auth error: ' + error.message + '</span>';
+            }
+        }
+
+        async function testSafeCharacter() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:7474/db/neo4j/tx/commit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(username + ':' + password)
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            statement: `
+                                CREATE (c:Character {
+                                    id: 'browser_test_' + randomUUID(),
+                                    name: 'Browser Test Character',
+                                    personality_traits: ['brave', 'curious'],
+                                    stat_strength: 15,
+                                    created_at: datetime()
+                                })
+                                RETURN c.id as character_id, c.name as name
+                            `,
+                            resultDataContents: ['row']
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const result = data.results[0].data[0].row;
+                    document.getElementById('character-result').innerHTML =
+                        '<span class="success">✅ Character created: ' + result[1] + ' (ID: ' + result[0] + ')</span>';
+                } else {
+                    document.getElementById('character-result').innerHTML =
+                        '<span class="error">❌ Character creation failed</span>';
+                }
+            } catch (error) {
+                document.getElementById('character-result').innerHTML =
+                    '<span class="error">❌ Character error: ' + error.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>

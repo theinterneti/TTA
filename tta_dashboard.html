@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTA System Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .service-card p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .service-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+
+        .service-link:hover {
+            background: #5a67d8;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-running {
+            background: #48bb78;
+        }
+
+        .status-stopped {
+            background: #f56565;
+        }
+
+        .database-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .database-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .db-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .db-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .monitoring-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 TTA System Dashboard</h1>
+            <p>Therapeutic Text Adventure - Local Development Environment</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <h3><span class="status-indicator status-running"></span>Player Experience Interface</h3>
+                <p>Main storytelling interface for players to engage with therapeutic text adventures.</p>
+                <a href="http://localhost:3000" target="_blank" class="service-link">Open Interface</a>
+            </div>
+
+            <div class="service-card">
+                <h3><span class="status-indicator status-running"></span>API Server</h3>
+                <p>Backend API providing core functionality and data management.</p>
+                <a href="http://localhost:8080/docs" target="_blank" class="service-link">API Documentation</a>
+            </div>
+
+            <div class="service-card">
+                <h3><span class="status-indicator status-running"></span>Neo4j Browser</h3>
+                <p>Graph database interface for exploring relationships and data structures.</p>
+                <a href="http://localhost:7474/browser/" target="_blank" class="service-link">Open Neo4j Browser</a>
+            </div>
+        </div>
+
+        <div class="database-section">
+            <h2>🗄️ Database Services</h2>
+            <div class="db-grid">
+                <div class="db-card">
+                    <h4><span class="status-indicator status-running"></span>Redis</h4>
+                    <p><strong>Port:</strong> 6379</p>
+                    <p><strong>Purpose:</strong> Session storage, caching</p>
+                </div>
+
+                <div class="db-card">
+                    <h4><span class="status-indicator status-running"></span>Neo4j</h4>
+                    <p><strong>HTTP:</strong> 7474 | <strong>Bolt:</strong> 7687</p>
+                    <p><strong>Purpose:</strong> Graph relationships, world data</p>
+                </div>
+
+                <div class="db-card">
+                    <h4><span class="status-indicator status-running"></span>PostgreSQL</h4>
+                    <p><strong>Port:</strong> 5432</p>
+                    <p><strong>Purpose:</strong> User data, session persistence</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="monitoring-section">
+            <h2>📊 Monitoring & Analytics</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <h3><span class="status-indicator status-running"></span>Grafana Dashboard</h3>
+                    <p>System monitoring, metrics visualization, and performance analytics.</p>
+                    <a href="http://localhost:3001" target="_blank" class="service-link">Open Grafana</a>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #888;">
+                        <strong>Login:</strong> admin / admin
+                    </p>
+                </div>
+
+                <div class="service-card">
+                    <h3><span class="status-indicator status-running"></span>Prometheus Metrics</h3>
+                    <p>Metrics collection and time-series data storage for system monitoring.</p>
+                    <a href="http://localhost:9090" target="_blank" class="service-link">Open Prometheus</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🚀 TTA Local Development Environment | All services running on localhost</p>
+            <p style="margin-top: 10px;">
+                <strong>Quick Health Check:</strong>
+                <a href="http://localhost:8080/health" target="_blank" style="color: #667eea;">API Health Status</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh status indicators every 30 seconds
+        setInterval(async () => {
+            try {
+                const response = await fetch('http://localhost:8080/health');
+                if (response.ok) {
+                    console.log('API is healthy');
+                } else {
+                    console.log('API health check failed');
+                }
+            } catch (error) {
+                console.log('API is not accessible');
+            }
+        }, 30000);
+
+        // Add click tracking for analytics
+        document.querySelectorAll('.service-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                console.log(`Opening: ${e.target.href}`);
+            });
+        });
+    </script>
+</body>
+</html>

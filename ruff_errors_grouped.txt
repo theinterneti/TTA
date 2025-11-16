@@ -1,0 +1,752 @@
+warning: The top-level linter settings are deprecated in favour of their counterparts in the `lint` section. Please update the following options in `pyproject.toml`:
+  - 'ignore' -> 'lint.ignore'
+  - 'select' -> 'lint.select'
+  - 'per-file-ignores' -> 'lint.per-file-ignores'
+src/agent_orchestration/adapters.py:
+  192:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  286:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  377:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/agent_orchestration/agents.py:
+  352:41 F821 Undefined name `AgentCapabilitySet`
+  532:16 F821 Undefined name `results`
+
+src/agent_orchestration/api/diagnostics.py:
+  229:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  369:13 F841 Local variable `stats` is assigned to but never used
+  463:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/agent_orchestration/coordinators/redis_message_coordinator.py:
+  32:1 E402 Module level import not at top of file
+  33:1 E402 Module level import not at top of file
+  40:1 E402 Module level import not at top of file
+
+src/agent_orchestration/monitoring.py:
+  286:13 B007 Loop control variable `monitor_key` not used within loop body
+
+src/agent_orchestration/optimization/optimization_engine.py:
+  137:13 B007 Loop control variable `stat_key` not used within loop body
+  185:13 B007 Loop control variable `stat_key` not used within loop body
+  244:13 B007 Loop control variable `stat_key` not used within loop body
+
+src/agent_orchestration/optimization/performance_analytics.py:
+  713:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  723:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  733:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  744:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  753:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/agent_orchestration/performance/optimization.py:
+  447:13 B007 Loop control variable `agent_type` not used within loop body
+  453:13 B007 Loop control variable `agent_type` not used within loop body
+
+src/agent_orchestration/profiling.py:
+  111:29 B007 Loop control variable `nc` not used within loop body
+  111:41 B007 Loop control variable `callers` not used within loop body
+  312:68 B023 Function definition does not bind loop variable `scenario`
+
+src/agent_orchestration/protocol_bridge.py:
+  289:13 F841 Local variable `result` is assigned to but never used
+  326:13 F841 Local variable `result` is assigned to but never used
+  370:13 F841 Local variable `result` is assigned to but never used
+
+src/agent_orchestration/realtime/dashboard.py:
+   23:9  F401 `...monitoring.realtime_alerts.console_notification_handler` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  365:13 F841 Local variable `event_data` is assigned to but never used
+  391:9  F841 Local variable `snapshot_data` is assigned to but never used
+
+src/agent_orchestration/registries/redis_agent_registry.py:
+  714:13 F841 Local variable `px` is assigned to but never used
+
+src/agent_orchestration/resources.py:
+  399:17 F841 Local variable `free` is assigned to but never used
+
+src/agent_orchestration/service.py:
+  236:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  298:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  528:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  557:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  893:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/agent_orchestration/state_validator.py:
+  91:25 B007 Loop control variable `pass_idx` not used within loop body
+
+src/agent_orchestration/therapeutic_safety.py:
+   709:13 C401 Unnecessary generator (rewrite as a set comprehension)
+  3359:1  E402 Module level import not at top of file
+  3362:1  E402 Module level import not at top of file
+
+src/agent_orchestration/tools/invocation_service.py:
+  121:13 F841 Local variable `loop` is assigned to but never used
+  132:13 F841 Local variable `loop` is assigned to but never used
+  150:13 F841 Local variable `loop` is assigned to but never used
+
+src/agent_orchestration/tools/metrics.py:
+  82:1 E402 Module level import not at top of file
+  83:1 E402 Module level import not at top of file
+  84:1 E402 Module level import not at top of file
+  85:1 E402 Module level import not at top of file
+  86:1 E402 Module level import not at top of file
+
+src/agent_orchestration/tools/models.py:
+  92:1 E402 Module level import not at top of file
+
+src/agent_orchestration/workflow_manager.py:
+   10:1  I001 [*] Import block is un-sorted or un-formatted
+  157:13 F841 Local variable `graph_response` is assigned to but never used
+
+src/ai_components/langgraph_integration.py:
+  258:1 W293 Blank line contains whitespace
+  264:1 W293 Blank line contains whitespace
+  328:1 W293 Blank line contains whitespace
+  334:1 W293 Blank line contains whitespace
+  341:1 W293 Blank line contains whitespace
+  383:1 W293 Blank line contains whitespace
+  388:1 W293 Blank line contains whitespace
+
+src/analytics/services/aggregation_service.py:
+  280:17 B007 Loop control variable `cohort` not used within loop body
+  351:13 B007 Loop control variable `cohort` not used within loop body
+
+src/analytics/services/reporting_service.py:
+  317:19 C408 Unnecessary `dict()` call (rewrite as a literal)
+  318:20 C408 Unnecessary `dict()` call (rewrite as a literal)
+  349:83 W291 Trailing whitespace
+  361:1  W293 Blank line contains whitespace
+  372:1  W293 Blank line contains whitespace
+  377:1  W293 Blank line contains whitespace
+  723:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/api_gateway/interfaces/patient_api.py:
+  185:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  252:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  283:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  327:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/components/agent_orchestration_component.py:
+    26:29 F821 Undefined name `Optional`
+   238:21 F841 Local variable `svi` is assigned to but never used
+   986:24 B025 try-except block with duplicate exception `Exception`
+  1972:21 F841 Local variable `tool_cache` is assigned to but never used
+  2567:17 F841 Local variable `pol_cfg` is assigned to but never used
+  2953:27 F821 Undefined name `asyncio`
+  2960:20 F821 Undefined name `asyncio`
+
+src/components/character_arc_integration.py:
+  30:9  F401 `core.character_development_system.PersonalityTrait` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  32:52 F401 `models.data_models.DialogueStyle` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  32:67 F401 `models.data_models.MemoryFragment` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  61:1  E402 Module level import not at top of file
+
+src/components/character_arc_manager.py:
+   381:13 F841 Local variable `milestone_progress` is assigned to but never used
+   930:13 F841 Local variable `personality` is assigned to but never used
+  1216:13 F841 Local variable `personality` is assigned to but never used
+
+src/components/docker_component.py:
+  155:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/components/gameplay_loop/__init__.py:
+  13:1 F403 `from .models import *` used; unable to detect undefined names
+  18:5 F405 `SessionState` may be undefined, or defined from star imports
+  19:5 F405 `Scene` may be undefined, or defined from star imports
+  20:5 F405 `Choice` may be undefined, or defined from star imports
+  21:5 F405 `ConsequenceSet` may be undefined, or defined from star imports
+  22:5 F405 `TherapeuticContext` may be undefined, or defined from star imports
+  23:5 F405 `GameplayMetrics` may be undefined, or defined from star imports
+  24:5 F405 `UserChoice` may be undefined, or defined from star imports
+  25:5 F405 `ChoiceOutcome` may be undefined, or defined from star imports
+  26:5 F405 `GameplaySession` may be undefined, or defined from star imports
+  27:5 F405 `ProgressMarker` may be undefined, or defined from star imports
+  28:5 F405 `ProgressType` may be undefined, or defined from star imports
+  29:5 F405 `ValidationResult` may be undefined, or defined from star imports
+
+src/components/gameplay_loop/choice_architecture/agency_protector.py:
+   83:13 F841 Local variable `agency_assessment` is assigned to but never used
+  290:24 C401 Unnecessary generator (rewrite as a set comprehension)
+  433:9  F841 Local variable `standard_count` is assigned to but never used
+  803:23 B007 Loop control variable `description` not used within loop body
+
+src/components/gameplay_loop/choice_architecture/generator.py:
+  201:9  F841 Local variable `narrative_templates` is assigned to but never used
+  237:9  F841 Local variable `therapeutic_templates` is assigned to but never used
+  273:9  F841 Local variable `skill_building_templates` is assigned to but never used
+  293:9  F841 Local variable `emotional_regulation_templates` is assigned to but never used
+  313:9  F841 Local variable `social_interaction_templates` is assigned to but never used
+  716:35 F821 Undefined name `narrative_templates`
+  717:37 F821 Undefined name `therapeutic_templates`
+  718:40 F821 Undefined name `skill_building_templates`
+  719:46 F821 Undefined name `emotional_regulation_templates`
+  720:44 F821 Undefined name `social_interaction_templates`
+
+src/components/gameplay_loop/choice_architecture/manager.py:
+  246:9 F841 Local variable `therapeutic_choice_count` is assigned to but never used
+
+src/components/gameplay_loop/consequence_system/causality_explainer.py:
+  294:9 F841 Local variable `modifiers` is assigned to but never used
+
+src/components/gameplay_loop/database/queries.py:
+  157:15 W291 Trailing whitespace
+  215:15 W291 Trailing whitespace
+  232:15 W291 Trailing whitespace
+
+src/components/gameplay_loop/narrative/immersion_manager.py:
+  472:13 B007 Loop control variable `sense_type` not used within loop body
+
+src/components/gameplay_loop_component.py:
+  302:17 B007 Loop control variable `session_id` not used within loop body
+
+src/components/model_management/api.py:
+  127:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  159:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  190:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  222:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  252:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  267:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  285:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  299:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  323:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  349:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  373:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  392:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  411:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  440:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  468:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  488:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/components/model_management/model_management_component.py:
+  214:17 F841 Local variable `instance` is assigned to but never used
+
+src/components/model_management/providers/custom_api.py:
+  486:13 B007 Loop control variable `provider_name` not used within loop body
+  516:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/components/narrative_arc_orchestrator/causal_graph.py:
+  23:9 B007 Loop control variable `src` not used within loop body
+
+src/components/narrative_arc_orchestrator/scale_manager.py:
+  225:9 F841 Local variable `strength` is assigned to but never used
+  232:9 F841 Local variable `align` is assigned to but never used
+  239:9 F841 Local variable `confidence` is assigned to but never used
+  244:9 F841 Local variable `decay` is assigned to but never used
+
+src/components/narrative_arc_orchestrator_component.py:
+   28:1 E402 Module level import not at top of file
+   41:7 F811 Redefinition of unused `NarrativeScale` from line 33
+   51:7 F811 Redefinition of unused `PlayerChoice` from line 35
+   69:7 F811 Redefinition of unused `NarrativeResponse` from line 32
+   89:7 F811 Redefinition of unused `NarrativeStatus` from line 34
+  106:7 F811 Redefinition of unused `NarrativeEvent` from line 31
+  127:7 F811 Redefinition of unused `ImpactAssessment` from line 30
+  141:7 F811 Redefinition of unused `ScaleConflict` from line 37
+  157:7 F811 Redefinition of unused `Resolution` from line 36
+  174:7 F811 Redefinition of unused `EmergentEvent` from line 29
+  570:9 F841 Local variable `confidence` is assigned to but never used
+
+src/components/narrative_coherence_engine.py:
+    31:1  E402 Module level import not at top of file
+    47:7  F811 Redefinition of unused `ValidationSeverity` from line 43
+    56:7  F811 Redefinition of unused `ConsistencyIssueType` from line 33
+    69:7  F811 Redefinition of unused `ConsistencyIssue` from line 32
+    84:7  F811 Redefinition of unused `ValidationResult` from line 42
+    99:7  F811 Redefinition of unused `NarrativeContent` from line 38
+   115:7  F811 Redefinition of unused `LoreEntry` from line 37
+   129:7  F811 Redefinition of unused `Contradiction` from line 34
+   144:7  F811 Redefinition of unused `CreativeSolution` from line 36
+   160:7  F811 Redefinition of unused `NarrativeResolution` from line 39
+   175:7  F811 Redefinition of unused `RetroactiveChange` from line 40
+   190:7  F811 Redefinition of unused `StorylineThread` from line 41
+   205:7  F811 Redefinition of unused `ConvergenceValidation` from line 35
+  3024:31 C401 Unnecessary generator (rewrite as a set comprehension)
+  3025:31 C401 Unnecessary generator (rewrite as a set comprehension)
+
+src/components/test_character_arc_integration.py:
+  23:54 F401 `components.character_arc_integration.CharacterArcIntegration` imported but unused; consider using `importlib.util.find_spec` to test for availability
+
+src/developer_dashboard/test_battery_integration.py:
+  360:1 W293 Blank line contains whitespace
+  382:1 W293 Blank line contains whitespace
+  387:1 W293 Blank line contains whitespace
+  393:1 W293 Blank line contains whitespace
+  400:1 W293 Blank line contains whitespace
+  406:1 W293 Blank line contains whitespace
+  410:1 W293 Blank line contains whitespace
+  413:1 W293 Blank line contains whitespace
+  421:1 W293 Blank line contains whitespace
+  427:1 W293 Blank line contains whitespace
+  435:1 W293 Blank line contains whitespace
+
+src/living_worlds/neo4j_integration.py:
+  223:1  W293 Blank line contains whitespace
+  226:1  W293 Blank line contains whitespace
+  317:1  W293 Blank line contains whitespace
+  336:47 E741 Ambiguous variable name: `l`
+  362:1  W293 Blank line contains whitespace
+  372:1  W293 Blank line contains whitespace
+  374:1  W293 Blank line contains whitespace
+  435:13 F841 Local variable `world_state` is assigned to but never used
+  438:13 F841 Local variable `emotional_changes` is assigned to but never used
+  476:34 W291 Trailing whitespace
+  483:1  W293 Blank line contains whitespace
+
+src/monitoring/metrics_middleware.py:
+  234:24 F401 `prometheus_client` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  274:16 F401 `prometheus_client` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  282:16 F401 `psutil` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  290:16 F401 `redis` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  299:16 F401 `neo4j` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  308:7  F811 Redefinition of unused `MockMetricsMiddleware` from line 141
+  362:24 F821 Undefined name `detect_environment`
+  382:13 E722 Do not use bare `except`
+
+src/monitoring/mock_monitoring.py:
+  298:5 E722 Do not use bare `except`
+
+src/player_experience/__init__.py:
+  8:1 F403 `from .managers import *` used; unable to detect undefined names
+  9:1 F403 `from .models import *` used; unable to detect undefined names
+
+src/player_experience/api/app.py:
+   48:5  I001 [*] Import block is un-sorted or un-formatted
+   65:5  I001 [*] Import block is un-sorted or un-formatted
+  192:20 F401 `prometheus_client` imported but unused; consider using `importlib.util.find_spec` to test for availability
+
+src/player_experience/api/auth.py:
+  180:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  233:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  359:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/auth.py:
+  150:1  E402 Module level import not at top of file
+  198:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  215:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  230:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  270:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  347:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  356:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  409:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  413:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  447:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  451:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  474:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  515:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  554:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  613:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/characters.py:
+  471:9 E731 Do not assign a `lambda` expression, use a `def`
+
+src/player_experience/api/routers/chat.py:
+  127:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/conversation.py:
+   731:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   784:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   851:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   931:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   970:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  1028:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  1086:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  1108:17 C401 Unnecessary generator (rewrite as a set comprehension)
+  1128:9  B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/franchise_worlds.py:
+  141:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  166:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  187:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  216:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  234:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  298:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/gameplay.py:
+  139:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  185:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  228:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  271:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  309:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/openrouter_auth.py:
+  200:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  246:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/players.py:
+  291:1 E402 Module level import not at top of file
+  328:5 F841 Local variable `characters` is assigned to but never used
+  329:5 F841 Local variable `therapeutic_preferences` is assigned to but never used
+  332:5 F841 Local variable `privacy_settings` is assigned to but never used
+  333:5 F841 Local variable `progress_summary` is assigned to but never used
+
+src/player_experience/api/routers/privacy.py:
+  255:9 F841 Local variable `export_stream` is assigned to but never used
+  266:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  299:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  323:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/api/routers/worlds.py:
+  13:1 E402 Module level import not at top of file
+  15:1 E402 Module level import not at top of file
+  16:1 E402 Module level import not at top of file
+  18:1 E402 Module level import not at top of file
+  19:1 E402 Module level import not at top of file
+  20:1 E402 Module level import not at top of file
+
+src/player_experience/api/test_sentry_integration.py:
+  16:1 E402 Module level import not at top of file
+  17:1 E402 Module level import not at top of file
+
+src/player_experience/api/validation_schemas.py:
+  245:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/database/character_repository.py:
+  220:17 F841 Local variable `character` is assigned to but never used
+  239:12 F821 Undefined name `character`
+  239:26 F821 Undefined name `character`
+  240:20 F821 Undefined name `character`
+
+src/player_experience/database/player_profile_repository.py:
+  119:25 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  123:25 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  147:25 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  151:21 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  155:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  366:1  W293 Blank line contains whitespace
+  370:1  W293 Blank line contains whitespace
+  374:1  W293 Blank line contains whitespace
+  378:1  W293 Blank line contains whitespace
+  414:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  419:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  424:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  673:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  756:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  796:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  828:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  862:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  899:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  927:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  957:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/database/player_profile_schema.py:
+  114:25 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  118:25 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  143:25 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  148:21 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  153:17 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/database/user_repository.py:
+   75:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  159:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  162:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/docs/api_docs.py:
+  486:1  W293 Blank line contains whitespace
+  492:1  W293 Blank line contains whitespace
+  499:1  W293 Blank line contains whitespace
+  507:1  W293 Blank line contains whitespace
+  513:1  W293 Blank line contains whitespace
+  519:1  W293 Blank line contains whitespace
+  524:1  W293 Blank line contains whitespace
+  531:1  W293 Blank line contains whitespace
+  540:1  W293 Blank line contains whitespace
+  546:1  W293 Blank line contains whitespace
+  553:1  W293 Blank line contains whitespace
+  558:1  W293 Blank line contains whitespace
+  562:1  W293 Blank line contains whitespace
+  567:1  W293 Blank line contains whitespace
+  577:1  W293 Blank line contains whitespace
+  591:1  W293 Blank line contains whitespace
+  822:33 B007 Loop control variable `content_type` not used within loop body
+
+src/player_experience/franchise_worlds/api/main.py:
+  208:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  244:9 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  326:1 E402 Module level import not at top of file
+  328:1 E402 Module level import not at top of file
+
+src/player_experience/franchise_worlds/integration/PlayerExperienceIntegration.py:
+  215:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/managers/ai_world_generator.py:
+  211:23 W291 Trailing whitespace
+
+src/player_experience/managers/player_profile_manager.py:
+  139:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  142:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  183:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  189:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  247:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  253:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  301:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  307:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  333:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  357:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  550:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/managers/progress_tracking_service.py:
+  150:9 F841 Local variable `skill_markers` is assigned to but never used
+  151:9 F841 Local variable `breakthrough_markers` is assigned to but never used
+  152:9 F841 Local variable `goal_markers` is assigned to but never used
+
+src/player_experience/managers/therapeutic_profile_integration.py:
+  434:23 B007 Loop control variable `description` not used within loop body
+
+src/player_experience/models/__init__.py:
+  8:1 I001 [*] Import block is un-sorted or un-formatted
+
+src/player_experience/models/character.py:
+  181:9 E731 Do not assign a `lambda` expression, use a `def`
+
+src/player_experience/models/world.py:
+  238:32 C401 Unnecessary generator (rewrite as a set comprehension)
+  242:28 C401 Unnecessary generator (rewrite as a set comprehension)
+
+src/player_experience/monitoring/performance_monitor.py:
+  154:17 C401 Unnecessary generator (rewrite as a set comprehension)
+
+src/player_experience/production_readiness.py:
+  708:13 F841 Local variable `benchmark` is assigned to but never used
+
+src/player_experience/security/rate_limiter.py:
+  501:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/services/auth_service.py:
+   23:1  E402 Module level import not at top of file
+  551:13 B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+src/player_experience/services/gameplay_service.py:
+  42:13 F841 Local variable `settings` is assigned to but never used
+
+src/player_experience/utils/compatibility_checker.py:
+  166:28 C401 Unnecessary generator (rewrite as a set comprehension)
+
+src/player_experience/utils/serialization.py:
+  211:83 E711 Comparison to `None` should be `cond is None`
+  219:8  E721 Use `is` and `is not` for type comparisons, or `isinstance()` for isinstance checks
+  222:8  E721 Use `is` and `is not` for type comparisons, or `isinstance()` for isinstance checks
+  225:8  E721 Use `is` and `is not` for type comparisons, or `isinstance()` for isinstance checks
+  228:8  E721 Use `is` and `is not` for type comparisons, or `isinstance()` for isinstance checks
+
+tests/agent_orchestration/test_agent_orchestration_service.py:
+  558:61 F841 Local variable `mock_logger` is assigned to but never used
+
+tests/agent_orchestration/test_agent_orchestration_service_integration.py:
+  189:5 F841 Local variable `agent_id` is assigned to but never used
+  211:5 F841 Local variable `agent` is assigned to but never used
+
+tests/agent_orchestration/test_circuit_breaker_integration.py:
+  124:10 B017 Do not assert blind exception: `Exception`
+  203:10 B017 Do not assert blind exception: `Exception`
+  225:10 B017 Do not assert blind exception: `Exception`
+  253:5  F841 Local variable `cb1` is assigned to but never used
+  254:5  F841 Local variable `cb2` is assigned to but never used
+
+tests/agent_orchestration/test_component_diagnostics_and_polling.py:
+  46:5 F841 Local variable `snap` is assigned to but never used
+
+tests/agent_orchestration/test_crisis_detection_scenarios.py:
+  340:9  F841 Local variable `low_confidence_result` is assigned to but never used
+  397:17 F841 Local variable `harsh_indicators` is assigned to but never used
+
+tests/agent_orchestration/test_crisis_intervention_system.py:
+  118:9  F841 Local variable `intervention` is assigned to but never used
+  355:13 B007 Loop control variable `component` not used within loop body
+
+tests/agent_orchestration/test_end_to_end_validation.py:
+  307:9  F841 Local variable `psychology_context` is assigned to but never used
+  364:33 B007 Loop control variable `user_id` not used within loop body
+
+tests/agent_orchestration/test_end_to_end_workflows.py:
+  360:13 F841 Local variable `nga_result` is assigned to but never used
+
+tests/agent_orchestration/test_enhanced_therapeutic_safety.py:
+  262:17 F841 Local variable `harsh_words` is assigned to but never used
+
+tests/agent_orchestration/test_integration_runner.py:
+  21:16 F401 `tests.agent_orchestration.test_state_persistence_aggregation` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  30:13 F401 `tests.agent_orchestration.test_multi_agent_workflow_integration.IntegrationTestHelper` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  31:13 F401 `tests.agent_orchestration.test_multi_agent_workflow_integration.PerformanceMetrics` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  32:13 F401 `tests.agent_orchestration.test_multi_agent_workflow_integration.WorkflowStateVerifier` imported but unused; consider using `importlib.util.find_spec` to test for availability
+
+tests/agent_orchestration/test_models.py:
+  27:1 E402 Module level import not at top of file
+
+tests/agent_orchestration/test_multi_agent_workflow_integration.py:
+  267:13 B007 Loop control variable `i` not used within loop body
+
+tests/agent_orchestration/test_optimization_integration.py:
+  92:9 B007 Loop control variable `i` not used within loop body
+
+tests/agent_orchestration/test_performance_concurrency.py:
+  163:13 F841 Local variable `max_execution_time` is assigned to but never used
+  415:25 B023 Function definition does not bind loop variable `metrics`
+  418:25 B023 Function definition does not bind loop variable `metrics`
+  512:13 F841 Local variable `initial_cpu_percent` is assigned to but never used
+  615:17 F841 Local variable `avg_memory` is assigned to but never used
+  819:21 F841 Local variable `workflow_start` is assigned to but never used
+
+tests/agent_orchestration/test_performance_validation.py:
+  181:18 F841 Local variable `operation_id` is assigned to but never used
+  585:14 F841 Local variable `operation_id` is assigned to but never used
+
+tests/agent_orchestration/test_real_agent_communication.py:
+  512:9 F841 Local variable `session_id` is assigned to but never used
+
+tests/agent_orchestration/test_real_agent_performance.py:
+   95:13 B007 Loop control variable `i` not used within loop body
+   99:17 F841 Local variable `result` is assigned to but never used
+  217:17 F841 Local variable `ipa_result` is assigned to but never used
+  234:17 F841 Local variable `nga_result` is assigned to but never used
+  327:21 F841 Local variable `result` is assigned to but never used
+
+tests/agent_orchestration/test_session_state_validation.py:
+  103:9  F841 Local variable `first_world_state` is assigned to but never used
+  449:13 B007 Loop control variable `i` not used within loop body
+
+tests/agent_orchestration/test_therapeutic_content_validation.py:
+  150:13 F841 Local variable `therapeutic_context_integrated` is assigned to but never used
+  158:13 F841 Local variable `narrative` is assigned to but never used
+
+tests/agent_orchestration/test_therapeutic_safety_integration.py:
+  120:65 F841 Local variable `mock_logger` is assigned to but never used
+
+tests/agent_orchestration/test_therapeutic_validator_performance.py:
+  164:13 B007 Loop control variable `i` not used within loop body
+
+tests/agent_orchestration/test_tool_models.py:
+  24:10 B017 Do not assert blind exception: `Exception`
+  44:10 B017 Do not assert blind exception: `Exception`
+
+tests/agent_orchestration/test_tools_diagnostics_and_concurrency.py:
+  87:5 F841 Local variable `lst_before` is assigned to but never used
+
+tests/agent_orchestration/test_websocket_performance.py:
+  389:13 B007 Loop control variable `i` not used within loop body
+  397:13 F841 Local variable `sent_count` is assigned to but never used
+
+tests/agent_orchestration/test_websocket_real_agent_integration.py:
+  271:9 F841 Local variable `ipa_result` is assigned to but never used
+  327:9 F841 Local variable `error_id` is assigned to but never used
+  644:9 F841 Local variable `ipa_result` is assigned to but never used
+  655:9 F841 Local variable `nga_result` is assigned to but never used
+
+tests/agent_orchestration/test_workflow_chain_validation.py:
+  100:14 F841 Local variable `operation_id` is assigned to but never used
+  141:9  F841 Local variable `job_related` is assigned to but never used
+  261:9  F841 Local variable `ipa_intent` is assigned to but never used
+
+tests/agent_orchestration/tools/test_policy_config_and_enforcement.py:
+  43:10 B017 Do not assert blind exception: `Exception`
+  63:10 C408 Unnecessary `dict()` call (rewrite as a literal)
+  64:10 C408 Unnecessary `dict()` call (rewrite as a literal)
+  65:10 C408 Unnecessary `dict()` call (rewrite as a literal)
+  66:10 C408 Unnecessary `dict()` call (rewrite as a literal)
+  67:10 C408 Unnecessary `dict()` call (rewrite as a literal)
+  68:10 C408 Unnecessary `dict()` call (rewrite as a literal)
+  70:13 C408 Unnecessary `dict()` call (rewrite as a literal)
+  95:18 B017 Do not assert blind exception: `Exception`
+
+tests/agent_orchestration/validate_integration_tests.py:
+  118:13 E722 Do not use bare `except`
+
+tests/comprehensive_battery/containers/enhanced_service_manager.py:
+  249:17 E731 Do not assign a `lambda` expression, use a `def`
+  253:17 E731 Do not assign a `lambda` expression, use a `def`
+  313:17 F841 Local variable `mock_driver` is assigned to but never used
+  323:17 F841 Local variable `mock_client` is assigned to but never used
+
+tests/comprehensive_battery/containers/health_checker.py:
+  268:16 B025 try-except block with duplicate exception `Exception`
+  395:13 E722 Do not use bare `except`
+
+tests/comprehensive_battery/run_comprehensive_tests.py:
+  20:1 E402 Module level import not at top of file
+  23:1 E402 Module level import not at top of file
+  24:1 E402 Module level import not at top of file
+
+tests/comprehensive_battery/test_suites/load_stress_test_suite.py:
+  168:13 F841 Local variable `start_metrics` is assigned to but never used
+  288:17 B007 Loop control variable `i` not used within loop body
+  349:17 B007 Loop control variable `i` not used within loop body
+  472:17 B007 Loop control variable `i` not used within loop body
+  535:17 B007 Loop control variable `i` not used within loop body
+
+tests/comprehensive_battery/utils/report_generator.py:
+  520:1 W293 Blank line contains whitespace
+  529:1 W293 Blank line contains whitespace
+  538:1 W293 Blank line contains whitespace
+  543:1 W293 Blank line contains whitespace
+
+tests/conftest.py:
+  364:1 E402 Module level import not at top of file
+  394:5 F811 Redefinition of unused `redis_client_sync` from line 368
+
+tests/integration/test_core_gameplay_loop.py:
+  175:13 B007 Loop control variable `i` not used within loop body
+
+tests/integration/test_phase2a_integration.py:
+   65:9 F841 Local variable `session_id` is assigned to but never used
+  283:9 F841 Local variable `feature_flags` is assigned to but never used
+  357:9 F841 Local variable `character` is assigned to but never used
+
+tests/performance/load_test_suite.py:
+  399:21 E722 Do not use bare `except`
+  472:13 B007 Loop control variable `test_name` not used within loop body
+  580:27 C401 Unnecessary generator (rewrite as a set comprehension)
+
+tests/test_character_avatar_manager.py:
+  357:13 B007 Loop control variable `trait_name` not used within loop body
+
+tests/test_components.py:
+  74:36 F401 `codecarbon.EmissionsTracker` imported but unused; consider using `importlib.util.find_spec` to test for availability
+
+tests/test_comprehensive_integration.py:
+  66:9 B007 Loop control variable `service_name` not used within loop body
+
+tests/test_end_to_end_workflows.py:
+  301:17 B007 Loop control variable `i` not used within loop body
+
+tests/test_free_models_filter.py:
+  218:20 E712 Avoid equality comparisons to `True`; use `show_free_only:` for truth checks
+  219:20 E712 Avoid equality comparisons to `False`; use `not prefer_free:` for false checks
+  286:16 E712 Avoid equality comparisons to `True`; use `result:` for truth checks
+  291:20 E712 Avoid equality comparisons to `True`; use `result:` for truth checks
+  295:16 E712 Avoid equality comparisons to `False`; use `not result:` for false checks
+
+tests/test_narrative_coherence_engine.py:
+  52:13 F401 `src.components.narrative_coherence_engine.ConsistencyIssue` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  53:13 F401 `src.components.narrative_coherence_engine.Contradiction` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  54:13 F401 `src.components.narrative_coherence_engine.NarrativeContent` imported but unused; consider using `importlib.util.find_spec` to test for availability
+  55:13 F401 `src.components.narrative_coherence_engine.ValidationResult` imported but unused; consider using `importlib.util.find_spec` to test for availability
+
+tests/test_player_experience_models.py:
+  490:13 F841 Local variable `profile` is assigned to but never used
+
+tests/test_player_experience_orchestration_integration.py:
+  410:18 W291 Trailing whitespace
+
+tests/test_player_profile_manager.py:
+  161:13 F841 Local variable `invalid_privacy` is assigned to but never used
+  402:13 F841 Local variable `invalid_privacy` is assigned to but never used
+
+tests/test_privacy_api.py:
+  140:9 F841 Local variable `data_id` is assigned to but never used
+  154:9 F841 Local variable `consent_id` is assigned to but never used
+  252:9 F841 Local variable `data_id` is assigned to but never used
+  390:9 F841 Local variable `data_id` is assigned to but never used
+
+tests/test_scale_manager_extraction.py:
+  10:5 F841 Local variable `choice` is assigned to but never used
+
+tests/test_wave3_facades.py:
+  1:1 F403 `from src.components.narrative_arc_orchestrator.causal_graph import *` used; unable to detect undefined names
+
+tests/test_websocket_chat_backend.py:
+  35:14 B017 Do not assert blind exception: `Exception`
+
+tests/tta_prod/test_dynamic_tools_invocation_service_integration.py:
+  52:10 B017 Do not assert blind exception: `Exception`
+
+tests/tta_prod/test_dynamic_tools_policy_and_metrics_integration.py:
+  25:10 B017 Do not assert blind exception: `Exception`
+
+Found 474 errors.
+[*] 4 fixable with the `--fix` option (213 hidden fixes can be enabled with the `--unsafe-fixes` option).

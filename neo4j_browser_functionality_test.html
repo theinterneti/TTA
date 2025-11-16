@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Neo4j Browser Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        #results { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+        .code { background: #f1f1f1; padding: 10px; border-radius: 4px; font-family: monospace; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Neo4j Browser Functionality Test</h1>
+        <p>This page tests the actual Neo4j browser functionality to identify issues.</p>
+
+        <div class="test-section">
+            <h3>Test 1: Basic Connectivity</h3>
+            <button onclick="testConnectivity()">Test Neo4j Connection</button>
+            <div id="connectivity-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 2: Authentication</h3>
+            <input type="text" id="username" placeholder="Username" value="neo4j">
+            <input type="password" id="password" placeholder="Password" value="neo4j_dev_password_2024">
+            <button onclick="testAuth()">Test Authentication</button>
+            <div id="auth-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 3: Database Query</h3>
+            <button onclick="testQuery()">Run Test Query</button>
+            <div id="query-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 4: Safe Character Creation</h3>
+            <button onclick="testSafeCharacter()">Create Safe Character</button>
+            <div id="character-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 5: Problematic Character Creation (Will Show Error)</h3>
+            <button onclick="testProblematicCharacter()">Create Problematic Character</button>
+            <div id="problematic-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Solutions</h3>
+            <div id="solutions">
+                <h4>If Neo4j Browser is not working:</h4>
+                <ol>
+                    <li><strong>Clear Browser Cache:</strong> Ctrl+Shift+Delete, clear all data</li>
+                    <li><strong>Try Incognito Mode:</strong> Open browser in private/incognito mode</li>
+                    <li><strong>Disable Extensions:</strong> Temporarily disable all browser extensions</li>
+                    <li><strong>Check Console:</strong> Press F12, look for JavaScript errors in Console tab</li>
+                    <li><strong>Try Different Browser:</strong> Test with Chrome, Firefox, Safari</li>
+                    <li><strong>Use Alternative:</strong> Use API endpoints at <a href="http://localhost:8080/docs">http://localhost:8080/docs</a></li>
+                </ol>
+
+                <h4>Safe Character Creation Pattern:</h4>
+                <div class="code">
+CREATE (c:Character {<br>
+&nbsp;&nbsp;id: 'char_' + randomUUID(),<br>
+&nbsp;&nbsp;name: 'Safe Character',<br>
+&nbsp;&nbsp;personality_traits: ['brave', 'curious'],<br>
+&nbsp;&nbsp;stat_strength: 15,<br>
+&nbsp;&nbsp;stat_wisdom: 12<br>
+})
+                </div>
+
+                <h4>❌ Avoid This Pattern (Crashes Browser):</h4>
+                <div class="code">
+CREATE (c:Character {<br>
+&nbsp;&nbsp;traits: {primary: ['brave'], secondary: ['curious']}<br>
+})
+                </div>
+            </div>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:7474';
+
+        async function testConnectivity() {
+            const resultDiv = document.getElementById('connectivity-result');
+            try {
+                const response = await fetch(baseUrl);
+                const data = await response.json();
+                resultDiv.innerHTML = `<span class="success">✅ Connected successfully!</span><br>
+                    Version: ${data.neo4j_version}<br>
+                    Edition: ${data.neo4j_edition}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Connection failed: ${error.message}</span><br>
+                    <span class="warning">Check if Neo4j is running on port 7474</span>`;
+            }
+        }
+
+        async function testAuth() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('auth-result');
+
+            try {
+                const response = await fetch(`${baseUrl}/db/neo4j/tx/commit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(username + ':' + password)
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            statement: 'RETURN "Authentication successful" as message',
+                            resultDataContents: ['row']
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<span class="success">✅ Authentication successful!</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Authentication failed (${response.status})</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Auth error: ${error.message}</span>`;
+            }
+        }
+
+        async function testQuery() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('query-result');
+
+            try {
+                const response = await fetch(`${baseUrl}/db/neo4j/tx/commit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(username + ':' + password)
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            statement: 'MATCH (n) RETURN count(n) as node_count',
+                            resultDataContents: ['row']
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const count = data.results[0].data[0].row[0];
+                    resultDiv.innerHTML = `<span class="success">✅ Query successful!</span><br>
+                        Total nodes in database: ${count}`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Query failed (${response.status})</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Query error: ${error.message}</span>`;
+            }
+        }
+
+        async function testSafeCharacter() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('character-result');
+
+            try {
+                const response = await fetch(`${baseUrl}/db/neo4j/tx/commit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(username + ':' + password)
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            statement: `
+                                CREATE (c:Character {
+                                    id: 'test_safe_' + randomUUID(),
+                                    name: 'Safe Test Character',
+                                    personality_traits: ['brave', 'curious', 'loyal'],
+                                    stat_strength: 15,
+                                    stat_wisdom: 12,
+                                    created_at: datetime()
+                                })
+                                RETURN c.id as character_id, c.name as name
+                            `,
+                            resultDataContents: ['row']
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const result = data.results[0].data[0].row;
+                    resultDiv.innerHTML = `<span class="success">✅ Safe character created!</span><br>
+                        Name: ${result[1]}<br>
+                        ID: ${result[0]}<br>
+                        <span class="success">This pattern works in Neo4j browser!</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Safe character creation failed (${response.status})</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Character creation error: ${error.message}</span>`;
+            }
+        }
+
+        async function testProblematicCharacter() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('problematic-result');
+
+            try {
+                const response = await fetch(`${baseUrl}/db/neo4j/tx/commit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(username + ':' + password)
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            statement: `
+                                CREATE (c:Character {
+                                    id: 'test_problematic_' + randomUUID(),
+                                    name: 'Problematic Character',
+                                    traits: {
+                                        primary: ['brave', 'loyal'],
+                                        secondary: ['curious'],
+                                        flaws: ['impulsive']
+                                    }
+                                })
+                                RETURN c.id as character_id, c.name as name
+                            `,
+                            resultDataContents: ['row']
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<span class="warning">⚠️ HTTP API allows this, but it WILL crash Neo4j browser interface!</span><br>
+                        <span class="error">Avoid nested objects in Neo4j properties</span>`;
+                } else {
+                    const errorData = await response.json();
+                    resultDiv.innerHTML = `<span class="error">❌ Failed as expected: ${errorData.errors[0].message}</span><br>
+                        <span class="success">This is actually good - the error prevents browser crashes</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

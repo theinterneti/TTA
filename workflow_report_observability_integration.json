@@ -1,0 +1,87 @@
+{
+  "success": false,
+  "component_name": "observability_integration",
+  "target_stage": "staging",
+  "stages_completed": [
+    "specification"
+  ],
+  "stages_failed": [
+    "testing"
+  ],
+  "stage_results": {
+    "specification": {
+      "stage_name": "specification_parsing",
+      "success": true,
+      "outputs": {
+        "spec_file": "specs/observability-integration.md",
+        "content_length": 22233,
+        "parsed_at": "2025-10-29T19:45:52.627584"
+      },
+      "errors": [],
+      "warnings": [],
+      "execution_time_ms": 0.0,
+      "quality_gates": {}
+    },
+    "testing": {
+      "stage_name": "testing",
+      "success": false,
+      "outputs": {
+        "component_path": "src/observability_integration",
+        "gates_run": [
+          "test_pass_rate",
+          "test_coverage"
+        ],
+        "gates_passed": [],
+        "gates_failed": [
+          "test_pass_rate",
+          "test_coverage"
+        ]
+      },
+      "errors": [
+        "Some tests failed",
+        "Coverage 8.3% < threshold 80%"
+      ],
+      "warnings": [],
+      "execution_time_ms": 0.0,
+      "quality_gates": {
+        "test_pass_rate": {
+          "passed": false,
+          "gate_name": "test_pass_rate",
+          "details": {
+            "exit_code": 4,
+            "output_summary": [
+              "asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function",
+              "collected 0 items",
+              "",
+              "============================ no tests ran in 0.14s =============================",
+              ""
+            ]
+          },
+          "errors": [
+            "Some tests failed"
+          ],
+          "warnings": [],
+          "execution_time_ms": 0.0
+        },
+        "test_coverage": {
+          "passed": false,
+          "gate_name": "test_coverage",
+          "details": {
+            "coverage": 8.34807389937107,
+            "threshold": 80,
+            "lines_covered": 1692,
+            "lines_total": 16034
+          },
+          "errors": [
+            "Coverage 8.3% < threshold 80%"
+          ],
+          "warnings": [],
+          "execution_time_ms": 0.0
+        }
+      }
+    }
+  },
+  "total_execution_time_ms": 0.0,
+  "context_session_id": null,
+  "metrics_dashboard": null
+}
