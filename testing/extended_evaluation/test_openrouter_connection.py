@@ -20,22 +20,14 @@ sys.path.insert(0, str(project_root))
 
 async def test_openrouter_connection():
     """Test basic OpenRouter API connection."""
-    print("🔑 Testing OpenRouter API Connection")
-    print("=" * 50)
 
     # Check API key
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        print("❌ OPENROUTER_API_KEY environment variable not set")
-        print("💡 Run: ./testing/extended_evaluation/setup_api_key.sh")
         return False
 
     if api_key.startswith("sk-or-v1-placeholder"):
-        print("⚠️  Using placeholder API key - this will fail")
-        print("💡 Set your real OpenRouter API key to test connection")
         return False
-
-    print(f"✅ API Key found: {api_key[:12]}...")
 
     # Test API connection
     url = "https://openrouter.ai/api/v1/models"
@@ -46,7 +38,6 @@ async def test_openrouter_connection():
     }
 
     try:
-        print("\n🌐 Testing API connection...")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, timeout=10) as response:
                 if response.status == 200:
@@ -61,55 +52,36 @@ async def test_openrouter_connection():
                             break
 
                     if llama_model:
-                        print("✅ API connection successful")
-                        print("✅ Llama 3.3 8B Instruct model available")
-                        print(f"   Model ID: {llama_model['id']}")
-                        print(
-                            f"   Context Length: {llama_model.get('context_length', 'Unknown')}"
-                        )
-
                         # Check pricing
                         pricing = llama_model.get("pricing", {})
                         if (
                             pricing.get("prompt") == "0"
                             and pricing.get("completion") == "0"
                         ):
-                            print("✅ Model is free tier")
+                            pass
                         else:
-                            print(
-                                f"💰 Pricing - Prompt: ${pricing.get('prompt', 'Unknown')}, Completion: ${pricing.get('completion', 'Unknown')}"
-                            )
+                            pass
 
                         return True
-                    print("❌ Llama 3.3 8B Instruct model not found")
-                    print("Available models with 'llama' in name:")
                     for model in models:
                         if "llama" in model.get("id", "").lower():
-                            print(f"   - {model['id']}")
+                            pass
                     return False
 
-                print(f"❌ API request failed: {response.status}")
-                error_text = await response.text()
-                print(f"Error: {error_text}")
+                await response.text()
                 return False
 
-    except asyncio.TimeoutError:
-        print("❌ API request timed out")
-        print("💡 Check your internet connection")
+    except TimeoutError:
         return False
-    except Exception as e:
-        print(f"❌ API request failed: {e}")
+    except Exception:
         return False
 
 
 async def test_simple_completion():
     """Test a simple completion request."""
-    print("\n🧪 Testing Simple Completion")
-    print("=" * 50)
 
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key or api_key.startswith("sk-or-v1-placeholder"):
-        print("⚠️  Skipping completion test - need real API key")
         return False
 
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -133,51 +105,35 @@ async def test_simple_completion():
     }
 
     try:
-        print("📤 Sending test completion request...")
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                url, headers=headers, json=payload, timeout=30
-            ) as response:
-                if response.status == 200:
-                    data = await response.json()
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(url, headers=headers, json=payload, timeout=30) as response,
+        ):
+            if response.status == 200:
+                data = await response.json()
 
-                    if "choices" in data and len(data["choices"]) > 0:
-                        content = data["choices"][0]["message"]["content"]
-                        print("✅ Completion successful!")
-                        print(f"📝 Response: {content}")
+                if "choices" in data and len(data["choices"]) > 0:
+                    data["choices"][0]["message"]["content"]
 
-                        # Check usage stats
-                        usage = data.get("usage", {})
-                        if usage:
-                            print("📊 Token usage:")
-                            print(f"   Prompt tokens: {usage.get('prompt_tokens', 0)}")
-                            print(
-                                f"   Completion tokens: {usage.get('completion_tokens', 0)}"
-                            )
-                            print(f"   Total tokens: {usage.get('total_tokens', 0)}")
+                    # Check usage stats
+                    usage = data.get("usage", {})
+                    if usage:
+                        pass
 
-                        return True
-                    print("❌ No completion in response")
-                    print(f"Response: {data}")
-                    return False
-
-                print(f"❌ Completion request failed: {response.status}")
-                error_text = await response.text()
-                print(f"Error: {error_text}")
+                    return True
                 return False
 
-    except asyncio.TimeoutError:
-        print("❌ Completion request timed out")
+            await response.text()
+            return False
+
+    except TimeoutError:
         return False
-    except Exception as e:
-        print(f"❌ Completion request failed: {e}")
+    except Exception:
         return False
 
 
 async def main():
     """Run all connection tests."""
-    print("🚀 OpenRouter Connection Test for TTA Extended Evaluation")
-    print("=" * 70)
 
     # Test 1: Basic API connection
     connection_ok = await test_openrouter_connection()
@@ -188,38 +144,21 @@ async def main():
         completion_ok = await test_simple_completion()
 
     # Summary
-    print("\n" + "=" * 70)
-    print("📋 TEST SUMMARY")
-    print("=" * 70)
 
     if connection_ok:
-        print("✅ OpenRouter API connection: PASSED")
+        pass
     else:
-        print("❌ OpenRouter API connection: FAILED")
+        pass
 
-    if completion_ok:
-        print("✅ Llama 3.3 8B completion: PASSED")
-    elif connection_ok:
-        print("❌ Llama 3.3 8B completion: FAILED")
+    if completion_ok or connection_ok:
+        pass
     else:
-        print("⚠️  Llama 3.3 8B completion: SKIPPED (connection failed)")
+        pass
 
     if connection_ok and completion_ok:
-        print("\n🎉 ALL TESTS PASSED!")
-        print("✅ Ready to run TTA Extended Evaluation with Llama 3.3 8B")
-        print("\nNext steps:")
-        print(
-            "1. python testing/run_extended_evaluation.py --mode quick-sample --config testing/configs/production_extended_evaluation.yaml"
-        )
-        print(
-            "2. python testing/run_extended_evaluation.py --mode comprehensive --config testing/configs/production_extended_evaluation.yaml"
-        )
         return True
-    print("\n❌ TESTS FAILED")
-    print("💡 Fix the issues above before running extended evaluation")
     if not connection_ok:
-        print("💡 Make sure you have a valid OpenRouter API key")
-        print("💡 Run: ./testing/extended_evaluation/setup_api_key.sh")
+        pass
     return False
 
 

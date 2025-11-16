@@ -10,8 +10,7 @@ Tests:
 - Error handling and graceful degradation
 """
 
-from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -155,9 +154,7 @@ def test_filter_by_status(mock_registry):
         compatibility_statuses=[CompatibilityStatus.VERIFIED],
     )
     assert len(filtered) == 2
-    assert all(
-        m.compatibility_status == CompatibilityStatus.VERIFIED for m in filtered
-    )
+    assert all(m.compatibility_status == CompatibilityStatus.VERIFIED for m in filtered)
 
 
 def test_filter_by_provider(mock_registry):
@@ -205,8 +202,7 @@ def test_filter_exclude_incompatible(mock_registry):
         exclude_incompatible=True,
     )
     assert all(
-        m.compatibility_status != CompatibilityStatus.INCOMPATIBLE
-        for m in filtered
+        m.compatibility_status != CompatibilityStatus.INCOMPATIBLE for m in filtered
     )
 
 
@@ -339,4 +335,3 @@ def test_model_selection_integration():
 
     # Verify all models have openrouter/ prefix
     assert all(model_id.startswith("openrouter/") for model_id in chain)
-

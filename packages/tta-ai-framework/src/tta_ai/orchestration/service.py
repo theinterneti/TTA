@@ -190,9 +190,7 @@ class AgentOrchestrationService:
 
             # Determine workflow type if not specified
             if workflow_type is None:
-                workflow_type = await self._determine_workflow_type(
-                    user_input, session_context
-                )
+                workflow_type = await self._determine_workflow_type(user_input, session_context)
 
             # Create orchestration request
             request = OrchestrationRequest(
@@ -228,9 +226,7 @@ class AgentOrchestrationService:
             self._error_count += 1
             logger.error(f"Error processing user input: {e}")
 
-            if isinstance(
-                e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)
-            ):
+            if isinstance(e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)):
                 raise
             raise ServiceError(f"Unexpected error during processing: {e}") from e
 
@@ -284,9 +280,7 @@ class AgentOrchestrationService:
                 logger.error(f"Workflow execution failed: {error}")
                 raise WorkflowExecutionError(f"Workflow execution failed: {error}")
 
-            logger.info(
-                f"Successfully coordinated agents for {workflow_type.value} workflow"
-            )
+            logger.info(f"Successfully coordinated agents for {workflow_type.value} workflow")
             return response, run_id, error
 
         except Exception as e:
@@ -319,9 +313,7 @@ class AgentOrchestrationService:
             }
 
             if self.crisis_intervention_manager:
-                metrics["crisis_manager"] = (
-                    self.crisis_intervention_manager.get_crisis_metrics()
-                )
+                metrics["crisis_manager"] = self.crisis_intervention_manager.get_crisis_metrics()
 
             if self.emergency_protocol_engine:
                 metrics["emergency_protocols"] = (
@@ -358,9 +350,7 @@ class AgentOrchestrationService:
         """Generate comprehensive safety report."""
         try:
             if self.safety_monitoring_dashboard:
-                return self.safety_monitoring_dashboard.get_safety_report(
-                    time_range_hours
-                )
+                return self.safety_monitoring_dashboard.get_safety_report(time_range_hours)
             return {"error": "Safety monitoring dashboard not available"}
         except Exception as e:
             logger.error(f"Error generating safety report: {e}")
@@ -381,8 +371,7 @@ class AgentOrchestrationService:
                 "request_count": self._request_count,
                 "error_count": self._error_count,
                 "error_rate": self._error_count / max(self._request_count, 1),
-                "avg_processing_time": self._total_processing_time
-                / max(self._request_count, 1),
+                "avg_processing_time": self._total_processing_time / max(self._request_count, 1),
             },
             "components": {
                 "workflow_manager": self.workflow_manager is not None,
@@ -392,13 +381,10 @@ class AgentOrchestrationService:
                 "resource_manager": self.resource_manager is not None,
                 "optimization_engine": self.optimization_engine is not None,
                 "neo4j_manager": self.neo4j_manager is not None,
-                "crisis_intervention_manager": self.crisis_intervention_manager
-                is not None,
+                "crisis_intervention_manager": self.crisis_intervention_manager is not None,
                 "emergency_protocol_engine": self.emergency_protocol_engine is not None,
-                "human_oversight_escalation": self.human_oversight_escalation
-                is not None,
-                "safety_monitoring_dashboard": self.safety_monitoring_dashboard
-                is not None,
+                "human_oversight_escalation": self.human_oversight_escalation is not None,
+                "safety_monitoring_dashboard": self.safety_monitoring_dashboard is not None,
             },
         }
 
@@ -412,9 +398,7 @@ class AgentOrchestrationService:
         try:
             # Cancel active workflows
             for session_id, run_id in self._active_workflows.items():
-                logger.info(
-                    f"Cancelling active workflow {run_id} for session {session_id}"
-                )
+                logger.info(f"Cancelling active workflow {run_id} for session {session_id}")
                 # Note: Actual cancellation would depend on WorkflowManager implementation
 
             # Clear state
@@ -440,12 +424,8 @@ class AgentOrchestrationService:
             collaborative_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.COLLABORATIVE,
                 agent_sequence=[
-                    AgentStep(
-                        agent=AgentType.IPA, name="input_processing", timeout_seconds=10
-                    ),
-                    AgentStep(
-                        agent=AgentType.WBA, name="world_building", timeout_seconds=15
-                    ),
+                    AgentStep(agent=AgentType.IPA, name="input_processing", timeout_seconds=10),
+                    AgentStep(agent=AgentType.WBA, name="world_building", timeout_seconds=15),
                     AgentStep(
                         agent=AgentType.NGA,
                         name="narrative_generation",
@@ -465,9 +445,7 @@ class AgentOrchestrationService:
             input_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.INPUT_PROCESSING,
                 agent_sequence=[
-                    AgentStep(
-                        agent=AgentType.IPA, name="input_processing", timeout_seconds=10
-                    ),
+                    AgentStep(agent=AgentType.IPA, name="input_processing", timeout_seconds=10),
                 ],
                 error_handling=ErrorHandlingStrategy.FAIL_FAST,
             )
@@ -482,9 +460,7 @@ class AgentOrchestrationService:
             world_building_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.WORLD_BUILDING,
                 agent_sequence=[
-                    AgentStep(
-                        agent=AgentType.WBA, name="world_building", timeout_seconds=15
-                    ),
+                    AgentStep(agent=AgentType.WBA, name="world_building", timeout_seconds=15),
                 ],
                 error_handling=ErrorHandlingStrategy.RETRY,
             )
@@ -512,9 +488,7 @@ class AgentOrchestrationService:
                 "narrative_generation", narrative_workflow
             )
             if not success:
-                logger.warning(
-                    f"Failed to register narrative generation workflow: {error}"
-                )
+                logger.warning(f"Failed to register narrative generation workflow: {error}")
 
             logger.info("Default workflows registered successfully")
 
@@ -575,9 +549,7 @@ class AgentOrchestrationService:
                     safety_level = validation_result.get("level", "unknown")
                     reason = validation_result.get("reason", "Safety validation failed")
                     crisis_detected = validation_result.get("crisis_detected", False)
-                    escalation_recommended = validation_result.get(
-                        "escalation_recommended", False
-                    )
+                    escalation_recommended = validation_result.get("escalation_recommended", False)
                     alternative_content = validation_result.get("alternative_content")
 
                     logger.warning(
@@ -587,13 +559,9 @@ class AgentOrchestrationService:
 
                     # For blocked content or crisis situations, raise an error with alternative
                     if safety_level == "blocked" or crisis_detected:
-                        error_message = (
-                            f"Content blocked due to safety concerns: {reason}"
-                        )
+                        error_message = f"Content blocked due to safety concerns: {reason}"
                         if alternative_content:
-                            error_message += (
-                                f"\n\nSuggested response: {alternative_content}"
-                            )
+                            error_message += f"\n\nSuggested response: {alternative_content}"
 
                         raise TherapeuticSafetyError(error_message)
 
@@ -636,9 +604,7 @@ class AgentOrchestrationService:
                 "session_count": getattr(session_context, "session_count", 0),
                 "previous_violations": getattr(session_context, "safety_violations", 0),
                 "therapeutic_session": True,
-                "previous_crisis_indicators": getattr(
-                    session_context, "crisis_indicators", False
-                ),
+                "previous_crisis_indicators": getattr(session_context, "crisis_indicators", False),
             }
 
             # Perform comprehensive validation
@@ -646,9 +612,7 @@ class AgentOrchestrationService:
 
             # Check if we should alert on this result
             should_alert = (
-                validator.should_alert(result)
-                if hasattr(validator, "should_alert")
-                else False
+                validator.should_alert(result) if hasattr(validator, "should_alert") else False
             )
 
             # Convert to expected format
@@ -681,12 +645,8 @@ class AgentOrchestrationService:
                         crisis_context = {
                             "session_id": session_context.session_id,
                             "user_id": getattr(session_context, "user_id", "unknown"),
-                            "session_count": getattr(
-                                session_context, "interaction_count", 0
-                            ),
-                            "previous_violations": getattr(
-                                session_context, "safety_violations", 0
-                            ),
+                            "session_count": getattr(session_context, "interaction_count", 0),
+                            "previous_violations": getattr(session_context, "safety_violations", 0),
                             "location": getattr(session_context, "location", "unknown"),
                         }
 
@@ -694,19 +654,14 @@ class AgentOrchestrationService:
                         assessment = self.crisis_intervention_manager.assess_crisis(
                             result, crisis_context
                         )
-                        intervention = (
-                            self.crisis_intervention_manager.initiate_intervention(
-                                assessment,
-                                session_context.session_id,
-                                crisis_context["user_id"],
-                            )
+                        intervention = self.crisis_intervention_manager.initiate_intervention(
+                            assessment,
+                            session_context.session_id,
+                            crisis_context["user_id"],
                         )
 
                         # Handle escalation if required
-                        if (
-                            assessment.escalation_required
-                            and self.human_oversight_escalation
-                        ):
+                        if assessment.escalation_required and self.human_oversight_escalation:
                             if assessment.crisis_level.value == "critical":
                                 self.human_oversight_escalation.escalate_to_emergency_services(
                                     intervention, "mental_health"
@@ -735,9 +690,7 @@ class AgentOrchestrationService:
                                 ),
                                 {
                                     "intervention_id": intervention.intervention_id,
-                                    "crisis_types": [
-                                        ct.value for ct in assessment.crisis_types
-                                    ],
+                                    "crisis_types": [ct.value for ct in assessment.crisis_types],
                                     "crisis_level": assessment.crisis_level.value,
                                 },
                             )
@@ -899,9 +852,7 @@ class AgentOrchestrationService:
         try:
             # Update context with response data
             if response.updated_context:
-                session_context.context.memory.update(
-                    response.updated_context.get("memory", {})
-                )
+                session_context.context.memory.update(response.updated_context.get("memory", {}))
                 session_context.context.world_state.update(
                     response.updated_context.get("world_state", {})
                 )

@@ -1,0 +1,104 @@
+version: "3.8"
+
+# Simplified TTA Development Setup
+# Single instances with logical data separation
+
+services:
+  # Single Neo4j instance for all environments
+  neo4j:
+    image: neo4j:5.26.1-community
+    container_name: tta-neo4j
+    ports:
+      - "7474:7474" # HTTP browser
+      - "7687:7687" # Bolt protocol
+    environment:
+      - NEO4J_AUTH=neo4j/tta_password_2024
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
+      - NEO4J_dbms_memory_heap_initial__size=1G
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=512m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+      - neo4j_plugins:/plugins
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - tta-network
+
+  # Single Redis instance for all environments
+  redis:
+    image: redis:7-alpine
+    container_name: tta-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru --databases 16
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - tta-network
+
+  # Redis Commander - GUI for Redis
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: tta-redis-commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - tta-network
+
+  # Grafana for monitoring (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: tta-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    profiles:
+      - monitoring
+    networks:
+      - tta-network
+
+volumes:
+  neo4j_data:
+    name: tta_neo4j_data
+  neo4j_logs:
+    name: tta_neo4j_logs
+  neo4j_import:
+    name: tta_neo4j_import
+  neo4j_plugins:
+    name: tta_neo4j_plugins
+  redis_data:
+    name: tta_redis_data
+  grafana_data:
+    name: tta_grafana_data
+
+networks:
+  tta-network:
+    name: tta-network
+    driver: bridge

@@ -54,6 +54,5 @@ class CallableRegistry:
         """
         with self._lock:
             return {
-                n: {v: repr(fn) for v, fn in versions.items()}
-                for n, versions in self._map.items()
+                n: {v: repr(fn) for v, fn in versions.items()} for n, versions in self._map.items()
             }

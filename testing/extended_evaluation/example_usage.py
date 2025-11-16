@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 
 async def example_single_extended_test():
     """Example: Run a single extended test with custom configuration."""
-    print("=== Example: Single Extended Test ===")
 
     # Initialize framework
     framework = ExtendedSessionTestFramework()
@@ -70,33 +69,21 @@ async def example_single_extended_test():
         first_model = next(iter(framework.models.values()))
         first_scenario = next(iter(framework.extended_scenarios.values()))
 
-        print("Running test with:")
-        print(f"  Model: {first_model.name}")
-        print(f"  Profile: {custom_profile.name}")
-        print(
-            f"  Scenario: {first_scenario.name} ({first_scenario.target_turns} turns)"
-        )
-
         # Run the test
         result = await framework._run_single_extended_test(
             first_model, custom_profile, first_scenario
         )
 
         # Display results
-        print("\nTest Results:")
-        print(f"  Session ID: {result.session_id}")
-        print(f"  Completed Turns: {result.completed_turns}/{result.total_turns}")
-        print(f"  Duration: {result.session_duration_minutes:.1f} minutes")
-        print(f"  Errors: {result.error_count}")
 
         if result.overall_quality_score:
-            print(f"  Overall Quality: {result.overall_quality_score:.2f}/10")
+            pass
 
         if result.strengths:
-            print(f"  Strengths: {', '.join(result.strengths)}")
+            pass
 
         if result.recommendations:
-            print(f"  Recommendations: {', '.join(result.recommendations)}")
+            pass
 
     except Exception as e:
         logger.error(f"Single test failed: {e}")
@@ -106,14 +93,13 @@ async def example_single_extended_test():
 
 async def example_custom_scenario_test():
     """Example: Create and test a custom scenario."""
-    print("\n=== Example: Custom Scenario Test ===")
 
     from testing.extended_evaluation.extended_session_framework import (
         ExtendedSessionScenario,
     )
 
     # Create a custom scenario
-    custom_scenario = ExtendedSessionScenario(
+    ExtendedSessionScenario(
         name="Custom Mystery Scenario",
         description="A custom mystery scenario for testing",
         target_turns=20,
@@ -140,18 +126,11 @@ async def example_custom_scenario_test():
         pacing_preference="moderate",
     )
 
-    print(f"Created custom scenario: {custom_scenario.name}")
-    print(f"  Target turns: {custom_scenario.target_turns}")
-    print(f"  Key decision points: {len(custom_scenario.key_decision_points)}")
-    print(f"  Success criteria: {custom_scenario.success_criteria}")
-
     # This scenario could be added to a framework and tested
-    print("  (Scenario ready for testing with framework)")
 
 
 async def example_data_analysis():
     """Example: Analyze existing evaluation data."""
-    print("\n=== Example: Data Analysis ===")
 
     try:
         # Initialize reporter
@@ -163,33 +142,19 @@ async def example_data_analysis():
         # Generate data summary
         summary = await reporter.generate_data_summary()
 
-        print("Data Summary:")
-        print(f"  Total Sessions: {summary['total_sessions']}")
-        print(f"  Total Turns: {summary['total_turns']}")
-        print(f"  Total Errors: {summary['total_errors']}")
-        print(f"  Avg Session Duration: {summary['avg_session_duration']:.1f} minutes")
-        print(f"  Avg Turns per Session: {summary['avg_turns_per_session']:.1f}")
-
         if summary["total_sessions"] > 0:
             # Generate comprehensive report
-            print("\nGenerating comprehensive analysis report...")
             report = await reporter.generate_comprehensive_report()
 
-            print(f"Report Generated: {report.report_id}")
-            print(f"  Models Analyzed: {len(report.model_analyses)}")
-            print(f"  Profiles Analyzed: {len(report.profile_analyses)}")
-
             if report.key_findings:
-                print(f"  Key Findings: {len(report.key_findings)}")
-                for finding in report.key_findings[:2]:
-                    print(f"    • {finding}")
+                for _finding in report.key_findings[:2]:
+                    pass
 
             # Generate visualizations
-            viz_files = await reporter.generate_visualizations(report)
-            print(f"  Visualizations: {len(viz_files)} files generated")
+            await reporter.generate_visualizations(report)
 
         else:
-            print("No evaluation data found. Run evaluation first.")
+            pass
 
     except Exception as e:
         logger.error(f"Data analysis failed: {e}")
@@ -197,7 +162,6 @@ async def example_data_analysis():
 
 async def example_user_behavior_simulation():
     """Example: Demonstrate user behavior simulation."""
-    print("\n=== Example: User Behavior Simulation ===")
 
     # Create different user profiles
     profiles = [
@@ -249,23 +213,9 @@ async def example_user_behavior_simulation():
 
     # Simulate behavior for each profile
     for profile in profiles:
-        print(f"\nProfile: {profile.name}")
-        print(
-            f"  Decision Style: {profile.behavior_pattern.decision_making_style.value}"
-        )
-        print(
-            f"  Interaction Style: {profile.behavior_pattern.interaction_style.value}"
-        )
-        print(
-            f"  Narrative Preference: {profile.behavior_pattern.narrative_preference.value}"
-        )
-
         # Simulate thinking time for different decision complexities
         for complexity in ["simple", "moderate", "complex"]:
-            thinking_time = profile.get_thinking_time(complexity)
-            print(
-                f"  {complexity.title()} Decision Thinking Time: {thinking_time:.1f}s"
-            )
+            profile.get_thinking_time(complexity)
 
         # Simulate response generation
         context = {
@@ -274,27 +224,17 @@ async def example_user_behavior_simulation():
             "choices": ["investigate", "retreat", "ask_questions"],
         }
 
-        response = profile.generate_response(context, turn=5)
-        print(f"  Sample Response: '{response}'")
+        profile.generate_response(context, turn=5)
 
 
 async def main():
     """Run all examples."""
-    print("TTA Extended Session Quality Evaluation Framework - Examples")
-    print("=" * 70)
 
     # Run examples
     await example_single_extended_test()
     await example_custom_scenario_test()
     await example_data_analysis()
     await example_user_behavior_simulation()
-
-    print("\n" + "=" * 70)
-    print("Examples completed!")
-    print("\nTo run the full framework:")
-    print("  python testing/run_extended_evaluation.py --mode status")
-    print("  python testing/run_extended_evaluation.py --mode quick-sample")
-    print("  python testing/run_extended_evaluation.py --mode comprehensive")
 
 
 if __name__ == "__main__":

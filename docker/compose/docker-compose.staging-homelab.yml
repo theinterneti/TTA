@@ -1,0 +1,447 @@
+# TTA Staging Environment for Homelab Infrastructure
+# Comprehensive setup for production-like testing and validation
+
+networks:
+  tta-staging:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/16
+    labels:
+      - "com.tta.environment=staging"
+      - "com.tta.purpose=homelab-testing"
+
+volumes:
+  # Database volumes
+  neo4j-staging-data:
+    driver: local
+    labels:
+      - "com.tta.service=neo4j"
+      - "com.tta.environment=staging"
+  neo4j-staging-logs:
+    driver: local
+  neo4j-staging-conf:
+    driver: local
+  redis-staging-data:
+    driver: local
+    labels:
+      - "com.tta.service=redis"
+      - "com.tta.environment=staging"
+  postgres-staging-data:
+    driver: local
+    labels:
+      - "com.tta.service=postgres"
+      - "com.tta.environment=staging"
+
+  # Monitoring volumes
+  grafana-staging-data:
+    driver: local
+  prometheus-staging-data:
+    driver: local
+
+  # Application volumes
+  app-staging-logs:
+    driver: local
+  app-staging-cache:
+    driver: local
+
+services:
+  # =============================================================================
+  # MONITORING SERVICES
+  # =============================================================================
+
+  # Health Check Service - Provides Prometheus metrics for all TTA services
+  health-check-staging:
+    build:
+      context: ./monitoring/health-check-service
+      dockerfile: Dockerfile
+    container_name: tta-staging-health-check
+    networks:
+      - tta-staging
+    ports:
+      - "8090:8080"
+    environment:
+      - TTA_ENVIRONMENT=staging
+    volumes:
+      - ./monitoring/health-check-service/config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+    depends_on:
+      - redis-staging
+      - neo4j-staging
+      - postgres-staging
+    labels:
+      - "com.tta.service=health-check"
+      - "com.tta.environment=staging"
+      - "com.tta.purpose=monitoring"
+
+  # =============================================================================
+  # DATABASE SERVICES
+  # =============================================================================
+
+  # Neo4j Knowledge Graph Database - Staging
+  neo4j-staging:
+    image: neo4j:5.13.0
+    container_name: tta-staging-neo4j
+    ports:
+      - "7475:7474" # HTTP browser interface (different port for staging)
+      - "7688:7687" # Bolt port (different port for staging)
+    volumes:
+      - neo4j-staging-data:/data
+      - neo4j-staging-logs:/logs
+      - neo4j-staging-conf:/conf
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_STAGING_PASSWORD:-staging_neo4j_secure_pass}
+      NEO4J_PLUGINS: "apoc,graph-data-science"
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*,gds.*
+      NEO4J_server_memory_heap_initial__size: 1G
+      NEO4J_server_memory_heap_max__size: 4G
+      NEO4J_server_memory_pagecache_size: 2G
+      NEO4J_dbms_default__listen__address: 0.0.0.0
+      NEO4J_dbms_connector_bolt_listen__address: 0.0.0.0:7687
+      NEO4J_dbms_connector_http_listen__address: 0.0.0.0:7474
+      NEO4J_dbms_logs_debug_level: INFO
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "cypher-shell -u neo4j -p staging_neo4j_secure_pass_2024 'RETURN 1' || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "com.tta.service=neo4j"
+      - "com.tta.environment=staging"
+      - "com.tta.monitoring=enabled"
+
+  # Redis Cache and Session Store - Staging
+  redis-staging:
+    image: redis:7.2-alpine
+    container_name: tta-staging-redis
+    ports:
+      - "6380:6379" # Different port for staging
+    volumes:
+      - redis-staging-data:/data
+      - ./config/redis-staging.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    environment:
+      REDIS_PASSWORD: ${REDIS_STAGING_PASSWORD:-staging_redis_secure_pass}
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "com.tta.service=redis"
+      - "com.tta.environment=staging"
+      - "com.tta.monitoring=enabled"
+
+  # PostgreSQL Database - Staging
+  postgres-staging:
+    image: postgres:15-alpine
+    container_name: tta-staging-postgres
+    ports:
+      - "5433:5432" # Different port for staging
+    volumes:
+      - postgres-staging-data:/var/lib/postgresql/data
+      - ./config/postgres-staging-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    environment:
+      POSTGRES_DB: ${POSTGRES_STAGING_DB:-tta_staging}
+      POSTGRES_USER: ${POSTGRES_STAGING_USER:-tta_staging_user}
+      POSTGRES_PASSWORD: ${POSTGRES_STAGING_PASSWORD:-staging_postgres_secure_pass}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_STAGING_USER:-tta_staging_user} -d ${POSTGRES_STAGING_DB:-tta_staging}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "com.tta.service=postgres"
+      - "com.tta.environment=staging"
+      - "com.tta.monitoring=enabled"
+
+  # =============================================================================
+  # APPLICATION SERVICES
+  # =============================================================================
+
+  # TTA Player Experience API - Staging
+  player-api-staging:
+    build:
+      context: .
+      dockerfile: src/player_experience/api/Dockerfile.staging
+      args:
+        ENVIRONMENT: staging
+    container_name: tta-staging-player-api
+    ports:
+      - "8081:8080" # Different port for staging
+    volumes:
+      - app-staging-logs:/app/logs
+      - app-staging-cache:/app/cache
+      - ./config/staging:/app/config:ro
+    environment:
+      - ENVIRONMENT=staging
+      - API_HOST=0.0.0.0
+      - API_PORT=8080
+      - DATABASE_URL=postgresql://${POSTGRES_STAGING_USER:-tta_staging_user}:${POSTGRES_STAGING_PASSWORD:-staging_postgres_secure_pass}@postgres-staging:5432/${POSTGRES_STAGING_DB:-tta_staging}
+      - REDIS_URL=redis://:${REDIS_STAGING_PASSWORD:-staging_redis_secure_pass}@redis-staging:6379
+      - NEO4J_URI=bolt://neo4j-staging:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=${NEO4J_STAGING_PASSWORD:-staging_neo4j_secure_pass}
+      - OPENROUTER_API_KEY=${OPENROUTER_STAGING_API_KEY}
+      - JWT_SECRET_KEY=${JWT_STAGING_SECRET_KEY:-staging_jwt_secret_key_minimum_32_chars_secure}
+      - API_CORS_ORIGINS=http://localhost:3001,http://localhost:8081,https://staging.tta-homelab.local
+      - MAX_CONCURRENT_SESSIONS=100
+      - LOG_LEVEL=INFO
+      - SENTRY_DSN=${SENTRY_STAGING_DSN}
+      - PROMETHEUS_METRICS_ENABLED=true
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+      neo4j-staging:
+        condition: service_healthy
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "com.tta.service=player-api"
+      - "com.tta.environment=staging"
+      - "com.tta.monitoring=enabled"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+
+  # TTA Player Frontend - Staging
+  player-frontend-staging:
+    build:
+      context: ./src/player_experience/frontend
+      dockerfile: Dockerfile.staging
+      args:
+        # Use host-mapped port for browser access (client-side SPA runs in browser, not container)
+        # Browser cannot resolve Docker network hostnames like 'player-api-staging'
+        REACT_APP_API_URL: http://localhost:8081
+        REACT_APP_WS_URL: ws://localhost:8081
+        REACT_APP_ENVIRONMENT: staging
+        CACHE_BUST: ${CACHE_BUST:-$(date +%s)} # Cache-busting with timestamp
+    container_name: tta-staging-player-frontend
+    ports:
+      - "3001:3000" # Different port for staging
+    environment:
+      - NODE_ENV=development
+      # Note: REACT_APP_ variables are baked in at build time, these are for runtime reference only
+      - REACT_APP_API_URL=http://localhost:8081
+      - REACT_APP_WS_URL=ws://localhost:8081
+      - REACT_APP_ENVIRONMENT=staging
+      - REACT_APP_SENTRY_DSN=${SENTRY_STAGING_DSN}
+      - REACT_APP_ANALYTICS_ENABLED=true
+      - NODE_OPTIONS=--max-old-space-size=4096 # Increase Node.js memory limit to 4GB
+    depends_on:
+      - player-api-staging
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s # Increased from 40s to 60s for webpack compilation
+    labels:
+      - "com.tta.service=player-frontend"
+      - "com.tta.environment=staging"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G # Increased from 512M to 4G for webpack-dev-server
+        reservations:
+          cpus: "1.0"
+          memory: 2G # Increased from 256M to 2G
+
+  # =============================================================================
+  # MONITORING AND OBSERVABILITY
+  # =============================================================================
+
+  # Prometheus Metrics Collection - Staging
+  prometheus-staging:
+    image: prom/prometheus:v2.48.1:latest
+    container_name: tta-staging-prometheus
+    ports:
+      - "9091:9090" # Different port for staging
+    volumes:
+      - prometheus-staging-data:/prometheus
+      - ./monitoring/prometheus-staging.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/rules-staging:/etc/prometheus/rules:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+      - "--storage.tsdb.retention.size=10GB"
+      - "--storage.tsdb.wal-compression"
+      - "--web.enable-lifecycle"
+      - "--web.enable-admin-api"
+      - "--web.listen-address=0.0.0.0:9090"
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "com.tta.service=prometheus"
+      - "com.tta.environment=staging"
+
+  # Grafana Dashboards - Staging
+  grafana-staging:
+    image: grafana/grafana:10.2.3:10.2.3
+    container_name: tta-staging-grafana
+    ports:
+      - "3003:3000" # Different port for staging
+    volumes:
+      - grafana-staging-data:/var/lib/grafana
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=tta-admin-2024
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel
+      - GF_SERVER_HTTP_ADDR=0.0.0.0
+      - GF_SERVER_HTTP_PORT=3000
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
+    depends_on:
+      - prometheus-staging
+      - health-check-staging
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "com.tta.service=grafana"
+      - "com.tta.environment=staging"
+
+  # =============================================================================
+  # LOAD BALANCER AND REVERSE PROXY
+  # =============================================================================
+
+  # Nginx Load Balancer - Staging
+  nginx-staging:
+    image: nginx:alpine
+    container_name: tta-staging-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/staging.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl-staging:/etc/nginx/ssl:ro
+      - ./nginx/logs-staging:/var/log/nginx
+    depends_on:
+      - player-api-staging
+      - player-frontend-staging
+      - grafana-staging
+    networks:
+      - tta-staging
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "com.tta.service=nginx"
+      - "com.tta.environment=staging"
+      - "com.tta.role=load-balancer"
+
+  # =============================================================================
+  # TESTING AND VALIDATION SERVICES
+  # =============================================================================
+
+  # Multi-User Testing Service
+  testing-service-staging:
+    build:
+      context: ./testing
+      dockerfile: Dockerfile.staging
+    container_name: tta-staging-testing-service
+    ports:
+      - "8082:8000"
+    volumes:
+      - ./testing/results-staging:/app/results
+      - ./testing/configs-staging:/app/configs:ro
+    environment:
+      - ENVIRONMENT=staging
+      - TARGET_API_URL=http://player-api-staging:8080
+      - TARGET_FRONTEND_URL=http://player-frontend-staging:3000
+      - CONCURRENT_USERS=50
+      - TEST_DURATION=3600
+      - RESULTS_DIR=/app/results
+    depends_on:
+      - player-api-staging
+      - player-frontend-staging
+    networks:
+      - tta-staging
+    restart: "no" # Only run when explicitly started
+    labels:
+      - "com.tta.service=testing"
+      - "com.tta.environment=staging"
+      - "com.tta.purpose=validation"

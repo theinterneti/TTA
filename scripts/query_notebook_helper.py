@@ -90,9 +90,6 @@ async def quick_query(question: str) -> None:
 def main():
     """Command-line entry point."""
     if len(sys.argv) < 2:
-        print(
-            "Usage: uv run python scripts/query_notebook_helper.py 'Your question here'"
-        )  # noqa: T201
         print()  # noqa: T201
         print("Examples:")  # noqa: T201
         print("  'What are the three layers of the AI-Native framework?'")  # noqa: T201

@@ -8,7 +8,7 @@ and error propagation.
 from __future__ import annotations
 
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -32,7 +32,9 @@ def retry_config() -> RetryConfig:
 
 
 @pytest.fixture
-def adapter(retry_config: RetryConfig, openhands_config: OpenHandsConfig) -> OpenHandsAdapter:
+def adapter(
+    retry_config: RetryConfig, openhands_config: OpenHandsConfig
+) -> OpenHandsAdapter:
     """Create test adapter instance."""
     client = OpenHandsClient(openhands_config)
     return OpenHandsAdapter(
@@ -43,7 +45,9 @@ def adapter(retry_config: RetryConfig, openhands_config: OpenHandsConfig) -> Ope
 
 
 @pytest.fixture
-def adapter_no_fallback(retry_config: RetryConfig, openhands_config: OpenHandsConfig) -> OpenHandsAdapter:
+def adapter_no_fallback(
+    retry_config: RetryConfig, openhands_config: OpenHandsConfig
+) -> OpenHandsAdapter:
     """Create test adapter instance without fallback."""
     client = OpenHandsClient(openhands_config)
     return OpenHandsAdapter(
@@ -56,14 +60,18 @@ def adapter_no_fallback(retry_config: RetryConfig, openhands_config: OpenHandsCo
 class TestOpenHandsAdapter:
     """Tests for OpenHandsAdapter."""
 
-    def test_adapter_initialization(self, adapter: OpenHandsAdapter, retry_config: RetryConfig):
+    def test_adapter_initialization(
+        self, adapter: OpenHandsAdapter, retry_config: RetryConfig
+    ):
         """Test adapter initialization with retry config."""
         assert adapter.fallback_to_mock is True
         assert adapter.retry_config == retry_config
         assert adapter.retry_config.max_retries == 3
         assert adapter.retry_config.base_delay == 0.1
 
-    def test_adapter_initialization_no_fallback(self, adapter_no_fallback: OpenHandsAdapter):
+    def test_adapter_initialization_no_fallback(
+        self, adapter_no_fallback: OpenHandsAdapter
+    ):
         """Test adapter initialization without fallback."""
         assert adapter_no_fallback.fallback_to_mock is False
 
@@ -78,7 +86,9 @@ class TestOpenHandsAdapter:
         task = "Write a Python function to calculate fibonacci numbers"
 
         # Mock client to return success
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.return_value = OpenHandsTaskResult(
                 success=True,
                 output="def fibonacci(n): ...",
@@ -106,7 +116,9 @@ class TestOpenHandsAdapter:
         task = "Write a Python function"
 
         # Mock client to fail first (exception), then succeed
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.side_effect = [
                 # First attempt raises exception (triggers retry)
                 Exception("Connection timeout"),
@@ -139,7 +151,9 @@ class TestOpenHandsAdapter:
         task = "Write a Python function"
 
         # Mock client to always fail
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.side_effect = Exception("SDK error")
 
             result = await adapter.execute_development_task(
@@ -162,7 +176,9 @@ class TestOpenHandsAdapter:
         task = "Write a Python function"
 
         # Mock client to fail
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.side_effect = Exception("SDK error")
 
             # Should raise exception when fallback is disabled
@@ -182,7 +198,9 @@ class TestOpenHandsAdapter:
         task = "Write a Python function"
 
         # Mock client to always raise exception (triggers retry until exhaustion)
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.side_effect = Exception("Persistent error")
 
             # Should raise AgentCommunicationError after all retries exhausted (no fallback)
@@ -204,7 +222,9 @@ class TestOpenHandsAdapter:
         task = "Write a Python function"
         custom_timeout = 120.0
 
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.return_value = OpenHandsTaskResult(
                 success=True,
                 output="def function(): pass",
@@ -221,7 +241,7 @@ class TestOpenHandsAdapter:
             # Verify timeout was passed to client
             mock_execute.assert_called_once()
             call_kwargs = mock_execute.call_args.kwargs
-            assert call_kwargs.get('timeout') == custom_timeout
+            assert call_kwargs.get("timeout") == custom_timeout
 
     @pytest.mark.asyncio
     async def test_execute_task_with_workspace(
@@ -234,7 +254,9 @@ class TestOpenHandsAdapter:
         custom_workspace = test_workspace / "custom"
         custom_workspace.mkdir()
 
-        with patch.object(OpenHandsClient, 'execute_task', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            OpenHandsClient, "execute_task", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.return_value = OpenHandsTaskResult(
                 success=True,
                 output="def function(): pass",
@@ -251,5 +273,4 @@ class TestOpenHandsAdapter:
             # Verify workspace was passed to client
             mock_execute.assert_called_once()
             call_kwargs = mock_execute.call_args.kwargs
-            assert call_kwargs.get('workspace_path') == custom_workspace
-
+            assert call_kwargs.get("workspace_path") == custom_workspace

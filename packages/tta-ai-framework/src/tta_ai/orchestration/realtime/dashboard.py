@@ -89,9 +89,7 @@ class RealtimeDashboardManager:
         if ALERTING_AVAILABLE:
             try:
                 self.alert_manager = get_alert_manager()
-                self.alert_manager.add_notification_handler(
-                    self._handle_alert_notification
-                )
+                self.alert_manager.add_notification_handler(self._handle_alert_notification)
             except Exception as e:
                 logger.warning(f"Could not initialize alert manager: {e}")
 
@@ -149,9 +147,7 @@ class RealtimeDashboardManager:
         for dashboard_type in dashboard_types:
             await self._send_dashboard_snapshot(connection_id, dashboard_type)
 
-        logger.debug(
-            f"Connection {connection_id} subscribed to dashboards: {dashboard_types}"
-        )
+        logger.debug(f"Connection {connection_id} subscribed to dashboards: {dashboard_types}")
         return True
 
     async def unsubscribe_from_dashboard(
@@ -239,9 +235,7 @@ class RealtimeDashboardManager:
                 "uptime": metrics.get("uptime", 0.0),
                 "health_status": self._determine_health_status(metrics),
             },
-            metadata={
-                "update_count": self.update_counts.get(DashboardType.SYSTEM_HEALTH, 0)
-            },
+            metadata={"update_count": self.update_counts.get(DashboardType.SYSTEM_HEALTH, 0)},
         )
 
         await self._store_and_broadcast_data(dashboard_data)
@@ -271,9 +265,7 @@ class RealtimeDashboardManager:
                     }
                     for agent_id, metrics in agent_metrics.items()
                 },
-                "performance_summary": self._calculate_performance_summary(
-                    agent_metrics
-                ),
+                "performance_summary": self._calculate_performance_summary(agent_metrics),
             },
         )
 
@@ -436,9 +428,7 @@ class RealtimeDashboardManager:
                 "avg_error_rate": 0.0,
             }
 
-        response_times = [
-            m.get("response_time_avg", 0.0) for m in agent_metrics.values()
-        ]
+        response_times = [m.get("response_time_avg", 0.0) for m in agent_metrics.values()]
         throughputs = [m.get("throughput_rps", 0.0) for m in agent_metrics.values()]
         error_rates = [m.get("error_rate", 0.0) for m in agent_metrics.values()]
 
@@ -466,9 +456,7 @@ class RealtimeDashboardManager:
                     "value": alert.value,
                     "threshold": alert.threshold,
                     "started_at": alert.started_at.isoformat(),
-                    "resolved_at": (
-                        alert.resolved_at.isoformat() if alert.resolved_at else None
-                    ),
+                    "resolved_at": (alert.resolved_at.isoformat() if alert.resolved_at else None),
                     "labels": alert.labels,
                     "annotations": alert.annotations,
                 },
@@ -517,9 +505,7 @@ class RealtimeDashboardManager:
                         for alert in active_alerts[:10]  # Limit to 10 most recent
                     ],
                 },
-                metadata={
-                    "update_count": self.update_counts.get(DashboardType.ALERTS, 0)
-                },
+                metadata={"update_count": self.update_counts.get(DashboardType.ALERTS, 0)},
             )
 
             self.dashboard_data[DashboardType.ALERTS].append(dashboard_data)
@@ -549,8 +535,7 @@ class RealtimeDashboardManager:
             )
 
         status["update_counts"] = {
-            dashboard_type.value: count
-            for dashboard_type, count in self.update_counts.items()
+            dashboard_type.value: count for dashboard_type, count in self.update_counts.items()
         }
         status["last_update_times"] = {
             dashboard_type.value: timestamp

@@ -203,7 +203,7 @@ class AdversarialProfileFactory:
                 recovery_probability=0.2,
             )
         ]
-        behavior_pattern = UserBehaviorPattern(
+        UserBehaviorPattern(
             decision_making_style=DecisionMakingStyle.IMPULSIVE,
             interaction_style=InteractionStyle.MIXED_ENGAGEMENT,
             narrative_preference=NarrativePreference.CHARACTER_DRIVEN,
@@ -229,7 +229,7 @@ class AdversarialProfileFactory:
                 recovery_probability=0.1,
             )
         ]
-        behavior_pattern = UserBehaviorPattern(
+        UserBehaviorPattern(
             decision_making_style=DecisionMakingStyle.IMPULSIVE,
             interaction_style=InteractionStyle.CREATIVE_COLLABORATOR,
             narrative_preference=NarrativePreference.WORLD_EXPLORATION,
@@ -255,7 +255,7 @@ class AdversarialProfileFactory:
                 recovery_probability=0.3,
             )
         ]
-        behavior_pattern = UserBehaviorPattern(
+        UserBehaviorPattern(
             decision_making_style=DecisionMakingStyle.CAUTIOUS,
             interaction_style=InteractionStyle.PASSIVE_OBSERVER,
             narrative_preference=NarrativePreference.PLOT_DRIVEN,
@@ -281,7 +281,7 @@ class AdversarialProfileFactory:
                 recovery_probability=0.1,
             )
         ]
-        behavior_pattern = UserBehaviorPattern(
+        UserBehaviorPattern(
             decision_making_style=DecisionMakingStyle.ANALYTICAL,
             interaction_style=InteractionStyle.ACTIVE_PARTICIPANT,
             narrative_preference=NarrativePreference.CHARACTER_DRIVEN,

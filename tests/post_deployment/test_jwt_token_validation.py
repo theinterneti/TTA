@@ -119,8 +119,7 @@ async def test_jwt_backward_compatibility_with_sub(
 
     # Verify 'sub' field exists (backward compatibility)
     assert "sub" in decoded_token, (
-        "JWT token missing 'sub' field. "
-        "Backward compatibility may be broken."
+        "JWT token missing 'sub' field. Backward compatibility may be broken."
     )
 
     # Verify sub is not None or empty
@@ -212,7 +211,9 @@ async def test_token_refresh_maintains_player_id(
 
     # Decode new access token
     new_access_token = new_token_data["access_token"]
-    decoded_new_token = jwt.decode(new_access_token, options={"verify_signature": False})
+    decoded_new_token = jwt.decode(
+        new_access_token, options={"verify_signature": False}
+    )
 
     # CRITICAL: Verify new token contains 'player_id' field
     assert "player_id" in decoded_new_token, (

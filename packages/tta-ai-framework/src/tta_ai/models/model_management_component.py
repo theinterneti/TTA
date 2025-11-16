@@ -74,9 +74,7 @@ class ModelManagementComponent(Component):
 
             # Detect system resources
             logger.info("Detecting system resources...")
-            self.system_resources = (
-                await self.hardware_detector.detect_system_resources()
-            )
+            self.system_resources = await self.hardware_detector.detect_system_resources()
             logger.info(
                 f"System resources: {self.system_resources['total_ram_gb']:.1f}GB RAM, "
                 f"{self.system_resources['gpu_count']} GPUs"
@@ -123,9 +121,7 @@ class ModelManagementComponent(Component):
             logger.error(f"Failed to stop Model Management Component: {e}")
             return False
 
-    async def select_model(
-        self, requirements: ModelRequirements
-    ) -> IModelInstance | None:
+    async def select_model(self, requirements: ModelRequirements) -> IModelInstance | None:
         """Select and load the best model for the given requirements."""
         if not self.initialized:
             raise RuntimeError("Model Management Component not initialized")
@@ -137,9 +133,7 @@ class ModelManagementComponent(Component):
             selected_model_info = await self.model_selector.select_model(requirements)
 
             if not selected_model_info:
-                logger.warning(
-                    f"No suitable model found for requirements: {requirements}"
-                )
+                logger.warning(f"No suitable model found for requirements: {requirements}")
                 return None
 
             # Load the selected model
@@ -155,9 +149,7 @@ class ModelManagementComponent(Component):
 
             # Try fallback if available
             if self.fallback_handler:
-                fallback_model = await self.fallback_handler.get_fallback_model(
-                    "", requirements
-                )
+                fallback_model = await self.fallback_handler.get_fallback_model("", requirements)
                 if fallback_model:
                     return await self.load_model(
                         fallback_model.model_id, fallback_model.provider_type.value
@@ -192,9 +184,7 @@ class ModelManagementComponent(Component):
         logger.info(f"Loaded model {model_id} from provider {provider_name}")
         return instance
 
-    async def unload_model(
-        self, model_id: str, provider_name: str | None = None
-    ) -> bool:
+    async def unload_model(self, model_id: str, provider_name: str | None = None) -> bool:
         """Unload a specific model."""
         try:
             # Find the model to unload
@@ -236,9 +226,7 @@ class ModelManagementComponent(Component):
 
         all_models = []
 
-        providers_to_check = (
-            [provider_name] if provider_name else list(self.providers.keys())
-        )
+        providers_to_check = [provider_name] if provider_name else list(self.providers.keys())
 
         for prov_name in providers_to_check:
             if prov_name in self.providers:
@@ -246,9 +234,7 @@ class ModelManagementComponent(Component):
                     models = await self.providers[prov_name].get_available_models()
                     all_models.extend(models)
                 except Exception as e:
-                    logger.warning(
-                        f"Failed to get models from provider {prov_name}: {e}"
-                    )
+                    logger.warning(f"Failed to get models from provider {prov_name}: {e}")
 
         # Apply free filter if requested
         if free_only:
@@ -257,13 +243,9 @@ class ModelManagementComponent(Component):
 
         return all_models
 
-    async def get_free_models(
-        self, provider_name: str | None = None
-    ) -> list[ModelInfo]:
+    async def get_free_models(self, provider_name: str | None = None) -> list[ModelInfo]:
         """Get only free models from all or specific providers."""
-        return await self.get_available_models(
-            provider_name=provider_name, free_only=True
-        )
+        return await self.get_available_models(provider_name=provider_name, free_only=True)
 
     async def get_openrouter_free_models(self) -> list[ModelInfo]:
         """Get free models specifically from OpenRouter provider."""
@@ -276,9 +258,7 @@ class ModelManagementComponent(Component):
             if hasattr(provider, "get_free_models"):
                 return await provider.get_free_models()
             # Fallback to general free filter
-            return await self.get_available_models(
-                provider_name="openrouter", free_only=True
-            )
+            return await self.get_available_models(provider_name="openrouter", free_only=True)
         except Exception as e:
             logger.error(f"Failed to get OpenRouter free models: {e}")
             return []
@@ -292,8 +272,7 @@ class ModelManagementComponent(Component):
         affordable_models = []
         for model in all_models:
             if model.is_free or (
-                model.cost_per_token is not None
-                and model.cost_per_token <= max_cost_per_token
+                model.cost_per_token is not None and model.cost_per_token <= max_cost_per_token
             ):
                 affordable_models.append(model)
 
@@ -315,9 +294,7 @@ class ModelManagementComponent(Component):
 
         provider = self.providers["openrouter"]
         if hasattr(provider, "set_free_models_filter"):
-            await provider.set_free_models_filter(
-                show_free_only, prefer_free, max_cost_per_token
-            )
+            await provider.set_free_models_filter(show_free_only, prefer_free, max_cost_per_token)
             logger.info(
                 f"Updated OpenRouter filter: free_only={show_free_only}, prefer_free={prefer_free}, max_cost={max_cost_per_token}"
             )
@@ -339,9 +316,7 @@ class ModelManagementComponent(Component):
         """Get model recommendations for a specific task type."""
         return await self.hardware_detector.recommend_models(task_type)
 
-    async def test_model_connectivity(
-        self, model_id: str, provider_name: str
-    ) -> dict[str, Any]:
+    async def test_model_connectivity(self, model_id: str, provider_name: str) -> dict[str, Any]:
         """Test connectivity and performance of a specific model."""
         try:
             # Load the model
@@ -366,9 +341,7 @@ class ModelManagementComponent(Component):
                 "response_generated": bool(response.text),
                 "latency_ms": latency_ms,
                 "test_response": (
-                    response.text[:100] + "..."
-                    if len(response.text) > 100
-                    else response.text
+                    response.text[:100] + "..." if len(response.text) > 100 else response.text
                 ),
                 "status": "success",
             }
@@ -414,9 +387,7 @@ class ModelManagementComponent(Component):
             # Create configuration object with defaults
             return ModelManagementConfig(
                 enabled=model_config_dict.get("enabled", True),
-                default_provider=model_config_dict.get(
-                    "default_provider", "openrouter"
-                ),
+                default_provider=model_config_dict.get("default_provider", "openrouter"),
                 **model_config_dict,
             )
 
@@ -454,9 +425,7 @@ class ModelManagementComponent(Component):
         self.performance_monitor = PerformanceMonitor()
 
         # Initialize fallback handler
-        self.fallback_handler = FallbackHandler(
-            self.providers, self.model_config.fallback_config
-        )
+        self.fallback_handler = FallbackHandler(self.providers, self.model_config.fallback_config)
 
         # Initialize model selector
         self.model_selector = ModelSelector(
@@ -528,9 +497,7 @@ class ModelManagementComponent(Component):
                     timestamp=datetime.now(),
                     response_time_ms=response.latency_ms or 0,
                     tokens_per_second=0,  # Would need to calculate
-                    total_tokens=(
-                        response.usage.get("total_tokens", 0) if response.usage else 0
-                    ),
+                    total_tokens=(response.usage.get("total_tokens", 0) if response.usage else 0),
                     task_type=task_type,
                 )
                 await self.performance_monitor.record_metrics(

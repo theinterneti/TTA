@@ -13,8 +13,8 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +27,12 @@ class ExecutionMetrics:
     model_id: str
     task_type: str
     start_time: float = field(default_factory=time.time)
-    end_time: Optional[float] = None
+    end_time: float | None = None
     duration_ms: float = 0.0
     tokens_used: int = 0
     cost: float = 0.0
     success: bool = False
-    error: Optional[str] = None
+    error: str | None = None
     quality_score: float = 0.0
     validation_passed: bool = False
 
@@ -55,7 +55,7 @@ class ModelMetrics:
     total_cost: float = 0.0
     avg_quality_score: float = 0.0
     validation_pass_rate: float = 0.0
-    last_updated: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    last_updated: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property
     def success_rate(self) -> float:
@@ -90,7 +90,7 @@ class ModelMetrics:
 class SystemMetrics:
     """System-level metrics."""
 
-    start_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    start_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     total_tasks: int = 0
     completed_tasks: int = 0
     failed_tasks: int = 0
@@ -132,7 +132,9 @@ class MetricsCollector:
 
         # Update model metrics
         if metrics.model_id not in self.model_metrics:
-            self.model_metrics[metrics.model_id] = ModelMetrics(model_id=metrics.model_id)
+            self.model_metrics[metrics.model_id] = ModelMetrics(
+                model_id=metrics.model_id
+            )
 
         model_metrics = self.model_metrics[metrics.model_id]
         model_metrics.total_executions += 1
@@ -157,7 +159,7 @@ class MetricsCollector:
         model_metrics.avg_quality_score = (
             model_metrics.avg_quality_score * 0.9 + metrics.quality_score * 0.1
         )
-        model_metrics.last_updated = datetime.now(timezone.utc)
+        model_metrics.last_updated = datetime.now(UTC)
 
         # Update system metrics
         self.system_metrics.total_tasks += 1
@@ -174,7 +176,7 @@ class MetricsCollector:
             f"success={metrics.success})"
         )
 
-    def get_model_metrics(self, model_id: str) -> Optional[ModelMetrics]:
+    def get_model_metrics(self, model_id: str) -> ModelMetrics | None:
         """Get metrics for a model.
 
         Args:
@@ -200,7 +202,7 @@ class MetricsCollector:
             System metrics
         """
         self.system_metrics.uptime_seconds = (
-            datetime.now(timezone.utc) - self.system_metrics.start_time
+            datetime.now(UTC) - self.system_metrics.start_time
         ).total_seconds()
         return self.system_metrics
 
@@ -233,4 +235,3 @@ class MetricsCollector:
                 for model_id, m in self.model_metrics.items()
             },
         }
-

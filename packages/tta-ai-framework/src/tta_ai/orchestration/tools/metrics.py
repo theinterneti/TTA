@@ -142,9 +142,7 @@ def tool_exec_context(name: str, version: str) -> Generator[None, None, None]:
         raise
 
 
-def run_with_metrics(
-    name: str, version: str, fn: Callable[..., Any], *args, **kwargs
-) -> Any:
+def run_with_metrics(name: str, version: str, fn: Callable[..., Any], *args, **kwargs) -> Any:
     """Run function and record metrics; supports sync and async return."""
     wrapped = tool_execution(name, version)(fn)
     return wrapped(*args, **kwargs)

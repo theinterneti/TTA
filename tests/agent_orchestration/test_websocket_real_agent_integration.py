@@ -6,6 +6,7 @@ including progress tracking, error reporting, and user-specific event filtering.
 """
 
 import asyncio
+import contextlib
 import json
 from unittest.mock import AsyncMock, Mock
 
@@ -81,7 +82,7 @@ class TestWebSocketRealAgentIntegration:
     @pytest_asyncio.fixture
     async def event_publisher(self, redis_client, realtime_config):
         """Create event publisher for testing."""
-        publisher = EventPublisher(
+        return EventPublisher(
             redis_client=redis_client,
             channel_prefix="test:events",
             enabled=True,
@@ -90,7 +91,6 @@ class TestWebSocketRealAgentIntegration:
             broadcast_workflow_progress=True,
             broadcast_system_metrics=True,
         )
-        return publisher
 
     @pytest_asyncio.fixture
     async def websocket_manager(self, realtime_config, redis_client):
@@ -106,11 +106,7 @@ class TestWebSocketRealAgentIntegration:
             "agent_orchestration.realtime.events.redis_channel_prefix": "test:events",
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     @pytest_asyncio.fixture
     async def enhanced_agent_proxies(self, redis_coordinator, event_publisher):
@@ -146,14 +142,12 @@ class TestWebSocketRealAgentIntegration:
         """Create workflow coordinator for testing."""
         ipa_proxy, wba_proxy, nga_proxy = enhanced_agent_proxies
 
-        coordinator = AgentWorkflowCoordinator(
+        return AgentWorkflowCoordinator(
             ipa_proxy=ipa_proxy,
             wba_proxy=wba_proxy,
             nga_proxy=nga_proxy,
             event_publisher=event_publisher,
         )
-
-        return coordinator
 
     @pytest_asyncio.fixture
     async def mock_websocket(self):
@@ -215,10 +209,8 @@ class TestWebSocketRealAgentIntegration:
 
         # Cleanup connection
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify workflow completed successfully
         assert workflow_result["story"] is not None
@@ -276,10 +268,8 @@ class TestWebSocketRealAgentIntegration:
 
         # Cleanup
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify progressive feedback events were sent
         feedback_events = [
@@ -337,10 +327,8 @@ class TestWebSocketRealAgentIntegration:
         # Cleanup
         await error_manager.stop()
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify error events were sent
         error_events = [
@@ -415,10 +403,8 @@ class TestWebSocketRealAgentIntegration:
 
         # Cleanup
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify only allowed events were received
         agent_events = [
@@ -462,10 +448,8 @@ class TestWebSocketRealAgentIntegration:
 
         # Simulate disconnect
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify subscription information is preserved
         user_subscriptions = await websocket_manager.get_user_subscriptions(
@@ -525,10 +509,8 @@ class TestWebSocketRealAgentIntegration:
         # Cleanup all connections
         for task in connection_tasks:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
 
         # Verify all connections were handled
         stats = await websocket_manager.get_connection_stats()
@@ -579,10 +561,8 @@ class TestWebSocketRealAgentIntegration:
 
         # Cleanup
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify workflow completed
         assert workflow_result["story"] is not None
@@ -666,10 +646,8 @@ class TestWebSocketRealAgentIntegration:
 
         # Cleanup
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify each agent generated status events
         ipa_events = [e for e in agent_events if "ipa" in e.get("agent_id", "").lower()]
@@ -767,10 +745,8 @@ class TestWebSocketRealAgentIntegration:
         # Cleanup
         await feedback_manager.stop()
         connection_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await connection_task
-        except asyncio.CancelledError:
-            pass
 
         # Verify progressive feedback events were generated
         assert len(feedback_events) >= len(intermediate_results)

@@ -75,9 +75,7 @@ class AgentMonitor:
         self._lock = threading.Lock()
         self._start_time = time.time()
 
-    def record_request(
-        self, response_time: float, success: bool, error: str | None = None
-    ):
+    def record_request(self, response_time: float, success: bool, error: str | None = None):
         """Record a request and its outcome."""
         with self._lock:
             self.metrics.total_requests += 1
@@ -90,19 +88,13 @@ class AgentMonitor:
 
             # Update response time metrics
             self.metrics.total_response_time += response_time
-            self.metrics.min_response_time = min(
-                self.metrics.min_response_time, response_time
-            )
-            self.metrics.max_response_time = max(
-                self.metrics.max_response_time, response_time
-            )
+            self.metrics.min_response_time = min(self.metrics.min_response_time, response_time)
+            self.metrics.max_response_time = max(self.metrics.max_response_time, response_time)
             self.metrics.recent_response_times.append(response_time)
 
             # Calculate derived metrics
             if self.metrics.total_requests > 0:
-                self.metrics.error_rate = (
-                    self.metrics.failed_requests / self.metrics.total_requests
-                )
+                self.metrics.error_rate = self.metrics.failed_requests / self.metrics.total_requests
                 self.metrics.average_response_time = (
                     self.metrics.total_response_time / self.metrics.total_requests
                 )
@@ -110,9 +102,7 @@ class AgentMonitor:
                 # Calculate RPS over the monitoring period
                 elapsed_time = time.time() - self._start_time
                 if elapsed_time > 0:
-                    self.metrics.requests_per_second = (
-                        self.metrics.total_requests / elapsed_time
-                    )
+                    self.metrics.requests_per_second = self.metrics.total_requests / elapsed_time
 
     def get_current_metrics(self) -> AgentMetrics:
         """Get current metrics snapshot."""
@@ -137,9 +127,7 @@ class AgentMonitor:
                 recent_response_times=self.metrics.recent_response_times.copy(),
             )
 
-    async def health_check(
-        self, health_check_func: Callable | None = None
-    ) -> HealthStatus:
+    async def health_check(self, health_check_func: Callable | None = None) -> HealthStatus:
         """Perform health check for this agent."""
         start_time = time.time()
 
@@ -198,9 +186,7 @@ class SystemMonitor:
         if monitor_key not in self.agent_monitors:
             with self._lock:
                 if monitor_key not in self.agent_monitors:
-                    self.agent_monitors[monitor_key] = AgentMonitor(
-                        agent_type, agent_instance
-                    )
+                    self.agent_monitors[monitor_key] = AgentMonitor(agent_type, agent_instance)
 
         return self.agent_monitors[monitor_key]
 
@@ -221,9 +207,7 @@ class SystemMonitor:
             workflow_time = time.time() - start_time
 
             self.metrics.total_workflows += 1
-            self.metrics.concurrent_workflows = max(
-                0, self.metrics.concurrent_workflows - 1
-            )
+            self.metrics.concurrent_workflows = max(0, self.metrics.concurrent_workflows - 1)
 
             if success:
                 self.metrics.successful_workflows += 1
@@ -233,13 +217,10 @@ class SystemMonitor:
             # Update average workflow time
             if self.metrics.total_workflows > 0:
                 total_time = (
-                    self.metrics.average_workflow_time
-                    * (self.metrics.total_workflows - 1)
+                    self.metrics.average_workflow_time * (self.metrics.total_workflows - 1)
                     + workflow_time
                 )
-                self.metrics.average_workflow_time = (
-                    total_time / self.metrics.total_workflows
-                )
+                self.metrics.average_workflow_time = total_time / self.metrics.total_workflows
 
     def update_system_resources(
         self,

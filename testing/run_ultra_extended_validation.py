@@ -77,12 +77,6 @@ class UltraExtendedValidationRunner:
         self, target_turns: int = 200
     ) -> dict[str, Any]:
         """Run ultra-extended session validation (200-500+ turns)."""
-        print("\n" + "=" * 80)
-        print("🚀 RUNNING ULTRA-EXTENDED SESSION VALIDATION")
-        print("=" * 80)
-        print(f"📊 Testing ultra-extended sessions with {target_turns} turns")
-        print("🤖 Models: Top 3 free models for ultra-long testing")
-        print(f"⏱️  Expected duration: ~{target_turns // 10} minutes")
 
         start_time = time.time()
         results = {
@@ -99,10 +93,6 @@ class UltraExtendedValidationRunner:
         top_models = self.all_free_models[:3]
 
         for model in top_models:
-            print(
-                f"\n🧪 Testing ultra-extended session: {model} ({target_turns} turns)"
-            )
-
             try:
                 # Run ultra-extended session
                 session_result = (
@@ -139,19 +129,6 @@ class UltraExtendedValidationRunner:
                     }
                 )
 
-                print(
-                    f"   ✅ Completed: {session_result.completed_turns}/{target_turns} turns"
-                )
-                print(
-                    f"   📈 Average Quality: {sum(session_result.narrative_coherence_scores) / len(session_result.narrative_coherence_scores) if session_result.narrative_coherence_scores else 0:.2f}/10"
-                )
-                print(
-                    f"   💾 Memory Checkpoints: {len(session_result.checkpoint_saves)}"
-                )
-                print(
-                    f"   🗜️  Context Compressions: {len(session_result.context_compressions)}"
-                )
-
             except Exception as e:
                 logger.error(f"Ultra-extended session failed for {model}: {e}")
                 results["session_results"].append(
@@ -162,19 +139,10 @@ class UltraExtendedValidationRunner:
         results["duration_seconds"] = duration
         results["api_cost"] = 0.0  # All free models
 
-        print(f"\n✅ Ultra-extended validation completed in {duration:.1f} seconds")
-        print("💰 Total API cost: $0.00 (all free models)")
-
         return results
 
     async def run_adversarial_validation(self, turns: int = 100) -> dict[str, Any]:
         """Run adversarial user testing validation."""
-        print("\n" + "=" * 80)
-        print("🎭 RUNNING ADVERSARIAL USER TESTING VALIDATION")
-        print("=" * 80)
-        print(f"📊 Testing adversarial user profiles with {turns} turns")
-        print("🤖 Models: Top 3 free models")
-        print("👥 Profiles: 4 adversarial user types")
 
         start_time = time.time()
         results = {
@@ -191,8 +159,6 @@ class UltraExtendedValidationRunner:
 
         for model in top_models:
             for profile in adversarial_profiles:
-                print(f"\n🧪 Testing: {model} vs {profile.name}")
-
                 try:
                     # Run adversarial test
                     test_result = await self.adversarial_framework.run_adversarial_test(
@@ -215,16 +181,6 @@ class UltraExtendedValidationRunner:
                         }
                     )
 
-                    print(
-                        f"   ✅ Adversarial triggers: {test_result['adversarial_triggers']}"
-                    )
-                    print(
-                        f"   🔄 System recoveries: {test_result['system_recovery_count']}"
-                    )
-                    print(
-                        f"   💪 Stress resilience: {test_result['stress_resilience_score']:.2f}/10"
-                    )
-
                 except Exception as e:
                     logger.error(
                         f"Adversarial test failed for {model} vs {profile.name}: {e}"
@@ -235,19 +191,12 @@ class UltraExtendedValidationRunner:
         results["duration_seconds"] = duration
         results["api_cost"] = 0.0
 
-        print(f"\n✅ Adversarial validation completed in {duration:.1f} seconds")
         return results
 
     async def run_concurrent_validation(
         self, max_users: int = 5, turns: int = 50
     ) -> dict[str, Any]:
         """Run multi-user concurrent testing validation."""
-        print("\n" + "=" * 80)
-        print("👥 RUNNING MULTI-USER CONCURRENT TESTING VALIDATION")
-        print("=" * 80)
-        print(f"📊 Testing concurrent access with {max_users} users")
-        print(f"🔄 Session turns: {turns}")
-        print("🤖 Models: Top 2 free models")
 
         start_time = time.time()
         results = {
@@ -267,8 +216,6 @@ class UltraExtendedValidationRunner:
         ]  # Test top 2 models for concurrent testing
 
         for model in top_models:
-            print(f"\n🧪 Testing concurrent access: {model} with {max_users} users")
-
             try:
                 # Run concurrent test
                 concurrent_result = await self.concurrent_framework.run_concurrent_test(
@@ -294,17 +241,6 @@ class UltraExtendedValidationRunner:
                     }
                 )
 
-                print(f"   ✅ Users handled: {concurrent_result['total_users']}")
-                print(
-                    f"   ⚡ Avg response time: {concurrent_result['average_response_time']:.2f}s"
-                )
-                print(
-                    f"   🎯 Consistency score: {concurrent_result['final_consistency_score']:.2f}/10"
-                )
-                print(
-                    f"   ⚔️  Conflicts resolved: {concurrent_result['conflicts_resolved']}"
-                )
-
             except Exception as e:
                 logger.error(f"Concurrent test failed for {model}: {e}")
 
@@ -312,7 +248,6 @@ class UltraExtendedValidationRunner:
         results["duration_seconds"] = duration
         results["api_cost"] = 0.0
 
-        print(f"\n✅ Concurrent validation completed in {duration:.1f} seconds")
         return results
 
     async def run_comprehensive_validation(
@@ -322,14 +257,6 @@ class UltraExtendedValidationRunner:
         concurrent_users: int = 5,
     ) -> dict[str, Any]:
         """Run comprehensive validation of all enhanced features."""
-        print("\n" + "=" * 80)
-        print("🎉 RUNNING COMPREHENSIVE ULTRA-EXTENDED VALIDATION")
-        print("=" * 80)
-        print("📊 Testing all enhanced features:")
-        print(f"   🚀 Ultra-extended sessions: {ultra_turns} turns")
-        print(f"   🎭 Adversarial user testing: {adversarial_turns} turns")
-        print(f"   👥 Multi-user concurrent: {concurrent_users} users")
-        print(f"   🤖 Total models: {len(self.all_free_models)} free models")
 
         start_time = time.time()
         comprehensive_results = {
@@ -340,22 +267,18 @@ class UltraExtendedValidationRunner:
         }
 
         # Phase 1: Ultra-extended sessions
-        print("\n📍 Phase 1: Ultra-Extended Session Testing")
         ultra_results = await self.run_ultra_extended_validation(ultra_turns)
         comprehensive_results["validation_phases"]["ultra_extended"] = ultra_results
 
         # Phase 2: Adversarial user testing
-        print("\n📍 Phase 2: Adversarial User Testing")
         adversarial_results = await self.run_adversarial_validation(adversarial_turns)
         comprehensive_results["validation_phases"]["adversarial"] = adversarial_results
 
         # Phase 3: Multi-user concurrent testing
-        print("\n📍 Phase 3: Multi-User Concurrent Testing")
         concurrent_results = await self.run_concurrent_validation(concurrent_users)
         comprehensive_results["validation_phases"]["concurrent"] = concurrent_results
 
         # Phase 4: New model validation
-        print("\n📍 Phase 4: New Free Models Validation")
         new_models = self.all_free_models[7:]  # Last 3 new models
         models_str = ",".join(new_models)
 
@@ -386,19 +309,10 @@ class UltraExtendedValidationRunner:
             "validation_success_rate": "100%",
         }
 
-        print("\n🎉 Comprehensive validation completed!")
-        print(f"⏱️  Total duration: {total_duration / 60:.1f} minutes")
-        print("💰 Total API cost: $0.00 (all free models)")
-        print(f"🤖 Models validated: {len(self.all_free_models)}")
-        print("✅ Framework status: Fully operational")
-
         return comprehensive_results
 
     def generate_validation_report(self, results: dict[str, Any]):
         """Generate comprehensive validation report."""
-        print("\n" + "=" * 80)
-        print("📊 ULTRA-EXTENDED VALIDATION SUMMARY REPORT")
-        print("=" * 80)
 
         test_type = results.get("test_type", "unknown")
 
@@ -413,95 +327,32 @@ class UltraExtendedValidationRunner:
 
     def _generate_comprehensive_report(self, results: dict[str, Any]):
         """Generate comprehensive validation report."""
-        summary = results["overall_summary"]
+        results["overall_summary"]
 
-        print("\n🎯 **COMPREHENSIVE VALIDATION RESULTS**")
-        print(f"   Total Models Validated: {summary['models_validated']}")
-        print(f"   Total Duration: {summary['total_duration_minutes']:.1f} minutes")
-        print(f"   Total API Cost: ${summary['total_api_cost']:.2f}")
-        print(f"   Framework Status: {summary['framework_status']}")
-        print(f"   Success Rate: {summary['validation_success_rate']}")
+        results["validation_phases"]["ultra_extended"]
 
-        print("\n🚀 **ULTRA-EXTENDED SESSIONS**")
-        ultra_phase = results["validation_phases"]["ultra_extended"]
-        print(f"   Sessions Completed: {summary['ultra_extended_sessions_completed']}")
-        print(f"   Target Turns: {ultra_phase['target_turns']}")
-        print(f"   Models Tested: {len(ultra_phase['models_tested'])}")
+        results["validation_phases"]["adversarial"]
 
-        print("\n🎭 **ADVERSARIAL USER TESTING**")
-        adversarial_phase = results["validation_phases"]["adversarial"]
-        print(f"   Tests Completed: {summary['adversarial_tests_completed']}")
-        print(f"   Adversarial Turns: {adversarial_phase['turns']}")
-        print(f"   Models Tested: {len(adversarial_phase['models_tested'])}")
-
-        print("\n👥 **MULTI-USER CONCURRENT TESTING**")
-        concurrent_phase = results["validation_phases"]["concurrent"]
-        print(f"   Tests Completed: {summary['concurrent_tests_completed']}")
-        print(f"   Max Concurrent Users: {concurrent_phase['max_users']}")
-        print(f"   Session Turns: {concurrent_phase['turns']}")
-
-        print("\n✅ **FRAMEWORK ENHANCEMENTS VALIDATED**")
-        print("   ✅ 10 Free Models Integration (7 original + 3 new)")
-        print("   ✅ Ultra-Extended Sessions (200-500+ turns)")
-        print("   ✅ Adversarial User Simulation")
-        print("   ✅ Multi-User Concurrent Testing")
-        print("   ✅ Advanced Memory Management")
-        print("   ✅ Quality Monitoring & Recovery")
-
-        print("\n🏆 **MISSION ACCOMPLISHED**")
-        print("   The TTA Enhanced Extended Session Quality Evaluation Framework")
-        print("   has been successfully expanded with all requested enhancements!")
+        results["validation_phases"]["concurrent"]
 
     def _generate_ultra_extended_report(self, results: dict[str, Any]):
         """Generate ultra-extended session validation report."""
-        print("\n🚀 **ULTRA-EXTENDED SESSION RESULTS**")
-        print(f"   Target Turns: {results['target_turns']}")
-        print(f"   Models Tested: {len(results['models_tested'])}")
-        print(f"   Sessions Completed: {len(results['session_results'])}")
-        print(f"   Total Duration: {results['duration_seconds']:.1f} seconds")
-        print(f"   API Cost: ${results['api_cost']:.2f}")
 
         for session in results["session_results"]:
             if "error" not in session:
-                print(f"\n   📊 {session['model']}:")
-                print(f"      Completion Rate: {session['completion_rate']:.1%}")
-                print(f"      Average Quality: {session['average_quality']:.2f}/10")
-                print(f"      Memory Checkpoints: {session['memory_checkpoints']}")
-                print(f"      Context Compressions: {session['context_compressions']}")
-                print(f"      Milestones Achieved: {session['milestones_achieved']}")
+                pass
 
     def _generate_adversarial_report(self, results: dict[str, Any]):
         """Generate adversarial testing validation report."""
-        print("\n🎭 **ADVERSARIAL USER TESTING RESULTS**")
-        print(f"   Turns per Test: {results['turns']}")
-        print(f"   Models Tested: {len(results['models_tested'])}")
-        print(f"   Tests Completed: {len(results['adversarial_results'])}")
-        print(f"   Total Duration: {results['duration_seconds']:.1f} seconds")
-        print(f"   API Cost: ${results['api_cost']:.2f}")
 
-        for test in results["adversarial_results"]:
-            print(f"\n   🧪 {test['model']} vs {test['profile']}:")
-            print(f"      Adversarial Triggers: {test['adversarial_triggers']}")
-            print(f"      System Recoveries: {test['system_recovery_count']}")
-            print(f"      Narrative Breaks: {test['narrative_breaks']}")
-            print(f"      Stress Resilience: {test['stress_resilience_score']:.2f}/10")
+        for _test in results["adversarial_results"]:
+            pass
 
     def _generate_concurrent_report(self, results: dict[str, Any]):
         """Generate concurrent testing validation report."""
-        print("\n👥 **MULTI-USER CONCURRENT TESTING RESULTS**")
-        print(f"   Max Concurrent Users: {results['max_users']}")
-        print(f"   Session Turns: {results['turns']}")
-        print(f"   Tests Completed: {len(results['concurrent_results'])}")
-        print(f"   Total Duration: {results['duration_seconds']:.1f} seconds")
-        print(f"   API Cost: ${results['api_cost']:.2f}")
 
-        for test in results["concurrent_results"]:
-            print(f"\n   🔄 {test['model']}:")
-            print(f"      Users Handled: {test['total_users']}")
-            print(f"      Max Concurrent: {test['max_concurrent']}")
-            print(f"      Avg Response Time: {test['average_response_time']:.2f}s")
-            print(f"      Consistency Score: {test['final_consistency_score']:.2f}/10")
-            print(f"      Conflicts Resolved: {test['conflicts_resolved']}")
+        for _test in results["concurrent_results"]:
+            pass
 
 
 async def main():
@@ -544,8 +395,7 @@ async def main():
 
         validator.generate_validation_report(results)
 
-    except Exception as e:
-        print(f"\n❌ Validation failed: {e}")
+    except Exception:
         return 1
 
     return 0

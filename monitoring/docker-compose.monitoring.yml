@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: prom/prometheus:v2.45.0
+    image: prom/prometheus:v2.48.1:v2.45.0
     container_name: tta-prometheus
     restart: unless-stopped
     ports:
@@ -33,7 +33,7 @@ services:
     security_opt:
       - no-new-privileges:true
   grafana:
-    image: grafana/grafana:10.0.0
+    image: grafana/grafana:10.2.3:10.0.0
     container_name: tta-grafana
     restart: unless-stopped
     ports:

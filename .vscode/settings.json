@@ -1,0 +1,155 @@
+{
+  // =============================================================================
+  // GITHUB COPILOT MCP CONFIGURATION
+  // =============================================================================
+  // Enable Context7 MCP server for GitHub Copilot CLI
+  "github.copilot.chat.mcp": {
+    "servers": {
+      "Context7": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp@latest"]
+      }
+    },
+    "inputs": []
+  },
+
+  // =============================================================================
+  // DATABASE CONFIGURATION
+  // =============================================================================
+  // Redis Client Configuration
+  "redis.database": [
+    {
+      "name": "🟢 TTA Dev Redis",
+      "host": "localhost",
+      "port": 6379,
+      "password": "",
+      "db": 0,
+      "separator": ":",
+      "connectionTimeout": 10000,
+      "treeViewMode": "namespace"
+    },
+    {
+      "name": "🟡 TTA Test Redis",
+      "host": "localhost",
+      "port": 7379,
+      "password": "",
+      "db": 0,
+      "separator": ":",
+      "connectionTimeout": 10000,
+      "treeViewMode": "namespace"
+    },
+    {
+      "name": "🟠 TTA Staging Redis",
+      "host": "localhost",
+      "port": 8379,
+      "password": "",
+      "db": 0,
+      "separator": ":",
+      "connectionTimeout": 10000,
+      "treeViewMode": "namespace"
+    }
+  ],
+
+  // Database Client Configuration (Neo4j)
+  "database-client.defaultSelectLimit": 100,
+  "database-client.autoSync": true,
+  "database-client.enableConfirmQuery": false,
+  "database-client.historySize": 200,
+
+  // =============================================================================
+  // PYTHON ENVIRONMENT
+  // =============================================================================
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+
+  // =============================================================================
+  // PYLANCE CONFIGURATION
+  // =============================================================================
+  // NOTE: Type checking mode, include/exclude paths, and extraPaths are configured
+  // in pyproject.toml [tool.pyright] section to avoid conflicts.
+  // Only Pylance-specific settings that don't conflict with pyproject.toml are here.
+
+  // Diagnostic scope - analyze entire workspace for quality gates
+  "python.analysis.diagnosticMode": "workspace",
+
+  // Indexing configuration for performance
+  "python.analysis.indexing": true,
+  "python.analysis.userFileIndexingLimit": 5000,
+
+  // Package index depths for better auto-imports and IntelliSense
+  // Depth 2-3 for main dependencies to improve suggestions for common submodules
+  "python.analysis.packageIndexDepths": [
+    { "name": "fastapi", "depth": 3 },
+    { "name": "pydantic", "depth": 3 },
+    { "name": "redis", "depth": 2 },
+    { "name": "neo4j", "depth": 2 },
+    { "name": "langchain", "depth": 2 },
+    { "name": "langgraph", "depth": 2 },
+    { "name": "torch", "depth": 2 },
+    { "name": "transformers", "depth": 2 },
+    { "name": "httpx", "depth": 2 },
+    { "name": "starlette", "depth": 2 }
+  ],
+
+  // Auto-import completions
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.includeAliasesFromUserFiles": true,
+
+  // Inlay hints for better code readability
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.inlayHints.callArgumentNames": "partial",
+  "python.analysis.inlayHints.pytestParameters": true,
+
+  // Performance optimizations
+  "python.analysis.persistAllIndices": true,
+
+  // =============================================================================
+  // TESTING
+  // =============================================================================
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+
+  // =============================================================================
+  // RUFF CONFIGURATION - NATIVE SERVER
+  // =============================================================================
+  // Force native Rust-based language server (not legacy ruff-lsp)
+  "ruff.nativeServer": "on",
+
+  // Use pyproject.toml for all configuration (ignore workspace-level overrides)
+  "ruff.configurationPreference": "filesystemFirst",
+
+  // Disable legacy ruff-lsp settings explicitly
+  "ruff.format.args": [],
+  "ruff.lint.args": [],
+
+  // Configure Python formatting and linting
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+  // Import sorting (handled by Ruff, not a separate tool)
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  // =============================================================================
+  // TODO TREE
+  // =============================================================================
+  "todo-tree.tree.showBadges": true,
+
+  // =============================================================================
+  // FILE ASSOCIATIONS
+  // =============================================================================
+  "files.associations": {
+    "*.cypher": "cypher",
+    "*.cyp": "cypher",
+    "*.cql": "cypher"
+  }
+}

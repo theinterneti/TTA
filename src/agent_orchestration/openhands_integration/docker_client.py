@@ -102,7 +102,7 @@ class DockerOpenHandsClient:
         workspace_abs = workspace_path.resolve()
 
         # Build Docker command
-        cmd = [
+        return [
             "docker",
             "run",
             "--rm",  # Automatic cleanup
@@ -136,8 +136,6 @@ class DockerOpenHandsClient:
             "-t",
             task_description,
         ]
-
-        return cmd
 
     def _parse_output(
         self, stdout: str, stderr: str, exit_code: int, execution_time: float
@@ -240,7 +238,7 @@ class DockerOpenHandsClient:
                 stdout_bytes, stderr_bytes = await asyncio.wait_for(
                     result.communicate(), timeout=timeout
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Kill container on timeout
                 result.kill()
                 await result.wait()

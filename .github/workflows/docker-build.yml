@@ -156,8 +156,16 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha
             type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Set consistent image tag for build and scan
+        id: image-tag
+        run: |
+          # Use the first tag from metadata for consistency across build/test/scan
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "Using image tag: $IMAGE_TAG"
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -166,7 +174,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.image-tag.outputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
@@ -195,9 +203,9 @@ jobs:
           fi
 
       - name: Scan image for vulnerabilities
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ${{ env.IMAGE_PREFIX }}/tta-${{ matrix.name }}:${{ github.ref_name }}
+          image-ref: ${{ steps.image-tag.outputs.tag }}
           format: 'sarif'
           output: 'trivy-results-${{ matrix.name }}.sarif'
           severity: 'CRITICAL,HIGH'

@@ -68,7 +68,7 @@ class TestRealAgentErrorScenarios:
             # Should fallback to mock due to timeout
             assert result["source"] == "mock_fallback"
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             # Timeout is also acceptable behavior
             pass
 

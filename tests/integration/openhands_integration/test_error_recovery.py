@@ -7,7 +7,7 @@ circuit breaker integration, and fallback mechanisms.
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -29,53 +29,84 @@ class TestErrorClassification:
         recovery = OpenHandsErrorRecovery(integration_config)
 
         error = Exception("Connection timeout")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.CONNECTION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.CONNECTION_ERROR
+        )
 
         error = Exception("Network error occurred")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.CONNECTION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.CONNECTION_ERROR
+        )
 
     def test_classify_timeout_error(self, integration_config):
         """Test classification of timeout errors."""
         recovery = OpenHandsErrorRecovery(integration_config)
 
         error = TimeoutError("Task timed out")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.TIMEOUT_ERROR
+        assert (
+            recovery.classify_openhands_error(error) == OpenHandsErrorType.TIMEOUT_ERROR
+        )
 
         error = Exception("timeout exceeded")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.TIMEOUT_ERROR
+        assert (
+            recovery.classify_openhands_error(error) == OpenHandsErrorType.TIMEOUT_ERROR
+        )
 
     def test_classify_authentication_error(self, integration_config):
         """Test classification of authentication errors."""
         recovery = OpenHandsErrorRecovery(integration_config)
 
         error = Exception("Invalid API key")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.AUTHENTICATION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.AUTHENTICATION_ERROR
+        )
 
         error = Exception("401 Unauthorized")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.AUTHENTICATION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.AUTHENTICATION_ERROR
+        )
 
         error = Exception("Authentication failed")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.AUTHENTICATION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.AUTHENTICATION_ERROR
+        )
 
     def test_classify_rate_limit_error(self, integration_config):
         """Test classification of rate limit errors."""
         recovery = OpenHandsErrorRecovery(integration_config)
 
         error = Exception("Rate limit exceeded")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.RATE_LIMIT_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.RATE_LIMIT_ERROR
+        )
 
         error = Exception("429 Too Many Requests")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.RATE_LIMIT_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.RATE_LIMIT_ERROR
+        )
 
     def test_classify_validation_error(self, integration_config):
         """Test classification of validation errors."""
         recovery = OpenHandsErrorRecovery(integration_config)
 
         error = ValueError("Invalid input")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.VALIDATION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.VALIDATION_ERROR
+        )
 
         error = Exception("Validation failed")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.VALIDATION_ERROR
+        assert (
+            recovery.classify_openhands_error(error)
+            == OpenHandsErrorType.VALIDATION_ERROR
+        )
 
     def test_classify_sdk_error(self, integration_config):
         """Test classification of SDK errors."""
@@ -92,7 +123,9 @@ class TestErrorClassification:
         recovery = OpenHandsErrorRecovery(integration_config)
 
         error = Exception("Some random error")
-        assert recovery.classify_openhands_error(error) == OpenHandsErrorType.UNKNOWN_ERROR
+        assert (
+            recovery.classify_openhands_error(error) == OpenHandsErrorType.UNKNOWN_ERROR
+        )
 
 
 class TestRecoveryStrategies:
@@ -163,6 +196,7 @@ class TestExecuteWithRecovery:
         self, integration_config, mock_circuit_breaker
     ):
         """Test execution with circuit breaker."""
+
         # Mock circuit breaker execute to return the function result
         async def mock_execute(func, *args, **kwargs):
             return await func(*args, **kwargs)
@@ -183,9 +217,7 @@ class TestExecuteWithRecovery:
         assert mock_circuit_breaker.execute.called
 
     @pytest.mark.asyncio
-    async def test_execute_with_recovery_with_error_reporter(
-        self, integration_config
-    ):
+    async def test_execute_with_recovery_with_error_reporter(self, integration_config):
         """Test error reporting during recovery."""
         from unittest.mock import patch
 
@@ -207,8 +239,8 @@ class TestExecuteWithRecovery:
         }
 
         with patch(
-            'src.agent_orchestration.openhands_integration.error_recovery.RECOVERY_STRATEGIES',
-            mock_strategies
+            "src.agent_orchestration.openhands_integration.error_recovery.RECOVERY_STRATEGIES",
+            mock_strategies,
         ):
             recovery = OpenHandsErrorRecovery(
                 integration_config,
@@ -241,7 +273,10 @@ class TestMockResponseGeneration:
         mock_response = recovery._generate_mock_response()
 
         assert mock_response["success"] is True
-        assert "MOCK" in mock_response["output"] or "mock" in mock_response["output"].lower()
+        assert (
+            "MOCK" in mock_response["output"]
+            or "mock" in mock_response["output"].lower()
+        )
         assert mock_response["error"] is None
         assert mock_response["metadata"]["mock"] is True
         assert mock_response["metadata"]["fallback"] is True
@@ -303,7 +338,7 @@ class TestErrorReporting:
             async def failing_func():
                 raise Exception("Test error")
 
-            result = await recovery.execute_with_recovery(failing_func)
+            await recovery.execute_with_recovery(failing_func)
 
             # Verify error was reported
             mock_error_reporter.report_error.assert_called_once()
@@ -393,7 +428,9 @@ class TestRecoveryStrategyExecution:
             recovery = OpenHandsErrorRecovery(integration_config)
 
             # Store original delay
-            original_delay = recovery.retry_config.base_delay if recovery.retry_config else None
+            original_delay = (
+                recovery.retry_config.base_delay if recovery.retry_config else None
+            )
 
             async def failing_func():
                 raise Exception("Test error")
@@ -521,7 +558,9 @@ class TestRecoveryStrategyExecution:
             assert result["metadata"]["mock"] is True
 
     @pytest.mark.asyncio
-    async def test_error_classification_with_timeout_error_type(self, integration_config):
+    async def test_error_classification_with_timeout_error_type(
+        self, integration_config
+    ):
         """Test error classification with TimeoutError type."""
         recovery = OpenHandsErrorRecovery(integration_config)
 
@@ -537,4 +576,3 @@ class TestRecoveryStrategyExecution:
         error = ValueError("Invalid value")
         error_type = recovery.classify_openhands_error(error)
         assert error_type == OpenHandsErrorType.VALIDATION_ERROR
-

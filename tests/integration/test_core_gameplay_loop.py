@@ -329,7 +329,6 @@ if __name__ == "__main__":
     # Run basic integration test
     async def run_basic_test():
         """Run a basic integration test."""
-        print("Running Core Gameplay Loop Integration Test...")
 
         # Create controller with minimal config
         config = {"response_time_target": 2.0}
@@ -345,7 +344,6 @@ if __name__ == "__main__":
 
         # Test basic session flow
         session = await controller.start_session("test_user")
-        print(f"✓ Session started: {session.session_id}")
 
         if session.available_choices:
             choice = session.available_choices[0]
@@ -359,14 +357,9 @@ if __name__ == "__main__":
                 session.session_id, choice.choice_id
             )
 
-            processing_time = (datetime.utcnow() - start_time).total_seconds()
-            print(f"✓ Choice processed in {processing_time:.2f}s")
-            print(f"✓ Therapeutic value: {consequences.therapeutic_value_realized:.2f}")
-            print(f"✓ Generated {len(new_choices)} new choices")
+            (datetime.utcnow() - start_time).total_seconds()
 
         await controller.end_session(session.session_id)
-        print("✓ Session ended successfully")
-        print("\nCore Gameplay Loop Integration Test PASSED!")
 
     # Run the test
     asyncio.run(run_basic_test())

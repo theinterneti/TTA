@@ -44,9 +44,7 @@ class BaseModelInstance(IModelInstance):
         """Default health check implementation."""
         try:
             # Simple test generation
-            test_request = GenerationRequest(
-                prompt="Hello", max_tokens=1, temperature=0.0
-            )
+            test_request = GenerationRequest(prompt="Hello", max_tokens=1, temperature=0.0)
             response = await self.generate(test_request)
             self._status = ModelStatus.READY if response.text else ModelStatus.ERROR
             self._last_health_check = datetime.now()
@@ -97,16 +95,12 @@ class BaseProvider(IModelProvider, ABC):
 
             # Validate required configuration
             if not await self._validate_config(config):
-                logger.error(
-                    f"Invalid configuration for {self.provider_type.value} provider"
-                )
+                logger.error(f"Invalid configuration for {self.provider_type.value} provider")
                 return False
 
             # Provider-specific initialization
             if not await self._initialize_provider():
-                logger.error(
-                    f"Failed to initialize {self.provider_type.value} provider"
-                )
+                logger.error(f"Failed to initialize {self.provider_type.value} provider")
                 return False
 
             # Initial model discovery
@@ -120,9 +114,7 @@ class BaseProvider(IModelProvider, ABC):
             logger.error(f"Error initializing {self.provider_type.value} provider: {e}")
             return False
 
-    async def get_available_models(
-        self, filters: dict[str, Any] | None = None
-    ) -> list[ModelInfo]:
+    async def get_available_models(self, filters: dict[str, Any] | None = None) -> list[ModelInfo]:
         """Get list of available models from this provider."""
         if not self._initialized:
             raise RuntimeError(f"Provider {self.provider_type.value} not initialized")
@@ -158,14 +150,10 @@ class BaseProvider(IModelProvider, ABC):
         try:
             instance = await self._load_model_impl(model_id, config or {})
             self._loaded_models[model_id] = instance
-            logger.info(
-                f"Successfully loaded model {model_id} from {self.provider_type.value}"
-            )
+            logger.info(f"Successfully loaded model {model_id} from {self.provider_type.value}")
             return instance
         except Exception as e:
-            logger.error(
-                f"Failed to load model {model_id} from {self.provider_type.value}: {e}"
-            )
+            logger.error(f"Failed to load model {model_id} from {self.provider_type.value}: {e}")
             raise
 
     async def unload_model(self, model_id: str) -> bool:
@@ -177,14 +165,10 @@ class BaseProvider(IModelProvider, ABC):
             instance = self._loaded_models[model_id]
             await self._unload_model_impl(instance)
             del self._loaded_models[model_id]
-            logger.info(
-                f"Successfully unloaded model {model_id} from {self.provider_type.value}"
-            )
+            logger.info(f"Successfully unloaded model {model_id} from {self.provider_type.value}")
             return True
         except Exception as e:
-            logger.error(
-                f"Failed to unload model {model_id} from {self.provider_type.value}: {e}"
-            )
+            logger.error(f"Failed to unload model {model_id} from {self.provider_type.value}: {e}")
             return False
 
     async def health_check(self) -> bool:
@@ -207,9 +191,7 @@ class BaseProvider(IModelProvider, ABC):
             return provider_healthy
 
         except Exception as e:
-            logger.error(
-                f"Health check failed for {self.provider_type.value} provider: {e}"
-            )
+            logger.error(f"Health check failed for {self.provider_type.value} provider: {e}")
             self._health_status = False
             return False
 
@@ -222,9 +204,7 @@ class BaseProvider(IModelProvider, ABC):
             "loaded_models_count": len(self._loaded_models),
             "available_models_count": len(self._available_models),
             "last_model_refresh": (
-                self._last_model_refresh.isoformat()
-                if self._last_model_refresh
-                else None
+                self._last_model_refresh.isoformat() if self._last_model_refresh else None
             ),
             "loaded_models": list(self._loaded_models.keys()),
         }
@@ -247,9 +227,7 @@ class BaseProvider(IModelProvider, ABC):
         pass
 
     @abstractmethod
-    async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
-    ) -> IModelInstance:
+    async def _load_model_impl(self, model_id: str, config: dict[str, Any]) -> IModelInstance:
         """Provider-specific model loading implementation."""
         pass
 
@@ -305,9 +283,7 @@ class BaseProvider(IModelProvider, ABC):
         required_caps = filters.get("required_capabilities", [])
         if required_caps:
             filtered_models = [
-                m
-                for m in filtered_models
-                if all(cap in m.capabilities for cap in required_caps)
+                m for m in filtered_models if all(cap in m.capabilities for cap in required_caps)
             ]
 
         return filtered_models

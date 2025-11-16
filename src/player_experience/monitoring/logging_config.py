@@ -221,9 +221,9 @@ class AsyncLogHandler(logging.Handler):
                     self.queue.task_done()
                 except queue.Empty:
                     continue
-            except Exception as e:
+            except Exception:
                 # Log to stderr to avoid infinite recursion
-                print(f"Error in async log handler: {e}", file=sys.stderr)
+                pass
 
     def emit(self, record):
         """Emit a log record asynchronously."""

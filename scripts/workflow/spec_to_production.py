@@ -49,7 +49,6 @@ try:
     CONTEXT_MANAGER_AVAILABLE = True
 except ImportError:
     CONTEXT_MANAGER_AVAILABLE = False
-    print("WARNING: AI Context Manager not available")
 
 from scripts.workflow.stage_handlers import (
     ProductionDeploymentStage,
@@ -144,8 +143,8 @@ class WorkflowOrchestrator:
                 content=f"Starting workflow for component '{self.component_name}' targeting '{self.target_stage}' stage",
                 importance=1.0,
             )
-        except Exception as e:
-            print(f"WARNING: Failed to initialize context session: {e}")
+        except Exception:
+            pass
 
     def _update_context(self, message: str, importance: float = 0.7):
         """Update AI context with workflow progress."""
@@ -158,8 +157,8 @@ class WorkflowOrchestrator:
                     importance=importance,
                 )
                 self.context_manager.save_session(self.context_session_id)
-            except Exception as e:
-                print(f"WARNING: Failed to update context: {e}")
+            except Exception:
+                pass
 
     @track_execution("workflow_complete")
     def run(self) -> WorkflowResult:
@@ -385,22 +384,12 @@ def main():
     result.save_report(Path(output_file))
 
     # Print summary
-    print("\n" + "=" * 60)
-    print("WORKFLOW SUMMARY")
-    print("=" * 60)
-    print(f"Component: {result.component_name}")
-    print(f"Target Stage: {result.target_stage}")
-    print(f"Success: {'✓ YES' if result.success else '✗ NO'}")
-    print(f"Stages Completed: {', '.join(result.stages_completed)}")
     if result.stages_failed:
-        print(f"Stages Failed: {', '.join(result.stages_failed)}")
-    print(f"Total Time: {result.total_execution_time_ms:.0f}ms")
+        pass
     if result.context_session_id:
-        print(f"Context Session: {result.context_session_id}")
+        pass
     if result.metrics_dashboard:
-        print(f"Metrics Dashboard: {result.metrics_dashboard}")
-    print(f"Report Saved: {output_file}")
-    print("=" * 60)
+        pass
 
     # Exit with appropriate code
     sys.exit(0 if result.success else 1)

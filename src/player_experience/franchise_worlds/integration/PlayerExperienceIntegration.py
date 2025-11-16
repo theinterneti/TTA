@@ -44,8 +44,7 @@ class FranchiseWorldBridge:
             # Run the franchise world integration initialization
             result = await self._run_node_script("initialize-system.js")
             return result.get("success", False)
-        except Exception as e:
-            print(f"Failed to initialize franchise system: {e}")
+        except Exception:
             return False
 
     async def get_franchise_worlds(
@@ -64,8 +63,7 @@ class FranchiseWorldBridge:
             script_args = {"genre": genre} if genre else {}
             result = await self._run_node_script("get-worlds.js", script_args)
             return result.get("worlds", [])
-        except Exception as e:
-            print(f"Failed to get franchise worlds: {e}")
+        except Exception:
             return []
 
     async def convert_franchise_world_to_tta(
@@ -95,8 +93,7 @@ class FranchiseWorldBridge:
             # Convert to TTA WorldDetails
             return self._convert_to_world_details(world_data)
 
-        except Exception as e:
-            print(f"Failed to convert franchise world {franchise_world_id}: {e}")
+        except Exception:
             return None
 
     async def register_franchise_worlds_with_tta(self) -> bool:
@@ -116,12 +113,10 @@ class FranchiseWorldBridge:
                 if world_details:
                     # Register with TTA world manager
                     self.world_manager.register_world(world_details)
-                    print(f"Registered franchise world: {world_details.name}")
 
             return True
 
-        except Exception as e:
-            print(f"Failed to register franchise worlds: {e}")
+        except Exception:
             return False
 
     async def get_character_archetypes(self) -> list[dict[str, Any]]:
@@ -131,8 +126,7 @@ class FranchiseWorldBridge:
         try:
             result = await self._run_node_script("get-archetypes.js")
             return result.get("archetypes", [])
-        except Exception as e:
-            print(f"Failed to get character archetypes: {e}")
+        except Exception:
             return []
 
     async def adapt_archetype_for_world(
@@ -151,8 +145,7 @@ class FranchiseWorldBridge:
                 },
             )
             return result.get("adaptedArchetype")
-        except Exception as e:
-            print(f"Failed to adapt archetype: {e}")
+        except Exception:
             return None
 
     async def validate_franchise_world_for_simulation(self, world_id: str) -> bool:
@@ -164,8 +157,7 @@ class FranchiseWorldBridge:
                 "validate-world.js", {"worldId": world_id}
             )
             return result.get("isValid", False)
-        except Exception as e:
-            print(f"Failed to validate world for simulation: {e}")
+        except Exception:
             return False
 
     async def create_customized_world_parameters(
@@ -189,8 +181,7 @@ class FranchiseWorldBridge:
 
             return self._convert_to_world_parameters(params_data)
 
-        except Exception as e:
-            print(f"Failed to create customized parameters: {e}")
+        except Exception:
             return None
 
     async def _run_node_script(

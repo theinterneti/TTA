@@ -22,7 +22,6 @@ try:
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
-    print("WARNING: matplotlib not available, dashboard will have no charts")
 
 from .dev_metrics import DevMetricsCollector
 
@@ -44,7 +43,6 @@ def generate_dashboard(
     summary = collector.get_metrics_summary(days=days)
 
     if not summary:
-        print(f"No metrics found in {metrics_dir}")
         _generate_empty_dashboard(output_file)
         return
 
@@ -61,8 +59,6 @@ def generate_dashboard(
     # Write to file
     output_path = Path(output_file)
     output_path.write_text(html)
-
-    print(f"Dashboard generated: {output_file}")
 
 
 def _generate_charts(summary: dict[str, Any], output_file: str) -> str | None:
@@ -110,8 +106,7 @@ def _generate_charts(summary: dict[str, Any], output_file: str) -> str | None:
         plt.close()
 
         return chart_path.name
-    except Exception as e:
-        print(f"Failed to generate charts: {e}")
+    except Exception:
         return None
 
 
@@ -163,7 +158,7 @@ def _generate_html(summary: dict[str, Any], chart_html: str, days: int) -> str:
         </div>
         """
 
-    html = f"""
+    return f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -278,8 +273,6 @@ def _generate_html(summary: dict[str, Any], chart_html: str, days: int) -> str:
     </html>
     """
 
-    return html
-
 
 def _generate_empty_dashboard(output_file: str) -> None:
     """Generate empty dashboard when no metrics available."""
@@ -304,7 +297,6 @@ def _generate_empty_dashboard(output_file: str) -> None:
     """
 
     Path(output_file).write_text(html)
-    print(f"Empty dashboard generated: {output_file}")
 
 
 if __name__ == "__main__":

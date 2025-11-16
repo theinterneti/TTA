@@ -93,7 +93,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Handles startup and shutdown events for the FastAPI application.
     """
     # Startup
-    print("Starting Player Experience Interface API...")
 
     # Initialize Sentry for error monitoring and performance tracking
     settings = get_settings()
@@ -105,7 +104,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
     # Shutdown
-    print("Shutting down Player Experience Interface API...")
 
     # Cleanup any resources here
     # e.g., close database connections, cache connections, etc.

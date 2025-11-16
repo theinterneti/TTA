@@ -36,9 +36,7 @@ class CapabilityMatcher:
     Advanced capability matching engine with multiple algorithms.
     """
 
-    def __init__(
-        self, default_strategy: MatchingStrategy = MatchingStrategy.WEIGHTED_SCORE
-    ):
+    def __init__(self, default_strategy: MatchingStrategy = MatchingStrategy.WEIGHTED_SCORE):
         self.default_strategy = default_strategy
         self._strategy_weights = {
             "name_match": 0.4,
@@ -113,9 +111,7 @@ class CapabilityMatcher:
                         match_score=1.0,
                         exact_match=True,
                         version_match=True,
-                        performance_match=self._check_performance_match(
-                            capability, criteria
-                        ),
+                        performance_match=self._check_performance_match(capability, criteria),
                         agent_load_factor=cap_set.load_factor,
                         agent_availability=cap_set.availability,
                     )
@@ -136,9 +132,7 @@ class CapabilityMatcher:
                 continue
 
             for capability in cap_set.get_active_capabilities():
-                score_components = self._calculate_score_components(
-                    capability, criteria
-                )
+                score_components = self._calculate_score_components(capability, criteria)
 
                 if score_components["total_score"] > 0:
                     final_score = self._calculate_weighted_score(score_components)
@@ -179,9 +173,7 @@ class CapabilityMatcher:
                         match_score=fuzzy_score,
                         exact_match=False,
                         version_match=self._check_version_match(capability, criteria),
-                        performance_match=self._check_performance_match(
-                            capability, criteria
-                        ),
+                        performance_match=self._check_performance_match(capability, criteria),
                         agent_load_factor=cap_set.load_factor,
                         agent_availability=cap_set.availability,
                     )
@@ -204,9 +196,7 @@ class CapabilityMatcher:
             for capability in cap_set.get_active_capabilities():
                 if self._meets_basic_criteria(capability, criteria):
                     # Score based on agent priority and load factor
-                    priority_score = (cap_set.priority / 10.0) * (
-                        1.0 - cap_set.load_factor
-                    )
+                    priority_score = (cap_set.priority / 10.0) * (1.0 - cap_set.load_factor)
 
                     match_result = CapabilityMatchResult(
                         agent_id=cap_set.agent_id,
@@ -214,9 +204,7 @@ class CapabilityMatcher:
                         match_score=priority_score,
                         exact_match=self._is_exact_match(capability, criteria),
                         version_match=self._check_version_match(capability, criteria),
-                        performance_match=self._check_performance_match(
-                            capability, criteria
-                        ),
+                        performance_match=self._check_performance_match(capability, criteria),
                         agent_load_factor=cap_set.load_factor,
                         agent_availability=cap_set.availability,
                     )
@@ -246,9 +234,7 @@ class CapabilityMatcher:
                         match_score=semantic_score,
                         exact_match=False,
                         version_match=self._check_version_match(capability, criteria),
-                        performance_match=self._check_performance_match(
-                            capability, criteria
-                        ),
+                        performance_match=self._check_performance_match(capability, criteria),
                         agent_load_factor=cap_set.load_factor,
                         agent_availability=cap_set.availability,
                     )
@@ -303,9 +289,7 @@ class CapabilityMatcher:
         try:
             if criteria.min_version and capability.version < criteria.min_version:
                 return False
-            return not (
-                criteria.max_version and capability.version > criteria.max_version
-            )
+            return not (criteria.max_version and capability.version > criteria.max_version)
         except Exception:
             return True  # If version comparison fails, assume compatible
 
@@ -355,10 +339,7 @@ class CapabilityMatcher:
         # Version matching
         components["version_match"] = self._check_version_match(capability, criteria)
         if components["version_match"]:
-            if (
-                criteria.preferred_version
-                and capability.version == criteria.preferred_version
-            ):
+            if criteria.preferred_version and capability.version == criteria.preferred_version:
                 components["version_score"] = 1.0
             else:
                 components["version_score"] = 0.8
@@ -366,15 +347,11 @@ class CapabilityMatcher:
             return components  # Version mismatch, skip this capability
 
         # Performance matching
-        components["performance_match"] = self._check_performance_match(
-            capability, criteria
-        )
+        components["performance_match"] = self._check_performance_match(capability, criteria)
         if components["performance_match"]:
             components["performance_score"] = 1.0
         else:
-            components["performance_score"] = (
-                0.5  # Partial score for performance issues
-            )
+            components["performance_score"] = 0.5  # Partial score for performance issues
 
         # Check for exact match
         components["exact_match"] = (
@@ -401,8 +378,7 @@ class CapabilityMatcher:
             components["name_score"] * self._strategy_weights["name_match"]
             + components["type_score"] * self._strategy_weights["type_match"]
             + components["version_score"] * self._strategy_weights["version_match"]
-            + components["performance_score"]
-            * self._strategy_weights["performance_match"]
+            + components["performance_score"] * self._strategy_weights["performance_match"]
         )
         return min(1.0, weighted_score)
 
@@ -414,9 +390,7 @@ class CapabilityMatcher:
             return 0.5  # No name criteria, moderate score
 
         # Simple fuzzy matching using common subsequences
-        name_similarity = self._string_similarity(
-            capability.name, criteria.capability_name
-        )
+        name_similarity = self._string_similarity(capability.name, criteria.capability_name)
 
         # Boost score if type matches
         type_boost = 0.0

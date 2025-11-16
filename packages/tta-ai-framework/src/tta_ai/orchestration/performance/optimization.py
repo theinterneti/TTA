@@ -172,9 +172,7 @@ class IntelligentAgentCoordinator:
 
         logger.info("IntelligentAgentCoordinator stopped")
 
-    def register_agent(
-        self, agent_id: str, agent_type: AgentType, max_concurrent: int = 5
-    ) -> None:
+    def register_agent(self, agent_id: str, agent_type: AgentType, max_concurrent: int = 5) -> None:
         """Register an agent with the coordinator."""
         profile = AgentPerformanceProfile(
             agent_id=agent_id,
@@ -220,9 +218,7 @@ class IntelligentAgentCoordinator:
         # ADAPTIVE
         return await self._schedule_adaptive(request)
 
-    async def _schedule_fastest_first(
-        self, request: WorkflowRequest
-    ) -> SchedulingDecision | None:
+    async def _schedule_fastest_first(self, request: WorkflowRequest) -> SchedulingDecision | None:
         """Schedule using fastest available agents."""
         selected_agents = {}
         total_estimated_time = 0.0
@@ -246,9 +242,7 @@ class IntelligentAgentCoordinator:
             best_agent = available_agents[0]
 
             selected_agents[agent_type] = best_agent.agent_id
-            total_estimated_time = max(
-                total_estimated_time, best_agent.average_response_time
-            )
+            total_estimated_time = max(total_estimated_time, best_agent.average_response_time)
 
         return SchedulingDecision(
             request_id=request.request_id,
@@ -258,9 +252,7 @@ class IntelligentAgentCoordinator:
             reasoning="Selected fastest available agents",
         )
 
-    async def _schedule_load_balanced(
-        self, request: WorkflowRequest
-    ) -> SchedulingDecision | None:
+    async def _schedule_load_balanced(self, request: WorkflowRequest) -> SchedulingDecision | None:
         """Schedule using load balancing."""
         selected_agents = {}
         total_estimated_time = 0.0
@@ -286,9 +278,7 @@ class IntelligentAgentCoordinator:
             selected_agents[agent_type] = best_agent.agent_id
 
             # Estimate completion time considering current load
-            load_factor = 1.0 + (
-                best_agent.current_load * 0.2
-            )  # 20% penalty per concurrent task
+            load_factor = 1.0 + (best_agent.current_load * 0.2)  # 20% penalty per concurrent task
             estimated_time = best_agent.average_response_time * load_factor
             total_estimated_time = max(total_estimated_time, estimated_time)
 
@@ -300,9 +290,7 @@ class IntelligentAgentCoordinator:
             reasoning="Selected least loaded agents",
         )
 
-    async def _schedule_predictive(
-        self, request: WorkflowRequest
-    ) -> SchedulingDecision | None:
+    async def _schedule_predictive(self, request: WorkflowRequest) -> SchedulingDecision | None:
         """Schedule using predictive algorithms."""
         selected_agents = {}
         total_estimated_time = 0.0
@@ -341,9 +329,7 @@ class IntelligentAgentCoordinator:
                 total_estimated_time = max(total_estimated_time, best_predicted_time)
                 confidence_scores.append(best_confidence)
 
-        overall_confidence = (
-            statistics.mean(confidence_scores) if confidence_scores else 0.0
-        )
+        overall_confidence = statistics.mean(confidence_scores) if confidence_scores else 0.0
 
         return SchedulingDecision(
             request_id=request.request_id,
@@ -353,9 +339,7 @@ class IntelligentAgentCoordinator:
             reasoning="Selected agents using predictive performance modeling",
         )
 
-    async def _schedule_adaptive(
-        self, request: WorkflowRequest
-    ) -> SchedulingDecision | None:
+    async def _schedule_adaptive(self, request: WorkflowRequest) -> SchedulingDecision | None:
         """Schedule using adaptive strategy based on current conditions."""
         # Analyze current system state
         system_load = self._calculate_system_load()
@@ -391,9 +375,7 @@ class IntelligentAgentCoordinator:
 
         # Calculate confidence based on reliability and recent activity
         time_since_activity = time.time() - agent.last_activity
-        activity_factor = max(
-            0.5, 1.0 - (time_since_activity / 3600)
-        )  # Decay over 1 hour
+        activity_factor = max(0.5, 1.0 - (time_since_activity / 3600))  # Decay over 1 hour
 
         confidence = agent.reliability_score * activity_factor
 
@@ -407,9 +389,7 @@ class IntelligentAgentCoordinator:
         # Adjust for deadline urgency
         if request.deadline:
             time_to_deadline = request.deadline - time.time()
-            urgency_factor = max(
-                0.1, 1.0 / max(time_to_deadline / 60, 1)
-            )  # Minutes to deadline
+            urgency_factor = max(0.1, 1.0 / max(time_to_deadline / 60, 1))  # Minutes to deadline
             base_priority *= urgency_factor
 
         return base_priority
@@ -431,9 +411,7 @@ class IntelligentAgentCoordinator:
         if len(self.agent_profiles) < 2:
             return 0.0
 
-        response_times = [
-            profile.average_response_time for profile in self.agent_profiles.values()
-        ]
+        response_times = [profile.average_response_time for profile in self.agent_profiles.values()]
 
         try:
             return statistics.stdev(response_times) / statistics.mean(response_times)

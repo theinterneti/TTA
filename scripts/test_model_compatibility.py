@@ -204,7 +204,6 @@ class ModelTestRunner:
 
     async def execute_task(self, model: str, task: TaskDefinition) -> TestResult:
         """Execute a single task with a specific model."""
-        print(f"\n  Testing {task.id} with {model}...")
 
         start_time = time.time()
 
@@ -281,7 +280,6 @@ class ModelTestRunner:
         self, model: str, tasks: list[TaskDefinition]
     ) -> list[TestResult]:
         """Test a model with all tasks."""
-        print(f"\n🧪 Testing model: {model}")
         results = []
 
         for task in tasks:
@@ -290,12 +288,8 @@ class ModelTestRunner:
             self.results.append(result)
 
             # Print result
-            status = "✅" if result.success else "❌"
-            print(
-                f"    {status} {task.id}: {result.execution_time:.1f}s, quality: {result.quality_score:.2f}"
-            )
             if result.error:
-                print(f"       Error: {result.error[:100]}...")
+                pass
 
         return results
 
@@ -512,8 +506,6 @@ def main():
     # Get API key
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        print("❌ Error: OPENROUTER_API_KEY environment variable not set")
-        print("   Get your API key from: https://openrouter.ai/keys")
         return 1
 
     # Determine models to test
@@ -521,18 +513,12 @@ def main():
         # Load all models from registry
         registry = get_model_registry()
         if not registry:
-            print("❌ Error: Could not load model registry")
-            print("   Check that free_models_registry.yaml exists and is valid")
             return 1
 
         models = list(registry.models.keys())
-        print(f"⚠️  WARNING: Testing {len(models)} models from registry")
-        print("   This may incur significant API costs!")
-        print("   Press Ctrl+C within 5 seconds to cancel...")
         try:
             time.sleep(5)
         except KeyboardInterrupt:
-            print("\n❌ Cancelled by user")
             return 0
 
     elif args.model:
@@ -550,10 +536,6 @@ def main():
     else:
         tasks = TASKS
 
-    print("🚀 OpenHands Model Compatibility Test Suite")
-    print(f"   Models: {len(models)}")
-    print(f"   Tasks: {len(tasks)}")
-
     # Run tests
     runner = ModelTestRunner(api_key)
 
@@ -564,7 +546,6 @@ def main():
     asyncio.run(run_tests())
 
     # Generate reports
-    print("\n📊 Generating reports...")
     generator = ReportGenerator()
 
     # JSON report
@@ -573,26 +554,14 @@ def main():
     json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(json_path, "w") as f:
         json.dump(json_data, f, indent=2)
-    print(f"   ✅ JSON report: {json_path}")
 
     # Markdown report
     markdown_content = generator.generate_markdown(runner.results)
     markdown_path = Path("docs/openhands/model-compatibility-results.md")
     with open(markdown_path, "w") as f:
         f.write(markdown_content)
-    print(f"   ✅ Markdown report: {markdown_path}")
 
     # Print summary
-    print("\n📈 Summary:")
-    print(f"   Models tested: {json_data['test_run']['models_tested']}")
-    print(f"   Tasks executed: {json_data['test_run']['tasks_executed']}")
-    print(
-        f"   Overall success rate: {json_data['test_run']['overall_success_rate']:.1%}"
-    )
-
-    print("\n📖 View reports:")
-    print(f"   - JSON: {json_path}")
-    print(f"   - Markdown: {markdown_path}")
 
     return 0
 

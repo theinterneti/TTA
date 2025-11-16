@@ -125,7 +125,7 @@ class TestSessionStateValidation:
         second_world_state = second_wba_result.get("world_state", {})
 
         # Should maintain character information
-        character_info_maintained = (
+        (
             "character_info" in second_world_state
             or "context" in second_world_state
             or any("alex" in str(v).lower() for v in second_world_state.values())
@@ -149,15 +149,10 @@ class TestSessionStateValidation:
         third_story = third_result["story"].lower()
 
         # Should reference previous context (burnout, work issues)
-        context_references = any(
+        any(
             word in third_story
             for word in ["burnout", "work", "hours", "balance", "developer", "startup"]
         )
-
-        print("Session context persistence test:")
-        print(f"  Character info maintained: {character_info_maintained}")
-        print(f"  Context references in final story: {context_references}")
-        print("  Total interactions: 3")
 
     async def test_multi_session_isolation(self, orchestration_service):
         """Test isolation between different sessions."""
@@ -224,26 +219,12 @@ class TestSessionStateValidation:
         session_2_story = session_2_continue_result["story"].lower()
 
         # Session 1 should reference Maria/teaching/fantasy, not John/engineering/hiking
-        session_1_correct = any(
-            word in session_1_story for word in ["maria", "teacher", "fantasy", "book"]
-        )
-        session_1_isolated = not any(
-            word in session_1_story for word in ["john", "engineer", "hiking"]
-        )
+        any(word in session_1_story for word in ["maria", "teacher", "fantasy", "book"])
+        not any(word in session_1_story for word in ["john", "engineer", "hiking"])
 
         # Session 2 should reference John/engineering/hiking, not Maria/teaching/fantasy
-        session_2_correct = any(
-            word in session_2_story for word in ["john", "engineer", "hiking", "trail"]
-        )
-        session_2_isolated = not any(
-            word in session_2_story for word in ["maria", "teacher", "fantasy"]
-        )
-
-        print("Multi-session isolation test:")
-        print(f"  Session 1 context correct: {session_1_correct}")
-        print(f"  Session 1 isolated: {session_1_isolated}")
-        print(f"  Session 2 context correct: {session_2_correct}")
-        print(f"  Session 2 isolated: {session_2_isolated}")
+        any(word in session_2_story for word in ["john", "engineer", "hiking", "trail"])
+        not any(word in session_2_story for word in ["maria", "teacher", "fantasy"])
 
     async def test_world_state_persistence(self, orchestration_service):
         """Test world state persistence and evolution."""
@@ -291,22 +272,12 @@ class TestSessionStateValidation:
 
         # Validate world state evolution
         # Should reference both forest/lake (from interaction 1) and temple (from interaction 2)
-        has_forest_lake = any(word in story_3 for word in ["forest", "lake", "crystal"])
-        has_temple = any(word in story_3 for word in ["temple", "ancient"])
+        any(word in story_3 for word in ["forest", "lake", "crystal"])
+        any(word in story_3 for word in ["temple", "ancient"])
 
         # World state should have evolved to include new elements
-        world_elements_count_1 = len(str(world_state_1))
-        world_elements_count_2 = len(str(world_state_2))
-
-        world_state_evolved = world_elements_count_2 >= world_elements_count_1
-
-        print("World state persistence test:")
-        print(f"  References forest/lake: {has_forest_lake}")
-        print(f"  References temple: {has_temple}")
-        print(f"  World state evolved: {world_state_evolved}")
-        print(
-            f"  World state size progression: {world_elements_count_1} → {world_elements_count_2}"
-        )
+        len(str(world_state_1))
+        len(str(world_state_2))
 
     async def test_session_recovery_after_interruption(self, orchestration_service):
         """Test session recovery after simulated interruption."""
@@ -344,20 +315,16 @@ class TestSessionStateValidation:
         continue_story = continue_result["story"].lower()
 
         # Should remember Sarah is a psychology student working on thesis
-        context_recovered = any(
+        any(
             word in continue_story
             for word in ["sarah", "psychology", "student", "thesis", "research"]
         )
 
         # Should provide relevant information about anxiety disorders
-        relevant_response = any(
+        any(
             word in continue_story
             for word in ["anxiety", "disorder", "types", "research"]
         )
-
-        print("Session recovery test:")
-        print(f"  Context recovered: {context_recovered}")
-        print(f"  Relevant response: {relevant_response}")
 
     async def test_state_consistency_across_agents(self, orchestration_service):
         """Test state consistency across all agents in the workflow."""
@@ -396,7 +363,7 @@ class TestSessionStateValidation:
         ipa_entities = ipa_result.get("entities", [])
         ipa_intent = ipa_result.get("intent", "")
 
-        work_stress_identified = any(
+        any(
             "work" in str(entity).lower() or "stress" in str(entity).lower()
             for entity in ipa_entities
         ) or any(word in ipa_intent.lower() for word in ["work", "stress", "coping"])
@@ -405,26 +372,19 @@ class TestSessionStateValidation:
         world_state = wba_result.get("world_state", {})
         world_state_text = json.dumps(world_state).lower()
 
-        work_stress_in_world = any(
-            word in world_state_text for word in ["work", "stress", "coping", "job"]
-        )
+        any(word in world_state_text for word in ["work", "stress", "coping", "job"])
 
         # NGA should provide therapeutic response for work stress
         narrative = nga_result.get("narrative", "")
         therapeutic_elements = nga_result.get("therapeutic_elements", [])
 
-        therapeutic_response = (
+        (
             any(
                 word in narrative.lower()
                 for word in ["stress", "coping", "manage", "balance", "strategies"]
             )
             and len(therapeutic_elements) > 0
         )
-
-        print("State consistency test:")
-        print(f"  Work stress identified by IPA: {work_stress_identified}")
-        print(f"  Work stress in WBA world state: {work_stress_in_world}")
-        print(f"  Therapeutic response from NGA: {therapeutic_response}")
 
     async def test_long_session_memory_management(self, orchestration_service):
         """Test memory management in long sessions with many interactions."""
@@ -466,17 +426,13 @@ class TestSessionStateValidation:
         final_story = final_result["story"].lower()
 
         # Should remember Emma is a graphic designer
-        remembers_identity = any(
-            word in final_story for word in ["emma", "graphic", "designer"]
-        )
+        any(word in final_story for word in ["emma", "graphic", "designer"])
 
         # Should remember the project context
-        remembers_project = any(
-            word in final_story for word in ["project", "brand", "client", "startup"]
-        )
+        any(word in final_story for word in ["project", "brand", "client", "startup"])
 
         # Should address the current concern (creativity under pressure)
-        addresses_concern = any(
+        any(
             word in final_story
             for word in ["creativity", "pressure", "deadline", "quality"]
         )
@@ -488,10 +444,3 @@ class TestSessionStateValidation:
 
         # World state should have grown with accumulated context
         assert world_state_size > 100  # Should have substantial context
-
-        print("Long session memory management test:")
-        print(f"  Total interactions: {len(interactions)}")
-        print(f"  Remembers identity: {remembers_identity}")
-        print(f"  Remembers project: {remembers_project}")
-        print(f"  Addresses current concern: {addresses_concern}")
-        print(f"  Final world state size: {world_state_size} characters")

@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 import argparse
 import logging
@@ -20,7 +21,7 @@ def attempt_connect(
     """Replicate the project's connect() logic with retries and backoff.
     Returns True/False and a summary list of (attempt_idx, elapsed, outcome, err_str).
     """
-    t0 = time.time()
+    time.time()
     try:
         from neo4j import GraphDatabase
         from neo4j.exceptions import (

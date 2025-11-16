@@ -27,6 +27,7 @@ Example:
 import logging
 import subprocess
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.table import Table
@@ -37,6 +38,9 @@ from .component import Component, ComponentStatus
 from .component_registry import ComponentRegistry
 from .config import TTAConfig
 from .decorators import log_entry_exit, retry, timing_decorator, validate_args
+
+if TYPE_CHECKING:
+    from .component_loader import ComponentLoader
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -60,7 +64,11 @@ class TTAOrchestrator:
         component_registry: Registry for TTA components
     """
 
-    def __init__(self, config_path: str | Path | None = None):
+    def __init__(
+        self,
+        config_path: str | Path | None = None,
+        component_loader: "ComponentLoader | None" = None,
+    ):
         """
         Initialize the TTA Orchestrator.
 
@@ -74,8 +82,11 @@ class TTAOrchestrator:
         # Initialize component registry
         self.component_registry = ComponentRegistry(self.config, self.root_dir)
 
-        # Import components
-        self._import_components()
+        self.component_loader = component_loader
+
+        # Validate paths and import components using the loader
+        self.component_loader.validate_paths()
+        self.components = self.component_loader.discover_components()
 
         logger.info(
             f"TTAOrchestrator initialized with {len(self.components)} components"

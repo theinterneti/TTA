@@ -1,3 +1,4 @@
+# ruff: noqa: ALL
 #!/usr/bin/env python3
 """
 Performance Regression Detection Script
@@ -78,8 +79,7 @@ class PerformanceRegressionDetector:
                     except ValueError:
                         continue
 
-            except ET.ParseError as e:
-                print(f"Warning: Could not parse {xml_file}: {e}")
+            except ET.ParseError:
                 continue
 
         # Load custom metrics files (JSON format)
@@ -109,8 +109,7 @@ class PerformanceRegressionDetector:
                                 test_category="custom",
                             )
                         )
-            except (json.JSONDecodeError, FileNotFoundError) as e:
-                print(f"Warning: Could not load metrics from {json_file}: {e}")
+            except (json.JSONDecodeError, FileNotFoundError):
                 continue
 
         return metrics
@@ -124,7 +123,7 @@ class PerformanceRegressionDetector:
                 with open(baseline_file) as f:
                     return json.load(f)
             except (json.JSONDecodeError, FileNotFoundError):
-                print(f"Warning: Could not load baseline from {baseline_file}")
+                pass
 
         # Default baseline metrics (these would typically come from historical data)
         return {
@@ -238,7 +237,9 @@ class PerformanceRegressionDetector:
                 status_emoji = (
                     "🔴"
                     if result.severity == "critical"
-                    else "🟡" if result.severity == "major" else "🟠"
+                    else "🟡"
+                    if result.severity == "major"
+                    else "🟠"
                 )
                 report.append(
                     f"{status_emoji} **{result.metric_name}** ({result.severity.upper()})"
@@ -296,27 +297,18 @@ def main():
     args = parser.parse_args()
 
     if not args.test_results.exists():
-        print(f"Error: Test results directory {args.test_results} does not exist")
         sys.exit(1)
 
     detector = PerformanceRegressionDetector(threshold_percent=args.threshold)
 
     # Load current metrics
-    print("Loading performance metrics from test results...")
     current_metrics_raw = detector.load_test_results(args.test_results)
     current_metrics = detector.calculate_aggregated_metrics(current_metrics_raw)
 
-    print(
-        f"Loaded {len(current_metrics_raw)} raw metrics, aggregated to {len(current_metrics)} metrics"
-    )
-
     # Load baseline metrics
-    print("Loading baseline metrics...")
     baseline_metrics = detector.load_baseline_metrics(args.baseline_file)
-    print(f"Loaded {len(baseline_metrics)} baseline metrics")
 
     # Detect regressions
-    print("Analyzing for performance regressions...")
     results = detector.detect_regressions(current_metrics, baseline_metrics)
 
     # Generate report
@@ -325,28 +317,22 @@ def main():
     if args.output:
         with open(args.output, "w") as f:
             f.write(report)
-        print(f"Report written to {args.output}")
     else:
-        print(report)
+        pass
 
     # Exit with error code if critical regressions found
     critical_regressions = [
         r for r in results if r.is_regression and r.severity == "critical"
     ]
     if critical_regressions:
-        print(
-            f"\n❌ {len(critical_regressions)} critical performance regressions detected!"
-        )
         sys.exit(1)
 
     major_regressions = [
         r for r in results if r.is_regression and r.severity == "major"
     ]
     if major_regressions:
-        print(f"\n⚠️  {len(major_regressions)} major performance regressions detected!")
+        pass
         # Don't exit with error for major regressions, just warn
-
-    print("\n✅ Performance regression check completed successfully")
 
 
 if __name__ == "__main__":

@@ -53,9 +53,7 @@ class NarrativeComplexityAdapter:
         self.adaptation_rules: dict[
             EmotionalState, dict[ComplexityDimension, AdaptationStrategy]
         ] = {}
-        self.difficulty_mappings: dict[
-            DifficultyLevel, dict[ComplexityDimension, float]
-        ] = {}
+        self.difficulty_mappings: dict[DifficultyLevel, dict[ComplexityDimension, float]] = {}
 
         logger.info("NarrativeComplexityAdapter initialized")
 
@@ -73,9 +71,7 @@ class NarrativeComplexityAdapter:
             logger.error(f"NarrativeComplexityAdapter initialization failed: {e}")
             return False
 
-    async def adapt_scene_complexity(
-        self, scene: Scene, session_state: SessionState
-    ) -> Scene:
+    async def adapt_scene_complexity(self, scene: Scene, session_state: SessionState) -> Scene:
         """
         Adapt scene complexity based on current session state.
 
@@ -105,18 +101,14 @@ class NarrativeComplexityAdapter:
                     adapted_scene, dimension, strategy, session_state
                 )
 
-            logger.info(
-                f"Adapted scene complexity using strategies: {adaptation_strategies}"
-            )
+            logger.info(f"Adapted scene complexity using strategies: {adaptation_strategies}")
             return adapted_scene
 
         except Exception as e:
             logger.error(f"Failed to adapt scene complexity: {e}")
             return scene
 
-    async def simplify_for_intervention(
-        self, scene: Scene, session_state: SessionState
-    ) -> Scene:
+    async def simplify_for_intervention(self, scene: Scene, session_state: SessionState) -> Scene:
         """
         Simplify scene complexity for therapeutic interventions.
 
@@ -143,22 +135,16 @@ class NarrativeComplexityAdapter:
 
             # Ensure intervention-appropriate characteristics
             simplified_scene.difficulty_level = DifficultyLevel.GENTLE
-            simplified_scene.estimated_duration = min(
-                simplified_scene.estimated_duration, 600
-            )
+            simplified_scene.estimated_duration = min(simplified_scene.estimated_duration, 600)
 
-            logger.info(
-                f"Simplified scene for intervention: {simplified_scene.scene_id}"
-            )
+            logger.info(f"Simplified scene for intervention: {simplified_scene.scene_id}")
             return simplified_scene
 
         except Exception as e:
             logger.error(f"Failed to simplify scene for intervention: {e}")
             return scene
 
-    async def assess_scene_complexity(
-        self, scene: Scene
-    ) -> dict[ComplexityDimension, float]:
+    async def assess_scene_complexity(self, scene: Scene) -> dict[ComplexityDimension, float]:
         """
         Assess the current complexity level of a scene across all dimensions.
 
@@ -343,9 +329,7 @@ class NarrativeComplexityAdapter:
         }
 
     # Core Analysis and Adaptation Methods
-    async def _analyze_complexity_needs(
-        self, session_state: SessionState
-    ) -> dict[str, Any]:
+    async def _analyze_complexity_needs(self, session_state: SessionState) -> dict[str, Any]:
         """Analyze current session state to determine complexity needs."""
         return {
             "emotional_state": session_state.emotional_state,
@@ -353,9 +337,7 @@ class NarrativeComplexityAdapter:
             "session_duration": len(session_state.choice_history) * 300,  # Estimate
             "therapeutic_progress": session_state.therapeutic_context.progress_markers,
             "recent_performance": self._analyze_recent_performance(session_state),
-            "cognitive_load_indicators": self._assess_cognitive_load_indicators(
-                session_state
-            ),
+            "cognitive_load_indicators": self._assess_cognitive_load_indicators(session_state),
         }
 
     async def _determine_adaptation_strategies(
@@ -430,14 +412,10 @@ class NarrativeComplexityAdapter:
         recent_choices = session_state.choice_history[-3:]
 
         # Calculate average therapeutic value
-        total_value = sum(
-            choice.get("therapeutic_value", 0.5) for choice in recent_choices
-        )
+        total_value = sum(choice.get("therapeutic_value", 0.5) for choice in recent_choices)
         return total_value / len(recent_choices)
 
-    def _assess_cognitive_load_indicators(
-        self, session_state: SessionState
-    ) -> dict[str, Any]:
+    def _assess_cognitive_load_indicators(self, session_state: SessionState) -> dict[str, Any]:
         """Assess indicators of cognitive load from session state."""
         indicators = {
             "choice_time_average": 30,  # Default assumption
@@ -455,9 +433,7 @@ class NarrativeComplexityAdapter:
         return indicators
 
     # Dimension-Specific Adaptation Methods
-    async def _adapt_cognitive_load(
-        self, scene: Scene, strategy: AdaptationStrategy
-    ) -> Scene:
+    async def _adapt_cognitive_load(self, scene: Scene, strategy: AdaptationStrategy) -> Scene:
         """Adapt cognitive load of the scene."""
         if strategy in (
             AdaptationStrategy.SIMPLIFY,
@@ -478,9 +454,7 @@ class NarrativeComplexityAdapter:
 
         return scene
 
-    async def _adapt_emotional_intensity(
-        self, scene: Scene, strategy: AdaptationStrategy
-    ) -> Scene:
+    async def _adapt_emotional_intensity(self, scene: Scene, strategy: AdaptationStrategy) -> Scene:
         """Adapt emotional intensity of the scene."""
         if strategy in (
             AdaptationStrategy.SIMPLIFY,
@@ -490,9 +464,7 @@ class NarrativeComplexityAdapter:
             scene.emotional_tone = "deeply_calming"
 
             # Add calming elements
-            calming_addition = (
-                " A profound sense of peace and safety permeates this space."
-            )
+            calming_addition = " A profound sense of peace and safety permeates this space."
             scene.narrative_content += calming_addition
 
         elif strategy == AdaptationStrategy.INCREASE:
@@ -501,9 +473,7 @@ class NarrativeComplexityAdapter:
 
         return scene
 
-    async def _adapt_choice_complexity(
-        self, scene: Scene, strategy: AdaptationStrategy
-    ) -> Scene:
+    async def _adapt_choice_complexity(self, scene: Scene, strategy: AdaptationStrategy) -> Scene:
         """Adapt choice complexity (this affects future choice generation)."""
         # Store complexity preference for choice generation
         if not hasattr(scene, "choice_complexity_preference"):
@@ -519,9 +489,7 @@ class NarrativeComplexityAdapter:
 
         return scene
 
-    async def _adapt_therapeutic_depth(
-        self, scene: Scene, strategy: AdaptationStrategy
-    ) -> Scene:
+    async def _adapt_therapeutic_depth(self, scene: Scene, strategy: AdaptationStrategy) -> Scene:
         """Adapt therapeutic depth of the scene."""
         if strategy in (
             AdaptationStrategy.SIMPLIFY,
@@ -540,9 +508,7 @@ class NarrativeComplexityAdapter:
 
         return scene
 
-    async def _adapt_narrative_length(
-        self, scene: Scene, strategy: AdaptationStrategy
-    ) -> Scene:
+    async def _adapt_narrative_length(self, scene: Scene, strategy: AdaptationStrategy) -> Scene:
         """Adapt narrative length."""
         if strategy in (
             AdaptationStrategy.SIMPLIFY,
@@ -558,14 +524,14 @@ class NarrativeComplexityAdapter:
 
         elif strategy == AdaptationStrategy.INCREASE:
             # Extend narrative with additional detail
-            scene.narrative_content += " Take time to fully absorb and appreciate all the nuances of this experience."
+            scene.narrative_content += (
+                " Take time to fully absorb and appreciate all the nuances of this experience."
+            )
             scene.estimated_duration = min(scene.estimated_duration + 120, 600)
 
         return scene
 
-    async def _adapt_vocabulary_level(
-        self, scene: Scene, strategy: AdaptationStrategy
-    ) -> Scene:
+    async def _adapt_vocabulary_level(self, scene: Scene, strategy: AdaptationStrategy) -> Scene:
         """Adapt vocabulary complexity."""
         if strategy in (
             AdaptationStrategy.SIMPLIFY,
@@ -603,7 +569,9 @@ class NarrativeComplexityAdapter:
 
         elif strategy == AdaptationStrategy.INCREASE:
             # Add more abstract therapeutic concepts
-            scene.narrative_content += " Consider the deeper meanings and connections that emerge from this experience."
+            scene.narrative_content += (
+                " Consider the deeper meanings and connections that emerge from this experience."
+            )
 
         return scene
 
@@ -639,15 +607,9 @@ class NarrativeComplexityAdapter:
 
         content_lower = scene.narrative_content.lower()
 
-        high_count = sum(
-            1 for word in intensity_keywords["high"] if word in content_lower
-        )
-        medium_count = sum(
-            1 for word in intensity_keywords["medium"] if word in content_lower
-        )
-        low_count = sum(
-            1 for word in intensity_keywords["low"] if word in content_lower
-        )
+        high_count = sum(1 for word in intensity_keywords["high"] if word in content_lower)
+        medium_count = sum(1 for word in intensity_keywords["medium"] if word in content_lower)
+        low_count = sum(1 for word in intensity_keywords["low"] if word in content_lower)
 
         if high_count > 0:
             return 0.8
@@ -699,9 +661,7 @@ class NarrativeComplexityAdapter:
         ]
 
         content_lower = scene.narrative_content.lower()
-        keyword_count = sum(
-            1 for keyword in therapeutic_keywords if keyword in content_lower
-        )
+        keyword_count = sum(1 for keyword in therapeutic_keywords if keyword in content_lower)
         depth_score += min(keyword_count * 0.1, 0.6)
 
         return min(depth_score, 1.0)
@@ -776,12 +736,8 @@ class NarrativeComplexityAdapter:
 
         content_lower = scene.narrative_content.lower()
 
-        abstract_count = sum(
-            1 for concept in abstract_concepts if concept in content_lower
-        )
-        concrete_count = sum(
-            1 for concept in concrete_concepts if concept in content_lower
-        )
+        abstract_count = sum(1 for concept in abstract_concepts if concept in content_lower)
+        concrete_count = sum(1 for concept in concrete_concepts if concept in content_lower)
 
         if abstract_count + concrete_count == 0:
             return 0.5  # Neutral

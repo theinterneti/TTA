@@ -1,0 +1,10 @@
+# Schema for specification templates (specs/templates/*.spec.template.md)
+# Validates YAML frontmatter in specification documents
+# Note: Active templates are in specs/templates/, not .github/specs/ (migrated to KB)
+
+type: enum('feature', 'api', 'component', required=True)
+category: str(required=True)
+status: enum('draft', 'review', 'approved', 'implemented', required=True)
+priority: enum('critical', 'high', 'medium', 'low', required=True)
+created: str(required=True)
+updated: str(required=True)

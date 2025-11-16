@@ -12,10 +12,8 @@ from pathlib import Path
 
 def check_requirements_file(file_path, expected_versions):
     """Check that a requirements file contains the expected versions."""
-    print(f"\n📄 Checking {file_path}...")
 
     if not Path(file_path).exists():
-        print(f"  ❌ File not found: {file_path}")
         return False
 
     with open(file_path) as f:
@@ -28,9 +26,8 @@ def check_requirements_file(file_path, expected_versions):
             or f"{package}[" in content
             and version in content
         ):
-            print(f"  ✅ {package}=={version}")
+            pass
         else:
-            print(f"  ❌ {package}=={version} NOT FOUND")
             all_found = False
 
     return all_found
@@ -43,18 +40,12 @@ def test_package_import(package_name, import_name=None):
 
     try:
         __import__(import_name)
-        print(f"  ✅ {package_name} can be imported")
         return True
-    except ImportError as e:
-        print(f"  ⚠️  {package_name} import failed (may not be installed): {e}")
+    except ImportError:
         return False
 
 
 def main():
-    print("=" * 80)
-    print("PHASE 1 SECURITY UPDATE VALIDATION")
-    print("=" * 80)
-
     # Define expected versions
     phase1_updates = {
         "python-jose": "3.4.0",
@@ -85,20 +76,10 @@ def main():
         },
     }
 
-    print("\n" + "=" * 80)
-    print("STEP 1: Verify Requirements Files")
-    print("=" * 80)
-
     all_files_ok = True
     for file_path, expected in files_to_check.items():
         if not check_requirements_file(file_path, expected):
             all_files_ok = False
-
-    print("\n" + "=" * 80)
-    print("STEP 2: Test Package Imports")
-    print("=" * 80)
-    print("\n⚠️  Note: Some packages may not be installed in current environment")
-    print("This is expected - validation focuses on requirements file updates\n")
 
     # Test imports (these may fail if not installed, which is OK)
     test_package_import("python-jose", "jose")
@@ -107,34 +88,14 @@ def main():
     test_package_import("aiohttp")
     test_package_import("pillow", "PIL")
 
-    print("\n" + "=" * 80)
-    print("STEP 3: Summary")
-    print("=" * 80)
-
     if all_files_ok:
-        print("\n✅ SUCCESS: All Phase 1 dependency updates are correctly applied!")
-        print("\nUpdated packages:")
-        for package, version in phase1_updates.items():
-            print(f"  • {package}: → {version}")
+        for _package, _version in phase1_updates.items():
+            pass
 
-        print("\nFiles updated:")
         for file_path in files_to_check:
-            print(f"  • {file_path}")
-
-        print("\n" + "=" * 80)
-        print("NEXT STEPS:")
-        print("=" * 80)
-        print("1. Install dependencies: uv sync --all-extras")
-        print("2. Run existing test suite to validate functionality")
-        print("3. Test authentication flows (JWT, OAuth)")
-        print("4. Test form data handling")
-        print("5. Test HTTP client operations")
-        print("6. Create conventional commits")
-        print("7. Generate PR for review")
+            pass
 
         return 0
-    print("\n❌ FAILURE: Some dependency updates are missing or incorrect")
-    print("Please review the errors above and fix the requirements files.")
     return 1
 
 

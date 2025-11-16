@@ -233,9 +233,7 @@ class HardwareDetector(IHardwareDetector):
         # Default estimates for unknown models
         default_requirements = {"ram_gb": 8, "vram_gb": 4, "disk_gb": 8}
 
-        requirements: dict[str, Any] = model_sizes.get(
-            model_id, default_requirements
-        ).copy()
+        requirements: dict[str, Any] = model_sizes.get(model_id, default_requirements).copy()
 
         # Add additional requirements
         requirements.update(
@@ -244,9 +242,7 @@ class HardwareDetector(IHardwareDetector):
                 "python_version_min": "3.8",
                 "supports_quantization": True,
                 "quantization_options": ["4bit", "8bit", "16bit"],
-                "estimated_load_time_seconds": (
-                    30 if requirements["ram_gb"] <= 16 else 120
-                ),
+                "estimated_load_time_seconds": (30 if requirements["ram_gb"] <= 16 else 120),
             }
         )
 
@@ -277,11 +273,7 @@ class HardwareDetector(IHardwareDetector):
             for i in range(device_count):
                 handle = pynvml.nvmlDeviceGetHandleByIndex(i)
                 name_raw = pynvml.nvmlDeviceGetName(handle)
-                name = (
-                    name_raw.decode("utf-8")
-                    if isinstance(name_raw, bytes)
-                    else name_raw
-                )
+                name = name_raw.decode("utf-8") if isinstance(name_raw, bytes) else name_raw
                 memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
                 memory_gb = float(memory_info.total) / (1024**3)
 

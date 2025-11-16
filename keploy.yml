@@ -1,0 +1,66 @@
+# Keploy Configuration for TTA
+# See: https://keploy.io/docs/server/configuration/
+
+# Test run configuration
+test:
+  # Selected tests to run (empty = all)
+  selectedTests: {}
+
+  # Global noise to ignore in responses
+  globalNoise:
+    global:
+      body: {
+          # Ignore timestamp fields that change between runs
+          "created_at": [],
+          "updated_at": [],
+          "timestamp": [],
+          # Ignore UUIDs that are generated dynamically
+          "id": [],
+          "session_id": [],
+          "request_id": [],
+        }
+      header: {
+          # Ignore headers that vary
+          "Date": [],
+          "X-Request-Id": [],
+        }
+
+# Record configuration
+record:
+  # Filters for which APIs to record
+  filters:
+    # URL patterns to record
+    urlRegex: ".*"
+
+    # HTTP methods to record
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+
+    # Headers to capture
+    headers:
+      - Content-Type
+      - Authorization
+      - Accept
+
+# Path configuration
+path: "./keploy"
+
+# Command to start your application
+# Override with -c flag if needed
+command: "uv run python scripts/minimal_api_server.py"
+
+# Port your application runs on
+port: 8000
+
+# Delay before starting tests (seconds)
+delay: 10
+
+# Enable debug logging
+debug: false
+
+# Disable telemetry
+disableTele: true

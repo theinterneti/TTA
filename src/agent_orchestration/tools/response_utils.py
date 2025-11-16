@@ -28,7 +28,7 @@ from .response_models import (
 T = TypeVar("T")
 
 
-def success_response(
+def success_response[T](
     data: T,
     tool_name: str,
     tool_version: str,
@@ -140,7 +140,7 @@ def error_response(
     )
 
 
-def paginated_response(
+def paginated_response[T](
     items: list[T],
     total_count: int | None,
     has_more: bool,

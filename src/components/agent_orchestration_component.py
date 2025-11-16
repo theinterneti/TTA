@@ -2743,7 +2743,7 @@ class AgentOrchestrationComponent(Component):
                     "duration_ms": dur_ms,
                     "metrics": usage,
                 }
-            except _asyncio.TimeoutError:
+            except TimeoutError:
                 return {"ok": False, "error": "timeout"}
             except Exception as e:
                 return {"ok": False, "error": str(e)}

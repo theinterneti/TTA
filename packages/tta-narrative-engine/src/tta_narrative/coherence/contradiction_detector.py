@@ -52,34 +52,24 @@ class ContradictionDetector:
             List of detected contradictions
         """
         try:
-            logger.debug(
-                f"Detecting contradictions across {len(content_history)} content pieces"
-            )
+            logger.debug(f"Detecting contradictions across {len(content_history)} content pieces")
 
             contradictions: list[Contradiction] = []
 
             # Detect direct contradictions
-            direct_contradictions = await self._detect_direct_contradictions(
-                content_history
-            )
+            direct_contradictions = await self._detect_direct_contradictions(content_history)
             contradictions.extend(direct_contradictions)
 
             # Detect implicit contradictions
-            implicit_contradictions = await self._detect_implicit_contradictions(
-                content_history
-            )
+            implicit_contradictions = await self._detect_implicit_contradictions(content_history)
             contradictions.extend(implicit_contradictions)
 
             # Detect temporal contradictions
-            temporal_contradictions = await self._detect_temporal_contradictions(
-                content_history
-            )
+            temporal_contradictions = await self._detect_temporal_contradictions(content_history)
             contradictions.extend(temporal_contradictions)
 
             # Detect causal contradictions
-            causal_contradictions = await self._detect_causal_contradictions(
-                content_history
-            )
+            causal_contradictions = await self._detect_causal_contradictions(content_history)
             contradictions.extend(causal_contradictions)
 
             logger.info(f"Detected {len(contradictions)} contradictions")
@@ -183,9 +173,7 @@ class ContradictionDetector:
                 for j in range(i + 1, len(content_history)):
                     content1 = content_history[i]
                     content2 = content_history[j]
-                    direct_conflicts = await self._find_direct_conflicts(
-                        content1, content2
-                    )
+                    direct_conflicts = await self._find_direct_conflicts(content1, content2)
                     contradictions.extend(direct_conflicts)
             return contradictions
         except Exception as e:
@@ -202,9 +190,7 @@ class ContradictionDetector:
                 for j in range(i + 1, len(content_history)):
                     content1 = content_history[i]
                     content2 = content_history[j]
-                    implicit_conflicts = await self._find_implicit_conflicts(
-                        content1, content2
-                    )
+                    implicit_conflicts = await self._find_implicit_conflicts(content1, content2)
                     contradictions.extend(implicit_conflicts)
             return contradictions
         except Exception as e:
@@ -222,9 +208,7 @@ class ContradictionDetector:
                 for j in range(i + 1, len(temporal_events)):
                     event1 = temporal_events[i]
                     event2 = temporal_events[j]
-                    temporal_conflicts = await self._find_temporal_conflicts(
-                        event1, event2
-                    )
+                    temporal_conflicts = await self._find_temporal_conflicts(event1, event2)
                     contradictions.extend(temporal_conflicts)
             return contradictions
         except Exception as e:

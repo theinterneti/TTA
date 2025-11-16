@@ -12,7 +12,6 @@ Provides:
 from __future__ import annotations
 
 import os
-import subprocess
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
@@ -174,4 +173,3 @@ def mock_agent_registry() -> MagicMock:
     registry = MagicMock()
     registry.register = MagicMock()
     return registry
-

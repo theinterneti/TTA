@@ -3,6 +3,11 @@
 /.pnp
 .pnp.js
 
+# Storybook dual-version setup
+.storybook/node_modules
+.storybook/package-lock.json
+storybook-static
+
 # Testing
 /coverage
 

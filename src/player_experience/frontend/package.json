@@ -26,7 +26,7 @@
     "recharts": "^3.2.1",
     "storybook": "^8.6.14",
     "typescript": "^5.3.3",
-    "vite": "^7.1.6",
+    "vite": "^7.1.12",
     "web-vitals": "^3.5.0"
   },
   "devDependencies": {
@@ -55,9 +55,11 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "test:storybook": "test-storybook",
+    "storybook": "bash scripts/storybook-wrapper.sh dev",
+    "build-storybook": "bash scripts/storybook-wrapper.sh build",
+    "test:storybook": "bash scripts/storybook-wrapper.sh test",
+    "storybook:clean": "bash scripts/storybook-wrapper.sh clean",
+    "storybook:reinstall": "bash scripts/storybook-wrapper.sh reinstall",
     "test:visual": "playwright test --config=playwright-visual.config.ts",
     "test:visual:headed": "playwright test --config=playwright-visual.config.ts --headed",
     "test:visual:debug": "playwright test --config=playwright-visual.config.ts --debug",

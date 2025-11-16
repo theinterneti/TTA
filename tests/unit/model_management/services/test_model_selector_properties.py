@@ -10,7 +10,6 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,
@@ -198,7 +197,7 @@ class TestModelSelectorProperties:
         assert all(model in unique_models for model in ranked)
 
         # Property: No duplicates in ranked list
-        assert len(ranked) == len(set(m.model_id for m in ranked))
+        assert len(ranked) == len({m.model_id for m in ranked})
 
     @given(
         models=st.lists(model_info_strategy(), min_size=2, max_size=20),
@@ -253,7 +252,7 @@ class TestModelSelectorProperties:
 
         # Property: Results should be identical
         assert len(filtered1) == len(filtered2)
-        assert set(m.model_id for m in filtered1) == set(m.model_id for m in filtered2)
+        assert {m.model_id for m in filtered1} == {m.model_id for m in filtered2}
 
     @given(
         models=st.lists(model_info_strategy(), min_size=1, max_size=20),
@@ -316,7 +315,7 @@ class TestModelSelectorProperties:
         if free_models and paid_models:
             # At least one free model should have a competitive score
             max_free_score = max(scores[m.model_id] for m in free_models)
-            max_paid_score = max(scores[m.model_id] for m in paid_models)
+            max(scores[m.model_id] for m in paid_models)
 
             # Free models get +1.0 bonus, so max free should be >= max paid - 1.0
             # (accounting for other factors)

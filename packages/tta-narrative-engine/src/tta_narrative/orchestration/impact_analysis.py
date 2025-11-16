@@ -25,11 +25,7 @@ def calculate_base_magnitude(choice: PlayerChoice, scale: NarrativeScale) -> flo
         NarrativeScale.EPIC_TERM: 0.1,
     }
     base = 0.5
-    choice_type = (
-        choice.metadata.get("choice_type", "dialogue")
-        if choice.metadata
-        else "dialogue"
-    )
+    choice_type = choice.metadata.get("choice_type", "dialogue") if choice.metadata else "dialogue"
     if choice_type == "major_decision":
         base *= 1.5
     elif choice_type == "character_interaction":
@@ -39,16 +35,12 @@ def calculate_base_magnitude(choice: PlayerChoice, scale: NarrativeScale) -> flo
     return min(1.0, base * scale_multipliers.get(scale, 0.5))
 
 
-def identify_affected_elements(
-    choice: PlayerChoice, scale: NarrativeScale
-) -> list[str]:
+def identify_affected_elements(choice: PlayerChoice, scale: NarrativeScale) -> list[str]:
     elements: list[str] = []
     if scale == NarrativeScale.SHORT_TERM:
         elements.extend(["current_scene", "immediate_dialogue", "character_mood"])
     elif scale == NarrativeScale.MEDIUM_TERM:
-        elements.extend(
-            ["character_relationships", "personal_growth", "skill_development"]
-        )
+        elements.extend(["character_relationships", "personal_growth", "skill_development"])
     elif scale == NarrativeScale.LONG_TERM:
         elements.extend(["world_state", "faction_relationships", "major_plot_threads"])
     elif scale == NarrativeScale.EPIC_TERM:
@@ -66,9 +58,7 @@ def calculate_causal_strength(choice: PlayerChoice, scale: NarrativeScale) -> fl
         strength *= 1.2
     if choice.metadata and "risk_level" in choice.metadata:
         with contextlib.suppress(Exception):
-            strength *= 1.1 + 0.1 * min(
-                1.0, max(0.0, float(choice.metadata["risk_level"]))
-            )
+            strength *= 1.1 + 0.1 * min(1.0, max(0.0, float(choice.metadata["risk_level"])))
     if scale == NarrativeScale.SHORT_TERM:
         strength *= 1.3
     elif scale == NarrativeScale.MEDIUM_TERM:
@@ -99,9 +89,7 @@ def calculate_confidence_score(choice: PlayerChoice, _scale: NarrativeScale) -> 
         confidence *= 1.2
     if choice.metadata and "ambiguity" in choice.metadata:
         with contextlib.suppress(Exception):
-            confidence *= (
-                1.0 - min(1.0, max(0.0, float(choice.metadata["ambiguity"]))) * 0.5
-            )
+            confidence *= 1.0 - min(1.0, max(0.0, float(choice.metadata["ambiguity"]))) * 0.5
     return min(1.0, max(0.0, confidence))
 
 
@@ -124,9 +112,7 @@ def create_narrative_event(
         causal_links={},
         description=f"Event from choice {choice.choice_id}",
         participants=[
-            choice.metadata.get("character_name", "player")
-            if choice.metadata
-            else "player"
+            choice.metadata.get("character_name", "player") if choice.metadata else "player"
         ],
         metadata={
             "choice_id": choice.choice_id,
@@ -147,9 +133,7 @@ def evaluate_cross_scale_influences(
                 if other != scale:
                     for ev in other_events:
                         ev.causal_links.setdefault("cross_scale", 0.0)
-                        ev.causal_links["cross_scale"] = max(
-                            ev.causal_links["cross_scale"], 0.2
-                        )
+                        ev.causal_links["cross_scale"] = max(ev.causal_links["cross_scale"], 0.2)
 
 
 __all__ = [

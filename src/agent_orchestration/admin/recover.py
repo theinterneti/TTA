@@ -42,13 +42,11 @@ def main() -> int:
     args = parser.parse_args()
 
     per_agent = asyncio.run(run_recovery(args.redis_url, key_prefix=args.key_prefix))
-    total = sum(per_agent.values())
-    print("Recovered messages summary:")
+    sum(per_agent.values())
     if not per_agent:
-        print("  No expired reservations found.")
-    for agent, count in per_agent.items():
-        print(f"  {agent}: {count}")
-    print(f"Total recovered: {total}")
+        pass
+    for _agent, _count in per_agent.items():
+        pass
     return 0
 
 

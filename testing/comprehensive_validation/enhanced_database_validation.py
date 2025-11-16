@@ -308,7 +308,7 @@ class EnhancedDatabaseValidator:
                 neo4j_ops += 1  # Neo4j operations for session creation
 
             # Test session retrieval
-            for session_id, original_context in test_sessions:
+            for session_id, _original_context in test_sessions:
                 retrieved_context = await self.session_repository.get_session(
                     session_id
                 )
@@ -480,27 +480,13 @@ if __name__ == "__main__":
     async def main():
         results = await run_enhanced_database_validation()
 
-        print("\n" + "=" * 80)
-        print("ENHANCED DATABASE VALIDATION RESULTS")
-        print("=" * 80)
-
         for result in results:
-            print(f"\n📊 Test: {result.test_name}")
-            print(f"   Duration: {result.duration_seconds:.2f}s")
-            print(f"   Redis Operations: {result.redis_operations}")
-            print(f"   Neo4j Operations: {result.neo4j_operations}")
-            print(f"   Success Rate: {result.success_rate:.1%}")
-            print(f"   Performance Score: {result.performance_score:.1f}/10")
-            print(f"   Consistency Score: {result.consistency_score:.1f}/10")
-
             if result.errors:
-                print(f"   ❌ Errors: {len(result.errors)}")
-                for error in result.errors[:3]:  # Show first 3 errors
-                    print(f"      - {error}")
+                for _error in result.errors[:3]:  # Show first 3 errors
+                    pass
 
             if result.recommendations:
-                print("   💡 Recommendations:")
-                for rec in result.recommendations:
-                    print(f"      - {rec}")
+                for _rec in result.recommendations:
+                    pass
 
     asyncio.run(main())

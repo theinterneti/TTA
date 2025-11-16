@@ -17,9 +17,7 @@ FactoryFn = Callable[[], Awaitable[ToolSpec]] | Callable[[], ToolSpec]
 
 
 class ToolCoordinator:
-    def __init__(
-        self, registry: RedisToolRegistry, policy: ToolPolicy | None = None
-    ) -> None:
+    def __init__(self, registry: RedisToolRegistry, policy: ToolPolicy | None = None) -> None:
         self._registry = registry
         self._policy = policy or ToolPolicy()
         self._locks: dict[str, asyncio.Lock] = {}
@@ -37,11 +35,7 @@ class ToolCoordinator:
         # Acquire a per-signature lock to avoid duplicate creation across tasks.
         async with self._lock_for(signature):
             # Build spec via factory
-            spec = (
-                await factory_fn()
-                if asyncio.iscoroutinefunction(factory_fn)
-                else factory_fn()
-            )
+            spec = await factory_fn() if asyncio.iscoroutinefunction(factory_fn) else factory_fn()
             # Validate safety and constraints before registration
             self._policy.check_safety(spec)
             now = time.time()
@@ -59,14 +53,10 @@ class ToolCoordinator:
                 spec = existing or spec
             return spec
 
-    async def run_tool(
-        self, spec: ToolSpec, fn: Callable[..., object], *args, **kwargs
-    ):
+    async def run_tool(self, spec: ToolSpec, fn: Callable[..., object], *args, **kwargs):
         """Run a tool callable with automatic metrics collection and policy timeouts."""
         timeout_ms = (
-            self._policy.get_timeout_ms()
-            if hasattr(self._policy, "get_timeout_ms")
-            else None
+            self._policy.get_timeout_ms() if hasattr(self._policy, "get_timeout_ms") else None
         )
         res = run_with_metrics(spec.name, spec.version, fn, *args, **kwargs)
         # Async path: enforce timeout via asyncio.wait_for
@@ -99,9 +89,7 @@ class ToolCoordinator:
             t.join(timeout_ms / 1000.0)
             if t.is_alive():
                 with contextlib.suppress(Exception):
-                    get_tool_metrics().record_failure(
-                        spec.name, spec.version, timeout_ms
-                    )
+                    get_tool_metrics().record_failure(spec.name, spec.version, timeout_ms)
                 # cannot kill the thread safely; document limitation
                 raise TimeoutError(
                     f"Tool '{spec.name}:{spec.version}' execution exceeded {timeout_ms} ms"

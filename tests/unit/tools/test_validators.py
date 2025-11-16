@@ -54,9 +54,7 @@ class TestToolNameValidator:
         result = validator.validate("unknown_player_profile")
         # Should still be valid but with lower score
         assert result.score < 1.0
-        assert any(
-            f.severity == ValidationSeverity.WARNING for f in result.findings
-        )
+        assert any(f.severity == ValidationSeverity.WARNING for f in result.findings)
 
     def test_approved_resource(self):
         """Test approved resource is accepted."""
@@ -147,9 +145,7 @@ class TestToolDescriptionValidator:
 
         # Too short for ideal
         result = validator.validate("This is a short description.")
-        assert any(
-            f.severity == ValidationSeverity.WARNING for f in result.findings
-        )
+        assert any(f.severity == ValidationSeverity.WARNING for f in result.findings)
 
         # Ideal length
         result = validator.validate(
@@ -164,9 +160,7 @@ class TestToolDescriptionValidator:
         result = validator.validate(
             "This tool does various things and stuff with the player data etc."
         )
-        assert any(
-            "vague terms" in f.message.lower() for f in result.findings
-        )
+        assert any("vague terms" in f.message.lower() for f in result.findings)
         assert result.score < 5.0
 
     def test_action_verb_check(self):
@@ -216,9 +210,7 @@ class TestToolDescriptionValidator:
             assert result.score >= 4.0
         else:
             # Should have info finding about action verb
-            assert any(
-                "action verb" in f.message.lower() for f in result.findings
-            )
+            assert any("action verb" in f.message.lower() for f in result.findings)
 
 
 class TestValidationIntegration:
@@ -250,4 +242,3 @@ class TestValidationIntegration:
 
         assert name_result.is_valid is False
         assert desc_result.is_valid is False
-

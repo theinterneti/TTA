@@ -1259,31 +1259,18 @@ async def main():
     report = await validator.run_comprehensive_assessment()
 
     # Print summary
-    print(f"\n{'=' * 60}")
-    print("PRODUCTION READINESS ASSESSMENT SUMMARY")
-    print(f"{'=' * 60}")
-    print(f"Overall Level: {report.overall_level.value.upper()}")
-    print(f"Overall Score: {report.overall_score:.1f}/100")
-    print(f"Total Checks: {len(report.checks)}")
-    print(f"Passed Checks: {sum(1 for check in report.checks if check.passed)}")
-    print(f"Failed Checks: {sum(1 for check in report.checks if not check.passed)}")
 
     if report.critical_issues:
-        print(f"\nCRITICAL ISSUES ({len(report.critical_issues)}):")
-        for issue in report.critical_issues[:5]:  # Show first 5
-            print(f"  - {issue}")
+        for _issue in report.critical_issues[:5]:  # Show first 5
+            pass
         if len(report.critical_issues) > 5:
-            print(f"  ... and {len(report.critical_issues) - 5} more")
+            pass
 
     if report.recommendations:
-        print(f"\nTOP RECOMMENDATIONS ({len(report.recommendations)}):")
-        for rec in report.recommendations[:5]:  # Show first 5
-            print(f"  - {rec}")
+        for _rec in report.recommendations[:5]:  # Show first 5
+            pass
         if len(report.recommendations) > 5:
-            print(f"  ... and {len(report.recommendations) - 5} more")
-
-    print("\nDetailed report saved to: ./production_readiness_reports/")
-    print(f"{'=' * 60}")
+            pass
 
 
 if __name__ == "__main__":

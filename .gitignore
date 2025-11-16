@@ -41,6 +41,9 @@ env.bak/
 venv.bak/
 .python-version
 
+# GitHub Project configuration (contains sensitive IDs)
+.github/project-config.env
+
 # -------------------------------------------------
 # 4) Testing & coverage outputs
 # -------------------------------------------------
@@ -201,6 +204,11 @@ dump.rdb
 
 # Secrets and certificates
 .secrets/
+secrets/
+!secrets/README.md
+!secrets/production/README.md
+*.secret
+*.password.txt
 *.pem
 *.key
 *.p12
@@ -268,3 +276,190 @@ chrome_profile_notebooklm/
 /TTA.prototype/*
 
 config/neo4j-staging.conf
+
+# -------------------------------------------------
+# 14) Development and debugging scripts (root level)
+# -------------------------------------------------
+# Root-level Python scripts used for development/testing/debugging
+# (Keep scripts in scripts/ directory for production use)
+/cleanup_obsolete_files.py
+/concurrent_load_test.py
+/enhanced_api_server.py
+/enhanced_preference_ai_server.py
+/minimal_api_server.py
+/simple_api_server.py
+/neo4j_*.py
+/phase*_test.py
+/phase*_frontend_integration_test.py
+/phase*_comprehensive_test.py
+/phase*_advanced_analytics_test.py
+/populate_tta_system.py
+/run_tta_verification.py
+/generate_therapeutic_worlds.py
+/import_grafana_dashboards.py
+/fix_*.py
+/setup_neo4j_schema.py
+/validate-*.py
+/staging_*.py
+/start_phase3_services.py
+
+# Artifacts directory (test scripts with development-only code)
+/artifacts/
+
+# Obsolete subdirectories (legacy configs and old code)
+/obsolete/
+
+# Root-level shell scripts (development utilities)
+# Keep scripts in scripts/ directory for production use
+/*.sh
+!scripts/*.sh
+
+# -------------------------------------------------
+# 15) Temporary and backup files
+# -------------------------------------------------
+cleanup_backup_*.txt
+cookies.txt
+emissions.csv
+docker-warnings.json
+ruff_errors_grouped.txt
+semgrep-*.json
+uv.toml.backup
+*_errors_grouped.txt
+*_FIXES_REPORT.txt
+PYRIGHT_BASELINE_*.txt
+
+# -------------------------------------------------
+# 16) HTML demos and test interfaces (root level)
+# -------------------------------------------------
+/demo_interface.html
+/tta_dashboard.html
+/neo4j_browser_*.html
+
+# -------------------------------------------------
+# 17) Node.js (root level - likely from testing)
+# -------------------------------------------------
+/node_modules/
+/package-lock.json
+/package.json
+/playwright.config.ts
+/quick-validation.spec.ts
+/tsconfig.json
+
+# Test mock node_modules (contains invalid JSON configs)
+/tests/e2e/mocks/node_modules/
+
+# -------------------------------------------------
+# 18) Staging and environment-specific directories
+# -------------------------------------------------
+venv-staging/
+archive/
+
+# -------------------------------------------------
+# 19) Task completion and validation documentation (root level)
+# -------------------------------------------------
+# Keep these in docs/ for proper documentation
+/TASK*_COMPLETE.md
+/STAGING_*.md
+/*_COMPLETE.md
+/*_SUMMARY.md
+/*_REPORT.md
+/*_ASSESSMENT.md
+/*_PLAN.md
+/*_GUIDE.md
+/*_TRACKER.md
+/*_RESEARCH.md
+/*_FIX.md
+/*_IMPROVEMENTS.md
+/*_OPTIMIZATION.md
+/*_DELIVERABLES.md
+/*_READY.md
+/VALIDATION_*.md
+/FINAL_*.md
+/GITHUB_*.md
+/NARRATIVE_*.md
+
+# -------------------------------------------------
+# 20) Cypher query files and Redis config (root level)
+# -------------------------------------------------
+/*.cypher
+/redis.conf
+
+# gemini-cli settings
+.gemini/
+
+# GitHub App credentials
+gha-creds-*.json
+
+# -------------------------------------------------
+# 21) Specific untracked artifacts
+# -------------------------------------------------
+# Version-like directories that appear to be artifacts
+/=0.2.0
+/=0.3.0
+
+# -------------------------------------------------
+# 22) AI tooling and GitHub Actions credentials
+# -------------------------------------------------
+# Gemini CLI configuration and context
+.gemini/
+
+# GitHub Actions credentials (generated during workflow runs)
+gha-creds-*.json
+
+# -------------------------------------------------
+# 23) Local AI development artifacts
+# -------------------------------------------------
+# Augment AI personal configuration
+.augment/chatmodes/
+.augment/instructions/
+.augment/memory/
+.augment/workflows/
+.augment/rules/ai-context-management.md
+.augment/rules/gemini-cli-sub-agent.md
+.augment/rules/integrated-workflow.md
+.augment/rules/use-serena-tools.md
+
+# Serena AI configuration
+.serena/
+
+# Development metrics and reports (generated)
+.metrics/
+workflow_report_*.json
+coverage_*.json
+test-results-*.json
+
+# Component registry cache
+scripts/registry/.component_registry.json
+
+# E2E visual testing artifacts (generated)
+tests/e2e-staging/visual-baselines/
+tests/e2e-staging/visual-diffs/
+tests/e2e-staging/*-snapshots/
+
+# Experimental GitHub workflows (not production-ready)
+.github/workflows/gemini-*.yml
+# MkDocs build output
+site/
+
+# -------------------------------------------------
+# 24) OpenHands integration artifacts
+# -------------------------------------------------
+# OpenHands workspace (generated during integration tests)
+openhands_workspace/
+
+# Task queue and workflow state (runtime artifacts)
+task_queue.json
+workflow_sync_report.json
+
+# Test generation results (generated artifacts)
+batch*_generation_results.json
+batch*_manual_results.json
+batch*_sample_results.json
+
+# Backup directories and files (use git for version control instead)
+backups/
+*.backup
+
+# Root-level test files (should be in tests/ directory)
+/test_*.py
+!tests/test_*.py

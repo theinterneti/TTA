@@ -6,6 +6,7 @@ and integrates with the TTA monitoring infrastructure.
 """
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections.abc import Callable

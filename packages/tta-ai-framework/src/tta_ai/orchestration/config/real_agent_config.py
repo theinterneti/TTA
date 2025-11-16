@@ -76,18 +76,10 @@ class RealAgentConfig:
             enable_monitoring=_get_env_bool("TTA_ENABLE_MONITORING", True),
             enable_profiling=_get_env_bool("TTA_ENABLE_PROFILING", False),
             enable_alerts=_get_env_bool("TTA_ENABLE_ALERTS", True),
-            high_memory_threshold_mb=_get_env_float(
-                "TTA_HIGH_MEMORY_THRESHOLD_MB", 1500.0
-            ),
-            high_queue_depth_threshold=_get_env_int(
-                "TTA_HIGH_QUEUE_DEPTH_THRESHOLD", 100
-            ),
-            high_error_rate_threshold=_get_env_float(
-                "TTA_HIGH_ERROR_RATE_THRESHOLD", 0.2
-            ),
-            slow_response_time_threshold_s=_get_env_float(
-                "TTA_SLOW_RESPONSE_TIME_THRESHOLD", 10.0
-            ),
+            high_memory_threshold_mb=_get_env_float("TTA_HIGH_MEMORY_THRESHOLD_MB", 1500.0),
+            high_queue_depth_threshold=_get_env_int("TTA_HIGH_QUEUE_DEPTH_THRESHOLD", 100),
+            high_error_rate_threshold=_get_env_float("TTA_HIGH_ERROR_RATE_THRESHOLD", 0.2),
+            slow_response_time_threshold_s=_get_env_float("TTA_SLOW_RESPONSE_TIME_THRESHOLD", 10.0),
         )
 
     def to_dict(self) -> dict[str, Any]:

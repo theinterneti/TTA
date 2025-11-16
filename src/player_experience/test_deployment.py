@@ -468,30 +468,17 @@ class DeploymentValidator:
 
     def print_summary(self, summary: dict[str, Any]):
         """Print test summary."""
-        print("\n" + "=" * 60)
-        print("DEPLOYMENT VALIDATION SUMMARY")
-        print("=" * 60)
-        print(f"Environment: {summary['environment']}")
-        print(f"Endpoint: {summary['endpoint']}")
-        print(f"Total Tests: {summary['total_tests']}")
-        print(f"Passed: {summary['passed_tests']}")
-        print(f"Failed: {summary['failed_tests']}")
-        print(f"Success Rate: {summary['success_rate']:.1f}%")
 
-        overall_status = (
+        (
             "✅ DEPLOYMENT SUCCESSFUL"
             if summary["overall_success"]
             else "❌ DEPLOYMENT FAILED"
         )
-        print(f"\nOverall Status: {overall_status}")
 
         if not summary["overall_success"]:
-            print("\nFailed Tests:")
             for result in summary["test_results"]:
                 if not result["success"]:
-                    print(f"  - {result['test_name']}: {result['message']}")
-
-        print("=" * 60)
+                    pass
 
 
 async def main():

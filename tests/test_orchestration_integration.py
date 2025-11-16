@@ -147,17 +147,17 @@ class TestOrchestratorIntegration:
         tta_dev.mkdir()
         tta_prototype.mkdir()
 
-        with patch.object(Path, "cwd", return_value=tmp_path):
-            with patch(
+        with (
+            patch.object(Path, "cwd", return_value=tmp_path),
+            patch(
                 "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"
-            ):
-                with patch(
-                    "src.orchestration.orchestrator.TTAOrchestrator._import_components"
-                ):
-                    orchestrator = TTAOrchestrator()
-                    orchestrator.tta_dev_path = tta_dev
-                    orchestrator.tta_prototype_path = tta_prototype
-                    yield orchestrator
+            ),
+            patch("src.orchestration.orchestrator.TTAOrchestrator._import_components"),
+        ):
+            orchestrator = TTAOrchestrator()
+            orchestrator.tta_dev_path = tta_dev
+            orchestrator.tta_prototype_path = tta_prototype
+            yield orchestrator
 
     def test_orchestrator_component_registration_flow(self, orchestrator_minimal):
         """Test complete component registration and management flow."""

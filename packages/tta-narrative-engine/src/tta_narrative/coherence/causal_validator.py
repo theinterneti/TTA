@@ -52,15 +52,9 @@ class CausalValidator:
             result.detected_issues.extend(issues)
             result.causal_consistency = self._calculate_causal_consistency_score(issues)
             result.consistency_score = result.causal_consistency
-            result.is_valid = result.causal_consistency >= self.config.get(
-                "causal_threshold", 0.7
-            )
-            result.suggested_corrections = await self._generate_causal_corrections(
-                issues
-            )
-            logger.debug(
-                f"Causal validation completed: score={result.causal_consistency:.2f}"
-            )
+            result.is_valid = result.causal_consistency >= self.config.get("causal_threshold", 0.7)
+            result.suggested_corrections = await self._generate_causal_corrections(issues)
+            logger.debug(f"Causal validation completed: score={result.causal_consistency:.2f}")
             return result
         except Exception as e:
             logger.error(f"Error validating causal logic: {e}")
@@ -127,9 +121,7 @@ class CausalValidator:
     ) -> list[ConsistencyIssue]:
         issues: list[ConsistencyIssue] = []
         try:
-            causal_relationships = await self._extract_causal_relationships(
-                narrative_branch
-            )
+            causal_relationships = await self._extract_causal_relationships(narrative_branch)
             for relationship in causal_relationships:
                 issues.extend(await self._validate_causal_relationship(relationship))
             return issues
@@ -169,9 +161,7 @@ class CausalValidator:
     ) -> list[ConsistencyIssue]:
         issues: list[ConsistencyIssue] = []
         try:
-            issues.extend(
-                await self._check_consequence_proportionality(narrative_branch)
-            )
+            issues.extend(await self._check_consequence_proportionality(narrative_branch))
             issues.extend(await self._check_consequence_timing(narrative_branch))
             issues.extend(await self._check_consequence_believability(narrative_branch))
             return issues
@@ -186,9 +176,7 @@ class CausalValidator:
                 )
             ]
 
-    def _calculate_causal_consistency_score(
-        self, issues: list[ConsistencyIssue]
-    ) -> float:
+    def _calculate_causal_consistency_score(self, issues: list[ConsistencyIssue]) -> float:
         if not issues:
             return 1.0
         total_penalty = 0.0
@@ -203,9 +191,7 @@ class CausalValidator:
         max_penalty = len(issues) * 1.0
         return max(0.0, 1.0 - (total_penalty / max_penalty))
 
-    async def _generate_causal_corrections(
-        self, issues: list[ConsistencyIssue]
-    ) -> list[str]:
+    async def _generate_causal_corrections(self, issues: list[ConsistencyIssue]) -> list[str]:
         return [f"Review causal relationship: {issue.description}" for issue in issues]
 
     # Placeholders for detailed causal analysis

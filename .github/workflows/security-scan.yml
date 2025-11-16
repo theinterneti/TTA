@@ -232,6 +232,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
@@ -244,7 +246,7 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
 
       - name: Run bandit security linter
         run: |
@@ -352,6 +354,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
@@ -364,18 +368,29 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --all-groups
 
       - name: Install CycloneDX tools
         run: |
           uv pip install cyclonedx-bom
           npm install -g @cyclonedx/cyclonedx-npm
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: src/player_experience/frontend/package-lock.json
+
+      - name: Install Node.js dependencies
+        working-directory: src/player_experience/frontend
+        run: npm ci --legacy-peer-deps
+
       - name: Generate Python SBOM
         run: |
           echo "Generating Python SBOM..."
-          uv run cyclonedx-py requirements pyproject.toml -o sbom-python.json --format json
-          uv run cyclonedx-py requirements pyproject.toml -o sbom-python.xml --format xml
+          uv run cyclonedx-py environment --of JSON -o sbom-python.json
+          uv run cyclonedx-py environment --of XML -o sbom-python.xml
 
       - name: Generate Node.js SBOM
         working-directory: src/player_experience/frontend

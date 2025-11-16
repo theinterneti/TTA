@@ -130,9 +130,7 @@ class ConservativeOptimizer(OptimizationAlgorithm):
 
         # Analyze message processing performance
         message_stats = {
-            k: v
-            for k, v in stats.items()
-            if v.category == ResponseTimeCategory.MESSAGE_PROCESSING
+            k: v for k, v in stats.items() if v.category == ResponseTimeCategory.MESSAGE_PROCESSING
         }
 
         for stat in message_stats.values():
@@ -141,9 +139,7 @@ class ConservativeOptimizer(OptimizationAlgorithm):
                 # Look for queue size parameter
                 queue_param = parameters.get("message_queue_size")
                 if queue_param and queue_param.current_value > queue_param.min_value:
-                    adjustment = -max(
-                        1, int(queue_param.current_value * self.adjustment_factor)
-                    )
+                    adjustment = -max(1, int(queue_param.current_value * self.adjustment_factor))
 
                     result = OptimizationResult(
                         optimization_id=uuid4().hex,
@@ -186,9 +182,7 @@ class AggressiveOptimizer(OptimizationAlgorithm):
         for stat in stats.values():
             if stat.success_rate < 0.9:  # Less than 90% success rate
                 # Increase timeout parameters
-                timeout_params = [
-                    p for p in parameters.values() if "timeout" in p.name.lower()
-                ]
+                timeout_params = [p for p in parameters.values() if "timeout" in p.name.lower()]
 
                 for param in timeout_params:
                     if param.current_value < param.max_value:
@@ -201,9 +195,7 @@ class AggressiveOptimizer(OptimizationAlgorithm):
                             optimization_id=uuid4().hex,
                             parameter_name=param.name,
                             old_value=param.current_value,
-                            new_value=min(
-                                param.max_value, param.current_value + adjustment
-                            ),
+                            new_value=min(param.max_value, param.current_value + adjustment),
                             strategy=self.get_strategy(),
                             target=OptimizationTarget.SUCCESS_RATE,
                             improvement_expected=0.2,  # 20% improvement expected
@@ -307,9 +299,7 @@ class OptimizationEngine:
         }
 
         # Enabled strategies
-        self.enabled_strategies = enabled_strategies or [
-            OptimizationStrategy.CONSERVATIVE
-        ]
+        self.enabled_strategies = enabled_strategies or [OptimizationStrategy.CONSERVATIVE]
 
         # System parameters that can be optimized
         self.parameters: dict[str, OptimizationParameter] = {}
@@ -446,15 +436,11 @@ class OptimizationEngine:
                     confidence_score=result.confidence_score,
                 )
 
-            logger.info(
-                f"Applied optimization: {result.parameter_name} {old_value} -> {new_value}"
-            )
+            logger.info(f"Applied optimization: {result.parameter_name} {old_value} -> {new_value}")
             return True
 
         except Exception as e:
-            logger.error(
-                f"Failed to apply optimization for {result.parameter_name}: {e}"
-            )
+            logger.error(f"Failed to apply optimization for {result.parameter_name}: {e}")
             return False
 
     async def _optimization_loop(self) -> None:
@@ -479,11 +465,7 @@ class OptimizationEngine:
             "registered_parameters": len(self.parameters),
             "optimization_history": len(self.optimization_history),
             "recent_optimizations": len(
-                [
-                    r
-                    for r in self.optimization_history
-                    if time.time() - r.timestamp < 3600
-                ]
+                [r for r in self.optimization_history if time.time() - r.timestamp < 3600]
             ),
             "configuration": {
                 "optimization_interval": self.optimization_interval,

@@ -69,7 +69,6 @@ async def audit_tools(env: str) -> dict[str, Any]:
     Returns:
         Dictionary containing audit results
     """
-    print(f"🔍 Auditing tools in {env} environment...")
 
     # Connect to Redis
     redis = await get_redis_connection(env)
@@ -117,19 +116,12 @@ async def audit_tools(env: str) -> dict[str, Any]:
                 analysis["missing_returns_schema"].append(tool["name"])
 
         # Build result
-        result = {
+        return {
             "environment": env,
             "tools": tools_data,
             "analysis": analysis,
             "timestamp": datetime.utcnow().isoformat() + "Z",
         }
-
-        print(f"✅ Found {len(tools_data)} tools in {env}")
-        print(f"   - Active: {analysis['by_status'].get('active', 0)}")
-        print(f"   - Deprecated: {analysis['by_status'].get('deprecated', 0)}")
-        print(f"   - Missing descriptions: {len(analysis['missing_descriptions'])}")
-
-        return result
 
     finally:
         await redis.close()
@@ -178,10 +170,7 @@ async def main():
             with open(output_path, "w") as f:
                 json.dump(result, f, indent=2)
 
-            print(f"📝 Inventory saved to {output_path}\n")
-
-        except Exception as e:
-            print(f"❌ Error auditing {env}: {e}\n")
+        except Exception:
             if not args.all:
                 sys.exit(1)
 

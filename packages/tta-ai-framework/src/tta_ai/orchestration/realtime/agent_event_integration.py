@@ -41,9 +41,7 @@ class AgentEventIntegrator:
         self.active_operations: dict[str, dict[str, Any]] = {}
         self.operation_counter = 0
 
-        logger.debug(
-            f"AgentEventIntegrator initialized for {agent_id}, enabled: {self.enabled}"
-        )
+        logger.debug(f"AgentEventIntegrator initialized for {agent_id}, enabled: {self.enabled}")
 
     def _generate_operation_id(self) -> str:
         """Generate unique operation ID."""
@@ -111,9 +109,7 @@ class AgentEventIntegrator:
 
             # Send completion event
             duration = time.time() - start_time
-            agent_type = (
-                self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
-            )
+            agent_type = self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
             completion_event = create_agent_status_event(
                 agent_id=self.agent_id,
                 agent_type=agent_type,
@@ -131,9 +127,7 @@ class AgentEventIntegrator:
         except Exception as e:
             # Send error event
             duration = time.time() - start_time
-            agent_type = (
-                self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
-            )
+            agent_type = self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
             error_event = create_agent_status_event(
                 agent_id=self.agent_id,
                 agent_type=agent_type,
@@ -198,8 +192,7 @@ class AgentEventIntegrator:
             operation_type=operation["type"],
             stage=feedback_data.get("stage", "processing"),
             message=feedback_data.get("message", "Processing..."),
-            progress_percentage=feedback_data.get("progress", 0.0)
-            * 100,  # Convert to percentage
+            progress_percentage=feedback_data.get("progress", 0.0) * 100,  # Convert to percentage
             intermediate_result=feedback_data.get("intermediate_result"),
             estimated_remaining=feedback_data.get("estimated_remaining"),
             user_id=feedback_data.get("user_id"),
@@ -235,9 +228,7 @@ class AgentEventIntegrator:
 class WorkflowEventIntegrator:
     """Integrates workflow operations with real-time event publishing."""
 
-    def __init__(
-        self, event_publisher: EventPublisher | None = None, enabled: bool = True
-    ):
+    def __init__(self, event_publisher: EventPublisher | None = None, enabled: bool = True):
         self.event_publisher = event_publisher
         self.enabled = enabled and event_publisher is not None
 
@@ -296,8 +287,7 @@ class WorkflowEventIntegrator:
                 "advance_step": lambda message="": self._advance_workflow_step(
                     workflow_id, message
                 ),
-                "update_progress": lambda progress,
-                message="": self._update_workflow_progress(
+                "update_progress": lambda progress, message="": self._update_workflow_progress(
                     workflow_id, progress, message
                 ),
                 "add_metadata": lambda key, value: self._add_workflow_metadata(
@@ -348,9 +338,7 @@ class WorkflowEventIntegrator:
         workflow["current_step"] += 1
 
         progress = workflow["current_step"] / max(workflow["total_steps"], 1)
-        step_message = (
-            message or f"Step {workflow['current_step']}/{workflow['total_steps']}"
-        )
+        step_message = message or f"Step {workflow['current_step']}/{workflow['total_steps']}"
 
         return await self._update_workflow_progress(workflow_id, progress, step_message)
 
@@ -503,9 +491,7 @@ class AgentWorkflowCoordinator:
 
             nga_result = await self.nga_proxy.process(nga_input)
 
-            await workflow["add_metadata"](
-                "story_generated", bool(nga_result.get("story"))
-            )
+            await workflow["add_metadata"]("story_generated", bool(nga_result.get("story")))
 
             # Compile final result
             return {

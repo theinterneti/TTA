@@ -57,9 +57,7 @@ class ResourceThresholds:
             < self.memory_exhaustion_percent
             <= 100
         ):
-            errors.append(
-                "Memory thresholds must be: 0 < warning < critical < exhaustion <= 100"
-            )
+            errors.append("Memory thresholds must be: 0 < warning < critical < exhaustion <= 100")
 
         # Check CPU thresholds
         if not (
@@ -69,9 +67,7 @@ class ResourceThresholds:
             < self.cpu_exhaustion_percent
             <= 100
         ):
-            errors.append(
-                "CPU thresholds must be: 0 < warning < critical < exhaustion <= 100"
-            )
+            errors.append("CPU thresholds must be: 0 < warning < critical < exhaustion <= 100")
 
         # Check disk thresholds
         if not (
@@ -81,9 +77,7 @@ class ResourceThresholds:
             < self.disk_exhaustion_percent
             <= 100
         ):
-            errors.append(
-                "Disk thresholds must be: 0 < warning < critical < exhaustion <= 100"
-            )
+            errors.append("Disk thresholds must be: 0 < warning < critical < exhaustion <= 100")
 
         # Check early warning percentage
         if not (0 < self.early_warning_percent < 100):
@@ -152,12 +146,8 @@ class ResourceExhaustionDetector:
         }
 
         # Callbacks
-        self._exhaustion_callbacks: list[
-            Callable[[ResourceExhaustionEvent], Awaitable[None]]
-        ] = []
-        self._warning_callbacks: list[
-            Callable[[ResourceExhaustionEvent], Awaitable[None]]
-        ] = []
+        self._exhaustion_callbacks: list[Callable[[ResourceExhaustionEvent], Awaitable[None]]] = []
+        self._warning_callbacks: list[Callable[[ResourceExhaustionEvent], Awaitable[None]]] = []
 
         # Statistics
         self._total_checks = 0
@@ -356,9 +346,7 @@ class ResourceExhaustionDetector:
             return "decreasing"
         return "stable"
 
-    async def _handle_sustained_exhaustion(
-        self, event: ResourceExhaustionEvent
-    ) -> None:
+    async def _handle_sustained_exhaustion(self, event: ResourceExhaustionEvent) -> None:
         """Handle sustained resource exhaustion."""
         logger.error(
             f"Sustained resource exhaustion detected: {event.resource_type}",

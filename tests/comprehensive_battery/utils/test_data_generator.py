@@ -148,7 +148,7 @@ class TestDataGenerator:
             safety_monitoring=True,
         )
 
-        session_context = SessionContext(
+        return SessionContext(
             session_id=session_id,
             player_id=user.user_id,
             character_id=str(uuid.uuid4()),
@@ -162,8 +162,6 @@ class TestDataGenerator:
                 "user_profile": user.therapeutic_profile,
             },
         )
-
-        return session_context
 
     async def cleanup_test_data(self, test_run_id: str):
         """Clean up test data after test execution."""

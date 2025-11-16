@@ -12,6 +12,7 @@ Test Categories:
 """
 
 import asyncio
+import contextlib
 import json
 import time
 from typing import Any
@@ -277,7 +278,7 @@ class WorkflowStateVerifier:
         initial_state: dict[str, Any], final_state: dict[str, Any]
     ) -> dict[str, bool]:
         """Verify that critical state elements are preserved across workflow execution."""
-        checks = {
+        return {
             "session_id_preserved": initial_state.get("session_id")
             == final_state.get("session_id"),
             "player_id_preserved": initial_state.get("player_id")
@@ -286,12 +287,11 @@ class WorkflowStateVerifier:
             "game_state_updated": final_state.get("game_state", {})
             != initial_state.get("game_state", {}),
         }
-        return checks
 
     @staticmethod
     def verify_response_aggregation(responses: list[dict[str, Any]]) -> dict[str, bool]:
         """Verify that agent responses are properly aggregated."""
-        checks = {
+        return {
             "all_agents_responded": len(responses) >= 3,  # IPA, WBA, NGA
             "responses_have_content": all(
                 "response" in r or "output" in r for r in responses
@@ -301,7 +301,6 @@ class WorkflowStateVerifier:
             ),
             "narrative_coherence": True,  # Placeholder for more complex coherence checks
         }
-        return checks
 
 
 # ============================================================================
@@ -506,10 +505,8 @@ class RedisStateVerifier:
         # Parse message content
         parsed_messages = []
         for msg in pending_messages:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 parsed_messages.append(json.loads(msg))
-            except json.JSONDecodeError:
-                pass
 
         return {
             "queue_exists": queue_length >= 0,
@@ -559,16 +556,12 @@ class RedisStateVerifier:
         coordination_state = {}
 
         if workflow_data:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 workflow_state = json.loads(workflow_data)
-            except json.JSONDecodeError:
-                pass
 
         if coordination_data:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 coordination_state = json.loads(coordination_data)
-            except json.JSONDecodeError:
-                pass
 
         return {
             "workflow_state_exists": bool(workflow_state),

@@ -20,7 +20,9 @@ except Exception:  # pragma: no cover - runtime optional
     END = "END"  # type: ignore
     _LANGGRAPH_AVAILABLE = False
 
-from .workflow import OrchestrationResponse as WorkflowOrchestrationResponse
+from .workflow import (
+    OrchestrationResponse as WorkflowOrchestrationResponse,
+)
 from .workflow import (
     WorkflowDefinition,
 )

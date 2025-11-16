@@ -135,17 +135,13 @@ class UnifiedAgentOrchestrator:
         self.retry_config = retry_config or RetryConfig()
 
         # Initialize adapters
-        self.ipa_adapter = IPAAdapter(
-            fallback_to_mock=True, retry_config=self.retry_config
-        )
+        self.ipa_adapter = IPAAdapter(fallback_to_mock=True, retry_config=self.retry_config)
         self.wba_adapter = WBAAdapter(
             neo4j_manager=neo4j_manager,
             fallback_to_mock=True,
             retry_config=self.retry_config,
         )
-        self.nga_adapter = NGAAdapter(
-            fallback_to_mock=True, retry_config=self.retry_config
-        )
+        self.nga_adapter = NGAAdapter(fallback_to_mock=True, retry_config=self.retry_config)
 
         # Redis client for state persistence
         self.redis: aioredis.Redis | None = None
@@ -265,9 +261,7 @@ class UnifiedAgentOrchestrator:
                 "safety_level": state.safety_level.value,
             }
 
-    async def _process_input_phase(
-        self, state: OrchestrationState
-    ) -> OrchestrationState:
+    async def _process_input_phase(self, state: OrchestrationState) -> OrchestrationState:
         """Process input through IPA."""
         try:
             # Validate input safety
@@ -287,9 +281,7 @@ class UnifiedAgentOrchestrator:
             logger.error(f"Input processing phase error: {e}")
             raise
 
-    async def _process_world_building_phase(
-        self, state: OrchestrationState
-    ) -> OrchestrationState:
+    async def _process_world_building_phase(self, state: OrchestrationState) -> OrchestrationState:
         """Process world updates through WBA."""
         try:
             # Extract intent and entities from IPA result
@@ -324,9 +316,7 @@ class UnifiedAgentOrchestrator:
             logger.error(f"World building phase error: {e}")
             raise
 
-    async def _process_narrative_phase(
-        self, state: OrchestrationState
-    ) -> OrchestrationState:
+    async def _process_narrative_phase(self, state: OrchestrationState) -> OrchestrationState:
         """Generate narrative response through NGA."""
         try:
             # Build narrative generation prompt
@@ -441,9 +431,7 @@ class UnifiedAgentOrchestrator:
             logger.error(f"Failed to retrieve state: {e}")
             return None
 
-    async def get_session_latest_workflow(
-        self, session_id: str
-    ) -> OrchestrationState | None:
+    async def get_session_latest_workflow(self, session_id: str) -> OrchestrationState | None:
         """Get the latest workflow for a session."""
         if not self.redis:
             return None

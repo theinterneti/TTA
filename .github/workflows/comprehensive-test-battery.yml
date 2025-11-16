@@ -67,6 +67,8 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
     - name: Cache uv dependencies
       uses: actions/cache@v4
@@ -79,10 +81,17 @@ jobs:
           ${{ runner.os }}-uv-
 
     - name: Install dependencies
-      run: uv sync --all-extras --dev
+      run: uv sync --all-groups
 
     - name: Run PR validation tests
       run: |
+        uv run pytest tests/comprehensive_battery/ \
+          --cov=src \
+          --cov-branch \
+          --cov-report=xml \
+          --cov-report=term \
+          -v
+
         python tests/comprehensive_battery/run_comprehensive_tests.py \
           --categories standard adversarial \
           --max-concurrent 3 \
@@ -91,6 +100,15 @@ jobs:
           --output-dir ./test-results/pr-validation
       env:
         REDIS_URL: redis://localhost:6379
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: comprehensive-pr-validation
+        name: comprehensive-pr-validation
+        fail_ci_if_error: false
 
     - name: Upload test results
       if: always()
@@ -163,6 +181,8 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
     - name: Cache uv dependencies
       uses: actions/cache@v4
@@ -175,7 +195,7 @@ jobs:
           ${{ runner.os }}-uv-
 
     - name: Install dependencies
-      run: uv sync --all-extras --dev
+      run: uv sync --all-groups
 
     - name: Wait for services and verify health
       run: |
@@ -205,26 +225,26 @@ jobs:
 
         # Final connectivity test
         echo "🧪 Running connectivity tests..."
-        python -c "
+        python -c '
 import sys
 try:
     import redis
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    r = redis.Redis(host="localhost", port=6379, decode_responses=True)
     r.ping()
-    print('✅ Redis Python client: Connected')
+    print("✅ Redis Python client: Connected")
 except Exception as e:
-    print(f'❌ Redis Python client: {e}')
+    print(f"❌ Redis Python client: {e}")
 
 try:
     import requests
-    response = requests.get('http://localhost:7474/db/data/', timeout=10)
+    response = requests.get("http://localhost:7474/db/data/", timeout=10)
     if response.status_code == 200:
-        print('✅ Neo4j HTTP: Connected')
+        print("✅ Neo4j HTTP: Connected")
     else:
-        print(f'❌ Neo4j HTTP: Status {response.status_code}')
+        print(f"❌ Neo4j HTTP: Status {response.status_code}")
 except Exception as e:
-    print(f'❌ Neo4j HTTP: {e}')
-"
+    print(f"❌ Neo4j HTTP: {e}")
+'
 
     - name: Wait for services
       run: |
@@ -240,6 +260,14 @@ except Exception as e:
 
     - name: Run comprehensive test battery
       run: |
+        # Run pytest with coverage first
+        uv run pytest tests/comprehensive_battery/ \
+          --cov=src \
+          --cov-branch \
+          --cov-report=xml \
+          --cov-report=term \
+          -v
+
         FORCE_MOCK_FLAG=""
         if [ "${{ github.event.inputs.force_mock_mode || 'false' }}" = "true" ]; then
           FORCE_MOCK_FLAG="--force-mock"
@@ -259,6 +287,15 @@ except Exception as e:
       env:
         NEO4J_AUTH: neo4j/testpassword
         FORCE_MOCK_MODE: ${{ github.event.inputs.force_mock_mode || 'false' }}
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: comprehensive-${{ matrix.test-suite.name }}
+        name: comprehensive-${{ matrix.test-suite.name }}
+        fail_ci_if_error: false
 
     - name: Generate test summary
       if: always()
@@ -356,6 +393,8 @@ except Exception as e:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.8.17"
 
     - name: Cache uv dependencies
       uses: actions/cache@v4
@@ -368,7 +407,7 @@ except Exception as e:
           ${{ runner.os }}-uv-
 
     - name: Install dependencies
-      run: uv sync --all-extras --dev
+      run: uv sync --all-groups
 
     - name: Wait for services
       run: |
@@ -377,6 +416,14 @@ except Exception as e:
 
     - name: Run custom test battery
       run: |
+        # Run pytest with coverage first
+        uv run pytest tests/comprehensive_battery/ \
+          --cov=src \
+          --cov-branch \
+          --cov-report=xml \
+          --cov-report=term \
+          -v
+
         CATEGORIES="${{ github.event.inputs.test_categories || 'standard,adversarial' }}"
         DETAILED_FLAG=""
         if [ "${{ github.event.inputs.detailed_report }}" = "true" ]; then
@@ -400,6 +447,15 @@ except Exception as e:
           --redis-url redis://localhost:6379
       env:
         NEO4J_AUTH: neo4j/testpassword
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: comprehensive-manual
+        name: comprehensive-manual
+        fail_ci_if_error: false
 
     - name: Upload manual test results
       if: always()

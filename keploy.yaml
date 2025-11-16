@@ -1,0 +1,43 @@
+# Keploy Configuration for TTA
+# Reference: https://github.com/keploy/keploy
+
+# Path to store test cases and mocks
+path: "keploy"
+
+# Default command to run your application
+# You can override this with -c flag
+command: "python -m uvicorn src.player_experience.api.app:app --host 0.0.0.0 --port 8080"
+
+# Port your application runs on
+port: 8080
+
+# Delay before running tests (seconds)
+# Gives your app time to start up
+delay: 10
+
+# Test configuration
+test:
+  # Selected tests (empty = run all)
+  selectedTests: {}
+
+  # Global noise (fields to ignore in comparison)
+  globalNoise:
+    # Ignore timestamp variations
+    global:
+      body: []
+      header: []
+
+  # Test set specific configuration
+  testsets: []
+
+# Don't upload mocks to Keploy cloud (keep everything local)
+disableMockUpload: true
+
+# Enable for arm64/aarch64 architectures
+# enableFreezeTime: false
+
+# Record configuration
+record:
+  # Filters for recording (empty = record all)
+  filters:
+    - ""

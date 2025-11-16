@@ -96,9 +96,7 @@ class CircuitBreakerRegistry:
         """List all registered circuit breaker names."""
         try:
             members = await self._redis.smembers(self._registry_key())
-            return [
-                m.decode() if isinstance(m, (bytes, bytearray)) else m for m in members
-            ]
+            return [m.decode() if isinstance(m, (bytes, bytearray)) else m for m in members]
         except Exception as e:
             logger.warning(f"Failed to list circuit breaker names: {e}")
             return []
@@ -111,9 +109,7 @@ class CircuitBreakerRegistry:
                 try:
                     metrics[name] = await cb.get_metrics()
                 except Exception as e:
-                    logger.warning(
-                        f"Failed to get metrics for circuit breaker {name}: {e}"
-                    )
+                    logger.warning(f"Failed to get metrics for circuit breaker {name}: {e}")
                     metrics[name] = {"error": str(e)}
         return metrics
 
@@ -125,9 +121,7 @@ class CircuitBreakerRegistry:
                 try:
                     states[name] = await cb.get_state()
                 except Exception as e:
-                    logger.warning(
-                        f"Failed to get state for circuit breaker {name}: {e}"
-                    )
+                    logger.warning(f"Failed to get state for circuit breaker {name}: {e}")
                     states[name] = CircuitBreakerState.CLOSED  # Default fallback
         return states
 
@@ -186,13 +180,9 @@ class CircuitBreakerRegistry:
                             # Clean up if older than 24 hours
                             if time.time() - updated_at > 86400:
                                 await self._redis.delete(key)
-                                await self._redis.delete(
-                                    f"{self._pfx}:cb:metrics:{name}"
-                                )
+                                await self._redis.delete(f"{self._pfx}:cb:metrics:{name}")
                                 cleaned_count += 1
-                                logger.debug(
-                                    f"Cleaned up expired circuit breaker state: {name}"
-                                )
+                                logger.debug(f"Cleaned up expired circuit breaker state: {name}")
                     except Exception as e:
                         logger.warning(f"Failed to process state key {key}: {e}")
 
@@ -250,9 +240,7 @@ class CircuitBreakerRegistry:
             # Initialize circuit breakers that exist in Redis but not in memory
             for name in redis_names - memory_names:
                 try:
-                    cb = CircuitBreaker(
-                        redis=self._redis, name=name, key_prefix=self._pfx
-                    )
+                    cb = CircuitBreaker(redis=self._redis, name=name, key_prefix=self._pfx)
                     await cb.initialize()
                     self._circuit_breakers[name] = cb
                     logger.debug(f"Loaded circuit breaker from Redis: {name}")
@@ -268,9 +256,7 @@ class CircuitBreakerRegistry:
             states = await self.get_all_states()
             state_counts = {}
             for state in CircuitBreakerState:
-                state_counts[state.value] = sum(
-                    1 for s in states.values() if s == state
-                )
+                state_counts[state.value] = sum(1 for s in states.values() if s == state)
 
             # Get last cleanup time
             last_cleanup = await self._redis.get(self._cleanup_key())

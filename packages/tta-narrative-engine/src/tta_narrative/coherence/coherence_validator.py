@@ -36,19 +36,13 @@ class CoherenceValidator:
         # Validation thresholds
         self.consistency_threshold = config.get("consistency_threshold", 0.7)
         self.lore_compliance_threshold = config.get("lore_compliance_threshold", 0.8)
-        self.character_consistency_threshold = config.get(
-            "character_consistency_threshold", 0.75
-        )
+        self.character_consistency_threshold = config.get("character_consistency_threshold", 0.75)
 
         logger.info("CoherenceValidator initialized")
 
-    async def validate_narrative_consistency(
-        self, content: NarrativeContent
-    ) -> ValidationResult:
+    async def validate_narrative_consistency(self, content: NarrativeContent) -> ValidationResult:
         try:
-            logger.debug(
-                f"Validating narrative consistency for content {content.content_id}"
-            )
+            logger.debug(f"Validating narrative consistency for content {content.content_id}")
 
             result = ValidationResult(
                 is_valid=True,
@@ -87,9 +81,7 @@ class CoherenceValidator:
                 and result.character_consistency >= self.character_consistency_threshold
             )
 
-            result.suggested_corrections = await self._generate_corrections(
-                result.detected_issues
-            )
+            result.suggested_corrections = await self._generate_corrections(result.detected_issues)
             logger.debug(
                 f"Validation completed: score={result.consistency_score:.2f}, valid={result.is_valid}"
             )
@@ -109,9 +101,7 @@ class CoherenceValidator:
                 ],
             )
 
-    async def _validate_lore_compliance(
-        self, content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _validate_lore_compliance(self, content: NarrativeContent) -> list[ConsistencyIssue]:
         issues: list[ConsistencyIssue] = []
         try:
             for character in content.characters:
@@ -126,17 +116,13 @@ class CoherenceValidator:
                 location_lore = self._get_location_lore(location)
                 if location_lore:
                     issues.extend(
-                        await self._check_location_lore_compliance(
-                            content, location, location_lore
-                        )
+                        await self._check_location_lore_compliance(content, location, location_lore)
                     )
             for theme in content.themes:
                 theme_lore = self._get_theme_lore(theme)
                 if theme_lore:
                     issues.extend(
-                        await self._check_theme_lore_compliance(
-                            content, theme, theme_lore
-                        )
+                        await self._check_theme_lore_compliance(content, theme, theme_lore)
                     )
             logger.debug(f"Found {len(issues)} lore compliance issues")
             return issues
@@ -170,19 +156,13 @@ class CoherenceValidator:
                     )
                     continue
                 issues.extend(
-                    await self._check_personality_consistency(
-                        content, character, character_profile
-                    )
+                    await self._check_personality_consistency(content, character, character_profile)
                 )
                 issues.extend(
-                    await self._check_dialogue_consistency(
-                        content, character, character_profile
-                    )
+                    await self._check_dialogue_consistency(content, character, character_profile)
                 )
                 issues.extend(
-                    await self._check_behavioral_consistency(
-                        content, character, character_profile
-                    )
+                    await self._check_behavioral_consistency(content, character, character_profile)
                 )
             logger.debug(f"Found {len(issues)} character consistency issues")
             return issues
@@ -197,9 +177,7 @@ class CoherenceValidator:
                 )
             ]
 
-    async def _validate_world_rules(
-        self, content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _validate_world_rules(self, content: NarrativeContent) -> list[ConsistencyIssue]:
         issues: list[ConsistencyIssue] = []
         try:
             issues.extend(await self._check_physics_rules(content))
@@ -340,19 +318,13 @@ class CoherenceValidator:
         return []
 
     # World rule checks (placeholders)
-    async def _check_physics_rules(
-        self, _content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _check_physics_rules(self, _content: NarrativeContent) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_supernatural_rules(
-        self, _content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _check_supernatural_rules(self, _content: NarrativeContent) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_social_rules(
-        self, _content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _check_social_rules(self, _content: NarrativeContent) -> list[ConsistencyIssue]:
         return []
 
     async def _check_technological_rules(
@@ -361,9 +333,7 @@ class CoherenceValidator:
         return []
 
     # Therapeutic checks (placeholders)
-    async def _check_harmful_content(
-        self, _content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _check_harmful_content(self, _content: NarrativeContent) -> list[ConsistencyIssue]:
         return []
 
     async def _check_therapeutic_concepts(
@@ -371,9 +341,7 @@ class CoherenceValidator:
     ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_emotional_safety(
-        self, _content: NarrativeContent
-    ) -> list[ConsistencyIssue]:
+    async def _check_emotional_safety(self, _content: NarrativeContent) -> list[ConsistencyIssue]:
         return []
 
     async def _check_therapeutic_progression(
@@ -385,15 +353,11 @@ class CoherenceValidator:
     def _calculate_lore_compliance_score(self, issues: list[ConsistencyIssue]) -> float:
         if not issues:
             return 1.0
-        total_penalty = sum(
-            SEVERITY_WEIGHTS_LORE.get(issue.severity.name, 0.5) for issue in issues
-        )
+        total_penalty = sum(SEVERITY_WEIGHTS_LORE.get(issue.severity.name, 0.5) for issue in issues)
         max_penalty = len(issues) * 1.0
         return max(0.0, 1.0 - (total_penalty / max_penalty))
 
-    def _calculate_character_consistency_score(
-        self, issues: list[ConsistencyIssue]
-    ) -> float:
+    def _calculate_character_consistency_score(self, issues: list[ConsistencyIssue]) -> float:
         if not issues:
             return 1.0
         total_penalty = 0.0
@@ -403,14 +367,11 @@ class CoherenceValidator:
         max_penalty = len(issues) * 1.0
         return max(0.0, 1.0 - (total_penalty / max_penalty))
 
-    def _calculate_therapeutic_alignment_score(
-        self, issues: list[ConsistencyIssue]
-    ) -> float:
+    def _calculate_therapeutic_alignment_score(self, issues: list[ConsistencyIssue]) -> float:
         if not issues:
             return 1.0
         total_penalty = sum(
-            SEVERITY_WEIGHTS_THERAPEUTIC.get(issue.severity.name, 0.5)
-            for issue in issues
+            SEVERITY_WEIGHTS_THERAPEUTIC.get(issue.severity.name, 0.5) for issue in issues
         )
         max_penalty = len(issues) * 1.0
         return max(0.0, 1.0 - (total_penalty / max_penalty))

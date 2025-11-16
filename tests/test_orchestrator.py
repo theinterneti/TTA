@@ -4,6 +4,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import pytest
+
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -38,6 +40,20 @@ class MockComponent(Component):
 
 class TestOrchestrator(unittest.TestCase):
     """Test the TTA Orchestrator."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Check if filesystem structure exists before running tests."""
+        # Check if required directories exist
+        root_dir = Path(__file__).parent.parent
+        tta_dev_path = root_dir / "tta.dev"
+        tta_prototype_path = root_dir / "tta.prototype"
+
+        if not (tta_dev_path.exists() and tta_prototype_path.exists()):
+            pytest.skip(
+                "Skipping integration tests: tta.dev and/or tta.prototype directories not found. "
+                "These tests require a complete filesystem structure."
+            )
 
     def setUp(self):
         """

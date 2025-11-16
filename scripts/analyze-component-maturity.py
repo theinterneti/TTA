@@ -95,21 +95,17 @@ COMPONENTS = {
 def run_command(cmd: list[str], capture_output=True) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
     try:
-        result = subprocess.run(
+        return subprocess.run(
             cmd, check=False, capture_output=capture_output, text=True, timeout=60
         )
-        return result
     except subprocess.TimeoutExpired:
-        print(f"⚠️  Command timed out: {' '.join(cmd)}")
         return subprocess.CompletedProcess(cmd, 1, "", "Timeout")
     except Exception as e:
-        print(f"❌ Error running command: {e}")
         return subprocess.CompletedProcess(cmd, 1, "", str(e))
 
 
 def check_test_coverage(component_path: str, test_path: str) -> dict[str, Any]:
     """Check test coverage for a component."""
-    print(f"  Checking coverage for {component_path}...")
 
     # Check if test file exists
     if not Path(test_path).exists():
@@ -141,7 +137,7 @@ def check_test_coverage(component_path: str, test_path: str) -> dict[str, Any]:
 
             # Find the specific component file in the coverage data
             component_file = None
-            for file_path in data.get("files", {}).keys():
+            for file_path in data.get("files", {}):
                 if component_path in file_path:
                     component_file = file_path
                     break
@@ -178,7 +174,6 @@ def check_test_coverage(component_path: str, test_path: str) -> dict[str, Any]:
 
 def check_code_quality(component_path: str) -> dict[str, Any]:
     """Check code quality (linting, type checking, security)."""
-    print(f"  Checking code quality for {component_path}...")
 
     results = {}
 
@@ -208,7 +203,6 @@ def check_code_quality(component_path: str) -> dict[str, Any]:
 
 def check_documentation(component_path: str) -> dict[str, bool]:
     """Check if documentation exists."""
-    print(f"  Checking documentation for {component_path}...")
 
     path = Path(component_path)
 
@@ -227,7 +221,6 @@ def check_documentation(component_path: str) -> dict[str, bool]:
 
 def get_component_stage(maturity_file: str) -> str:
     """Extract current stage from MATURITY.md file."""
-    print(f"  Checking stage from {maturity_file}...")
 
     try:
         maturity_path = Path(maturity_file)
@@ -261,8 +254,8 @@ def get_component_stage(maturity_file: str) -> str:
                 if stage.lower() in ["production", "prod"]:
                     return "Production"
 
-    except Exception as e:
-        print(f"    Warning: Could not parse stage from {maturity_file}: {e}")
+    except Exception:
+        pass
 
     return "Development"
 
@@ -302,8 +295,8 @@ def get_observation_period(maturity_file: str) -> dict[str, Any] | None:
                         "complete": days_remaining <= 0,
                     }
 
-    except Exception as e:
-        print(f"    Warning: Could not parse observation period: {e}")
+    except Exception:
+        pass
 
     return None
 
@@ -337,15 +330,14 @@ def get_blocker_issues(maturity_file: str) -> list[dict[str, str]]:
                     {"issue": f"#{issue_num}", "description": description.strip()}
                 )
 
-    except Exception as e:
-        print(f"    Warning: Could not parse blocker issues: {e}")
+    except Exception:
+        pass
 
     return blockers
 
 
 def analyze_component(name: str, config: dict[str, str]) -> dict[str, Any]:
     """Analyze a single component."""
-    print(f"\n📊 Analyzing: {name}")
 
     analysis = {
         "name": name,
@@ -450,17 +442,10 @@ def analyze_component(name: str, config: dict[str, str]) -> dict[str, Any]:
 
 def main():
     """Main analysis function."""
-    print("=" * 80)
-    print("TTA Component Maturity Analysis")
-    print("=" * 80)
 
     all_results = {}
 
     for group_name, components in COMPONENTS.items():
-        print(f"\n{'=' * 80}")
-        print(f"Functional Group: {group_name}")
-        print(f"{'=' * 80}")
-
         group_results = {}
         for component_name, config in components.items():
             result = analyze_component(component_name, config)
@@ -472,10 +457,6 @@ def main():
     output_file = "component-maturity-analysis.json"
     with open(output_file, "w") as f:
         json.dump(all_results, f, indent=2)
-
-    print(f"\n{'=' * 80}")
-    print(f"✅ Analysis complete! Results saved to: {output_file}")
-    print(f"{'=' * 80}")
 
     return all_results
 

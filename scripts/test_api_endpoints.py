@@ -95,7 +95,7 @@ class GameplayAPITester:
                             f"✅ Authentication successful with {credentials['username']}"
                         )
                         return True
-                    error_data = await response.text()
+                    await response.text()
                     logger.warning(
                         f"⚠️  Login failed for {credentials['username']}: {response.status}"
                     )
@@ -198,7 +198,7 @@ class GameplayAPITester:
                 json=payload,
             ) as response:
                 if response.status == 200:
-                    data = await response.json()
+                    await response.json()
                     logger.info("✅ Choice processed successfully")
                     return True
                 error_data = await response.text()
@@ -223,7 +223,7 @@ class GameplayAPITester:
                 headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
-                    data = await response.json()
+                    await response.json()
                     logger.info("✅ Progress retrieved successfully")
                     return True
                 error_data = await response.text()
@@ -248,7 +248,7 @@ class GameplayAPITester:
                 headers=self._get_headers(),
             ) as response:
                 if response.status == 200:
-                    data = await response.json()
+                    await response.json()
                     logger.info("✅ Session terminated successfully")
                     return True
                 error_data = await response.text()

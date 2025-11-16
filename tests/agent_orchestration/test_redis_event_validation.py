@@ -30,7 +30,7 @@ class TestRedisEventValidation:
     @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for testing."""
-        publisher = EventPublisher(
+        return EventPublisher(
             redis_client=redis_client,
             channel_prefix="test:events",
             enabled=True,
@@ -39,7 +39,6 @@ class TestRedisEventValidation:
             broadcast_workflow_progress=True,
             broadcast_system_metrics=True,
         )
-        return publisher
 
     @pytest_asyncio.fixture
     async def event_subscriber(self, redis_client):

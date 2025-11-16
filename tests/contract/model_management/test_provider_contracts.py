@@ -10,7 +10,6 @@ from abc import ABC
 from typing import get_type_hints
 
 import pytest
-
 from tta_ai.models.interfaces import IModelProvider, ModelInfo
 from tta_ai.models.providers.openrouter import OpenRouterProvider
 
@@ -280,8 +279,8 @@ class TestAllProvidersConformToContract:
                 provider_sig = inspect.signature(provider_method)
 
                 # Compare parameter names (excluding 'self')
-                ref_params = [p for p in reference_sig.parameters.keys() if p != "self"]
-                prov_params = [p for p in provider_sig.parameters.keys() if p != "self"]
+                ref_params = [p for p in reference_sig.parameters if p != "self"]
+                prov_params = [p for p in provider_sig.parameters if p != "self"]
 
                 assert ref_params == prov_params, (
                     f"{provider_class.__name__}.{method_name} has different parameters than reference"

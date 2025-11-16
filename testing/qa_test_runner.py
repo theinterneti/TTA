@@ -554,9 +554,8 @@ async def main():
     if args.output:
         with open(args.output, "w") as f:
             json.dump(results, f, indent=2)
-        print(f"Results saved to {args.output}")
     else:
-        print(json.dumps(results, indent=2))
+        pass
 
 
 if __name__ == "__main__":

@@ -290,23 +290,10 @@ async def main():
         failed_tests = total_tests - passed_tests
         success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
 
-        print("\n" + "=" * 60)
-        print("COMPREHENSIVE TEST BATTERY SUMMARY")
-        print("=" * 60)
-        print(f"Total Tests: {total_tests}")
-        print(f"Passed: {passed_tests}")
-        print(f"Failed: {failed_tests}")
-        print(f"Success Rate: {success_rate:.1f}%")
-        print(f"Duration: {(end_time - start_time).total_seconds():.1f} seconds")
-        print(f"Overall Status: {'PASS' if failed_tests == 0 else 'FAIL'}")
-
         if failed_tests > 0:
-            print("\nFAILED TESTS:")
             for result in results:
                 if not result.passed:
-                    print(f"  - {result.test_name}: {result.error_message}")
-
-        print("=" * 60)
+                    pass
 
         # Return appropriate exit code
         return 0 if failed_tests == 0 else 1

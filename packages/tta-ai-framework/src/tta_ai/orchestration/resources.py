@@ -64,13 +64,9 @@ class ResourceUsageReport:
 @dataclass
 class WorkloadMetrics:
     # Minimal fields to drive optimization
-    queue_lengths: dict[str, int] = field(
-        default_factory=dict
-    )  # key: agent_type:instance
+    queue_lengths: dict[str, int] = field(default_factory=dict)  # key: agent_type:instance
     dlq_lengths: dict[str, int] = field(default_factory=dict)
-    step_latency_ms_p50: dict[str, float] = field(
-        default_factory=dict
-    )  # key: agent_type
+    step_latency_ms_p50: dict[str, float] = field(default_factory=dict)  # key: agent_type
     step_error_rates: dict[str, float] = field(default_factory=dict)  # 0..1
 
 
@@ -102,9 +98,7 @@ class ResourceManager:
         redis_prefix: str = "ao",
         circuit_breaker_registry: Any = None,
     ) -> None:
-        self.gpu_memory_limit_fraction = float(
-            max(0.0, min(1.0, gpu_memory_limit_fraction))
-        )
+        self.gpu_memory_limit_fraction = float(max(0.0, min(1.0, gpu_memory_limit_fraction)))
         self.cpu_thread_limit = cpu_thread_limit
         self.memory_limit_bytes = memory_limit_bytes
         self.warn_cpu_percent = warn_cpu_percent
@@ -139,24 +133,18 @@ class ResourceManager:
         """
         usage = self._collect_usage()
         if usage is None:
-            return ResourceAllocation(
-                granted=True, reason="psutil unavailable; cannot evaluate"
-            )
+            return ResourceAllocation(granted=True, reason="psutil unavailable; cannot evaluate")
 
         # CPU check
         if self.cpu_thread_limit is not None and resource_requirements.cpu_threads:
             if resource_requirements.cpu_threads > self.cpu_thread_limit:
-                return ResourceAllocation(
-                    granted=False, reason="CPU thread request exceeds limit"
-                )
+                return ResourceAllocation(granted=False, reason="CPU thread request exceeds limit")
 
         # Memory check
         if resource_requirements.ram_bytes is not None:
             avail_bytes = max(0, usage.memory_total_bytes - usage.memory_used_bytes)
             if resource_requirements.ram_bytes > avail_bytes:
-                return ResourceAllocation(
-                    granted=False, reason="Insufficient RAM available"
-                )
+                return ResourceAllocation(granted=False, reason="Insufficient RAM available")
 
         # GPU check (best-effort)
         gpu_index, grant_gpu_bytes = self._evaluate_gpu_request(resource_requirements)
@@ -196,18 +184,14 @@ class ResourceManager:
         )
         self._latest_report = report
         # Emergency mode flag
-        self._emergency_active = any(
-            v.get("level") == "critical" for v in thresholds.values()
-        )
+        self._emergency_active = any(v.get("level") == "critical" for v in thresholds.values())
 
         # Check for resource exhaustion and trigger workflow error handling
         await self._check_resource_exhaustion(report)
 
         return report
 
-    async def optimize_allocation(
-        self, current_workload: WorkloadMetrics
-    ) -> OptimizationResult:
+    async def optimize_allocation(self, current_workload: WorkloadMetrics) -> OptimizationResult:
         actions: list[str] = []
         details: dict[str, Any] = {}
 
@@ -217,17 +201,13 @@ class ResourceManager:
             details["emergency"] = True
 
         # Use queue lengths to recommend instance scaling (logical recommendations)
-        hot_agents = {
-            k: v for k, v in current_workload.queue_lengths.items() if v >= 10
-        }
+        hot_agents = {k: v for k, v in current_workload.queue_lengths.items() if v >= 10}
         if hot_agents:
             actions.append("rebalance_queues")
             details["hot_agents"] = hot_agents
 
         # If step latencies degraded, suggest lowering concurrency or increasing backoff
-        slow_agents = {
-            k: v for k, v in current_workload.step_latency_ms_p50.items() if v >= 1500.0
-        }
+        slow_agents = {k: v for k, v in current_workload.step_latency_ms_p50.items() if v >= 1500.0}
         if slow_agents:
             actions.append("reduce_concurrency")
             details["slow_agents"] = slow_agents
@@ -245,9 +225,7 @@ class ResourceManager:
         with contextlib.suppress(Exception):
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                self._monitoring_task = loop.create_task(
-                    self._monitor_loop(interval_seconds)
-                )
+                self._monitoring_task = loop.create_task(self._monitor_loop(interval_seconds))
             else:
                 # In synchronous contexts, run one iteration
                 loop.run_until_complete(self.monitor_usage())
@@ -268,13 +246,9 @@ class ResourceManager:
                     lvl = v.get("level")
                     val = v.get("value")
                     if lvl == "critical":
-                        logger.error(
-                            "[ResourceManager] Critical %s usage: %s%%", k, val
-                        )
+                        logger.error("[ResourceManager] Critical %s usage: %s%%", k, val)
                     elif lvl == "warning":
-                        logger.warning(
-                            "[ResourceManager] Elevated %s usage: %s%%", k, val
-                        )
+                        logger.warning("[ResourceManager] Elevated %s usage: %s%%", k, val)
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -376,9 +350,7 @@ class ResourceManager:
                     pct = (used / total * 100.0) if total else 0.0
                     usage.gpu_utilization.append(float(pct))
 
-    def _evaluate_gpu_request(
-        self, req: ResourceRequirements
-    ) -> tuple[int | None, int]:
+    def _evaluate_gpu_request(self, req: ResourceRequirements) -> tuple[int | None, int]:
         # Best-effort: grant on device 0 if enough headroom by fraction
         with contextlib.suppress(Exception):
             import torch  # type: ignore
@@ -416,9 +388,7 @@ class ResourceManager:
         for resource, threshold_info in report.thresholds_exceeded.items():
             if threshold_info.get("level") == "critical":
                 exhaustion_detected = True
-                exhaustion_reasons.append(
-                    f"{resource}: {threshold_info.get('value', 0):.1f}%"
-                )
+                exhaustion_reasons.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
 
         if exhaustion_detected:
             self._last_exhaustion_alert = current_time
@@ -432,9 +402,7 @@ class ResourceManager:
             )
 
             # Trigger circuit breakers for resource exhaustion
-            await self._trigger_resource_exhaustion_circuit_breakers(
-                report, exhaustion_reasons
-            )
+            await self._trigger_resource_exhaustion_circuit_breakers(report, exhaustion_reasons)
 
             # Call registered callbacks
             for callback in self._resource_exhaustion_callbacks:
@@ -487,9 +455,7 @@ class ResourceManager:
         except ValueError:
             return False
 
-    async def check_resource_health_for_workflow(
-        self, workflow_name: str
-    ) -> dict[str, Any]:
+    async def check_resource_health_for_workflow(self, workflow_name: str) -> dict[str, Any]:
         """Check if resources are healthy enough to run a workflow."""
         if not self._latest_report:
             await self.monitor_usage()
@@ -501,9 +467,7 @@ class ResourceManager:
         critical_issues = []
         for resource, threshold_info in self._latest_report.thresholds_exceeded.items():
             if threshold_info.get("level") == "critical":
-                critical_issues.append(
-                    f"{resource}: {threshold_info.get('value', 0):.1f}%"
-                )
+                critical_issues.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
 
         if critical_issues:
             return {
@@ -517,9 +481,7 @@ class ResourceManager:
         warning_issues = []
         for resource, threshold_info in self._latest_report.thresholds_exceeded.items():
             if threshold_info.get("level") == "warning":
-                warning_issues.append(
-                    f"{resource}: {threshold_info.get('value', 0):.1f}%"
-                )
+                warning_issues.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
 
         return {
             "healthy": True,

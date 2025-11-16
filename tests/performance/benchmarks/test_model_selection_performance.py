@@ -9,7 +9,6 @@ import asyncio
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-
 from tta_ai.models import (
     ModelInfo,
     ModelManagementComponent,
@@ -73,7 +72,7 @@ def model_selector(mock_models):
     mock_provider = AsyncMock()
     mock_provider.get_available_models = AsyncMock(return_value=mock_models)
 
-    selector = ModelSelector(
+    return ModelSelector(
         providers={"test_provider": mock_provider},
         hardware_detector=Mock(),
         selection_criteria=ModelSelectionCriteria(
@@ -81,7 +80,6 @@ def model_selector(mock_models):
             min_therapeutic_safety_score=7.0,
         ),
     )
-    return selector
 
 
 @pytest.fixture
@@ -91,14 +89,13 @@ def fallback_handler(mock_models):
     mock_provider = AsyncMock()
     mock_provider.get_available_models = AsyncMock(return_value=mock_models)
 
-    handler = FallbackHandler(
+    return FallbackHandler(
         providers={"test_provider": mock_provider},
         fallback_config=FallbackConfiguration(
             enabled=True,
             fallback_strategy="performance_based",
         ),
     )
-    return handler
 
 
 # ============================================================================

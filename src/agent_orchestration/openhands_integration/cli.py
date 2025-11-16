@@ -14,7 +14,6 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -37,7 +36,9 @@ def cli(debug: bool) -> None:
 
 
 @cli.command()
-@click.option("--task-type", required=True, help="Task type (unit_test, refactor, etc.)")
+@click.option(
+    "--task-type", required=True, help="Task type (unit_test, refactor, etc.)"
+)
 @click.option("--description", required=True, help="Task description")
 @click.option("--target-file", type=click.Path(), help="Target file path")
 @click.option(
@@ -47,11 +48,16 @@ def cli(debug: bool) -> None:
     help="Task priority",
 )
 @click.option("--quality-threshold", type=float, default=0.7, help="Quality threshold")
-@click.option("--complexity", type=click.Choice(["simple", "moderate", "complex"]), default="moderate", help="Task complexity")
+@click.option(
+    "--complexity",
+    type=click.Choice(["simple", "moderate", "complex"]),
+    default="moderate",
+    help="Task complexity",
+)
 def submit_task(
     task_type: str,
     description: str,
-    target_file: Optional[str],
+    target_file: str | None,
     priority: str,
     quality_threshold: float,
     complexity: str,
@@ -203,7 +209,11 @@ def run_engine(workers: int, duration: int) -> None:
 
 @cli.command()
 @click.option("--task-type", required=True, help="Task type")
-@click.option("--complexity", type=click.Choice(["simple", "moderate", "complex"]), default="moderate")
+@click.option(
+    "--complexity",
+    type=click.Choice(["simple", "moderate", "complex"]),
+    default="moderate",
+)
 @click.option("--quality-threshold", type=float, default=0.7)
 def select_model(task_type: str, complexity: str, quality_threshold: float) -> None:
     """Select optimal model for task."""
@@ -247,4 +257,3 @@ def select_model(task_type: str, complexity: str, quality_threshold: float) -> N
 
 if __name__ == "__main__":
     cli()
-

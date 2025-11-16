@@ -181,34 +181,18 @@ async def run_validation_test(task: dict) -> dict:
 async def main():
     """Run validation tests."""
     if not API_KEY:
-        print("❌ Error: OPENROUTER_API_KEY environment variable not set")
         return
-
-    print("=" * 80)
-    print("Phase 1: Validation Testing - Mistral Small + Simple Code Generation")
-    print("=" * 80)
-    print(f"Model: {MODEL}")
-    print(f"Tasks: {len(SIMPLE_TASKS)}")
-    print(f"Start Time: {datetime.now().isoformat()}")
-    print()
 
     # Run tests
     results = []
-    for i, task in enumerate(SIMPLE_TASKS, 1):
-        print(
-            f"[{i}/{len(SIMPLE_TASKS)}] Running: {task['id']}...", end=" ", flush=True
-        )
+    for _i, task in enumerate(SIMPLE_TASKS, 1):
         result = await run_validation_test(task)
         results.append(result)
 
         if result["success"]:
-            print(
-                f"✅ {result['elapsed']:.1f}s | "
-                f"{result['tokens']} tokens | "
-                f"⭐ {result['quality']}/5"
-            )
+            pass
         else:
-            print(f"❌ {result['error']}")
+            pass
 
     # Calculate statistics
     successful = sum(1 for r in results if r["success"])
@@ -230,33 +214,10 @@ async def main():
         else 0
     )
 
-    print()
-    print("=" * 80)
-    print("VALIDATION RESULTS")
-    print("=" * 80)
-    print(f"Success Rate: {success_rate:.1f}% ({successful}/{len(results)})")
-    print(f"Average Time: {avg_time:.2f}s")
-    print(f"Average Tokens: {avg_tokens:.0f}")
-    print(f"Average Quality: {avg_quality:.1f}/5")
-    print()
-
     # Validation criteria
-    print("VALIDATION CRITERIA:")
-    print(
-        f"  ✅ Success Rate > 90%: {'PASS' if success_rate >= 90 else 'FAIL'} ({success_rate:.1f}%)"
-    )
-    print(f"  ✅ Avg Time < 3s: {'PASS' if avg_time < 3 else 'FAIL'} ({avg_time:.2f}s)")
-    print(
-        f"  ✅ Avg Quality >= 4.5/5: {'PASS' if avg_quality >= 4.5 else 'FAIL'} ({avg_quality:.1f}/5)"
-    )
-    print()
 
     # Overall result
     all_pass = success_rate >= 90 and avg_time < 3 and avg_quality >= 4.5
-    print(
-        f"OVERALL: {'✅ PASS - Ready for Phase 2' if all_pass else '❌ FAIL - Needs investigation'}"
-    )
-    print()
 
     # Save results
     report = {
@@ -274,8 +235,6 @@ async def main():
 
     with open("validation_results.json", "w") as f:
         json.dump(report, f, indent=2)
-
-    print("Results saved to: validation_results.json")
 
 
 if __name__ == "__main__":

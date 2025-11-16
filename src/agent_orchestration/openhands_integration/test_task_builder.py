@@ -53,7 +53,7 @@ def create_test_generation_task(spec: TestTaskSpecification) -> str:
         **spec.conventions,
     }
 
-    task = f"""
+    return f"""
 Generate comprehensive unit tests for `{spec.target_file}` with the following requirements:
 
 **Target File:** `{spec.target_file}`
@@ -95,8 +95,6 @@ Generate comprehensive unit tests for `{spec.target_file}` with the following re
 - Test edge cases (empty inputs, None, invalid values, etc.)
 """.strip()
 
-    return task
-
 
 def create_package_test_generation_task(
     package_path: Path,
@@ -122,7 +120,7 @@ def create_package_test_generation_task(
         >>> print(task[:100])
         Generate comprehensive unit tests for all files in package `src/agent_orchestration/tools/` with...
     """
-    task = f"""
+    return f"""
 Generate comprehensive unit tests for all files in package `{package_path}/` with ≥{coverage_threshold}% coverage.
 
 **Package:** `{package_path}/`
@@ -153,8 +151,6 @@ Generate comprehensive unit tests for all files in package `{package_path}/` wit
 - Test both success and failure cases
 - Test edge cases for all functions
 """.strip()
-
-    return task
 
 
 def get_test_file_path(
@@ -192,6 +188,4 @@ def get_test_file_path(
     test_file_name = f"test_{relative_path.stem}.py"
 
     # Construct full test path
-    test_path = test_directory / relative_path.parent / test_file_name
-
-    return test_path
+    return test_directory / relative_path.parent / test_file_name

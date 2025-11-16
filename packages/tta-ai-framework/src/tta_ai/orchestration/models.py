@@ -107,29 +107,19 @@ class AgentCapability(BaseModel):
 
     name: str = Field(..., description="Unique name of the capability")
     type: CapabilityType = Field(..., description="Type of capability")
-    version: str = Field(
-        ..., description="Semantic version of the capability (e.g., '1.0.0')"
-    )
+    version: str = Field(..., description="Semantic version of the capability (e.g., '1.0.0')")
     description: str | None = Field(None, description="Human-readable description")
 
     # Operational metadata
     scope: CapabilityScope = Field(
         default=CapabilityScope.SESSION, description="Scope of operation"
     )
-    status: CapabilityStatus = Field(
-        default=CapabilityStatus.ACTIVE, description="Current status"
-    )
+    status: CapabilityStatus = Field(default=CapabilityStatus.ACTIVE, description="Current status")
 
     # Capability requirements and constraints
-    required_inputs: set[str] = Field(
-        default_factory=set, description="Required input fields"
-    )
-    optional_inputs: set[str] = Field(
-        default_factory=set, description="Optional input fields"
-    )
-    output_schema: dict[str, Any] | None = Field(
-        None, description="JSON schema for outputs"
-    )
+    required_inputs: set[str] = Field(default_factory=set, description="Required input fields")
+    optional_inputs: set[str] = Field(default_factory=set, description="Optional input fields")
+    output_schema: dict[str, Any] | None = Field(None, description="JSON schema for outputs")
 
     # Performance and resource metadata
     estimated_duration_ms: int | None = Field(
@@ -143,15 +133,11 @@ class AgentCapability(BaseModel):
     compatible_versions: set[str] = Field(
         default_factory=set, description="Compatible capability versions"
     )
-    dependencies: set[str] = Field(
-        default_factory=set, description="Required dependencies"
-    )
+    dependencies: set[str] = Field(default_factory=set, description="Required dependencies")
 
     # Metadata
     tags: set[str] = Field(default_factory=set, description="Searchable tags")
-    metadata: dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
     @validator("version")
     def validate_version(cls, v):
@@ -200,9 +186,7 @@ class AgentCapabilitySet(BaseModel):
         default=True, description="Whether agent is available for new requests"
     )
 
-    def get_capability(
-        self, name: str, version: str | None = None
-    ) -> AgentCapability | None:
+    def get_capability(self, name: str, version: str | None = None) -> AgentCapability | None:
         """Get a specific capability by name and optionally version."""
         for cap in self.capabilities:
             if cap.name == name:
@@ -214,39 +198,27 @@ class AgentCapabilitySet(BaseModel):
         """Check if agent has a specific capability."""
         return self.get_capability(name, version) is not None
 
-    def get_capabilities_by_type(
-        self, capability_type: CapabilityType
-    ) -> list[AgentCapability]:
+    def get_capabilities_by_type(self, capability_type: CapabilityType) -> list[AgentCapability]:
         """Get all capabilities of a specific type."""
         return [cap for cap in self.capabilities if cap.type == capability_type]
 
     def get_active_capabilities(self) -> list[AgentCapability]:
         """Get all active capabilities."""
-        return [
-            cap for cap in self.capabilities if cap.status == CapabilityStatus.ACTIVE
-        ]
+        return [cap for cap in self.capabilities if cap.status == CapabilityStatus.ACTIVE]
 
 
 class CapabilityMatchCriteria(BaseModel):
     """Criteria for matching agent capabilities."""
 
     # Basic matching criteria
-    capability_name: str | None = Field(
-        None, description="Specific capability name to match"
-    )
-    capability_type: CapabilityType | None = Field(
-        None, description="Type of capability required"
-    )
-    required_inputs: set[str] = Field(
-        default_factory=set, description="Required input fields"
-    )
+    capability_name: str | None = Field(None, description="Specific capability name to match")
+    capability_type: CapabilityType | None = Field(None, description="Type of capability required")
+    required_inputs: set[str] = Field(default_factory=set, description="Required input fields")
 
     # Version constraints
     min_version: str | None = Field(None, description="Minimum capability version")
     max_version: str | None = Field(None, description="Maximum capability version")
-    preferred_version: str | None = Field(
-        None, description="Preferred capability version"
-    )
+    preferred_version: str | None = Field(None, description="Preferred capability version")
 
     # Performance constraints
     max_duration_ms: int | None = Field(None, description="Maximum acceptable duration")
@@ -255,20 +227,12 @@ class CapabilityMatchCriteria(BaseModel):
     )
 
     # Availability constraints
-    require_available: bool = Field(
-        default=True, description="Require agent to be available"
-    )
-    max_load_factor: float = Field(
-        default=0.8, description="Maximum acceptable load factor"
-    )
+    require_available: bool = Field(default=True, description="Require agent to be available")
+    max_load_factor: float = Field(default=0.8, description="Maximum acceptable load factor")
 
     # Tags and metadata
-    required_tags: set[str] = Field(
-        default_factory=set, description="Required capability tags"
-    )
-    metadata_filters: dict[str, Any] = Field(
-        default_factory=dict, description="Metadata filters"
-    )
+    required_tags: set[str] = Field(default_factory=set, description="Required capability tags")
+    metadata_filters: dict[str, Any] = Field(default_factory=dict, description="Metadata filters")
 
 
 class CapabilityMatchResult(BaseModel):
@@ -279,35 +243,23 @@ class CapabilityMatchResult(BaseModel):
     match_score: float = Field(..., description="Match score (0.0-1.0)")
 
     # Match details
-    exact_match: bool = Field(
-        default=False, description="Whether this is an exact match"
-    )
-    version_match: bool = Field(
-        default=False, description="Whether version requirements are met"
-    )
+    exact_match: bool = Field(default=False, description="Whether this is an exact match")
+    version_match: bool = Field(default=False, description="Whether version requirements are met")
     performance_match: bool = Field(
         default=False, description="Whether performance requirements are met"
     )
 
     # Agent status at match time
-    agent_load_factor: float = Field(
-        default=0.0, description="Agent load factor at match time"
-    )
-    agent_availability: bool = Field(
-        default=True, description="Agent availability at match time"
-    )
-    estimated_wait_time_ms: int | None = Field(
-        None, description="Estimated wait time for agent"
-    )
+    agent_load_factor: float = Field(default=0.0, description="Agent load factor at match time")
+    agent_availability: bool = Field(default=True, description="Agent availability at match time")
+    estimated_wait_time_ms: int | None = Field(None, description="Estimated wait time for agent")
 
 
 class CapabilityDiscoveryRequest(BaseModel):
     """Request for discovering agents with specific capabilities."""
 
     criteria: CapabilityMatchCriteria = Field(..., description="Matching criteria")
-    max_results: int = Field(
-        default=10, description="Maximum number of results to return"
-    )
+    max_results: int = Field(default=10, description="Maximum number of results to return")
     include_degraded: bool = Field(
         default=False, description="Include agents with degraded performance"
     )
@@ -321,17 +273,11 @@ class CapabilityDiscoveryResponse(BaseModel):
     matches: list[CapabilityMatchResult] = Field(
         default_factory=list, description="Matched capabilities"
     )
-    total_agents_searched: int = Field(
-        default=0, description="Total number of agents searched"
-    )
-    search_duration_ms: int = Field(
-        default=0, description="Search duration in milliseconds"
-    )
+    total_agents_searched: int = Field(default=0, description="Total number of agents searched")
+    search_duration_ms: int = Field(default=0, description="Search duration in milliseconds")
 
     # Discovery metadata
     discovery_timestamp: datetime = Field(
         default_factory=datetime.utcnow, description="Discovery timestamp"
     )
-    cache_hit: bool = Field(
-        default=False, description="Whether results came from cache"
-    )
+    cache_hit: bool = Field(default=False, description="Whether results came from cache")

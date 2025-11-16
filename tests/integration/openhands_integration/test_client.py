@@ -82,9 +82,7 @@ class TestOpenHandsClient:
         """Test task execution with custom timeout."""
         client = OpenHandsClient(openhands_config)
 
-        result = await client.execute_task(
-            "Write a Python function", timeout=120.0
-        )
+        result = await client.execute_task("Write a Python function", timeout=120.0)
 
         assert result.success is True
 
@@ -98,9 +96,7 @@ class TestOpenHandsClient:
         client = OpenHandsClient(openhands_config)
 
         # Make conversation.run() raise an error
-        mock_openhands_sdk["conversation"].run.side_effect = RuntimeError(
-            "SDK error"
-        )
+        mock_openhands_sdk["conversation"].run.side_effect = RuntimeError("SDK error")
 
         result = await client.execute_task("Write a Python function")
 
@@ -165,7 +161,7 @@ class TestOpenHandsClient:
         mock_event2 = MagicMock()
         mock_event2.source = "agent"
         mock_event2.content = "Second agent message (content)"
-        delattr(mock_event2, 'message')  # Remove message attribute
+        delattr(mock_event2, "message")  # Remove message attribute
 
         mock_event3 = MagicMock()
         mock_event3.source = "user"
@@ -183,7 +179,10 @@ class TestOpenHandsClient:
 
         assert result.success is True
         # Output should contain agent messages (in reverse order)
-        assert "First agent message" in result.output or "Second agent message" in result.output
+        assert (
+            "First agent message" in result.output
+            or "Second agent message" in result.output
+        )
 
 
 @pytest.mark.skip(reason="Requires --run-real-api flag and OPENROUTER_API_KEY")
@@ -203,4 +202,3 @@ class TestOpenHandsClientRealAPI:
         assert result.success is True
         assert result.execution_time > 0
         assert result.output  # Should have output
-

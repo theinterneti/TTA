@@ -74,19 +74,10 @@ class ComprehensiveFreeModelValidator:
 
     async def initialize(self):
         """Initialize the enhanced evaluation runner."""
-        print(
-            "🔧 Initializing TTA Enhanced Extended Session Quality Evaluation Framework..."
-        )
         self.runner = EnhancedEvaluationRunner()
-        print("✅ Framework initialized successfully!")
 
     async def run_quick_validation(self):
         """Run quick validation tests (~15 minutes)."""
-        print("\n" + "=" * 80)
-        print("🚀 RUNNING QUICK FREE MODEL VALIDATION")
-        print("=" * 80)
-        print(f"📊 Testing {len(self.free_models)} free models on basic scenarios")
-        print("⏱️  Expected duration: ~15 minutes")
 
         start_time = time.time()
 
@@ -101,12 +92,9 @@ class ComprehensiveFreeModelValidator:
 
         args = MockArgs()
 
-        print(f"\n🔬 Running multi-model comparison: {top_models}")
         await self.runner.run_multi_model_comparison(args)
 
         duration = time.time() - start_time
-        print(f"\n✅ Quick validation completed in {duration:.1f} seconds")
-        print("💰 Total API cost: $0.00 (all free models)")
 
         return {
             "test_type": "quick",
@@ -118,11 +106,6 @@ class ComprehensiveFreeModelValidator:
 
     async def run_extended_validation(self):
         """Run extended session validation tests (~45 minutes)."""
-        print("\n" + "=" * 80)
-        print("🚀 RUNNING EXTENDED SESSION VALIDATION")
-        print("=" * 80)
-        print(f"📊 Testing {len(self.free_models)} free models on extended sessions")
-        print("⏱️  Expected duration: ~45 minutes")
 
         start_time = time.time()
 
@@ -136,12 +119,9 @@ class ComprehensiveFreeModelValidator:
 
         args = MockArgs()
 
-        print(f"\n🔬 Running extended session testing: {self.free_models}")
         await self.runner.run_extended_sessions(args)
 
         duration = time.time() - start_time
-        print(f"\n✅ Extended validation completed in {duration:.1f} seconds")
-        print("💰 Total API cost: $0.00 (all free models)")
 
         return {
             "test_type": "extended",
@@ -153,17 +133,10 @@ class ComprehensiveFreeModelValidator:
 
     async def run_full_validation(self):
         """Run complete validation suite (~2 hours)."""
-        print("\n" + "=" * 80)
-        print("🚀 RUNNING COMPREHENSIVE FREE MODEL VALIDATION SUITE")
-        print("=" * 80)
-        print(f"📊 Testing {len(self.free_models)} free models across all scenarios")
-        print("⏱️  Expected duration: ~2 hours")
 
         start_time = time.time()
-        results = []
 
         # 1. Multi-model comparison
-        print("\n🔬 Phase 1: Multi-Model Comparison")
         models_str = ",".join(self.free_models)
 
         class MockArgs:
@@ -174,24 +147,19 @@ class ComprehensiveFreeModelValidator:
         await self.runner.run_multi_model_comparison(args)
 
         # 2. Extended session testing
-        print("\n🔬 Phase 2: Extended Session Testing")
         args.turns = 50
         await self.runner.run_extended_sessions(args)
 
         # 3. Diversified scenario testing for top 3 models
-        print("\n🔬 Phase 3: Diversified Scenario Testing")
         top_models = self.free_models[:3]
         for model in top_models:
             args.models = model
             await self.runner.run_diversified_scenarios(args)
 
         # 4. Performance benchmarking
-        print("\n🔬 Phase 4: Performance Benchmarking")
         await self.runner.run_performance_benchmark(args)
 
         duration = time.time() - start_time
-        print(f"\n✅ Full validation completed in {duration:.1f} seconds")
-        print("💰 Total API cost: $0.00 (all free models)")
 
         return {
             "test_type": "full",
@@ -205,54 +173,6 @@ class ComprehensiveFreeModelValidator:
 
     def generate_summary_report(self, results):
         """Generate a comprehensive summary report."""
-        print("\n" + "=" * 80)
-        print("📊 COMPREHENSIVE FREE MODEL VALIDATION SUMMARY")
-        print("=" * 80)
-
-        print("\n🎯 **VALIDATION RESULTS**")
-        print(f"   Test Type: {results['test_type'].upper()}")
-        print(f"   Models Tested: {results['models_tested']}")
-        print(f"   Scenarios Tested: {results['scenarios_tested']}")
-        print(
-            f"   Duration: {results['duration_seconds']:.1f} seconds ({results['duration_seconds'] / 60:.1f} minutes)"
-        )
-        print(f"   API Cost: ${results['api_cost']:.2f}")
-
-        print("\n🏆 **FREE MODEL RANKINGS** (Based on Testing)")
-        print(
-            "   1. 🥇 Qwen 2.5 72B Instruct - Best overall performance (largest model)"
-        )
-        print(
-            "   2. 🥈 Meta Llama 3.3 8B Instruct - Excellent balance of speed/quality"
-        )
-        print(
-            "   3. 🥉 Meta Llama 3.2 11B Vision Instruct - Enhanced reasoning capabilities"
-        )
-        print("   4. 🏅 Google Gemma 2 9B IT - Reliable Google architecture")
-        print("   5. 🏅 Meta Llama 3.1 8B Instruct - Solid baseline performance")
-        print("   6. 🏅 Qwen 3 4B - Ultra-fast inference for speed testing")
-        print("   7. 🏅 Google Gemma 3n 2B - Minimal resource usage")
-
-        print("\n💡 **RECOMMENDATIONS**")
-        print(
-            "   🎯 **For Production**: Qwen 2.5 72B Instruct or Llama 3.3 8B Instruct"
-        )
-        print("   ⚡ **For Speed**: Qwen 3 4B or Gemma 3n 2B")
-        print("   🧠 **For Reasoning**: Llama 3.2 11B Vision Instruct")
-        print("   🔄 **For Testing**: All models available at $0.00 cost")
-
-        print("\n✅ **FRAMEWORK STATUS**")
-        print("   🚀 All 7 free models successfully integrated")
-        print("   🔧 Configuration files updated with new models")
-        print("   📊 Multi-model comparison framework operational")
-        print("   🎭 Diversified scenario library expanded")
-        print("   ⚡ Performance optimization active")
-        print("   👥 Real user testing framework ready")
-
-        print("\n🎉 **TTA Enhanced Extended Session Quality Evaluation Framework**")
-        print(
-            "   **Successfully expanded to support 7 free models with $0.00 API costs!**"
-        )
 
 
 async def main():
@@ -291,8 +211,7 @@ async def main():
 
         validator.generate_summary_report(results)
 
-    except Exception as e:
-        print(f"\n❌ Validation failed: {e}")
+    except Exception:
         return 1
 
     return 0

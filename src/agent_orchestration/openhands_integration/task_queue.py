@@ -15,10 +15,10 @@ import asyncio
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -50,15 +50,15 @@ class QueuedTask:
     task_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     task_type: str = ""  # "unit_test", "refactor", "document", etc.
     description: str = ""
-    target_file: Optional[Path] = None
+    target_file: Path | None = None
     priority: TaskPriority = TaskPriority.NORMAL
     status: TaskStatus = TaskStatus.PENDING
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
-    result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    result: dict[str, Any] | None = None
+    error: str | None = None
     retry_count: int = 0
     max_retries: int = 3
 
@@ -79,7 +79,9 @@ class QueuedTask:
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": self.completed_at.isoformat()
+            if self.completed_at
+            else None,
             "metadata": self.metadata,
             "result": self.result,
             "error": self.error,
@@ -123,10 +125,12 @@ class TaskQueue:
             task.status = TaskStatus.QUEUED
             self._tasks[task.task_id] = task
             await self._queue.put((task.priority.value, task))
-            logger.info(f"Task {task.task_id} enqueued (priority: {task.priority.name})")
+            logger.info(
+                f"Task {task.task_id} enqueued (priority: {task.priority.name})"
+            )
             return task.task_id
 
-    async def dequeue(self) -> Optional[QueuedTask]:
+    async def dequeue(self) -> QueuedTask | None:
         """Get next task from queue.
 
         Returns:
@@ -136,7 +140,7 @@ class TaskQueue:
             _, task = self._queue.get_nowait()
             async with self._lock:
                 task.status = TaskStatus.RUNNING
-                task.started_at = datetime.now(timezone.utc)
+                task.started_at = datetime.now(UTC)
             logger.info(f"Task {task.task_id} dequeued")
             return task
         except asyncio.QueueEmpty:
@@ -144,7 +148,7 @@ class TaskQueue:
 
     async def mark_completed(
         self, task_id: str, result: dict[str, Any]
-    ) -> Optional[QueuedTask]:
+    ) -> QueuedTask | None:
         """Mark task as completed.
 
         Args:
@@ -158,12 +162,12 @@ class TaskQueue:
             task = self._tasks.get(task_id)
             if task:
                 task.status = TaskStatus.COMPLETED
-                task.completed_at = datetime.now(timezone.utc)
+                task.completed_at = datetime.now(UTC)
                 task.result = result
                 logger.info(f"Task {task_id} completed")
             return task
 
-    async def mark_failed(self, task_id: str, error: str) -> Optional[QueuedTask]:
+    async def mark_failed(self, task_id: str, error: str) -> QueuedTask | None:
         """Mark task as failed.
 
         Args:
@@ -182,7 +186,7 @@ class TaskQueue:
                 logger.error(f"Task {task_id} failed: {error}")
             return task
 
-    async def get_task(self, task_id: str) -> Optional[QueuedTask]:
+    async def get_task(self, task_id: str) -> QueuedTask | None:
         """Get task by ID.
 
         Args:
@@ -202,11 +206,21 @@ class TaskQueue:
         """
         async with self._lock:
             total = len(self._tasks)
-            pending = sum(1 for t in self._tasks.values() if t.status == TaskStatus.PENDING)
-            queued = sum(1 for t in self._tasks.values() if t.status == TaskStatus.QUEUED)
-            running = sum(1 for t in self._tasks.values() if t.status == TaskStatus.RUNNING)
-            completed = sum(1 for t in self._tasks.values() if t.status == TaskStatus.COMPLETED)
-            failed = sum(1 for t in self._tasks.values() if t.status == TaskStatus.FAILED)
+            pending = sum(
+                1 for t in self._tasks.values() if t.status == TaskStatus.PENDING
+            )
+            queued = sum(
+                1 for t in self._tasks.values() if t.status == TaskStatus.QUEUED
+            )
+            running = sum(
+                1 for t in self._tasks.values() if t.status == TaskStatus.RUNNING
+            )
+            completed = sum(
+                1 for t in self._tasks.values() if t.status == TaskStatus.COMPLETED
+            )
+            failed = sum(
+                1 for t in self._tasks.values() if t.status == TaskStatus.FAILED
+            )
 
             return {
                 "total_tasks": total,
@@ -218,4 +232,3 @@ class TaskQueue:
                 "queue_size": self._queue.qsize(),
                 "max_size": self.max_size,
             }
-

@@ -83,9 +83,7 @@ class AgentCoordinationProfiler:
             memory_usage = self._memory_tracker.stop_tracking(profile_name)
 
             # Generate profile result
-            result = self._generate_profile_result(
-                profiler, end_time - start_time, memory_usage
-            )
+            result = self._generate_profile_result(profiler, end_time - start_time, memory_usage)
 
             with self._profile_lock:
                 self._active_profiles.pop(profile_name, None)
@@ -129,9 +127,7 @@ class AgentCoordinationProfiler:
             function_calls=stats.total_calls,
             primitive_calls=stats.prim_calls,
             total_time=stats.total_tt,
-            cumulative_time=sum(
-                ct for (cc, nc, tt, ct, callers) in stats.stats.values()
-            ),
+            cumulative_time=sum(ct for (cc, nc, tt, ct, callers) in stats.stats.values()),
             top_functions=top_functions,
             memory_usage=memory_usage,
         )
@@ -408,9 +404,7 @@ class CoordinationBenchmark:
         latency_degradation = []
 
         baseline_throughput = concurrency_results[concurrency_levels[0]].throughput_rps
-        baseline_latency = concurrency_results[
-            concurrency_levels[0]
-        ].average_response_time
+        baseline_latency = concurrency_results[concurrency_levels[0]].average_response_time
 
         for concurrency in concurrency_levels:
             metrics = concurrency_results[concurrency]
@@ -419,17 +413,13 @@ class CoordinationBenchmark:
             expected_throughput = baseline_throughput * concurrency
             actual_throughput = metrics.throughput_rps
             scaling_efficiency = (
-                actual_throughput / expected_throughput
-                if expected_throughput > 0
-                else 0
+                actual_throughput / expected_throughput if expected_throughput > 0 else 0
             )
             throughput_scaling.append(scaling_efficiency)
 
             # Latency degradation
             latency_increase = (
-                metrics.average_response_time / baseline_latency
-                if baseline_latency > 0
-                else 1
+                metrics.average_response_time / baseline_latency if baseline_latency > 0 else 1
             )
             latency_degradation.append(latency_increase)
 
@@ -441,9 +431,7 @@ class CoordinationBenchmark:
             "scalability_score": min(throughput_scaling) if throughput_scaling else 0,
         }
 
-    def _find_optimal_concurrency(
-        self, concurrency_results: dict[int, ConcurrencyMetrics]
-    ) -> int:
+    def _find_optimal_concurrency(self, concurrency_results: dict[int, ConcurrencyMetrics]) -> int:
         """Find optimal concurrency level based on throughput and latency trade-off."""
         best_score = 0
         optimal_concurrency = 1

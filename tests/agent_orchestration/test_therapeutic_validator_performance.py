@@ -51,11 +51,6 @@ class TestTherapeuticValidatorPerformance:
         avg_time = statistics.mean(times)
         max_time = max(times)
 
-        print("\nSingle Validation Performance:")
-        print(f"  Average time: {avg_time * 1000:.2f}ms")
-        print(f"  Maximum time: {max_time * 1000:.2f}ms")
-        print(f"  Minimum time: {min(times) * 1000:.2f}ms")
-
         # Should complete validations quickly
         assert avg_time < 0.050, f"Average validation time too slow: {avg_time:.3f}s"
         assert max_time < 0.100, f"Maximum validation time too slow: {max_time:.3f}s"
@@ -93,11 +88,6 @@ class TestTherapeuticValidatorPerformance:
         # Performance metrics
         avg_time_per_validation = total_time / len(test_batch)
         validations_per_second = len(test_batch) / total_time
-
-        print(f"\nBatch Validation Performance ({len(test_batch)} validations):")
-        print(f"  Total time: {total_time:.3f}s")
-        print(f"  Average per validation: {avg_time_per_validation * 1000:.2f}ms")
-        print(f"  Validations per second: {validations_per_second:.1f}")
 
         # Performance requirements
         assert avg_time_per_validation < 0.025, (
@@ -137,12 +127,6 @@ class TestTherapeuticValidatorPerformance:
         # Performance metrics
         validations_per_second = len(test_texts) / total_time
 
-        print(
-            f"\nConcurrent Validation Performance ({len(test_texts)} validations, 10 workers):"
-        )
-        print(f"  Total time: {total_time:.3f}s")
-        print(f"  Validations per second: {validations_per_second:.1f}")
-
         # Should handle concurrent load efficiently
         assert validations_per_second > 30, (
             f"Concurrent throughput too low: {validations_per_second:.1f} validations/sec"
@@ -168,14 +152,8 @@ class TestTherapeuticValidatorPerformance:
             validation_time = end_time - start_time
             times.append(validation_time)
 
-            print(f"  Text size {len(text):,} chars: {validation_time * 1000:.2f}ms")
-
             # Ensure validation completed successfully
             assert isinstance(result, ValidationResult)
-
-        print("\nLarge Content Performance:")
-        print(f"  Average time: {statistics.mean(times) * 1000:.2f}ms")
-        print(f"  Maximum time: {max(times) * 1000:.2f}ms")
 
         # Should handle large content reasonably
         assert max(times) < 0.500, (
@@ -260,9 +238,7 @@ class TestTherapeuticValidatorAccuracy:
             ):
                 true_positives += 1
             else:
-                print(
-                    f"False negative: '{text}' - Expected {[ct.value for ct in expected_types]}, got {[ct.value for ct in result.crisis_types]}"
-                )
+                pass
 
         # Test true negatives
         true_negatives = 0
@@ -278,16 +254,9 @@ class TestTherapeuticValidatorAccuracy:
         sensitivity = true_positives / len(true_positive_cases)
         specificity = true_negatives / len(true_negative_cases)
 
-        print("\nCrisis Detection Accuracy:")
-        print(f"  Sensitivity (True Positive Rate): {sensitivity:.2%}")
-        print(f"  Specificity (True Negative Rate): {specificity:.2%}")
-        print(f"  True Positives: {true_positives}/{len(true_positive_cases)}")
-        print(f"  True Negatives: {true_negatives}/{len(true_negative_cases)}")
-
         if false_positives:
-            print("  False Positives:")
-            for text, types in false_positives:
-                print(f"    '{text}' -> {types}")
+            for text, _types in false_positives:
+                pass
 
         # Accuracy requirements
         assert sensitivity >= 0.90, f"Sensitivity too low: {sensitivity:.2%}"
@@ -315,15 +284,9 @@ class TestTherapeuticValidatorAccuracy:
             if min_expected <= appropriateness <= max_expected:
                 accurate_scores += 1
             else:
-                print(
-                    f"Inappropriate score: '{text}' -> {appropriateness:.2f} (expected {min_expected:.2f}-{max_expected:.2f})"
-                )
+                pass
 
         accuracy = accurate_scores / len(test_cases)
-
-        print("\nTherapeutic Appropriateness Accuracy:")
-        print(f"  Accurate scores: {accurate_scores}/{len(test_cases)}")
-        print(f"  Accuracy: {accuracy:.2%}")
 
         # Should have high accuracy in appropriateness scoring
         assert accuracy >= 0.85, (
@@ -376,21 +339,10 @@ class TestTherapeuticValidatorAccuracy:
                 quality = (keyword_score + supportive_score + length_score) / 3
                 quality_scores.append(quality)
 
-                print(f"  '{text}' -> Quality: {quality:.2f}")
-                print(
-                    f"    Keywords: {keyword_score:.2f}, Supportive: {supportive_score:.2f}, Length: {length_score:.2f}"
-                )
             else:
                 quality_scores.append(0.0)
-                print(f"  '{text}' -> No alternative generated")
 
         avg_quality = statistics.mean(quality_scores) if quality_scores else 0.0
-
-        print("\nAlternative Generation Quality:")
-        print(f"  Average quality score: {avg_quality:.2f}")
-        print(
-            f"  Alternatives generated: {sum(1 for score in quality_scores if score > 0)}/{len(crisis_cases)}"
-        )
 
         # Should generate high-quality alternatives
         assert avg_quality >= 0.75, (
@@ -440,14 +392,7 @@ class TestTherapeuticValidatorAccuracy:
             group_consistency = 1.0 if crisis_consistency and level_consistency else 0.5
             consistency_scores.append(group_consistency)
 
-            print(f"  Group consistency: {group_consistency:.2f}")
-            print(f"    Crisis detections: {crisis_detections}")
-            print(f"    Safety levels: {[level.value for level in safety_levels]}")
-
         avg_consistency = statistics.mean(consistency_scores)
-
-        print("\nConsistency Across Similar Inputs:")
-        print(f"  Average consistency: {avg_consistency:.2f}")
 
         # Should be reasonably consistent
         assert avg_consistency >= 0.80, f"Consistency too low: {avg_consistency:.2f}"

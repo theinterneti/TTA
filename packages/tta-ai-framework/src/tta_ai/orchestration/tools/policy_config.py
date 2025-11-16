@@ -118,9 +118,7 @@ def load_tool_policy_config() -> ToolPolicyConfig:
     # 2b) Env boolean flags
     for env_key, field_name in _ENV_BOOL_KEYS.items():
         if env_key in os.environ:
-            base[field_name] = _parse_bool(
-                os.environ.get(env_key), base.get(field_name, True)
-            )
+            base[field_name] = _parse_bool(os.environ.get(env_key), base.get(field_name, True))
 
     # 2c) Env integer options
     for env_key, field_name in _ENV_INT_KEYS.items():

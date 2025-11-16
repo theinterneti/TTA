@@ -11,7 +11,6 @@ Tests:
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -74,9 +73,7 @@ class TestOpenHandsConfig:
         assert config.workspace_path == test_workspace
         assert config.timeout_seconds == 300.0  # Default
 
-    def test_config_with_custom_timeout(
-        self, test_api_key: str, test_workspace: Path
-    ):
+    def test_config_with_custom_timeout(self, test_api_key: str, test_workspace: Path):
         """Test config with custom timeout."""
         config = OpenHandsConfig(
             api_key=SecretStr(test_api_key),
@@ -87,9 +84,7 @@ class TestOpenHandsConfig:
 
         assert config.timeout_seconds == 600.0
 
-    def test_config_timeout_validation(
-        self, test_api_key: str, test_workspace: Path
-    ):
+    def test_config_timeout_validation(self, test_api_key: str, test_workspace: Path):
         """Test timeout validation."""
         # Too low
         with pytest.raises(ValidationError):
@@ -113,9 +108,7 @@ class TestOpenHandsConfig:
 class TestOpenHandsIntegrationConfig:
     """Tests for OpenHandsIntegrationConfig."""
 
-    def test_integration_config_creation(
-        self, test_api_key: str, test_workspace: Path
-    ):
+    def test_integration_config_creation(self, test_api_key: str, test_workspace: Path):
         """Test creating integration config."""
         config = OpenHandsIntegrationConfig(
             api_key=SecretStr(test_api_key),
@@ -183,9 +176,7 @@ class TestOpenHandsIntegrationConfig:
         # Set environment variables
         monkeypatch.setenv("OPENROUTER_API_KEY", "test-key-from-env")
         monkeypatch.setenv("OPENHANDS_MODEL", "gemini-flash")
-        monkeypatch.setenv(
-            "OPENHANDS_WORKSPACE_ROOT", str(tmp_path / "env_workspace")
-        )
+        monkeypatch.setenv("OPENHANDS_WORKSPACE_ROOT", str(tmp_path / "env_workspace"))
         monkeypatch.setenv("OPENHANDS_TIMEOUT", "600.0")
         monkeypatch.setenv("OPENHANDS_ENABLE_CIRCUIT_BREAKER", "false")
 
@@ -200,14 +191,14 @@ class TestOpenHandsIntegrationConfig:
         """Test from_env fails without API key."""
         # Remove API key from environment and mock load_dotenv to prevent loading from .env file
         monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
-        monkeypatch.setenv("OPENROUTER_API_KEY", "")  # Set to empty string to ensure it's not loaded
+        monkeypatch.setenv(
+            "OPENROUTER_API_KEY", ""
+        )  # Set to empty string to ensure it's not loaded
 
         with pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
             OpenHandsIntegrationConfig.from_env()
 
-    def test_retry_config_validation(
-        self, test_api_key: str, test_workspace: Path
-    ):
+    def test_retry_config_validation(self, test_api_key: str, test_workspace: Path):
         """Test retry configuration validation."""
         config = OpenHandsIntegrationConfig(
             api_key=SecretStr(test_api_key),
@@ -219,9 +210,7 @@ class TestOpenHandsIntegrationConfig:
         assert config.max_retries == 5
         assert config.retry_base_delay == 2.0
 
-    def test_circuit_breaker_config(
-        self, test_api_key: str, test_workspace: Path
-    ):
+    def test_circuit_breaker_config(self, test_api_key: str, test_workspace: Path):
         """Test circuit breaker configuration."""
         config = OpenHandsIntegrationConfig(
             api_key=SecretStr(test_api_key),
@@ -234,4 +223,3 @@ class TestOpenHandsIntegrationConfig:
         assert config.circuit_breaker_enabled is True
         assert config.circuit_breaker_failure_threshold == 10
         assert config.circuit_breaker_timeout_seconds == 120
-

@@ -75,9 +75,9 @@ class TestFreeModelsFilter:
                     "yes",
                     "on",
                 )
-                assert (
-                    result == expected
-                ), f"Failed for {env_value}, expected {expected}, got {result}"
+                assert result == expected, (
+                    f"Failed for {env_value}, expected {expected}, got {result}"
+                )
 
     def test_float_parsing(self):
         """Test that float environment variables are parsed correctly."""
@@ -92,9 +92,9 @@ class TestFreeModelsFilter:
             with patch.dict(os.environ, {"TEST_FLOAT": env_value}):
                 # Simulate the float parsing logic
                 result = float(os.getenv("TEST_FLOAT", "0.0"))
-                assert (
-                    result == expected
-                ), f"Failed for {env_value}, expected {expected}, got {result}"
+                assert result == expected, (
+                    f"Failed for {env_value}, expected {expected}, got {result}"
+                )
 
     def test_free_models_filtering(self):
         """Test filtering to show only free models."""
@@ -373,8 +373,6 @@ if __name__ == "__main__":
     test_instance = TestFreeModelsFilter()
     test_instance.setup_method()
 
-    print("🧪 Running Free Models Filter Tests...")
-
     # Run all test methods
     test_methods = [
         test_instance.test_environment_variables_parsing,
@@ -405,15 +403,11 @@ if __name__ == "__main__":
     for test_method in test_methods:
         try:
             test_method()
-            print(f"✅ {test_method.__name__}")
             passed += 1
-        except Exception as e:
-            print(f"❌ {test_method.__name__}: {e}")
+        except Exception:
             failed += 1
 
-    print(f"\n📊 Test Results: {passed} passed, {failed} failed")
-
     if failed == 0:
-        print("🎉 All tests passed! Free models filter is working correctly.")
+        pass
     else:
-        print("⚠️  Some tests failed. Please check the implementation.")
+        pass

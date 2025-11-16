@@ -107,9 +107,9 @@ async def initialize_franchise_system():
     try:
         success = await franchise_api.initialize()
         if not success:
-            print("Warning: Failed to initialize franchise world system")
-    except Exception as e:
-        print(f"Error initializing franchise world system: {e}")
+            pass
+    except Exception:
+        pass
 
 
 @router.get("/", response_model=list[FranchiseWorldSummary])

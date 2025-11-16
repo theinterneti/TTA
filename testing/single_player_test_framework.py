@@ -210,9 +210,9 @@ class SinglePlayerTestFramework:
             total_tests = len(self.models) * len(self.profiles) * len(self.scenarios)
             completed_tests = 0
 
-            for model_key, model in self.models.items():
-                for profile_key, profile in self.profiles.items():
-                    for scenario_key, scenario in self.scenarios.items():
+            for model in self.models.values():
+                for profile in self.profiles.values():
+                    for scenario in self.scenarios.values():
                         logger.info(
                             f"Running test: {model.name} + {profile.name} + {scenario.name}"
                         )
@@ -310,7 +310,7 @@ class SinglePlayerTestFramework:
 
         # This would integrate with the actual character creation system
         # For now, return a mock character
-        character = Character(
+        return Character(
             character_id=str(uuid.uuid4()),
             player_id=anonymous_id,
             name=character_data.name,
@@ -321,8 +321,6 @@ class SinglePlayerTestFramework:
             last_active=datetime.now(),
         )
 
-        return character
-
     async def _execute_scenario_step(
         self,
         step: str,
@@ -332,7 +330,7 @@ class SinglePlayerTestFramework:
         scenario: TestScenario,
     ) -> dict[str, Any]:
         """Execute a single scenario step."""
-        step_start = time.time()
+        time.time()
         step_result = {"conversations": [], "response_times": [], "errors": 0}
 
         try:
@@ -595,7 +593,7 @@ class SinglePlayerTestFramework:
         if not self.results:
             return {"error": "No test results available for analysis"}
 
-        analysis = {
+        return {
             "summary": self._generate_summary_statistics(),
             "model_comparison": self._generate_model_comparison(),
             "profile_analysis": self._generate_profile_analysis(),
@@ -605,8 +603,6 @@ class SinglePlayerTestFramework:
                 self._serialize_result(result) for result in self.results
             ],
         }
-
-        return analysis
 
     def _generate_summary_statistics(self) -> dict[str, Any]:
         """Generate summary statistics across all tests."""
@@ -955,7 +951,7 @@ class SinglePlayerTestFramework:
 
         sorted_models = sorted(model_rankings.items(), key=lambda x: x[1], reverse=True)
 
-        recommendations = {
+        return {
             "primary_recommendation": {
                 "model": best_result.model_name,
                 "overall_score": best_result.overall_score,
@@ -969,8 +965,6 @@ class SinglePlayerTestFramework:
             "implementation_guidelines": self._generate_implementation_guidelines(),
             "areas_for_improvement": self._identify_improvement_areas(),
         }
-
-        return recommendations
 
     def _generate_use_case_recommendations(self) -> dict[str, str]:
         """Generate model recommendations for specific use cases."""
@@ -1147,25 +1141,10 @@ async def main():
     try:
         analysis = await framework.run_comprehensive_test()
 
-        print("\n" + "=" * 80)
-        print("TTA SINGLE-PLAYER STORYTELLING EXPERIENCE TEST RESULTS")
-        print("=" * 80)
-
-        summary = analysis.get("summary", {})
-        print("\nSUMMARY:")
-        print(f"Total Tests: {summary.get('total_tests', 0)}")
-        print(f"Success Rate: {summary.get('success_rate', 0):.1%}")
-        print(
-            f"Average Overall Score: {summary.get('average_scores', {}).get('overall', 0):.2f}/10"
-        )
+        analysis.get("summary", {})
 
         recommendations = analysis.get("recommendations", {})
-        primary_rec = recommendations.get("primary_recommendation", {})
-        print("\nPRIMARY RECOMMENDATION:")
-        print(f"Best Model: {primary_rec.get('model', 'N/A')}")
-        print(f"Score: {primary_rec.get('overall_score', 0):.2f}/10")
-
-        print("\nDetailed results saved to: testing/results/")
+        recommendations.get("primary_recommendation", {})
 
     except Exception as e:
         logger.error(f"Test execution failed: {e}")

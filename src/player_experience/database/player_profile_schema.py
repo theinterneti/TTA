@@ -13,7 +13,6 @@ try:
     from neo4j import Driver, GraphDatabase, Result, Session
     from neo4j.exceptions import ClientError, ServiceUnavailable
 except ImportError:
-    print("Warning: neo4j package not installed. Install with: pip install neo4j")
     GraphDatabase = None
     Driver = None
     Session = None
@@ -73,8 +72,12 @@ class PlayerProfileSchemaManager:
             from neo4j.exceptions import (
                 AuthError,
             )
-            from neo4j.exceptions import ClientError as _ClientError
-            from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
+            from neo4j.exceptions import (
+                ClientError as _ClientError,
+            )
+            from neo4j.exceptions import (
+                ServiceUnavailable as _ServiceUnavailable,
+            )
         except Exception:  # pragma: no cover - neo4j not installed path
             AuthError = Exception  # type: ignore
             _ServiceUnavailable = ServiceUnavailable  # type: ignore

@@ -62,9 +62,6 @@ class EnhancedEvaluationRunner:
 
     async def run_extended_sessions(self, args):
         """Run extended session testing (30-50+ turns)."""
-        print("\n" + "=" * 80)
-        print("🚀 RUNNING EXTENDED SESSION TESTING (30-50+ TURNS)")
-        print("=" * 80)
 
         # Start performance optimization
         await self.performance_optimizer.start_optimization()
@@ -88,21 +85,11 @@ class EnhancedEvaluationRunner:
             )
             profiles = ["typical_user", "marathon_user", "deep_explorer"]
 
-            print("📊 Testing Configuration:")
-            print(f"   Scenarios: {scenarios}")
-            print(f"   Models: {models}")
-            print(f"   User Profiles: {profiles}")
-            print(
-                f"   Expected Duration: {len(scenarios) * len(models) * len(profiles) * 4} hours"
-            )
-
             # Run extended session tests
             results = []
             for scenario in scenarios:
                 for model in models:
                     for profile in profiles:
-                        print(f"\n🧪 Testing: {model} + {profile} + {scenario}")
-
                         result = await self.extended_framework.run_extended_session(
                             model_name=model,
                             scenario_name=scenario,
@@ -113,64 +100,34 @@ class EnhancedEvaluationRunner:
                             results.append(result)
 
                             # Calculate extended metrics
-                            extended_metrics = (
-                                result.calculate_extended_quality_metrics()
-                            )
-                            print(f"   ✅ Completed: {result.total_turns} turns")
-                            print(
-                                f"   📈 Quality: {extended_metrics.get('avg_narrative_coherence', 0):.2f}/10"
-                            )
-                            print(
-                                f"   🧠 Memory Consistency: {extended_metrics.get('avg_memory_consistency', 0):.2f}/10"
-                            )
-                            print(
-                                f"   📉 Quality Degradation: {extended_metrics.get('quality_degradation', 0):.2f}"
-                            )
+                            (result.calculate_extended_quality_metrics())
 
             # Generate comprehensive report
-            print("\n📋 EXTENDED SESSION RESULTS SUMMARY")
-            print(f"   Total Tests Completed: {len(results)}")
             if results:
-                avg_quality = sum(
+                sum(
                     r.calculate_extended_quality_metrics().get(
                         "avg_narrative_coherence", 0
                     )
                     for r in results
                 ) / len(results)
-                print(f"   Average Quality: {avg_quality:.2f}/10")
             else:
-                print("   Average Quality: No successful tests completed")
+                pass
 
             # Save results
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            results_file = f"testing/results/extended_evaluation/enhanced_extended_sessions_{timestamp}.json"
+            datetime.now().strftime("%Y%m%d_%H%M%S")
 
             # Performance report
             perf_report = await self.performance_optimizer.get_performance_report()
-            print("\n⚡ PERFORMANCE SUMMARY")
             if "current_metrics" in perf_report:
-                print(
-                    f"   Average Response Time: {perf_report['current_metrics'].get('avg_response_time', 0):.2f}s"
-                )
-                print(
-                    f"   Cache Hit Rate: {perf_report['current_metrics'].get('cache_hit_rate', 0):.1%}"
-                )
-                print(
-                    f"   Memory Usage: {perf_report['current_metrics'].get('memory_usage_percent', 0):.1f}%"
-                )
+                pass
             else:
-                print("   Performance monitoring data not available yet")
-                print(f"   Cache Stats: {perf_report.get('cache_stats', {})}")
-                print(f"   Database Stats: {perf_report.get('database_stats', {})}")
+                pass
 
         finally:
             await self.performance_optimizer.stop_optimization()
 
     async def run_multi_model_comparison(self, args):
         """Run multi-model comparison testing."""
-        print("\n" + "=" * 80)
-        print("🔬 RUNNING MULTI-MODEL COMPARISON")
-        print("=" * 80)
 
         # Configure models for comparison
         models = (
@@ -182,16 +139,9 @@ class EnhancedEvaluationRunner:
         scenarios = ["fantasy_baseline", "contemporary_baseline", "fantasy_extended_30"]
         user_profile = "typical_user"
 
-        print("📊 Comparison Configuration:")
-        print(f"   Models: {models}")
-        print(f"   Scenarios: {scenarios}")
-        print("   Runs per model: 3")
-
         # Run comparisons
         comparison_results = []
         for scenario in scenarios:
-            print(f"\n🧪 Comparing models on scenario: {scenario}")
-
             result = await self.multi_model_comparator.run_model_comparison(
                 models=models,
                 scenario_name=scenario,
@@ -203,31 +153,16 @@ class EnhancedEvaluationRunner:
 
             # Display results
             if result.overall_ranking:
-                print(
-                    f"   🏆 Best Model: {result.overall_ranking[0][0]} (score: {result.overall_ranking[0][1]:.3f})"
-                )
-                print(
-                    f"   💰 Cost Analysis: {len([m for m in models if 'free' in str(m).lower()])} free models tested"
-                )
-                print(
-                    f"   📈 Key Findings: {len(result.key_findings)} insights generated"
-                )
+                pass
 
         # Generate comprehensive comparison report
-        print("\n📋 MULTI-MODEL COMPARISON SUMMARY")
         for result in comparison_results:
-            report = await self.multi_model_comparator.generate_comparison_report(
-                result
-            )
-            print(f"   Scenario: {result.scenario_name}")
+            await self.multi_model_comparator.generate_comparison_report(result)
             if result.overall_ranking:
-                print(f"   Winner: {result.overall_ranking[0][0]}")
+                pass
 
     async def run_diversified_scenarios(self, args):
         """Run testing across diversified scenario library."""
-        print("\n" + "=" * 80)
-        print("🎭 RUNNING DIVERSIFIED SCENARIO TESTING")
-        print("=" * 80)
 
         # All available scenarios across genres
         scenarios = [
@@ -254,18 +189,11 @@ class EnhancedEvaluationRunner:
         model = args.models.split(",")[0] if args.models else "llama_3_3_8b_instruct"
         user_profile = "typical_user"
 
-        print("📊 Diversified Testing Configuration:")
-        print(f"   Total Scenarios: {len(scenarios)}")
-        print("   Genres: Sci-Fi, Mystery, Historical, Horror, Romance, Edge Cases")
-        print(f"   Model: {model}")
-
         # Run scenario tests
         results = []
         genre_results = {}
 
         for scenario in scenarios:
-            print(f"\n🎬 Testing scenario: {scenario}")
-
             result = await self.extended_framework.run_extended_session(
                 model_name=model, scenario_name=scenario, user_profile=user_profile
             )
@@ -279,17 +207,10 @@ class EnhancedEvaluationRunner:
                     genre_results[genre] = []
                 genre_results[genre].append(result)
 
-                print(f"   ✅ Completed: {result.total_turns} turns")
-                print(f"   📈 Quality: {result.final_narrative_coherence or 0:.2f}/10")
-
         # Genre analysis
-        print("\n📋 DIVERSIFIED SCENARIO RESULTS")
         for genre, genre_results_list in genre_results.items():
-            avg_quality = sum(
-                r.final_narrative_coherence or 0 for r in genre_results_list
-            ) / len(genre_results_list)
-            print(
-                f"   {genre}: {len(genre_results_list)} scenarios, avg quality {avg_quality:.2f}/10"
+            sum(r.final_narrative_coherence or 0 for r in genre_results_list) / len(
+                genre_results_list
             )
 
     def _get_scenario_genre(self, scenario_name: str) -> str:
@@ -312,16 +233,6 @@ class EnhancedEvaluationRunner:
 
     async def run_real_user_testing_demo(self, args):
         """Run real user testing demonstration."""
-        print("\n" + "=" * 80)
-        print("👥 REAL USER TESTING FRAMEWORK DEMO")
-        print("=" * 80)
-
-        print("🔒 Privacy and Consent Framework:")
-        print("   ✅ Anonymized participant IDs")
-        print("   ✅ Explicit consent management")
-        print("   ✅ Data retention policies")
-        print("   ✅ Right to withdraw")
-        print("   ✅ GDPR compliance features")
 
         # Demonstrate participant registration
         from testing.extended_evaluation.real_user_testing import ParticipantType
@@ -342,8 +253,6 @@ class EnhancedEvaluationRunner:
             },
         )
 
-        print(f"   📝 Demo participant registered: {participant_id}")
-
         # Demonstrate session start
         session_id = await self.real_user_framework.start_user_session(
             participant_id=participant_id,
@@ -352,8 +261,6 @@ class EnhancedEvaluationRunner:
         )
 
         if session_id:
-            print(f"   🎮 Demo session started: {session_id}")
-
             # Simulate some interactions
             for turn in range(3):
                 await self.real_user_framework.record_user_interaction(
@@ -371,33 +278,18 @@ class EnhancedEvaluationRunner:
 
             # End session
             await self.real_user_framework.end_user_session(session_id)
-            print("   ✅ Demo session completed")
 
         # Generate anonymized dataset
-        dataset = await self.real_user_framework.generate_anonymized_research_dataset()
-        print(
-            f"   📊 Anonymized dataset: {dataset['metadata']['participant_count']} participants"
-        )
+        await self.real_user_framework.generate_anonymized_research_dataset()
 
     async def run_performance_benchmark(self, args):
         """Run performance benchmarking."""
-        print("\n" + "=" * 80)
-        print("⚡ PERFORMANCE OPTIMIZATION BENCHMARK")
-        print("=" * 80)
 
         # Start performance optimization
         await self.performance_optimizer.start_optimization()
 
         try:
-            print("🔧 Performance Optimization Features:")
-            print("   ✅ Intelligent caching with LRU eviction")
-            print("   ✅ Database query optimization")
-            print("   ✅ Response time monitoring")
-            print("   ✅ Memory management")
-            print("   ✅ Automatic performance alerts")
-
             # Run a quick test to generate performance data
-            print("\n🧪 Running performance test...")
 
             result = await self.extended_framework.run_extended_session(
                 model_name="llama_3_3_8b_instruct",
@@ -406,48 +298,22 @@ class EnhancedEvaluationRunner:
             )
 
             if result:
-                print(f"   ✅ Test completed: {result.total_turns} turns")
-                print(
-                    f"   ⏱️  Average response time: {sum(result.response_times) / len(result.response_times):.2f}s"
-                )
+                pass
 
             # Get performance report
             perf_report = await self.performance_optimizer.get_performance_report()
 
-            print("\n📊 PERFORMANCE METRICS:")
             if "current_metrics" in perf_report:
-                print(
-                    f"   Response Time: {perf_report['current_metrics'].get('avg_response_time', 0):.2f}s"
-                )
-                print(
-                    f"   Memory Usage: {perf_report['current_metrics'].get('memory_usage_percent', 0):.1f}%"
-                )
-                print(
-                    f"   Cache Hit Rate: {perf_report['current_metrics'].get('cache_hit_rate', 0):.1%}"
-                )
-                print(
-                    f"   Cache Size: {perf_report['current_metrics'].get('cache_size_mb', 0):.1f}MB"
-                )
+                pass
             else:
-                print("   Performance monitoring data not available yet")
-                cache_stats = perf_report.get("cache_stats", {})
-                db_stats = perf_report.get("database_stats", {})
-                print(f"   Cache Hit Rate: {cache_stats.get('hit_rate', 0):.1%}")
-                print(f"   Cache Entries: {cache_stats.get('entries', 0)}")
-                print(f"   Cache Size: {cache_stats.get('size_mb', 0):.1f}MB")
-                print(f"   Database Queries: {db_stats.get('query_count', 0)}")
-                print(f"   Avg Query Time: {db_stats.get('avg_query_time', 0):.3f}s")
+                perf_report.get("cache_stats", {})
+                perf_report.get("database_stats", {})
 
             if perf_report.get("recommendations"):
-                print("\n💡 OPTIMIZATION RECOMMENDATIONS:")
-                for rec in perf_report["recommendations"]:
-                    print(f"   • {rec}")
+                for _rec in perf_report["recommendations"]:
+                    pass
             else:
-                print("\n💡 OPTIMIZATION STATUS:")
-                print("   • Intelligent caching system active")
-                print("   • Database optimization enabled")
-                print("   • Response time monitoring configured")
-                print("   • Memory management operational")
+                pass
 
         finally:
             await self.performance_optimizer.stop_optimization()
@@ -477,16 +343,6 @@ async def main():
 
     args = parser.parse_args()
 
-    print("🚀 TTA Enhanced Extended Session Quality Evaluation Framework")
-    print("=" * 80)
-    print("Systematic Improvements Implemented:")
-    print("1. ✅ Extended Sessions (30-50+ turns) with Memory Management")
-    print("2. ✅ Multi-Model Comparison Framework")
-    print("3. ✅ Diversified Scenario Library (15+ scenarios, 7 genres)")
-    print("4. ✅ Real User Testing Integration")
-    print("5. ✅ Performance Optimization & Caching")
-    print("=" * 80)
-
     runner = EnhancedEvaluationRunner()
 
     try:
@@ -508,12 +364,9 @@ async def main():
             await runner.run_real_user_testing_demo(args)
             await runner.run_performance_benchmark(args)
 
-        print("\n🎉 Enhanced evaluation completed successfully!")
-
     except KeyboardInterrupt:
-        print("\n⚠️  Evaluation interrupted by user")
+        pass
     except Exception as e:
-        print(f"\n❌ Evaluation failed: {e}")
         logger.error(f"Evaluation error: {e}", exc_info=True)
 
 

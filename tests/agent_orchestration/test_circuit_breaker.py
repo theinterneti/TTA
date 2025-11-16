@@ -16,6 +16,8 @@ import pytest
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
+import contextlib
+
 from agent_orchestration.circuit_breaker import (
     CircuitBreaker,
     CircuitBreakerMetrics,
@@ -165,10 +167,8 @@ class TestCircuitBreaker:
 
         # Trigger failures up to threshold
         for _ in range(circuit_breaker.failure_threshold):
-            try:
+            with contextlib.suppress(Exception):
                 await circuit_breaker.call(failing_operation)
-            except Exception:
-                pass
 
         # Circuit should be OPEN now
         assert circuit_breaker.state == CircuitBreakerState.OPEN
@@ -199,7 +199,7 @@ class TestCircuitBreaker:
             return "success"
 
         # Call should attempt and succeed, transitioning to HALF_OPEN
-        result = await circuit_breaker.call(successful_operation)
+        await circuit_breaker.call(successful_operation)
 
         # After successful call in HALF_OPEN, should transition to CLOSED
         assert circuit_breaker.state in [

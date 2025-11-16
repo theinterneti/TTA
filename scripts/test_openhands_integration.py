@@ -327,8 +327,7 @@ if __name__ == "__main__":
     try:
         exit_code = asyncio.run(main())
         sys.exit(exit_code)
-    except Exception as e:
-        print(f"FATAL ERROR: {e}", file=sys.stderr)
+    except Exception:
         import traceback
 
         traceback.print_exc()

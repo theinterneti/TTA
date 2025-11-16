@@ -101,9 +101,7 @@ try:
     from .tools.redis_tool_registry import RedisToolRegistry
 except Exception:
     # Tools package may be optional during partial builds/tests
-    ToolSpec = ToolParameter = ToolRegistration = ToolInvocation = ToolPolicy = (
-        ToolStatus
-    ) = None
+    ToolSpec = ToolParameter = ToolRegistration = ToolInvocation = ToolPolicy = ToolStatus = None
     RedisToolRegistry = ToolCoordinator = None
 
 __all__ = [

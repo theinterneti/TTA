@@ -6,6 +6,7 @@ and resilience under various failure conditions.
 """
 
 import asyncio
+import contextlib
 import json
 from unittest.mock import AsyncMock, Mock
 
@@ -42,19 +43,14 @@ class TestWebSocketErrorRecovery:
             "agent_orchestration.realtime.recovery.timeout": 10.0,
         }
 
-        manager = WebSocketConnectionManager(
-            config=config_dict, redis_client=redis_client
-        )
-
-        return manager
+        return WebSocketConnectionManager(config=config_dict, redis_client=redis_client)
 
     @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for testing."""
-        publisher = EventPublisher(
+        return EventPublisher(
             redis_client=redis_client, channel_prefix="test:events", enabled=True
         )
-        return publisher
 
     @pytest_asyncio.fixture
     async def error_manager(self, event_publisher):
@@ -79,7 +75,7 @@ class TestWebSocketErrorRecovery:
         mock_websocket.headers = {}
 
         # Mock receive_text to simulate timeout
-        mock_websocket.receive_text = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_websocket.receive_text = AsyncMock(side_effect=TimeoutError())
 
         # Handle connection (should timeout and close)
         await websocket_manager.handle_connection(mock_websocket)
@@ -121,10 +117,8 @@ class TestWebSocketErrorRecovery:
         # Cleanup
         for task in tasks:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
 
     async def test_redis_connection_failure_handling(self, websocket_manager):
         """Test handling of Redis connection failures."""
@@ -146,10 +140,8 @@ class TestWebSocketErrorRecovery:
         mock_websocket.headers = {}
 
         # Should handle connection gracefully even without Redis
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await websocket_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Connection should still be accepted
         mock_websocket.accept.assert_called_once()
@@ -176,10 +168,8 @@ class TestWebSocketErrorRecovery:
         mock_websocket.headers = {}
 
         # Should handle malformed messages gracefully
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await websocket_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Connection should remain open despite malformed messages
         mock_websocket.accept.assert_called_once()
@@ -304,10 +294,8 @@ class TestWebSocketErrorRecovery:
 
         # Simulate disconnect
         task1.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await task1
-        except asyncio.CancelledError:
-            pass
 
         # Verify connection history was saved
         assert user_id in websocket_manager.connection_history
@@ -341,10 +329,8 @@ class TestWebSocketErrorRecovery:
 
         # Cleanup
         task2.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await task2
-        except asyncio.CancelledError:
-            pass
 
     async def test_concurrent_error_handling(self, error_manager):
         """Test handling of multiple concurrent errors."""
@@ -387,10 +373,8 @@ class TestWebSocketErrorRecovery:
         mock_websocket.headers = {}
 
         # Handle connection (should detect failure and close)
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await websocket_manager.handle_connection(mock_websocket)
-        except asyncio.CancelledError:
-            pass
 
         # Should have attempted to send heartbeat response and detected failure
         mock_websocket.send_text.assert_called()

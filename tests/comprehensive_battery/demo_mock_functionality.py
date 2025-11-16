@@ -32,11 +32,6 @@ logger = logging.getLogger(__name__)
 async def demonstrate_mock_functionality():
     """Demonstrate the mock functionality of the test battery."""
 
-    print("=" * 80)
-    print("TTA COMPREHENSIVE TEST BATTERY - MOCK FUNCTIONALITY DEMO")
-    print("=" * 80)
-    print()
-
     # Initialize test battery
     logger.info("🚀 Initializing Comprehensive Test Battery...")
     test_battery = ComprehensiveTestBattery(
@@ -54,35 +49,18 @@ async def demonstrate_mock_functionality():
             logger.error("❌ Failed to initialize test battery")
             return False
 
-        print()
-        print("=" * 80)
-        print("SERVICE STATUS REPORT")
-        print("=" * 80)
-
         # Get mock service status
         mock_summary = test_battery.mock_service_manager.get_mock_summary()
 
-        print(f"🎭 Mock Mode: {'ENABLED' if mock_summary['mock_mode'] else 'DISABLED'}")
-        print()
-
-        print("📊 Service Status:")
-        for service_name, service_status in mock_summary["services"].items():
-            status_icon = "✅" if service_status["real"] else "🎭"
-            status_text = "REAL" if service_status["real"] else "MOCK"
-            print(f"  {status_icon} {service_name.upper()}: {status_text}")
+        for service_status in mock_summary["services"].values():
+            "✅" if service_status["real"] else "🎭"
+            "REAL" if service_status["real"] else "MOCK"
 
             if service_status["error"]:
-                print(f"    └─ Error: {service_status['error']}")
+                pass
 
-        print()
-        print("💡 Recommendations:")
-        for recommendation in mock_summary["recommendations"]:
-            print(f"  • {recommendation}")
-
-        print()
-        print("=" * 80)
-        print("MOCK DATABASE OPERATIONS DEMO")
-        print("=" * 80)
+        for _recommendation in mock_summary["recommendations"]:
+            pass
 
         # Demonstrate mock Neo4j operations
         logger.info("🎭 Demonstrating mock Neo4j operations...")
@@ -94,20 +72,17 @@ async def demonstrate_mock_functionality():
                 name="demo_user",
                 created_at=datetime.utcnow().isoformat(),
             )
-            user_record = await result.single()
-            print(f"  ✅ Created user: {user_record.data()}")
+            await result.single()
 
             # Query users
             result = await session.run(
                 "MATCH (u:User) RETURN u.name as name, u.created_at as created_at"
             )
             users = await result.data()
-            print(f"  📋 Found {len(users)} users in mock database")
             for user in users:
                 # Handle mock data structure
-                name = user.get("name", "Unknown")
-                created_at = user.get("created_at", "Unknown")
-                print(f"    - {name} (created: {created_at})")
+                user.get("name", "Unknown")
+                user.get("created_at", "Unknown")
 
         # Demonstrate mock Redis operations
         logger.info("🎭 Demonstrating Redis operations (real or mock)...")
@@ -124,16 +99,8 @@ async def demonstrate_mock_functionality():
         await test_battery.redis_client.hset("demo:user:456", mapping=user_data)
 
         # Retrieve data
-        session_status = await test_battery.redis_client.get("demo:session:123")
+        await test_battery.redis_client.get("demo:session:123")
         user_data = await test_battery.redis_client.hgetall("demo:user:456")
-
-        print(f"  ✅ Session status: {session_status}")
-        print(f"  📋 User data: {user_data}")
-
-        print()
-        print("=" * 80)
-        print("TEST FRAMEWORK CAPABILITIES")
-        print("=" * 80)
 
         # Demonstrate test data generation
         logger.info("🎲 Demonstrating test data generation...")
@@ -143,62 +110,28 @@ async def demonstrate_mock_functionality():
             test_users = await test_battery.test_data_generator.generate_test_users(
                 count=3
             )
-            print(f"  👥 Generated {len(test_users)} test user profiles:")
             for user in test_users:
-                prefs = (
+                (
                     user.preferences.get("genres", ["unknown"])
                     if isinstance(user.preferences, dict)
                     else ["unknown"]
-                )
-                print(
-                    f"    - {user.username} ({user.gaming_experience}, prefers: {', '.join(prefs)})"
                 )
 
             # Generate test scenarios
             test_scenarios = (
                 await test_battery.test_data_generator.generate_story_scenarios(count=2)
             )
-            print(f"  📚 Generated {len(test_scenarios)} story scenarios:")
             for scenario in test_scenarios:
-                genre = (
+                (
                     scenario.test_data.get("genre", "unknown")
                     if hasattr(scenario, "test_data")
                     else "unknown"
                 )
-                complexity = (
+                (
                     scenario.test_data.get("complexity", "medium")
                     if hasattr(scenario, "test_data")
                     else "medium"
                 )
-                print(f"    - {scenario.name}: {genre} ({complexity} complexity)")
-
-        print()
-        print("=" * 80)
-        print("MOCK FUNCTIONALITY SUMMARY")
-        print("=" * 80)
-
-        print("✅ DEMONSTRATED CAPABILITIES:")
-        print("  • Automatic service availability detection")
-        print("  • Graceful fallback to mock implementations")
-        print("  • Mixed real/mock environment operation")
-        print("  • Detailed status reporting and recommendations")
-        print("  • Mock database operations (Neo4j)")
-        print("  • Real/mock Redis operations")
-        print("  • Test data generation")
-        print("  • Comprehensive logging and error handling")
-
-        print()
-        print("🎯 BENEFITS:")
-        print("  • Tests can run without full infrastructure setup")
-        print("  • Development and CI/CD environments supported")
-        print("  • Framework robustness demonstrated")
-        print("  • Easy transition between mock and real services")
-        print("  • Comprehensive validation of test framework logic")
-
-        print()
-        print("=" * 80)
-        print("DEMO COMPLETED SUCCESSFULLY! 🎉")
-        print("=" * 80)
 
         return True
 

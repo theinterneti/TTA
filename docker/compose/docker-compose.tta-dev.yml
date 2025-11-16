@@ -1,0 +1,87 @@
+version: "3.8"
+
+# TTA Development Environment
+# Minimal setup for TTA agent development with Redis + Neo4j
+# Focus: Reliable, simple, working configuration for agent orchestration
+
+services:
+  # Redis: Session state, caching, pub/sub for agents
+  redis:
+    image: redis:7-alpine
+    container_name: tta-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - tta_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tta-network
+
+  # Neo4j: Narrative graph database for agent workflows
+  neo4j:
+    image: neo4j:5.26.1-community
+    container_name: tta-neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt
+    environment:
+      # Simple, consistent authentication
+      - NEO4J_AUTH=neo4j/tta_dev_neo4j_2024
+      # Enable APOC and GDS plugins
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
+      # Network configuration
+      - NEO4J_server_bolt_listen__address=0.0.0.0:7687
+      - NEO4J_server_http_listen__address=0.0.0.0:7474
+      # Memory settings (optimized for development)
+      - NEO4J_server_memory_heap_initial__size=512m
+      - NEO4J_server_memory_heap_max__size=1G
+      - NEO4J_server_memory_pagecache_size=512m
+      # Accept license (required for GDS plugin)
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+    volumes:
+      - tta_neo4j_data:/data
+      - tta_neo4j_logs:/logs
+      - tta_neo4j_import:/var/lib/neo4j/import
+      - tta_neo4j_plugins:/plugins
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - tta-network
+
+networks:
+  tta-network:
+    name: tta-network
+    driver: bridge
+
+volumes:
+  tta_redis_data:
+    name: tta_redis_data
+  tta_neo4j_data:
+    name: tta_neo4j_data
+  tta_neo4j_logs:
+    name: tta_neo4j_logs
+  tta_neo4j_import:
+    name: tta_neo4j_import
+  tta_neo4j_plugins:
+    name: tta_neo4j_plugins

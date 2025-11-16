@@ -1,5 +1,12 @@
 # Agent Orchestration
 
-*Documentation coming soon*
+> ⚠️ **This document has moved!**
+>
+> This content is now maintained in the TTA-notes knowledge base:
+> - **New location:** [[TTA/Architecture/Agent Orchestration]]
+> - **Path:** `.augment/kb/Architecture/Agent Orchestration.md`
+>
+> If using Logseq with TTA-notes, you can access it directly in the graph.
+> Otherwise, see: `.augment/kb/Architecture/Agent Orchestration.md`
 
-This page is a placeholder and will be populated with content in a future update.
+**Migration date:** 2025-11-01

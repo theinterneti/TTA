@@ -80,25 +80,19 @@ class ScaleManager:
         self, choice: PlayerChoice, scales: list[NarrativeScale]
     ) -> dict[NarrativeScale, ImpactAssessment]:
         try:
-            logger.debug(
-                f"Evaluating choice impact across scales: {[s.value for s in scales]}"
-            )
+            logger.debug(f"Evaluating choice impact across scales: {[s.value for s in scales]}")
             impact_assessments: dict[NarrativeScale, ImpactAssessment] = {}
             for scale in scales:
                 assessment = await self._assess_scale_impact(choice, scale)
                 impact_assessments[scale] = assessment
                 if assessment.magnitude > 0.3:
-                    event = await self._create_narrative_event(
-                        choice, scale, assessment
-                    )
+                    event = await self._create_narrative_event(choice, scale, assessment)
                     self.active_events[scale].append(event)
             await self._evaluate_cross_scale_influences(impact_assessments)
             return impact_assessments
         except Exception as e:
             logger.error(f"Error evaluating choice impact: {e}")
-            return {
-                scale: ImpactAssessment(scale=scale, magnitude=0.0) for scale in scales
-            }
+            return {scale: ImpactAssessment(scale=scale, magnitude=0.0) for scale in scales}
 
     async def maintain_causal_relationships(self, session_id: str) -> bool:
         try:
@@ -113,15 +107,11 @@ class ScaleManager:
             logger.error(f"Error maintaining causal relationships: {e}")
             return False
 
-    async def resolve_scale_conflicts(
-        self, conflicts: list[ScaleConflict]
-    ) -> list[Resolution]:
+    async def resolve_scale_conflicts(self, conflicts: list[ScaleConflict]) -> list[Resolution]:
         try:
             logger.info(f"Resolving {len(conflicts)} scale conflicts")
             resolutions: list[Resolution] = []
-            sorted_conflicts = sorted(
-                conflicts, key=lambda c: (c.resolution_priority, -c.severity)
-            )
+            sorted_conflicts = sorted(conflicts, key=lambda c: (c.resolution_priority, -c.severity))
             for conflict in sorted_conflicts:
                 resolution = await self._generate_conflict_resolution(conflict)
                 if resolution:
@@ -148,9 +138,7 @@ class ScaleManager:
     def get_scale_window(self, scale: NarrativeScale) -> int:
         return self.scale_windows.get(scale, 300)
 
-    def get_active_events(
-        self, scale: NarrativeScale | None = None
-    ) -> list[NarrativeEvent]:
+    def get_active_events(self, scale: NarrativeScale | None = None) -> list[NarrativeEvent]:
         if scale:
             return self.active_events.get(scale, [])
         all_events: list[NarrativeEvent] = []
@@ -178,9 +166,7 @@ class ScaleManager:
             temporal_decay=temporal_decay,
         )
 
-    def _calculate_base_magnitude(
-        self, choice: PlayerChoice, scale: NarrativeScale
-    ) -> float:
+    def _calculate_base_magnitude(self, choice: PlayerChoice, scale: NarrativeScale) -> float:
         scale_multipliers = {
             NarrativeScale.SHORT_TERM: 0.8,
             NarrativeScale.MEDIUM_TERM: 0.5,
@@ -189,9 +175,7 @@ class ScaleManager:
         }
         base = 0.5
         choice_type = (
-            choice.metadata.get("choice_type", "dialogue")
-            if choice.metadata
-            else "dialogue"
+            choice.metadata.get("choice_type", "dialogue") if choice.metadata else "dialogue"
         )
         if choice_type == "major_decision":
             base *= 1.5
@@ -208,13 +192,9 @@ class ScaleManager:
         if scale == NarrativeScale.SHORT_TERM:
             elements.extend(["current_scene", "immediate_dialogue", "character_mood"])
         elif scale == NarrativeScale.MEDIUM_TERM:
-            elements.extend(
-                ["character_relationships", "personal_growth", "skill_development"]
-            )
+            elements.extend(["character_relationships", "personal_growth", "skill_development"])
         elif scale == NarrativeScale.LONG_TERM:
-            elements.extend(
-                ["world_state", "faction_relationships", "major_plot_threads"]
-            )
+            elements.extend(["world_state", "faction_relationships", "major_plot_threads"])
         elif scale == NarrativeScale.EPIC_TERM:
             elements.extend(["generational_legacy", "world_history", "cultural_impact"])
         if choice.metadata and "character_name" in choice.metadata:
@@ -235,9 +215,7 @@ class ScaleManager:
         # moved to impact_analysis.assess_therapeutic_alignment
         return assess_therapeutic_alignment(choice, scale)
 
-    def _calculate_confidence_score(
-        self, choice: PlayerChoice, scale: NarrativeScale
-    ) -> float:
+    def _calculate_confidence_score(self, choice: PlayerChoice, scale: NarrativeScale) -> float:
         # moved to impact_analysis.calculate_confidence_score
         return calculate_confidence_score(choice, scale)
 
@@ -282,9 +260,7 @@ class ScaleManager:
         for scale, events in self.active_events.items():
             window = self.get_scale_window(scale)
             cutoff_time = cutoff_now - window
-            self.active_events[scale] = [
-                e for e in events if e.timestamp.timestamp() > cutoff_time
-            ]
+            self.active_events[scale] = [e for e in events if e.timestamp.timestamp() > cutoff_time]
 
     async def _detect_temporal_conflicts(self) -> list[ScaleConflict]:
         all_events = self.get_active_events()
@@ -302,9 +278,7 @@ class ScaleManager:
         all_events = self.get_active_events()
         return detect_therapeutic_conflicts(all_events)
 
-    async def _generate_conflict_resolution(
-        self, conflict: ScaleConflict
-    ) -> Resolution | None:
+    async def _generate_conflict_resolution(self, conflict: ScaleConflict) -> Resolution | None:
         return build_simple_resolution(conflict)
 
     async def _implement_resolution(self, resolution: Resolution) -> None:

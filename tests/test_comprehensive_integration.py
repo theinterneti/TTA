@@ -46,7 +46,7 @@ async def test_comprehensive_framework_integration(
 
     await redis_client.set("test:integration", "success", ex=300)
     value = await redis_client.get("test:integration")
-    assert value == b"success" or value == "success"
+    assert value in {b"success", "success"}
 
     # Cleanup
     await neo4j_driver.close()
@@ -63,7 +63,7 @@ async def test_service_status_reporting(mock_service_manager):
     assert "redis" in status
 
     # Each service should have status and details
-    for _, service_info in status.items():
+    for service_info in status.values():
         assert "status" in service_info
         assert service_info["status"] in ["real", "mock"]
 

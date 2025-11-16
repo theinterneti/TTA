@@ -25,25 +25,11 @@ async def main():
         # List all tools
         tools, next_cursor = await registry.list_tools()
 
-        print(f"\n{'=' * 80}")
-        print("REGISTERED TOOLS IN REDIS (DB 1, prefix: ao-dev)")
-        print(f"{'=' * 80}\n")
-
         if not tools:
-            print("❌ NO TOOLS REGISTERED")
-            print("\nThis is expected - the tool infrastructure exists but no concrete")
-            print("tools have been implemented yet. This is what Phase 3 will address.")
+            pass
         else:
-            print(f"✅ Found {len(tools)} registered tool(s):\n")
-            for i, tool in enumerate(tools, 1):
-                print(f"{i}. {tool.name} (v{tool.version})")
-                print(f"   Description: {tool.description}")
-                print(f"   Parameters: {len(tool.parameters)}")
-                print(f"   Supports Pagination: {tool.supports_pagination}")
-                print(f"   Status: {tool.status}")
-                print()
-
-        print(f"{'=' * 80}\n")
+            for _i, _tool in enumerate(tools, 1):
+                pass
 
     finally:
         await redis_client.aclose()

@@ -247,9 +247,7 @@ class WorkflowMonitor:
         if not raw:
             return None
         try:
-            return self._from_dump(
-                json.loads(raw if isinstance(raw, str) else raw.decode())
-            )
+            return self._from_dump(json.loads(raw if isinstance(raw, str) else raw.decode()))
         except Exception:
             return None
 

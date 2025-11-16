@@ -245,25 +245,27 @@ async def test_process_user_input_therapeutic_safety_error(
     )
 
     # Mock _call_therapeutic_validator to return blocked content (async method)
-    with patch.object(
-        orchestration_service,
-        "_call_therapeutic_validator",
-        new=AsyncMock(
-            return_value={
-                "safe": False,
-                "level": "blocked",
-                "reason": "Test error",
-                "crisis_detected": False,
-            }
+    with (
+        patch.object(
+            orchestration_service,
+            "_call_therapeutic_validator",
+            new=AsyncMock(
+                return_value={
+                    "safe": False,
+                    "level": "blocked",
+                    "reason": "Test error",
+                    "crisis_detected": False,
+                }
+            ),
+        ),
+        pytest.raises(
+            TherapeuticSafetyError, match="Content blocked due to safety concerns"
         ),
     ):
-        with pytest.raises(
-            TherapeuticSafetyError, match="Content blocked due to safety concerns"
-        ):
-            await orchestration_service.process_user_input(
-                user_input="I want to hurt myself",
-                session_context=sample_session_context,
-            )
+        await orchestration_service.process_user_input(
+            user_input="I want to hurt myself",
+            session_context=sample_session_context,
+        )
 
     # Verify error metrics were updated
     assert orchestration_service._error_count == 1

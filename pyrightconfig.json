@@ -1,6 +1,8 @@
 {
   "include": [
-    "src"
+    "src",
+    "packages/tta-ai-framework/src",
+    "packages/tta-narrative-engine/src"
   ],
   "exclude": [
     "**/node_modules",
@@ -11,7 +13,13 @@
     ".git",
     "build",
     "dist",
-    "*.egg-info"
+    "*.egg-info",
+    ".uv_cache",
+    "tta.prototype",
+    "tta.dev",
+    "tta.prod",
+    "obsolete",
+    "artifacts"
   ],
   "ignore": [
     "tests/comprehensive_battery",
@@ -80,7 +88,7 @@
       ]
     }
   ],
-  "typeCheckingMode": "basic",
+  "typeCheckingMode": "standard",
   "useLibraryCodeForTypes": true,
   "venvPath": ".",
   "venv": ".venv"

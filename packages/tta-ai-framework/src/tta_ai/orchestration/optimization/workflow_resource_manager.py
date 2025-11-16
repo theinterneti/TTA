@@ -55,11 +55,7 @@ class ResourceAllocation:
 
     def utilization_percentage(self) -> float:
         """Calculate resource utilization percentage."""
-        return (
-            (self.allocated_amount / self.max_amount) * 100.0
-            if self.max_amount > 0
-            else 0.0
-        )
+        return (self.allocated_amount / self.max_amount) * 100.0 if self.max_amount > 0 else 0.0
 
 
 @dataclass
@@ -93,8 +89,7 @@ class ResourcePool:
     def utilization_percentage(self) -> float:
         """Get utilization percentage."""
         return (
-            ((self.allocated_capacity + self.reserved_capacity) / self.total_capacity)
-            * 100.0
+            ((self.allocated_capacity + self.reserved_capacity) / self.total_capacity) * 100.0
             if self.total_capacity > 0
             else 0.0
         )
@@ -192,9 +187,7 @@ class WorkflowScheduler:
         else:
             self.total_failed += 1
 
-        logger.info(
-            f"Completed workflow {workflow_id} ({'success' if success else 'failed'})"
-        )
+        logger.info(f"Completed workflow {workflow_id} ({'success' if success else 'failed'})")
         return True
 
     def get_queue_stats(self) -> dict[str, Any]:
@@ -203,8 +196,7 @@ class WorkflowScheduler:
             "running_workflows": len(self.running_workflows),
             "max_concurrent": self.max_concurrent_workflows,
             "queued_workflows": {
-                priority.value: len(queue)
-                for priority, queue in self.workflow_queues.items()
+                priority.value: len(queue) for priority, queue in self.workflow_queues.items()
             },
             "total_queued": sum(len(queue) for queue in self.workflow_queues.values()),
             "total_scheduled": self.total_scheduled,
@@ -233,12 +225,8 @@ class WorkflowResourceManager:
         # Resource pools
         self.resource_pools: dict[ResourceType, ResourcePool] = {
             ResourceType.CPU: ResourcePool(ResourceType.CPU, 100.0),  # 100% CPU
-            ResourceType.MEMORY: ResourcePool(
-                ResourceType.MEMORY, 8192.0
-            ),  # 8GB memory
-            ResourceType.NETWORK: ResourcePool(
-                ResourceType.NETWORK, 1000.0
-            ),  # 1000 Mbps
+            ResourceType.MEMORY: ResourcePool(ResourceType.MEMORY, 8192.0),  # 8GB memory
+            ResourceType.NETWORK: ResourcePool(ResourceType.NETWORK, 1000.0),  # 1000 Mbps
             ResourceType.AGENT_SLOTS: ResourcePool(
                 ResourceType.AGENT_SLOTS, 50.0
             ),  # 50 agent slots
@@ -356,9 +344,7 @@ class WorkflowResourceManager:
                 return False
         return True
 
-    async def _allocate_workflow_resources(
-        self, request: WorkflowResourceRequest
-    ) -> bool:
+    async def _allocate_workflow_resources(self, request: WorkflowResourceRequest) -> bool:
         """Allocate resources for a workflow."""
         if not self._can_allocate_resources(request):
             return False
@@ -436,9 +422,7 @@ class WorkflowResourceManager:
             utilization = pool.utilization_percentage()
 
             if utilization > 90.0:  # High utilization warning
-                logger.warning(
-                    f"High {resource_type.value} utilization: {utilization:.1f}%"
-                )
+                logger.warning(f"High {resource_type.value} utilization: {utilization:.1f}%")
 
             # Record utilization metric
             if self.response_time_collector:
@@ -461,15 +445,10 @@ class WorkflowResourceManager:
 
         for workflow_id, allocations in self.allocations.items():
             # Check if any allocation is stale
-            if (
-                allocations
-                and current_time - allocations[0].allocated_at > stale_threshold
-            ):
+            if allocations and current_time - allocations[0].allocated_at > stale_threshold:
                 # Check if workflow is still active in tracker
                 if self.workflow_tracker:
-                    workflow_status = self.workflow_tracker.get_workflow_status(
-                        workflow_id
-                    )
+                    workflow_status = self.workflow_tracker.get_workflow_status(workflow_id)
                     if not workflow_status:  # Workflow not found in tracker
                         stale_workflows.append(workflow_id)
                 else:
@@ -496,9 +475,7 @@ class WorkflowResourceManager:
             },
             "scheduler_stats": self.scheduler.get_queue_stats(),
             "active_allocations": len(self.allocations),
-            "total_allocated_workflows": sum(
-                len(allocs) for allocs in self.allocations.values()
-            ),
+            "total_allocated_workflows": sum(len(allocs) for allocs in self.allocations.values()),
         }
 
 

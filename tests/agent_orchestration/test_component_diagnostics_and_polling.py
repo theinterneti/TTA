@@ -47,9 +47,7 @@ async def test_poll_queue_metrics_once(redis_client):
     # At least some gauges should be present
     assert any(
         k.startswith("ipa:testpoll|") or k.startswith("ipa:testpoll")
-        for k in [
-            f"{k0}|{k1}" for (k0, k1) in coord.metrics.gauges.queue_lengths.keys()
-        ]
+        for k in [f"{k0}|{k1}" for (k0, k1) in coord.metrics.gauges.queue_lengths]
     )
 
     # Stop component

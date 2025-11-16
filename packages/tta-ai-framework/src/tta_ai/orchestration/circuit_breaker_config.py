@@ -22,9 +22,7 @@ logger = logging.getLogger(__name__)
 class CircuitBreakerConfigSchema(BaseModel):
     """Pydantic schema for circuit breaker configuration validation."""
 
-    enabled: bool = Field(
-        default=True, description="Enable circuit breaker functionality"
-    )
+    enabled: bool = Field(default=True, description="Enable circuit breaker functionality")
     failure_threshold: int = Field(
         default=5, ge=1, le=100, description="Number of failures before opening circuit"
     )
@@ -73,12 +71,8 @@ class WorkflowErrorHandlingConfigSchema(BaseModel):
     """Schema for workflow error handling configuration."""
 
     enabled: bool = Field(default=True, description="Enable workflow error handling")
-    timeout_seconds: int = Field(
-        default=300, ge=1, le=3600, description="Default workflow timeout"
-    )
-    step_timeout_seconds: int = Field(
-        default=60, ge=1, le=600, description="Default step timeout"
-    )
+    timeout_seconds: int = Field(default=300, ge=1, le=3600, description="Default workflow timeout")
+    step_timeout_seconds: int = Field(default=60, ge=1, le=600, description="Default step timeout")
     rollback_retention_days: int = Field(
         default=30, ge=1, le=365, description="Rollback history retention"
     )
@@ -158,28 +152,20 @@ class CircuitBreakerConfigManager:
             ).lower() in ("true", "1", "yes")
 
         if os.getenv("TTA_WORKFLOW_TIMEOUT_SECONDS"):
-            env_config["timeout_seconds"] = int(
-                os.getenv("TTA_WORKFLOW_TIMEOUT_SECONDS")
-            )
+            env_config["timeout_seconds"] = int(os.getenv("TTA_WORKFLOW_TIMEOUT_SECONDS"))
 
         if os.getenv("TTA_WORKFLOW_STEP_TIMEOUT_SECONDS"):
-            env_config["step_timeout_seconds"] = int(
-                os.getenv("TTA_WORKFLOW_STEP_TIMEOUT_SECONDS")
-            )
+            env_config["step_timeout_seconds"] = int(os.getenv("TTA_WORKFLOW_STEP_TIMEOUT_SECONDS"))
 
         # Resource monitoring settings
         if os.getenv("TTA_RESOURCE_MEMORY_THRESHOLD"):
-            env_config["resource_monitoring"] = env_config.get(
-                "resource_monitoring", {}
-            )
+            env_config["resource_monitoring"] = env_config.get("resource_monitoring", {})
             env_config["resource_monitoring"]["memory_threshold_percent"] = int(
                 os.getenv("TTA_RESOURCE_MEMORY_THRESHOLD")
             )
 
         if os.getenv("TTA_RESOURCE_CPU_THRESHOLD"):
-            env_config["resource_monitoring"] = env_config.get(
-                "resource_monitoring", {}
-            )
+            env_config["resource_monitoring"] = env_config.get("resource_monitoring", {})
             env_config["resource_monitoring"]["cpu_threshold_percent"] = int(
                 os.getenv("TTA_RESOURCE_CPU_THRESHOLD")
             )
@@ -190,9 +176,7 @@ class CircuitBreakerConfigManager:
     def _validate_config(self) -> None:
         """Validate configuration using Pydantic schema."""
         try:
-            self.validated_config = WorkflowErrorHandlingConfigSchema(
-                **self.config_data
-            )
+            self.validated_config = WorkflowErrorHandlingConfigSchema(**self.config_data)
             logger.info("Circuit breaker configuration validated successfully")
         except Exception as e:
             logger.error(f"Circuit breaker configuration validation failed: {e}")
@@ -200,9 +184,7 @@ class CircuitBreakerConfigManager:
             self.validated_config = WorkflowErrorHandlingConfigSchema()
             logger.info("Using default circuit breaker configuration")
 
-    def get_circuit_breaker_config(
-        self, name: str | None = None
-    ) -> CircuitBreakerConfig:
+    def get_circuit_breaker_config(self, name: str | None = None) -> CircuitBreakerConfig:
         """Get CircuitBreakerConfig instance for a specific circuit breaker."""
         if not self.validated_config:
             self._validate_config()
@@ -221,10 +203,7 @@ class CircuitBreakerConfigManager:
         """Check if circuit breaker functionality is enabled."""
         if not self.validated_config:
             self._validate_config()
-        return (
-            self.validated_config.enabled
-            and self.validated_config.circuit_breaker.enabled
-        )
+        return self.validated_config.enabled and self.validated_config.circuit_breaker.enabled
 
     def get_workflow_timeout_config(self) -> dict[str, int]:
         """Get workflow timeout configuration."""

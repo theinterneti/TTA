@@ -239,7 +239,7 @@ def filter_models(
 
     # Filter models
     filtered = []
-    for model_id, model in registry.models.items():
+    for model in registry.models.values():
         # Filter by compatibility status
         if model.compatibility_status not in compatibility_statuses:
             continue

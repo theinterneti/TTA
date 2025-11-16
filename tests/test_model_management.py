@@ -48,8 +48,7 @@ class TestModelManagementComponent:
     @pytest_asyncio.fixture
     async def component(self, mock_config):
         """Create a ModelManagementComponent instance for testing."""
-        component = ModelManagementComponent(mock_config)
-        return component
+        return ModelManagementComponent(mock_config)
 
     @pytest.mark.asyncio
     async def test_component_initialization(self, component):
@@ -118,8 +117,7 @@ class TestModelManagementComponent:
 
         # Mock successful model selection
         mock_model_info = Mock(
-            model_id="test-model",
-            provider_type=ProviderType.OPENROUTER
+            model_id="test-model", provider_type=ProviderType.OPENROUTER
         )
         component.model_selector.select_model.return_value = mock_model_info
 
@@ -253,8 +251,20 @@ class TestHardwareDetector:
         """Test GPU detection."""
         # Mock GPU info
         mock_gpu_info = [
-            {"index": 0, "name": "NVIDIA RTX 3090", "memory_gb": 24.0, "type": "NVIDIA", "available": True},
-            {"index": 1, "name": "NVIDIA RTX 3090", "memory_gb": 24.0, "type": "NVIDIA", "available": True}
+            {
+                "index": 0,
+                "name": "NVIDIA RTX 3090",
+                "memory_gb": 24.0,
+                "type": "NVIDIA",
+                "available": True,
+            },
+            {
+                "index": 1,
+                "name": "NVIDIA RTX 3090",
+                "memory_gb": 24.0,
+                "type": "NVIDIA",
+                "available": True,
+            },
         ]
 
         with patch.object(detector, "_detect_gpu_info", return_value=mock_gpu_info):
@@ -303,7 +313,7 @@ class TestModelSelector:
                 context_length=4096,
                 cost_per_1k_tokens=0.0,
                 capabilities=["chat"],
-                performance_tier="fast"
+                performance_tier="fast",
             ),
             ModelInfo(
                 model_id="quality-model",
@@ -312,7 +322,7 @@ class TestModelSelector:
                 context_length=8192,
                 cost_per_1k_tokens=0.0,
                 capabilities=["chat", "reasoning"],
-                performance_tier="balanced"
+                performance_tier="balanced",
             ),
         ]
 
@@ -324,8 +334,7 @@ class TestModelSelector:
     async def test_select_model_by_task_type(self, selector):
         """Test model selection based on task type."""
         requirements = ModelRequirements(
-            task_type=TaskType.GENERAL_CHAT,
-            max_latency_ms=1000
+            task_type=TaskType.GENERAL_CHAT, max_latency_ms=1000
         )
 
         result = await selector.select_model(requirements)
@@ -337,8 +346,7 @@ class TestModelSelector:
     async def test_select_model_with_context_requirement(self, selector):
         """Test model selection with context length requirement."""
         requirements = ModelRequirements(
-            task_type=TaskType.GENERAL_CHAT,
-            min_context_length=6000
+            task_type=TaskType.GENERAL_CHAT, min_context_length=6000
         )
 
         result = await selector.select_model(requirements)
@@ -352,7 +360,7 @@ class TestModelSelector:
         """Test model selection when no model matches requirements."""
         requirements = ModelRequirements(
             task_type=TaskType.GENERAL_CHAT,
-            min_context_length=100000  # Unrealistic requirement
+            min_context_length=100000,  # Unrealistic requirement
         )
 
         result = await selector.select_model(requirements)
@@ -384,8 +392,7 @@ class TestModelManagementComponentAdvanced:
     @pytest_asyncio.fixture
     async def component(self, mock_config):
         """Create a ModelManagementComponent instance for testing."""
-        component = ModelManagementComponent(mock_config)
-        return component
+        return ModelManagementComponent(mock_config)
 
     @pytest.mark.asyncio
     async def test_get_available_models(self, component):
@@ -402,7 +409,7 @@ class TestModelManagementComponentAdvanced:
                 context_length=4096,
                 cost_per_1k_tokens=0.0,
                 capabilities=["chat"],
-                performance_tier="balanced"
+                performance_tier="balanced",
             )
         ]
         mock_provider.get_available_models.return_value = mock_models
@@ -426,10 +433,7 @@ class TestModelManagementComponentAdvanced:
     async def test_get_system_status(self, component):
         """Test getting system status."""
         component.initialized = True
-        component.system_resources = {
-            "total_ram_gb": 16.0,
-            "gpu_count": 1
-        }
+        component.system_resources = {"total_ram_gb": 16.0, "gpu_count": 1}
 
         # Mock providers
         mock_provider = AsyncMock()
@@ -453,7 +457,9 @@ class TestModelManagementComponentAdvanced:
         result = await component.get_model_recommendations(TaskType.GENERAL_CHAT)
 
         assert result == mock_recommendations
-        component.hardware_detector.recommend_models.assert_called_once_with(TaskType.GENERAL_CHAT)
+        component.hardware_detector.recommend_models.assert_called_once_with(
+            TaskType.GENERAL_CHAT
+        )
 
     @pytest.mark.asyncio
     async def test_test_model_connectivity(self, component):
@@ -480,7 +486,9 @@ class TestModelManagementComponentAdvanced:
         component.fallback_handler = AsyncMock()
 
         # Primary selection fails
-        component.model_selector.select_model.side_effect = Exception("Selection failed")
+        component.model_selector.select_model.side_effect = Exception(
+            "Selection failed"
+        )
 
         # Fallback succeeds
         fallback_model = ModelInfo(
@@ -489,7 +497,7 @@ class TestModelManagementComponentAdvanced:
             name="Fallback Model",
             context_length=4096,
             cost_per_1k_tokens=0.0,
-            capabilities=["chat"]
+            capabilities=["chat"],
         )
         component.fallback_handler.get_fallback_model.return_value = fallback_model
 
@@ -559,7 +567,7 @@ class TestModelManagementComponentAdvanced:
                 name="Free Model",
                 context_length=4096,
                 cost_per_1k_tokens=0.0,
-                capabilities=["chat"]
+                capabilities=["chat"],
             )
         ]
         mock_provider.get_available_models.return_value = mock_models
@@ -583,7 +591,7 @@ class TestModelManagementComponentAdvanced:
             name="Test Model",
             context_length=4096,
             cost_per_1k_tokens=0.0,
-            capabilities=["chat"]
+            capabilities=["chat"],
         )
         component.model_selector.select_model.return_value = mock_model_info
 
@@ -594,14 +602,13 @@ class TestModelManagementComponentAdvanced:
             model_id="test-model",
             latency_ms=100.0,
             usage={"total_tokens": 50},
-            metadata={}
+            metadata={},
         )
         mock_instance.generate.return_value = mock_response
 
         with patch.object(component, "load_model", return_value=mock_instance):
             result = await component.generate_text(
-                "Test prompt",
-                task_type=TaskType.GENERAL_CHAT
+                "Test prompt", task_type=TaskType.GENERAL_CHAT
             )
 
             assert result.text == "Generated response"
@@ -622,14 +629,14 @@ class TestModelManagementComponentAdvanced:
         component.model_config = Mock(
             providers={
                 "openrouter": Mock(
-                    enabled=True,
-                    api_key="test-key",
-                    free_models_only=True
+                    enabled=True, api_key="test-key", free_models_only=True
                 )
             }
         )
 
-        with patch("src.components.model_management.model_management_component.OpenRouterProvider") as mock_provider_class:
+        with patch(
+            "src.components.model_management.model_management_component.OpenRouterProvider"
+        ) as mock_provider_class:
             mock_provider = AsyncMock()
             mock_provider.initialize.return_value = True
             mock_provider_class.return_value = mock_provider
@@ -642,8 +649,7 @@ class TestModelManagementComponentAdvanced:
     async def test_initialize_services(self, component):
         """Test service initialization."""
         component.model_config = Mock(
-            performance_monitoring=Mock(enabled=True),
-            fallback=Mock(enabled=True)
+            performance_monitoring=Mock(enabled=True), fallback=Mock(enabled=True)
         )
         component.providers = {"test-provider": AsyncMock()}
 
@@ -656,10 +662,7 @@ class TestModelManagementComponentAdvanced:
     @pytest.mark.asyncio
     async def test_perform_health_check(self, component):
         """Test health check performance."""
-        component.providers = {
-            "provider1": AsyncMock(),
-            "provider2": AsyncMock()
-        }
+        component.providers = {"provider1": AsyncMock(), "provider2": AsyncMock()}
 
         await component._perform_health_check()
 
@@ -685,7 +688,7 @@ class TestFallbackHandler:
                 context_length=4096,
                 cost_per_1k_tokens=0.0,
                 capabilities=["chat"],
-                performance_tier="fast"
+                performance_tier="fast",
             ),
             ModelInfo(
                 model_id="fallback-model",
@@ -694,7 +697,7 @@ class TestFallbackHandler:
                 context_length=4096,
                 cost_per_1k_tokens=0.0,
                 capabilities=["chat"],
-                performance_tier="balanced"
+                performance_tier="balanced",
             ),
         ]
         return handler
@@ -729,7 +732,7 @@ class TestPerformanceMonitor:
             "model_id": "test-model",
             "response_time_ms": 250.5,
             "total_tokens": 100,
-            "task_type": "chat"
+            "task_type": "chat",
         }
 
         await monitor.record_metrics("test-model", metrics)
@@ -745,7 +748,7 @@ class TestPerformanceMonitor:
             "model_id": "test-model",
             "response_time_ms": 250.5,
             "total_tokens": 100,
-            "task_type": "chat"
+            "task_type": "chat",
         }
         await monitor.record_metrics("test-model", metrics)
 
@@ -893,8 +896,7 @@ class TestIntegration:
             }
         }
 
-        component = ModelManagementComponent(config)
-        return component
+        return ModelManagementComponent(config)
 
     @pytest.mark.asyncio
     async def test_end_to_end_generation(self, full_system):
@@ -1059,15 +1061,13 @@ class TestOllamaProvider:
     def provider(self):
         """Create an Ollama provider instance."""
         from src.components.model_management.providers.ollama import OllamaProvider
+
         return OllamaProvider()
 
     @pytest.mark.asyncio
     async def test_initialization(self, provider):
         """Test provider initialization."""
-        config = {
-            "base_url": "http://localhost:11434",
-            "timeout": 30
-        }
+        config = {"base_url": "http://localhost:11434", "timeout": 30}
 
         with patch("httpx.AsyncClient"):
             result = await provider.initialize(config)
@@ -1083,9 +1083,7 @@ class TestOllamaProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "models": [
-                {"name": "llama2", "size": 3800000000}
-            ]
+            "models": [{"name": "llama2", "size": 3800000000}]
         }
         provider.client.get = AsyncMock(return_value=mock_response)
 
@@ -1125,15 +1123,13 @@ class TestLocalProvider:
     def provider(self):
         """Create a Local provider instance."""
         from src.components.model_management.providers.local import LocalProvider
+
         return LocalProvider()
 
     @pytest.mark.asyncio
     async def test_initialization(self, provider):
         """Test provider initialization."""
-        config = {
-            "model_path": "/path/to/models",
-            "device": "cpu"
-        }
+        config = {"model_path": "/path/to/models", "device": "cpu"}
 
         result = await provider.initialize(config)
         # Initialization might fail without actual models, but should not crash
@@ -1147,15 +1143,13 @@ class TestLMStudioProvider:
     def provider(self):
         """Create an LM Studio provider instance."""
         from src.components.model_management.providers.lm_studio import LMStudioProvider
+
         return LMStudioProvider()
 
     @pytest.mark.asyncio
     async def test_initialization(self, provider):
         """Test provider initialization."""
-        config = {
-            "base_url": "http://localhost:1234",
-            "timeout": 30
-        }
+        config = {"base_url": "http://localhost:1234", "timeout": 30}
 
         with patch("httpx.AsyncClient"):
             result = await provider.initialize(config)
@@ -1172,6 +1166,7 @@ class TestCustomAPIProvider:
         from src.components.model_management.providers.custom_api import (
             CustomAPIProvider,
         )
+
         return CustomAPIProvider()
 
     @pytest.mark.asyncio
@@ -1180,7 +1175,7 @@ class TestCustomAPIProvider:
         config = {
             "base_url": "https://api.example.com",
             "api_key": "test-key",
-            "timeout": 30
+            "timeout": 30,
         }
 
         with patch("httpx.AsyncClient"):
@@ -1197,9 +1192,7 @@ class TestCustomAPIProvider:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "data": [
-                {"id": "model-1", "name": "Model 1"}
-            ]
+            "data": [{"id": "model-1", "name": "Model 1"}]
         }
         provider.client.get = AsyncMock(return_value=mock_response)
 
@@ -1237,7 +1230,7 @@ class TestAdditionalCoverage:
                 name="Cheap Model",
                 context_length=4096,
                 cost_per_1k_tokens=0.001,
-                capabilities=["chat"]
+                capabilities=["chat"],
             ),
             ModelInfo(
                 model_id="expensive-model",
@@ -1245,8 +1238,8 @@ class TestAdditionalCoverage:
                 name="Expensive Model",
                 context_length=4096,
                 cost_per_1k_tokens=0.1,
-                capabilities=["chat"]
-            )
+                capabilities=["chat"],
+            ),
         ]
         mock_provider.get_available_models.return_value = mock_models
         component.providers["test-provider"] = mock_provider
@@ -1267,7 +1260,7 @@ class TestAdditionalCoverage:
             name="Test Model",
             context_length=4096,
             cost_per_1k_tokens=0.0,
-            capabilities=["chat", "completion"]
+            capabilities=["chat", "completion"],
         )
 
         assert model.model_id == "test-model"
@@ -1278,10 +1271,7 @@ class TestAdditionalCoverage:
     async def test_generation_request_creation(self):
         """Test GenerationRequest model creation."""
         request = GenerationRequest(
-            prompt="Test prompt",
-            max_tokens=100,
-            temperature=0.7,
-            top_p=0.9
+            prompt="Test prompt", max_tokens=100, temperature=0.7, top_p=0.9
         )
 
         assert request.prompt == "Test prompt"
@@ -1292,9 +1282,7 @@ class TestAdditionalCoverage:
     async def test_model_requirements_creation(self):
         """Test ModelRequirements model creation."""
         requirements = ModelRequirements(
-            task_type=TaskType.GENERAL_CHAT,
-            max_latency_ms=1000,
-            min_quality_score=7.0
+            task_type=TaskType.GENERAL_CHAT, max_latency_ms=1000, min_quality_score=7.0
         )
 
         assert requirements.task_type == TaskType.GENERAL_CHAT
@@ -1306,7 +1294,7 @@ class TestAdditionalCoverage:
         criteria = ModelSelectionCriteria(
             task_type=TaskType.GENERAL_CHAT,
             max_cost_per_1k_tokens=0.01,
-            min_context_length=2048
+            min_context_length=2048,
         )
 
         assert criteria.task_type == TaskType.GENERAL_CHAT

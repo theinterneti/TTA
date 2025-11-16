@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -308,9 +308,7 @@ class DiagnosticsAPI:
         last_heartbeat_timestamp = agent_info.get("last_heartbeat")
         last_heartbeat = None
         if last_heartbeat_timestamp:
-            last_heartbeat = datetime.fromtimestamp(
-                last_heartbeat_timestamp, tz=timezone.utc
-            )
+            last_heartbeat = datetime.fromtimestamp(last_heartbeat_timestamp, tz=UTC)
 
         # Determine health status
         current_time = time.time()
@@ -446,7 +444,7 @@ class DiagnosticsAPI:
                 overall_health = "degraded"
 
             return SystemDiagnosticSummary(
-                timestamp=datetime.now(tz=timezone.utc),
+                timestamp=datetime.now(tz=UTC),
                 total_agents=total_agents,
                 healthy_agents=health_counts["healthy"],
                 degraded_agents=health_counts["degraded"],
@@ -480,6 +478,6 @@ class DiagnosticsAPI:
             logger.error(f"Failed to get system health: {e}")
             return {
                 "status": "error",
-                "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+                "timestamp": datetime.now(tz=UTC).isoformat(),
                 "message": f"Health check failed: {str(e)}",
             }

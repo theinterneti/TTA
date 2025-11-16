@@ -14,9 +14,7 @@ def detect_simple_cycles(graph: dict[str, set[str]]) -> list[str]:
     issues: list[str] = []
     for src, dsts in graph.items():
         issues.extend(
-            f"Cycle between {src} and {dst}"
-            for dst in dsts
-            if dst in graph and src in graph[dst]
+            f"Cycle between {src} and {dst}" for dst in dsts if dst in graph and src in graph[dst]
         )
     return issues
 

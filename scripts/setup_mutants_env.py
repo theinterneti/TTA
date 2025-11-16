@@ -22,7 +22,6 @@ def setup_mutants_environment():
 
     # Check if mutants directory exists
     if not mutants_dir.exists():
-        print("Mutants directory doesn't exist yet. Will be created by mutmut.")
         return
 
     # List of __init__.py files that need to be copied
@@ -31,8 +30,6 @@ def setup_mutants_environment():
         "src/components/__init__.py",
         "src/components/model_management/__init__.py",
     ]
-
-    print("Setting up mutants environment...")
 
     for init_file in init_files_to_copy:
         source = project_root / init_file
@@ -44,13 +41,9 @@ def setup_mutants_environment():
         # Copy the file if it exists
         if source.exists():
             shutil.copy2(source, dest)
-            print(f"✓ Copied {init_file}")
         else:
             # Create empty __init__.py if source doesn't exist
             dest.touch()
-            print(f"✓ Created empty {init_file}")
-
-    print("Mutants environment setup complete!")
 
 
 if __name__ == "__main__":

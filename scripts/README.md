@@ -1,18 +1,12 @@
 # TTA Scripts
 
-This directory contains scripts for the TTA project.
+> ⚠️ **This document has moved!**
+>
+> This content is now maintained in the TTA-notes knowledge base:
+> - **New location:** [[TTA/References/TTA Scripts]]
+> - **Path:** `.augment/kb/References/TTA Scripts.md`
+>
+> If using Logseq with TTA-notes, you can access it directly in the graph.
+> Otherwise, see: `.augment/kb/References/TTA Scripts.md`
 
-## Directories
-
-- **dev**: Development scripts
-- **docker**: Docker-related scripts
-- **maintenance**: Maintenance scripts
-- **utils**: Utility scripts
-- **setup**: Setup scripts
-
-## Main Scripts
-
-- **organize_tta.sh**: Main script to organize the TTA repository
-- **organize_files.sh**: Script to organize files in the TTA repository
-- **organize_documentation.sh**: Script to organize documentation in the TTA repository
-- **ensure_docker_consistency.sh**: Script to ensure Docker and DevContainer consistency across repositories
+**Migration date:** 2025-11-01

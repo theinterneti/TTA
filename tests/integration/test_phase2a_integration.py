@@ -92,7 +92,7 @@ class TestPhase2AIntegration:
                 session_response = await response.json()
                 assert session_response["patient_id"] == patient_id
                 assert session_response["status"] == "active"
-                assert "current_scenario" in session_response
+            assert "current_scenario" in session_response
 
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="Living worlds system not fully implemented")
@@ -185,25 +185,27 @@ class TestPhase2AIntegration:
         clinician_id = "clinician_001"
 
         # Test dashboard data retrieval
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
+        async with (
+            aiohttp.ClientSession() as session,
+            session.get(
                 f"http://localhost:8002/api/clinical/dashboard/{clinician_id}",
                 headers={"Authorization": "Bearer test_token"},
-            ) as response:
-                assert response.status == 200
-                dashboard_data = await response.json()
+            ) as response,
+        ):
+            assert response.status == 200
+            dashboard_data = await response.json()
 
-                assert "patients" in dashboard_data
-                assert "alerts" in dashboard_data
-                assert "metrics" in dashboard_data
-                assert "schedule" in dashboard_data
+            assert "patients" in dashboard_data
+            assert "alerts" in dashboard_data
+            assert "metrics" in dashboard_data
+            assert "schedule" in dashboard_data
 
-                # Verify metrics structure
-                metrics = dashboard_data["metrics"]
-                assert "totalPatients" in metrics
-                assert "activePatients" in metrics
-                assert "averageEngagement" in metrics
-                assert "crisisInterventions" in metrics
+            # Verify metrics structure
+            metrics = dashboard_data["metrics"]
+            assert "totalPatients" in metrics
+            assert "activePatients" in metrics
+            assert "averageEngagement" in metrics
+            assert "crisisInterventions" in metrics
 
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="Therapeutic systems integration not fully implemented")
@@ -455,17 +457,19 @@ class TestPhase2AIntegration:
             "initial_difficulty": 3,
         }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(
                 "http://localhost:8001/api/patient/sessions",
                 json=session_data,
                 headers={"Authorization": "Bearer test_token"},
-            ) as response:
-                result = await response.json()
-                end_time = datetime.utcnow()
+            ) as response,
+        ):
+            result = await response.json()
+            end_time = datetime.utcnow()
 
-                result["response_time"] = (end_time - start_time).total_seconds()
-                return result
+            result["response_time"] = (end_time - start_time).total_seconds()
+            return result
 
 
 if __name__ == "__main__":

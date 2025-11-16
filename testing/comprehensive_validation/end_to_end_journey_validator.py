@@ -901,9 +901,7 @@ async def run_end_to_end_journey_validation(
             logger.warning("⚠️ Validator initialization failed, using simulation mode")
 
         # Run journey validation
-        results = await validator.validate_complete_user_journeys()
-
-        return results
+        return await validator.validate_complete_user_journeys()
 
     except Exception as e:
         logger.error(f"❌ Journey validation failed: {e}")
@@ -916,37 +914,16 @@ if __name__ == "__main__":
     async def main():
         results = await run_end_to_end_journey_validation()
 
-        print("\n" + "=" * 80)
-        print("END-TO-END USER JOURNEY VALIDATION RESULTS")
-        print("=" * 80)
-
         for metrics in results:
-            print(f"\n🚀 Journey: {metrics.journey_id}")
-            print(f"   User Profile: {metrics.user_profile}")
-            print(f"   Duration: {metrics.total_duration:.2f}s")
-            print(f"   Success: {'✅ YES' if metrics.journey_success else '❌ NO'}")
-            print(f"   Overall Quality: {metrics.overall_quality_score:.1f}/10")
-            print(f"   User Experience: {metrics.user_experience_score:.1f}/10")
-            print(f"   System Integration: {metrics.system_integration_score:.1f}/10")
-            print(
-                f"   Meets Excellence: {'✅ YES' if metrics.meets_excellence_standards else '❌ NO'}"
-            )
-
-            print("\n   📊 Stage Analysis:")
-            successful_stages = len([s for s in metrics.stage_metrics if s.success])
-            total_stages = len(metrics.stage_metrics)
-            print(f"      Successful Stages: {successful_stages}/{total_stages}")
-            print(f"      Database Operations: {metrics.database_operations_total}")
-            print(f"      Narrative Quality: {metrics.narrative_quality_score:.1f}/10")
+            len([s for s in metrics.stage_metrics if s.success])
+            len(metrics.stage_metrics)
 
             if metrics.journey_issues:
-                print(f"\n   ❌ Issues ({len(metrics.journey_issues)}):")
-                for issue in metrics.journey_issues[:3]:
-                    print(f"      - {issue}")
+                for _issue in metrics.journey_issues[:3]:
+                    pass
 
             if metrics.improvement_recommendations:
-                print("\n   💡 Recommendations:")
-                for rec in metrics.improvement_recommendations[:3]:
-                    print(f"      - {rec}")
+                for _rec in metrics.improvement_recommendations[:3]:
+                    pass
 
     asyncio.run(main())

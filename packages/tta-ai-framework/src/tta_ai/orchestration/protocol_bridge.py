@@ -89,9 +89,7 @@ class ProtocolTranslator:
             # Determine translation rule
             rule_key = f"{source_protocol.value}_to_{target_protocol.value}"
             if agent_type:
-                specific_rule_key = (
-                    f"{source_protocol.value}_to_{agent_type.value.lower()}"
-                )
+                specific_rule_key = f"{source_protocol.value}_to_{agent_type.value.lower()}"
                 if specific_rule_key in self._translation_rules:
                     rule_key = specific_rule_key
 
@@ -207,9 +205,7 @@ class ProtocolTranslator:
 class MessageRouter:
     """Routes messages between orchestration system and real agents."""
 
-    def __init__(
-        self, ipa_adapter: IPAAdapter, wba_adapter: WBAAdapter, nga_adapter: NGAAdapter
-    ):
+    def __init__(self, ipa_adapter: IPAAdapter, wba_adapter: WBAAdapter, nga_adapter: NGAAdapter):
         self.ipa_adapter = ipa_adapter
         self.wba_adapter = wba_adapter
         self.nga_adapter = nga_adapter
@@ -252,9 +248,7 @@ class MessageRouter:
                 message_id=self._get_message_id(message), delivered=False, error=str(e)
             )
 
-    async def _route_to_ipa(
-        self, message: AgentMessage | dict[str, Any]
-    ) -> MessageResult:
+    async def _route_to_ipa(self, message: AgentMessage | dict[str, Any]) -> MessageResult:
         """Route message to IPA adapter."""
         try:
             # Translate message to IPA format
@@ -295,9 +289,7 @@ class MessageRouter:
                 message_id=self._get_message_id(message), delivered=False, error=str(e)
             )
 
-    async def _route_to_wba(
-        self, message: AgentMessage | dict[str, Any]
-    ) -> MessageResult:
+    async def _route_to_wba(self, message: AgentMessage | dict[str, Any]) -> MessageResult:
         """Route message to WBA adapter."""
         try:
             # Translate message to WBA format
@@ -332,9 +324,7 @@ class MessageRouter:
                 message_id=self._get_message_id(message), delivered=False, error=str(e)
             )
 
-    async def _route_to_nga(
-        self, message: AgentMessage | dict[str, Any]
-    ) -> MessageResult:
+    async def _route_to_nga(self, message: AgentMessage | dict[str, Any]) -> MessageResult:
         """Route message to NGA adapter."""
         try:
             # Translate message to NGA format

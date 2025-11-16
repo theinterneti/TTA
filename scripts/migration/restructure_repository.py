@@ -84,13 +84,12 @@ class RepositoryRestructurer:
         self.migration_log.append(entry)
 
         if not self.dry_run:
-            print(f"  [{status.upper()}] {action}: {source} -> {destination}")
+            pass
         else:
-            print(f"  [DRY-RUN] {action}: {source} -> {destination}")
+            pass
 
     def create_directory_structure(self):
         """Create the new directory structure."""
-        print("\n=== Creating New Directory Structure ===")
 
         new_dirs = [
             "packages/tta-ai-framework/src/tta_ai",
@@ -119,7 +118,6 @@ class RepositoryRestructurer:
 
     def migrate_code(self):
         """Migrate code to new locations."""
-        print("\n=== Migrating Code ===")
 
         for source, destination in MIGRATION_MAP.items():
             source_path = self.repo_root / source
@@ -145,7 +143,6 @@ class RepositoryRestructurer:
 
     def update_imports(self):
         """Update import statements across all Python files."""
-        print("\n=== Updating Import Statements ===")
 
         # Find all Python files
         python_files = list(self.repo_root.glob("**/*.py"))
@@ -157,8 +154,6 @@ class RepositoryRestructurer:
             for f in python_files
             if not any(pattern in str(f) for pattern in exclude_patterns)
         ]
-
-        print(f"Found {len(python_files)} Python files to process")
 
         for py_file in python_files:
             try:
@@ -186,18 +181,14 @@ class RepositoryRestructurer:
 
                     if not self.dry_run:
                         py_file.write_text(content)
-                        print(f"  Updated imports in: {relative_path}")
                     else:
-                        print(f"  [DRY-RUN] Would update imports in: {relative_path}")
+                        pass
 
-            except Exception as e:
-                print(f"  Error processing {py_file}: {e}")
-
-        print(f"\nTotal files with import updates: {len(self.import_updates)}")
+            except Exception:
+                pass
 
     def cleanup_obsolete(self):
         """Remove obsolete directories and files."""
-        print("\n=== Cleaning Up Obsolete Files ===")
 
         # Remove directories
         for dir_path in OBSOLETE_DIRS:
@@ -234,11 +225,6 @@ class RepositoryRestructurer:
 
     def execute(self):
         """Execute the full migration."""
-        print(f"\n{'=' * 60}")
-        print(
-            f"TTA Repository Restructuring - {'DRY RUN' if self.dry_run else 'EXECUTION'}"
-        )
-        print(f"{'=' * 60}")
 
         self.create_directory_structure()
         self.migrate_code()
@@ -251,13 +237,8 @@ class RepositoryRestructurer:
 
         if not self.dry_run:
             report_path.write_text(report_content)
-            print(f"\n✓ Migration report saved to: {report_path}")
         else:
-            print(f"\n[DRY-RUN] Would save migration report to: {report_path}")
-
-        print(f"\n{'=' * 60}")
-        print(f"Migration {'Preview' if self.dry_run else 'Execution'} Complete")
-        print(f"{'=' * 60}\n")
+            pass
 
 
 def main():
@@ -277,9 +258,6 @@ def main():
     repo_root = Path(__file__).resolve().parents[2]
 
     if args.rollback:
-        print(
-            "Rollback functionality: Use 'git checkout pre-restructure-backup' to rollback"
-        )
         return
 
     if args.execute:
@@ -287,7 +265,6 @@ def main():
             "This will modify the repository structure. Continue? (yes/no): "
         )
         if response.lower() != "yes":
-            print("Migration cancelled.")
             return
         dry_run = False
     else:

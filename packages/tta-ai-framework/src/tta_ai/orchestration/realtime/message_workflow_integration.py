@@ -47,9 +47,7 @@ class WorkflowAwareMessageCoordinator:
         self.workflow_agents: dict[str, set[AgentId]] = {}  # workflow_id -> agent_ids
 
         # Message processing callbacks
-        self.message_callbacks: dict[
-            str, set[Callable]
-        ] = {}  # workflow_id -> callbacks
+        self.message_callbacks: dict[str, set[Callable]] = {}  # workflow_id -> callbacks
 
         logger.info("WorkflowAwareMessageCoordinator initialized")
 
@@ -126,9 +124,7 @@ class WorkflowAwareMessageCoordinator:
 
         # Track workflow association if enabled
         if self.track_message_workflows and workflow_id and result.delivered:
-            await self._track_workflow_message(
-                workflow_id, message.message_id, sender, recipient
-            )
+            await self._track_workflow_message(workflow_id, message.message_id, sender, recipient)
 
         return result
 
@@ -141,9 +137,7 @@ class WorkflowAwareMessageCoordinator:
     ) -> list[MessageResult]:
         """Broadcast a message with workflow tracking."""
         # Send messages through existing coordinator
-        results = await self.redis_coordinator.broadcast_message(
-            sender, message, recipients
-        )
+        results = await self.redis_coordinator.broadcast_message(sender, message, recipients)
 
         # Track workflow associations if enabled
         if self.track_message_workflows and workflow_id:
@@ -162,15 +156,11 @@ class WorkflowAwareMessageCoordinator:
     ) -> ReceivedMessage | None:
         """Receive a message with workflow progress tracking."""
         # Receive message through existing coordinator
-        received_message = await self.redis_coordinator.receive(
-            agent_id, visibility_timeout
-        )
+        received_message = await self.redis_coordinator.receive(agent_id, visibility_timeout)
 
         if received_message and self.track_message_workflows:
             # Check if this message is part of a workflow
-            workflow_id = self.message_to_workflow.get(
-                received_message.message.message_id
-            )
+            workflow_id = self.message_to_workflow.get(received_message.message.message_id)
             if workflow_id:
                 await self._update_workflow_on_message_received(
                     workflow_id, received_message, agent_id
@@ -256,9 +246,7 @@ class WorkflowAwareMessageCoordinator:
             for message_id in message_ids:
                 self.message_to_workflow.pop(message_id, None)
 
-            logger.info(
-                f"Completed workflow: {workflow_id} ({'success' if success else 'failed'})"
-            )
+            logger.info(f"Completed workflow: {workflow_id} ({'success' if success else 'failed'})")
             return True
 
         except Exception as e:
@@ -367,9 +355,7 @@ class WorkflowAwareMessageCoordinator:
             {
                 "message_info": message_info,
                 "agent_id": (
-                    agent_id.model_dump()
-                    if hasattr(agent_id, "model_dump")
-                    else str(agent_id)
+                    agent_id.model_dump() if hasattr(agent_id, "model_dump") else str(agent_id)
                 ),
                 "workflow_result": workflow_result,
             },
@@ -403,9 +389,7 @@ class WorkflowAwareMessageCoordinator:
             {
                 "message_info": message_info,
                 "agent_id": (
-                    agent_id.model_dump()
-                    if hasattr(agent_id, "model_dump")
-                    else str(agent_id)
+                    agent_id.model_dump() if hasattr(agent_id, "model_dump") else str(agent_id)
                 ),
                 "failure_type": failure.value,
                 "error": error,
@@ -425,9 +409,7 @@ class WorkflowAwareMessageCoordinator:
             if payload:
                 import json
 
-                data = json.loads(
-                    payload if isinstance(payload, str) else payload.decode()
-                )
+                data = json.loads(payload if isinstance(payload, str) else payload.decode())
                 return {
                     "message_id": data.get("message", {}).get("message_id"),
                     "message_type": data.get("message", {}).get("message_type"),

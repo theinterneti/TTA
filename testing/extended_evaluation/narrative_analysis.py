@@ -532,7 +532,7 @@ class NarrativeAnalyzer:
 
                 # Check for varied sentence length
                 sentences = dialogue.split(".")
-                if len(set(len(s.split()) for s in sentences if s.strip())) > 1:
+                if len({len(s.split()) for s in sentences if s.strip()}) > 1:
                     score += 0.1
 
         return min(10.0, score)
@@ -589,11 +589,10 @@ class NarrativeAnalyzer:
     ) -> list[str]:
         """Find contradictions between current content and narrative history."""
         # Simplified contradiction detection
-        contradictions = []
+        return []
 
         # This would be much more sophisticated in a full implementation
         # For now, just return empty list
-        return contradictions
 
     def _evaluate_narrative_continuity(
         self, current_content: str, previous_content: str
@@ -645,7 +644,7 @@ class NarrativeAnalyzer:
 
         # Generate character analyses
         character_data = self.character_tracking.get(session_id, {})
-        for char_name, char_info in character_data.items():
+        for char_name in character_data:
             analysis = CharacterAnalysis(
                 character_id=char_name,
                 character_name=char_name,

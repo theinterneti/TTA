@@ -275,28 +275,6 @@ def cmd_setup() -> bool:
 
 def print_usage() -> None:
     """Print usage information."""
-    print("""
-Development Commands with Error Recovery
-
-Usage: python scripts/dev_with_recovery.py <command>
-
-Commands:
-  lint              Run linting
-  lint-fix          Run linting with auto-fix
-  format            Format code
-  format-check      Check code formatting
-  typecheck         Run type checking
-  test              Run tests
-  test-cov          Run tests with coverage
-
-  quality           Run quality checks (lint + format-check)
-  quality-fix       Run quality fixes (lint-fix + format)
-  check-all         Run full validation (quality + typecheck + test)
-  dev-check         Quick dev workflow (quality-fix + test-fast)
-  setup             Setup development environment
-
-All commands include automatic retry on transient failures.
-""")
 
 
 def main() -> NoReturn:

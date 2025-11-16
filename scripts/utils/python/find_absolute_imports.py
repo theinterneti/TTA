@@ -27,7 +27,7 @@ def find_absolute_imports(directory):
                             relative_path = os.path.relpath(file_path, directory)
                             absolute_imports.append((relative_path, matches))
                     except UnicodeDecodeError:
-                        print(f"Error reading {file_path}")
+                        pass
 
     return absolute_imports
 
@@ -35,25 +35,20 @@ def find_absolute_imports(directory):
 def main():
     """Main function."""
     if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <directory>")
         sys.exit(1)
 
     directory = sys.argv[1]
     if not os.path.isdir(directory):
-        print(f"Error: {directory} is not a directory")
         sys.exit(1)
 
     absolute_imports = find_absolute_imports(directory)
 
     if not absolute_imports:
-        print("No absolute imports found.")
         return
 
-    print(f"Found {len(absolute_imports)} files with absolute imports:")
-    for file_path, imports in absolute_imports:
-        print(f"\n{file_path}:")
-        for imp in imports:
-            print(f"  {imp}")
+    for _file_path, imports in absolute_imports:
+        for _imp in imports:
+            pass
 
 
 if __name__ == "__main__":

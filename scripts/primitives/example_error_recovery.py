@@ -226,7 +226,7 @@ def development_workflow():
     # Step 3: Build (with circuit breaker)
     logger.info("\nStep 3: Building project...")
     try:
-        build_result = run_build_with_circuit_breaker()
+        run_build_with_circuit_breaker()
         logger.info("✓ Build successful")
     except Exception as e:
         logger.error(f"✗ Build failed: {e}")

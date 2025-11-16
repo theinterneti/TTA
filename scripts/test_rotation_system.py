@@ -134,7 +134,6 @@ async def test_model_with_rotation(task: dict) -> dict:
                     attempt += 1
                     if attempt <= RETRY_POLICY.config.max_retries:
                         delay = RETRY_POLICY.config.get_delay(attempt - 1)
-                        print(f"  ⏳ Rate limited, rotating in {delay:.2f}s...")
                         await asyncio.sleep(delay)
                     continue
                 attempt += 1
@@ -147,7 +146,6 @@ async def test_model_with_rotation(task: dict) -> dict:
                 attempt += 1
                 if attempt <= RETRY_POLICY.config.max_retries:
                     delay = RETRY_POLICY.config.get_delay(attempt - 1)
-                    print(f"  ⏳ Error, retrying in {delay:.2f}s...")
                     await asyncio.sleep(delay)
                 continue
 
@@ -163,13 +161,12 @@ async def test_model_with_rotation(task: dict) -> dict:
                 "attempt_time": attempt_time,
             }
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             ROTATION_MANAGER.on_failure(time.time() - attempt_start)
             last_error = "Timeout"
             attempt += 1
             if attempt <= RETRY_POLICY.config.max_retries:
                 delay = RETRY_POLICY.config.get_delay(attempt - 1)
-                print(f"  ⏳ Timeout, retrying in {delay:.2f}s...")
                 await asyncio.sleep(delay)
         except Exception as e:
             ROTATION_MANAGER.on_failure(time.time() - attempt_start)
@@ -177,7 +174,6 @@ async def test_model_with_rotation(task: dict) -> dict:
             attempt += 1
             if attempt <= RETRY_POLICY.config.max_retries:
                 delay = RETRY_POLICY.config.get_delay(attempt - 1)
-                print(f"  ⏳ Error, retrying in {delay:.2f}s...")
                 await asyncio.sleep(delay)
 
     # All attempts failed
@@ -194,47 +190,22 @@ async def test_model_with_rotation(task: dict) -> dict:
 
 async def main():
     """Run rotation system tests."""
-    print("\n" + "=" * 80)
-    print("PHASE 3: MODEL ROTATION SYSTEM TEST")
-    print("=" * 80)
-    print(f"Start Time: {datetime.now().isoformat()}")
-    print(f"Tasks: {len(TEST_TASKS)}")
-    print(f"Max Retries: {RETRY_POLICY.config.max_retries}")
-    print(f"Base Delay: {RETRY_POLICY.config.base_delay}s")
-    print(f"Exponential Base: {RETRY_POLICY.config.exponential_base}\n")
 
     results = []
     success_count = 0
 
-    for i, task in enumerate(TEST_TASKS, 1):
-        print(f"[{i}/{len(TEST_TASKS)}] Testing: {task['name']}")
+    for _i, task in enumerate(TEST_TASKS, 1):
         result = await test_model_with_rotation(task)
         results.append(result)
 
         if result["success"]:
             success_count += 1
-            print(
-                f"  ✅ Success | Model: {result['model'][:40]:40} | "
-                f"Attempt: {result['attempt']} | Time: {result['time']:.2f}s"
-            )
         else:
-            print(
-                f"  ❌ Failed | Model: {result['model'][:40]:40} | "
-                f"Error: {result['error']}"
-            )
+            pass
 
     # Summary
-    print("\n" + "=" * 80)
-    print("ROTATION SYSTEM TEST SUMMARY")
-    print("=" * 80)
-    print(f"Total Tests: {len(TEST_TASKS)}")
-    print(
-        f"Successful: {success_count}/{len(TEST_TASKS)} ({100 * success_count / len(TEST_TASKS):.1f}%)"
-    )
-    print(f"Failed: {len(TEST_TASKS) - success_count}")
 
     # Rotation metrics
-    print("\n📊 ROTATION METRICS:")
     ROTATION_MANAGER.print_metrics()
 
     # Save results
@@ -252,9 +223,6 @@ async def main():
             f,
             indent=2,
         )
-
-    print(f"\n✅ Results saved to: {output_file}")
-    print("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

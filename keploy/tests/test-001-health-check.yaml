@@ -1,0 +1,30 @@
+version: api.keploy.io/v1beta1
+kind: Http
+name: health-check
+spec:
+  metadata:
+    description: Health endpoint check
+  req:
+    method: GET
+    proto_major: 1
+    proto_minor: 1
+    url: http://localhost:8000/health
+    header:
+      Accept: "*/*"
+      Content-Type: application/json
+      Host: localhost:8000
+    body: ""
+    timestamp: 2025-10-28T21:22:11Z
+  resp:
+    status_code: 200
+    header:
+      Content-Type: application/json
+    body: '{\"status\":\"healthy\",\"sessions_count\":5}'
+    timestamp: 2025-10-28T21:22:11Z
+  objects: []
+  assertions:
+    noise:
+      - "body.session_id"
+      - "body.timestamp"
+      - "body.created_at"
+  created: 1761686531

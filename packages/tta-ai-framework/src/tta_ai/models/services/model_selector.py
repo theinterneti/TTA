@@ -50,14 +50,10 @@ class ModelSelector(IModelSelector):
                 return None
 
             # Filter models based on requirements
-            compatible_models = await self._filter_compatible_models(
-                available_models, requirements
-            )
+            compatible_models = await self._filter_compatible_models(available_models, requirements)
 
             if not compatible_models:
-                logger.warning(
-                    f"No compatible models found for requirements: {requirements}"
-                )
+                logger.warning(f"No compatible models found for requirements: {requirements}")
                 return None
 
             # Rank models by suitability
@@ -177,9 +173,7 @@ class ModelSelector(IModelSelector):
                 all_models.extend(models)
 
             except Exception as e:
-                logger.warning(
-                    f"Failed to get models from provider {provider_name}: {e}"
-                )
+                logger.warning(f"Failed to get models from provider {provider_name}: {e}")
                 continue
 
         return all_models
@@ -205,9 +199,7 @@ class ModelSelector(IModelSelector):
 
             # Base score from model performance
             if model.performance_score:
-                score += (
-                    model.performance_score * self.selection_criteria.performance_weight
-                )
+                score += model.performance_score * self.selection_criteria.performance_weight
             else:
                 # Default score for unknown performance
                 score += 5.0 * self.selection_criteria.performance_weight
@@ -232,9 +224,7 @@ class ModelSelector(IModelSelector):
             if model.cost_per_token and model.cost_per_token > 0:
                 # Normalize cost (assuming max acceptable cost of $0.01 per token)
                 max_cost = 0.01
-                cost_score = max(
-                    0, 10.0 * (1 - min(model.cost_per_token / max_cost, 1.0))
-                )
+                cost_score = max(0, 10.0 * (1 - min(model.cost_per_token / max_cost, 1.0)))
 
             score += cost_score * self.selection_criteria.cost_weight
 
@@ -257,9 +247,7 @@ class ModelSelector(IModelSelector):
             score += hardware_bonus
 
             # Performance history bonus
-            performance_bonus = await self._calculate_performance_history_bonus(
-                model.model_id
-            )
+            performance_bonus = await self._calculate_performance_history_bonus(model.model_id)
             score += performance_bonus
 
             return max(0.0, score)  # Ensure non-negative score
@@ -268,9 +256,7 @@ class ModelSelector(IModelSelector):
             logger.error(f"Score calculation failed for {model.model_id}: {e}")
             return 0.0
 
-    async def _calculate_task_bonus(
-        self, model: ModelInfo, task_type: TaskType
-    ) -> float:
+    async def _calculate_task_bonus(self, model: ModelInfo, task_type: TaskType) -> float:
         """Calculate bonus score based on task-specific model suitability."""
         bonus = 0.0
 
@@ -331,9 +317,7 @@ class ModelSelector(IModelSelector):
         """Calculate bonus based on hardware compatibility."""
         try:
             # Get hardware requirements for the model
-            requirements = await self.hardware_detector.estimate_model_requirements(
-                model.model_id
-            )
+            requirements = await self.hardware_detector.estimate_model_requirements(model.model_id)
 
             # Get system resources
             system_resources = await self.hardware_detector.detect_system_resources()
@@ -393,9 +377,7 @@ class ModelSelector(IModelSelector):
             quality_bonus = max(0, (average_quality - 5.0) / 5.0 + 2.0)
 
             # Reliability bonus based on success rate
-            success_rates = [
-                m.success_rate for m in recent_metrics if m.success_rate is not None
-            ]
+            success_rates = [m.success_rate for m in recent_metrics if m.success_rate is not None]
             if success_rates:
                 avg_success_rate = sum(success_rates) / len(success_rates)
                 reliability_bonus = max(
@@ -428,9 +410,7 @@ class ModelSelector(IModelSelector):
         # Keep only recent metrics (last 100 entries or 24 hours)
         cutoff_time = datetime.now() - timedelta(hours=24)
         self._performance_cache[model_id] = [
-            m
-            for m in self._performance_cache[model_id][-100:]
-            if m.timestamp > cutoff_time
+            m for m in self._performance_cache[model_id][-100:] if m.timestamp > cutoff_time
         ]
 
     def clear_cache(self):

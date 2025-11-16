@@ -74,9 +74,7 @@ class RedisAgentRegistry(AgentRegistry):
 
     # ---- Key helpers ----
     def _key(self, agent_id: AgentId) -> str:
-        return (
-            f"{self._pfx}:agents:{agent_id.type.value}:{agent_id.instance or 'default'}"
-        )
+        return f"{self._pfx}:agents:{agent_id.type.value}:{agent_id.instance or 'default'}"
 
     def _index_key(self) -> str:
         return f"{self._pfx}:agents:index"
@@ -269,9 +267,7 @@ class RedisAgentRegistry(AgentRegistry):
             await self._detect_and_publish_status_changes(agent)
 
         except Exception as e:
-            logger.warning(
-                f"Failed to update heartbeat for agent {agent.agent_id}: {e}"
-            )
+            logger.warning(f"Failed to update heartbeat for agent {agent.agent_id}: {e}")
 
     async def restore_state_if_available(self, agent: Agent) -> bool:
         """If a serialized state exists in Redis for this agent, restore it.
@@ -359,9 +355,7 @@ class RedisAgentRegistry(AgentRegistry):
                 },
             )
 
-            logger.debug(
-                f"Published agent event via EventPublisher: {event_type} for {agent_key}"
-            )
+            logger.debug(f"Published agent event via EventPublisher: {event_type} for {agent_key}")
 
         except Exception as e:
             logger.warning(f"Failed to publish agent event via EventPublisher: {e}")
@@ -424,9 +418,7 @@ class RedisAgentRegistry(AgentRegistry):
         agent_key = self._agent_status_key(agent_id)
         self._agent_status_cache.pop(agent_key, None)
 
-    async def _publish_heartbeat_event(
-        self, agent: Agent, heartbeat_age: float = 0.0
-    ) -> None:
+    async def _publish_heartbeat_event(self, agent: Agent, heartbeat_age: float = 0.0) -> None:
         """Publish heartbeat event with current status."""
         await self._publish_agent_event(
             "heartbeat",
@@ -461,9 +453,7 @@ class RedisAgentRegistry(AgentRegistry):
             logger.error(f"Failed to register capabilities for {agent_id}: {e}")
             return False
 
-    async def get_agent_capabilities(
-        self, agent_id: AgentId
-    ) -> AgentCapabilitySet | None:
+    async def get_agent_capabilities(self, agent_id: AgentId) -> AgentCapabilitySet | None:
         """Get capabilities for a specific agent."""
         try:
             cap_key = self._capability_key(agent_id)
@@ -495,9 +485,7 @@ class RedisAgentRegistry(AgentRegistry):
                         capability_set = AgentCapabilitySet(**capabilities_dict)
                         capability_sets.append(capability_set)
                     except Exception as e:
-                        logger.warning(
-                            f"Failed to parse capabilities from key {key}: {e}"
-                        )
+                        logger.warning(f"Failed to parse capabilities from key {key}: {e}")
 
             return capability_sets
 
@@ -602,9 +590,7 @@ class RedisAgentRegistry(AgentRegistry):
             all_capabilities = await self.list_all_capabilities()
 
             total_agents = len(all_capabilities)
-            total_capabilities = sum(
-                len(cap_set.capabilities) for cap_set in all_capabilities
-            )
+            total_capabilities = sum(len(cap_set.capabilities) for cap_set in all_capabilities)
             active_capabilities = sum(
                 len(cap_set.get_active_capabilities()) for cap_set in all_capabilities
             )
@@ -620,8 +606,7 @@ class RedisAgentRegistry(AgentRegistry):
             avg_load_factor = 0.0
             if total_agents > 0:
                 avg_load_factor = (
-                    sum(cap_set.load_factor for cap_set in all_capabilities)
-                    / total_agents
+                    sum(cap_set.load_factor for cap_set in all_capabilities) / total_agents
                 )
 
             return {
@@ -660,9 +645,7 @@ class RedisAgentRegistry(AgentRegistry):
             # Convert agent keys to expected capability key format
             expected_cap_keys = set()
             for bkey in agent_keys:
-                agent_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
-                )
+                agent_key = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
                 # Convert from "ao:agents:type:instance" to "ao:capabilities:type:instance"
                 if ":agents:" in agent_key:
                     cap_key = agent_key.replace(":agents:", ":capabilities:")
@@ -671,9 +654,7 @@ class RedisAgentRegistry(AgentRegistry):
             # Find stale capability keys
             stale_keys = []
             for bkey in cap_keys:
-                cap_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
-                )
+                cap_key = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
                 if cap_key not in expected_cap_keys:
                     stale_keys.append(cap_key)
 
@@ -685,9 +666,7 @@ class RedisAgentRegistry(AgentRegistry):
                     await self._redis.srem(self._capability_index_key(), stale_key)
                     removed_count += 1
                 except Exception as e:
-                    logger.warning(
-                        f"Failed to remove stale capability key {stale_key}: {e}"
-                    )
+                    logger.warning(f"Failed to remove stale capability key {stale_key}: {e}")
 
             if removed_count > 0:
                 logger.info(f"Cleaned up {removed_count} stale capability entries")
@@ -741,18 +720,14 @@ class RedisAgentRegistry(AgentRegistry):
             # Check for orphaned capabilities
             expected_cap_keys = set()
             for bkey in agent_keys:
-                agent_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
-                )
+                agent_key = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
                 if ":agents:" in agent_key:
                     cap_key = agent_key.replace(":agents:", ":capabilities:")
                     expected_cap_keys.add(cap_key)
 
             orphaned_count = 0
             for bkey in cap_keys:
-                cap_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
-                )
+                cap_key = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
                 if cap_key not in expected_cap_keys:
                     orphaned_count += 1
 
@@ -760,8 +735,7 @@ class RedisAgentRegistry(AgentRegistry):
                 "total_capability_entries": total_capabilities,
                 "total_agent_entries": total_agents,
                 "orphaned_capabilities": orphaned_count,
-                "capability_coverage": (total_capabilities - orphaned_count)
-                / max(1, total_agents),
+                "capability_coverage": (total_capabilities - orphaned_count) / max(1, total_agents),
                 "ttl_seconds": self._ttl,
                 "heartbeat_interval_seconds": self._hb_interval_s,
             }

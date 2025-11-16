@@ -120,6 +120,7 @@ dependencies = [
     "docker>=7.0.0",
     "notebooklm-mcp>=2.0.11",
     "task>=0.1.0",
+    "serena>=0.9.1",
 ]
 
 # DEPRECATED: Use dependency-groups instead (see below)
@@ -177,6 +178,9 @@ minimal = [
 # ============================================================================
 # UV DEPENDENCY GROUPS (PEP 735)
 # ============================================================================
+# ============================================================================
+# UV DEPENDENCY GROUPS (PEP 735)
+# ============================================================================
 # Organized dependency groups for granular installation and faster CI/CD
 # Usage:
 #   uv sync                    # Install all groups (default)
@@ -186,17 +190,14 @@ minimal = [
 
 [dependency-groups]
 # Development and testing utilities (synced by default with 'uv sync')
-# Development tools (IDE, debugging, pre-commit hooks)
+# UV automatically syncs the 'dev' group, so we include both development tools
+# and testing frameworks here for convenience and alignment with UV's design.
 dev = [
+    # Development tools
     "pre-commit>=3.5.0",
     "ipython>=8.12.0",
     "ipdb>=0.13.13",
-    "prospector[with_pyright]>=1.10.2",
-]
-
-# Testing frameworks and utilities
-test = [
-    # Core testing frameworks
+    # Testing frameworks and utilities
     "pytest>=7.3.1",
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=5.0.0",
@@ -212,17 +213,8 @@ test = [
     "pytest-benchmark>=4.0.0", # Performance benchmarking
     "pact-python>=2.2.0", # Contract testing
     "cosmic-ray>=8.4.3",
+    "yamale>=6.0.0",
 ]
-
-# Staging environment tools (monitoring, profiling, debugging)
-staging = [
-    "py-spy>=0.3.14", # Profiling
-    "memory-profiler>=0.61.0", # Memory profiling
-    "prometheus-client>=0.20.0", # Metrics
-]
-
-# Production environment (minimal - uses main dependencies)
-production = []
 
 # Linting and formatting tools
 lint = [
@@ -278,8 +270,8 @@ Documentation = "https://github.com/your-org/tta/docs"
 # virtual environment management across all contexts.
 
 # Default dependency groups to install with 'uv sync'
-# Includes both dev tools and testing frameworks for productive local development
-default-groups = ["dev", "test"]
+# The 'dev' group includes both development tools and testing frameworks
+default-groups = ["dev"]
 
 # DEPRECATED: Replaced by [dependency-groups] above
 # This section is kept for backwards compatibility but is no longer the primary way to manage dev dependencies
@@ -305,13 +297,12 @@ environments = [
 # Use project-local cache to avoid cross-filesystem overhead
 cache-dir = "./.uv_cache"
 
-# Cache invalidation keys
-# Rebuild when these files change
-cache-keys = [
-    { file = "pyproject.toml" },
-    { file = "uv.lock" },
-]
+# Note: cache-keys not supported in UV 0.8.x - removed for compatibility
+# Cache invalidation happens automatically based on pyproject.toml and uv.lock
 
+# ============================================================================
+# UV WORKSPACE CONFIGURATION
+# ============================================================================
 # ============================================================================
 # UV WORKSPACE CONFIGURATION
 # ============================================================================
@@ -321,6 +312,8 @@ cache-keys = [
 members = [
     "packages/tta-ai-framework",
     "packages/tta-narrative-engine",
+    # Note: ai-dev-toolkit excluded until TTA.dev packages (dev-primitives, tta-workflow-primitives) are published
+    # Note: universal-agent-context is a documentation package, not a Python package
 ]
 
 [tool.uv.sources]
@@ -410,7 +403,10 @@ reportUnusedVariable = "warning"
 reportDuplicateImport = "warning"
 
 [tool.ruff]
-target-version = "py310"
+# Target Python version - must match project.requires-python
+target-version = "py312"
+
+# Line length - same as Black default for compatibility
 line-length = 88
 
 # Ruff now handles linting, formatting, AND import sorting

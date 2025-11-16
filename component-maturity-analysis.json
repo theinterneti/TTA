@@ -5,100 +5,13 @@
       "path": "src/components/neo4j_component.py",
       "test_path": "tests/test_components.py",
       "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
       "coverage": {
-        "coverage": 27.2,
+        "coverage": 22.9,
         "tests_exist": true,
-        "tests_passed": true
-      },
-      "quality": {
-        "linting": {
-          "passed": false,
-          "issues": 14
-        },
-        "type_checking": {
-          "passed": true,
-          "output": ""
-        },
-        "security": {
-          "passed": true,
-          "output": ""
-        }
-      },
-      "documentation": {
-        "readme_exists": true,
-        "api_docs_exist": false,
-        "usage_examples_exist": true
-      },
-      "blockers": [
-        {
-          "type": "tests",
-          "description": "Test coverage (27.2%) below 70% threshold",
-          "gap": 42.8
-        },
-        {
-          "type": "code_quality",
-          "description": "Linting issues found (14 issues)"
-        }
-      ],
-      "blocker_count": 2,
-      "ready_for_staging": false
-    },
-    "Docker": {
-      "name": "Docker",
-      "path": "src/components/docker_component.py",
-      "test_path": "tests/test_components.py",
-      "maturity_file": "src/components/MATURITY.md",
-      "coverage": {
-        "coverage": 20.1,
-        "tests_exist": true,
-        "tests_passed": true
-      },
-      "quality": {
-        "linting": {
-          "passed": false,
-          "issues": 148
-        },
-        "type_checking": {
-          "passed": false,
-          "output": "/home/thein/recovered-tta-storytelling/src/components/docker_component.py\n  /home/thein/recovered-tta-storytelling/src/components/docker_component.py:42:5 - error: \"CODECARBON_AVAILABLE\" is constant ("
-        },
-        "security": {
-          "passed": true,
-          "output": ""
-        }
-      },
-      "documentation": {
-        "readme_exists": true,
-        "api_docs_exist": false,
-        "usage_examples_exist": true
-      },
-      "blockers": [
-        {
-          "type": "tests",
-          "description": "Test coverage (20.1%) below 70% threshold",
-          "gap": 49.9
-        },
-        {
-          "type": "code_quality",
-          "description": "Linting issues found (148 issues)"
-        },
-        {
-          "type": "code_quality",
-          "description": "Type checking errors found"
-        }
-      ],
-      "blocker_count": 3,
-      "ready_for_staging": false
-    },
-    "Carbon": {
-      "name": "Carbon",
-      "path": "src/components/carbon_component.py",
-      "test_path": "tests/test_components.py",
-      "maturity_file": "src/components/MATURITY.md",
-      "coverage": {
-        "coverage": 73.2,
-        "tests_exist": true,
-        "tests_passed": true
+        "tests_passed": false
       },
       "quality": {
         "linting": {
@@ -119,9 +32,105 @@
         "api_docs_exist": false,
         "usage_examples_exist": true
       },
-      "blockers": [],
-      "blocker_count": 0,
-      "ready_for_staging": true
+      "blockers": [
+        {
+          "type": "tests",
+          "description": "Test coverage (22.9%) below 70% threshold",
+          "gap": 47.1
+        }
+      ],
+      "blocker_count": 1,
+      "ready_for_staging": false,
+      "ready_for_production": false
+    },
+    "Docker": {
+      "name": "Docker",
+      "path": "src/components/docker_component.py",
+      "test_path": "tests/test_components.py",
+      "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
+      "coverage": {
+        "coverage": 15.7,
+        "tests_exist": true,
+        "tests_passed": false
+      },
+      "quality": {
+        "linting": {
+          "passed": true,
+          "issues": 0
+        },
+        "type_checking": {
+          "passed": false,
+          "output": "/home/thein/recovered-tta-storytelling/src/components/docker_component.py\n  /home/thein/recovered-tta-storytelling/src/components/docker_component.py:37:10 - error: Import \"codecarbon\" could not be re"
+        },
+        "security": {
+          "passed": true,
+          "output": ""
+        }
+      },
+      "documentation": {
+        "readme_exists": true,
+        "api_docs_exist": false,
+        "usage_examples_exist": true
+      },
+      "blockers": [
+        {
+          "type": "tests",
+          "description": "Test coverage (15.7%) below 70% threshold",
+          "gap": 54.3
+        },
+        {
+          "type": "code_quality",
+          "description": "Type checking errors found"
+        }
+      ],
+      "blocker_count": 2,
+      "ready_for_staging": false,
+      "ready_for_production": false
+    },
+    "Carbon": {
+      "name": "Carbon",
+      "path": "src/components/carbon_component.py",
+      "test_path": "tests/test_components.py",
+      "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
+      "coverage": {
+        "coverage": 70.6,
+        "tests_exist": true,
+        "tests_passed": false
+      },
+      "quality": {
+        "linting": {
+          "passed": true,
+          "issues": 0
+        },
+        "type_checking": {
+          "passed": false,
+          "output": "/home/thein/recovered-tta-storytelling/src/components/carbon_component.py\n  /home/thein/recovered-tta-storytelling/src/components/carbon_component.py:40:10 - error: Import \"codecarbon\" could not be re"
+        },
+        "security": {
+          "passed": true,
+          "output": ""
+        }
+      },
+      "documentation": {
+        "readme_exists": true,
+        "api_docs_exist": false,
+        "usage_examples_exist": true
+      },
+      "blockers": [
+        {
+          "type": "code_quality",
+          "description": "Type checking errors found"
+        }
+      ],
+      "blocker_count": 1,
+      "ready_for_staging": false,
+      "ready_for_production": false
     }
   },
   "AI/Agent Systems": {
@@ -130,108 +139,39 @@
       "path": "src/components/model_management/",
       "test_path": "tests/test_model_management.py",
       "maturity_file": "src/components/model_management/MATURITY.md",
-      "coverage": {
-        "coverage": 100.0,
-        "tests_exist": true,
-        "tests_passed": true
-      },
-      "quality": {
-        "linting": {
-          "passed": false,
-          "issues": 665
-        },
-        "type_checking": {
-          "passed": false,
-          "output": "/home/thein/recovered-tta-storytelling/src/components/model_management/api.py\n  /home/thein/recovered-tta-storytelling/src/components/model_management/api.py:79:10 - error: Import \"src.orchestration.c"
-        },
-        "security": {
-          "passed": false,
-          "output": "Run started:2025-10-08 17:13:49.748142\n\nTest results:\n>> Issue: [B615:huggingface_unsafe_download] Unsafe Hugging Face Hub download without revision pinning in from_pretrained()\n   Severity: Medium   "
-        }
-      },
-      "documentation": {
-        "readme_exists": true,
-        "api_docs_exist": false,
-        "usage_examples_exist": true
-      },
-      "blockers": [
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [
         {
-          "type": "code_quality",
-          "description": "Linting issues found (665 issues)"
+          "issue": "#55",
+          "description": "See issue for details"
         },
         {
-          "type": "code_quality",
-          "description": "Type checking errors found"
+          "issue": "#55",
+          "description": "See issue for details"
         },
         {
-          "type": "security",
-          "description": "Security scan found issues"
+          "issue": "#55",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#55",
+          "description": "See issue for details"
         }
       ],
-      "blocker_count": 3,
-      "ready_for_staging": false
-    },
-    "LLM": {
-      "name": "LLM",
-      "path": "src/components/llm_component.py",
-      "test_path": "tests/test_components.py",
-      "maturity_file": "src/components/MATURITY.md",
       "coverage": {
-        "coverage": 28.2,
-        "tests_exist": true,
-        "tests_passed": true
-      },
-      "quality": {
-        "linting": {
-          "passed": false,
-          "issues": 14
-        },
-        "type_checking": {
-          "passed": true,
-          "output": ""
-        },
-        "security": {
-          "passed": true,
-          "output": ""
-        }
-      },
-      "documentation": {
-        "readme_exists": true,
-        "api_docs_exist": false,
-        "usage_examples_exist": true
-      },
-      "blockers": [
-        {
-          "type": "tests",
-          "description": "Test coverage (28.2%) below 70% threshold",
-          "gap": 41.8
-        },
-        {
-          "type": "code_quality",
-          "description": "Linting issues found (14 issues)"
-        }
-      ],
-      "blocker_count": 2,
-      "ready_for_staging": false
-    },
-    "Agent Orchestration": {
-      "name": "Agent Orchestration",
-      "path": "src/components/agent_orchestration_component.py",
-      "test_path": "tests/agent_orchestration/",
-      "maturity_file": "src/components/MATURITY.md",
-      "coverage": {
-        "coverage": 2.0,
+        "coverage": 0.0,
         "tests_exist": true,
         "tests_passed": false
       },
       "quality": {
         "linting": {
           "passed": false,
-          "issues": 2953
+          "issues": 423
         },
         "type_checking": {
           "passed": false,
-          "output": "/home/thein/recovered-tta-storytelling/src/components/agent_orchestration_component.py\n  /home/thein/recovered-tta-storytelling/src/components/agent_orchestration_component.py:733:34 - error: Cannot a"
+          "output": "/home/thein/recovered-tta-storytelling/src/components/model_management/providers/lm_studio.py\n  /home/thein/recovered-tta-storytelling/src/components/model_management/providers/lm_studio.py:136:32 - e"
         },
         "security": {
           "passed": true,
@@ -246,12 +186,12 @@
       "blockers": [
         {
           "type": "tests",
-          "description": "Test coverage (2.0%) below 70% threshold",
-          "gap": 68.0
+          "description": "Test coverage (0.0%) below 70% threshold",
+          "gap": 70.0
         },
         {
           "type": "code_quality",
-          "description": "Linting issues found (2953 issues)"
+          "description": "Linting issues found (423 issues)"
         },
         {
           "type": "code_quality",
@@ -259,26 +199,30 @@
         }
       ],
       "blocker_count": 3,
-      "ready_for_staging": false
+      "ready_for_staging": false,
+      "ready_for_production": false
     },
-    "Narrative Arc Orchestrator": {
-      "name": "Narrative Arc Orchestrator",
-      "path": "src/components/narrative_arc_orchestrator/",
-      "test_path": "tests/test_narrative_arc_orchestrator_component.py",
-      "maturity_file": "src/components/narrative_arc_orchestrator/MATURITY.md",
+    "LLM": {
+      "name": "LLM",
+      "path": "src/components/llm_component.py",
+      "test_path": "tests/test_components.py",
+      "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
       "coverage": {
-        "coverage": 47.1,
+        "coverage": 23.8,
         "tests_exist": true,
-        "tests_passed": true
+        "tests_passed": false
       },
       "quality": {
         "linting": {
-          "passed": false,
-          "issues": 150
+          "passed": true,
+          "issues": 0
         },
         "type_checking": {
-          "passed": false,
-          "output": "/home/thein/recovered-tta-storytelling/src/components/narrative_arc_orchestrator/impact_analysis.py\n  /home/thein/recovered-tta-storytelling/src/components/narrative_arc_orchestrator/impact_analysis.p"
+          "passed": true,
+          "output": ""
         },
         "security": {
           "passed": true,
@@ -286,31 +230,124 @@
         }
       },
       "documentation": {
-        "readme_exists": false,
+        "readme_exists": true,
         "api_docs_exist": false,
-        "usage_examples_exist": false
+        "usage_examples_exist": true
       },
       "blockers": [
         {
           "type": "tests",
-          "description": "Test coverage (47.1%) below 70% threshold",
-          "gap": 22.9
+          "description": "Test coverage (23.8%) below 70% threshold",
+          "gap": 46.2
+        }
+      ],
+      "blocker_count": 1,
+      "ready_for_staging": false,
+      "ready_for_production": false
+    },
+    "Agent Orchestration": {
+      "name": "Agent Orchestration",
+      "path": "src/components/agent_orchestration_component.py",
+      "test_path": "tests/agent_orchestration/",
+      "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
+      "coverage": {
+        "coverage": 1.6,
+        "tests_exist": true,
+        "tests_passed": false
+      },
+      "quality": {
+        "linting": {
+          "passed": false,
+          "issues": 1430
+        },
+        "type_checking": {
+          "passed": false,
+          "output": "/home/thein/recovered-tta-storytelling/src/components/agent_orchestration_component.py\n  /home/thein/recovered-tta-storytelling/src/components/agent_orchestration_component.py:309:38 - error: \"loop\" i"
+        },
+        "security": {
+          "passed": true,
+          "output": ""
+        }
+      },
+      "documentation": {
+        "readme_exists": true,
+        "api_docs_exist": false,
+        "usage_examples_exist": true
+      },
+      "blockers": [
+        {
+          "type": "tests",
+          "description": "Test coverage (1.6%) below 70% threshold",
+          "gap": 68.4
         },
         {
           "type": "code_quality",
-          "description": "Linting issues found (150 issues)"
+          "description": "Linting issues found (1430 issues)"
         },
         {
           "type": "code_quality",
           "description": "Type checking errors found"
-        },
-        {
-          "type": "documentation",
-          "description": "Component README missing"
         }
       ],
-      "blocker_count": 4,
-      "ready_for_staging": false
+      "blocker_count": 3,
+      "ready_for_staging": false,
+      "ready_for_production": false
+    },
+    "Narrative Arc Orchestrator": {
+      "name": "Narrative Arc Orchestrator",
+      "path": "src/components/narrative_arc_orchestrator/",
+      "test_path": "tests/test_narrative_arc_orchestrator_component.py",
+      "maturity_file": "src/components/narrative_arc_orchestrator/MATURITY.md",
+      "current_stage": "Staging",
+      "observation_period": {
+        "deployed": "2025-10-22",
+        "observation_end": "2025-10-29",
+        "days_remaining": 0,
+        "complete": true
+      },
+      "blocker_issues": [
+        {
+          "issue": "#45",
+          "description": "See issue for details"
+        }
+      ],
+      "coverage": {
+        "coverage": 18.5,
+        "tests_exist": true,
+        "tests_passed": false
+      },
+      "quality": {
+        "linting": {
+          "passed": true,
+          "issues": 0
+        },
+        "type_checking": {
+          "passed": true,
+          "output": ""
+        },
+        "security": {
+          "passed": true,
+          "output": ""
+        }
+      },
+      "documentation": {
+        "readme_exists": true,
+        "api_docs_exist": false,
+        "usage_examples_exist": true
+      },
+      "blockers": [
+        {
+          "type": "tests",
+          "description": "Test coverage (18.5%) below 70% threshold",
+          "gap": 51.5
+        }
+      ],
+      "blocker_count": 1,
+      "ready_for_staging": true,
+      "ready_for_production": false
     }
   },
   "Player Experience": {
@@ -319,15 +356,43 @@
       "path": "src/components/gameplay_loop/",
       "test_path": "tests/integration/test_gameplay_loop_integration.py",
       "maturity_file": "src/components/gameplay_loop/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [
+        {
+          "issue": "#57",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#57",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#57",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#57",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#57",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#57",
+          "description": "See issue for details"
+        }
+      ],
       "coverage": {
         "coverage": 100.0,
         "tests_exist": true,
-        "tests_passed": true
+        "tests_passed": false
       },
       "quality": {
         "linting": {
           "passed": false,
-          "issues": 1247
+          "issues": 772
         },
         "type_checking": {
           "passed": false,
@@ -346,7 +411,7 @@
       "blockers": [
         {
           "type": "code_quality",
-          "description": "Linting issues found (1247 issues)"
+          "description": "Linting issues found (772 issues)"
         },
         {
           "type": "code_quality",
@@ -358,13 +423,17 @@
         }
       ],
       "blocker_count": 3,
-      "ready_for_staging": false
+      "ready_for_staging": false,
+      "ready_for_production": false
     },
     "Character Arc Manager": {
       "name": "Character Arc Manager",
       "path": "src/components/character_arc_manager.py",
       "test_path": "tests/test_character_avatar_manager.py",
       "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
       "coverage": {
         "coverage": 0.0,
         "tests_exist": true,
@@ -373,7 +442,7 @@
       "quality": {
         "linting": {
           "passed": false,
-          "issues": 209
+          "issues": 179
         },
         "type_checking": {
           "passed": false,
@@ -397,7 +466,7 @@
         },
         {
           "type": "code_quality",
-          "description": "Linting issues found (209 issues)"
+          "description": "Linting issues found (179 issues)"
         },
         {
           "type": "code_quality",
@@ -405,22 +474,26 @@
         }
       ],
       "blocker_count": 3,
-      "ready_for_staging": false
+      "ready_for_staging": false,
+      "ready_for_production": false
     },
     "Player Experience": {
       "name": "Player Experience",
       "path": "src/components/player_experience_component.py",
       "test_path": "tests/test_player_experience_component_integration.py",
       "maturity_file": "src/components/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
       "coverage": {
-        "coverage": 17.3,
+        "coverage": 13.8,
         "tests_exist": true,
         "tests_passed": false
       },
       "quality": {
         "linting": {
-          "passed": false,
-          "issues": 46
+          "passed": true,
+          "issues": 0
         },
         "type_checking": {
           "passed": true,
@@ -439,16 +512,13 @@
       "blockers": [
         {
           "type": "tests",
-          "description": "Test coverage (17.3%) below 70% threshold",
-          "gap": 52.7
-        },
-        {
-          "type": "code_quality",
-          "description": "Linting issues found (46 issues)"
+          "description": "Test coverage (13.8%) below 70% threshold",
+          "gap": 56.2
         }
       ],
-      "blocker_count": 2,
-      "ready_for_staging": false
+      "blocker_count": 1,
+      "ready_for_staging": false,
+      "ready_for_production": false
     }
   },
   "Therapeutic Content": {
@@ -457,19 +527,39 @@
       "path": "src/components/narrative_coherence/",
       "test_path": "tests/test_narrative_coherence_engine.py",
       "maturity_file": "src/components/narrative_coherence/MATURITY.md",
+      "current_stage": "Staging",
+      "observation_period": null,
+      "blocker_issues": [
+        {
+          "issue": "#39",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#42",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#39",
+          "description": "See issue for details"
+        },
+        {
+          "issue": "#42",
+          "description": "See issue for details"
+        }
+      ],
       "coverage": {
-        "coverage": 100.0,
+        "coverage": 0.0,
         "tests_exist": true,
-        "tests_passed": true
+        "tests_passed": false
       },
       "quality": {
         "linting": {
-          "passed": false,
-          "issues": 445
+          "passed": true,
+          "issues": 0
         },
         "type_checking": {
-          "passed": false,
-          "output": "/home/thein/recovered-tta-storytelling/src/components/narrative_coherence/causal_validator.py\n  /home/thein/recovered-tta-storytelling/src/components/narrative_coherence/causal_validator.py:58:20 - er"
+          "passed": true,
+          "output": ""
         },
         "security": {
           "passed": true,
@@ -477,45 +567,42 @@
         }
       },
       "documentation": {
-        "readme_exists": false,
+        "readme_exists": true,
         "api_docs_exist": false,
-        "usage_examples_exist": false
+        "usage_examples_exist": true
       },
       "blockers": [
         {
-          "type": "code_quality",
-          "description": "Linting issues found (445 issues)"
-        },
-        {
-          "type": "code_quality",
-          "description": "Type checking errors found"
-        },
-        {
-          "type": "documentation",
-          "description": "Component README missing"
+          "type": "tests",
+          "description": "Test coverage (0.0%) below 70% threshold",
+          "gap": 70.0
         }
       ],
-      "blocker_count": 3,
-      "ready_for_staging": false
+      "blocker_count": 1,
+      "ready_for_staging": true,
+      "ready_for_production": false
     },
     "Therapeutic Systems": {
       "name": "Therapeutic Systems",
       "path": "src/components/therapeutic_systems_enhanced/",
       "test_path": "tests/test_therapeutic_effectiveness_integration.py",
       "maturity_file": "src/components/therapeutic_systems_enhanced/MATURITY.md",
+      "current_stage": "Development",
+      "observation_period": null,
+      "blocker_issues": [],
       "coverage": {
         "coverage": 0.0,
         "tests_exist": true,
-        "tests_passed": true
+        "tests_passed": false
       },
       "quality": {
         "linting": {
           "passed": false,
-          "issues": 571
+          "issues": 425
         },
         "type_checking": {
-          "passed": true,
-          "output": ""
+          "passed": false,
+          "output": "/home/thein/recovered-tta-storytelling/src/components/therapeutic_systems_enhanced/error_recovery_manager.py\n  /home/thein/recovered-tta-storytelling/src/components/therapeutic_systems_enhanced/error_"
         },
         "security": {
           "passed": true,
@@ -535,15 +622,20 @@
         },
         {
           "type": "code_quality",
-          "description": "Linting issues found (571 issues)"
+          "description": "Linting issues found (425 issues)"
+        },
+        {
+          "type": "code_quality",
+          "description": "Type checking errors found"
         },
         {
           "type": "documentation",
           "description": "Component README missing"
         }
       ],
-      "blocker_count": 3,
-      "ready_for_staging": false
+      "blocker_count": 4,
+      "ready_for_staging": false,
+      "ready_for_production": false
     }
   }
 }

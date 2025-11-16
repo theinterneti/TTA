@@ -136,9 +136,7 @@ class TestPaginatedData:
         pagination = PaginationMetadata(
             has_more=True, next_cursor="abc.def", page_size=2
         )
-        data = PaginatedData(
-            items=[{"id": "1"}, {"id": "2"}], pagination=pagination
-        )
+        data = PaginatedData(items=[{"id": "1"}, {"id": "2"}], pagination=pagination)
         assert len(data.items) == 2
         assert data.pagination.has_more is True
 
@@ -237,4 +235,3 @@ class TestJSONSchema:
         assert schema["type"] == "object"
         assert "properties" in schema
         assert "tool_name" in schema["properties"]
-

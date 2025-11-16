@@ -20,7 +20,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 T = TypeVar("T")
 
 
-def log_entry_exit(func: F) -> F:
+def log_entry_exit[F: Callable[..., Any]](func: F) -> F:
     """
     Decorator to log function entry and exit.
 
@@ -45,7 +45,7 @@ def log_entry_exit(func: F) -> F:
     return cast(F, wrapper)
 
 
-def timing_decorator(func: F) -> F:
+def timing_decorator[F: Callable[..., Any]](func: F) -> F:
     """
     Decorator to measure and log the execution time of a function.
 
@@ -117,7 +117,7 @@ def retry(
     return decorator
 
 
-def validate_args(func: F) -> F:
+def validate_args[F: Callable[..., Any]](func: F) -> F:
     """
     Decorator to validate function arguments against type annotations.
 
@@ -182,7 +182,7 @@ def deprecated(reason: str) -> Callable[[F], F]:
     return decorator
 
 
-def singleton(cls: type[T]) -> type[T]:
+def singleton[T](cls: type[T]) -> type[T]:
     """
     Decorator to implement the Singleton pattern.
 

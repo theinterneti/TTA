@@ -4,6 +4,7 @@ Validate YAML frontmatter in chatmode and workflow files.
 """
 
 import re
+import sys
 from pathlib import Path
 
 import yaml
@@ -141,64 +142,41 @@ def main():
     """Validate all chatmode and workflow files."""
     repo_root = Path(__file__).parent.parent
 
-    print("=" * 80)
-    print("YAML Frontmatter Validation Report")
-    print("=" * 80)
-    print()
-
     # Validate chatmodes
-    print("📋 CHATMODES (.augment/chatmodes/*.chatmode.md)")
-    print("-" * 80)
 
     chatmodes_dir = repo_root / ".augment" / "chatmodes"
     chatmode_files = sorted(chatmodes_dir.glob("*.chatmode.md"))
 
     chatmode_results = []
     for chatmode_file in chatmode_files:
-        print(f"\n{chatmode_file.name}:")
         valid, issues = validate_chatmode(chatmode_file)
         chatmode_results.append(valid)
-        for issue in issues:
-            print(f"  {issue}")
+        for _issue in issues:
+            pass
 
     # Validate workflows
-    print("\n" + "=" * 80)
-    print("🔄 WORKFLOWS (.augment/workflows/*.prompt.md)")
-    print("-" * 80)
 
     workflows_dir = repo_root / ".augment" / "workflows"
     workflow_files = sorted(workflows_dir.glob("*.prompt.md"))
 
     workflow_results = []
     for workflow_file in workflow_files:
-        print(f"\n{workflow_file.name}:")
         valid, issues = validate_workflow(workflow_file)
         workflow_results.append(valid)
-        for issue in issues:
-            print(f"  {issue}")
+        for _issue in issues:
+            pass
 
     # Summary
-    print("\n" + "=" * 80)
-    print("📊 SUMMARY")
-    print("-" * 80)
 
     chatmodes_passed = sum(chatmode_results)
     chatmodes_total = len(chatmode_results)
     workflows_passed = sum(workflow_results)
     workflows_total = len(workflow_results)
 
-    print(f"Chatmodes: {chatmodes_passed}/{chatmodes_total} passed")
-    print(f"Workflows: {workflows_passed}/{workflows_total} passed")
-    print(
-        f"Overall: {chatmodes_passed + workflows_passed}/{chatmodes_total + workflows_total} passed"
-    )
-
     if chatmodes_passed == chatmodes_total and workflows_passed == workflows_total:
-        print("\n✅ All YAML frontmatter is valid!")
         return 0
-    print("\n❌ Some files have invalid YAML frontmatter")
     return 1
 
 
 if __name__ == "__main__":
-    exit(main())
+    sys.exit(main())

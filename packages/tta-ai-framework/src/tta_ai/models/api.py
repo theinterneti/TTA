@@ -82,14 +82,10 @@ async def get_model_management() -> ModelManagementComponent:
     # component = get_component("model_management")
     component = None  # Placeholder until component_registry is implemented
     if not component:
-        raise HTTPException(
-            status_code=503, detail="Model management component not available"
-        )
+        raise HTTPException(status_code=503, detail="Model management component not available")
 
     if not component.initialized:
-        raise HTTPException(
-            status_code=503, detail="Model management component not initialized"
-        )
+        raise HTTPException(status_code=503, detail="Model management component not initialized")
 
     return component
 
@@ -276,9 +272,7 @@ async def test_model_connectivity(
 ):
     """Test connectivity and performance of a specific model."""
     try:
-        result = await model_mgmt.test_model_connectivity(
-            request.model_id, request.provider_name
-        )
+        result = await model_mgmt.test_model_connectivity(request.model_id, request.provider_name)
 
         return ModelTestResponse(**result)
 
@@ -341,9 +335,7 @@ async def unload_model(
                 "model_id": model_id,
                 "status": "unloaded",
             }
-        raise HTTPException(
-            status_code=404, detail=f"Model {model_id} not found or not loaded"
-        )
+        raise HTTPException(status_code=404, detail=f"Model {model_id} not found or not loaded")
 
     except Exception as e:
         logger.error(f"Failed to unload model {model_id}: {e}")
@@ -359,13 +351,9 @@ async def get_model_performance(
     """Get performance metrics for a specific model."""
     try:
         if not model_mgmt.performance_monitor:
-            raise HTTPException(
-                status_code=503, detail="Performance monitoring not available"
-            )
+            raise HTTPException(status_code=503, detail="Performance monitoring not available")
 
-        return await model_mgmt.performance_monitor.get_model_performance(
-            model_id, timeframe_hours
-        )
+        return await model_mgmt.performance_monitor.get_model_performance(model_id, timeframe_hours)
 
     except Exception as e:
         logger.error(f"Failed to get performance metrics for {model_id}: {e}")
@@ -379,9 +367,7 @@ async def get_system_performance(
     """Get overall system performance metrics."""
     try:
         if not model_mgmt.performance_monitor:
-            raise HTTPException(
-                status_code=503, detail="Performance monitoring not available"
-            )
+            raise HTTPException(status_code=503, detail="Performance monitoring not available")
 
         return await model_mgmt.performance_monitor.get_system_performance()
 
@@ -397,9 +383,7 @@ async def get_fallback_statistics(
     """Get fallback handler statistics."""
     try:
         if not model_mgmt.fallback_handler:
-            raise HTTPException(
-                status_code=503, detail="Fallback handler not available"
-            )
+            raise HTTPException(status_code=503, detail="Fallback handler not available")
 
         return model_mgmt.fallback_handler.get_failure_statistics()
 
@@ -415,9 +399,7 @@ async def reset_model_failures(
     """Reset failure count for a model."""
     try:
         if not model_mgmt.fallback_handler:
-            raise HTTPException(
-                status_code=503, detail="Fallback handler not available"
-            )
+            raise HTTPException(status_code=503, detail="Fallback handler not available")
 
         success = model_mgmt.fallback_handler.reset_model_failures(model_id)
 
@@ -446,9 +428,7 @@ async def set_openrouter_filter(
 ):
     """Set OpenRouter free models filter settings."""
     try:
-        await model_mgmt.set_openrouter_filter(
-            show_free_only, prefer_free, max_cost_per_token
-        )
+        await model_mgmt.set_openrouter_filter(show_free_only, prefer_free, max_cost_per_token)
 
         return {
             "message": "OpenRouter filter settings updated",
@@ -473,9 +453,7 @@ async def get_openrouter_filter(
         settings = model_mgmt.get_openrouter_filter_settings()
 
         if settings is None:
-            raise HTTPException(
-                status_code=404, detail="OpenRouter provider not available"
-            )
+            raise HTTPException(status_code=404, detail="OpenRouter provider not available")
 
         return {"provider": "openrouter", "settings": settings}
 

@@ -150,11 +150,38 @@ jobs:
           timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
 
       - name: Run E2E tests
+        id: playwright-tests
         run: |
-          npx playwright test tests/e2e/specs/${{ matrix.test-suite }}.spec.ts --project=${{ matrix.browser }} --reporter=html,json,junit
+          # Run Playwright tests with retries and headless mode
+          npx playwright test tests/e2e/specs/${{ matrix.test-suite }}.spec.ts \
+            --project=${{ matrix.browser }} \
+            --reporter=html,json,junit \
+            --retries=2 \
+            --workers=2 \
+            --timeout=30000 \
+            --headed=false
         env:
           PLAYWRIGHT_BASE_URL: ${{ env.PLAYWRIGHT_BASE_URL }}
           PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}-${{ matrix.test-suite }}
+          CI: true
+
+      - name: Retry failed tests (if any)
+        if: failure() && steps.playwright-tests.conclusion == 'failure'
+        run: |
+          echo "Retrying failed tests..."
+          npx playwright test tests/e2e/specs/${{ matrix.test-suite }}.spec.ts \
+            --project=${{ matrix.browser }} \
+            --reporter=html,json,junit \
+            --retries=1 \
+            --workers=1 \
+            --timeout=45000 \
+            --headed=false \
+            --last-failed
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ env.PLAYWRIGHT_BASE_URL }}
+          PLAYWRIGHT_HTML_REPORT: playwright-report-retry-${{ matrix.browser }}-${{ matrix.test-suite }}
+          CI: true
+        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

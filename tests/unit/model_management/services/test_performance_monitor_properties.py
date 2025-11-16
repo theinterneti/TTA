@@ -10,7 +10,6 @@ from datetime import datetime
 import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
 from tta_ai.models.models import TaskType
 from tta_ai.models.services import PerformanceMonitor
 
