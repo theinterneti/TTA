@@ -23,7 +23,7 @@ websockets==12.0
 
 # Load and performance testing
 locust==2.17.0
-pytest-benchmark==4.0.0
+pytest-benchmark==5.2.1
 
 # Database testing
 pytest-postgresql==5.0.0
