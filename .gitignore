@@ -35,6 +35,7 @@ wheels/
 .venv
 env/
 venv/
+venv-*/
 ENV/
 env.bak/
 venv.bak/
@@ -251,9 +252,19 @@ result-*
 .model_cache/
 huggingface-cache/
 
+# -------------------------------------------------
+# 14) External dependencies & cloned repositories
+# -------------------------------------------------
+# Prevent external git repositories from being tracked
+serena/.git/
+notebooklm-mcp/
+chrome_profile_notebooklm/
+
 # Exclude specific directories that will be managed as submodules
 # (These entries do not remove tracked files; they prevent new files from being added.)
 /tta.dev/*
 # Corrected prototype ignore (case-sensitive fix); keep the old line for safety below
 /tta.prototype/*
-/TTA.prototype/*config/neo4j-staging.conf
+/TTA.prototype/*
+
+config/neo4j-staging.conf
