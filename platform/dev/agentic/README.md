@@ -1,55 +1,51 @@
-# Agentic Primitives Hub
+# ⚠️ DEPRECATED: Agentic Components Migrated
 
-All assistant-facing primitives now live under a single root so MCP servers,
-VS Code tasks, and Serena/ACE tooling can mount one directory without touching
-therapeutic product code.
+**This directory structure is now deprecated!**
 
-## Current Layout (2025-11-16)
+All agentic components have been migrated to the new **`platform_tta_dev`** structure as of 2025-11-17.
+
+## New Location
+
+All components are now at: **`platform_tta_dev/components/`**
 
 ```text
-agentic/
-├── augment/                 # formerly `.augment/`
-├── personas/                # formerly `.tta/`
-├── cline/                   # `.cline/` + `.clinerules/`
-│   ├── hooks/
-│   └── rules/
-├── hypertool/
-│   └── config.json          # moved from `.mcp.hypertool.json`
-└── serena/
-    ├── runtime/             # full `serena/` repo
-    └── state/               # cache + metadata from `.serena/`
+platform_tta_dev/
+└── components/
+    ├── augment/     # AI workflow primitives (chatmodes, workflows, memory, KB)
+    ├── cline/       # CLI automation hooks and quality assurance
+    ├── hypertool/   # MCP server orchestration + workflow foundation
+    ├── personas/    # Agent persona definitions and metrics
+    └── serena/      # Code search & architectural analysis toolkit
 ```
 
-Each legacy path in the repo root is a symlink into this directory so existing
-scripts (e.g., `.augment`, `.tta`, `.cline`, `.clinerules`, `.serena`, `serena`,
-and `.mcp.hypertool.json`) keep working while we update automation. New tools
-should import files directly from `platform/dev/agentic/*`.
+## Migration Status (2025-11-17)
 
-## Primitive Reference
+**All components successfully migrated:**
+- ✅ Hypertool (26 files) - MCP servers, chatmodes, workflows
+- ✅ Serena (472 files) - Complete Python package (serena-agent==0.1.4)
+- ✅ Augment (393 files) - Chatmodes, workflows, memory, context, KB
+- ✅ Cline (5 files) - JavaScript hooks and rules
+- ✅ Personas (9 files) - Persona definitions, metrics, configs
 
-| Primitive | Legacy entry point | New path |
+**Root-level symlinks** (`.mcp.hypertool.json`) now point to the new locations in `platform_tta_dev/components/`.
+
+## Component Reference
+
+| Component | New Location | Description |
 | --- | --- | --- |
-| Hypertool MCP manifest | `.mcp.hypertool.json` | `platform/dev/agentic/hypertool/config.json` |
-| Serena runtime | `serena/` | `platform/dev/agentic/serena/runtime/` |
-| Serena persisted state | `.serena/` | `platform/dev/agentic/serena/state/` |
-| ACE personas & overrides | `.tta/` | `platform/dev/agentic/personas/` |
-| Cline CLI hooks | `.cline/` | `platform/dev/agentic/cline/` |
-| Cline rulesets | `.clinerules/` | `platform/dev/agentic/cline/rules/` |
-| Logseq KB, chatmodes, workflows | `.augment/` | `platform/dev/agentic/augment/` |
-| Future skills (Anthropic, e2b, etc.) | *not yet migrated* | `platform/dev/agentic/skills/` (placeholder) |
+| Hypertool | `platform_tta_dev/components/hypertool/` | MCP server orchestration + workflow foundation |
+| Serena | `platform_tta_dev/components/serena/` | Code search & architectural analysis toolkit |
+| Augment | `platform_tta_dev/components/augment/` | AI workflow primitives (chatmodes, workflows, memory, KB) |
+| Cline | `platform_tta_dev/components/cline/` | CLI automation hooks and quality assurance |
+| Personas | `platform_tta_dev/components/personas/` | Agent persona definitions and metrics |
 
-## Automation Status
+## Next Steps
 
-- `TTA-AI-Workflow.code-workspace` now mounts `platform/dev/agentic/augment/*`
-  for chatmodes, contexts, workflows, and memory so future symlink removal
-  won't break editor tooling.
-- Remaining automation (devcontainers, standalone scripts) still reads through
-  the root-level symlinks—track updates here as they land.
+If you're looking for the old `platform/dev/agentic/` components:
 
-## Follow-up Work
+1. **Update imports/paths** to reference `platform_tta_dev/components/`
+2. **Update .vscode/settings.json** to reference new component locations
+3. **Update workspace files** to mount from new locations
+4. **Remove this deprecated directory** once all references are updated
 
-- Update `.vscode/settings.json`, devcontainers, and CLI scripts to read the new
-  paths (symlinks act as an interim bridge).
-- Add `skills/` once the Anthropic/e2b helpers move out of `scripts/`.
-- Mirror this directory into the upcoming `TTA.dev` repository when Phase 2
-  begins.
+See `platform_tta_dev/README.md` for the new component-centric structure and guidelines.
