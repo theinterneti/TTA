@@ -8,7 +8,13 @@ from pprint import pprint
 
 from serena.agent import SerenaAgent
 from serena.constants import REPO_ROOT
-from serena.tools import FindFileTool, FindReferencingSymbolsTool, GetSymbolsOverviewTool, JetBrainsFindSymbolTool, SearchForPatternTool
+from serena.tools import (
+    FindFileTool,
+    FindReferencingSymbolsTool,
+    GetSymbolsOverviewTool,
+    JetBrainsFindSymbolTool,
+    SearchForPatternTool,
+)
 
 if __name__ == "__main__":
     agent = SerenaAgent(project=REPO_ROOT)

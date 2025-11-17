@@ -463,3 +463,7 @@ backups/
 # Root-level test files (should be in tests/ directory)
 /test_*.py
 !tests/test_*.py
+
+# Legacy agentic component runtime/state directories
+platform/dev/agentic/*/runtime/
+platform/dev/agentic/*/state/
