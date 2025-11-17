@@ -271,7 +271,7 @@ agent orchestration and player experience components.
 1. Create specification: `specs/narrative-branching.md`
 2. Delegate implementation to backend-dev
 3. Delegate testing to qa-engineer
-4. Document decision in `.augment/memory/architecture-decisions.memory.md`
+4. Document decision in `platform_tta_dev/components/augment/memory/architecture-decisions.memory.md`
 ```
 
 ### Example 2: Integration Design
@@ -336,7 +336,7 @@ ai_providers:
 ### Next Steps
 1. Delegate implementation to backend-dev
 2. Delegate testing to qa-engineer
-3. Document in `.augment/memory/ai-integration.memory.md`
+3. Document in `platform_tta_dev/components/augment/memory/ai-integration.memory.md`
 ```
 
 ### Example 3: Scalability Review
@@ -391,7 +391,7 @@ ai_providers:
 1. Implement Phase 1 recommendations
 2. Delegate to devops for infrastructure
 3. Delegate to backend-dev for code changes
-4. Document in `.augment/memory/scalability-decisions.memory.md`
+4. Document in `platform_tta_dev/components/augment/memory/scalability-decisions.memory.md`
 ```
 
 ---
@@ -500,9 +500,9 @@ response = await query_notebook("What are MCP security best practices?")
 ## Resources
 
 ### TTA Documentation
-- Global Instructions: `.augment/instructions/global.instructions.md`
-- Component Maturity: `.augment/instructions/component-maturity.instructions.md`
-- Architecture Decisions: `.augment/memory/architecture-decisions.memory.md`
+- Global Instructions: `platform_tta_dev/components/augment/instructions/global.instructions.md`
+- Component Maturity: `platform_tta_dev/components/augment/instructions/component-maturity.instructions.md`
+- Architecture Decisions: `platform_tta_dev/components/augment/memory/architecture-decisions.memory.md`
 
 ### External Resources
 - Design Patterns: https://refactoring.guru/design-patterns

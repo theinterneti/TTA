@@ -559,10 +559,10 @@ uv run python scripts/query_notebook_helper.py "What context should I include in
 ## Resources
 
 ### TTA Documentation
-- Global Instructions: `.augment/instructions/global.instructions.md`
-- Testing Instructions: `.augment/instructions/testing.instructions.md`
-- Quality Gates: `.augment/instructions/quality-gates.instructions.md`
-- Testing Patterns: `.augment/memory/testing-patterns.memory.md`
+- Global Instructions: `platform_tta_dev/components/augment/instructions/global.instructions.md`
+- Testing Instructions: `platform_tta_dev/components/augment/instructions/testing.instructions.md`
+- Quality Gates: `platform_tta_dev/components/augment/instructions/quality-gates.instructions.md`
+- Testing Patterns: `platform_tta_dev/components/augment/memory/testing-patterns.memory.md`
 
 ### External Resources
 - FastAPI: https://fastapi.tiangolo.com/

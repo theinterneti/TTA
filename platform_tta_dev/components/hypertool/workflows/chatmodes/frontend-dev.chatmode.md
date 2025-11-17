@@ -577,7 +577,7 @@ it('refetches narrative when sessionId changes', async () => {
 ## Resources
 
 ### TTA Documentation
-- Global Instructions: `.augment/instructions/global.instructions.md`
+- Global Instructions: `platform_tta_dev/components/augment/instructions/global.instructions.md`
 - API Documentation: `specs/templates/api.spec.template.md`
 
 ### External Resources

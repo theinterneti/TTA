@@ -593,10 +593,10 @@ uv run python scripts/query_notebook_helper.py "What validation gates should age
 ## Resources
 
 ### TTA Documentation
-- Testing Instructions: `.augment/instructions/testing.instructions.md`
-- Quality Gates: `.augment/instructions/quality-gates.instructions.md`
-- Testing Patterns: `.augment/memory/testing-patterns.memory.md`
-- Quality Gates Memory: `.augment/memory/quality-gates.memory.md`
+- Testing Instructions: `platform_tta_dev/components/augment/instructions/testing.instructions.md`
+- Quality Gates: `platform_tta_dev/components/augment/instructions/quality-gates.instructions.md`
+- Testing Patterns: `platform_tta_dev/components/augment/memory/testing-patterns.memory.md`
+- Quality Gates Memory: `platform_tta_dev/components/augment/memory/quality-gates.memory.md`
 
 ### External Resources
 - pytest: https://docs.pytest.org/

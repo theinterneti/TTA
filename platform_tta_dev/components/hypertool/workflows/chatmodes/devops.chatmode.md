@@ -521,8 +521,8 @@ uv run python scripts/query_notebook_helper.py "How should Agent CLI runtimes in
 ## Resources
 
 ### TTA Documentation
-- Component Maturity: `.augment/instructions/component-maturity.instructions.md`
-- Workflow Learnings: `.augment/memory/workflow-learnings.memory.md`
+- Component Maturity: `platform_tta_dev/components/augment/instructions/component-maturity.instructions.md`
+- Workflow Learnings: `platform_tta_dev/components/augment/memory/workflow-learnings.memory.md`
 
 ### External Resources
 - Docker: https://docs.docker.com/
