@@ -400,15 +400,16 @@ Comparing `.kiro/specs/` documentation against:
 
 **Access Methods:**
 1. Logseq: Open TTA-notes → Navigate to TTA namespace
-2. Direct: `.augment/kb/TTA___Category___Page.md`
+2. Direct: `platform_tta_dev/components/augment/kb/TTA___Category___Page.md`
 3. Symlink: `~/repos/TTA-notes/logseq/pages/TTA/`
+4. Legacy symlink: `.augment/kb/` → `platform_tta_dev/components/augment/kb/`
 
 ### 4.2 Documentation Fragmentation Issues
 
 **Problem:** Documentation now exists in multiple locations:
 
 1. **`.kiro/specs/`** - Active specification documents (54 files)
-2. **`.augment/kb/`** - Knowledge Base (306 files)
+2. **`platform_tta_dev/components/augment/kb/`** - Knowledge Base (306 files) - symlinked from `.augment/kb/`
 3. **`docs/`** - Legacy documentation (many migrated)
 4. **`.github/specs/`** - Stub files pointing to KB
 5. **`.github/instructions/`** - Active instruction files (14 files)
@@ -423,7 +424,7 @@ Comparing `.kiro/specs/` documentation against:
 ### 4.3 Documentation Quality by Category
 
 #### Technical Specifications
-- **Location:** `.kiro/specs/` (primary), `.augment/kb/` (KB)
+- **Location:** `.kiro/specs/` (primary), `platform_tta_dev/components/augment/kb/` (KB)
 - **Status:** ✅ Good - Well-structured, comprehensive
 - **Issues:** Some components need more detail
 
@@ -433,7 +434,7 @@ Comparing `.kiro/specs/` documentation against:
 - **Issues:** OpenAPI/Swagger specs not generated
 
 #### Architecture Documentation
-- **Location:** `docs/architecture/`, `.augment/kb/`, copilot instructions
+- **Location:** `docs/architecture/`, `platform_tta_dev/components/augment/kb/`, copilot instructions
 - **Status:** ✅ Good - Multi-agent patterns well-documented
 - **Issues:** System diagrams need updating
 

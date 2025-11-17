@@ -24,7 +24,7 @@
 - VSCode database → `docs/setup/vscode-database.md`
 
 ### Need Architecture/Deep Docs?
-🧠 **Check `.augment/kb/`** (Logseq Knowledge Base)
+🧠 **Check `platform_tta_dev/components/augment/kb/`** (Logseq Knowledge Base)
 - 306 interconnected documents
 - Architecture, components, agents, workflows
 - Navigation guide → `docs/reference/logseq-kb.md`
@@ -41,18 +41,18 @@
 1. `CONTRIBUTING.md` - Contribution guidelines
 2. `docs/setup/dev-environment.md` - Get set up
 3. `docs/guides/testing.md` - Learn testing workflow
-4. `.augment/kb/TTA___Architecture___Docs Architecture Overview.md` - Understand system
+4. `platform_tta_dev/components/augment/kb/TTA___Architecture___Docs Architecture Overview.md` - Understand system
 
 ### Developer (Existing)
 - **Daily:** `docs/status/current-sprint.md`
+- **Architecture:** `platform_tta_dev/components/augment/kb/TTA___Architecture___*`
 - **Debugging:** `docs/guides/database-quick-ref.md`
 - **Testing:** `docs/guides/testing.md`
-- **Architecture:** `.augment/kb/TTA___Architecture___*`
 
 ### DevOps/Infrastructure
 - **Docker:** `docs/guides/docker-quick-start.md`
-- **Deployment:** `.augment/kb/TTA___Workflows___Docs Deployment*`
-- **Monitoring:** `.augment/kb/TTA___Workflows___Operations Monitoring*`
+- **Deployment:** `platform_tta_dev/components/augment/kb/TTA___Workflows___Docs Deployment*`
+- **Monitoring:** `platform_tta_dev/components/augment/kb/TTA___Workflows___Operations Monitoring*`
 
 ### QA/Testing
 - **Test Guide:** `docs/guides/testing.md`
@@ -76,7 +76,7 @@ TTA/
 │   ├── development/ → Process docs
 │   └── reference/   → Quick references
 │
-├── 🧠 Knowledge Base (.augment/kb/)
+├── 🧠 Knowledge Base (platform_tta_dev/components/augment/kb/)
 │   └── 306 docs     → Architecture, components, deep context
 │
 └── 🗄️ Archive (.archive/)
@@ -91,7 +91,7 @@ TTA/
 find docs/ -name "*test*"
 
 # Search in KB
-find .augment/kb/ -name "*Component*"
+find platform_tta_dev/components/augment/kb/ -name "*Component*"
 
 # Search in archive
 find .archive/ -name "*Phase*"
@@ -103,7 +103,7 @@ find .archive/ -name "*Phase*"
 grep -r "docker" docs/
 
 # Search KB content
-grep -r "circuit breaker" .augment/kb/
+grep -r "circuit breaker" platform_tta_dev/components/augment/kb/
 
 # Search everywhere
 grep -r "redis" . --include="*.md"
@@ -115,7 +115,7 @@ grep -r "redis" . --include="*.md"
 A: `.archive/status-reports/2025-10/` and organized by category
 
 **Q: Where's the architecture documentation?**
-A: `.augment/kb/TTA___Architecture___*` (Logseq KB)
+A: `platform_tta_dev/components/augment/kb/TTA___Architecture___*` (Logseq KB)
 
 **Q: Where are the old logs?**
 A: `.archive/logs/2025-10/` (organized by month)

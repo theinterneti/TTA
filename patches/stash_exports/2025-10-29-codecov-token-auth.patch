@@ -1,0 +1,89 @@
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 604ddd752..237871dce 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -110,29 +110,29 @@ def mock_redis_client():
+ def mock_tta_repos(tmp_path, monkeypatch):
+     """
+     Create mock TTA repository directories for orchestrator tests.
+-    
++
+     Addresses Quick Win #3 - Phase 1: Orchestrator/Docker Tests (34 failures)
+     Root Cause: Missing tta.dev and tta.prototype directories
+     """
+     tta_dev = tmp_path / "tta.dev"
+     tta_proto = tmp_path / "tta.prototype"
+-    
++
+     # Create directory structure with minimal required files
+     tta_dev.mkdir()
+     tta_proto.mkdir()
+-    
++
+     # Create src/ subdirectories to satisfy component discovery
+     (tta_dev / "src").mkdir()
+     (tta_proto / "src").mkdir()
+-    
++
+     # Create empty __init__.py files to mark as Python packages
+     (tta_dev / "src" / "__init__.py").write_text("")
+     (tta_proto / "src" / "__init__.py").write_text("")
+-    
++
+     # Monkeypatch environment variables that orchestrator uses
+     monkeypatch.setenv("TTA_DEV_PATH", str(tta_dev))
+     monkeypatch.setenv("TTA_PROTOTYPE_PATH", str(tta_proto))
+-    
++
+     return {
+         "tta_dev": tta_dev,
+         "tta_prototype": tta_proto,
+@@ -145,11 +145,11 @@ def mock_tta_repos(tmp_path, monkeypatch):
+ def mock_component_loader(mock_tta_repos, monkeypatch):
+     """
+     Mock FilesystemComponentLoader to avoid filesystem dependencies.
+-    
++
+     Used by orchestrator tests that need component loading without real filesystem access.
+     """
+     from unittest.mock import Mock
+-    
++
+     mock_loader = Mock()
+     mock_loader.root_dir = mock_tta_repos["tta_dev"]
+     mock_loader.tta_dev_path = mock_tta_repos["tta_dev"]
+@@ -157,7 +157,7 @@ def mock_component_loader(mock_tta_repos, monkeypatch):
+     mock_loader.discover_components = Mock(return_value=[])
+     mock_loader.load_component = Mock(return_value=None)
+     mock_loader.validate_paths = Mock(return_value=True)
+-    
++
+     return mock_loader
+ 
+ 
+diff --git a/tests/post_deployment/conftest.py b/tests/post_deployment/conftest.py
+index f19497a33..eac1cf3be 100644
+--- a/tests/post_deployment/conftest.py
++++ b/tests/post_deployment/conftest.py
+@@ -15,7 +15,7 @@ import pytest
+ def pytest_collection_modifyitems(items):
+     """
+     Automatically mark all tests in post_deployment/ with @pytest.mark.post_deployment.
+-    
++
+     This ensures these tests are skipped by default unless explicitly requested
+     with: pytest -m post_deployment
+     """
+@@ -28,7 +28,11 @@ def pytest_configure(config):
+     markexpr = config.getoption("markexpr", "")
+     if not markexpr or "post_deployment" not in markexpr:
+         # Skip post_deployment tests by default
+-        config.option.markexpr = "not post_deployment" if not markexpr else f"({markexpr}) and not post_deployment"
++        config.option.markexpr = (
++            "not post_deployment"
++            if not markexpr
++            else f"({markexpr}) and not post_deployment"
++        )
+ 
+ 
+ @pytest.fixture(scope="session")
