@@ -47,21 +47,21 @@ Key ideas:
 
 1. **Single entry points**: anything under `platform/dev/` is safe to copy wholesale into `theinterneti/TTA.dev` — no therapeutic PHI nearby.
 2. **Legacy shelf** keeps paused tech (.kiro, openhands, Gemini workflows) but removes them from default import paths so new agents do not autoload them.
-3. **Observability + MCP connectors** live inside `platform/dev/agentic/` so hooking Serena/ACE/Hypertool/e2b is trivial.
+- **Observability + MCP connectors** live inside `platform_tta_dev/components/` so hooking Serena/ACE/Hypertool/e2b is trivial.
 
 ## 4. Migration Phases
 
 1. **Phase 0 – Freeze & tags (current)**
    - Document authoritative inventory (this file) ✅
    - Tag directories slated for relocation via CODEOWNERS or lint rule (follow-up)
-2. **Phase 1 – Agentic primitives first (priority in user request)**
-   - Create `platform/dev/agentic/` and physically move:
-     - `.mcp.hypertool.json` → `platform/dev/agentic/hypertool/config.json`
-     - `.augment/` → `platform/dev/agentic/augment/`
-     - `.tta/` personas, metrics → `platform/dev/agentic/personas/`
-     - `.cline/` + `.clinerules/` → `platform/dev/agentic/cline/`
-     - `.serena/` + `serena/` → `platform/dev/agentic/serena/`
-   - Wire symlinks/back-compat wrappers (e.g., env vars pointing to new paths) so automation keeps running.
+2. **Phase 1 – Agentic primitives first (priority in user request)** ✅ _completed 2025-11-17_
+   - Created `platform_tta_dev/components/` and physically moved:
+     - `.mcp.hypertool.json` → `platform_tta_dev/components/hypertool/mcp/config.json`
+     - `.augment/` → `platform_tta_dev/components/augment/`
+     - `.tta/` personas, metrics → `platform_tta_dev/components/personas/`
+     - `.cline/` + `.clinerules/` → `platform_tta_dev/components/cline/`
+     - `.serena/` + `serena/` → `platform_tta_dev/components/serena/`
+   - Wired symlinks/back-compat wrappers (e.g., `.augment`, `.cline`, `.serena` symlinks at root) so automation keeps running.
 3. **Phase 2 – Tooling packages & docs**
    - Move `packages/ai-dev-toolkit/` and `packages/universal-agent-context/` under `platform/dev/packages/`
    - Consolidate TTA.dev docs: `docs/TTA_DEV_*` → `platform/dev/docs/`
@@ -77,8 +77,8 @@ Key ideas:
 
 ## 5. Immediate Work Items
 
-1. **Stand up `platform/dev` scaffold** with README + placeholder subfolders ✅ _todo pending_
-2. **Relocate agentic primitives** (hypertool, Serena, personas, cline rules) ✅ _completed 2025-11-16_: assets now live in `platform/dev/agentic/` with compatibility symlinks documented in `platform/dev/agentic/README.md`.
+1. **Stand up `platform_tta_dev` scaffold** with README + placeholder subfolders ✅ _completed 2025-11-17_
+2. **Relocate agentic primitives** (hypertool, Serena, personas, cline rules) ✅ _completed 2025-11-17_: assets now live in `platform_tta_dev/components/` with compatibility symlinks (`.augment`, `.cline`, `.serena`) at repository root. See `MIGRATION_SUMMARY.md` for complete details.
 3. **Draft deprecation notices** for `.kiro` and openhands integrations so other agents stop reviving them.
 4. **Observability hookup**: ensure Grafana/Redis/Neo4j MCP configs move with agentic workspace so telemetry remains intact.
 5. **Automation updates**: update `.vscode/settings.json`, `.devcontainer`, and `scripts/dev.sh` to look under `platform/dev` for agent assistants.
@@ -90,9 +90,9 @@ Key ideas:
 - **VS Code tasks**: existing tasks rely on root-level `.cline` hooks; plan to update `package.json`-style scripts concurrently.
 - **Knowledge base**: `.augment/logseq` replicates the Logseq KB; relocating it must not break the symlinks described in `AGENTS.md`.
 
-## 7. Next Steps (2025-11-16)
+## 7. Next Steps (2025-11-17)
 
-- [x] Create `platform/dev/agentic` tree and start moving hypertool + personas (Phase 1 kickoff) — landed 2025-11-16 with symlink bridge for existing tooling.
+- [x] Create `platform_tta_dev/components` tree and move all agentic components (Phase 1 complete) — landed 2025-11-17 with symlink bridge for existing tooling. See branch `refactor/repo-reorg`.
 - [ ] Announce legacy quarantine plan (README under `legacy/` summarizing `.kiro`, openhands, Gemini status)
 - [x] Update workspace docs (`docs/development/environment-overlays.md`) to mention new structure once scaffold lands (see “Platform Reorg Context” section).
 - [ ] Schedule automation updates (VS Code, devcontainer, scripts) once directories move

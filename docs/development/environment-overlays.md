@@ -7,21 +7,18 @@ project template, a profile-specific overlay, and a secret bundle that lives
 
 ## Platform Reorg Context
 
-TTA is in the middle of the platform split outlined in
+TTA has completed the platform split outlined in
 `docs/development/reorg/tta-separation-roadmap.md`. Environment artifacts now
 map to the following directories:
 
-- `platform/app/config/env/…`: player-facing runtime overlays and samples.
-- `platform/dev/agentic/config/env/…`: tooling overlays for Serena, ACE,
+- `app_tta/config/env/…`: player-facing runtime overlays and samples.
+- `platform_tta_dev/components/*/config/env/…`: tooling overlays for Serena, ACE,
   Hypertool, e2b, cline CLI, and other developer agents.
 - `legacy/*/config/env/…`: quarantined overlays that will be retired after the
   migration completes.
 
-As you move files into the new tree, keep overlay names stable so existing
-automation keeps working. The roadmap tracks which overlays have migrated; if
-you touch a file that still lives under the old `config/env` root, add a note to
-the roadmap so the Phase 1 (agentic) or Phase 2 (platform/app) checklist stays
-accurate.
+As of 2025-11-17, all agentic components have been migrated to `platform_tta_dev/components/`
+with backward-compatibility symlinks. See `MIGRATION_SUMMARY.md` for complete details.
 
 ## Components
 
