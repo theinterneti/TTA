@@ -11,7 +11,7 @@ TTA is an AI-powered therapeutic text adventure that combines evidence-based men
 This directory will contain:
 
 - `src/` - Application source code
-- `tests/` - Application tests  
+- `tests/` - Application tests
 - `packages/` - Application workspace packages
 - `scripts/` - Application-specific scripts
 - `docs/` - Game/therapy documentation

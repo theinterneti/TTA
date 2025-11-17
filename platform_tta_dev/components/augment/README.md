@@ -125,7 +125,7 @@ Knowledge graph management:
 
 ```bash
 # Execute structured workflow
-python .augment/workflows/test-coverage-improvement.py --component gameplay_loop
+python platform_tta_dev/components/augment/workflows/test-coverage-improvement.py --component gameplay_loop
 
 # Or reference in conversation
 "Follow the component-promotion workflow for circuit_breaker"
@@ -135,20 +135,20 @@ python .augment/workflows/test-coverage-improvement.py --component gameplay_loop
 
 ```bash
 # Load conversation context
-python .augment/context/cli.py load-session --id tta-dev-session
+python platform_tta_dev/components/augment/context/cli.py load-session --id tta-dev-session
 
 # View memory
-cat .augment/memory/circuit-breaker-implementation.memory.md
+cat platform_tta_dev/components/augment/memory/circuit-breaker-implementation.memory.md
 ```
 
 ### Query Knowledge Base
 
 ```bash
 # Search KB
-grep -r "circuit breaker pattern" .augment/kb/
+grep -r "circuit breaker pattern" platform_tta_dev/components/augment/kb/
 
 # View quick reference
-cat .augment/kb/dev-workflow-quick-reference.md
+cat platform_tta_dev/components/augment/kb/dev-workflow-quick-reference.md
 ```
 
 ## Integration Points
