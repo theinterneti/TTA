@@ -9,7 +9,7 @@
 
 **All TTA documentation is now centralized in Logseq:**
 
-- 📍 **Location:** `.augment/kb/` (symlinked to `~/repos/TTA-notes/logseq/pages/TTA/`)
+- 📍 **Location:** `platform_tta_dev/components/augment/kb/` (symlinked to `~/repos/TTA-notes/logseq/pages/TTA/`)
 - 📊 **Files:** 306 documents covering 507 documents worth of content
 - 🏷️ **Format:** Logseq-compatible with wiki-links and tags
 
