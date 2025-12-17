@@ -90,13 +90,25 @@ repos:
         types: [yaml]
         exclude: ^(.github/|docker-compose|\.codecarbon/|\.kiro/)
 
+  # AI Code Review - Gentleman Guardian Angel
+  # Runs AI review against CODE_STANDARDS.md before allowing commits
+  - repo: local
+    hooks:
+      - id: gga
+        name: Gentleman Guardian Angel (AI Code Review)
+        entry: /home/thein/.local/bin/gga run
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        always_run: true
+
   # Local custom hooks
   - repo: local
     hooks:
       # Custom hook: Check pytest-asyncio fixture decorators
       - id: check-pytest-asyncio-fixtures
         name: Check pytest-asyncio fixture decorators
-        entry: python scripts/pre-commit/check-pytest-asyncio-fixtures.py
+        entry: python3 scripts/pre-commit/check_pytest_asyncio_fixtures.py
         language: system
         types: [python]
         files: ^tests/.*\.py$
@@ -105,12 +117,22 @@ repos:
       # Custom hook: Run tests on changed files
       - id: run-tests-on-changed-files
         name: Run tests on changed files
-        entry: python scripts/pre-commit/run-tests-on-changed-files.py
+        entry: python3 scripts/pre-commit/run-tests-on-changed-files.py
         language: system
         types: [python]
         files: ^src/.*\.py$
         pass_filenames: true
         stages: [commit]
+
+  - repo: local
+    hooks:
+      - id: logseq-graph-sync
+        name: Logseq Graph Sync
+        entry: scripts/pre-commit-logseq.sh
+        language: script
+        types_or: [python, ts, javascript, markdown]
+        pass_filenames: true
+        verbose: true
 
 # Configuration for specific tools
 ci:
