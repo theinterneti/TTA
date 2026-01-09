@@ -1,5 +1,11 @@
 # recovered-tta-storytelling Bloat Analysis
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 **Date:** 2026-01-09
 **Total Size:** 24GB (!)
 **Status:** 🔴 CRITICAL - 90% of all repository disk usage
@@ -224,7 +230,7 @@ git gc --aggressive --prune=now
    - **Mitigation:** Extract requirements.txt first
    - **Document:** All Python and Node dependencies
 
-### Low Risk  
+### Low Risk
 4. **Branch Divergence** - refactor/repo-reorg branch might have changes
    - **Mitigation:** Review diff first
    - **Merge:** Cherry-pick useful changes
@@ -293,7 +299,7 @@ rm -rf recovered-tta-storytelling.OLD
 
 - [ ] Repository size < 1GB
 - [ ] No virtual environments in repo
-- [ ] No test artifacts in repo  
+- [ ] No test artifacts in repo
 - [ ] No duplicate platform/ directories
 - [ ] Clean git history (no venv commits)
 - [ ] Backup created and verified
@@ -306,3 +312,7 @@ rm -rf recovered-tta-storytelling.OLD
 **Priority:** 🔴 CRITICAL
 **Estimated Time:** 2-3 hours
 **Potential Savings:** ~23GB (95% reduction)
+
+
+---
+**Logseq:** [[TTA.dev/Bloat_analysis]]

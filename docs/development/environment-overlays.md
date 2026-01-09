@@ -1,5 +1,11 @@
 # Host-Aware Environment Overlays
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 This guide explains the new workflow for generating `.env` files that adapt to
 the local host (e.g., Ubuntu on bare metal vs. WSL). The generator merges the
 project template, a profile-specific overlay, and a secret bundle that lives

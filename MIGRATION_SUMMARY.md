@@ -1,5 +1,11 @@
 # Repository Reorganization - Migration Summary
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 **Branch:** `refactor/repo-reorg`
 **Date:** November 16-17, 2025
 **Status:** ✅ Complete (pending VS Code tasks from @cline)

@@ -1,5 +1,11 @@
 # TTA - Therapeutic Text Adventure
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 > ⚠️ **Documentation has moved to the TTA Knowledge Base!**
 >
 > **New location:** `TTA___References___Overview Document.md`

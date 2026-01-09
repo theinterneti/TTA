@@ -1,5 +1,11 @@
 # Archived Components
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 This directory contains deprecated tools and experiments that are no longer actively maintained or integrated into the TTA platform.
 
 ## Archive Policy

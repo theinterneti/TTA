@@ -1,5 +1,11 @@
 # TTA Documentation Quick Reference
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 > 🎯 **Quick navigation guide after repository cleanup**
 
 ## 📚 Where to Find Things

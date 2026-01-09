@@ -1,5 +1,11 @@
 # TTA Specification Review & Audit
 
+
+> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
+> See https://github.com/yourusername/TTA.dev for the toolkit components.
+
+
+
 **Date:** November 2, 2025
 **Auditor:** GitHub Copilot
 **Scope:** Comprehensive review of TTA project specifications, documentation, and implementation alignment

@@ -1,5 +1,8 @@
-"""Calculate totals with proper error handling."""
+"""Calculate totals with proper error handling.
 Logseq: [[TTA.dev/Gga_test_clean]]
+
+Logseq: [[TTA.dev / Gga_test_clean]]
+"""
 
 import logging
 from collections.abc import Iterable
