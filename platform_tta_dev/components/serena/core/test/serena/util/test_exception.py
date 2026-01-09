@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Util/Test_exception]]
 import os
 from unittest.mock import MagicMock, Mock, patch
 

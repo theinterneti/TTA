@@ -367,3 +367,7 @@ If tests fail:
 3. Check staging environment logs
 4. Consult [[TTA/Workflows/README|README.md]] for detailed documentation
 5. Open GitHub issue with test results and logs
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___tests e2e staging test execution guide document]]

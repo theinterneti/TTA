@@ -1,5 +1,7 @@
 """Tests for monitoring.logging_config module."""
 
+# Logseq: [[TTA.dev/Tests/Monitoring/Test_logging_config]]
+
 
 class TestLoggingConfig:
     """Tests for logging configuration module."""

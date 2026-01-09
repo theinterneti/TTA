@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_docker_component_enhanced]]
 Enhanced tests for DockerComponent.
 
 This module provides comprehensive test coverage for DockerComponent

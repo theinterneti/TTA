@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Test_openhands_with_real_credentials]]
 # ruff: noqa: ALL
 """
 Test OpenHands integration with real OpenRouter API credentials.

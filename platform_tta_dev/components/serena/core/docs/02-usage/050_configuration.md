@@ -94,3 +94,7 @@ You can manage contexts using the `mode` command,
     <serena> mode delete <mode-name>
 
 where `<serena>` is [your way of running Serena](020_running).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/050_configuration]]

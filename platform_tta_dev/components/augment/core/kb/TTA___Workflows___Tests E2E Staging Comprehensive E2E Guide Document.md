@@ -296,3 +296,7 @@ For issues or questions:
 2. Review test logs and reports
 3. Check Playwright documentation
 4. Review staging environment setup
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___tests e2e staging comprehensive e2e guide document]]

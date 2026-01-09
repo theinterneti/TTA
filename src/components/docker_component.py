@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Docker_component]]
 Docker Component.
 
 This module provides a component for managing Docker configurations across repositories.

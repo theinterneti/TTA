@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Api_gateway/Interfaces/Patient_api]]
 Patient Interface API Endpoints
 Provides therapeutic gaming and patient-focused functionality
 """

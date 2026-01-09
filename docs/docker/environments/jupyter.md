@@ -230,3 +230,7 @@ To add Jupyter extensions:
 - **Consider nbdime**: Use nbdime for notebook diffing and merging
 
 For more information about Docker and container setup, see the [Docker Setup Guide](../README.md).
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Docker/Environments/Jupyter]]

@@ -359,3 +359,7 @@ After successful integration:
 ---
 
 **Integration complete!** Your project now has production-ready AI-native development primitives.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs guides integration guide document]]

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_alternative_model_ids]]
 Test alternative model IDs for OpenRouter free tier.
 
 Some models may have different naming conventions or versions available.

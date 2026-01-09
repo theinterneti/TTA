@@ -67,3 +67,7 @@ COMPOSE_PROJECT_NAME=tta-prototype
 3. Use root .env only for integration
 4. Document all variables and their purpose
 5. Consider cross-repository impacts when changing shared variables
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Environment/Env-structure]]

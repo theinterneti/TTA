@@ -65,3 +65,7 @@ Notes:
 
 ## Reference
 - Metals + sbt: [https://scalameta.org/metals/docs/build-tools/sbt](https://scalameta.org/metals/docs/build-tools/sbt)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/03-special-guides/Scala_setup_guide_for_serena]]

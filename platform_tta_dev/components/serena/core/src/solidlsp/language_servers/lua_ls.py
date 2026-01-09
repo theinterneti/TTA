@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Lua_ls]]
 Provides Lua specific instantiation of the LanguageServer class using lua-language-server.
 """
 

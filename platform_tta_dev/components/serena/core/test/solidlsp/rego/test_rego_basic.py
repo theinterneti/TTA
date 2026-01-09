@@ -1,5 +1,7 @@
 """Tests for Rego language server (Regal) functionality."""
 
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Rego/Test_rego_basic]]
+
 import os
 import sys
 

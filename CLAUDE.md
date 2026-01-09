@@ -17,3 +17,7 @@
 **See AGENTS.md for complete KB navigation guide.**
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Claude]]

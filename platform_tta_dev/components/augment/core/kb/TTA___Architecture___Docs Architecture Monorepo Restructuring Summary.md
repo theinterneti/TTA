@@ -329,3 +329,7 @@ The restructuring maintains all git history, passes all quality checks, and prov
 **Date**: 2025-10-21
 **Branch**: `pre-restructure-backup`
 **Ready for**: Merge to `main`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture monorepo restructuring summary]]

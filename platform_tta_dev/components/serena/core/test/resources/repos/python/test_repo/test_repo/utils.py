@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Test_repo/Utils]]
 Utility functions and classes demonstrating various Python features.
 """
 

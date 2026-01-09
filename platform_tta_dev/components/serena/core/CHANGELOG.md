@@ -217,3 +217,7 @@ Fixes:
 # 2025-04-01
 
 Initial public version
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Changelog]]

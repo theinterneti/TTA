@@ -357,3 +357,7 @@ model_mgmt.set_openrouter_filter(show_free_only=True)
 - `POST /api/v1/models/openrouter/filter` - Update filter settings
 
 For detailed documentation, see [FREE_MODELS_FILTER_GUIDE.md](FREE_MODELS_FILTER_GUIDE.md).
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Integration/Model_management_integration]]

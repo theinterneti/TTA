@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Tests/Visual-regression/Global-setup]]
 import { chromium, FullConfig } from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {

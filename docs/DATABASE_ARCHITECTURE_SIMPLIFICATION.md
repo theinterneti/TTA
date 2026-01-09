@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/Database Architecture Simplification - Complete! ✅.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Database_architecture_simplification]]

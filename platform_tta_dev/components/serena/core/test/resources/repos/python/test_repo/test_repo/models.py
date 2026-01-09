@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Test_repo/Models]]
 Models module that demonstrates various Python class patterns.
 """
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Test_repo/Overloaded]]
 Module demonstrating function and method overloading with typing.overload
 """
 

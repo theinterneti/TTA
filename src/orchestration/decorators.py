@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Orchestration/Decorators]]
 TTA Decorators.
 
 This module provides decorators for the TTA orchestration system.

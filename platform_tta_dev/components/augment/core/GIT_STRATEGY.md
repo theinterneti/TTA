@@ -532,3 +532,7 @@ git stash pop
 ---
 
 **Next Step:** Choose branch strategy (Option A recommended) and begin with .gitignore update.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Git_strategy]]

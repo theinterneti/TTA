@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Settings]]
 Defines settings for Solid-LSP
 """
 

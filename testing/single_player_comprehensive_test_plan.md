@@ -211,3 +211,7 @@ This document outlines a comprehensive testing strategy for TTA's single-player 
 3. **User Experience Analysis and Insights**
 4. **Technical Performance Benchmarks**
 5. **Implementation Guidelines for Optimal Model Selection**
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Single_player_comprehensive_test_plan]]

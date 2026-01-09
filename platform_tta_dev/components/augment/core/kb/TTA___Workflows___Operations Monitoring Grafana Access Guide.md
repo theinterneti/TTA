@@ -185,3 +185,7 @@ curl http://localhost:9091/api/v1/targets
 ---
 
 **🎉 Phase 1 Complete - Monitoring Infrastructure Fully Operational!**
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___operations monitoring grafana access guide]]

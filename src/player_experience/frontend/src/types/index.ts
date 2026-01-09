@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Types/Index]]
 // Common types used across the application
 
 export interface ApiResponse<T> {

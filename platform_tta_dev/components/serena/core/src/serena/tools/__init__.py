@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/__init__]]
 # ruff: noqa
 from .tools_base import *
 from .file_tools import *

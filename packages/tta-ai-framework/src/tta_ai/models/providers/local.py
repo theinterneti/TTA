@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Providers/Local]]
 Local Model Provider Implementation.
 
 This module provides local model management with hardware optimization

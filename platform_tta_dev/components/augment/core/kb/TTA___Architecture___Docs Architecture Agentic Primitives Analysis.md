@@ -501,3 +501,7 @@ TTA's existing architecture already implements many agentic primitives effective
 By focusing on these areas, TTA can build more reliable, observable, and sophisticated therapeutic AI workflows while maintaining our commitment to appropriate complexity and therapeutic safety.
 
 The recommended roadmap prioritizes reliability and observability first, aligning with our therapeutic focus and component maturity workflow. Implementation should proceed incrementally, building on existing patterns rather than introducing unnecessary complexity.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture agentic primitives analysis]]

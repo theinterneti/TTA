@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Client]]
 OpenHands SDK client wrapper.
 
 Provides:

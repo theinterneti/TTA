@@ -402,3 +402,7 @@ gh issue list --label "promotion:completed" --state closed
 - [[TTA/Components/COMPONENT_MATURITY_WORKFLOW|Component Maturity Workflow]]
 - [[TTA/Components/COMPONENT_PROMOTION_GUIDE|Component Promotion Guide]]
 - [[TTA/Components/GITHUB_PROJECT_SETUP|GitHub Project Setup]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs development component labels guide document]]

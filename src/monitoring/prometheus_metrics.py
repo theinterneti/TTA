@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Prometheus_metrics]]
 Comprehensive Prometheus metrics collection for TTA application.
 
 This module provides standardized metrics collection patterns for all TTA services,

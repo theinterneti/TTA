@@ -147,3 +147,7 @@
 
 **Last Updated:** 2025-10-11
 **Maintained By:** TTA Development Team
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Mutation_testing_quick_reference]]

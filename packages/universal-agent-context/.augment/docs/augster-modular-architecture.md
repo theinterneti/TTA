@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/Augster Modular Architecture.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Docs/Augster-modular-architecture]]

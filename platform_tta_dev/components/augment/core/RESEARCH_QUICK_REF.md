@@ -111,3 +111,7 @@ response = await query_notebook("Your question")
 ## Full Documentation
 
 See `.augment/RESEARCH_NOTEBOOK_INTEGRATION.md` for complete details.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Research_quick_ref]]

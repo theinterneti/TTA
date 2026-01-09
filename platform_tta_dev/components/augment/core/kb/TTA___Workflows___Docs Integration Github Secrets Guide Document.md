@@ -258,3 +258,7 @@ Set up staging first to test:
 - Check your existing workflows in `.github/workflows/`
 - Review your deployment guides: `PRODUCTION_DEPLOYMENT_GUIDE.md`
 - Validate configuration with: `./scripts/validate-repository-config.sh`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs integration github secrets guide document]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/__init__]]
 Comprehensive Test Battery for TTA Storytelling System
 
 This module provides comprehensive testing capabilities for the TTA storytelling system,

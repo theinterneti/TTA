@@ -3,6 +3,8 @@
 Implements contradiction detection across direct, implicit, temporal, and causal dimensions.
 """
 
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Coherence/Contradiction_detector]]
+
 from __future__ import annotations
 
 import logging

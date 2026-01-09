@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Utils/Sessionrestoration]]
 /**
  * Session Restoration Utility
  *

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Ruby_lsp]]
 Ruby LSP Language Server implementation using Shopify's ruby-lsp.
 Provides modern Ruby language server capabilities with improved performance.
 """

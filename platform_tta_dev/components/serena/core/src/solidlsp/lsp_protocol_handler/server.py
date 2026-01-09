@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Lsp_protocol_handler/Server]]
 This file provides the implementation of the JSON-RPC client, that launches and
 communicates with the language server.
 

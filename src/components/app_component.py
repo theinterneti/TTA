@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/App_component]]
 App Component.
 
 This module provides a component for managing the TTA.prototype app.

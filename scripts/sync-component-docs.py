@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Sync-component-docs]]
 TTA Component Documentation Sync Script
 
 Syncs component metrics from component-maturity-analysis.json to documentation files

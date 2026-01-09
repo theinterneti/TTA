@@ -264,3 +264,7 @@ curl -f http://staging.tta.local/health/carbon
 
 ### Final Assessment (2025-10-21)
 <!-- To be filled at end of observation period -->
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs component promotion carbon promotion github issue document]]

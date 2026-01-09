@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Utils/Metrics_collector]]
 Test Metrics Collector
 
 Collects and analyzes metrics during comprehensive testing including:

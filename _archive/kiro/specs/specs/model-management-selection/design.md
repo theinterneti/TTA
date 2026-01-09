@@ -445,3 +445,7 @@ class ModelManagementTestSuite:
 - CDN usage for model downloads
 
 This design provides a robust, scalable, and therapeutically-safe model management system that integrates seamlessly with TTA's existing architecture while providing users with maximum flexibility in their AI model choices.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Model-management-selection/Design]]

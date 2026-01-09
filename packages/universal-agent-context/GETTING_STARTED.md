@@ -268,3 +268,7 @@ cat docs/architecture/YAML_SCHEMA.md
 
 For detailed documentation, see [README.md](README.md) and [docs/](docs/).
 
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/Getting_started]]

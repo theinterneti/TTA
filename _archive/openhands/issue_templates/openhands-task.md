@@ -43,3 +43,7 @@ assignees: ''
 - Generating documentation
 
 For complex tasks requiring architectural decisions or deep context, consider using Augment Agent or GitHub Copilot instead.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Openhands/Issue_templates/Openhands-task]]

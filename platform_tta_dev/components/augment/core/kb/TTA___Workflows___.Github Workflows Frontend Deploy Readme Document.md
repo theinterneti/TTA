@@ -356,3 +356,7 @@ For issues or questions:
    - `docs/FRONTEND_DEPLOYMENT_FIX.md`
    - `src/player_experience/frontend/README.md`
 4. Contact the development team
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.github workflows frontend deploy readme document]]

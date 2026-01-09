@@ -142,3 +142,7 @@ Or use the helper script:
 - The warning about `personalization_engine` module is expected and doesn't affect pytest functionality
 - All pytest plugins are properly installed and configured
 - The fix maintains compatibility with both WSL and Docker environments through the use of `${workspaceFolder}` variable
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Fixes/Pytest_vscode_fix_summary]]

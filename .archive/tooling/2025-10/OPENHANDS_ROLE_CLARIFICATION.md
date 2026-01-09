@@ -303,3 +303,7 @@ python scripts/test_openhands_workflow.py
 **Document Owner:** TTA Development Team
 **Last Updated:** 2025-10-28
 **Status:** ✅ Clarification Complete - Ready for Verification
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Tooling/2025-10/Openhands_role_clarification]]

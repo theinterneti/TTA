@@ -321,3 +321,7 @@ Once SDK is installed, we can:
 
 **Status**: Ready for decision on OpenTelemetry SDK installation
 **Contact**: Observability integration complete, awaiting next phase approval
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___status___observability implementation status document]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/PR Automation Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Pr_automation_guide]]

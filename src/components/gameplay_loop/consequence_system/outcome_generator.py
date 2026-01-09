@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Consequence_system/Outcome_generator]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Consequence_system/Outcome_generator]]
 Outcome Generator for Therapeutic Text Adventure
 
 This module implements outcome generation functionality that creates logical,

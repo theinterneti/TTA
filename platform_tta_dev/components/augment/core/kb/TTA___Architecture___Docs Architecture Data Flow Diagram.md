@@ -440,3 +440,7 @@ CREATE TABLE analytics_events (
 - [[TTA/Architecture/component-interaction-diagram|Component Interaction Diagram]]
 - [[TTA/Architecture/database-architecture|Database Schema Documentation]]
 - [[TTA/Architecture/README|API Documentation]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture data flow diagram]]

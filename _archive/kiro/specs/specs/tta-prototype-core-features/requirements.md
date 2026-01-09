@@ -105,3 +105,7 @@ This specification focuses on creating a safe, ethical, and therapeutically effe
 4. WHEN therapeutic content is delivered THEN the system SHALL ensure it meets clinical appropriateness standards
 5. WHEN user interactions are logged THEN the system SHALL anonymize sensitive information while preserving therapeutic insights
 6. WHEN the system operates THEN it SHALL monitor and optimize energy consumption in accordance with ethical AI practices
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Tta-prototype-core-features/Requirements]]

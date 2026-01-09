@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_narrative_coherence_engine]]
 Unit tests for the Narrative Coherence Engine component.
 
 This module contains comprehensive tests for the narrative coherence engine

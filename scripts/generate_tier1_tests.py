@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Generate_tier1_tests]]
 Optimized test generation for Tier 1 modules using OpenHands integration.
 
 Generates comprehensive unit tests with:

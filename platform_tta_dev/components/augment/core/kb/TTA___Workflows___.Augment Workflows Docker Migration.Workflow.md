@@ -121,3 +121,7 @@ services:
 ---
 
 **For detailed patterns, anti-patterns, and real-world examples, see the primitive file.**
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment workflows docker migration.workflow]]

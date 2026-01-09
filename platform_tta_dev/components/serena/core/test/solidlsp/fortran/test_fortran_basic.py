@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Fortran/Test_fortran_basic]]
 Basic tests for Fortran language server integration.
 
 These tests validate some low-level LSP functionality and high-level Serena APIs.

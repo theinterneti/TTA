@@ -10,6 +10,8 @@ New code should import directly from the component modules:
 - from agent_orchestration.safety_monitoring import SafetyService
 """
 
+# Logseq: [[TTA.dev/Agent_orchestration/Therapeutic_safety]]
+
 # Re-export all symbols from new components
 from .crisis_detection import (
     CrisisAssessment,

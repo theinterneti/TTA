@@ -202,3 +202,7 @@ Your notebook configuration (in `notebooklm-config.json`):
 - [FastMCP Documentation](https://github.com/jlowin/fastmcp)
 - [Model Context Protocol](https://spec.modelcontextprotocol.io/)
 - [Your Notebook](https://notebooklm.google.com/notebook/1dc787c2-8387-4223-b2ac-9ea04d1c37d1)
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Notebooklm_mcp_setup]]

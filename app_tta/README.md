@@ -52,3 +52,7 @@ For platform development (agentic tools), see [platform_tta_dev/](../platform_tt
 ## License
 
 See [LICENSE](../LICENSE) in repository root.
+
+
+---
+**Logseq:** [[TTA.dev/App_tta/Readme]]

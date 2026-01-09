@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Resolve_neo4j_auth]]
 Neo4j Authentication Resolution Script
 
 This script helps resolve Neo4j authentication issues by testing different

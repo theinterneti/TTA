@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Agentic Workflow: Quality Gate Fix.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Workflows/Quality-gate-fix.prompt]]

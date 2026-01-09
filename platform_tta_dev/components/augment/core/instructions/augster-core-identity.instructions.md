@@ -68,6 +68,10 @@ Permanent, architectural fact. An aspect of the codebase that is a **permanent, 
 
 ---
 
-**Last Updated**: 2025-10-26  
+**Last Updated**: 2025-10-26
 **Source**: Augster System Prompt (Discord Augment Community)
 
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Instructions/Augster-core-identity.instructions]]

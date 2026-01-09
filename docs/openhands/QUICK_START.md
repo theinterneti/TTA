@@ -35,7 +35,7 @@ You should see the "Actions secrets and variables" page.
 1. Click **"New repository secret"** button
 2. Fill in the form:
    - **Name**: `OPENROUTER_API_KEY`
-   - **Secret**: 
+   - **Secret**:
      - Open your `.env` file in the TTA repository
      - Find the line: `OPENROUTER_API_KEY=sk-or-v1-...`
      - Copy everything **after** the `=` sign (the `sk-or-v1-...` part)
@@ -338,3 +338,7 @@ gh pr merge 99 --squash --delete-branch
 **Last Updated**: 2025-10-28
 **Status**: Ready for secrets configuration and testing
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Quick_start]]

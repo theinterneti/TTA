@@ -168,7 +168,7 @@ secrets/                           ❌ Not accessible
 
 ### Scenario 1: Design New API Endpoint
 ```
-User: "Design new API endpoint for player actions with proper 
+User: "Design new API endpoint for player actions with proper
        JWT authentication, input validation, and error handling."
 
 API Actions:
@@ -182,7 +182,7 @@ API Actions:
 
 ### Scenario 2: Implement Authentication
 ```
-User: "Implement JWT token validation and refresh logic with 
+User: "Implement JWT token validation and refresh logic with
        proper expiration and security headers."
 
 API Actions:
@@ -196,7 +196,7 @@ API Actions:
 
 ### Scenario 3: Add Rate Limiting
 ```
-User: "Add rate limiting to prevent abuse with different limits 
+User: "Add rate limiting to prevent abuse with different limits
        for authenticated and anonymous users."
 
 API Actions:
@@ -210,7 +210,7 @@ API Actions:
 
 ### Scenario 4: Create API Documentation
 ```
-User: "Create comprehensive OpenAPI documentation for all 
+User: "Create comprehensive OpenAPI documentation for all
        endpoints with examples and security requirements."
 
 API Actions:
@@ -257,7 +257,7 @@ class PlayerAction(BaseModel):
     action_type: str
     target_id: str
     metadata: dict = {}
-    
+
     @field_validator('action_type')
     def validate_action_type(cls, v):
         if v not in VALID_ACTIONS:
@@ -323,3 +323,7 @@ class PlayerAction(BaseModel):
 - **JWT Documentation**: https://jwt.io/
 - **TTA Architecture**: `GEMINI.md`
 
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.github/Chatmodes/Api-gateway-engineer.chatmode]]

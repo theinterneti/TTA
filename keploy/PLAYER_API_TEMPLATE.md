@@ -33,3 +33,7 @@ uv run uvicorn src.player_experience.api.app:app --host 0.0.0.0 --port 8080 &
 # Record tests
 ./record-player-api.sh
 ```
+
+
+---
+**Logseq:** [[TTA.dev/Keploy/Player_api_template]]

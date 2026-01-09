@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Agent]]
 The Serena Model Context Protocol (MCP) Server
 """
 

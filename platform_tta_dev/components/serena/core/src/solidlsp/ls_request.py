@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Ls_request]]
 from typing import TYPE_CHECKING, Any, Union
 
 from solidlsp.lsp_protocol_handler import lsp_types

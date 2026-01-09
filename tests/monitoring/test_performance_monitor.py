@@ -1,5 +1,7 @@
 """Tests for monitoring.performance_monitor module."""
 
+# Logseq: [[TTA.dev/Tests/Monitoring/Test_performance_monitor]]
+
 from src.monitoring.performance_monitor import get_performance_monitor
 
 

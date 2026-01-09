@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Test_symbol_editing]]
 Snapshot tests using the (awesome) syrupy pytest plugin https://github.com/syrupy-project/syrupy.
 Recreate the snapshots with `pytest --snapshot-update`.
 """

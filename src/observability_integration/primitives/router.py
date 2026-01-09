@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Observability_integration/Primitives/Router]]
 RouterPrimitive - LLM request routing workflow primitive.
 
 Routes LLM requests to optimal provider (cheap vs premium model) based on

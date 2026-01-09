@@ -57,3 +57,7 @@ After reading this guide, check out:
 
 - [API Reference](api.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Markdown/Test_repo/Guide]]

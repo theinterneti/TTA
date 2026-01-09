@@ -56,3 +56,7 @@ Can't see them? Scroll down or check Extensions (Ctrl+Shift+X) to ensure they're
 ---
 
 **Still stuck?** Open `.vscode/TROUBLESHOOTING_CONNECTIONS.md` for detailed troubleshooting steps.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Setup_database_connections]]

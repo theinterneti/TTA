@@ -8,6 +8,9 @@ supported-markers = [
     "sys_platform == 'linux'",
 ]
 
+[options]
+prerelease-mode = "if-necessary"
+
 [manifest]
 members = [
     "tta",

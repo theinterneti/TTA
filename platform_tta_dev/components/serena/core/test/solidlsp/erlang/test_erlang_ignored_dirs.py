@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Erlang/Test_erlang_ignored_dirs]]
 from collections.abc import Generator
 from pathlib import Path
 

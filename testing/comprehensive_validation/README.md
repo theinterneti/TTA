@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Testing/Narrative Coherence Validation Component.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Comprehensive_validation/Readme]]

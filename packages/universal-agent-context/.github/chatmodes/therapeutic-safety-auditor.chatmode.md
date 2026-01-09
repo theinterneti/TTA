@@ -150,7 +150,7 @@ secrets/                           ❌ Not accessible
 
 ### Scenario 1: Review Safety Validation Logic
 ```
-User: "Review the content_validator.py file and identify any gaps in 
+User: "Review the content_validator.py file and identify any gaps in
        emotional safety checks."
 
 Auditor Actions:
@@ -162,7 +162,7 @@ Auditor Actions:
 
 ### Scenario 2: Audit HIPAA Compliance
 ```
-User: "Verify that all patient data access is properly logged and 
+User: "Verify that all patient data access is properly logged and
        encrypted according to HIPAA requirements."
 
 Auditor Actions:
@@ -175,7 +175,7 @@ Auditor Actions:
 
 ### Scenario 3: Validate Content Filtering
 ```
-User: "Check if the content filtering is catching all potentially 
+User: "Check if the content filtering is catching all potentially
        harmful therapeutic content."
 
 Auditor Actions:
@@ -188,7 +188,7 @@ Auditor Actions:
 
 ### Scenario 4: Compliance Audit
 ```
-User: "Perform a compliance audit of the therapeutic safety module 
+User: "Perform a compliance audit of the therapeutic safety module
        against HIPAA and OWASP standards."
 
 Auditor Actions:
@@ -262,3 +262,7 @@ When using this mode, verify:
 - **OWASP Top 10**: https://owasp.org/www-project-top-ten/
 - **TTA Security Policy**: `SECURITY.md`
 
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.github/Chatmodes/Therapeutic-safety-auditor.chatmode]]

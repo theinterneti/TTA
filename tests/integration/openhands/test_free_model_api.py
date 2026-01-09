@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Openhands/Test_free_model_api]]
 Minimal API test for free model registry integration with OpenRouter.
 
 This test validates that the free model registry can successfully interact with

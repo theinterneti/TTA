@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Policy_config]]
 Policy configuration for tool execution governance.
 
 - Supports file-based YAML/JSON or environment variables

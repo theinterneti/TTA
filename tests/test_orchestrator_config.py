@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_orchestrator_config]]
 Tests for TTAConfig configuration management.
 
 This module tests the TTAConfig class to achieve comprehensive coverage

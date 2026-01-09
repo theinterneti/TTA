@@ -1,5 +1,7 @@
 """Safety validation enumerations."""
 
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Safety_validation/Enums]]
+
 from enum import Enum
 
 

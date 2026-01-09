@@ -302,3 +302,7 @@
 **Status:** Complete
 **Last Updated:** 2025-10-25
 **Related:** openhands-capability-matrix.md, openhands-decision-guide.md
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Openhands/Docs/Validation/Openhands-task-capability-matrix]]

@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Playwright.quick.config]]
 import { defineConfig, devices } from '@playwright/test';
 
 /**

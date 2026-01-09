@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Codecov Integration - Critical Fixes Applied.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Workflows/Codecov_fixes_applied]]

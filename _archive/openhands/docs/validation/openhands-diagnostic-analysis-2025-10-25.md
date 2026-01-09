@@ -230,3 +230,7 @@ The OpenHands integration failure is due to **architectural limitations of the S
 **Root Cause:** SDK Limitation (not task complexity)
 **Solution:** Use Docker/CLI mode instead of SDK mode
 **Status:** Ready for implementation
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Openhands/Docs/Validation/Openhands-diagnostic-analysis-2025-10-25]]

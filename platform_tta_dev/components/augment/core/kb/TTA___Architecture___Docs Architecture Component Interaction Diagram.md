@@ -349,3 +349,7 @@ sequenceDiagram
 - [[TTA/Architecture/data-flow-diagram|Data Flow Diagram]]
 - [[TTA/Architecture/README|API Documentation]]
 - [[TTA/Architecture/README|Agent Orchestration Guide]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture component interaction diagram]]

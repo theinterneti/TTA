@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Gui_log_viewer]]
 # mypy: ignore-errors
 import logging
 import os

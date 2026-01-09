@@ -1258,3 +1258,7 @@ async def test_character_context_isolation():
 **Last Updated:** November 2, 2025
 **Next Review:** December 2, 2025
 **Maintainer:** TTA Development Team
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Authentication-user-management/Implementation-guide]]

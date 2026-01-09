@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/GitHub Issue: Promote Carbon Component to Staging.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Carbon_promotion_github_issue]]

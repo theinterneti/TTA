@@ -358,3 +358,7 @@ If you have questions about contributing, please:
 ---
 
 **Thank you for contributing to the Universal Agent Context System!**
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___universal agent context packages universal agent context contributing document]]

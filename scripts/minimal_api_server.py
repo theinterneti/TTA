@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Minimal_api_server]]
 Minimal FastAPI Server for TTA Core Gameplay Loop Integration Testing
 
 This script creates a minimal FastAPI server that includes only the essential

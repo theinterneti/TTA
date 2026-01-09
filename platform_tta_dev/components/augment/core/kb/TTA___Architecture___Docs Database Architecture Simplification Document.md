@@ -268,3 +268,7 @@ Your database architecture is now simplified and ready for MVP development. When
 - Quick answers: `DATABASE_QUICK_REF.md`
 - Deep dive: `docs/setup/SIMPLIFIED_DOCKER_SETUP.md`
 - Migration details: `MIGRATION_COMPLETE.md`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs database architecture simplification document]]

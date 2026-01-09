@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Seed_worlds]]
 Seed therapeutic worlds into Neo4j database.
 
 This script populates the database with 5 sample therapeutic worlds

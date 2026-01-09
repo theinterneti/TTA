@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Perl_language_server]]
 Provides Perl specific instantiation of the LanguageServer class using Perl::LanguageServer.
 
 Note: Windows is not supported as Nix itself doesn't support Windows natively.

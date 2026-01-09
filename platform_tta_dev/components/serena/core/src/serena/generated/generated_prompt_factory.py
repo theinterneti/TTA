@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Generated/Generated_prompt_factory]]
 # ruff: noqa
 # black: skip
 # mypy: ignore-errors

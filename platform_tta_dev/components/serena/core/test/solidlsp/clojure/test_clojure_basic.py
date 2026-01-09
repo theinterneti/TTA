@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Clojure/Test_clojure_basic]]
 import pytest
 
 from serena.project import Project

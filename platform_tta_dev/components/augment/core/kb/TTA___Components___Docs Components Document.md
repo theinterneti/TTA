@@ -19,3 +19,7 @@ updated: 2025-11-01
 > Otherwise, see: `.augment/kb/Components/TTA Components.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs components document]]

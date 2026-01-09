@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Security/Rate_limiter]]
 Advanced rate limiting and DDoS protection system.
 
 This module provides multiple rate limiting algorithms and DDoS protection

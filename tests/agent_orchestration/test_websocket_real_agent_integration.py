@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_websocket_real_agent_integration]]
 End-to-end WebSocket communication tests with real agent integration.
 
 This module tests the complete WebSocket integration with real agent communication,

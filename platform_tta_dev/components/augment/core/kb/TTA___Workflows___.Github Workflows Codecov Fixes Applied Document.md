@@ -311,3 +311,7 @@ chmod +x codecov
 **Status**: ✅ ALL CRITICAL FIXES APPLIED
 **Total Changes**: 9 modifications across 4 workflow files
 **Expected Result**: Codecov should now receive coverage data from all test workflows
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.github workflows codecov fixes applied document]]

@@ -49,3 +49,7 @@ Basic thresholds (configurable via config):
 
 If DLQ length exceeds the threshold for an agent, a warning is logged.
 If retry activity between two polling intervals exceeds the retry spike threshold, a warning is logged.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Ai-agent-orchestration/Diagnostics]]

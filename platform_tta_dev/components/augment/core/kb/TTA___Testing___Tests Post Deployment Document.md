@@ -19,3 +19,7 @@ updated: 2025-11-01
 > Otherwise, see: `.augment/kb/Testing/Post-Deployment Integration Tests.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___testing___tests post deployment document]]

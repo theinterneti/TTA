@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Hooks/Usemobile]]
 import { useState, useEffect } from 'react';
 
 interface MobileState {

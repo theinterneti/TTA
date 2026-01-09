@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Observability/Dev_metrics]]
 Development Metrics Collection Framework
 
 Tracks execution metrics for development operations (tests, builds, quality checks)

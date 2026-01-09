@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/TTA Monorepo Restructuring Summary.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Architecture/Monorepo-restructuring-summary]]

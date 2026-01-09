@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Docker Authentication Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Authentication-guide]]

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Quick Neo4j connection test"""
 
+# Logseq: [[TTA.dev/Scripts/Quick_neo4j_test]]
+
 import sys
 
 from neo4j import GraphDatabase

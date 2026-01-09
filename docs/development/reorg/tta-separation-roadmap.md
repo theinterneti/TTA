@@ -98,3 +98,7 @@ Key ideas:
 - [ ] Schedule automation updates (VS Code, devcontainer, scripts) once directories move
 
 Once Phase 1 is complete, we can begin copying `platform/dev` into the external `TTA.dev` repository or expose it as a git submodule. For now, this roadmap keeps the effort scoped and visible to every collaborating agent.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Reorg/Tta-separation-roadmap]]

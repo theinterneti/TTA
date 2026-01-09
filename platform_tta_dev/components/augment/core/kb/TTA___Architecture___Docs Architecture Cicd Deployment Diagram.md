@@ -322,3 +322,7 @@ flowchart TB
 - [[TTA/Architecture/data-flow-diagram|Data Flow Diagram]]
 - [[TTA/Architecture/README|Deployment Guide]]
 - [GitHub Actions Workflows](../../.github/workflows/)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture cicd deployment diagram]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Providers/Ollama]]
 Ollama Provider Implementation.
 
 This module provides integration with Ollama for containerized local model

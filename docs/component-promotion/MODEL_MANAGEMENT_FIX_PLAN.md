@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Model Management Component - Detailed Fix Plan.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Model_management_fix_plan]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Privacy_service]]
 Data privacy and protection service for GDPR compliance.
 
 This service provides comprehensive data privacy features including encryption,

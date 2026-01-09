@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Narrative/Pacing_controller]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Narrative/Pacing_controller]]
 Pacing Controller for Therapeutic Text Adventure
 
 This module implements pacing control functionality that manages the rhythm

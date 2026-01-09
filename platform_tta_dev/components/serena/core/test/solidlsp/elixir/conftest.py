@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Elixir/Conftest]]
 Elixir-specific test configuration and fixtures.
 """
 

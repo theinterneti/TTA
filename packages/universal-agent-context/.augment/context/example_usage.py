@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Packages/Universal-agent-context/.augment/Context/Example_usage]]
 Example usage of AI Conversation Context Manager.
 
 This demonstrates how to use the context manager for AI-assisted development

@@ -45,3 +45,7 @@ Implements processing of player choices, consequence propagation, preference tra
 - Tagging generated evolution events with content categories for stronger bias verification
 - Persisting preference summaries across sessions via persistence layer
 - Surfacing feedback visualization to UI layer with consistent schema
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Tta-living-worlds/Player-choice-impact-system]]

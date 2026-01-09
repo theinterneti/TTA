@@ -300,3 +300,7 @@ const customReport = await runner.runWithConfig(customConfig);
 - **Quality Assurance**: Maintain high standards across all user experiences
 
 This comprehensive simulation framework provides everything needed to validate TTA's entertainment value and world-building capabilities, ensuring the platform successfully delivers therapeutic benefits through engaging gameplay while maintaining an entertainment-first approach.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Simulation-framework-overview]]

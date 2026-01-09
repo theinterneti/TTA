@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Cli/Scripts/Gen_prompt_factory]]
 Autogenerates the `prompt_factory.py` module
 """
 

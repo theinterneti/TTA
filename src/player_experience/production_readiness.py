@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Production_readiness]]
 Production readiness validation and optimization system.
 
 This module provides comprehensive production readiness checks including

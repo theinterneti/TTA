@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Haskell/Test_haskell_basic]]
 Rigorous tests for Haskell Language Server integration with Serena.
 
 Tests prove that Serena's symbol tools can:

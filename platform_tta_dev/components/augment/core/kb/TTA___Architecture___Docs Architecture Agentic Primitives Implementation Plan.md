@@ -626,3 +626,7 @@ class ToolObservabilityCollector:
 
 **Status:** Ready for implementation
 **Next Review:** After Phase 1 completion
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture agentic primitives implementation plan]]

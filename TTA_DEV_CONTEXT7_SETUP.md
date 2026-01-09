@@ -40,3 +40,7 @@
 
 ## Implementation Status
 Starting Phase 2: Core TTA.dev Configuration
+
+
+---
+**Logseq:** [[TTA.dev/Tta_dev_context7_setup]]

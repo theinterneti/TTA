@@ -243,3 +243,7 @@
 The staging environment is 90% ready for production deployment. The primary blocker is the logout functionality (Issue #51), which should be addressed immediately. After that, refresh token implementation and session timeout handling are the next priorities.
 
 With focused effort on the recommended priority order, the system should be production-ready within 2-3 weeks.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Staging-environment-next-steps]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/__init__]]
 Model Management System for TTA
 
 This package provides comprehensive AI model management capabilities including:

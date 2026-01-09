@@ -352,3 +352,7 @@ See separate template files:
 
 **Status**: Ready for Implementation
 **Last Updated**: 2025-10-22
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-implementation-plan]]

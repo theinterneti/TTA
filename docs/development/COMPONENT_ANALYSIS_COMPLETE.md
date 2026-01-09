@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Archived: TTA Component Maturity Analysis - Complete.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Component_analysis_complete]]

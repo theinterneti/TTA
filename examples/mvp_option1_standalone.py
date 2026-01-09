@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Examples/Mvp_option1_standalone]]
 MVP Option 1: Complete Standalone Example
 
 This demonstrates the full enhanced workflow without dependencies on tta_ai package.

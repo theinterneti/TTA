@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Error_recovery]]
 Error recovery manager for OpenHands integration.
 
 Provides:

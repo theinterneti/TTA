@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/🧪 Efficient Testing Guide for TTA Codebase.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Guides/Testing]]

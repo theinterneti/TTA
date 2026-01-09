@@ -109,3 +109,7 @@ For detailed information on model testing, see the [[TTA/Workflows/model-testing
 ## Conclusion
 
 The TTA project's model strategy balances performance, resource usage, and task requirements to provide the best possible experience. By using a combination of models and sophisticated selection strategies, the system can adapt to different scenarios and provide high-quality responses while managing resource constraints.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___ai framework models models guide]]

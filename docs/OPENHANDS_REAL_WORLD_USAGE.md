@@ -284,3 +284,7 @@ For issues or questions:
 2. Review `docs/OPENHANDS_ARCHITECTURE.md`
 3. Run validation tests: `python scripts/test_openhands_integration.py`
 4. Check Docker logs: `docker logs <container_id>`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands_real_world_usage]]

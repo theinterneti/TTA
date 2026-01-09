@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_privacy_service]]
 Tests for data privacy and protection service.
 
 This module tests GDPR compliance features including data encryption,

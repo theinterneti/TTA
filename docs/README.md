@@ -103,3 +103,7 @@ Complementary documentation for active development:
 ---
 
 **Questions?** Check the [Logseq KB Guide](reference/logseq-kb.md) or ask in team chat!
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Readme]]

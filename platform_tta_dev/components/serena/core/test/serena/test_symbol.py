@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Test_symbol]]
 import pytest
 
 from src.serena.symbol import LanguageServerSymbol

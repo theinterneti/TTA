@@ -111,3 +111,7 @@ Configuration is loaded from (in order of precedence):
 - Language servers run as separate processes with LSP communication
 - Memory system enables persistent project knowledge
 - Context/mode system allows workflow customization
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Claude]]

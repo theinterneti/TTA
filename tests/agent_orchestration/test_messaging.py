@@ -1,5 +1,7 @@
 """Comprehensive unit tests for agent_orchestration.messaging module."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_messaging]]
+
 from src.agent_orchestration.messaging import (
     FailureType,
     MessageResult,

@@ -408,3 +408,7 @@ Would you like to:
 1. Promote Carbon to staging now?
 2. Start fixing Model Management?
 3. Review a specific component in detail?
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___component promotion plan document]]

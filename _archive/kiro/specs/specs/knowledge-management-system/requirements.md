@@ -82,3 +82,7 @@ The Knowledge Management System is a core infrastructure component that provides
 2. WHEN knowledge contains sensitive therapeutic information THEN the system SHALL encrypt data at rest and in transit
 3. WHEN users request data deletion THEN the system SHALL remove all related knowledge while maintaining system integrity
 4. IF privacy violations are detected THEN the system SHALL alert administrators and prevent unauthorized access
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Knowledge-management-system/Requirements]]

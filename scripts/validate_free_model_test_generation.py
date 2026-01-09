@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate_free_model_test_generation]]
 Free Model Test Generation Validation Script
 
 Validates that verified free models (DeepSeek Chat) can successfully generate

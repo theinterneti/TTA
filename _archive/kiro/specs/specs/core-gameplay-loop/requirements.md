@@ -127,3 +127,7 @@ The system must balance engaging adventure mechanics with therapeutic effectiven
 3. WHEN users share experiences THEN the system SHALL provide appropriate privacy controls and consent mechanisms
 4. IF social conflicts arise THEN the system SHALL have moderation tools and conflict resolution processes that maintain therapeutic focus
 5. WHEN users prefer solo play THEN the system SHALL ensure rich, complete experiences that don't require social interaction for full therapeutic benefit
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Core-gameplay-loop/Requirements]]

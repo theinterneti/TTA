@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Openrouter_auth]]
 OpenRouter Authentication Router
 
 Provides secure authentication endpoints for OpenRouter integration including:

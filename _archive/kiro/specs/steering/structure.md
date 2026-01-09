@@ -119,3 +119,7 @@ class MyComponent(Component):
 - Use descriptive test names: `test_therapeutic_narrative_generation`
 - Include integration tests for component interactions
 - Maintain 80%+ coverage for therapeutic pathways
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Steering/Structure]]

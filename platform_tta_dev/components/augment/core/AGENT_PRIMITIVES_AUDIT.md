@@ -621,3 +621,7 @@ The TTA project demonstrates strong understanding and implementation of AI-Nativ
 
 **Research Notebook:** `d998992e-acd6-4151-a5f2-615ac1f242f3`
 **Query Tool:** `scripts/query_notebook_helper.py`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Agent_primitives_audit]]

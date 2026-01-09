@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA/Components/Narrative_arc_orchestrator/Resolution_engine]]
 Resolution engine helpers.
 Utilities to build and apply narrative conflict resolutions.
 """

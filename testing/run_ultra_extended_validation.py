@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Run_ultra_extended_validation]]
 Ultra-Extended TTA Validation Script
 
 Comprehensive validation of the enhanced TTA Extended Session Quality Evaluation Framework

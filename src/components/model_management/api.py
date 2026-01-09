@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Api]]
 Model Management API Endpoints.
 
 This module provides FastAPI endpoints for model management functionality.

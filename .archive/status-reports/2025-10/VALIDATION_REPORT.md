@@ -307,3 +307,7 @@ Both critical systems have been validated:
 - `docs/openhands/INTEGRATION_ANALYSIS_AND_RECOMMENDATION.md`
 - `docs/openhands/INVESTIGATION_SUMMARY.md`
 - `validation_report.json`
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Validation_report]]

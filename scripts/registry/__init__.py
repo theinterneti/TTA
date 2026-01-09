@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Registry/__init__]]
 TTA Component Registry
 
 This package provides centralized component discovery and maturity tracking.

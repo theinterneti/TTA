@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Websocket_manager]]
 WebSocket connection manager for real-time agent orchestration communication.
 
 This module provides WebSocket connection lifecycle management, authentication,

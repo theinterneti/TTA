@@ -190,3 +190,7 @@ For authentication issues:
 5. Fall back to mock services if needed
 
 The system is designed to be resilient and provide clear error messages for troubleshooting authentication problems.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs testing authentication guide]]

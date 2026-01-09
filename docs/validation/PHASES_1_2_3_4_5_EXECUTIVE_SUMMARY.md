@@ -319,3 +319,7 @@ We've successfully:
 ---
 
 **End of Phases 1, 2, 3, 4 & 5 Executive Summary**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Phases_1_2_3_4_5_executive_summary]]

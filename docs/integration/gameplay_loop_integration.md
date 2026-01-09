@@ -299,3 +299,7 @@ The integration provides several extension points for future development:
 - **Third-party Integrations**: APIs for external therapeutic tools and services
 - **Advanced AI Features**: Integration with additional AI models and services
 - **Reporting and Analytics**: Comprehensive therapeutic outcome reporting
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Integration/Gameplay_loop_integration]]

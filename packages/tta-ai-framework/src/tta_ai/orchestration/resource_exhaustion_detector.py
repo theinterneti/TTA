@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Resource_exhaustion_detector]]
 Resource exhaustion detection with configurable thresholds.
 
 Provides comprehensive resource monitoring and exhaustion detection

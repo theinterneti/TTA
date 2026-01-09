@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/Alerting]]
 Minimal alerting interfaces to satisfy monitoring package imports during tests.
 
 These stubs can be expanded later; for now, they provide structure needed by monitoring.__init__.

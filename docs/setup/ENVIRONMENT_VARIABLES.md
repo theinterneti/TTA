@@ -119,3 +119,7 @@ This allows for repository-specific overrides while maintaining common infrastru
 3. When adding new variables, consider which level they belong to
 4. Use comments to explain the purpose of variables
 5. Regularly review and clean up unused variables
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Environment_variables]]

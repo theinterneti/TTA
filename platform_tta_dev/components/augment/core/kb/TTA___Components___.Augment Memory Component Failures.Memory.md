@@ -455,3 +455,7 @@ Before promoting a component, ensure:
 ---
 
 **Note:** This file should be updated whenever a component fails quality gates or when new anti-patterns are discovered.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___.augment memory component failures.memory]]

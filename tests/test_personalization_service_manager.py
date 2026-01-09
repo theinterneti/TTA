@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_personalization_service_manager]]
 Unit tests for PersonalizationServiceManager.
 
 Tests the therapeutic personalization service, real-time adaptation,

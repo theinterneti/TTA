@@ -425,3 +425,7 @@ Your production deployment is ready when:
 ---
 
 **Need help?** Check the troubleshooting section or run `./scripts/validate-repository-config.sh` for configuration validation.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs deployment production deployment guide document]]

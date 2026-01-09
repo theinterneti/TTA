@@ -360,3 +360,7 @@ uv run pytest tests/test_model_management.py -v --cov=src/components/model_manag
 **Last Updated**: 2025-10-08
 **Updated By**: The Augster
 **Status**: Fix plan complete, awaiting implementation
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs component promotion model management fix plan document]]

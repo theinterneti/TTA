@@ -584,3 +584,7 @@ def test_player_interaction(mock_player, game_session):
 ---
 
 **Note:** This file should be updated with new testing patterns as they are discovered and validated.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Memory/Testing-patterns.memory]]

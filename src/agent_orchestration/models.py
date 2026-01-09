@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Models]]
 Core data models for Agent Orchestration.
 
 These minimal pydantic models define the contract for agent communication and

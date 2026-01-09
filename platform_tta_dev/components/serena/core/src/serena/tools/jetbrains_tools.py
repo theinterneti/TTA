@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/Jetbrains_tools]]
 import json
 
 from serena.tools import Tool, ToolMarkerOptional, ToolMarkerSymbolicRead

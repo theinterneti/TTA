@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Test_openhands_real_api]]
 Test OpenHands integration helpers with real API calls.
 
 This script tests the helper functions with actual OpenRouter API calls

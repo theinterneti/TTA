@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/AI Dev Toolkit - Packaging Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Ai-dev-toolkit/Docs/Packaging_guide]]

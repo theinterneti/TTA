@@ -316,3 +316,7 @@ The solution is straightforward: switch from SDK mode to Docker runtime mode. No
 **Date:** 2025-10-25
 **Status:** Ready for Implementation
 **Next Review:** After Phase 1 completion
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Openhands/Docs/Validation/Openhands-investigation-final-report]]

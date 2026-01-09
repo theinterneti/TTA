@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Services/Hardware_detector]]
 Hardware Detection Service.
 
 This module provides comprehensive hardware detection capabilities to

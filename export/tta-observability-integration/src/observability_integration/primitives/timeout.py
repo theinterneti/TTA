@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Export/Tta-observability-integration/Src/Observability_integration/Primitives/Timeout]]
 TimeoutPrimitive - Timeout enforcement workflow primitive.
 
 Wraps async operations with configurable timeouts to prevent hanging workflows.

@@ -307,3 +307,7 @@ async def get_player_data(player_id: str) -> dict:
 
 **Last Updated**: 2025-10-22
 **Maintainer**: theinterneti
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Instructions/Global.instructions]]

@@ -341,3 +341,7 @@ uv run pytest tests/test_*_generated.py --cov=src/agent_orchestration --cov-repo
 **Status:** ✅ PRODUCTION-READY
 **Last Updated:** 2025-10-24
 **Next Review:** After first batch generation
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___test generation workflow guide document]]

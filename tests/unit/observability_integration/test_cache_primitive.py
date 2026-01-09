@@ -1,5 +1,7 @@
 """Unit tests for CachePrimitive (wrapper-based implementation)."""
 
+# Logseq: [[TTA.dev/Tests/Unit/Observability_integration/Test_cache_primitive]]
+
 import json
 from unittest.mock import AsyncMock, MagicMock
 

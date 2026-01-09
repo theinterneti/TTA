@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Auth]]
 Authentication and authorization utilities for the Player Experience API.
 
 This module provides JWT token handling, password hashing, and authentication

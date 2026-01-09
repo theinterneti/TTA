@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Platform_tta_dev/Components/Cline/Core/Rules/Hooks/Pre_task_persona_detection]]
 #!/usr/bin/env node
 /**
  * TTA.dev Persona Detection Hook

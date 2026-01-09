@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Util/Git]]
 import logging
 
 from sensai.util.git import GitStatus

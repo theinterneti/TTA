@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/TTA Data Flow Diagram.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Architecture/Data-flow-diagram]]

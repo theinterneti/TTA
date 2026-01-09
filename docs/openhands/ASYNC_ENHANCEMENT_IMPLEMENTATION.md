@@ -244,3 +244,7 @@ if result.openhands_task_ids:
 **Estimated Effort**: 2-3 hours
 **Priority**: Medium (Performance optimization)
 **Risk**: Low (Backward compatible)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Async_enhancement_implementation]]

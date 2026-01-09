@@ -385,3 +385,7 @@ The configuration is production-ready and aligned with our WSL2 solo developer w
 **For detailed usage instructions, see:** `docs/PRE_COMMIT_HOOKS.md`
 
 **For setup, run:** `./scripts/setup-pre-commit.sh --run-all`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Pre_commit_enhancement_summary]]

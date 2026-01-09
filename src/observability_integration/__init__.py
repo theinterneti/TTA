@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Observability_integration/__init__]]
 Observability Integration Package
 
 Comprehensive observability and monitoring integration for TTA platform.

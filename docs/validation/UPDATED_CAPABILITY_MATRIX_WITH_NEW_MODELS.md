@@ -289,3 +289,7 @@ Successfully expanded model coverage from 5 to 7 production-ready models. Identi
 ---
 
 **End of Updated Capability Matrix**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Updated_capability_matrix_with_new_models]]

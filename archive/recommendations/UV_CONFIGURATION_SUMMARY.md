@@ -451,3 +451,7 @@ pkill -f 'vscode-server'
 **UV Version:** 0.8.17
 **Python Version:** 3.12.3
 **Environment:** WSL2 + VS Code Remote
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Recommendations/Uv_configuration_summary]]

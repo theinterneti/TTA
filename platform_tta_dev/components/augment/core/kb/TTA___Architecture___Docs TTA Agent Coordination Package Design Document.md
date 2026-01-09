@@ -314,3 +314,7 @@ dev = [
 
 **Status:** 🔄 IN PROGRESS - Design phase
 **Estimated Completion:** 2025-10-30
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs tta agent coordination package design document]]

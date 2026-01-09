@@ -193,3 +193,7 @@ Shared observability core provides:
 **Status**: Phase 2 in progress
 **Last Updated**: 2025-11-16
 **Tracking**: See GitHub issues #126-129
+
+
+---
+**Logseq:** [[TTA.dev/Refactor_strategy]]

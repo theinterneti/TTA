@@ -1,5 +1,7 @@
 """Therapeutic content validation with comprehensive safety analysis."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Therapeutic_scoring/Validator]]
+
 from __future__ import annotations
 
 from typing import Any
@@ -15,6 +17,7 @@ class TherapeuticValidator:
     def __init__(
         self, config: dict[str, Any] | None = None, config_path: str | None = None
     ) -> None:
+        print("DEBUG: Loading TherapeuticValidator from source")
         if config_path and not config:
             cfg = SafetyRuleEngine.load_config(config_path)
         else:
@@ -131,6 +134,22 @@ class TherapeuticValidator:
             alternative_content=alternative_content,
             monitoring_flags=monitoring_flags,
         )
+
+    def suggest_alternative(
+        self, text: str, findings: list[Any], level: SafetyLevel
+    ) -> str | None:
+        """
+        Suggest a therapeutic alternative for the given text.
+        
+        Args:
+            text: The original text
+            findings: List of safety findings
+            level: The safety level
+            
+        Returns:
+            Suggested alternative text or None
+        """
+        return self._generate_therapeutic_alternative(text, findings, level)
 
     def _calculate_comprehensive_score(
         self,

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Testing/TTA Comprehensive Simulation Testing Framework.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Simulation/Readme]]

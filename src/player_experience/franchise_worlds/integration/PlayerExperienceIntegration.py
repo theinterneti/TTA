@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Integration/Playerexperienceintegration]]
 Player Experience Integration for Franchise World System
 
 This module provides the bridge between the TypeScript franchise world system

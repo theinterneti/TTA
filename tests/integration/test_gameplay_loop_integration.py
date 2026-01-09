@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_gameplay_loop_integration]]
 Integration tests for the Core Gameplay Loop system.
 
 These tests validate the complete flow from user authentication through

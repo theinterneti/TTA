@@ -30,3 +30,7 @@ should not occur too often, unless the task is very large or complicated.
 When it comes to serena AND git-worktree AND larger projects (that take longer to index),
 the recommended way is to COPY your `$ORIG_PROJECT/.serena/cache` to `$GIT_WORKTREE/.serena/cache`.
 Perform [pre-indexing of your project](indexing) to avoid having to re-index per each worktree you create.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/999_additional-usage]]

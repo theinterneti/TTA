@@ -88,3 +88,7 @@ installations. This was so messy to get right that we pivoted to a web-dashboard
 Not only are LLMs notoriously bad in counting, but also the line numbers change after edit operations,
 and LLMs are also often too dumb to understand that they should update the line numbers information they had
 received before. We pivoted to string-matching and symbol-name based editing.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Lessons_learned]]

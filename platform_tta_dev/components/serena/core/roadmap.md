@@ -61,3 +61,7 @@ The technologies and approaches taken in Serena can be used for various research
 - Develop a web app to quantitatively compare the performance of various agents by scraping PRs and manually crafted metadata.
   The main metric for coding agents should be *developer experience*, and that is hard to grasp and is poorly correlated with
   performance on current benchmarks.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Roadmap]]

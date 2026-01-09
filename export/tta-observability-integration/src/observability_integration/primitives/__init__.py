@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Export/Tta-observability-integration/Src/Observability_integration/Primitives/__init__]]
 Observability-enabled workflow primitives.
 
 This package provides the missing agentic primitives identified in the

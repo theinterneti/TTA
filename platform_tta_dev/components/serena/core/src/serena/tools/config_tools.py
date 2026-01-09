@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/Config_tools]]
 from serena.config.context_mode import SerenaAgentMode
 from serena.tools import Tool, ToolMarkerDoesNotRequireActiveProject, ToolMarkerOptional
 

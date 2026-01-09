@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_orchestrator_decorators]]
 Tests for orchestration decorators.
 
 This module tests the decorator functions in src/orchestration/decorators.py

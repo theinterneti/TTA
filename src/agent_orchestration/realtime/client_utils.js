@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Agent_orchestration/Realtime/Client_utils]]
 /**
  * WebSocket client utilities for TTA Agent Orchestration real-time communication.
  *

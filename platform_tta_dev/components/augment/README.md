@@ -243,3 +243,7 @@ Augment is configured via:
 - `platform_tta_dev/components/hypertool/` - MCP server orchestration
 - `platform_tta_dev/components/serena/` - Code analysis toolkit
 - `platform_tta_dev/components/personas/` - Agent persona definitions
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Readme]]

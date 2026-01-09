@@ -365,3 +365,7 @@ scripts/test_openhands_models_comprehensive.py
 **Start with:** openhands-capability-matrix.md
 **Questions?** See openhands-decision-guide.md
 **Need examples?** See openhands-concrete-examples.md
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Openhands_matrix_index]]

@@ -31,29 +31,29 @@ from tta_agent_coordination import AgentId, AgentMessage, MessageResult
 
 class MessageCoordinator(ABC):
     """Abstract interface for agent message coordination."""
-    
+
     @abstractmethod
     async def send_message(
-        self, 
-        sender: AgentId, 
-        recipient: AgentId, 
+        self,
+        sender: AgentId,
+        recipient: AgentId,
         message: AgentMessage
     ) -> MessageResult:
         """
         Send a message to a specific agent.
-        
+
         Args:
             sender: Sending agent identifier
             recipient: Receiving agent identifier
             message: Message to send
-            
+
         Returns:
             MessageResult with delivery status
-            
+
         Raises:
             MessageCoordinatorError: If delivery fails
         """
-    
+
     @abstractmethod
     async def broadcast_message(
         self,
@@ -63,16 +63,16 @@ class MessageCoordinator(ABC):
     ) -> list[MessageResult]:
         """
         Broadcast a message to multiple agents.
-        
+
         Args:
             sender: Sending agent identifier
             message: Message to broadcast
             recipients: List of recipient agent identifiers
-            
+
         Returns:
             List of MessageResult (one per recipient)
         """
-    
+
     @abstractmethod
     def subscribe_to_messages(
         self,
@@ -81,15 +81,15 @@ class MessageCoordinator(ABC):
     ) -> MessageSubscription:
         """
         Subscribe an agent to specific message types.
-        
+
         Args:
             agent_id: Agent identifier
             message_types: List of message types to subscribe to
-            
+
         Returns:
             MessageSubscription handle
         """
-    
+
     @abstractmethod
     async def receive(
         self,
@@ -98,28 +98,28 @@ class MessageCoordinator(ABC):
     ) -> ReceivedMessage | None:
         """
         Reserve the next available message with visibility timeout.
-        
+
         Args:
             agent_id: Agent identifier
             visibility_timeout: Seconds before message becomes visible again
-            
+
         Returns:
             ReceivedMessage if available, None otherwise
         """
-    
+
     @abstractmethod
     async def ack(self, agent_id: AgentId, token: str) -> bool:
         """
         Acknowledge successful message processing.
-        
+
         Args:
             agent_id: Agent identifier
             token: Reservation token from receive()
-            
+
         Returns:
             True if acknowledged, False if token not found
         """
-    
+
     @abstractmethod
     async def nack(
         self,
@@ -130,29 +130,29 @@ class MessageCoordinator(ABC):
     ) -> bool:
         """
         Negative-acknowledge message with retry/DLQ logic.
-        
+
         Args:
             agent_id: Agent identifier
             token: Reservation token from receive()
             failure: Failure type (TRANSIENT, PERMANENT, TIMEOUT)
             error: Optional error message
-            
+
         Returns:
             True if processed, False if token not found
         """
-    
+
     @abstractmethod
     async def recover_pending(self, agent_id: AgentId | None = None) -> int:
         """
         Recover expired reservations back to ready queues.
-        
+
         Args:
             agent_id: Specific agent or None for all agents
-            
+
         Returns:
             Number of messages recovered
         """
-    
+
     @abstractmethod
     async def configure(
         self,
@@ -165,7 +165,7 @@ class MessageCoordinator(ABC):
     ) -> None:
         """
         Update coordinator configuration at runtime.
-        
+
         Args:
             queue_size: Maximum queue size (default: 10000)
             retry_attempts: Max retry attempts (default: 3)
@@ -182,20 +182,20 @@ Abstract base class for agent registration and discovery.
 ```python
 class AgentRegistry(ABC):
     """Abstract interface for agent registration and discovery."""
-    
+
     @abstractmethod
     def register(self, agent: Agent) -> None:
         """Register an agent."""
-    
+
     @abstractmethod
     def deregister(self, agent_id: AgentId) -> None:
         """Deregister an agent."""
-    
+
     @abstractmethod
     async def list_registered(self) -> list[dict[str, Any]]:
         """
         List all registered agents with liveness status.
-        
+
         Returns:
             List of agent info dictionaries with keys:
             - name: Agent name
@@ -205,11 +205,11 @@ class AgentRegistry(ABC):
             - last_heartbeat: Timestamp
             - capabilities: Optional capability set
         """
-    
+
     @abstractmethod
     def start_heartbeats(self) -> None:
         """Start background heartbeat task."""
-    
+
     @abstractmethod
     def stop_heartbeats(self) -> None:
         """Stop background heartbeat task."""
@@ -228,16 +228,16 @@ from pydantic import BaseModel, Field
 
 class AgentId(BaseModel):
     """Generic agent identifier."""
-    
+
     type: str = Field(
-        ..., 
+        ...,
         description="Agent type identifier (e.g., 'input_processor', 'world_builder')"
     )
     instance: str | None = Field(
         default=None,
         description="Optional instance identifier for sharded/pooled agents"
     )
-    
+
     # Usage
     agent = AgentId(type="input_processor", instance="worker-1")
 ```
@@ -269,7 +269,7 @@ class MessageType(str, Enum):
 ```python
 class AgentMessage(BaseModel):
     """Generic agent message."""
-    
+
     message_id: str = Field(..., min_length=6)
     sender: AgentId
     recipient: AgentId
@@ -284,7 +284,7 @@ class AgentMessage(BaseModel):
 ```python
 class MessageResult(BaseModel):
     """Result of message delivery attempt."""
-    
+
     message_id: str
     delivered: bool
     error: str | None = None
@@ -295,7 +295,7 @@ class MessageResult(BaseModel):
 ```python
 class ReceivedMessage(BaseModel):
     """Message received with reservation token."""
-    
+
     token: str
     queue_message: QueueMessage
     visibility_deadline: str | None = None
@@ -346,12 +346,12 @@ received = await coordinator.receive(agent_id, visibility_timeout=10)
 if received:
     # Process message
     success = await process_message(received.queue_message.message)
-    
+
     if success:
         await coordinator.ack(agent_id, received.token)
     else:
         await coordinator.nack(
-            agent_id, 
+            agent_id,
             received.token,
             failure=FailureType.TRANSIENT,
             error="Processing failed"
@@ -454,23 +454,23 @@ from typing import Protocol
 
 class MessageMetrics(Protocol):
     """Optional metrics protocol for message coordination."""
-    
+
     def inc_delivered_ok(self, count: int) -> None:
         """Increment successful deliveries."""
-    
+
     def inc_delivered_error(self, count: int) -> None:
         """Increment delivery errors."""
-    
+
     def inc_retries_scheduled(
-        self, 
-        count: int, 
+        self,
+        count: int,
         last_backoff_seconds: float
     ) -> None:
         """Increment retry scheduling."""
-    
+
     def inc_nacks(self, count: int) -> None:
         """Increment negative acknowledgments."""
-    
+
     def inc_permanent(self, count: int) -> None:
         """Increment permanent failures (DLQ)."""
 ```
@@ -495,3 +495,7 @@ class AgentRegistryError(Exception):
 **Status:** 📋 SPECIFICATION COMPLETE
 **Next:** Create extraction specification document
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Tta_agent_coordination_api]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Auth_service]]
 Enhanced authentication service with MFA and RBAC support.
 
 This service provides comprehensive authentication, authorization, and security

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Utils/Normalization]]
 Normalization helpers for therapeutic settings.
 
 Centralizes alias mapping for TherapeuticApproach and IntensityLevel so both

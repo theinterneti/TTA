@@ -12,3 +12,7 @@ Therefore, you can think of Serena as providing IDE-like tools to your LLM/codin
 With it, the agent no longer needs to read entire files, perform grep-like searches or string replacements to find and
 edit the right code.
 Instead, it can use code-centred tools like `find_symbol`, `find_referencing_symbols` and `insert_after_symbol`.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/000_intro]]

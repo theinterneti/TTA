@@ -27,3 +27,7 @@ try to do an automatic install based on freeform instructions.
    }
 
 ```
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Llms-install]]

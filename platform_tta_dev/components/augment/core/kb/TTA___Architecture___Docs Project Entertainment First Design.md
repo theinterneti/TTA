@@ -246,3 +246,7 @@ const App = () => {
 ## Conclusion
 
 The entertainment-first design transformation successfully shifts the TTA platform from a clinical interface to an engaging gaming experience while maintaining all therapeutic benefits. This approach reduces stigma, increases engagement, and delivers therapeutic value through natural, enjoyable interactions.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs project entertainment first design]]

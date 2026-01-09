@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_session_engine_integration]]
 Integration tests for session engine.
 
 Tests the complete session lifecycle:

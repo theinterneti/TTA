@@ -412,3 +412,7 @@ knowledge_management:
 2. **Vector Sharding**: Distributed vector storage for large datasets
 3. **Cache Clustering**: Redis clustering for high availability
 4. **Load Balancing**: Request distribution across service instances
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Knowledge-management-system/Design]]

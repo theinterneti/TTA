@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_websocket_chat_typing_and_metrics]]
 Tests for typing indicators and observability metrics in WebSocket chat.
 """
 

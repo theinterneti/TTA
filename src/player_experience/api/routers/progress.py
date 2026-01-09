@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Progress]]
 Progress router exposing minimal endpoints for progress visualization and summaries.
 """
 

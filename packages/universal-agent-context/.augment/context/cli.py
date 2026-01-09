@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Packages/Universal-agent-context/.augment/Context/Cli]]
 CLI tool for managing AI conversation contexts.
 
 Usage:

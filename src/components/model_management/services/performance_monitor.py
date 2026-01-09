@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Services/Performance_monitor]]
 Performance Monitoring Service.
 
 This module provides real-time performance tracking and metrics collection

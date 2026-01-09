@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Integration/Gameplay_loop_integration]]
 Gameplay Loop Integration Module
 
 This module provides integration between the Core Gameplay Loop system and existing

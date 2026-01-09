@@ -8,6 +8,8 @@ to prevent import errors in existing tests.
 TODO: Extract full implementation from therapeutic_safety.py.backup lines 2771-3347
 """
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_monitoring/Dashboard]]
+
 from __future__ import annotations
 
 from typing import Any

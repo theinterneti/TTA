@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Gameplay_loop_controller]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Gameplay_loop_controller]]
 Production Therapeutic GameplayLoopController Implementation
 
 This module provides production-ready session lifecycle management with seamless

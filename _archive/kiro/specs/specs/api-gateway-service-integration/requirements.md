@@ -127,3 +127,7 @@ The gateway will serve as the primary interface between client applications and 
 3. WHEN performance metrics are needed THEN the system SHALL expose Prometheus-compatible metrics for monitoring dashboards
 4. WHEN therapeutic safety events occur THEN the logging SHALL create audit trails suitable for clinical review
 5. IF compliance reporting is required THEN the system SHALL generate reports on API usage, security events, and therapeutic interactions
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Api-gateway-service-integration/Requirements]]

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Util/Logging]]
 import queue
 import threading
 from collections.abc import Callable

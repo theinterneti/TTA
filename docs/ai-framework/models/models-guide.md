@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Models Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Ai-framework/Models/Models-guide]]

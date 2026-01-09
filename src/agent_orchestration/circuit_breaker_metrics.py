@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Circuit_breaker_metrics]]
 Circuit breaker metrics integration with existing metrics system.
 
 Provides structured logging with correlation IDs and metrics collection

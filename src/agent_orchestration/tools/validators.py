@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Validators]]
 Tool validators for naming conventions and description quality (Phase 3 Tool Optimization).
 
 Provides validation for:

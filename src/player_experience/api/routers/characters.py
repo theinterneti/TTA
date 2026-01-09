@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Characters]]
 Character management router for the Player Experience API.
 
 This module provides REST endpoints for character management with

@@ -462,3 +462,7 @@ if summary['system']['success_rate'] < 0.9:
 ---
 
 **Last Updated:** October 25, 2025
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___agent orchestration openhands integration integration guide document]]

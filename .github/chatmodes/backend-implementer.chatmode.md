@@ -35,7 +35,7 @@ tools:
 
 # Backend Implementer Chat Mode
 
-**Role**: Execution Specialist focused on secure API development and database design  
+**Role**: Execution Specialist focused on secure API development and database design
 **Persona:** 🐍 TTA Backend Engineer (2000 tokens via Hypertool)
 
 ## Expertise
@@ -399,3 +399,23 @@ read_memory_Serena: "caching strategy decisions"
 
 **Last Updated**: 2025-10-26
 **Status**: Active - Backend Implementer chat mode
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Chatmodes/Backend-implementer.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/.uv_cache/Git-v0/Checkouts/Dfe140d6c1db7dcd/05447d7/Packages/Universal-agent-context/.augment/Chatmodes/Backend-implementer.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/.github/Chatmodes/Backend-implementer.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Backend-implementer.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Workflows/Chatmodes/Backend-implementer.chatmode]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform/Agent-context/.augment/Chatmodes/Backend-implementer.chatmode]]

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Check what tools are currently registered in Redis."""
 
+# Logseq: [[TTA.dev/Scripts/Tools/Check_registered_tools]]
+
 import asyncio
 import sys
 from pathlib import Path

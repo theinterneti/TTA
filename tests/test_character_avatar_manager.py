@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_character_avatar_manager]]
 Unit tests for CharacterAvatarManager.
 """
 

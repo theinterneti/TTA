@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/Core]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/Core]]
 Core Data Models for Gameplay Loop
 
 This module defines the fundamental data structures for the therapeutic text adventure

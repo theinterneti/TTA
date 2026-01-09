@@ -314,3 +314,7 @@ The testing demonstrates that [conclusion about game-first presentation and ther
 ---
 
 *This report was generated automatically by the TTA Single-Player Testing Framework on [Date]*
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Model_comparison_matrix_template]]

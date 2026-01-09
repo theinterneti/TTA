@@ -283,3 +283,7 @@ Personas are configured via:
 - `platform_tta_dev/components/hypertool/` - MCP server orchestration
 - `platform_tta_dev/components/serena/` - Code analysis integration
 - `platform_tta_dev/components/cline/` - CLI automation hooks
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Personas/Readme]]

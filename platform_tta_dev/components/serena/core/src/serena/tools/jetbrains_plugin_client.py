@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/Jetbrains_plugin_client]]
 Client for the Serena JetBrains Plugin
 """
 

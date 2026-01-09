@@ -178,3 +178,7 @@ We're working on:
 - Better project path handling
 - Dynamic port allocation
 - Windows line-ending handling.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docker]]

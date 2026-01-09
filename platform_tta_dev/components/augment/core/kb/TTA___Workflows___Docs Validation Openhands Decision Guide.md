@@ -466,3 +466,7 @@ A: Use CLI mode for simplicity. Use Docker only if isolation is needed.
 **Status:** Complete
 **Last Updated:** 2025-10-25
 **Related:** openhands-capability-matrix.md
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs validation openhands decision guide]]

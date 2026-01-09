@@ -159,3 +159,7 @@ The OpenHands production system's **infrastructure is sound** (config loading, m
 - **Diagnostic script:** `scripts/diagnose_openhands.py`
 - **Session ID:** `openhands-test-gen-messaging-20251026-085107`
 - **Workspace:** `openhands_workspace/`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___openhands workflow test findings document]]

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Ls_manager]]
 import logging
 import threading
 from collections.abc import Iterator

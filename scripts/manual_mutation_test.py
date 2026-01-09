@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Manual_mutation_test]]
 Manual Mutation Testing Script for ModelSelector
 
 This script performs manual mutation testing by:

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Docs/Api_docs]]
 Automated API documentation generation.
 
 This module provides comprehensive API documentation generation including

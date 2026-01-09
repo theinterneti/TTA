@@ -545,3 +545,7 @@ async def get_ai_response(prompt):
 ---
 
 **Note:** Always write a regression test before fixing the bug. This ensures the bug is caught if it reappears.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment workflows bug fix.prompt]]

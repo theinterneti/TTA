@@ -352,3 +352,7 @@ For issues or questions:
 2. Review the logs: `docker-compose -f <compose-file> logs`
 3. Check environment configuration: `./scripts/switch-environment.sh --check <env>`
 4. Consult the main [[TTA/Workflows/README|README.md]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs environments environment setup guide document]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Test_repo/Variables]]
 Test module for variable declarations and usage.
 
 This module tests various types of variable declarations and usages including:

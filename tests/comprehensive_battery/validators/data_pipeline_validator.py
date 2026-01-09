@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Validators/Data_pipeline_validator]]
 Data Pipeline Validator
 
 Validates the complete data pipeline from story generation input to database storage:

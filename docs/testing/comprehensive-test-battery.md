@@ -430,3 +430,7 @@ For issues, questions, or contributions:
 5. Verify mock fallback is working correctly
 
 The comprehensive test battery is designed to be robust and provide meaningful feedback even when external dependencies are unavailable.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Comprehensive-test-battery]]

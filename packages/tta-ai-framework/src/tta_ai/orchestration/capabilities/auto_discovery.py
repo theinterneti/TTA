@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Capabilities/Auto_discovery]]
 Auto-discovery mechanisms for agent capability registration during startup.
 
 This module provides intelligent auto-discovery that automatically registers

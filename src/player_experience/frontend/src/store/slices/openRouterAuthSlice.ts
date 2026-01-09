@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Slices/Openrouterauthslice]]
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { openRouterAuthAPI } from '../../services/api';
 

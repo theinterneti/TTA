@@ -402,3 +402,7 @@ class OnboardingErrorHandler:
 **Rationale**: First impressions are critical; system failures during onboarding could permanently lose potential users.
 
 This design addresses all requirements while maintaining consistency with TTA's therapeutic focus, component architecture, and accessibility commitments. The system provides a welcoming, engaging introduction to TTA's adventure platform while establishing the foundation for personalized therapeutic experiences.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-onboarding-system/Design]]

@@ -407,3 +407,7 @@ Templates ensure consistency and prevent missing required sections.
 
 **Last Updated**: 2025-10-22
 **Maintainer**: TTA Development Team
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Instructions/Memory-capture.instructions]]

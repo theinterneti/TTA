@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Docs/__init__]]
 Documentation generation and management for the Player Experience Interface.
 
 This module provides automated documentation generation, API documentation,

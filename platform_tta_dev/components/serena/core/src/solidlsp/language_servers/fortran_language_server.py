@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Fortran_language_server]]
 Fortran Language Server implementation using fortls.
 """
 

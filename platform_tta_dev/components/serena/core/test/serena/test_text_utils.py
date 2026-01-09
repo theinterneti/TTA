@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Test_text_utils]]
 import re
 
 import pytest

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Coherence/Models]]
 from __future__ import annotations
 
 from dataclasses import dataclass, field

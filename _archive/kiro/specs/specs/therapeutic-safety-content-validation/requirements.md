@@ -115,3 +115,7 @@ Building upon TTA's commitment to therapeutic effectiveness and user safety, thi
 3. WHEN therapeutic goals change THEN the system SHALL adapt safety parameters to support new therapeutic directions
 4. IF safety measures conflict with therapeutic progress THEN the system SHALL seek clinical guidance for resolution
 5. WHEN therapeutic effectiveness is measured THEN the system SHALL account for the impact of safety interventions on outcomes
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Therapeutic-safety-content-validation/Requirements]]

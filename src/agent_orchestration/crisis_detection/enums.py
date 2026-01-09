@@ -1,5 +1,7 @@
 """Crisis detection enumerations."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Crisis_detection/Enums]]
+
 from enum import Enum
 
 

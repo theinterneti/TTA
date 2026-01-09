@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_component_agents_endpoint_and_auto_register]]
 import os
 
 import pytest

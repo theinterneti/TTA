@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Test-simple.spec]]
 import { test, expect } from '@playwright/test';
 
 test('simple test - frontend is accessible', async ({ page }) => {

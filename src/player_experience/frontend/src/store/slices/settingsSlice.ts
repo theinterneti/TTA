@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Slices/Settingsslice]]
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { settingsAPI } from '../../services/api';
 

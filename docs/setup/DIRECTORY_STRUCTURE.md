@@ -119,3 +119,7 @@ Documentation/
 │   └── README.md           # Therapeutic content README
 └── index.md                 # Documentation index
 ```
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Directory_structure]]

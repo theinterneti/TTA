@@ -231,3 +231,7 @@ The Augster instructions **complement** existing TTA instructions:
 - [[TTA/Architecture/augster-migration-guide|Migration Guide]]
 - [[TTA/Architecture/augster-usage-guide|Usage Guide]]
 - [Original Monolithic Prompt](../.augment/user_guidelines.md.backup)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___.augment docs augster modular architecture]]

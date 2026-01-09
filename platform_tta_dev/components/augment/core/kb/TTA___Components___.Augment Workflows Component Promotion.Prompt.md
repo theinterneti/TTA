@@ -524,3 +524,7 @@ gh issue create \
 ---
 
 **Note:** Always validate promotion criteria before executing promotion. Rollback is easier than fixing production issues.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___.augment workflows component promotion.prompt]]

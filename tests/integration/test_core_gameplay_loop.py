@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_core_gameplay_loop]]
 Integration Tests for Core Gameplay Loop
 
 This module contains comprehensive integration tests for the Core Gameplay Loop

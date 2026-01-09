@@ -19,3 +19,7 @@ updated: 2025-11-01
 > Otherwise, see: `.augment/kb/References/Docker and Devcontainer Setup.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___references___docs docker document]]

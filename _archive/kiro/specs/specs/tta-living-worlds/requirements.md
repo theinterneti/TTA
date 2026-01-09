@@ -95,3 +95,7 @@ This system will integrate with the existing TTA architecture, leveraging Neo4j 
 2. WHEN potentially uncomfortable or triggering content might emerge THEN the system SHALL either prevent it or handle it sensitively within the therapeutic narrative framework
 3. WHEN player behavior indicates disengagement or distress THEN the world SHALL subtly adapt to provide more supportive, therapeutic, and engaging elements
 4. IF world evolution leads to negative player experiences or therapeutic setbacks THEN the system SHALL automatically adjust course to improve both engagement and therapeutic outcomes
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Tta-living-worlds/Requirements]]

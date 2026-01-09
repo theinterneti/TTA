@@ -277,3 +277,7 @@ When using multiple MCP servers, call them in parallel when possible.
 **Status:** Active (Meta-Level Guide)
 **Last Updated:** 2025-10-22
 **Related Rules:** `use-serena-tools.md`, `use-playwright.md`, `use-context7.md`, `use-sequential-thinking.md`, `use-github.md`, `use-redis.md`, `prefer-uvx-for-tools.md`, `integrated-workflow.md`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Rules/Use-your-tools]]

@@ -195,3 +195,7 @@ python scripts/direct_llm_code_generation.py \
 **Status:** ✅ Success - Working alternative implemented and tested
 **Recommendation:** Use direct LLM API for TTA code generation needs
 **Next Steps:** Integrate into TTA development workflow and customize for project-specific requirements
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Openhands_investigation_executive_summary]]

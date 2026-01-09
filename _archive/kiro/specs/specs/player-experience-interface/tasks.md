@@ -381,3 +381,7 @@
     - Implement automated documentation generation
     - Status: Not started - Need to create production documentation and guides
     - _Requirements: System documentation and operational requirements_
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-experience-interface/Tasks]]

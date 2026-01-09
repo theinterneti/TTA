@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Privacy]]
 Privacy and data protection API endpoints.
 
 This module provides GDPR-compliant endpoints for data export, deletion,

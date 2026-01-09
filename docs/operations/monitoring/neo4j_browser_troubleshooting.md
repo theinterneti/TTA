@@ -302,3 +302,7 @@ CALL dbms.security.listUsers()
 4. **Prevention**: Always test Cypher queries with simple data types first
 
 The Neo4j browser should now work reliably with the provided safe Cypher examples!
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Operations/Monitoring/Neo4j_browser_troubleshooting]]

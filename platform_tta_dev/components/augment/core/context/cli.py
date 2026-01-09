@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Context/Cli]]
 CLI tool for managing AI conversation contexts.
 
 Usage:

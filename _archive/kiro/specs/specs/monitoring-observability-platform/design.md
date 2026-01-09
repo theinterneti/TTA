@@ -638,3 +638,7 @@ class MonitoringPlatformTests:
 **Rationale**: Enables prevention of issues before they impact therapeutic users, improving overall system reliability and user experience.
 
 This design ensures comprehensive monitoring and observability while maintaining the privacy, performance, and therapeutic focus that are essential to the TTA platform's mission.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Monitoring-observability-platform/Design]]

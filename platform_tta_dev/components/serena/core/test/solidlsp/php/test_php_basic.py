@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Php/Test_php_basic]]
 from pathlib import Path
 
 import pytest

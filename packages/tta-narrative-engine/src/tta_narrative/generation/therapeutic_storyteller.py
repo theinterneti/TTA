@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/Therapeutic_storyteller]]
 Therapeutic Storyteller for Gameplay Loop
 
 This module implements therapeutic storytelling functionality that weaves evidence-based

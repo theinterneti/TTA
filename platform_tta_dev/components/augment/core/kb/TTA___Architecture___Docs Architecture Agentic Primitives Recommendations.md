@@ -370,3 +370,7 @@ The recommended agentic primitives align closely with the GitHub blog's framewor
 **Next Review:** After team discussion
 **Owner:** Development Team
 **Stakeholders:** Product, Engineering, Therapeutic Advisory
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture agentic primitives recommendations]]

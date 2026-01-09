@@ -1,5 +1,7 @@
 """Crisis intervention management and coordination."""
 
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Crisis_detection/Manager]]
+
 from __future__ import annotations
 
 import logging

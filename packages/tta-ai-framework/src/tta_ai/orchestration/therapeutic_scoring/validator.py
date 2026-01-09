@@ -1,5 +1,7 @@
 """Therapeutic content validation with comprehensive safety analysis."""
 
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Therapeutic_scoring/Validator]]
+
 from __future__ import annotations
 
 from typing import Any
@@ -118,6 +120,25 @@ class TherapeuticValidator:
             monitoring_flags=monitoring_flags,
         )
 
+    def suggest_alternative(
+        self, 
+        original: str, 
+        reason: SafetyLevel, 
+        findings: list[Any] | None = None
+    ) -> str | None:
+        """
+        Suggest a therapeutic alternative for the given text.
+        
+        Args:
+            original: The original text
+            reason: The safety level/reason
+            findings: List of safety findings (optional)
+            
+        Returns:
+            Suggested alternative text or None
+        """
+        return self._generate_therapeutic_alternative(original, findings or [], reason)
+
     def _calculate_comprehensive_score(
         self,
         findings: list[Any],
@@ -186,6 +207,7 @@ class TherapeuticValidator:
             return (
                 "I understand you're going through a difficult time. "
                 "Let's focus on finding healthy ways to cope with these feelings. "
+                "I'm here to support you. "
                 "Would you like to talk about what's troubling you?"
             )
         if level == SafetyLevel.WARNING:

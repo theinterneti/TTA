@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Therapeutic_integration_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Therapeutic_integration_system]]
 Therapeutic Integration System Implementation
 
 This module provides production-ready therapeutic framework integration

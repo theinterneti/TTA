@@ -92,3 +92,7 @@ For platform-wide documentation, see `docs/`.
 ## Development
 
 See [REFACTOR_STRATEGY.md](../REFACTOR_STRATEGY.md) for migration protocol and architectural decisions.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Readme]]

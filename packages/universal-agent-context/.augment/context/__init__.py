@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Universal-agent-context/.augment/Context/__init__]]
 Agentic Primitives - AI Conversation Context Management
 
 Manage AI conversation context windows with automatic token counting and intelligent pruning.

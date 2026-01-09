@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Therapeutic_settings]]
 Enhanced therapeutic settings and preferences models.
 
 This module provides comprehensive therapeutic personalization models including

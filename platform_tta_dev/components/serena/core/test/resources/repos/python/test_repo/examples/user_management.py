@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Examples/User_management]]
 Example demonstrating user management with the test_repo module.
 
 This example showcases:

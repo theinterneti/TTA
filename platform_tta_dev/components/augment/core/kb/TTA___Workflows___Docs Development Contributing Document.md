@@ -73,3 +73,7 @@ Please read and follow our [[TTA/Workflows/CODE_OF_CONDUCT|Code of Conduct]].
 ## License
 
 By contributing to the TTA project, you agree that your contributions will be licensed under the project's [MIT License](../../LICENSE).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs development contributing document]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Interfaces]]
 Interfaces for Agent Orchestration components.
 
 These define contracts to be implemented by concrete backends (e.g., Redis-backed

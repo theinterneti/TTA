@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Chat]]
 WebSocket chat router for the Player Experience API.
 
 Implements authenticated WebSocket endpoint for therapeutic chat.

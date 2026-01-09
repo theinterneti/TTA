@@ -328,3 +328,7 @@ curl -X GET "http://localhost:8080/api/v1/models/available?provider=openrouter" 
 The OpenRouter Free Models Filter provides a powerful and flexible way to manage AI model costs while maintaining access to high-quality models. Whether you're developing, testing, or running production workloads, this system helps you make cost-effective choices without sacrificing functionality.
 
 Start with free models, understand your usage patterns, and scale up to paid models only when necessary. The filter system makes it easy to find the right balance between cost and capability for your specific use case.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs development free models filter guide document]]

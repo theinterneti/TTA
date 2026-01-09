@@ -311,3 +311,7 @@ The API Gateway will be deployed as a containerized service with the following c
 4. **Audit Logging**: Structured logging with correlation IDs for therapeutic compliance
 
 **Design Rationale**: This architecture provides a scalable, secure, and therapeutically-aware API gateway that can grow with the TTA platform while maintaining the highest standards for user safety and clinical compliance. The modular design allows for independent scaling and updates of different gateway components while preserving system stability.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Api-gateway-service-integration/Design]]

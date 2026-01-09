@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/Progress]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/Progress]]
 Progress Tracking Models for Gameplay Loop
 
 This module defines models for tracking therapeutic progress, character development,

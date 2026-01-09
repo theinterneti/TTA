@@ -9,3 +9,7 @@ The `legacy/` tree is where we quarantine tooling that is no longer part of the 
 | `gemini/` | Gemini workflow experiments that are on hold. |
 
 As we migrate files into these directories we will add README notes explaining why they were retired and how to re-enable them if the strategy changes.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Legacy_readme]]

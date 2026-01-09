@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Validation_schemas]]
 Enhanced validation schemas for API requests.
 
 This module provides comprehensive Pydantic models with detailed validation,

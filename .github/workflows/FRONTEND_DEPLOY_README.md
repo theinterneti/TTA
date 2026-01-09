@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Frontend Deployment Workflow Documentation.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Workflows/Frontend_deploy_readme]]

@@ -312,3 +312,7 @@ Task Type?
 **Status:** Complete
 **Last Updated:** 2025-10-25
 **Test Results:** openhands_model_test_results.json
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Openhands/Docs/Validation/Openhands-capability-matrix]]

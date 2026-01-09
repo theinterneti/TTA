@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Ls_utils]]
 This file contains various utility functions like I/O operations, handling paths, etc.
 """
 

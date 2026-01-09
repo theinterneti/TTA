@@ -449,3 +449,7 @@ After Carbon deployment:
 **Last Updated**: 2025-10-08
 **Deployed Components**: Carbon
 **Status**: Staging environment ready for Carbon component
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs deployment staging deployment guide document]]

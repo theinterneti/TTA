@@ -185,3 +185,7 @@
   - Implement API versioning documentation and migration guides
   - Create operational runbooks for deployment and troubleshooting
   - _Requirements: 2.4, 4.1_
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Api-gateway-service-integration/Tasks]]

@@ -220,3 +220,7 @@ All files in the `obsolete/` directory have been reviewed and confirmed safe for
 **Date:** 2025-10-04
 **Review Status:** ✅ APPROVED FOR DELETION
 **Deletion Date:** 2025-10-11 or later
+
+
+---
+**Logseq:** [[TTA.dev/Obsolete/Review_and_deletion_plan]]

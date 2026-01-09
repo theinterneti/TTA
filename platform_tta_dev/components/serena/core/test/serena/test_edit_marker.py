@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Test_edit_marker]]
 from serena.tools import CreateTextFileTool, ReadFileTool, Tool
 
 

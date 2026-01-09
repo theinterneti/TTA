@@ -5,6 +5,17 @@
 > **New location:** `TTA___References___Overview Document.md`
 > **Access:** See AGENTS.md for KB navigation guide
 
+## 🎮 About TTA (The Game)
+
+**TTA (Therapeutic Text Adventure)** is a narrative storytelling game designed for therapeutic purposes. This repository contains the game logic, narrative engine, and specific implementations for the TTA experience.
+
+### 🏗️ Built on TTA.dev
+
+This project is built using **[TTA.dev](../repos/TTA.dev)**, a comprehensive DevOps and infrastructure platform that provides the agentic primitives and workflow patterns used here.
+
+- **TTA (This Repo):** The Game & Narrative Content
+- **TTA.dev:** The Platform & Infrastructure
+
 ## 🗂️ TTA Knowledge Base
 
 **All TTA documentation is now centralized in Logseq:**
@@ -33,3 +44,7 @@
 **See AGENTS.md for complete KB structure and navigation guide.**
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Readme]]

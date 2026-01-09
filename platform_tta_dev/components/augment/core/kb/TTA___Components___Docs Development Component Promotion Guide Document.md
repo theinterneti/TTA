@@ -497,3 +497,7 @@ If issues are discovered after promotion:
 - [[TTA/Components/COMPONENT_MATURITY_WORKFLOW|Component Maturity Workflow]]
 - [[TTA/Components/COMPONENT_LABELS_GUIDE|Component Labels Guide]]
 - [[TTA/Components/ENVIRONMENT_SETUP_GUIDE|Environment Setup Guide]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs development component promotion guide document]]

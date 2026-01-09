@@ -316,3 +316,7 @@ The Neo4j component has **good test coverage in terms of scenarios** (20 tests c
 To achieve the 70% coverage threshold required for staging promotion, we need to refactor tests to reduce internal mocking and add integration tests with real Neo4j instances.
 
 **Recommended Timeline**: 2-3 days of focused work to achieve 70%+ coverage with confidence in production readiness.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs component promotion neo4j coverage analysis document]]

@@ -293,3 +293,7 @@ workflow = (
 ---
 
 **Bottom Line:** You have a solid foundation. The 8 improvements identified will transform good primitives into production-grade, cost-optimized, highly reliable workflow infrastructure. Start with routing, timeout, and caching this week for immediate 40% cost reduction.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Agentic_primitives_review_summary]]

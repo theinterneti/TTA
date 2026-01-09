@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Test_openhands_api_direct]]
 Test OpenHands via direct HTTP API calls to OpenRouter.
 
 This tests the most reliable and controllable access method - direct HTTP requests

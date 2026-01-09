@@ -9,3 +9,7 @@ Planned contents:
 - `docs/` – migrated `docs/TTA_DEV_*` and similar references.
 
 > Phase 1 starts by moving agentic primitives into `agentic/`. Subsequent phases will bring over packages, docs, and scripts before final export.
+
+
+---
+**Logseq:** [[TTA.dev/Platform/Dev/Readme]]

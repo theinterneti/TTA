@@ -1,5 +1,7 @@
 """Component Registry for TTA Maturity Tracking."""
 
+# Logseq: [[TTA.dev/Scripts/Registry/Component_registry]]
+
 import json
 import logging
 import re

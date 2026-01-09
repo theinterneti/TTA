@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Custom_api]]
 Custom API Provider Implementation.
 
 This module provides support for custom API providers like OpenAI, Anthropic,

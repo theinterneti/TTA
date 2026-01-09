@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/Cmd_tools]]
 Tools supporting the execution of (external) commands
 """
 

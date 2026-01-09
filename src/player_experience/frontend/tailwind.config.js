@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Tailwind.config]]
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [

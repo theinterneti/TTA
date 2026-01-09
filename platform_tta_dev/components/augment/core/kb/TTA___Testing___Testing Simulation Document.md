@@ -19,3 +19,7 @@ updated: 2025-11-01
 > Otherwise, see: `.augment/kb/Testing/TTA Comprehensive Simulation Testing Framework.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___testing___testing simulation document]]

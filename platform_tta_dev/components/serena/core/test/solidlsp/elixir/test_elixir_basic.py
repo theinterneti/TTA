@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Elixir/Test_elixir_basic]]
 Basic integration tests for the Elixir language server functionality.
 
 These tests validate the functionality of the language server APIs

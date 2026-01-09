@@ -253,3 +253,7 @@ When documentation updates can be done separately:
 **Last Updated**: 2025-10-27
 **Status**: Active - TTA Docker migration primitive
 **Detailed Workflow**: `.augment/workflows/docker-migration.workflow.md`
+
+
+---
+**Logseq:** [[TTA.dev/.github/Primitives/Docker-dependency-migration.primitive]]

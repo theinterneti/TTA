@@ -898,3 +898,7 @@ The AI Agent Orchestration system is now production-ready for therapeutic applic
   - Multi-instance auto-registration array support (specified above) not yet implemented
   - Per-instance resource recommendations accepted in config but not enforced (future integration with ResourceManager)
   - Real agent backends (IPA/WBA/NGA integration) deferred to Task 16
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Ai-agent-orchestration/Tasks]]

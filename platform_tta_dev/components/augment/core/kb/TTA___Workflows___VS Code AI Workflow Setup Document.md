@@ -420,3 +420,7 @@ Tasks: Run Task -> ✅ Quality: Run All Checks
 ---
 
 **Ready to build AI applications with intelligent workflows!** 🤖✨
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___vs code ai workflow setup document]]

@@ -132,3 +132,7 @@ $ tta-dev link  # Creates symlinks/references as needed
 
 **Last Updated**: 2025-11-16
 **Status**: Architecture Planning Phase
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Personas/Core/Tta_dev_architecture]]

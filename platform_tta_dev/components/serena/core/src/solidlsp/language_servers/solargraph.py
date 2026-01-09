@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Solargraph]]
 Provides Ruby specific instantiation of the LanguageServer class using Solargraph.
 Contains various configurations and settings specific to Ruby.
 """

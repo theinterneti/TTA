@@ -238,3 +238,7 @@ norecursedirs = archive .git __pycache__ .venv node_modules
 ---
 
 **Next Update**: After full test suite run completes
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Status/Current-sprint]]

@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Platform_tta_dev/Components/Cline/Core/Hooks/Post_tool_use_quality_assurance]]
 #!/usr/bin/env node
 /**
  * TTA.dev Post-Tool Quality Assurance Hook

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Player_profile_repository]]
 Repository for Player Profile database operations.
 
 This module provides data access layer for player profiles,

@@ -627,3 +627,7 @@ agent_orchestration:
 
 **Last Updated:** 2025-10-20
 **Maintainer:** Development Team
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture agentic primitives quick reference]]

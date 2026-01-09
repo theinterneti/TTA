@@ -342,3 +342,7 @@ CREATE INDEX [index_name] FOR (n:[NodeType]) ON (n.id)
 
 **Last Updated**: 2025-10-26
 **Status**: Template - Ready for use
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___.github specs therapeutic feature.spec]]

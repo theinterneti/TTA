@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/App]]
 Main FastAPI application for the Player Experience Interface.
 
 This module sets up the FastAPI application with middleware, error handling,

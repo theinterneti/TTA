@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/OpenHands Integration Design.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Openhands/Docs/Development/Openhands-integration-design]]

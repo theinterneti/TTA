@@ -1,5 +1,7 @@
 """Tests for agent_orchestration.interfaces module."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_interfaces]]
+
 
 class TestInterfacesModule:
     """Tests for interfaces module."""

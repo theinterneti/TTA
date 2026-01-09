@@ -250,3 +250,7 @@ curl -H "Authorization: Bearer test_token_demo" \
 **Testing Guide Version:** 1.0
 **Last Updated:** September 23, 2025
 **Compatible With:** TTA Core Gameplay Loop Integration v1.0
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs testing manual frontend testing guide]]

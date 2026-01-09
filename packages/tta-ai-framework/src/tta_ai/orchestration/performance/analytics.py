@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Performance/Analytics]]
 Performance analytics and bottleneck identification algorithms.
 
 This module provides advanced analytics for identifying performance bottlenecks,

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Tests/Test_player_experience_component_integration]]
 Player Experience Component Integration Tests
 
 This module tests the integration of the PlayerExperienceComponent with the TTA orchestration system.

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Phase 5: Pilot Promotion Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Phase5_pilot_promotion_guide]]

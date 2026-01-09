@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Playwright.coverage.config]]
 import { defineConfig, devices } from '@playwright/test';
 
 /**

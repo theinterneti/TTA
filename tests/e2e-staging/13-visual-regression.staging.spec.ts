@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/13-visual-regression.staging.spec]]
 /**
  * Visual Regression Testing Suite for TTA Staging Environment
  *

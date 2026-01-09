@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Test_wave3_facades]]
 from tta_narrative.coherence.causal_validator import CausalValidator
 from tta_narrative.coherence.coherence_validator import CoherenceValidator
 

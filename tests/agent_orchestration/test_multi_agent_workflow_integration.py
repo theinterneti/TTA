@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_multi_agent_workflow_integration]]
 Comprehensive integration tests for multi-agent workflows (Task 12.2).
 
 This module implements comprehensive integration tests for complete IPA → WBA → NGA workflows,

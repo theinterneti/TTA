@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Constants]]
 from pathlib import Path
 
 _repo_root_path = Path(__file__).parent.parent.parent.resolve()

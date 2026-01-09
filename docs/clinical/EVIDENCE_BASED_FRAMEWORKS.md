@@ -231,3 +231,7 @@ All therapeutic framework implementations must adhere to:
 - Research protocols for measuring TTA effectiveness
 
 This framework provides the clinical foundation for implementing evidence-based therapeutic interventions within the TTA platform, ensuring that all therapeutic systems are grounded in established clinical practice and research.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Clinical/Evidence_based_frameworks]]

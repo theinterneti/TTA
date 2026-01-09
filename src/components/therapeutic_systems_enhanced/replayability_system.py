@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Replayability_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Replayability_system]]
 Production Therapeutic ReplayabilitySystem Implementation
 
 This module provides safe exploration environment with outcome comparison,

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/__init__]]
 Narrative Engine Components for Gameplay Loop
 
 This module provides narrative generation, scene management, and therapeutic storytelling

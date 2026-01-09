@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Interprompt/Prompt_factory]]
 import logging
 import os
 from typing import Any

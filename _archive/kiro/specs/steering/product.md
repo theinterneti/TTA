@@ -71,3 +71,7 @@ TTA (Therapeutic Text Adventure) is an AI-powered therapeutic platform that comb
 - Performance: Response times under 2 seconds for user interactions
 - Accessibility: WCAG 2.1 AA compliance for all user interfaces
 - Security: Regular vulnerability assessments and updates
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Steering/Product]]

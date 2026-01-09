@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Simple_api_server]]
 Simplified TTA API Server for Demo Purposes
 This bypasses complex dependencies and provides core functionality for testing.
 """

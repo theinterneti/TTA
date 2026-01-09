@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Util/Inspection]]
 import logging
 import os
 from collections.abc import Generator

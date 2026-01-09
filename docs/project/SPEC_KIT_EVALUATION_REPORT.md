@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Spec-Kit Evaluation Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Spec_kit_evaluation_report]]

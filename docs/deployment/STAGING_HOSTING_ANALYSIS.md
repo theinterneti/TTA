@@ -383,3 +383,7 @@ gh codespace create --repo theinterneti/TTA
 **Recommendation**: AWS Lightsail is the clear winner for healthcare applications.
 
 **Bottom Line**: For a healthcare application like TTA, proper cloud hosting isn't just recommended—it's essential for compliance, security, and reliable testing. The $20-40/month investment in AWS Lightsail will save you countless hours of troubleshooting and ensure your staging environment actually serves its purpose! 🚀
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Deployment/Staging_hosting_analysis]]

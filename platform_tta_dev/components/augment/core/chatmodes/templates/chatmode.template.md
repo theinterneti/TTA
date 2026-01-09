@@ -177,3 +177,7 @@ Brief description of this role's purpose and responsibilities.
 
 **Last Updated**: YYYY-MM-DD
 **Maintainer**: [GitHub username]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Templates/Chatmode.template]]

@@ -64,3 +64,7 @@ It should be straightforward to incorporate Serena into any
 agent framework (like [pydantic-ai](https://ai.pydantic.dev/), [langgraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/) or others).
 Typically, you need only to write an adapter for Serena's tools to the tool representation in the framework of your choice,
 as was done by us for Agno with `SerenaAgnoToolkit` (see `/src/serena/agno.py`).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/03-special-guides/Custom_agent]]

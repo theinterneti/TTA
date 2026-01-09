@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Analytics/Services/Reporting_service]]
 Advanced Reporting Service for TTA Analytics
 
 This service provides automated report generation, trend analysis, and

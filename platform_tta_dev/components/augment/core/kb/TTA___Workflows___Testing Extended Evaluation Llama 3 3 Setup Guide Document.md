@@ -252,3 +252,7 @@ python -c "import yaml; yaml.safe_load(open('testing/configs/production_extended
 ---
 
 **Ready to establish your Llama 3.3 8B quality baselines?** Start with the quick sample test! 🚀
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___testing extended evaluation llama 3 3 setup guide document]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Streaming_response]]
 Streaming response system for long-running agent orchestration workflows.
 
 This module provides streaming capabilities for workflows that need to provide

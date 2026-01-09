@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Sentry_config]]
 Sentry configuration for error monitoring and performance tracking.
 
 This module handles the initialization and configuration of Sentry SDK

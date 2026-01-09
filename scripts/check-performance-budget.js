@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Scripts/Check-performance-budget]]
 #!/usr/bin/env node
 
 /**

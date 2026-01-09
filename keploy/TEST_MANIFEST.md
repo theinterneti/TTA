@@ -68,3 +68,7 @@ KEPLOY_PORT=8080 uv run python run-keploy-tests.py
 2. 🔄 Enable Player Experience API testing
 3. 🔄 Add Agent Orchestration tests
 4. 🔄 Integrate into CI/CD pipeline
+
+
+---
+**Logseq:** [[TTA.dev/Keploy/Test_manifest]]

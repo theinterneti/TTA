@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Test_openhands_models_comprehensive]]
 Comprehensive test of free models via OpenRouter API.
 
 Tests multiple free models to establish baseline capabilities and performance.

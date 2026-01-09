@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Observability/Dashboard]]
 Development Metrics Dashboard Generator
 
 Generates HTML dashboard with visualizations for development metrics.

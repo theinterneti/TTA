@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/Create_toc]]
 import os
 from pathlib import Path
 

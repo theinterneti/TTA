@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Conversation]]
 Conversation router: HTTP-based therapeutic conversation endpoints.
 
 Provides simple REST API for therapeutic conversations with OpenRouter AI integration.

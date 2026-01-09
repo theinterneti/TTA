@@ -406,3 +406,7 @@ uv run pytest tests/test_gameplay_loop_component.py --cov=src/components/gamepla
 **Last Updated**: 2025-10-13 (CORRECTED)
 **Next Review**: 2025-10-14
 **Maintained By**: @theinterneti
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs component promotion top 3 priorities document]]

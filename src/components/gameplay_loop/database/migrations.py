@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Database/Migrations]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Database/Migrations]]
 Database Migrations for Gameplay Loop
 
 This module provides database migration functionality for the therapeutic text adventure

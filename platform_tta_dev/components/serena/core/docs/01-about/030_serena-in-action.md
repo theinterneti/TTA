@@ -22,3 +22,7 @@ preload="metadata"
 style="max-width: 100%; height: auto;">
 Your browser does not support the video tag.
 </video>
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/030_serena-in-action]]

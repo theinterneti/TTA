@@ -257,3 +257,7 @@ If you encounter issues with the modular architecture:
 - [[TTA/Workflows/augster-modular-architecture|Architecture Documentation]]
 - [[TTA/Workflows/augster-usage-guide|Usage Guide]]
 - [Original Monolithic Prompt](../.augment/user_guidelines.md.backup)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment docs augster migration guide]]

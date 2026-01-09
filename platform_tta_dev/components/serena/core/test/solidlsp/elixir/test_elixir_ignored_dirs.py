@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Elixir/Test_elixir_ignored_dirs]]
 from collections.abc import Generator
 from pathlib import Path
 

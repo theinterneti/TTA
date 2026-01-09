@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/Validation]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/Validation]]
 Validation Models for Gameplay Loop
 
 This module defines models for validation, safety checks, and therapeutic validation

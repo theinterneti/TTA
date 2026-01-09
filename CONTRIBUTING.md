@@ -80,3 +80,7 @@ ls -1 TTA___Components___*.md
 **See AGENTS.md for complete KB structure and navigation guide.**
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Contributing]]

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Julia/Test_julia_basic]]
 import pytest
 
 from solidlsp.ls import SolidLanguageServer

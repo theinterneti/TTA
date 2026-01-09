@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Realtime_alerts]]
 Real-time Alerting System for TTA Monitoring
 
 Integrates with the existing real-time dashboard system to provide

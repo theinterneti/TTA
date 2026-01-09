@@ -382,3 +382,7 @@ Only use `settings.json` for Pylance-specific IDE features:
 - **Using Pyright with Pylance:** https://github.com/microsoft/pylance-release/blob/main/USING_WITH_PYRIGHT.md
 - **Our Configuration:** `pyproject.toml` under `[tool.pyright]`
 - **Our Convenience Script:** `scripts/dev.sh typecheck`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Pyright-vs-pylance-clarification]]

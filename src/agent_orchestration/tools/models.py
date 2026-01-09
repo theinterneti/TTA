@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Models]]
 Tool models and validation for dynamic tool system (Task 7.1/7.2).
 """
 

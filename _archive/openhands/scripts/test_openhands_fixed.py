@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Test_openhands_fixed]]
 Test script to verify OpenHands Docker client works with condensation bug fix.
 
 This script tests the fixed OpenHands implementation with:

@@ -245,3 +245,7 @@ rm -rf list
 ---
 
 **Status:** ✅ All automated fixes complete. Awaiting user actions (close/reopen VS Code + manual interpreter selection).
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Fixes/Vscode_pytest_cache_fix_complete]]

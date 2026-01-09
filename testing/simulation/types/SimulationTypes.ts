@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Testing/Simulation/Types/Simulationtypes]]
 /**
  * Simulation Types
  *

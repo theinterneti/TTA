@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_end_to_end_workflows]]
 End-to-end integration tests for complete user workflows.
 
 This module tests complete user journeys from character creation through therapeutic interaction,

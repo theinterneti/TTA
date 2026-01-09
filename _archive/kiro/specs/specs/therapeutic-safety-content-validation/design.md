@@ -462,3 +462,7 @@ class BiasDetectionResult:
 **Rationale**: User safety is paramount in therapeutic applications. System should gracefully degrade other features before compromising safety validation capabilities.
 
 This design ensures comprehensive safety protection while maintaining the real-time, engaging experience that makes TTA therapeutically effective. The modular architecture allows for continuous improvement and adaptation to evolving therapeutic safety requirements.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Therapeutic-safety-content-validation/Design]]

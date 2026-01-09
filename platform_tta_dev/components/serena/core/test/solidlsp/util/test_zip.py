@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Util/Test_zip]]
 import sys
 import zipfile
 from pathlib import Path

@@ -370,3 +370,7 @@ Decision to implement comprehensive agentic primitives infrastructure using file
 **Status**: Active
 **Last Reviewed**: 2025-10-22
 **Next Review**: 2026-01-22 (3 months)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Memory/Architectural-decisions/Agentic-primitives-implementation-2025-10-22.memory]]

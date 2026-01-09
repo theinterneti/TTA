@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Primitive Specification: AI Conversation Context Management.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Context/Specs/Context_management_spec]]

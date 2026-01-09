@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Interprompt/Util/Class_decorators]]
 from typing import Any
 
 

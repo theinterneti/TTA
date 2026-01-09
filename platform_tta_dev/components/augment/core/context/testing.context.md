@@ -431,3 +431,7 @@ pytest tests/
 ---
 
 **Note:** Good tests are fast, isolated, repeatable, and self-validating. Write tests that give you confidence to refactor and deploy.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Context/Testing.context]]

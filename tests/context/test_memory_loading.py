@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Context/Test_memory_loading]]
 Tests for memory loading functionality in AI Conversation Context Manager.
 
 This module tests the MemoryLoader class and load_memories() method,

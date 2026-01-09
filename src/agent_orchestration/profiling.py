@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Profiling]]
 Performance profiling utilities for agent coordination.
 
 This module provides profiling and monitoring capabilities to analyze

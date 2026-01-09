@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Choice_architecture/Manager]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Choice_architecture/Manager]]
 Choice Architecture Manager for Therapeutic Text Adventure
 
 This module implements the main choice architecture manager that orchestrates

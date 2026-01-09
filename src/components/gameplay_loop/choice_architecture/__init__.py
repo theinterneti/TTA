@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Choice_architecture/__init__]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Choice_architecture/__init__]]
 Choice Architecture System for Therapeutic Text Adventure
 
 This module implements the choice architecture system that generates meaningful choices,

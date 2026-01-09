@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/TTA Deployment Status Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Deployment_status]]

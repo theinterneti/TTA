@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Rust/Test_rust_2024_edition]]
 import os
 from pathlib import Path
 

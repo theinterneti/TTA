@@ -288,3 +288,7 @@ Copilot can suggest creating OpenHands tasks:
 **Branch**: `feature/openhands-github-integration`
 **Commit**: `8bd5eeba2`
 **Status**: Ready for GitHub Secrets configuration and testing
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Implementation_summary]]

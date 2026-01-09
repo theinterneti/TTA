@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/Immersion_manager]]
 Immersion Manager for Therapeutic Text Adventure
 
 This module implements immersion management functionality that enhances

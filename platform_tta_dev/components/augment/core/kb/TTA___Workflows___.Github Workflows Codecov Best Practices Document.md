@@ -369,3 +369,7 @@ flags:
 **Status**: ✅ IMPLEMENTATION VERIFIED
 **Compliance**: Follows official Codecov best practices
 **Optional Enhancements**: Available for future implementation
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.github workflows codecov best practices document]]

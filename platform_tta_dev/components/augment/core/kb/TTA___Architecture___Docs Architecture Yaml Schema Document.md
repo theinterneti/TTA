@@ -458,3 +458,7 @@ For questions about YAML schema:
 - See [examples/](../examples/)
 - Check [[TTA/Architecture/INTEGRATION_GUIDE|INTEGRATION_GUIDE.md]]
 - Open an [issue](https://github.com/theinterneti/TTA.dev/issues)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture yaml schema document]]

@@ -49,3 +49,7 @@ retrieval and editing tools; they rely purely on text-based analysis.
 It is the integration of language servers and the MCP that makes Serena unique
 and so powerful for challenging coding tasks, especially in the context of
 larger codebases.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/040_comparison-to-other-agents]]

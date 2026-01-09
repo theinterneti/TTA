@@ -103,3 +103,7 @@ Building upon the existing TTA architecture with Neo4j knowledge graphs, LangGra
 3. WHEN workflow patterns are modified THEN the system SHALL validate changes and update agent coordination accordingly
 4. IF configuration errors are detected THEN the system SHALL prevent invalid configurations and provide clear error messages
 5. WHEN system extensions are deployed THEN the system SHALL maintain backward compatibility and provide migration support for existing workflows
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Ai-agent-orchestration/Requirements]]

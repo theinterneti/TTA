@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Tta_analytics_demo]]
 TTA Analytics Demonstration Script
 Shows current data visualization and analytics capabilities
 """

@@ -289,3 +289,7 @@ We've successfully expanded model coverage from 6 to 8 tested models, identifyin
 ---
 
 **End of Phase 2 Report**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Phase2_expanded_model_analysis]]

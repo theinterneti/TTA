@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Coordinators/Redis_message_coordinator]]
 Redis-backed implementation of the MessageCoordinator with reliability (Task 4.1 + 4.2).
 
 Capabilities:

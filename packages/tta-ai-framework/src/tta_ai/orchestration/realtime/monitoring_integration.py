@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Monitoring_integration]]
 Integration between monitoring system and real-time event broadcasting.
 
 This module connects the monitoring system from Task 16.2 with the real-time

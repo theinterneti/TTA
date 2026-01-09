@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Metrics]]
 Enhanced metrics router with Prometheus integration for TTA Player Experience API.
 Provides both legacy metrics and new Prometheus metrics endpoints.
 """

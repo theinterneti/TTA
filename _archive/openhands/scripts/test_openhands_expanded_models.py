@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Test_openhands_expanded_models]]
 Expanded model testing for OpenHands integration - Phase 2.
 
 Tests additional free models on OpenRouter to expand coverage and identify

@@ -421,3 +421,7 @@ Packaging the right components will significantly improve TTA's:
 - **Testability** - Isolated testing of components
 
 **Start with `tta-common` and `tta-monitoring`** - they're foundational, have no dependencies, and will unblock further packaging efforts.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs agentic primitives component packaging strategy document]]

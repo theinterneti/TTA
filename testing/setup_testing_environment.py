@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Setup_testing_environment]]
 TTA Single-Player Testing Environment Setup
 
 This script helps set up the testing environment for comprehensive

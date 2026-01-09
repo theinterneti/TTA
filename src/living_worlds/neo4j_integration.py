@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Living_worlds/Neo4j_integration]]
 Neo4j Integration for Living Worlds System
 Manages dynamic narrative environments and character relationships
 """

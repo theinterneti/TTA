@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Archived: Agentic Primitives Multi-Session Implementation Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-session-guide]]

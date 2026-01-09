@@ -100,3 +100,7 @@ This is strongly recommended if you want a read-only or safer agent.
 With this setup, ChatGPT becomes a coding assistant **running on your local code** — able to index, search, edit, and even run shell commands depending on your configuration.
 
 Use responsibly, and keep security in mind.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/03-special-guides/Serena_on_chatgpt]]

@@ -283,3 +283,7 @@ After completing all verification steps, confirm:
 
 **Last Updated:** 2025-10-23
 **Status:** Active
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Vscode_testing_verification]]

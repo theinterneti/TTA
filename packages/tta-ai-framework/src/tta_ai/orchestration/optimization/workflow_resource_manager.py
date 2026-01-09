@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Optimization/Workflow_resource_manager]]
 Workflow resource manager for concurrent workflow optimization.
 
 This module provides efficient resource allocation and scheduling for

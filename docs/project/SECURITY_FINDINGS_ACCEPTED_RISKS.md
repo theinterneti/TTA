@@ -113,3 +113,7 @@ This document tracks Semgrep security findings that have been reviewed and accep
 - **INFO Severity:** 0
 
 All other findings have been remediated.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Security_findings_accepted_risks]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/🎯 **Grafana Access Guide - TTA Monitoring**.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Operations/Monitoring/Grafana_access_guide]]

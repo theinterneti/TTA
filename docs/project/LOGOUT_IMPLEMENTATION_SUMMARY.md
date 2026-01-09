@@ -172,3 +172,7 @@ Logout endpoints are public because they:
 ## Conclusion
 
 The logout functionality is fully implemented and tested. All components work together to provide a secure and reliable logout experience for users.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Logout_implementation_summary]]

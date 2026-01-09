@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Diagnose_openhands]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

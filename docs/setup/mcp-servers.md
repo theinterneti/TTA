@@ -192,3 +192,7 @@ If you also use Claude Desktop, you can add NotebookLM there too:
 ---
 
 **Ready to explore your NotebookLM notebook with AI assistance! 🚀**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Mcp-servers]]

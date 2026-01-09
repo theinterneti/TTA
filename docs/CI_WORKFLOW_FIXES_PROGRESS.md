@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/CI Workflow Fixes - Progress Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Ci_workflow_fixes_progress]]

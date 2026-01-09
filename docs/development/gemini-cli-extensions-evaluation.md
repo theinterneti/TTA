@@ -442,3 +442,7 @@ echo 'export REDIS_URL="redis://localhost:6379"' >> ~/.bashrc
 - ⏸️ **mcp-redis** extension ready (pending config for session queries)
 
 **Status:** Extensions installed and partially configured. Core extensions (code-review, security) working immediately. Database extensions (Neo4j, Redis) ready to configure when needed.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Gemini-cli-extensions-evaluation]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Accurate P0 Component Status - Verified Data.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Status/P0-components]]

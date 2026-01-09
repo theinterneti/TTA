@@ -456,3 +456,7 @@ class AgentOrchestrationComponent(Component):
 ```
 
 This design ensures seamless integration with the existing TTA architecture while providing robust, scalable, and therapeutically-safe agent orchestration capabilities.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Ai-agent-orchestration/Design]]

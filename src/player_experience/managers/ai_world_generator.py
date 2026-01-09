@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Ai_world_generator]]
 AI-powered therapeutic world content generator.
 
 Uses OpenRouter AI integration to generate rich, therapeutic world content

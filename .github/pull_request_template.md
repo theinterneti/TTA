@@ -234,3 +234,7 @@ Depends on #<!-- PR number -->
 ---
 
 *Thank you for contributing to TTA! 🚀*
+
+
+---
+**Logseq:** [[TTA.dev/.github/Pull_request_template]]

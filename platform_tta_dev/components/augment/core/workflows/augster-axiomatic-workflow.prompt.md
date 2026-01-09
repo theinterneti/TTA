@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Agentic Workflow: Augster Axiomatic Workflow.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Workflows/Augster-axiomatic-workflow.prompt]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_websocket_chat_backend_task8_2]]
 Additional tests for Task 8.2: therapeutic chat message processing enhancements.
 """
 

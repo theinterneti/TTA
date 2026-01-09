@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Default_character_world_service]]
 Service for auto-initializing default character and world for new players.
 
 This service handles the automatic creation of a default character and world

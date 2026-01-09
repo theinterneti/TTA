@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Platform_tta_dev/Components/Cline/Core/Rules/Hooks/Pre_tool_use_enforce_tta_standards]]
 #!/usr/bin/env node
 /**
  * TTA.dev Standards Enforcement Hook

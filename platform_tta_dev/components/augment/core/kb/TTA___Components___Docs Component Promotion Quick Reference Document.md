@@ -196,3 +196,7 @@ A: Check Docker logs, verify environment variables, ensure dependencies are avai
 ---
 
 **Next Action**: Run `./scripts/promote-narrative-arc-orchestrator.sh` to begin promotion process.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs component promotion quick reference document]]

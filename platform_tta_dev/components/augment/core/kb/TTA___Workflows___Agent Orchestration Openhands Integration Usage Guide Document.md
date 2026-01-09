@@ -441,3 +441,7 @@ model = selector.select_model(requirements)
 ---
 
 **Last Updated:** October 25, 2025
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___agent orchestration openhands integration usage guide document]]

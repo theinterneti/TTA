@@ -161,3 +161,7 @@ This workflow implements standards from:
 3. At Phase 5, review the generated files and approve/request changes
 4. Proceed with Phase 6 commit and documentation
 5. Update team documentation with new agent primitive structure
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.github standardization workflow summary document]]

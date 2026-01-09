@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Fix_docker_compose_security]]
 Fix Docker Compose Security Issues
 
 This script automatically fixes common security issues in docker-compose files:

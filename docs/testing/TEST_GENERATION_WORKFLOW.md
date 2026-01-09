@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Test Generation Workflow.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Test_generation_workflow]]

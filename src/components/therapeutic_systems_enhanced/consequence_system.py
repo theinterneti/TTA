@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Consequence_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Consequence_system]]
 Therapeutic ConsequenceSystem Implementation
 
 This module provides the production ConsequenceSystem that provides the interface

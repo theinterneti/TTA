@@ -224,3 +224,7 @@ Here are some examples of commands you might find useful:
 ```
 
 Explore the full set of commands and options using the CLI itself!
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/020_running]]

@@ -1,5 +1,7 @@
 """Validation script for async workflow CLI integration."""
 
+# Logseq: [[TTA.dev/Scripts/Workflow/Validate_async_cli]]
+
 import asyncio
 import sys
 from pathlib import Path

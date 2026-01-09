@@ -32,3 +32,7 @@ We built Serena on top of multiple existing open-source technologies, the most i
 3. All the language servers that we use through Solid-LSP.
 
 Without these projects, Serena would not have been possible (or would have been significantly more difficult to build).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/050_acknowledgements]]

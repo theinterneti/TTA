@@ -594,3 +594,7 @@ For more information, see:
 - [Component Maturity Workflow](./COMPONENT_MATURITY_WORKFLOW.md)
 - [Component Promotion Guide](./COMPONENT_PROMOTION_GUIDE.md)
 - [GitHub Projects V2 Documentation](https://docs.github.com/en/issues/planning-and-tracking-with-projects)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Github_project_automation]]

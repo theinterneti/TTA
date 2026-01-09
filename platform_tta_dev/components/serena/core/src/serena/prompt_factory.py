@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Prompt_factory]]
 import os
 
 from serena.constants import PROMPT_TEMPLATES_DIR_IN_USER_HOME, PROMPT_TEMPLATES_DIR_INTERNAL

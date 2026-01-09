@@ -141,3 +141,7 @@ key: value
 
 **Maintainer**: [GitHub username]
 **Last Updated**: YYYY-MM-DD
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Context/Templates/Context.template]]

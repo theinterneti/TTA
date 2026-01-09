@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Util/File_system]]
 import logging
 import os
 from collections.abc import Callable, Iterator

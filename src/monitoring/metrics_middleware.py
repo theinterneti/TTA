@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Metrics_middleware]]
 FastAPI middleware for automatic Prometheus metrics collection.
 
 This middleware automatically collects HTTP request metrics, system metrics,

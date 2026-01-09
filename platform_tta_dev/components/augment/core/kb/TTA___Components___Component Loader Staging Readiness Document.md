@@ -278,3 +278,7 @@ The `discover_components` method has complexity 11 due to:
 ---
 
 **Last Updated**: 2025-10-29 15:15 UTC
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___component loader staging readiness document]]

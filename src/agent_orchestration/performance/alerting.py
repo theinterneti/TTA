@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Alerting]]
 Response time alerting system with configurable thresholds and escalation.
 
 This module provides comprehensive alerting for response time violations,

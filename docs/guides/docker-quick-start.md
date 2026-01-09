@@ -103,3 +103,7 @@ After starting services:
 ---
 
 **Ready to start?** Run: `bash docker/scripts/tta-docker.sh dev up -d`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Guides/Docker-quick-start]]

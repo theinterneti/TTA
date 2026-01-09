@@ -336,3 +336,7 @@ Our pre-commit setup provides:
 - ✅ Solo developer friendly
 
 For questions or issues, refer to the [pre-commit documentation](https://pre-commit.com/).
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Pre_commit_hooks]]

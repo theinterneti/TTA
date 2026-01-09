@@ -103,3 +103,7 @@ Building upon the existing living worlds infrastructure and therapeutic framewor
 3. WHEN unexpected developments occur THEN the system SHALL maintain logical connections to established narrative elements and player choices
 4. IF emergent narratives create conflicts THEN the system SHALL resolve them through creative storytelling that strengthens overall narrative coherence
 5. WHEN emergent stories conclude THEN the system SHALL integrate their outcomes into the ongoing narrative framework for future story development
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Narrative-arc-orchestration/Requirements]]

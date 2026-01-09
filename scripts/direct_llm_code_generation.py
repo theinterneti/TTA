@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Direct_llm_code_generation]]
 Direct LLM Code Generation - Fallback for OpenHands
 
 This script provides a simple, reliable alternative to OpenHands for code generation

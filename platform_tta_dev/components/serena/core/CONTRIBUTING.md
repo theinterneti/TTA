@@ -35,3 +35,7 @@ An example script for running tools is provided in [scripts/demo_run_tools.py](s
 ## Adding a New Supported Language
 
 See the corresponding [memory](.serena/memories/adding_new_language_support_guide.md).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Contributing]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Observability/Examples]]
 Development Observability Examples
 
 Demonstrates how to use the dev_metrics framework for tracking

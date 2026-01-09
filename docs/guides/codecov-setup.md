@@ -177,3 +177,7 @@ uv sync --all-extras
 ---
 
 **Questions?** Check `docs/CODECOV_SETUP.md` or ask the team!
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Guides/Codecov-setup]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_component_registry]]
 Test the TTA Component Registry.
 """
 

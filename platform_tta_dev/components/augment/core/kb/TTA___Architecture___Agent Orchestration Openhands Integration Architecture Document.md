@@ -333,3 +333,7 @@ engine = ExecutionEngine(config, max_concurrent_tasks=5)
 
 **Status:** Production Ready
 **Last Updated:** October 25, 2025
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___agent orchestration openhands integration architecture document]]

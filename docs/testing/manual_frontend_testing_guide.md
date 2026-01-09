@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Core Gameplay Loop - Manual Frontend Testing Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Manual_frontend_testing_guide]]

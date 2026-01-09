@@ -71,3 +71,7 @@ graph TD
 ```
 
 Generated: generate_dependency_graph.py
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture dependency graph]]

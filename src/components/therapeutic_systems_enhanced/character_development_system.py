@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Character_development_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Character_development_system]]
 Therapeutic CharacterDevelopmentSystem Implementation
 
 This module provides production-ready character development and progression

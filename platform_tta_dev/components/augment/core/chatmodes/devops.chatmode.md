@@ -533,3 +533,7 @@ uv run python scripts/query_notebook_helper.py "How should Agent CLI runtimes in
 ---
 
 **Note:** This chat mode focuses on deployment and infrastructure. For application code, delegate to backend-dev or frontend-dev. For testing, delegate to qa-engineer.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Devops.chatmode]]

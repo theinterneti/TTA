@@ -393,3 +393,7 @@ After successful migration:
 ---
 
 **Migration complete!** Your project now uses the Universal Agent Context System.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs guides migration guide document]]

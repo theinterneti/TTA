@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA/Components/Narrative_coherence_engine]]
 Narrative Coherence Engine Component
 
 This module implements the Narrative Coherence Engine that ensures story consistency

@@ -127,3 +127,7 @@ The system must prioritize the adventure experience above all else, introducing 
 3. WHEN users need help during early adventures THEN the system SHALL provide contextual assistance that builds on onboarding knowledge
 4. IF users want to revisit onboarding information THEN the system SHALL make it easily accessible without disrupting their current adventure experience
 5. WHEN users complete their first adventure THEN the system SHALL celebrate their successful journey and preview future adventure possibilities
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-onboarding-system/Requirements]]

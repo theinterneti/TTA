@@ -101,3 +101,7 @@ The Model Management & Selection System provides users with flexible options for
 3. WHEN models are running THEN the system SHALL monitor resource usage and provide real-time feedback
 4. WHEN resource limits are approached THEN the system SHALL automatically scale down or suggest alternatives
 5. IF insufficient resources are available THEN the system SHALL prevent model loading and suggest cloud alternatives
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Model-management-selection/Requirements]]

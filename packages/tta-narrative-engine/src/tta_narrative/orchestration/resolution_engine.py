@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Orchestration/Resolution_engine]]
 Resolution engine helpers.
 Utilities to build and apply narrative conflict resolutions.
 """

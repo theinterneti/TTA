@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Testing/Visual Regression Testing for TherapeuticGoalsSelector.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Frontend/Tests/Visual-regression/Readme]]

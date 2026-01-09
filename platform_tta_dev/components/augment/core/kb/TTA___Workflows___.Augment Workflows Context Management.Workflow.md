@@ -164,3 +164,7 @@ python scripts/workflow/spec_to_production.py \
 ---
 
 **For detailed troubleshooting and advanced patterns, see the rule file.**
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment workflows context management.workflow]]

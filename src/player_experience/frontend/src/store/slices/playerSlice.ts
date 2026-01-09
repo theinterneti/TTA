@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Slices/Playerslice]]
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { playerAPI } from '../../services/api';
 

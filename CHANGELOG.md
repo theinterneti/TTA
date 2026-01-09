@@ -282,3 +282,7 @@ When upgrading from 0.x versions:
 
 **Maintained by**: TTA Development Team
 **Last Updated**: 2025-10-04
+
+
+---
+**Logseq:** [[TTA.dev/Changelog]]

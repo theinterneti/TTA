@@ -167,3 +167,7 @@
 - **Phase 4**: 12-16 weeks (Advanced AI)
 
 This roadmap provides a structured approach to evolving the TTA Core Gameplay Loop from its current integrated state to a comprehensive therapeutic gaming platform.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Roadmap/Next_features]]

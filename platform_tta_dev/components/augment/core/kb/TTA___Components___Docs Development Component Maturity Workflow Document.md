@@ -371,3 +371,7 @@ For questions or issues with the component maturity workflow:
 2. Review existing promotion requests for examples
 3. Create a discussion in GitHub Discussions
 4. Contact the repository maintainer
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs development component maturity workflow document]]

@@ -379,3 +379,7 @@ class PerformanceMonitor:
 - **Professional Boundaries**: Clear limitations and referral mechanisms
 - **Content Appropriateness**: Validation of all therapeutic content by qualified professionals
 - **User Safety**: Safeguards against harmful or triggering content
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Tta-prototype-core-features/Design]]

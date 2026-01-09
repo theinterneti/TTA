@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Resource_exhaustion_detector]]
 Resource exhaustion detection with configurable thresholds.
 
 Provides comprehensive resource monitoring and exhaustion detection

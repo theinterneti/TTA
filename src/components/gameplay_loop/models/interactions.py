@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/Interactions]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/Interactions]]
 Interaction Models for Gameplay Loop
 
 This module defines models for player interactions, choices, outcomes, and therapeutic interventions

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/UV Configuration Guide for TTA Project.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Uv_configuration_guide]]

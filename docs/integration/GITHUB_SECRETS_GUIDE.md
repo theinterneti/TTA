@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/GitHub Secrets and Variables Configuration Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Integration/Github_secrets_guide]]

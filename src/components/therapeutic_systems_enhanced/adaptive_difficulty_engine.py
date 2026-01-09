@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Adaptive_difficulty_engine]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Adaptive_difficulty_engine]]
 Therapeutic AdaptiveDifficultyEngine Implementation
 
 This module provides production-ready adaptive difficulty adjustment for the TTA

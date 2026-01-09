@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/GitHub Actions Workflow Review: Component Status Reporting.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Github_workflow_review_and_recommendations]]

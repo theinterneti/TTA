@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_session_management]]
 Unit tests for session management functionality.
 
 Tests session creation, lifecycle management, context switching,

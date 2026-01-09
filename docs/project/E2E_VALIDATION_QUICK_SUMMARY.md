@@ -259,3 +259,7 @@ npx playwright show-report playwright-staging-report
 
 **Last Updated:** 2025-10-15
 **Next Update:** After CRITICAL issues resolved
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/E2e_validation_quick_summary]]

@@ -182,3 +182,7 @@ The root Documentation folder now provides a unified entry point and overview of
 ## Conclusion
 
 The reorganization of the TTA project files, folders, and documentation has created a more structured, consistent, and comprehensive project structure. This will make it easier for users and developers to find the information and resources they need and contribute to the project.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Project_organization]]

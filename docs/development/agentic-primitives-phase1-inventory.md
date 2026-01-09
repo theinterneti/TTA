@@ -533,3 +533,7 @@ primitives-v2.0.0                  # Major version (Phase 2 integration)
 2. Add tests for existing primitives
 3. Create lightweight specifications
 4. Consider reorganization before Phase 2
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-phase1-inventory]]

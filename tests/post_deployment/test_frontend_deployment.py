@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Post_deployment/Test_frontend_deployment]]
 Post-Deployment Tests: Frontend Deployment Verification (Issue #4)
 
 These tests verify that the frontend deployment fix remains effective.

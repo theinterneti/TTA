@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/Narrative Arc Orchestrator.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Orchestration/Readme]]

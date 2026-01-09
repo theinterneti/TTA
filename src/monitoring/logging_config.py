@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Logging_config]]
 Mock logging configuration for TTA containerized deployment.
 """
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Universal-agent-context/.augment/Context/Conversation_manager]]
 AI Conversation Context Manager for TTA Development.
 
 This module provides context management for AI-assisted development sessions,

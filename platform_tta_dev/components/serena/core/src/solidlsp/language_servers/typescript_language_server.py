@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Typescript_language_server]]
 Provides TypeScript specific instantiation of the LanguageServer class. Contains various configurations and settings specific to TypeScript.
 """
 

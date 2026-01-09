@@ -459,3 +459,7 @@ async def test_cleanup_on_error():
 - [Python Logging HOWTO](https://docs.python.org/3/howto/logging.html)
 - [Ruff S110 Rule](https://docs.astral.sh/ruff/rules/try-except-pass/)
 - [Ruff S112 Rule](https://docs.astral.sh/ruff/rules/try-except-continue/)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs development exception handling guidelines]]

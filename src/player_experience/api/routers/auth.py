@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Auth]]
 Enhanced authentication router for the Player Experience API.
 
 This module provides endpoints for user authentication, registration,

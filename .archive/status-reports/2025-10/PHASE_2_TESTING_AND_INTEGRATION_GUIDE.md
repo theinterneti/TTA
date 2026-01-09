@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Phase 2: Testing and Integration Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Phase_2_testing_and_integration_guide]]

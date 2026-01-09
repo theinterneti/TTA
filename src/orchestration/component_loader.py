@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Orchestration/Component_loader]]
 Component Loader Abstraction for TTA Orchestrator.
 
 This module provides protocols and implementations for component discovery and loading,

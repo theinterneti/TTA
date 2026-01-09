@@ -109,3 +109,7 @@ The Player Experience Interface is a comprehensive system that enables players t
 4. WHEN progress stalls THEN the system SHALL suggest alternative approaches or professional support resources
 5. IF sharing is desired THEN the system SHALL allow progress sharing with chosen therapeutic professionals
 6. WHEN celebrating progress THEN the system SHALL provide meaningful recognition and encouragement
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-experience-interface/Requirements]]

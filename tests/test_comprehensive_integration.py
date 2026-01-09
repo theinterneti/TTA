@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_comprehensive_integration]]
 Integration tests that demonstrate comprehensive test battery integration.
 
 These tests show how existing test suites can leverage the comprehensive

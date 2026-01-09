@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Health check script for Carbon component."""
 
+# Logseq: [[TTA.dev/Scripts/Health_check_carbon]]
+
 import sys
 from pathlib import Path
 

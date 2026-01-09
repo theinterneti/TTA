@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Testing/Extended_evaluation/Adversarial_user_profiles]]
 Adversarial User Profiles for TTA Extended Session Testing
 
 Implements challenging user simulation patterns that test edge cases and stress

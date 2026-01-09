@@ -1,5 +1,7 @@
 """AL Language Server implementation for Microsoft Dynamics 365 Business Central."""
 
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Al_language_server]]
+
 import logging
 import os
 import pathlib

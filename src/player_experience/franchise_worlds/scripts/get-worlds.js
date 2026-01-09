@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Scripts/Get-worlds]]
 #!/usr/bin/env node
 
 /**

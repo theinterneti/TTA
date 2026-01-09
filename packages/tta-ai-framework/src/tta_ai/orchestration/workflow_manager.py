@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Workflow_manager]]
 WorkflowManager core functionality (Task 3.1, extended for 3.2 integration points).
 
 Provides registration, validation, and a minimal execution entrypoint for

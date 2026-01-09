@@ -68,3 +68,7 @@ The DevOpsGuardian is the expert in infrastructure, deployment, and operational 
 - Conservative approach to changes
 - Thorough testing requirements
 - Rollback plan mandatory
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Personas/Core/Personas/Devopsguardian]]

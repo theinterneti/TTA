@@ -101,3 +101,7 @@ The Authentication & User Management system provides secure user registration, a
 3. WHEN users interact with therapeutic content THEN the system SHALL maintain therapeutic boundaries and safety protocols
 4. WHEN user therapeutic data is accessed THEN the system SHALL enforce role-based access controls for therapeutic staff
 5. IF therapeutic safety concerns arise THEN the system SHALL provide mechanisms for immediate intervention and support
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Authentication-user-management/Requirements]]

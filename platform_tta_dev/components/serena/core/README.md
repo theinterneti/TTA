@@ -170,3 +170,7 @@ It is also relatively straightforward to add [support for a new programming lang
 
 We look forward to seeing what the community will come up with!
 For details on contributing, see [contributing guidelines](/CONTRIBUTING.md).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Readme]]

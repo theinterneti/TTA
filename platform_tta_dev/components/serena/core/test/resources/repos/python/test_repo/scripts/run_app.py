@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Scripts/Run_app]]
 Main entry point script for the test_repo application.
 
 This script demonstrates how a typical application entry point would be structured,

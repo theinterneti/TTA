@@ -216,3 +216,7 @@ Potential improvements:
 - **Usage Guide:** `USING_NOTEBOOKLM_WITH_COPILOT.md`
 - **MCP Configuration:** `MCP_CONFIGURED.md`
 - **Helper Script:** `scripts/query_notebook_helper.py`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Research_notebook_integration]]

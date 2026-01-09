@@ -223,3 +223,7 @@ OPENHANDS_USE_DOCKER_RUNTIME=false
 The OpenHands integration system can now use Docker runtime for full tool access, resolving the SDK limitations that prevented real code generation in Phase 7. The system maintains backward compatibility with SDK mode through environment configuration.
 
 **Status**: Ready for testing with real model output.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Docker_runtime_enablement_report]]

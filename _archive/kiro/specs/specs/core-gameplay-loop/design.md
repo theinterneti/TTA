@@ -359,3 +359,7 @@ The Core Gameplay Loop must seamlessly integrate with:
 - **Monitoring and Analytics**: Provide data for therapeutic effectiveness analysis
 
 This design ensures that the Core Gameplay Loop serves as an effective orchestration layer while maintaining the therapeutic focus, safety requirements, and technical standards established by the TTA platform.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Core-gameplay-loop/Design]]

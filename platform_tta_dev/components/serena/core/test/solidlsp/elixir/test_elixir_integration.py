@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Elixir/Test_elixir_integration]]
 Integration tests for Elixir language server with test repository.
 
 These tests verify that the language server works correctly with a real Elixir project

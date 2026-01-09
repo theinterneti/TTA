@@ -493,3 +493,7 @@ uv run python scripts/test_model_compatibility.py --report-only
 **Status:** Design Complete
 **Next Steps:** Implement test suite, execute tests, document results
 **Estimated Effort:** 4-6 hours total
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs openhands model compatibility test suite design]]

@@ -493,3 +493,7 @@ class CoherenceValidationTests:
 **Rationale**: Ensures that coherence validation supports therapeutic goals and doesn't conflict with safety requirements, maintaining the platform's therapeutic focus.
 
 This design ensures comprehensive coherence validation while maintaining the real-time performance requirements and therapeutic focus that are essential to the TTA platform's effectiveness.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Coherence-validation-system/Design]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_world_system_integration]]
 Integration tests for the world system.
 
 Tests world listing, retrieval, validation in session creation,

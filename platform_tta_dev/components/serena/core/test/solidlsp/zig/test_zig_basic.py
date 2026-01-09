@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Zig/Test_zig_basic]]
 Basic integration tests for Zig language server functionality.
 
 These tests validate symbol finding and navigation capabilities using the Zig Language Server (ZLS).

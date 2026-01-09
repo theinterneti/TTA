@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Interprompt/Multilang_prompt]]
 import logging
 import os
 from enum import Enum

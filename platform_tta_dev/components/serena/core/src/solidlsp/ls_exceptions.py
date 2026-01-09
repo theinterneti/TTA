@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Ls_exceptions]]
 This module contains the exceptions raised by the framework.
 """
 

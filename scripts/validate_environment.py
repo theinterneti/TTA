@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate_environment]]
 TTA Environment Configuration Validator
 
 This script validates the TTA environment configuration to ensure all required

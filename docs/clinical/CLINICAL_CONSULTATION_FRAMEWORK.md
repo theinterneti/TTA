@@ -241,3 +241,7 @@ Crisis intervention systems require specialized review:
 - Develop long-term clinical consultation and quality assurance plans
 
 This framework ensures that the TTA platform maintains the highest standards of clinical accuracy, safety, and therapeutic effectiveness throughout its development and deployment.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Clinical/Clinical_consultation_framework]]

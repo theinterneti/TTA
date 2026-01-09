@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Agentic Workflow: TTA Agent Primitive Standardization.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Github_workflows_gemini/Workflows/Tta-standardization-onboarding.prompt]]

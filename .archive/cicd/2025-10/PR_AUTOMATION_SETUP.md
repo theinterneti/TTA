@@ -300,3 +300,7 @@ git push
 **Setup Complete!** Your GitHub Copilot subscription is now fully automated for PR reviews and merging. 🎉
 
 **Next**: Address PR #73 comments and watch the automation work!
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Cicd/2025-10/Pr_automation_setup]]

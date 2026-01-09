@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_websocket_chat_backend]]
 Tests for WebSocket Chat Interface Backend (Task 8).
 """
 

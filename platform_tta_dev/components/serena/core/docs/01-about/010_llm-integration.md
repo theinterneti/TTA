@@ -15,3 +15,7 @@ In general, Serena can be integrated with an LLM in several ways:
 * by using [mcpo to connect it to ChatGPT](../03-special-guides/serena_on_chatgpt.md) or other clients that don't support MCP but do support tool calling via OpenAPI.
 * by incorporating Serena's tools into an agent framework of your choice, as illustrated [here](../03-special-guides/custom_agent).
   Serena's tool implementation is decoupled from the framework-specific code and can thus easily be adapted to any agent framework.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/010_llm-integration]]

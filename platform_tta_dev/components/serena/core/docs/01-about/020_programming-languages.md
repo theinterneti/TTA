@@ -62,3 +62,7 @@ With Serena, we provide direct, out-of-the-box support for:
 
 Support for further languages can easily be added by providing a shallow adapter for a new language server implementation,
 see Serena's [memory on that](https://github.com/oraios/serena/blob/main/.serena/memories/adding_new_language_support_guide.md).
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/020_programming-languages]]

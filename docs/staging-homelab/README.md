@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/TTA Staging Environment - Homelab Deployment Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Staging-homelab/Readme]]

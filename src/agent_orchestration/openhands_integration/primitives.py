@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Primitives]]
 Workflow primitives for OpenHands integration.
 
 Provides composable workflow primitives that wrap OpenHands-specific functionality

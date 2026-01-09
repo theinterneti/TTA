@@ -68,3 +68,7 @@ The PrimitiveArchitect is the master builder of clean, efficient primitives and 
 - Conservative approach to technical debt
 - Thorough consideration of dependencies
 - Strong emphasis on proven patterns
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Personas/Personas/Primitivearchitect]]

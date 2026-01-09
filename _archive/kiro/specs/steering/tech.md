@@ -88,3 +88,7 @@ class MyComponent(Component):
 - Implement safeguards against harmful content
 - Use descriptive names reflecting therapeutic context
 - Include comprehensive docstrings for therapeutic functions
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Steering/Tech]]

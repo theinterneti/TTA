@@ -1,5 +1,7 @@
 """Tests for the mcp.py module in serena."""
 
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Test_mcp]]
+
 import pytest
 from mcp.server.fastmcp.tools.base import Tool as MCPTool
 

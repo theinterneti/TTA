@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/TTA Component Maturity Workflow Instructions.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Instructions/Component-maturity.instructions]]

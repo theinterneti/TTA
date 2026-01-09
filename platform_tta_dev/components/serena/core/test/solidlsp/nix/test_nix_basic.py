@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Nix/Test_nix_basic]]
 Tests for the Nix language server implementation using nixd.
 
 These tests validate symbol finding and cross-file reference capabilities for Nix expressions.

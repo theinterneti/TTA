@@ -1,5 +1,7 @@
 """Regal Language Server implementation for Rego policy files."""
 
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Regal_server]]
+
 import logging
 import os
 import shutil

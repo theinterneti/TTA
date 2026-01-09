@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Enhanced Extended Session Quality Evaluation Framework.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Extended_evaluation/Enhanced_framework_guide]]

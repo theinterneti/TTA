@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_session_integration_manager_simple]]
 Simplified unit tests for SessionIntegrationManager functionality.
 
 Tests the core session management and context switching functionality

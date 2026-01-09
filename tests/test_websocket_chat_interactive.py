@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_websocket_chat_interactive]]
 Tests for interactive therapeutic elements over WebSocket (Task 8.3).
 """
 

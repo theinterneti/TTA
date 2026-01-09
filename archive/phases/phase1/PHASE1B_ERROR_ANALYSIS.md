@@ -235,3 +235,7 @@ for _ in dict.values():
 ---
 
 **Ready to proceed with Phase 1B.1: Critical Fixes (F821 undefined names)?**
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Phases/Phase1/Phase1b_error_analysis]]

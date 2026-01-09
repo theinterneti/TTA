@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Lm_studio]]
 LM Studio Provider Implementation.
 
 This module provides integration with LM Studio for local model hosting.

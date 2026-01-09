@@ -437,3 +437,7 @@ player_experience:
     crisis_detection_enabled: true
     safety_monitoring_interval: 300
 ```
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-experience-interface/Design]]

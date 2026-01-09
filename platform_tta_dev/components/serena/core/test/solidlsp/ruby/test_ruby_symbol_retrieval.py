@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Ruby/Test_ruby_symbol_retrieval]]
 Tests for the Ruby language server symbol-related functionality.
 
 These tests focus on the following methods:

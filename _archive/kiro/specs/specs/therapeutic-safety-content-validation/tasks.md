@@ -191,3 +191,7 @@
     - Implement incident response automation for safety failures
     - Write monitoring system verification tests
     - _Requirements: 7.1, 8.3, 8.5_
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Therapeutic-safety-content-validation/Tasks]]

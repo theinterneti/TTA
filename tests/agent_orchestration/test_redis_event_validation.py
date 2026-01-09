@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_redis_event_validation]]
 Validation tests for Redis-based event publishing and subscription.
 
 This module tests the Redis pub/sub event system to ensure it works correctly

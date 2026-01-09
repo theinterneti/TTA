@@ -461,3 +461,7 @@ The Meta-Game Interface System must integrate seamlessly with TTA's therapeutic 
 - **Crisis Response**: Immediate escalation protocols for emergency situations
 
 This design provides a comprehensive foundation for implementing the Meta-Game Interface System while maintaining TTA's core therapeutic focus and immersive adventure experience.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Meta-game-interface-system/Design]]

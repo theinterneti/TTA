@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Lua/Test_lua_basic]]
 Tests for the Lua language server implementation.
 
 These tests validate symbol finding and cross-file reference capabilities

@@ -245,3 +245,7 @@ The system supports multiple deployment configurations:
 - [[TTA/Architecture/data-flow-diagram|Data Flow Diagram]]
 - [[TTA/Architecture/README|System Architecture Overview]]
 - [[TTA/Architecture/technical-specifications|Technical Specifications]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___architecture___docs architecture system architecture diagram]]

@@ -24,7 +24,7 @@
 - VSCode database → `docs/setup/vscode-database.md`
 
 ### Need Architecture/Deep Docs?
-🧠 **Check `platform_tta_dev/components/augment/kb/`** (Logseq Knowledge Base)
+🧠 **Check `~/repos/TTA-notes/pages/`** (Logseq Knowledge Base)
 - 306 interconnected documents
 - Architecture, components, agents, workflows
 - Navigation guide → `docs/reference/logseq-kb.md`
@@ -146,3 +146,7 @@ Run monthly to maintain organization.
 
 **Last Updated:** 2025-11-02
 **Cleanup Report:** `CLEANUP_FINAL_REPORT.md`
+
+
+---
+**Logseq:** [[TTA.dev/Docs_quick_ref]]

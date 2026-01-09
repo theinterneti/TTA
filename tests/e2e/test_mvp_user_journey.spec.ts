@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Test_mvp_user_journey.spec]]
 /**
  * TTA MVP End-to-End User Journey Tests
  *

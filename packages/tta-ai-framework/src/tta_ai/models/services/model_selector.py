@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Services/Model_selector]]
 Model Selection Service
 
 This module provides intelligent model selection based on task requirements,

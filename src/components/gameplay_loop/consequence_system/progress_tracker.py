@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Consequence_system/Progress_tracker]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Consequence_system/Progress_tracker]]
 Progress Tracker for Therapeutic Text Adventure
 
 This module implements progress tracking functionality that monitors and

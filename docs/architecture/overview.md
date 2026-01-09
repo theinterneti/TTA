@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/Architecture Overview.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Architecture/Overview]]

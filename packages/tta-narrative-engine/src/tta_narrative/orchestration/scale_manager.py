@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Orchestration/Scale_manager]]
 ScaleManager extracted from narrative_arc_orchestrator_component.
 Implements impact assessment, causal maintenance, and conflict resolution.
 """

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Testing/Single_player_test_framework]]
 TTA Single-Player Storytelling Experience Testing Framework
 
 This module provides comprehensive testing infrastructure for evaluating

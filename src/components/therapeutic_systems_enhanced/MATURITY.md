@@ -10,3 +10,10 @@
 > Otherwise, see: `.augment/kb/Components/Therapeutic Systems Maturity Status.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA/Components/Therapeutic_systems_enhanced/Maturity]]
+
+---
+**Logseq:** [[TTA.dev/Components/Therapeutic_systems_enhanced/Maturity]]

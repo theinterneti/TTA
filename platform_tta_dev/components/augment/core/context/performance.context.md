@@ -530,3 +530,7 @@ def get_narrative_context(session_id: str, depth: int = 5):
 ---
 
 **Note:** Always measure before and after optimization to verify improvement.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Context/Performance.context]]

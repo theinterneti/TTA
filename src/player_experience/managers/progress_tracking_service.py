@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Progress_tracking_service]]
 Progress Tracking Service.
 
 Aggregates session data and progress markers to compute summaries, detect milestones,

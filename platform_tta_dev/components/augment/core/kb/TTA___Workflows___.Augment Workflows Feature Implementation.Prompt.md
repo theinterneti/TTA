@@ -575,3 +575,7 @@ python .augment/context/cli.py add feature-name-implementation-2025-10-20 \
 ---
 
 **Note:** This workflow ensures systematic feature implementation following TTA standards and quality gates.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment workflows feature implementation.prompt]]

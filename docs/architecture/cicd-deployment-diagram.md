@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/TTA CI/CD and Deployment Architecture.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Architecture/Cicd-deployment-diagram]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Erlang/Conftest]]
 Erlang-specific test configuration and fixtures.
 """
 

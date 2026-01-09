@@ -20,3 +20,7 @@ Serena comes with built-in tools for monitoring and managing the current session
 
 Both can be configured in Serena's [configuration](050_configuration) file (`serena_config.yml`).
 If enabled, they will automatically be opened as soon as the Serena agent/MCP server is started.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/060_dashboard]]

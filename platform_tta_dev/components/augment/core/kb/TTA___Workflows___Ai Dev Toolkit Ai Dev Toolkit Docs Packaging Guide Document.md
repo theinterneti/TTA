@@ -158,3 +158,7 @@ These stay in the TTA repository.
 ## License
 
 MIT - Free to use in any project
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___ai dev toolkit ai dev toolkit docs packaging guide document]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Agentic Workflow: Component Promotion.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Workflows/Component-promotion.prompt]]

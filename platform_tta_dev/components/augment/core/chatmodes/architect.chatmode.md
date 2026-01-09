@@ -513,3 +513,7 @@ response = await query_notebook("What are MCP security best practices?")
 ---
 
 **Note:** This chat mode focuses on architecture and design. For implementation, testing, or deployment, switch to the appropriate specialized chat mode.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Architect.chatmode]]

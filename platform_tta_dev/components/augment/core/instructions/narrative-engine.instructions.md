@@ -363,3 +363,7 @@ focusing on {self.character_archetypes['wise_guide']['therapeutic_role']}.
 
 **Last Updated**: 2025-10-22
 **Maintainer**: theinterneti
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Instructions/Narrative-engine.instructions]]

@@ -83,3 +83,7 @@ The modular architecture is designed to maintain **100% behavioral equivalence**
 **Version**: 1.0.0
 **Migration Date**: 2025-10-26
 **Source**: Discord Augment Community
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment user guidelines]]

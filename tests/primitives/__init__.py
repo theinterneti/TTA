@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Primitives/__init__]]
 Tests for Agentic Primitives
 
 Test suites for all Phase 1 agentic primitives:

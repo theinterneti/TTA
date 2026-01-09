@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Gameplay]]
 Gameplay Loop API Router
 
 This module provides REST API endpoints for the Core Gameplay Loop system,

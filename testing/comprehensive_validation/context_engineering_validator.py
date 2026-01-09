@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Testing/Comprehensive_validation/Context_engineering_validator]]
 AI Agent Context Engineering Validation System for TTA
 
 This module provides comprehensive validation of context prompt engineering
@@ -22,9 +24,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from enhanced_preference_ai_server import EnhancedContext, PlayerPreferences
 from tta_ai.orchestration.models import AgentType
 
-from enhanced_preference_ai_server import EnhancedContext, PlayerPreferences
 from src.components.therapeutic_systems_enhanced.therapeutic_integration_system import (
     TherapeuticIntegrationSystem,
 )

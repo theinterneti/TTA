@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Python/Test_symbol_retrieval]]
 Tests for the language server symbol-related functionality.
 
 These tests focus on the following methods:

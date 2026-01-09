@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Primitives/Test_conversation_manager]]
 Tests for AI Conversation Context Manager
 
 Tests cover:

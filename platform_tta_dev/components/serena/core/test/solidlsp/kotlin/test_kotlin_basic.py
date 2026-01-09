@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Kotlin/Test_kotlin_basic]]
 import os
 
 import pytest

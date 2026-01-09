@@ -49,3 +49,7 @@ If you're looking for the old `platform/dev/agentic/` components:
 4. **Remove this deprecated directory** once all references are updated
 
 See `platform_tta_dev/README.md` for the new component-centric structure and guidelines.
+
+
+---
+**Logseq:** [[TTA.dev/Platform/Dev/Agentic/Readme]]

@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Testing/Simulation/Validate-framework]]
 #!/usr/bin/env ts-node
 
 /**

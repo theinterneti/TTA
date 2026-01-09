@@ -297,3 +297,7 @@ class AgentType(str, Enum):
 
 **Maintained by**: TTA Development Team
 **Contact**: See AGENTS.md for project context
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Pylance_configuration]]

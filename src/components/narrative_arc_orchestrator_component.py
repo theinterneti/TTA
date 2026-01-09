@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA/Components/Narrative_arc_orchestrator_component]]
 Narrative Arc Orchestrator Component
 
 This module implements the Narrative Arc Orchestrator component that manages

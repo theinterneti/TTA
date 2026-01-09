@@ -355,3 +355,7 @@ tta:
 - Audit trails for all therapeutic data access
 
 This design ensures that the Authentication & User Management system not only meets all specified requirements but also integrates seamlessly with TTA's therapeutic mission and technical architecture.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Authentication-user-management/Design]]

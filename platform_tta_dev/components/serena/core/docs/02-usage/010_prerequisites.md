@@ -10,3 +10,7 @@ If you do not have it yet, install it following the instructions [here](https://
 Depending on the programming language you intend to use with Serena, you may need to install additional tools or SDKs if you
 intend to use the language server backend of Serena.
 See the [language support documentation](../01-about/020_programming-languages) for details.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/010_prerequisites]]

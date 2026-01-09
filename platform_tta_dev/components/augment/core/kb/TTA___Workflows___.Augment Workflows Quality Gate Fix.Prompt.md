@@ -570,3 +570,7 @@ python .augment/context/cli.py add quality-gate-fix-component-2025-10-20 \
 ---
 
 **Note:** Document all quality gate fixes in `.augment/memory/quality-gates.memory.md` for future reference.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment workflows quality gate fix.prompt]]

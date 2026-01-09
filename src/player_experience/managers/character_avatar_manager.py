@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Character_avatar_manager]]
 Character creation, customization, and lifecycle management.
 
 This module provides the CharacterAvatarManager service that handles character CRUD operations,

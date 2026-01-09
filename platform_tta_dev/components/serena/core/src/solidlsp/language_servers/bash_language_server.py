@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Bash_language_server]]
 Provides Bash specific instantiation of the LanguageServer class using bash-language-server.
 Contains various configurations and settings specific to Bash scripting.
 """

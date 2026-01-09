@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Config_schema]]
 Configuration schema validation for Agent Orchestration.
 
 This module provides Pydantic models for validating agent orchestration

@@ -258,3 +258,7 @@ RUN /app/.venv/bin/python -c "import torch; print('CUDA available:', torch.cuda.
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 - [Neo4j Docker Documentation](https://neo4j.com/docs/operations-manual/current/docker/)
 - [CodeCarbon Documentation](https://codecarbon.io/docs)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs deployment docker setup guide]]

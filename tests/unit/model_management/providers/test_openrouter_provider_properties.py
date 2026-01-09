@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Providers/Test_openrouter_provider_properties]]
 Property-Based Tests for OpenRouter Provider.
 
 This module uses Hypothesis to test invariants and properties of the

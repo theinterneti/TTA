@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate_mistral_simple_code]]
 Phase 1 Validation Test: Mistral Small + Simple Code Generation
 
 Purpose: Validate that Mistral Small + Direct API works reliably for simple code generation

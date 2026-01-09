@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Python/Test_repo/Custom_test/Advanced_features]]
 Advanced Python features for testing code parsing capabilities.
 
 This module contains various advanced Python code patterns to ensure

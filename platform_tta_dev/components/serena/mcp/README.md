@@ -277,3 +277,7 @@ uv run pytest test/serena/test_mcp_server.py
 - [MCP Specification](https://spec.modelcontextprotocol.io/)
 - [Serena Documentation](../core/docs/index.md)
 - [Tool Implementation Guide](../core/src/serena/tools/README.md)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Mcp/Readme]]

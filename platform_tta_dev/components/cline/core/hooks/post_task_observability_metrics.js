@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Platform_tta_dev/Components/Cline/Core/Hooks/Post_task_observability_metrics]]
 #!/usr/bin/env node
 /**
  * TTA.dev Post-Task Observability Hook

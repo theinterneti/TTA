@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Testing/Mutation Testing for TTA Model Management.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Tests/Mutation/Readme]]

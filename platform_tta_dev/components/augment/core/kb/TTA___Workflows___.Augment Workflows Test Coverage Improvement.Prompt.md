@@ -554,3 +554,7 @@ python .augment/context/cli.py add coverage-improvement-component-2025-10-20 \
 ---
 
 **Note:** Focus on meaningful tests that verify behavior, not just increase coverage numbers.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.augment workflows test coverage improvement.prompt]]

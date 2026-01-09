@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Docs/Tta-dev-setup/Scripts/Validate-mcp-schemas]]
 MCP Schema Validator
 
 Validates that MCP tool definitions match actual implementation.

@@ -689,3 +689,7 @@ if __name__ == "__main__":
 - ✅ Integration with circuit breakers works
 - ✅ Fallback to local models seamless
 - ✅ Development workflow feels natural
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs development sub agent implementation guide]]

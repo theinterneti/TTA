@@ -219,3 +219,7 @@ export SENTRY_DEBUG=true
 - [x] Documentation provided
 
 Your TTA storytelling application now has comprehensive error monitoring and performance tracking while maintaining the highest standards of therapeutic data privacy! 🎉
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs integration sentry integration guide document]]

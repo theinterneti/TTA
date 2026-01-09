@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/R/Test_r_basic]]
 Basic tests for R Language Server integration
 """
 

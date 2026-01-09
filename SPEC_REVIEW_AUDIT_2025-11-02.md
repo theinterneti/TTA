@@ -388,7 +388,7 @@ Comparing `.kiro/specs/` documentation against:
 
 **Knowledge Base Structure:**
 ```
-~/repos/TTA-notes/logseq/pages/TTA/
+~/repos/TTA-notes/pages/TTA/
 ├── TTA___References___Agents Document.md
 ├── TTA___References___Claude Document.md
 ├── TTA___References___Overview Document.md
@@ -401,7 +401,7 @@ Comparing `.kiro/specs/` documentation against:
 **Access Methods:**
 1. Logseq: Open TTA-notes → Navigate to TTA namespace
 2. Direct: `platform_tta_dev/components/augment/kb/TTA___Category___Page.md`
-3. Symlink: `~/repos/TTA-notes/logseq/pages/TTA/`
+3. Symlink: `~/repos/TTA-notes/pages/TTA/`
 4. Legacy symlink: `.augment/kb/` → `platform_tta_dev/components/augment/kb/`
 
 ### 4.2 Documentation Fragmentation Issues
@@ -803,3 +803,7 @@ With focused effort on these priorities, TTA's specification foundation can matu
 ---
 
 **End of Audit Report**
+
+
+---
+**Logseq:** [[TTA.dev/Spec_review_audit_2025-11-02]]

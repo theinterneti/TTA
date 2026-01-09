@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/_archive/Openhands/Scripts/Openhands_build_component]]
 Use OpenHands to build a practical component for TTA.
 
 Task: Create a Redis Connection Pool Manager utility

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Mock_monitoring]]
 Mock Monitoring Implementation
 
 Provides mock implementations of monitoring components for environments

@@ -723,3 +723,7 @@ Epic: Repository Reorganization [#1]
 **Last Updated**: 2025-10-29
 **Total Issues**: 15 (1 epic + 14 implementation)
 **Estimated Total Effort**: 3 weeks
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Github-issues]]

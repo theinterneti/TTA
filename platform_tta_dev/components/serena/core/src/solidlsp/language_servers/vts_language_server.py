@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Vts_language_server]]
 Language Server implementation for TypeScript/JavaScript using https://github.com/yioneko/vtsls,
 which provides TypeScript language server functionality via VSCode's TypeScript extension
 (contrary to typescript-language-server, which uses the TypeScript compiler directly).

@@ -253,3 +253,7 @@ This workflow is complete when:
 - ✅ Feature specification template is ready for immediate use
 - ✅ Human validation confirms compatibility, security, and governance standards
 - ✅ All changes are committed and documented
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___.github workflows tta standardization onboarding.prompt]]

@@ -231,3 +231,7 @@ if result.openhands_task_ids:
 **Status**: Analysis Complete - Ready for Implementation
 **Priority**: Medium (Performance optimization)
 **Effort**: 2-3 hours for full implementation
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Async_execution_analysis]]

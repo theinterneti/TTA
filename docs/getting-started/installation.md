@@ -225,3 +225,7 @@ Once installation is complete:
 - **[Environment Setup Guide](../../ENVIRONMENT_SETUP.md)**: Detailed environment configuration
 - **[Docker Setup Guide](../../Documentation/docker/docker_setup_guide.md)**: Advanced Docker configuration
 - **[Troubleshooting Guide](../../Documentation/docker/devcontainer_troubleshooting_guide.md)**: Common issues and solutions
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Getting-started/Installation]]

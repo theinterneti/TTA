@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Nixd_ls]]
 Provides Nix specific instantiation of the LanguageServer class using nixd (Nix Language Server).
 
 Note: Windows is not supported as Nix itself doesn't support Windows natively.

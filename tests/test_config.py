@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_config]]
 Test the TTA Configuration.
 """
 

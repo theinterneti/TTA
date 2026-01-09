@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/File_tools]]
 File and file system-related tools, specifically for
   * listing directory contents
   * reading files

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Archived: Phase 3: Component Inventory - Completion Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Phase3_component_inventory_complete]]

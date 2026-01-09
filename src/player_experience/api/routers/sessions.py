@@ -1,5 +1,7 @@
 """Sessions router: minimal endpoints to support test workflows."""
 
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Sessions]]
+
 from __future__ import annotations
 
 import uuid

@@ -72,3 +72,7 @@ For more information, see:
 ## Questions?
 
 Contact the maintainers or open an issue.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Markdown/Test_repo/Contributing]]

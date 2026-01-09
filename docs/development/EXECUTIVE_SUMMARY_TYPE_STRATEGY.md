@@ -387,3 +387,7 @@ src.player_experience.services.gameplay_service  # ← CIRCULAR!
 **Approval Required:** Yes
 **Estimated Start Date:** Immediate (upon approval)
 **Estimated Completion:** 2-2.5 weeks from start
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Executive_summary_type_strategy]]

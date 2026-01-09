@@ -332,3 +332,7 @@ If you're migrating from the old environment structure:
 5. **Remove** old environment files once confirmed working
 
 The new structure provides better organization, security, and maintainability for the TTA platform.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Environment_setup]]

@@ -364,3 +364,7 @@ async def refund_payment_handler(): ...
 **Status:** Active (Enforced via Component Maturity Workflow)
 **Last Updated:** 2025-10-22
 **Related Rules:** `integrated-workflow.md`, `use-serena-tools.md`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Rules/Avoid-long-files]]

@@ -581,3 +581,7 @@ uv run python scripts/query_notebook_helper.py "What context should I include in
 ---
 
 **Note:** This chat mode focuses on backend implementation. For architecture decisions, consult the architect chat mode. For deployment, consult the devops chat mode.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Backend-dev.chatmode]]

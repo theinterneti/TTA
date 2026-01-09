@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Csharp/Test_csharp_basic]]
 import os
 import tempfile
 from pathlib import Path

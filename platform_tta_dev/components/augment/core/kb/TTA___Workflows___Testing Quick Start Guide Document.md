@@ -73,3 +73,7 @@ python testing/run_single_player_tests.py --mode comprehensive
 - Check logs in `testing/results/logs/`
 - Review configuration in `testing/model_testing_config.yaml`
 - Run setup script again: `python testing/setup_testing_environment.py`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___testing quick start guide document]]

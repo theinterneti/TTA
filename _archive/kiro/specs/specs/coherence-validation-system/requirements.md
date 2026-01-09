@@ -89,3 +89,7 @@ The Coherence Validation System is a critical component of the TTA (Therapeutic 
 3. WHEN validation rules change THEN existing tests SHALL be updated and new tests SHALL be added
 4. IF tests fail THEN they SHALL provide clear, actionable error messages indicating what validation failed
 5. WHEN performance requirements are tested THEN tests SHALL verify response times meet the 500ms requirement
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Coherence-validation-system/Requirements]]

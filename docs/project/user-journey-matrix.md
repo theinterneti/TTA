@@ -628,3 +628,7 @@ Operations Center → System Health → Performance Management
 - **Technical Debt Management**: Regular assessment and resolution of system maintenance needs
 
 This comprehensive user journey matrix provides the foundation for thorough testing, user acceptance criteria development, and system validation across all user categories in the TTA platform.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/User-journey-matrix]]

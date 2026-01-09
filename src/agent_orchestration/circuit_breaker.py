@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Circuit_breaker]]
 Circuit breaker implementation for workflow error handling and graceful degradation.
 
 Provides configurable failure detection, state management, and recovery mechanisms

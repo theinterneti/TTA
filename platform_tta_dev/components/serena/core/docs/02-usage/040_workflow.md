@@ -136,3 +136,7 @@ Therefore, software that is designed to meaningful interpretable outputs (e.g. l
 and that has a good test coverage is much easier to work with for Serena.
 
 We generally recommend to start an editing task from a state where all linting checks and tests pass.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/040_workflow]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Lsp_protocol_handler/Lsp_constants]]
 This module contains constants used in the LSP protocol.
 """
 

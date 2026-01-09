@@ -83,3 +83,7 @@ Dependencies:
 
 - Persistent storage of computed summaries (to be handled by Task 10 or DB layer)
 - API endpoints/UI (covered in subsequent tasks)
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-experience-interface/Progress-tracking]]

@@ -653,3 +653,7 @@ Track overall progress using this table:
 **Last Updated**: 2025-10-22
 **Current Session**: 1.1 (Create Global Instructions)
 **Next Session**: 1.2 (Create Testing Instructions)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs development agentic primitives session guide]]

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Analyze coverage by component from test output."""
 
+# Logseq: [[TTA.dev/Analyze_coverage]]
+
 import re
 from collections import defaultdict
 

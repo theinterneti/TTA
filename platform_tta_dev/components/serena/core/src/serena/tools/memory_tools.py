@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Serena/Tools/Memory_tools]]
 import json
 
 from serena.tools import ReplaceRegexTool, Tool

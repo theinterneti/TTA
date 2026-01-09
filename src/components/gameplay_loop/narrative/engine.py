@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Narrative/Engine]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Narrative/Engine]]
 Narrative Engine for Therapeutic Text Adventure
 
 This module implements the core narrative engine that orchestrates scene generation,

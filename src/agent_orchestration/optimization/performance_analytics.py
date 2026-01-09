@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Optimization/Performance_analytics]]
 Performance analytics system for monitoring optimization effectiveness.
 
 This module provides comprehensive analytics, reporting, and monitoring

@@ -413,3 +413,7 @@ By contributing to TTA, you agree that your contributions will be licensed under
 **Thank you for contributing to TTA!** 🎉
 
 Your contributions help make therapeutic AI technology more accessible and effective.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___contributing document]]

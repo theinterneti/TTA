@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate_yaml_frontmatter]]
 Validate YAML frontmatter in chatmode and workflow files.
 """
 

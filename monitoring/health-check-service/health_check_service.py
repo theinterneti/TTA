@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Monitoring/Health-check-service/Health_check_service]]
 TTA Health Check Service
 Provides Prometheus-compatible health check metrics for TTA services
 """

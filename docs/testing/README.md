@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Testing/TTA Testing Documentation.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Readme]]

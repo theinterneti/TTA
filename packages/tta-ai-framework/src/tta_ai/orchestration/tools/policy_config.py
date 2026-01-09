@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Tools/Policy_config]]
 Policy configuration for tool execution governance.
 
 - Supports file-based YAML/JSON or environment variables

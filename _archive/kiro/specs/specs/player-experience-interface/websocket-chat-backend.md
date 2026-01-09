@@ -120,3 +120,7 @@ Implements the backend for real-time therapeutic chat via WebSocket. Provides:
 
 - Group chat/broadcast across players
 - Persistence of chat history
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-experience-interface/Websocket-chat-backend]]

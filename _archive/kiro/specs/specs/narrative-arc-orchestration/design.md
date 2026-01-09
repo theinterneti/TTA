@@ -512,3 +512,7 @@ tta.prod:
 - AI model inference failures
 
 This design provides a comprehensive framework for implementing the Narrative Arc Orchestration system while maintaining integration with the existing TTA architecture and ensuring therapeutic safety and effectiveness.
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Narrative-arc-orchestration/Design]]

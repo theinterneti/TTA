@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Fix_b904_exception_chaining]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

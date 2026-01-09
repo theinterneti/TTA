@@ -203,3 +203,7 @@ Cline is configured via:
 - `platform_tta_dev/components/augment/` - AI workflow primitives
 - `platform_tta_dev/components/hypertool/` - MCP server orchestration
 - `platform_tta_dev/components/serena/` - Code analysis toolkit
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Cline/Readme]]

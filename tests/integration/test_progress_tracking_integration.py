@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_progress_tracking_integration]]
 Integration tests for progress tracking and analytics system.
 
 Tests the complete progress tracking workflow including:

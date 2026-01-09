@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Codecov Integration - Comprehensive Diagnostic Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Workflows/Codecov_diagnostic_report]]

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Docs/Tta-dev-setup/Scripts/Validate-instruction-consistency]]
 Instruction Consistency Validator
 
 Checks that .instructions.md files follow standards and don't conflict.

@@ -233,3 +233,7 @@ In workflow file:
 ---
 
 **For questions or issues, see OPTIMIZATION_SUMMARY.md or OPTIMIZATION_REPORT.md**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Optimization/Quick_reference]]

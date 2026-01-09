@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Choice_architecture/Agency_protector]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Choice_architecture/Agency_protector]]
 Agency Protector for Therapeutic Text Adventure
 
 This module implements agency protection functionality that ensures player

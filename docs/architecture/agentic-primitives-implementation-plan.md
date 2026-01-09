@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/Agentic Primitives Implementation Plan.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Architecture/Agentic-primitives-implementation-plan]]

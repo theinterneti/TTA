@@ -224,3 +224,7 @@ Rigorous Evaluation: Implement evaluation metrics for both LTM retrieval effecti
 Ecosystem Velocity: The open-source LLM and agent ecosystem is evolving extremely rapidly.87 New models, optimization techniques (like FlashAttention-3 30), and framework features appear frequently. Be prepared to monitor developments and potentially adapt the chosen technology stack over time.
 Developer Effort: Despite the power of open-source tools, significant developer effort is required for selecting components, ensuring interoperability, tuning parameters 47, implementing custom logic, and evaluating performance. The ease of use and documentation quality of tools (e.g., ChromaDB's user-friendly API 47, LangChain's extensive examples 66) are valid considerations when balancing development time against raw performance metrics.
 By carefully considering these strategies, recommendations, and final points, developers can navigate the complexities of implementing effective short-term and long-term agentic memory systems within the challenging but rewarding constraints of local, single-GPU deployment using the vibrant open-source AI toolkit.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Research/Agent memory]]

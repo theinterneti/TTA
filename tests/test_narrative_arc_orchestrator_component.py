@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_narrative_arc_orchestrator_component]]
 Tests for Narrative Arc Orchestrator Component
 
 This module contains unit tests for the NarrativeArcOrchestratorComponent

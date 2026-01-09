@@ -590,3 +590,7 @@ it('refetches narrative when sessionId changes', async () => {
 ---
 
 **Note:** This chat mode focuses on frontend implementation. For backend APIs, consult the backend-dev chat mode. For deployment, consult the devops chat mode.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Frontend-dev.chatmode]]

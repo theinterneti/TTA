@@ -361,3 +361,7 @@ After adding your model:
 ---
 
 **Questions?** Open an issue or ask in the project Discord.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Adding-models-to-registry]]

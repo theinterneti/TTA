@@ -276,3 +276,7 @@ usage_sites = FindReferencingSymbolsTool().execute(
 3. **Phase 6**: Create serena-specific workflows for TTA codebase analysis
 4. **Phase 7**: Instrument tool invocations with observability traces
 5. **Phase 8**: Integrate with TTA's graph database for semantic code graph
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Readme]]

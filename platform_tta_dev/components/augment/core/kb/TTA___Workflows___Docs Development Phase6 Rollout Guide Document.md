@@ -398,3 +398,7 @@ After all components are stable in staging:
 - [[TTA/Workflows/COMPONENT_PROMOTION_GUIDE|Component Promotion Guide]]
 - [[TTA/Workflows/COMPONENT_INVENTORY|Component Inventory]]
 - [[TTA/Workflows/PHASE5_PILOT_PROMOTION_GUIDE|Phase 5: Pilot Promotion]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs development phase6 rollout guide document]]

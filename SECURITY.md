@@ -169,3 +169,7 @@ We would like to thank the following individuals for responsibly disclosing secu
 
 **Last Updated:** October 4, 2025
 **Version:** 1.0
+
+
+---
+**Logseq:** [[TTA.dev/Security]]

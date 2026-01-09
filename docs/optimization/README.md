@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/TTA Agentic Primitives - Rules & Patterns.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Optimization/Readme]]

@@ -292,3 +292,7 @@ def test_example(self, orchestrator_with_mocked_paths):
 **Session:** coverage-improvement-orchestration-2025-10-20
 **Workflow:** test-coverage-improvement.prompt.md
 **Chat Mode:** qa-engineer.chatmode.md
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Coverage-improvement-orchestration-summary]]

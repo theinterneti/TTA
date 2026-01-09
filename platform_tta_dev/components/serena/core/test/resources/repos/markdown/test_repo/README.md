@@ -51,3 +51,7 @@ function greet(name) {
 ## License
 
 MIT License
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Resources/Repos/Markdown/Test_repo/Readme]]

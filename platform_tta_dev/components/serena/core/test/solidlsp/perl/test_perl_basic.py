@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Perl/Test_perl_basic]]
 import platform
 from pathlib import Path
 

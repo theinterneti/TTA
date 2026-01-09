@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Create_batch2_tests_sample]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

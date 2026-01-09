@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Narrative Arc Orchestrator Maturity Status.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA/Components/Narrative_arc_orchestrator/Maturity]]

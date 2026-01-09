@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Jedi_server]]
 Provides Python specific instantiation of the LanguageServer class. Contains various configurations and settings specific to Python.
 """
 

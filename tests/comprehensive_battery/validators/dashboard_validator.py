@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Validators/Dashboard_validator]]
 Dashboard Validator
 
 Validates dashboard population and real-time data display including:

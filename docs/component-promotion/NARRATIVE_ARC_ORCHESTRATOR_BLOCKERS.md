@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Narrative Arc Orchestrator - Promotion Blockers.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Narrative_arc_orchestrator_blockers]]

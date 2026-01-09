@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Services/Test_model_selector_concrete]]
 Concrete value tests for ModelSelector.
 
 These tests complement property-based tests by validating business logic correctness

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Single-Player Testing Quick Start Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Quick_start_guide]]

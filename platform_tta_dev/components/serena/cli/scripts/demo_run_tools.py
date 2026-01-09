@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Cli/Scripts/Demo_run_tools]]
 This script demonstrates how to use Serena's tools locally, useful
 for testing or development. Here the tools will be operation the serena repo itself.
 """

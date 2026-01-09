@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Codecov Best Practices - Based on Official Documentation.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Workflows/Codecov_best_practices]]

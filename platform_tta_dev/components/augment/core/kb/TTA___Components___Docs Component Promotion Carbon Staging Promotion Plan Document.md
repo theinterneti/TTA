@@ -387,3 +387,7 @@ curl -f http://staging.tta.local/health/carbon || echo "Health check failed"
 **Last Updated**: 2025-10-13
 **Next Review**: 2025-10-21 (end of observation period)
 **Maintained By**: @theinterneti
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs component promotion carbon staging promotion plan document]]

@@ -321,3 +321,7 @@ The `MUTATION_TESTING_GUIDE.md` should be updated with:
 3. ⏭️ Update Phase 3 summary with findings
 4. ⏭️ Create Cosmic Ray configuration for future use
 5. ⏭️ Update mutation testing guide with alternative approaches
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Mutation_testing_resolution]]

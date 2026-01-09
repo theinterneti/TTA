@@ -613,3 +613,7 @@ uv run python scripts/query_notebook_helper.py "What validation gates should age
 ---
 
 **Note:** This chat mode focuses on testing and quality assurance. For implementation fixes, delegate to backend-dev or frontend-dev. For deployment, delegate to devops.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Workflows/Chatmodes/Qa-engineer.chatmode]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Optimization]]
 Intelligent agent coordination optimization with predictive scheduling.
 
 This module provides advanced optimization algorithms for agent coordination,

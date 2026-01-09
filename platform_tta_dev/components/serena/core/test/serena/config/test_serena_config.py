@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Config/Test_serena_config]]
 import shutil
 import tempfile
 from pathlib import Path

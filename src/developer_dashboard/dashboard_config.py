@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Developer_dashboard/Dashboard_config]]
 Developer Dashboard Configuration for TTA Comprehensive Test Battery.
 
 Configuration settings and initialization for dashboard integration.

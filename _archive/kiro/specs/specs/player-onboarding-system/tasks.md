@@ -118,3 +118,7 @@
   - Add database migration scripts for production deployment
   - Write deployment validation tests and production readiness checks
   - _Requirements: All requirements - production deployment support_
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Player-onboarding-system/Tasks]]

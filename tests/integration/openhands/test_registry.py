@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Openhands/Test_registry]]
 Unit tests for OpenHands model registry system.
 
 Tests:

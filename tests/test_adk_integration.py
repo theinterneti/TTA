@@ -12,6 +12,8 @@ Test Coverage:
 - Error handling and retries
 """
 
+# Logseq: [[TTA.dev/Tests/Test_adk_integration]]
+
 import os
 from unittest.mock import patch
 

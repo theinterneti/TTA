@@ -45,3 +45,7 @@ Note that in most configurations, only a subset of these tools will be enabled s
 * `think_about_task_adherence`: Thinking tool for determining whether the agent is still on track with the current task.
 * `think_about_whether_you_are_done`: Thinking tool for determining whether the task is truly completed.
 * `write_memory`: Writes a named memory (for future reference) to Serena's project-specific memory store.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/01-about/035_tools]]

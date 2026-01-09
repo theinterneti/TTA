@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Playwright-visual.config]]
 import { defineConfig, devices } from '@playwright/test';
 
 /**

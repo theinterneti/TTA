@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Session_manager]]
 Redis-backed session manager for OpenRouter OAuth.
 
 Replaces in-memory session storage with persistent Redis storage

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Haskell_language_server]]
 Provides Haskell specific instantiation of the LanguageServer class. Contains various configurations and settings specific to Haskell.
 """
 

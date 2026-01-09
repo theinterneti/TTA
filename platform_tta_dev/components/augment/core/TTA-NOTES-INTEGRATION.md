@@ -795,3 +795,7 @@ The TTA system uses multiple AI agents...
 
 **Status:** Ready to begin Phase 1 (Setup)
 **Next:** User decision on integration strategy + TTA-notes repo path
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Tta-notes-integration]]

@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Character_arc_manager]]
+
+# Logseq: [[TTA/Components/Character_arc_manager]]
 Character Arc Manager Component
 
 This module implements the Character Arc Manager component that manages dynamic

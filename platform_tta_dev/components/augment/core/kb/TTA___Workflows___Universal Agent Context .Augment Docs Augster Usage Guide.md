@@ -331,3 +331,7 @@ See [Architecture Documentation - Troubleshooting](./augster-modular-architectur
 - [[TTA/Workflows/augster-modular-architecture|Architecture Documentation]]
 - [[TTA/Workflows/augster-migration-guide|Migration Guide]]
 - [Original Monolithic Prompt](../.augment/user_guidelines.md.backup)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___universal agent context .augment docs augster usage guide]]

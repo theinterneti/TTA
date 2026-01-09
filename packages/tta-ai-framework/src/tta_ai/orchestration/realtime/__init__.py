@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/__init__]]
 Real-time interaction management for agent orchestration.
 
 This module provides WebSocket-based real-time communication, event broadcasting,

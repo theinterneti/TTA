@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Context/Test_instruction_loading]]
 Unit tests for instruction loading in AI Conversation Context Manager.
 
 Tests the InstructionLoader class and load_instructions() method.

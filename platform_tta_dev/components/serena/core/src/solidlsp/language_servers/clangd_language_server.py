@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Clangd_language_server]]
 Provides C/C++ specific instantiation of the LanguageServer class. Contains various configurations and settings specific to C/C++.
 """
 

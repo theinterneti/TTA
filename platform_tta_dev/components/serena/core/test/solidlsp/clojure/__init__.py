@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Clojure/__init__]]
 from pathlib import Path
 
 from solidlsp.language_servers.clojure_lsp import verify_clojure_cli

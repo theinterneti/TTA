@@ -1,5 +1,7 @@
 """Therapeutic scoring enumerations."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Therapeutic_scoring/Enums]]
+
 from enum import Enum
 
 

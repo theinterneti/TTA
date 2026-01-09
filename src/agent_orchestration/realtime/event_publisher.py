@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Event_publisher]]
 Event publisher for real-time agent orchestration communication.
 
 This module provides a centralized event publishing system that broadcasts

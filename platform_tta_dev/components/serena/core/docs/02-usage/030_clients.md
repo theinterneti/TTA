@@ -158,3 +158,7 @@ Some of the leading open source GUI applications are
 
 These applications allow to combine Serena with almost any LLM (including locally running ones)
 and offer various other integrations.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Docs/02-usage/030_clients]]

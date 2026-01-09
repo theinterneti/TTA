@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/.storybook/Test-runner]]
 import type { TestRunnerConfig } from '@storybook/test-runner';
 import { getStoryContext } from '@storybook/test-runner';
 

@@ -1,5 +1,7 @@
 """Tests for CLI project commands (create, index)."""
 
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Serena/Test_cli_project_commands]]
+
 import os
 import shutil
 import tempfile

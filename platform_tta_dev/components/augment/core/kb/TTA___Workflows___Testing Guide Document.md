@@ -419,3 +419,7 @@ uv run pytest -m "not slow"
 **🎉 You now have everything to test TTA efficiently!**
 
 **Quick start**: `uv run pytest tests/unit/ -v --cov=src --cov-report=html`
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___testing guide document]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Test/Solidlsp/Swift/Test_swift_basic]]
 Basic integration tests for the Swift language server functionality.
 
 These tests validate the functionality of the language server APIs

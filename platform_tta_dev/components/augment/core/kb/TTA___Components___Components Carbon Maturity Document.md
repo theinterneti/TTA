@@ -282,3 +282,7 @@ echo "✅ All checks passed!"
 **Current Stage**: **Development** ⚠️
 **Status**: Requires remediation (42.2% coverage, 1 linting violation)
 <!-- END AUTO-GENERATED -->
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___components carbon maturity document]]

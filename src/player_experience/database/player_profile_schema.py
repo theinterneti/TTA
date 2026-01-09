@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Player_profile_schema]]
 Neo4j schema management for Player Profile data.
 
 This module extends the existing TTA Neo4j schema to include

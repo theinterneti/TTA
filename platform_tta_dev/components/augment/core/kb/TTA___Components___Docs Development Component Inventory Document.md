@@ -452,3 +452,7 @@ Therapeutic Content (Depends on Core + AI/Agent)
 - [[TTA/Components/COMPONENT_PROMOTION_GUIDE|Component Promotion Guide]]
 - [[TTA/Components/COMPONENT_LABELS_GUIDE|Component Labels Guide]]
 - [[TTA/Components/GITHUB_PROJECT_SETUP|GitHub Project Setup]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___components___docs development component inventory document]]

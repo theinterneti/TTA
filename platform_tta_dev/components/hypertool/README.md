@@ -173,3 +173,7 @@ persona_path = "platform_tta_dev/components/hypertool/personas/personas/QualityG
 2. **Phase 4**: Migrate serena component (depends on hypertool personas)
 3. **Phase 5**: Add observability instrumentation for MCP calls
 4. **Phase 6**: Document workflow DSL schema with trace requirements
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Readme]]

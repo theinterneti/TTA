@@ -114,3 +114,7 @@ This document tracks the missing specification documents identified for the TTA 
 - [AI Framework Documentation](../Documentation/ai-framework/README.md)
 - [Architecture Documentation](../Documentation/architecture/README.md)
 - [Components Documentation](../Documentation/components/README.md)
+
+
+---
+**Logseq:** [[TTA.dev/_archive/Kiro/Specs/Specs/Missing-specs-analysis]]

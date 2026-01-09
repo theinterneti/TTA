@@ -225,3 +225,7 @@ chmod -R u+w ../core/.serena/
 - [Serena CLI Documentation](../core/docs/02-usage/cli.md)
 - [Tool Reference](../core/docs/01-about/035_tools.html)
 - [Project Configuration Guide](../core/.serena/README.md)
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Cli/Readme]]

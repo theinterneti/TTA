@@ -269,3 +269,7 @@ async def test_new_feature_validation(
 - [Testing Guide](./TESTING_GUIDE.md)
 - [Production Readiness Fixes](../PRODUCTION_READINESS_FIXES.md)
 - [Frontend Deployment Fix](../FRONTEND_DEPLOYMENT_FIX.md)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Post_deployment_testing]]

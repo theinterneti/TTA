@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_enhanced_authentication]]
 Tests for enhanced authentication system with MFA and RBAC.
 
 This module tests the enhanced authentication features including

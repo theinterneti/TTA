@@ -463,3 +463,7 @@ async def run_quality_gates_parallel(component_path, target_stage):
 ---
 
 **Note:** This file should be updated with new quality gate insights and optimizations as they are discovered.
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Memory/Quality-gates.memory]]

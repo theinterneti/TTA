@@ -365,3 +365,7 @@ secrets:
 ---
 
 **For production secrets management**, see: `secrets/production/README.md`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Guides/Secrets-management]]

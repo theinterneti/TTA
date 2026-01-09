@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Analytics]]
 Performance analytics and bottleneck identification algorithms.
 
 This module provides advanced analytics for identifying performance bottlenecks,

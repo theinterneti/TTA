@@ -491,3 +491,7 @@ alias tta-type="uv run mypy src/"
 
 **Quick Reference Version:** 1.0
 **Last Updated:** 2025-10-03
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Kb/Tta___workflows___docs testing quick reference testing guide document]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Common/Health_checks]]
 System health check utilities for TTA production readiness.
 
 Provides unified health check interface for all system components:

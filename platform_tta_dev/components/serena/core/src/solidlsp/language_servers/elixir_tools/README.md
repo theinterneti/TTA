@@ -88,3 +88,7 @@ pytest test/solidlsp/elixir/ -m elixir
 - **Command**: `nextls --stdio`
 
 The implementation follows the same patterns as other language servers in this project, inheriting from `SolidLanguageServer` and providing Elixir-specific configuration and behavior.
+
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Serena/Core/Src/Solidlsp/Language_servers/Elixir_tools/Readme]]

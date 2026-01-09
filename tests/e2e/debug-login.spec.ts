@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Debug-login.spec]]
 import { test, expect } from '@playwright/test';
 
 test('debug login flow', async ({ page }) => {

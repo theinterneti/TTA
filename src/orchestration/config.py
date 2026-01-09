@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Orchestration/Config]]
 TTA Configuration.
 
 This module provides configuration management for the TTA project.

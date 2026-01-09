@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Metrics_collector]]
 Mock metrics collector for TTA containerized deployment.
 """
 

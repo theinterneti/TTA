@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Optimization/Performance_analytics]]
 Performance analytics system for monitoring optimization effectiveness.
 
 This module provides comprehensive analytics, reporting, and monitoring

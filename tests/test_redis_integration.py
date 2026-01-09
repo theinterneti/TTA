@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Test_redis_integration]]
 # CI retrigger: ensure sync Redis fixture is used consistently
 
 
