@@ -68,7 +68,6 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
-        args: [optional-scope]
 
   # Python docstring formatting (warning only for now)
   - repo: https://github.com/pycqa/pydocstyle
