@@ -9,9 +9,12 @@ REST and WebSocket paths stay consistent.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 
 from ..models.enums import IntensityLevel, TherapeuticApproach
+
+logger = logging.getLogger(__name__)
 
 # Canonical alias map for approaches
 _APPROACH_ALIAS = {

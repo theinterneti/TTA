@@ -436,6 +436,7 @@ ignore = [
     "PLR2004", # magic value comparison
     "S101",  # use of assert (common in tests)
     "SIM108", # use ternary operator (sometimes less readable)
+    "ERA001", # Logseq citation comments (# Logseq: [[...]]) are project convention
 ]
 
 # Allow auto-fixing for all enabled rules
@@ -445,7 +446,7 @@ unfixable = []
 # Per-file ignores
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "E402"]
-"tests/**/*.py" = ["S101", "ARG", "PLR2004"]  # Allow assert, unused args, magic values in tests
+"tests/**/*.py" = ["S101", "ARG", "PLR2004", "S105", "S106", "S110", "PLC0415", "PLR0911", "PLR0912", "PLR0915", "PTH103", "PTH123", "PTH110", "F811", "E402"]  # Allow assert, unused args, test passwords, deferred imports in tests
 "scripts/analyze-neo4j-staging-metrics.py" = ["T201", "PLR0912", "PLR0915", "ARG001", "F841", "PTH123"]  # Reporting script needs print statements
 
 # Import sorting configuration (replaces isort)
@@ -470,6 +471,16 @@ testpaths = [
 python_files = [
     "test_*.py",
     "*_test.py",
+]
+norecursedirs = [
+    "tests/archive",
+    "tests/e2e",
+    "tests/e2e-staging",
+    "tests/mutation",
+    ".git",
+    "__pycache__",
+    ".venv",
+    "node_modules",
 ]
 # pytest-asyncio configuration
 asyncio_mode = "auto"

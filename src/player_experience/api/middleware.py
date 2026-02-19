@@ -138,7 +138,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         # Record player_id presence metrics for authenticated endpoints
         if endpoint not in ["/health", "/metrics", "/docs", "/openapi.json"]:
             try:
-                from src.monitoring.prometheus_metrics import get_metrics_collector
+                from src.monitoring.prometheus_metrics import (  # noqa: PLC0415
+                    get_metrics_collector,
+                )
 
                 collector = get_metrics_collector("player-experience")
                 collector.record_player_id_presence(endpoint, has_player_id)
@@ -282,6 +284,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/redoc",
         "/openapi.json",
         "/metrics",  # gated by settings.debug inside the route
+        "/metrics-prom",  # gated by settings.debug inside the route
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/register",
@@ -298,7 +301,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/api/v1/health/startup",  # Kubernetes startup probe
     }
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:  # noqa: PLR0911
         """
         Handle authentication for protected routes.
 
@@ -436,7 +439,9 @@ class CrisisDetectionMiddleware(BaseHTTPMiddleware):
                             break
 
                 # Recreate request with body for next handler
-                from starlette.requests import Request as StarletteRequest
+                from starlette.requests import (  # noqa: PLC0415
+                    Request as StarletteRequest,
+                )
 
                 async def receive() -> dict[str, str | bytes]:
                     return {"type": "http.request", "body": body}

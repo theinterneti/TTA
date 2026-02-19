@@ -11,10 +11,10 @@ import os
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import bcrypt as _bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from ..models.player import PlayerProfile
@@ -27,8 +27,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT token scheme
 security = HTTPBearer()
@@ -51,7 +49,7 @@ class Token(BaseModel):
 
     access_token: str
     refresh_token: str
-    token_type: str = "bearer"
+    token_type: str = "bearer"  # noqa: S105
     expires_in: int
 
 
@@ -88,7 +86,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if password matches, False otherwise
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return _bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+    except Exception:
+        return False
 
 
 def get_password_hash(password: str) -> str:
@@ -101,7 +102,7 @@ def get_password_hash(password: str) -> str:
     Returns:
         str: The hashed password
     """
-    return pwd_context.hash(password)
+    return _bcrypt.hashpw(password.encode(), _bcrypt.gensalt()).decode()
 
 
 def create_access_token(
@@ -285,7 +286,7 @@ class AuthService:
     """Service class for authentication operations."""
 
     @staticmethod
-    async def authenticate_player(username: str, password: str) -> PlayerProfile | None:
+    async def authenticate_player(username: str, password: str) -> PlayerProfile | None:  # noqa: ARG004
         """
         Authenticate a player with username and password.
 

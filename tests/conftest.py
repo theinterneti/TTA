@@ -416,7 +416,7 @@ def redis_client_sync(redis_container):
 
 
 # Comprehensive Test Battery Integration
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def comprehensive_test_config():
     """Provide comprehensive test battery configuration."""
     if not COMPREHENSIVE_TEST_AVAILABLE:
@@ -438,7 +438,7 @@ async def comprehensive_test_config():
     return config
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def mock_service_manager():
     """Provide mock service manager for comprehensive testing."""
     if not COMPREHENSIVE_TEST_AVAILABLE:

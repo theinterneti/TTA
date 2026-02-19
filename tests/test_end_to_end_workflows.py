@@ -22,6 +22,17 @@ from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 
 
+def receive_message_with_role(websocket, role: str, max_messages: int = 20) -> dict:
+    """Read WebSocket messages until one with the given role is found."""
+    for _ in range(max_messages):
+        msg = json.loads(websocket.receive_text())
+        if msg.get("role") == role:
+            return msg
+    raise AssertionError(
+        f"No message with role={role!r} received in {max_messages} messages"
+    )
+
+
 @pytest.fixture
 def client():
     """Create a test FastAPI application client."""
@@ -62,23 +73,22 @@ def create_test_character_data(name: str = "Test Character") -> dict[str, Any]:
             "occupation": "student",
             "personality_traits": ["empathetic", "curious", "patient"],
             "backstory": "A student exploring personal growth through therapeutic adventures",
+            "life_goals": ["Improve wellbeing"],
         },
         "therapeutic_profile": {
             "readiness_level": 0.7,
             "preferred_intensity": "medium",
             "therapeutic_approaches": ["cbt", "narrative_therapy"],
+            "primary_concerns": ["anxiety", "stress management"],
             "therapeutic_goals": [
                 {
                     "goal_id": "goal-1",
                     "description": "Improve emotional regulation",
                     "target_date": (datetime.now() + timedelta(days=30)).isoformat(),
-                    "priority": "high",
                     "is_active": True,
                 }
             ],
-            "comfort_topics": ["relationships", "personal_growth"],
-            "avoid_topics": ["trauma", "violence"],
-            "trigger_warnings": ["loud_noises"],
+            "comfort_zones": ["relationships", "personal_growth"],
         },
     }
 
@@ -191,9 +201,8 @@ class TestEndToEndUserWorkflows:
             }
             websocket.send_text(json.dumps(user_message))
 
-            # Receive therapeutic response
-            response_msg = json.loads(websocket.receive_text())
-            assert response_msg["role"] == "assistant"
+            # Receive therapeutic response (skip intermediate progress/system events)
+            response_msg = receive_message_with_role(websocket, "assistant")
             assert "text" in response_msg["content"]
             assert response_msg["metadata"]["safety"]["crisis"] is False
 
@@ -250,7 +259,7 @@ class TestEndToEndUserWorkflows:
 
         # Create multiple characters
         characters = []
-        for i, name in enumerate(["Character1", "Character2", "Character3"]):
+        for i, name in enumerate(["Alice", "Bob", "Carol"]):
             char_data = create_test_character_data(name)
             # Vary therapeutic approaches
             char_data["therapeutic_profile"]["therapeutic_approaches"] = [
@@ -330,9 +339,8 @@ class TestEndToEndUserWorkflows:
                 }
                 websocket.send_text(json.dumps(user_message))
 
-                # Receive response
-                response_msg = json.loads(websocket.receive_text())
-                assert response_msg["role"] == "assistant"
+                # Receive response (skip intermediate progress/system events)
+                response_msg = receive_message_with_role(websocket, "assistant")
                 assert "text" in response_msg["content"]
 
         # Verify dashboard shows all characters
@@ -400,7 +408,9 @@ class TestEndToEndUserWorkflows:
                 },
             }
             websocket.send_text(json.dumps(user_message))
-            websocket.receive_text()  # Response
+            receive_message_with_role(
+                websocket, "assistant"
+            )  # Drain progress events and get response
 
             # Provide positive feedback indicating readiness for higher intensity
             feedback = {
@@ -443,8 +453,7 @@ class TestEndToEndUserWorkflows:
             }
             websocket.send_text(json.dumps(follow_up_message))
 
-            response_msg = json.loads(websocket.receive_text())
-            assert response_msg["role"] == "assistant"
+            response_msg = receive_message_with_role(websocket, "assistant")
             # Response should reflect updated intensity and approaches
             assert "text" in response_msg["content"]
 
@@ -489,9 +498,8 @@ class TestConcurrentUserScenarios:
                     }
                     websocket.send_text(json.dumps(user_message))
 
-                    # Receive response
-                    response_msg = json.loads(websocket.receive_text())
-                    assert response_msg["role"] == "assistant"
+                    # Receive response (skip intermediate progress/system events)
+                    receive_message_with_role(websocket, "assistant")
 
                     connection_time = time.time() - start_time
 
@@ -770,8 +778,7 @@ class TestErrorHandlingAndRecovery:
             }
             websocket.send_text(json.dumps(continuation_message))
 
-            response_msg = json.loads(websocket.receive_text())
-            assert response_msg["role"] == "assistant"
+            response_msg = receive_message_with_role(websocket, "assistant")
             assert "text" in response_msg["content"]
 
     def test_invalid_data_handling(self, client):
