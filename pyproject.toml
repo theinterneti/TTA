@@ -25,6 +25,11 @@ dependencies = [
     # Workspace packages
     "tta-ai-framework",
     "tta-narrative-engine",
+    # TTA.dev platform packages
+    "tta-dev-primitives>=1.3.0",
+    "tta-observability-integration>=1.0.0",
+    "universal-agent-context>=1.0.0",
+    "tta-dev-integrations>=0.1.0",
     # Core dependencies
     "numpy>=1.24.0",
     "pandas>=2.0.0",
@@ -312,13 +317,17 @@ cache-dir = "./.uv_cache"
 members = [
     "packages/tta-ai-framework",
     "packages/tta-narrative-engine",
-    # Note: ai-dev-toolkit excluded until TTA.dev packages (dev-primitives, tta-workflow-primitives) are published
-    # Note: universal-agent-context is a documentation package, not a Python package
+    "packages/ai-dev-toolkit",
 ]
 
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
+ai-dev-toolkit = { workspace = true }
+tta-dev-primitives = { path = "../TTA.dev/platform/primitives", editable = true }
+tta-observability-integration = { path = "../TTA.dev/platform/observability", editable = true }
+universal-agent-context = { path = "../TTA.dev/platform/agent-context", editable = true }
+tta-dev-integrations = { path = "../TTA.dev/platform/integrations", editable = true }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
