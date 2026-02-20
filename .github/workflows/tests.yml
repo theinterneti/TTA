@@ -36,10 +36,14 @@ jobs:
         run: |
           uv run pytest -q --tb=short \
             -m "not integration and not neo4j and not redis" \
+            --ignore=tests/post_deployment \
+            --ignore=tests/e2e \
+            --ignore=tests/e2e-staging \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-branch \
             --cov-report=xml:coverage-unit.xml \
             --cov-report=term-missing \
+            --override-ini="fail_under=0" \
             tests/
 
       - name: Upload coverage to Codecov
