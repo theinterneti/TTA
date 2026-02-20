@@ -723,7 +723,7 @@ class TestPerformanceMonitor:
         from src.components.model_management.services import PerformanceMonitor
 
         monitor = PerformanceMonitor()
-        await monitor.initialize()
+        await monitor.start()
         return monitor
 
     @pytest.mark.asyncio
@@ -753,7 +753,7 @@ class TestPerformanceMonitor:
         }
         await monitor.record_metrics("test-model", metrics)
 
-        result = await monitor.get_metrics("test-model")
+        result = await monitor.get_model_performance("test-model")
 
         assert result is not None
 
@@ -1128,9 +1128,9 @@ class TestLocalProvider:
     @pytest.fixture
     def provider(self):
         """Create a Local provider instance."""
-        from src.components.model_management.providers.local import LocalProvider
+        from src.components.model_management.providers.local import LocalModelProvider
 
-        return LocalProvider()
+        return LocalModelProvider()
 
     @pytest.mark.asyncio
     async def test_initialization(self, provider):
