@@ -117,8 +117,8 @@ def test_load_valid_registry():
     """Test loading a valid registry file."""
     registry = load_model_registry()
     assert registry is not None
-    assert registry.version == "1.0.0"
-    assert len(registry.models) == 11  # From actual registry file
+    assert registry.version == "1.1.0"
+    assert len(registry.models) >= 11  # Registry grows as models are added
     assert "openrouter/deepseek/deepseek-chat" in registry.models
 
 
