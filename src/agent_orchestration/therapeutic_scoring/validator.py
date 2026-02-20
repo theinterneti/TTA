@@ -209,7 +209,10 @@ class TherapeuticValidator:
         return max(0.0, min(1.0, appropriateness))
 
     def _generate_therapeutic_alternative(
-        self, text: str, findings: list[Any], level: SafetyLevel  # noqa: ARG002
+        self,
+        text: str,
+        findings: list[Any],
+        level: SafetyLevel,  # noqa: ARG002
     ) -> str | None:
         """Generate therapeutic alternative content."""
         if not self._therapeutic_tone:

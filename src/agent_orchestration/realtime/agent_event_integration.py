@@ -298,9 +298,8 @@ class WorkflowEventIntegrator:
                 "advance_step": lambda message="": self._advance_workflow_step(
                     workflow_id, message
                 ),
-                "update_progress": lambda progress,
-                message="": self._update_workflow_progress(
-                    workflow_id, progress, message
+                "update_progress": lambda progress, message="": (
+                    self._update_workflow_progress(workflow_id, progress, message)
                 ),
                 "add_metadata": lambda key, value: self._add_workflow_metadata(
                     workflow_id, key, value

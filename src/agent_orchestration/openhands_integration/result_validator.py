@@ -67,8 +67,9 @@ class ResultValidator:
             ValidationRule(
                 name="file_exists",
                 description="Output file exists",
-                validator=lambda result: "output_file" in result
-                and Path(result["output_file"]).exists(),
+                validator=lambda result: (
+                    "output_file" in result and Path(result["output_file"]).exists()
+                ),
                 level=ValidationLevel.ERROR,
                 error_message="Output file does not exist",
             )
@@ -79,8 +80,9 @@ class ResultValidator:
             ValidationRule(
                 name="content_not_empty",
                 description="Output content is not empty",
-                validator=lambda result: "content" in result
-                and len(result["content"]) > 0,
+                validator=lambda result: (
+                    "content" in result and len(result["content"]) > 0
+                ),
                 level=ValidationLevel.ERROR,
                 error_message="Output content is empty",
             )

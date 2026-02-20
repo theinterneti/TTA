@@ -209,8 +209,8 @@ async def test_frontend_can_reach_backend_api(
 
         # Verify CORS headers are present (if making cross-origin request)
         if (
-            frontend_base_url.split("://")[1].split(":")[0]
-            != api_base_url.split("://")[1].split(":")[0]
+            frontend_base_url.split("://")[1].split(":", maxsplit=1)[0]
+            != api_base_url.split("://")[1].split(":", maxsplit=1)[0]
         ):
             # Cross-origin request - check CORS headers
             cors_headers = api_response.headers.get("access-control-allow-origin")

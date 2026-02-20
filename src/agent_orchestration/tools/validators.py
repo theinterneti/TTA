@@ -349,7 +349,9 @@ class ToolDescriptionValidator:
             score -= 0.5
 
         # Check for action verbs (good descriptions start with verbs)
-        first_word = description.split()[0].lower() if description.split() else ""
+        first_word = (
+            description.split(maxsplit=1)[0].lower() if description.split() else ""
+        )
         action_verbs = {
             "retrieves",
             "fetches",
