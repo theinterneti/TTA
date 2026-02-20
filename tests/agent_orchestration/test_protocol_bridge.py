@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from agent_orchestration.adapters import AgentCommunicationError
 from agent_orchestration.messaging import MessageResult
-from agent_orchestration.models import AgentMessage, AgentType
+from agent_orchestration.models import AgentId, AgentMessage, AgentType, MessageType
 from agent_orchestration.protocol_bridge import (
     MessageRouter,
     MessageTranslationResult,
@@ -122,10 +122,11 @@ class TestProtocolTranslator:
         """Test translating an AgentMessage object."""
         translator = ProtocolTranslator()
         message = AgentMessage(
-            id="test-id",
-            type="command",
-            content="test content",
-            agent_type=AgentType.IPA,
+            message_id="test-id-msg",
+            sender=AgentId(type=AgentType.IPA),
+            recipient=AgentId(type=AgentType.WBA),
+            message_type=MessageType.REQUEST,
+            payload={"content": "test content"},
         )
 
         result = translator.translate_message(
@@ -224,10 +225,11 @@ class TestMessageRouter:
     async def test_route_message_with_agent_message(self, router):
         """Test routing with AgentMessage object."""
         message = AgentMessage(
-            id="test-id",
-            type="command",
-            content="test",
-            agent_type=AgentType.IPA,
+            message_id="test-id-msg",
+            sender=AgentId(type=AgentType.IPA),
+            recipient=AgentId(type=AgentType.WBA),
+            message_type=MessageType.REQUEST,
+            payload={"content": "test"},
         )
         result = await router.route_message(AgentType.IPA, message)
 

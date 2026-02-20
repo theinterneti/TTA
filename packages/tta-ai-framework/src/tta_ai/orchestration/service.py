@@ -228,7 +228,7 @@ class AgentOrchestrationService:
             self._error_count += 1
             logger.error(f"Error processing user input: {e}")
 
-            if isinstance(e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)):
+            if isinstance(e, TherapeuticSafetyError | WorkflowExecutionError | SessionContextError):
                 raise
             raise ServiceError(f"Unexpected error during processing: {e}") from e
 
@@ -624,7 +624,9 @@ class AgentOrchestrationService:
                 "score": result.score,
                 "reason": f"Therapeutic validation: {result.level.value}",
                 "crisis_detected": result.crisis_detected,
-                "crisis_types": [ct.value for ct in result.crisis_types],
+                "crisis_types": [
+                    ct.value if hasattr(ct, "value") else ct for ct in result.crisis_types
+                ],
                 "escalation_recommended": result.escalation_recommended,
                 "alternative_content": result.alternative_content,
                 "therapeutic_appropriateness": result.therapeutic_appropriateness,
@@ -692,7 +694,10 @@ class AgentOrchestrationService:
                                 ),
                                 {
                                     "intervention_id": intervention.intervention_id,
-                                    "crisis_types": [ct.value for ct in assessment.crisis_types],
+                                    "crisis_types": [
+                                        ct.value if hasattr(ct, "value") else ct
+                                        for ct in assessment.crisis_types
+                                    ],
                                     "crisis_level": assessment.crisis_level.value,
                                 },
                             )

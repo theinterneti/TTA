@@ -42,8 +42,12 @@ def test_typing_events_emitted_when_opt_in(client: TestClient) -> None:
         # first event should be typing start
         assert first["content"].get("event") == "typing"
         assert first["content"].get("status") == "start"
-        # then assistant reply
+        # consume progress events until assistant reply (progress events have role="system")
         reply = json.loads(ws.receive_text())
+        while (
+            reply.get("role") == "system" and reply["content"].get("event") != "typing"
+        ):
+            reply = json.loads(ws.receive_text())
         assert reply["role"] == "assistant"
         # then typing stop
         last = json.loads(ws.receive_text())

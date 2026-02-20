@@ -1,4 +1,5 @@
 """
+Logseq: [[TTA.dev/Tests/Test_components_legacy]]
 
 # Logseq: [[TTA.dev/Tests/Test_components]]
 TTA Components Tests
@@ -354,8 +355,10 @@ class TestComponents(unittest.TestCase):
                 }
             }
 
-            # Call _save_emissions_data
-            carbon._save_emissions_data()
+            # Patch codecarbon_available so get_emissions_report returns proper data
+            with patch("src.components.carbon_component.codecarbon_available", True):
+                # Call _save_emissions_data
+                carbon._save_emissions_data()
 
             # Check that a file was created
             files = list(Path(temp_dir).glob("emissions_*.json"))
@@ -404,7 +407,16 @@ class TestComponents(unittest.TestCase):
         config = TTAConfig()
         carbon = CarbonComponent(config)
 
-        with patch("src.components.carbon_component.codecarbon_available", True):
+        mock_decorator = lambda f: f  # noqa: E731
+        mock_track_emissions = MagicMock(return_value=mock_decorator)
+        with (
+            patch("src.components.carbon_component.codecarbon_available", True),
+            patch(
+                "src.components.carbon_component.track_emissions",
+                mock_track_emissions,
+                create=True,
+            ),
+        ):
             decorator = carbon.get_carbon_decorator(project_name="test_project")
             self.assertIsNotNone(decorator, "Should return a decorator")
 

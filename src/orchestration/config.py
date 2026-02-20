@@ -99,10 +99,10 @@ class TTAConfig:
         try:
             # Determine file format based on extension
             if self.config_path.suffix.lower() in [".yaml", ".yml"]:
-                with open(self.config_path) as f:
+                with self.config_path.open() as f:
                     self.config = yaml.safe_load(f) or {}
             elif self.config_path.suffix.lower() == ".json":
-                with open(self.config_path) as f:
+                with self.config_path.open() as f:
                     self.config = json.load(f)
             else:
                 logger.warning(
@@ -284,14 +284,17 @@ class TTAConfig:
         """
         config = self.config
         for key in keys[:-1]:
-            if key == "ttadev":
-                key = "tta.dev"
-            elif key == "ttaprototype":
-                key = "tta.prototype"
+            config_key = (
+                "tta.dev"
+                if key == "ttadev"
+                else "tta.prototype"
+                if key == "ttaprototype"
+                else key
+            )
 
-            if key not in config:
-                config[key] = {}
-            config = config[key]
+            if config_key not in config:
+                config[config_key] = {}
+            config = config[config_key]
 
         last_key = keys[-1]
         if last_key == "ttadev":
@@ -375,10 +378,10 @@ class TTAConfig:
 
             # Determine file format based on extension
             if path.suffix.lower() in [".yaml", ".yml"]:
-                with open(path, "w") as f:
+                with path.open("w") as f:
                     yaml.dump(self.config, f, default_flow_style=False)
             elif path.suffix.lower() == ".json":
-                with open(path, "w") as f:
+                with path.open("w") as f:
                     json.dump(self.config, f, indent=2)
             else:
                 logger.error(f"Unsupported config file format: {path.suffix}")
@@ -421,13 +424,9 @@ class TTAConfig:
         if schema is None:
             schema = self._get_default_schema()
 
-        try:
-            self._validate_dict(self.config, schema)
-            logger.info("Configuration validation successful")
-            return True
-        except ValueError as e:
-            logger.error(f"Configuration validation failed: {e}")
-            return False
+        self._validate_dict(self.config, schema)
+        logger.info("Configuration validation successful")
+        return True
 
     def _validate_dict(
         self, config: dict[str, Any], schema: dict[str, Any], path: str = ""
@@ -445,9 +444,10 @@ class TTAConfig:
         """
         for key, value_schema in schema.items():
             # Check if the key exists
+            full_key = f"{path}.{key}" if path else key
             if key not in config:
                 if value_schema.get("required", False):
-                    raise ValueError(f"Required key '{path}.{key}' is missing")
+                    raise ValueError(f"Required key '{full_key}' is missing")
                 continue
 
             value = config[key]
@@ -456,27 +456,27 @@ class TTAConfig:
             expected_type = value_schema.get("type")
             if expected_type is not None:
                 if expected_type == "dict" and not isinstance(value, dict):
-                    raise ValueError(f"Key '{path}.{key}' must be a dictionary")
+                    raise ValueError(f"Key '{full_key}' must be a dictionary")
                 if expected_type == "list" and not isinstance(value, list):
-                    raise ValueError(f"Key '{path}.{key}' must be a list")
+                    raise ValueError(f"Key '{full_key}' must be a list")
                 if expected_type == "str" and not isinstance(value, str):
-                    raise ValueError(f"Key '{path}.{key}' must be a string")
+                    raise ValueError(f"Key '{full_key}' must be a string")
                 if expected_type == "int" and not isinstance(value, int):
-                    raise ValueError(f"Key '{path}.{key}' must be an integer")
-                if expected_type == "float" and not isinstance(value, (int, float)):
-                    raise ValueError(f"Key '{path}.{key}' must be a number")
+                    raise ValueError(f"Key '{full_key}' must be an integer")
+                if expected_type == "float" and not isinstance(value, int | float):
+                    raise ValueError(f"Key '{full_key}' must be a number")
                 if expected_type == "bool" and not isinstance(value, bool):
-                    raise ValueError(f"Key '{path}.{key}' must be a boolean")
+                    raise ValueError(f"Key '{full_key}' must be a boolean")
 
             # Check nested schema
             nested_schema = value_schema.get("schema")
             if nested_schema is not None and isinstance(value, dict):
-                self._validate_dict(value, nested_schema, f"{path}.{key}")
+                self._validate_dict(value, nested_schema, full_key)
 
             # Check enum values
             enum_values = value_schema.get("enum")
             if enum_values is not None and value not in enum_values:
-                raise ValueError(f"Key '{path}.{key}' must be one of {enum_values}")
+                raise ValueError(f"Key '{full_key}' must be one of {enum_values}")
 
     def _get_default_schema(self) -> dict[str, Any]:
         """

@@ -239,7 +239,7 @@ class TestAgentMessage:
             MessagePriority.HIGH,
         ]:
             msg = AgentMessage(
-                message_id=f"msg_{priority.value}",
+                message_id=f"msg_{priority.name.lower()}",
                 sender=AgentId(type=AgentType.IPA),
                 recipient=AgentId(type=AgentType.WBA),
                 message_type=MessageType.EVENT,

@@ -21,14 +21,17 @@ try:
     )
 except ImportError:
     # Fallback for development/testing
-    from typing import Protocol
+    from typing import Protocol, TypeVar
+
+    _T = TypeVar("_T")
+    _U = TypeVar("_U")
 
     class WorkflowContext:  # type: ignore
         """Mock WorkflowContext for testing."""
 
         pass
 
-    class WorkflowPrimitive(Protocol):  # type: ignore
+    class WorkflowPrimitive(Protocol[_T, _U]):  # type: ignore
         """Minimal WorkflowPrimitive protocol for testing."""
 
         pass

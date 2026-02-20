@@ -82,6 +82,7 @@ def cache_primitive(mock_primitive, mock_redis, simple_cache_key_fn):
         ttl_seconds=3600.0,
         redis_client=mock_redis,
         cost_per_call=0.01,
+        operation_name="TestPrimitive",
     )
 
 
@@ -146,6 +147,7 @@ class TestCacheHitBehavior:
             cache_key_fn=simple_cache_key_fn,
             ttl_seconds=3600.0,
             redis_client=mock_redis,
+            operation_name="TestPrimitive",
         )
 
         mock_context = MagicMock()
@@ -193,6 +195,7 @@ class TestCacheKeyGeneration:
             cache_key_fn=user_query_cache_key,
             ttl_seconds=3600.0,
             redis_client=mock_redis,
+            operation_name="TestPrimitive",
         )
 
         mock_context = MagicMock()
@@ -349,6 +352,7 @@ class TestCostSavings:
             ttl_seconds=3600.0,
             redis_client=mock_redis,
             cost_per_call=0.05,  # $0.05 per call
+            operation_name="TestPrimitive",
         )
 
         mock_context = MagicMock()

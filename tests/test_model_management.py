@@ -313,18 +313,16 @@ class TestModelSelector:
                 provider_type=ProviderType.OPENROUTER,
                 name="Fast Model",
                 context_length=4096,
-                cost_per_1k_tokens=0.0,
+                cost_per_token=0.0,
                 capabilities=["chat"],
-                performance_tier="fast",
             ),
             ModelInfo(
                 model_id="quality-model",
                 provider_type=ProviderType.OPENROUTER,
                 name="Quality Model",
                 context_length=8192,
-                cost_per_1k_tokens=0.0,
+                cost_per_token=0.0,
                 capabilities=["chat", "reasoning"],
-                performance_tier="balanced",
             ),
         ]
 
@@ -409,9 +407,8 @@ class TestModelManagementComponentAdvanced:
                 provider_type=ProviderType.OPENROUTER,
                 name="Model 1",
                 context_length=4096,
-                cost_per_1k_tokens=0.0,
+                cost_per_token=0.0,
                 capabilities=["chat"],
-                performance_tier="balanced",
             )
         ]
         mock_provider.get_available_models.return_value = mock_models
@@ -477,7 +474,8 @@ class TestModelManagementComponentAdvanced:
 
         result = await component.test_model_connectivity("test-model", "test-provider")
 
-        assert result is True
+        assert isinstance(result, dict)
+        assert result.get("healthy") is True
         mock_provider.load_model.assert_called_once_with("test-model")
 
     @pytest.mark.asyncio
@@ -498,7 +496,7 @@ class TestModelManagementComponentAdvanced:
             provider_type=ProviderType.OPENROUTER,
             name="Fallback Model",
             context_length=4096,
-            cost_per_1k_tokens=0.0,
+            cost_per_token=0.0,
             capabilities=["chat"],
         )
         component.fallback_handler.get_fallback_model.return_value = fallback_model
@@ -568,7 +566,7 @@ class TestModelManagementComponentAdvanced:
                 provider_type=ProviderType.OPENROUTER,
                 name="Free Model",
                 context_length=4096,
-                cost_per_1k_tokens=0.0,
+                cost_per_token=0.0,
                 capabilities=["chat"],
             )
         ]
@@ -578,7 +576,7 @@ class TestModelManagementComponentAdvanced:
         result = await component.get_free_models()
 
         assert isinstance(result, list)
-        assert all(model.cost_per_1k_tokens == 0.0 for model in result)
+        assert all(model.cost_per_token == 0.0 for model in result)
 
     @pytest.mark.asyncio
     async def test_generate_text(self, component):
@@ -592,7 +590,7 @@ class TestModelManagementComponentAdvanced:
             provider_type=ProviderType.OPENROUTER,
             name="Test Model",
             context_length=4096,
-            cost_per_1k_tokens=0.0,
+            cost_per_token=0.0,
             capabilities=["chat"],
         )
         component.model_selector.select_model.return_value = mock_model_info
@@ -680,28 +678,29 @@ class TestFallbackHandler:
         """Create a FallbackHandler instance for testing."""
         from src.components.model_management.services import FallbackHandler
 
-        handler = FallbackHandler()
-        # Mock available models
-        handler.available_models = [
+        # Create mock provider with available models
+        mock_provider = AsyncMock()
+        mock_provider.health_check.return_value = True
+        mock_provider.get_available_models.return_value = [
             ModelInfo(
                 model_id="primary-model",
                 provider_type=ProviderType.OPENROUTER,
                 name="Primary Model",
                 context_length=4096,
-                cost_per_1k_tokens=0.0,
+                cost_per_token=0.0,
                 capabilities=["chat"],
-                performance_tier="fast",
             ),
             ModelInfo(
                 model_id="fallback-model",
                 provider_type=ProviderType.OPENROUTER,
                 name="Fallback Model",
                 context_length=4096,
-                cost_per_1k_tokens=0.0,
+                cost_per_token=0.0,
                 capabilities=["chat"],
-                performance_tier="balanced",
             ),
         ]
+
+        handler = FallbackHandler(providers={"openrouter": mock_provider})
         return handler
 
     @pytest.mark.asyncio
@@ -1069,25 +1068,27 @@ class TestOllamaProvider:
     @pytest.mark.asyncio
     async def test_initialization(self, provider):
         """Test provider initialization."""
-        config = {"base_url": "http://localhost:11434", "timeout": 30}
+        config = {"host": "localhost", "port": 11434, "timeout": 30}
 
-        with patch("httpx.AsyncClient"):
-            result = await provider.initialize(config)
-            assert result is True
-            assert provider.base_url == "http://localhost:11434"
+        with patch.object(provider, "_initialize_provider", return_value=True):
+            with patch.object(provider, "_refresh_available_models", return_value=None):
+                result = await provider.initialize(config)
+                assert result is True
+                assert provider._ollama_host == "localhost"
+                assert provider._ollama_port == 11434
 
     @pytest.mark.asyncio
     async def test_get_available_models(self, provider):
         """Test getting available models."""
-        provider.initialized = True
-        provider.client = AsyncMock()
+        provider._initialized = True
+        provider._client = AsyncMock()
 
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "models": [{"name": "llama2", "size": 3800000000}]
         }
-        provider.client.get = AsyncMock(return_value=mock_response)
+        provider._client.get = AsyncMock(return_value=mock_response)
 
         result = await provider.get_available_models()
         assert isinstance(result, list)
@@ -1095,14 +1096,17 @@ class TestOllamaProvider:
     @pytest.mark.asyncio
     async def test_load_model(self, provider):
         """Test loading a model."""
-        provider.initialized = True
-        provider.base_url = "http://localhost:11434"
-        provider.client = AsyncMock()
+        provider._initialized = True
+        provider._client = AsyncMock()
 
-        # Mock successful model load
-        mock_response = Mock()
-        mock_response.status_code = 200
-        provider.client.post = AsyncMock(return_value=mock_response)
+        # Pre-populate available models so pull is not needed
+        provider._available_models = [
+            ModelInfo(
+                model_id="llama2",
+                name="llama2",
+                provider_type=ProviderType.OLLAMA,
+            )
+        ]
 
         result = await provider.load_model("llama2")
         assert result is not None
@@ -1110,8 +1114,8 @@ class TestOllamaProvider:
     @pytest.mark.asyncio
     async def test_unload_model(self, provider):
         """Test unloading a model."""
-        provider.initialized = True
-        provider.client = AsyncMock()
+        provider._initialized = True
+        provider._client = AsyncMock()
 
         result = await provider.unload_model("llama2")
         # Should return True or False, not crash
@@ -1153,10 +1157,11 @@ class TestLMStudioProvider:
         """Test provider initialization."""
         config = {"base_url": "http://localhost:1234", "timeout": 30}
 
-        with patch("httpx.AsyncClient"):
-            result = await provider.initialize(config)
-            assert result is True
-            assert provider.base_url == "http://localhost:1234"
+        with patch.object(provider, "_initialize_provider", return_value=True):
+            with patch.object(provider, "_refresh_available_models", return_value=None):
+                result = await provider.initialize(config)
+                assert result is True
+                assert provider._base_url == "http://localhost:1234"
 
 
 class TestCustomAPIProvider:
@@ -1175,28 +1180,23 @@ class TestCustomAPIProvider:
     async def test_initialization(self, provider):
         """Test provider initialization."""
         config = {
-            "base_url": "https://api.example.com",
-            "api_key": "test-key",
-            "timeout": 30,
+            "custom_providers": {
+                "test-api": {
+                    "base_url": "https://api.example.com",
+                    "api_key": "test-key",
+                }
+            }
         }
 
-        with patch("httpx.AsyncClient"):
-            result = await provider.initialize(config)
-            assert result is True
-            assert provider.base_url == "https://api.example.com"
+        with patch.object(provider, "_initialize_provider", return_value=True):
+            with patch.object(provider, "_refresh_available_models", return_value=None):
+                result = await provider.initialize(config)
+                assert result is True
 
     @pytest.mark.asyncio
     async def test_get_available_models(self, provider):
         """Test getting available models."""
-        provider.initialized = True
-        provider.client = AsyncMock()
-
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "data": [{"id": "model-1", "name": "Model 1"}]
-        }
-        provider.client.get = AsyncMock(return_value=mock_response)
+        provider._initialized = True
 
         result = await provider.get_available_models()
         assert isinstance(result, list)
@@ -1208,7 +1208,7 @@ class TestAdditionalCoverage:
     @pytest.mark.asyncio
     async def test_component_stop(self):
         """Test component stop functionality."""
-        component = ModelManagementComponent(mock_config)
+        component = ModelManagementComponent({"model_management": {"enabled": True}})
         component.initialized = True
         component.providers = {"test": AsyncMock()}
 
@@ -1220,7 +1220,7 @@ class TestAdditionalCoverage:
     @pytest.mark.asyncio
     async def test_get_affordable_models(self):
         """Test getting affordable models."""
-        component = ModelManagementComponent(mock_config)
+        component = ModelManagementComponent({"model_management": {"enabled": True}})
         component.initialized = True
 
         # Mock provider with models
@@ -1231,7 +1231,7 @@ class TestAdditionalCoverage:
                 provider_type=ProviderType.OPENROUTER,
                 name="Cheap Model",
                 context_length=4096,
-                cost_per_1k_tokens=0.001,
+                cost_per_token=0.001,
                 capabilities=["chat"],
             ),
             ModelInfo(
@@ -1239,19 +1239,19 @@ class TestAdditionalCoverage:
                 provider_type=ProviderType.OPENROUTER,
                 name="Expensive Model",
                 context_length=4096,
-                cost_per_1k_tokens=0.1,
+                cost_per_token=0.1,
                 capabilities=["chat"],
             ),
         ]
         mock_provider.get_available_models.return_value = mock_models
         component.providers["test-provider"] = mock_provider
 
-        result = await component.get_affordable_models(max_cost=0.01)
+        result = await component.get_affordable_models(max_cost_per_token=0.01)
 
         assert isinstance(result, list)
         # Should only include models under the cost threshold
         for model in result:
-            assert model.cost_per_1k_tokens <= 0.01
+            assert model.cost_per_token <= 0.01
 
     @pytest.mark.asyncio
     async def test_model_info_creation(self):
@@ -1261,7 +1261,7 @@ class TestAdditionalCoverage:
             provider_type=ProviderType.OPENROUTER,
             name="Test Model",
             context_length=4096,
-            cost_per_1k_tokens=0.0,
+            cost_per_token=0.0,
             capabilities=["chat", "completion"],
         )
 
@@ -1294,13 +1294,10 @@ class TestAdditionalCoverage:
     async def test_model_selection_criteria_creation(self):
         """Test ModelSelectionCriteria model creation."""
         criteria = ModelSelectionCriteria(
-            task_type=TaskType.GENERAL_CHAT,
-            max_cost_per_1k_tokens=0.01,
-            min_context_length=2048,
+            max_cost_per_token=0.01,
         )
 
-        assert criteria.task_type == TaskType.GENERAL_CHAT
-        assert criteria.max_cost_per_1k_tokens == 0.01
+        assert criteria.max_cost_per_token == 0.01
 
 
 if __name__ == "__main__":

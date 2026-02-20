@@ -35,6 +35,15 @@ def _recv_json(ws) -> dict:
     return json.loads(ws.receive_text())
 
 
+def _recv_assistant(ws, max_messages: int = 20) -> dict:
+    """Receive messages until we get a non-system (assistant) message."""
+    for _ in range(max_messages):
+        msg = _recv_json(ws)
+        if msg.get("role") != "system":
+            return msg
+    raise AssertionError("Did not receive an assistant message within expected count")
+
+
 def test_interactive_buttons_suggested_on_anxiety(client: TestClient) -> None:
     token = _auth_token("player-anxious")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
@@ -47,7 +56,7 @@ def test_interactive_buttons_suggested_on_anxiety(client: TestClient) -> None:
                 }
             )
         )
-        reply = _recv_json(ws)
+        reply = _recv_assistant(ws)
         assert reply["role"] == "assistant"
         elements = reply["content"].get("elements", [])
         # Expect two interactive buttons for exercises

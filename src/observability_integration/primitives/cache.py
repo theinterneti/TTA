@@ -23,14 +23,17 @@ try:
     )
 except ImportError:
     # Fallback for development/testing
-    from typing import Protocol
+    from typing import Protocol, TypeVar
+
+    _T = TypeVar("_T")
+    _U = TypeVar("_U")
 
     class WorkflowContext:  # type: ignore
         """Mock WorkflowContext for testing."""
 
         pass
 
-    class WorkflowPrimitive(Protocol):  # type: ignore
+    class WorkflowPrimitive(Protocol[_T, _U]):  # type: ignore
         """Minimal WorkflowPrimitive protocol for testing."""
 
         pass
@@ -144,9 +147,7 @@ class CachePrimitive(WorkflowPrimitive[Any, Any]):
                 name="cache_hit_rate",
                 description="Cache hit rate (0.0-1.0)",
                 callbacks=[
-                    lambda options: [
-                        (get_hit_rate(), {"operation": self.operation_name})
-                    ]
+                    lambda _: [(get_hit_rate(), {"operation": self.operation_name})]
                 ],
             )
         else:

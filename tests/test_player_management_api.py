@@ -628,9 +628,10 @@ class TestPlayerManagementAPI:
         ):
             mock_player_manager.get_player_profile.return_value = sample_player_profile
 
+            cors_headers = {**auth_headers, "Origin": "http://localhost:3000"}
             response = client.get(
                 f"/api/v1/players/{sample_player_profile.player_id}",
-                headers=auth_headers,
+                headers=cors_headers,
             )
 
         assert response.status_code == 200

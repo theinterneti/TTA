@@ -42,7 +42,7 @@ class TestSafetyRuleEngine:
         assert engine._rules[0].id == "test_rule"
 
     def test_evaluate_placeholder(self) -> None:
-        """Test evaluate method (placeholder implementation)."""
+        """Test evaluate method with keyword rule matching."""
         rules = [
             SafetyRule(
                 id="rule1",
@@ -54,5 +54,6 @@ class TestSafetyRuleEngine:
         ]
         engine = SafetyRuleEngine(rules)
         findings = engine.evaluate("test text")
-        # Placeholder returns empty list
-        assert findings == []
+        # Engine evaluates keyword rules and returns findings for matches
+        assert len(findings) >= 1
+        assert findings[0].rule_id == "rule1"
