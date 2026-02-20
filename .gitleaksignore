@@ -32,6 +32,14 @@
 # Reason: Example refresh_token in TokenResponse schema json_schema_extra (line 73)
 # Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT for API schema documentation
 
+# platform_tta_dev/ (removed directory) - historical commits only
+# These files existed in commit f33cd7d (2025-11-17) and were subsequently removed.
+# The directory platform_tta_dev/ no longer exists in the current working tree.
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/context/security.context.md:generic-api-key:42
+# Reason: Augment agent context file showing OPENROUTER_API_KEY variable reference; file removed from repo
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___.Github Workflows Codecov Fixes Applied Document.md:generic-api-key:261
+# Reason: KB documentation markdown in removed platform_tta_dev/ directory; token reference in docs
+
 # Security Note:
 # All tokens above are intentionally truncated example values ("eyJ0eXAiOiJKV1QiLCJhbGc...")
 # used for API documentation purposes. They are not complete, valid JWT tokens and cannot
