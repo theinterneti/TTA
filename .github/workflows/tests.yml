@@ -43,7 +43,7 @@ jobs:
             --cov=src --cov-branch \
             --cov-report=xml:coverage-unit.xml \
             --cov-report=term-missing \
-            --override-ini="fail_under=0" \
+            --cov-fail-under=0 \
             tests/
 
       - name: Upload coverage to Codecov

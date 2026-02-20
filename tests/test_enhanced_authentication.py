@@ -406,22 +406,22 @@ class TestAuthenticationAPI:
         """Test MFA setup endpoint requires authentication."""
         response = client.post("/auth/mfa/setup", params={"method": "totp"})
 
-        # Should require authentication
-        assert response.status_code == 403  # No authorization header
+        # Should require authentication (401 Unauthorized when no auth header)
+        assert response.status_code == 401
 
     def test_permissions_endpoint_requires_auth(self, client):
         """Test permissions endpoint requires authentication."""
         response = client.get("/auth/permissions")
 
-        # Should require authentication
-        assert response.status_code == 403
+        # Should require authentication (401 Unauthorized when no auth header)
+        assert response.status_code == 401
 
     def test_security_events_endpoint_requires_admin(self, client):
         """Test security events endpoint requires admin permissions."""
         response = client.get("/auth/security/events")
 
-        # Should require authentication and admin permissions
-        assert response.status_code == 403
+        # Should require authentication (401 Unauthorized when no auth header)
+        assert response.status_code == 401
 
 
 class TestRoleBasedAccessControl:
