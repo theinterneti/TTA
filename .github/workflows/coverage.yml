@@ -55,6 +55,12 @@ jobs:
         with:
           fetch-depth: 0  # Full history for better blame info
 
+      - name: Checkout TTA.dev (path source dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: theinterneti/TTA.dev
+          path: ../TTA.dev
+
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true

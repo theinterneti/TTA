@@ -23,6 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout TTA.dev (path source dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: theinterneti/TTA.dev
+          path: ../TTA.dev
+
       - uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
@@ -50,6 +56,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Checkout TTA.dev (path source dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: theinterneti/TTA.dev
+          path: ../TTA.dev
 
       - uses: astral-sh/setup-uv@v4
         with:
