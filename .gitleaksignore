@@ -35,10 +35,20 @@
 # platform_tta_dev/ (removed directory) - historical commits only
 # These files existed in commit f33cd7d (2025-11-17) and were subsequently removed.
 # The directory platform_tta_dev/ no longer exists in the current working tree.
+# All findings below are example/placeholder values in KB markdown documentation.
 f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/context/security.context.md:generic-api-key:42
-# Reason: Augment agent context file showing OPENROUTER_API_KEY variable reference; file removed from repo
 f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___.Github Workflows Codecov Fixes Applied Document.md:generic-api-key:261
-# Reason: KB documentation markdown in removed platform_tta_dev/ directory; token reference in docs
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___.Augment Workflows Quality Gate Fix.Prompt.md:generic-api-key:399
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___.Github Workflows Codecov Diagnostic Report Document.md:generic-api-key:238
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___Docs Testing Manual Frontend Testing Guide.md:curl-auth-header:213
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___Operations Monitoring Grafana Access Guide.md:curl-auth-user:78
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___Operations Monitoring Grafana Access Guide.md:curl-auth-user:83
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___Operations Monitoring Grafana Access Guide.md:curl-auth-user:89
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___Operations Monitoring Grafana Access Guide.md:curl-auth-user:94
+f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/core/kb/TTA___Workflows___Universal Agent Context .Augment Workflows Quality Gate Fix.Prompt.md:generic-api-key:398
+# patches/stash_exports/ - stash export files containing workflow diffs
+# Commit 00aedfb (2025-10-26) - patch file, not executable code, no live credentials
+00aedfb8c2df42eca546d3f6c9b3941707438bdc:patches/stash_exports/2025-10-26-workflow-primitives.patch:generic-api-key:7
 
 # Security Note:
 # All tokens above are intentionally truncated example values ("eyJ0eXAiOiJKV1QiLCJhbGc...")
