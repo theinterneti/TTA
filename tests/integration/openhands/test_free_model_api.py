@@ -102,10 +102,7 @@ async def test_deepseek_chat_basic_call(openrouter_api_key, verified_model_id):
     except Exception as e:
         # Skip on authentication/authorization failures (invalid/expired key)
         err_str = str(e).lower()
-        if any(
-            kw in err_str
-            for kw in ("401", "unauthorized", "authentication", "user not found")
-        ):
+        if any(kw in err_str for kw in ("401", "unauthorized", "authentication", "user not found")):
             pytest.skip(f"OPENROUTER_API_KEY is set but invalid/expired: {e}")
         pytest.fail(f"API call failed: {type(e).__name__}: {e}")
 
@@ -171,10 +168,7 @@ async def test_response_parsing(openrouter_api_key, verified_model_id):
 
     except Exception as e:
         err_str = str(e).lower()
-        if any(
-            kw in err_str
-            for kw in ("401", "unauthorized", "authentication", "user not found")
-        ):
+        if any(kw in err_str for kw in ("401", "unauthorized", "authentication", "user not found")):
             pytest.skip(f"OPENROUTER_API_KEY is set but invalid/expired: {e}")
         pytest.fail(f"Response parsing failed: {type(e).__name__}: {e}")
 
