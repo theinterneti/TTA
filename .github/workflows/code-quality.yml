@@ -31,7 +31,7 @@ jobs:
           enable-cache: true
 
       - name: Sync deps
-        run: uv sync
+        run: uv sync --group lint
 
       - name: Ruff lint
         run: uv run ruff check src/ tests/ --output-format=github
@@ -62,7 +62,7 @@ jobs:
           enable-cache: true
 
       - name: Sync deps
-        run: uv sync
+        run: uv sync --group type
 
       - name: Run Pyright
         run: uv run pyright src/
