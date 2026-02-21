@@ -10,11 +10,12 @@ specifics; richer models can be added in follow-up tasks.
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class AgentType(str, Enum):
@@ -141,22 +142,20 @@ class AgentCapability(BaseModel):
     tags: set[str] = Field(default_factory=set, description="Searchable tags")
     metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
-    @validator("version")
-    def validate_version(cls, v):
+    @field_validator("version")
+    @classmethod
+    def validate_version(cls, v: str) -> str:
         """Validate semantic version format."""
-        import re
-
         if not re.match(r"^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$", v):
             raise ValueError(
                 'Version must follow semantic versioning (e.g., "1.0.0" or "1.0.0-beta.1")'
             )
         return v
 
-    @validator("name")
-    def validate_name(cls, v):
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
         """Validate capability name format."""
-        import re
-
         if not re.match(r"^[a-z][a-z0-9_]*$", v):
             raise ValueError(
                 "Capability name must start with lowercase letter and contain only lowercase letters, numbers, and underscores"
@@ -191,9 +190,8 @@ class AgentCapabilitySet(BaseModel):
     def get_capability(self, name: str, version: str | None = None) -> AgentCapability | None:
         """Get a specific capability by name and optionally version."""
         for cap in self.capabilities:
-            if cap.name == name:
-                if version is None or cap.version == version:
-                    return cap
+            if cap.name == name and (version is None or cap.version == version):
+                return cap
         return None
 
     def has_capability(self, name: str, version: str | None = None) -> bool:

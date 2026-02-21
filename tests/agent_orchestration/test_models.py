@@ -142,7 +142,7 @@ class TestRoutingKey:
     def test_routing_key_serialization(self):
         """Test RoutingKey serialization."""
         key = RoutingKey(topic="test", tags=["tag1"])
-        data = key.dict()
+        data = key.model_dump()
         assert data["topic"] == "test"
         assert data["tags"] == ["tag1"]
 
