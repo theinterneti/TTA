@@ -73,7 +73,11 @@ def _make_ollama_llm(
     model: str | None, temperature: float, max_tokens: int
 ) -> ChatOpenAI:
     model_name = model or os.environ.get("OLLAMA_MODEL", _DEFAULT_OLLAMA_MODEL)
-    base_url = os.environ.get("OLLAMA_BASE_URL", _OLLAMA_BASE_URL)
+    raw_url = os.environ.get("OLLAMA_BASE_URL", _OLLAMA_BASE_URL)
+    # Ensure the URL ends with /v1 (OpenAI-compatible path)
+    base_url = raw_url.rstrip("/")
+    if not base_url.endswith("/v1"):
+        base_url = f"{base_url}/v1"
     logger.info("LLM: Ollama %s @ %s", model_name, base_url)
     return ChatOpenAI(
         api_key="ollama",  # Ollama ignores the key; placeholder required by client
@@ -93,8 +97,11 @@ def _make_openrouter_llm(
             "OPENROUTER_API_KEY environment variable is required"
             " for the openrouter provider"
         )
+    # Check TTA_LLM_MODEL first, then OPENROUTER_MODEL (existing convention), then default
     model_name = (
-        model or os.environ.get("TTA_LLM_MODEL", _DEFAULT_OPENROUTER_MODEL)
+        model
+        or os.environ.get("TTA_LLM_MODEL")
+        or os.environ.get("OPENROUTER_MODEL", _DEFAULT_OPENROUTER_MODEL)
     )
     logger.info("LLM: OpenRouter %s", model_name)
     return ChatOpenAI(
