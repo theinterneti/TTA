@@ -12,7 +12,7 @@ therapeutic text adventure gameplay loop system.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from ..database.neo4j_manager import Neo4jGameplayManager
@@ -28,6 +28,9 @@ from .complexity_adapter import NarrativeComplexityAdapter
 from .immersion_manager import ImmersionManager
 from .pacing_controller import PacingController
 from .scene_generator import SceneGenerator
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 from .therapeutic_storyteller import TherapeuticStoryteller
 
 logger = logging.getLogger(__name__)
@@ -43,13 +46,19 @@ class NarrativeEngine:
     """
 
     def __init__(
-        self, db_manager: Neo4jGameplayManager, config: dict[str, Any] | None = None
+        self,
+        db_manager: Neo4jGameplayManager,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
     ):
         self.db_manager = db_manager
         self.config = config or {}
+        self._llm = llm
 
         # Initialize narrative components
-        self.scene_generator = SceneGenerator(config.get("scene_generation", {}))
+        self.scene_generator = SceneGenerator(
+            config.get("scene_generation", {}), llm=llm
+        )
         self.therapeutic_storyteller = TherapeuticStoryteller(
             config.get("therapeutic_storytelling", {})
         )

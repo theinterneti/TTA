@@ -15,6 +15,8 @@ import logging
 from datetime import datetime
 from typing import Any
 
+from src.ai_components.llm_factory import get_llm
+
 from .choice_architecture.manager import ChoiceArchitectureManager
 from .consequence_system.system import ConsequenceSystem
 from .database.neo4j_manager import Neo4jGameplayManager
@@ -43,8 +45,17 @@ class GameplayLoopController:
             neo4j_password=db_config.get("neo4j_password", "password"),
             redis_url=db_config.get("redis_url", "redis://localhost:6379"),
         )
+        # Build LLM — gracefully skip if no provider is configured
+        try:
+            _llm = get_llm()
+        except Exception as _exc:
+            logger.warning(
+                "No LLM configured; narrative engine will use templates: %s", _exc
+            )
+            _llm = None
+
         self.narrative_engine = NarrativeEngine(
-            self.database_manager, config.get("narrative", {})
+            self.database_manager, config.get("narrative", {}), llm=_llm
         )
         self.choice_architecture = ChoiceArchitectureManager(
             config.get("choice_architecture", {})

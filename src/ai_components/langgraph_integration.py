@@ -18,6 +18,8 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 
+from .llm_factory import get_llm
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,16 +64,19 @@ class TherapeuticWorkflowManager:
 
     def __init__(
         self,
-        openai_api_key: str,
+        openai_api_key: str = "",  # kept for backward-compat; ignored when provider set
         redis_url: str = "redis://localhost:6379",
-        model_name: str = "gpt-4-turbo-preview",
+        model_name: str | None = None,
+        provider: str | None = None,
     ):
-        self.openai_api_key = openai_api_key
         self.redis_url = redis_url
         self.model_name = model_name
 
-        self.llm = ChatOpenAI(
-            api_key=openai_api_key, model=model_name, temperature=0.7, max_tokens=1000
+        self.llm: ChatOpenAI = get_llm(
+            provider=provider,
+            model=model_name,
+            temperature=0.7,
+            max_tokens=1000,
         )
 
         self.redis: aioredis.Redis | None = None
