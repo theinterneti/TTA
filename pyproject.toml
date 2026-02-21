@@ -486,6 +486,7 @@ norecursedirs = [
     "tests/e2e",
     "tests/e2e-staging",
     "tests/mutation",
+    "tests/post_deployment",
     ".git",
     "__pycache__",
     ".venv",
