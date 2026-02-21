@@ -431,6 +431,27 @@ async def login(
                 f"Unexpected error during player profile auto-creation: {e}",
                 exc_info=True,
             )
+        # Auto-initialize default character and world for new players (Issue #60)
+        try:
+            from ...services.default_character_world_service import (
+                DefaultCharacterWorldService,
+            )
+
+            default_service = DefaultCharacterWorldService()
+            character_id, world_id, session_id = (
+                default_service.initialize_default_character_and_world(player_id)
+            )
+            if character_id:
+                logger.debug(
+                    f"Auto-initialized default character {character_id}, world {world_id}, and session {session_id} for player {player_id}"
+                )
+        except Exception as e:
+            logger.warning(
+                f"Failed to auto-initialize default character/world for player {player_id}: {e}",
+                exc_info=True,
+            )
+            # Don't block login if character/world initialization fails
+
         finally:
             # Record player profile auto-creation metrics
             if autocreation_start_time is not None:
