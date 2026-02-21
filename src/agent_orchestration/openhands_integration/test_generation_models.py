@@ -9,7 +9,7 @@ validating test results, and classifying errors during the test generation proce
 from enum import Enum
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TestTaskSpecification(BaseModel):
@@ -65,10 +65,7 @@ class TestTaskSpecification(BaseModel):
         description="Maximum time allowed for test generation in seconds (default: 600)",
     )
 
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = False  # Allow modification for retry logic
+    model_config = ConfigDict(frozen=False)  # Allow modification for retry logic
 
 
 class TestValidationResult(BaseModel):
@@ -123,10 +120,7 @@ class TestValidationResult(BaseModel):
         default=None, description="Path to the generated test file (if successful)"
     )
 
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = False  # Allow modification during validation
+    model_config = ConfigDict(frozen=False)  # Allow modification during validation
 
 
 class TestGenerationError(str, Enum):

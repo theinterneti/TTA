@@ -88,9 +88,6 @@ class UserChoice(BaseModel):
         None, description="User's perceived difficulty"
     )
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class ChoiceOutcome(BaseModel):
     """The outcome of a user choice."""
@@ -126,9 +123,6 @@ class ChoiceOutcome(BaseModel):
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class NarrativeEvent(BaseModel):
     """A significant event in the narrative progression."""
@@ -159,9 +153,6 @@ class NarrativeEvent(BaseModel):
 
     # Metadata
     occurred_at: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class TherapeuticIntervention(BaseModel):
@@ -206,9 +197,6 @@ class TherapeuticIntervention(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: datetime | None = Field(None)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class AgencyAssessment(BaseModel):
     """Assessment of player agency and empowerment for a choice."""
@@ -233,9 +221,6 @@ class AgencyAssessment(BaseModel):
     # Metadata
     assessed_at: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class GameplaySession(BaseModel):
     """A gameplay session containing state and available choices."""
@@ -257,6 +242,3 @@ class GameplaySession(BaseModel):
 
     # Therapeutic context
     therapeutic_context: dict[str, Any] = Field(default_factory=dict)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}

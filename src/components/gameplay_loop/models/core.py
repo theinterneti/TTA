@@ -126,9 +126,6 @@ class Scene(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class Choice(BaseModel):
     """A player choice option within a scene."""
@@ -162,9 +159,6 @@ class Choice(BaseModel):
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class ConsequenceSet(BaseModel):
     """A set of consequences resulting from player choices."""
@@ -194,9 +188,6 @@ class ConsequenceSet(BaseModel):
 
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class SessionState(BaseModel):
@@ -242,9 +233,6 @@ class SessionState(BaseModel):
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
 
     def update_activity(self) -> None:
         """Update last activity time and session duration."""

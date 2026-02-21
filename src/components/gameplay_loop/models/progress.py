@@ -88,9 +88,6 @@ class ProgressMarker(BaseModel):
     # Metadata
     achieved_at: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class SkillDevelopment(BaseModel):
     """Tracking of skill development over time."""
@@ -134,9 +131,6 @@ class SkillDevelopment(BaseModel):
     first_practiced: datetime = Field(default_factory=datetime.utcnow)
     last_practiced: datetime | None = Field(None)
     mastery_achieved: datetime | None = Field(None)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
 
     def update_skill_level(self, practice_outcome: float) -> None:
         """Update skill level based on practice outcome."""
@@ -200,9 +194,6 @@ class CharacterState(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
     def modify_attribute(self, attribute: CharacterAttribute, change: float) -> None:
         """Modify a character attribute."""
         current_value = self.attributes.get(attribute, 0.5)
@@ -257,6 +248,3 @@ class TherapeuticProgress(BaseModel):
     # Metadata
     started_at: datetime = Field(default_factory=datetime.utcnow)
     last_updated: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}

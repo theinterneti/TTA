@@ -42,7 +42,7 @@ import logging
 import time
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from tta_dev_primitives.core.base import WorkflowContext, WorkflowPrimitive
 
 from .adapter import OpenHandsAdapter
@@ -67,8 +67,7 @@ class OpenHandsTaskInput(BaseModel):
     requirements: TaskRequirements | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class OpenHandsTaskOutput(BaseModel):
@@ -83,8 +82,7 @@ class OpenHandsTaskOutput(BaseModel):
     success: bool = False
     error: str | None = None
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class ModelSelectionPrimitive(
