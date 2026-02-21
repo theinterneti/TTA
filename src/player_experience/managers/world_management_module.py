@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/World_management_module]]
 World discovery, selection, and customization management.
 
 This module handles world discovery, selection, and customization for the

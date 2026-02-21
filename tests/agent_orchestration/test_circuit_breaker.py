@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_circuit_breaker]]
 Comprehensive unit tests for circuit_breaker module.
 
 Tests cover:
@@ -10,6 +12,7 @@ Tests cover:
 import sys
 import time
 from pathlib import Path
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -20,6 +23,7 @@ import contextlib
 
 from agent_orchestration.circuit_breaker import (
     CircuitBreaker,
+    CircuitBreakerConfig,
     CircuitBreakerMetrics,
     CircuitBreakerState,
 )
@@ -104,31 +108,39 @@ class TestCircuitBreaker:
     """Tests for CircuitBreaker class."""
 
     @pytest.fixture
-    def circuit_breaker(self):
-        """Create CircuitBreaker instance."""
-        return CircuitBreaker(
-            name="test_breaker",
+    def mock_redis(self):
+        """Create a mock async Redis client."""
+        redis = AsyncMock()
+        redis.get.return_value = None  # No stored state
+        redis.setex.return_value = True
+        return redis
+
+    @pytest.fixture
+    def circuit_breaker(self, mock_redis):
+        """Create CircuitBreaker instance with mock Redis."""
+        config = CircuitBreakerConfig(
             failure_threshold=5,
-            recovery_timeout=60,
+            timeout_seconds=60,
             half_open_max_calls=3,
         )
+        return CircuitBreaker(redis=mock_redis, name="test_breaker", config=config)
 
     def test_circuit_breaker_initialization(self, circuit_breaker):
         """Test CircuitBreaker initializes correctly."""
-        assert circuit_breaker.name == "test_breaker"
-        assert circuit_breaker.failure_threshold == 5
-        assert circuit_breaker.recovery_timeout == 60
-        assert circuit_breaker.half_open_max_calls == 3
+        assert circuit_breaker._name == "test_breaker"
+        assert circuit_breaker._config.failure_threshold == 5
+        assert circuit_breaker._config.timeout_seconds == 60
+        assert circuit_breaker._config.half_open_max_calls == 3
 
     def test_circuit_breaker_initial_state(self, circuit_breaker):
         """Test CircuitBreaker starts in CLOSED state."""
-        assert circuit_breaker.state == CircuitBreakerState.CLOSED
+        assert circuit_breaker._state == CircuitBreakerState.CLOSED
 
     def test_circuit_breaker_initial_metrics(self, circuit_breaker):
         """Test CircuitBreaker initializes with zero metrics."""
-        assert circuit_breaker.metrics.total_calls == 0
-        assert circuit_breaker.metrics.failed_calls == 0
-        assert circuit_breaker.metrics.successful_calls == 0
+        assert circuit_breaker._metrics.total_calls == 0
+        assert circuit_breaker._metrics.failed_calls == 0
+        assert circuit_breaker._metrics.successful_calls == 0
 
     @pytest.mark.asyncio
     async def test_call_success_in_closed_state(self, circuit_breaker):
@@ -140,9 +152,9 @@ class TestCircuitBreaker:
         result = await circuit_breaker.call(successful_operation)
 
         assert result == "success"
-        assert circuit_breaker.metrics.total_calls == 1
-        assert circuit_breaker.metrics.successful_calls == 1
-        assert circuit_breaker.state == CircuitBreakerState.CLOSED
+        assert circuit_breaker._metrics.total_calls == 1
+        assert circuit_breaker._metrics.successful_calls == 1
+        assert circuit_breaker._state == CircuitBreakerState.CLOSED
 
     @pytest.mark.asyncio
     async def test_call_failure_in_closed_state(self, circuit_breaker):
@@ -154,9 +166,9 @@ class TestCircuitBreaker:
         with pytest.raises(Exception):
             await circuit_breaker.call(failing_operation)
 
-        assert circuit_breaker.metrics.total_calls == 1
-        assert circuit_breaker.metrics.failed_calls == 1
-        assert circuit_breaker.state == CircuitBreakerState.CLOSED
+        assert circuit_breaker._metrics.total_calls == 1
+        assert circuit_breaker._metrics.failed_calls == 1
+        assert circuit_breaker._state == CircuitBreakerState.CLOSED
 
     @pytest.mark.asyncio
     async def test_circuit_breaker_opens_after_threshold(self, circuit_breaker):
@@ -166,19 +178,19 @@ class TestCircuitBreaker:
             raise Exception("Operation failed")
 
         # Trigger failures up to threshold
-        for _ in range(circuit_breaker.failure_threshold):
+        for _ in range(circuit_breaker._config.failure_threshold):
             with contextlib.suppress(Exception):
                 await circuit_breaker.call(failing_operation)
 
         # Circuit should be OPEN now
-        assert circuit_breaker.state == CircuitBreakerState.OPEN
+        assert circuit_breaker._state == CircuitBreakerState.OPEN
 
     @pytest.mark.asyncio
     async def test_call_fails_fast_in_open_state(self, circuit_breaker):
         """Test calls fail fast when circuit is OPEN."""
-        # Force circuit to OPEN state
-        circuit_breaker.state = CircuitBreakerState.OPEN
-        circuit_breaker.last_failure_time = time.time()
+        # Force circuit to OPEN state with recent failure time
+        circuit_breaker._state = CircuitBreakerState.OPEN
+        circuit_breaker._state_changed_at = time.time()
 
         async def operation():
             return "success"
@@ -186,111 +198,112 @@ class TestCircuitBreaker:
         with pytest.raises(Exception) as exc_info:
             await circuit_breaker.call(operation)
 
-        assert "Circuit breaker is OPEN" in str(exc_info.value)
+        assert "OPEN" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_circuit_breaker_half_open_state(self, circuit_breaker):
-        """Test circuit breaker transitions to HALF_OPEN."""
-        # Force circuit to OPEN state
-        circuit_breaker.state = CircuitBreakerState.OPEN
-        circuit_breaker.last_failure_time = time.time() - 100  # Old failure time
+        """Test circuit breaker transitions to HALF_OPEN after timeout."""
+        # Force circuit to OPEN state with old failure time (past timeout)
+        circuit_breaker._state = CircuitBreakerState.OPEN
+        circuit_breaker._state_changed_at = time.time() - 100
 
         async def successful_operation():
             return "success"
 
-        # Call should attempt and succeed, transitioning to HALF_OPEN
+        # Call should attempt and succeed (circuit transitions to HALF_OPEN first)
         await circuit_breaker.call(successful_operation)
 
-        # After successful call in HALF_OPEN, should transition to CLOSED
-        assert circuit_breaker.state in [
+        # After successful call should be in HALF_OPEN or CLOSED
+        assert circuit_breaker._state in [
             CircuitBreakerState.HALF_OPEN,
             CircuitBreakerState.CLOSED,
         ]
 
-    def test_circuit_breaker_reset(self, circuit_breaker):
+    @pytest.mark.asyncio
+    async def test_circuit_breaker_reset(self, circuit_breaker):
         """Test resetting circuit breaker."""
-        # Set some metrics
-        circuit_breaker.metrics.total_calls = 100
-        circuit_breaker.metrics.failed_calls = 50
-        circuit_breaker.state = CircuitBreakerState.OPEN
+        # Force to OPEN state with some failures
+        circuit_breaker._state = CircuitBreakerState.OPEN
+        circuit_breaker._failure_count = 50
 
-        # Reset
-        circuit_breaker.reset()
+        # Reset (async)
+        await circuit_breaker.reset()
 
-        assert circuit_breaker.state == CircuitBreakerState.CLOSED
-        assert circuit_breaker.metrics.total_calls == 0
-        assert circuit_breaker.metrics.failed_calls == 0
+        assert circuit_breaker._state == CircuitBreakerState.CLOSED
+        assert circuit_breaker._failure_count == 0
 
     def test_circuit_breaker_metrics_tracking(self, circuit_breaker):
         """Test metrics are tracked correctly."""
-        initial_total = circuit_breaker.metrics.total_calls
+        initial_total = circuit_breaker._metrics.total_calls
 
-        # Simulate some calls
-        circuit_breaker.metrics.total_calls += 10
-        circuit_breaker.metrics.successful_calls += 8
-        circuit_breaker.metrics.failed_calls += 2
+        # Simulate some calls by modifying metrics directly
+        circuit_breaker._metrics.total_calls += 10
+        circuit_breaker._metrics.successful_calls += 8
+        circuit_breaker._metrics.failed_calls += 2
 
-        assert circuit_breaker.metrics.total_calls == initial_total + 10
-        assert circuit_breaker.metrics.successful_calls == 8
-        assert circuit_breaker.metrics.failed_calls == 2
+        assert circuit_breaker._metrics.total_calls == initial_total + 10
+        assert circuit_breaker._metrics.successful_calls == 8
+        assert circuit_breaker._metrics.failed_calls == 2
 
     def test_circuit_breaker_state_transitions(self, circuit_breaker):
         """Test valid state transitions."""
         # CLOSED -> OPEN
-        circuit_breaker.state = CircuitBreakerState.CLOSED
-        circuit_breaker.state = CircuitBreakerState.OPEN
-        assert circuit_breaker.state == CircuitBreakerState.OPEN
+        circuit_breaker._state = CircuitBreakerState.CLOSED
+        circuit_breaker._state = CircuitBreakerState.OPEN
+        assert circuit_breaker._state == CircuitBreakerState.OPEN
 
         # OPEN -> HALF_OPEN
-        circuit_breaker.state = CircuitBreakerState.HALF_OPEN
-        assert circuit_breaker.state == CircuitBreakerState.HALF_OPEN
+        circuit_breaker._state = CircuitBreakerState.HALF_OPEN
+        assert circuit_breaker._state == CircuitBreakerState.HALF_OPEN
 
         # HALF_OPEN -> CLOSED
-        circuit_breaker.state = CircuitBreakerState.CLOSED
-        assert circuit_breaker.state == CircuitBreakerState.CLOSED
+        circuit_breaker._state = CircuitBreakerState.CLOSED
+        assert circuit_breaker._state == CircuitBreakerState.CLOSED
 
-    def test_circuit_breaker_with_custom_timeout(self):
+    def test_circuit_breaker_with_custom_timeout(self, mock_redis):
         """Test circuit breaker with custom recovery timeout."""
-        breaker = CircuitBreaker(
-            name="custom_timeout",
+        config = CircuitBreakerConfig(
             failure_threshold=3,
-            recovery_timeout=30,
+            timeout_seconds=30,
             half_open_max_calls=2,
         )
+        breaker = CircuitBreaker(redis=mock_redis, name="custom_timeout", config=config)
 
-        assert breaker.recovery_timeout == 30
+        assert breaker._config.timeout_seconds == 30
 
-    def test_circuit_breaker_with_custom_half_open_calls(self):
+    def test_circuit_breaker_with_custom_half_open_calls(self, mock_redis):
         """Test circuit breaker with custom half-open max calls."""
-        breaker = CircuitBreaker(
-            name="custom_half_open",
+        config = CircuitBreakerConfig(
             failure_threshold=5,
-            recovery_timeout=60,
+            timeout_seconds=60,
             half_open_max_calls=5,
         )
+        breaker = CircuitBreaker(
+            redis=mock_redis, name="custom_half_open", config=config
+        )
 
-        assert breaker.half_open_max_calls == 5
+        assert breaker._config.half_open_max_calls == 5
 
     @pytest.mark.asyncio
     async def test_multiple_sequential_calls(self, circuit_breaker):
         """Test multiple sequential calls."""
-
-        async def operation(value):
-            return value * 2
-
         results = []
         for i in range(5):
-            result = await circuit_breaker.call(operation, i)
+
+            async def operation(value=i):
+                return value * 2
+
+            result = await circuit_breaker.call(operation)
             results.append(result)
 
         assert results == [0, 2, 4, 6, 8]
-        assert circuit_breaker.metrics.total_calls == 5
-        assert circuit_breaker.metrics.successful_calls == 5
+        assert circuit_breaker._metrics.total_calls == 5
+        assert circuit_breaker._metrics.successful_calls == 5
 
     def test_circuit_breaker_name_property(self, circuit_breaker):
-        """Test circuit breaker name property."""
-        assert circuit_breaker.name == "test_breaker"
+        """Test circuit breaker name attribute."""
+        assert circuit_breaker._name == "test_breaker"
 
     def test_circuit_breaker_failure_threshold_property(self, circuit_breaker):
-        """Test circuit breaker failure threshold property."""
-        assert circuit_breaker.failure_threshold == 5
+        """Test circuit breaker failure threshold config."""
+        assert circuit_breaker._config.failure_threshold == 5

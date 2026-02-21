@@ -85,3 +85,7 @@ Your current PR needs:
 ```
 
 See: `docs/development/PR_AUTOMATION_GUIDE.md` for full documentation
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Pr_quick_ref]]

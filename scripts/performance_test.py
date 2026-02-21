@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Performance_test]]
 Performance Testing Script for TTA Core Gameplay Loop
 
 This script performs load testing and performance validation

@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Collaborative_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Collaborative_system]]
 Production Therapeutic CollaborativeSystem Implementation
 
 This module provides multi-user therapeutic experiences with peer support,

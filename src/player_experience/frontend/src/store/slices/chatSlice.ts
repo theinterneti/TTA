@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Slices/Chatslice]]
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { conversationAPI } from '../../services/api';
 import { getErrorMessage } from '../../utils/errorHandling';

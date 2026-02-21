@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Test_database_connections]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

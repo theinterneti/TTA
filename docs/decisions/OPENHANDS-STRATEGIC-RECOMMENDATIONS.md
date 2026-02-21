@@ -1,7 +1,7 @@
 # OpenHands Integration - Strategic Recommendations
 
-**Date:** 2025-10-27  
-**Context:** Post-investigation strategic planning for code generation in TTA  
+**Date:** 2025-10-27
+**Context:** Post-investigation strategic planning for code generation in TTA
 **Related:** ADR-001-OPENHANDS-INTEGRATION-POSTPONEMENT.md
 
 ---
@@ -123,10 +123,10 @@ async def generate_code_streaming(
     output_file: Path
 ) -> AsyncIterator[str]:
     """Generate code with streaming responses."""
-    
+
     async for chunk in model.generate_stream(prompt):
         yield chunk
-        
+
     # Save complete response
     output_file.write_text(complete_response)
 ```
@@ -159,13 +159,13 @@ def build_prompt_with_context(
     context_type: str = "agent_orchestration"
 ) -> str:
     """Build prompt with TTA-specific context."""
-    
+
     # Load relevant examples from codebase
     examples = load_code_examples(context_type)
-    
+
     # Load architectural patterns
     patterns = load_architectural_patterns()
-    
+
     # Build prompt
     prompt = f"""You are an expert Python developer working on the TTA project.
 
@@ -187,7 +187,7 @@ REQUIREMENTS:
 - Follow SOLID principles
 
 Generate production-quality code:"""
-    
+
     return prompt
 ```
 
@@ -219,26 +219,26 @@ async def generate_with_refinement(
     max_iterations: int = 3
 ) -> dict:
     """Generate code with iterative refinement."""
-    
+
     # Initial generation
     code = await generate_code(task_description)
-    
+
     for iteration in range(max_iterations):
         # Validate against quality gates
         validation_result = validate_code(code)
-        
+
         if validation_result.passed:
             break
-            
+
         # Refine based on validation feedback
         refinement_prompt = build_refinement_prompt(
             code, validation_result.issues
         )
         code = await generate_code(refinement_prompt)
-    
+
     # Generate tests
     tests = await generate_tests(code)
-    
+
     return {"code": code, "tests": tests}
 ```
 
@@ -427,7 +427,7 @@ Generate the implementation:"""
 
 ### Risk 1: OpenHands Never Fixed
 
-**Probability:** Medium  
+**Probability:** Medium
 **Impact:** Low (we have working alternative)
 
 **Mitigation:**
@@ -437,7 +437,7 @@ Generate the implementation:"""
 
 ### Risk 2: Direct LLM Quality Issues
 
-**Probability:** Low  
+**Probability:** Low
 **Impact:** Medium
 
 **Mitigation:**
@@ -448,7 +448,7 @@ Generate the implementation:"""
 
 ### Risk 3: Cost Escalation
 
-**Probability:** Low  
+**Probability:** Low
 **Impact:** Low
 
 **Mitigation:**
@@ -481,7 +481,11 @@ Generate the implementation:"""
 
 ---
 
-**Document Owner:** TTA Development Team  
-**Last Updated:** 2025-10-27  
+**Document Owner:** TTA Development Team
+**Last Updated:** 2025-10-27
 **Next Review:** 2026-01-27 (3 months)
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Decisions/Openhands-strategic-recommendations]]

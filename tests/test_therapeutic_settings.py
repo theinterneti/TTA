@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_therapeutic_settings]]
 Unit tests for therapeutic settings models.
 
 Tests the enhanced therapeutic settings, validation, conflict resolution,

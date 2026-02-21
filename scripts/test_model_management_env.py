@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_model_management_env]]
 Test Model Management Environment Integration
 
 This script tests that the model management system can properly load

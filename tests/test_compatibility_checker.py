@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_compatibility_checker]]
 Unit tests for CompatibilityChecker.
 """
 

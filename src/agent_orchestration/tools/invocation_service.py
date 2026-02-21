@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Invocation_service]]
 ToolInvocationService: Centralized entry point for dynamic tool executions.
 """
 

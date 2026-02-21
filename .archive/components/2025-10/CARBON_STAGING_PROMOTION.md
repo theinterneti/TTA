@@ -299,3 +299,7 @@ The Carbon component has met all maturity criteria and is hereby promoted from D
 
 **Last Updated**: 2025-10-08
 **Document Owner**: theinterneti
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Components/2025-10/Carbon_staging_promotion]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Neo4j Component Maturity Status.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Components/Neo4j/Maturity]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_crisis_intervention_system]]
 Comprehensive tests for the crisis intervention system (Task 17.2).
 
 Tests all crisis intervention components including:

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Run_extended_evaluation]]
 TTA Extended Session Quality Evaluation Runner
 
 Comprehensive testing framework for evaluating TTA storytelling system

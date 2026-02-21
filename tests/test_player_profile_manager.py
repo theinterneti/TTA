@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_player_profile_manager]]
 Unit tests for PlayerProfileManager service.
 
 Tests CRUD operations, privacy controls, and data access restrictions

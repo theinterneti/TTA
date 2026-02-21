@@ -279,3 +279,7 @@ python benchmark_improvements.py
 ---
 
 **Questions? See full documentation in AGENTIC_PRIMITIVES_REVIEW_AND_IMPROVEMENTS.md**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Primitives-comparison]]

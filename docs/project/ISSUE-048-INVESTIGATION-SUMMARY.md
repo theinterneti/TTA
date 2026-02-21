@@ -166,3 +166,7 @@ Reason: Session data lost during navigation
 4. ⏭️ Run E2E tests
 5. ⏭️ Deploy to staging
 6. ⏭️ Validate in staging environment
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Issue-048-investigation-summary]]

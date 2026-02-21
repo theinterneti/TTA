@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Circuit_breaker_config]]
 Circuit breaker configuration schema and validation.
 
 Provides configuration loading, validation, and default value handling

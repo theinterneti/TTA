@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Redis_tool_registry]]
 Redis-backed ToolRegistry with lifecycle management and caching (Task 7.1/7.2).
 """
 

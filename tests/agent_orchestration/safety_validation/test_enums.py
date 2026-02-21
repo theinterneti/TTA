@@ -1,5 +1,7 @@
 """Tests for safety validation enums."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Safety_validation/Test_enums]]
+
 from src.agent_orchestration.safety_validation.enums import SafetyLevel, ValidationType
 
 

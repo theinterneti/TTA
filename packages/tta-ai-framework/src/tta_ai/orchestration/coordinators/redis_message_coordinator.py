@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Coordinators/Redis_message_coordinator]]
 Redis-backed implementation of the MessageCoordinator with reliability (Task 4.1 + 4.2).
 
 Capabilities:

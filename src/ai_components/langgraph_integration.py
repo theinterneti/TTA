@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Ai_components/Langgraph_integration]]
 LangGraph Integration for AI-Powered Narrative Workflows
 Manages complex therapeutic conversation flows and decision trees
 """

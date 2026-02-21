@@ -329,3 +329,7 @@ $ ./complete-keploy-workflow.sh
 ```
 
 **That's it! You have fully automated API testing with Keploy!** 🎊
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Keploy_automation_complete]]

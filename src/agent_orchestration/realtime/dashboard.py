@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Dashboard]]
 Real-time system health and performance dashboards.
 
 This module provides real-time dashboard capabilities for monitoring system

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/__init__]]
 Player Experience Interface Module
 
 This module provides the player-facing interface for the TTA system,

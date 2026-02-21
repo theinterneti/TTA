@@ -190,3 +190,7 @@ const createCharacterBtn = page.locator('[data-testid="dashboard-manage-characte
 **Discovered**: 2025-01-11
 **Validation Phase**: Complete User Journey E2E Testing
 **Reporter**: Augster AI Agent
+
+
+---
+**Logseq:** [[TTA.dev/.github/Issue_template/Issue-5-character-fetch-blocker]]

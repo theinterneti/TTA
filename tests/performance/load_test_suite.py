@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Performance/Load_test_suite]]
 Comprehensive Load Testing Suite for TTA Storytelling Platform
 Tests performance under realistic healthcare usage scenarios
 """

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Docker_client]]
 Docker runtime client for OpenHands integration.
 
 Provides full OpenHands capabilities (bash, file operations, Jupyter) via Docker

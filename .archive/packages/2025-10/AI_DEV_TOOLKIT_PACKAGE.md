@@ -341,3 +341,7 @@ MIT - Free to use in any project, commercial or personal.
 **Benefit:** 30-40% cost savings + production patterns
 
 **Ready to use in your next AI project!** 🚀
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Packages/2025-10/Ai_dev_toolkit_package]]

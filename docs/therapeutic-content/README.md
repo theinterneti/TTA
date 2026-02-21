@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/TTA Therapeutic Content Documentation.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Therapeutic-content/Readme]]

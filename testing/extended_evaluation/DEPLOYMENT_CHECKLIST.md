@@ -241,3 +241,7 @@ python -c "import yaml; yaml.safe_load(open('testing/configs/production_extended
 ---
 
 **Ready for Production**: ✅ All checklist items completed, baselines established, monitoring in place
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Extended_evaluation/Deployment_checklist]]

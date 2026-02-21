@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/GitHub Workflows Recommendations for TTA Testing Strategy.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing/Github_workflows_recommendations]]

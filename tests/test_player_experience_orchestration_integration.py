@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_player_experience_orchestration_integration]]
 Player Experience Orchestration Integration Tests
 
 This module tests the integration of the Player Experience Interface with the TTA orchestration system.

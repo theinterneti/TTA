@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Development Workflow Quick Reference.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Dev-workflow-quick-reference]]

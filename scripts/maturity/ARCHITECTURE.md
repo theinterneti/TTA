@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/Component Maturity Automation System - Architecture.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Scripts/Maturity/Architecture]]

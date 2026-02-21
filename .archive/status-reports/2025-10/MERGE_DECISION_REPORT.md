@@ -191,3 +191,7 @@
 3. **Verify**: Confirm new PR passes CI/CD
 4. **Merge**: Merge Phase 2 PR to main
 5. **Follow-up**: Address infrastructure issues in separate PRs
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Merge_decision_report]]

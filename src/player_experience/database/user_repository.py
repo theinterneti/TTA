@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/User_repository]]
 User Repository for authentication database operations.
 
 This module provides the UserRepository class that handles all database

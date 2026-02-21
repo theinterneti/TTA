@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Setup_neo4j_databases]]
 Setup Neo4j databases for different environments.
 
 Creates separate databases within a single Neo4j instance for:

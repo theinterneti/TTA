@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Choice_architecture/Generator]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Choice_architecture/Generator]]
 Choice Generator for Therapeutic Text Adventure
 
 This module implements choice generation functionality that creates meaningful,

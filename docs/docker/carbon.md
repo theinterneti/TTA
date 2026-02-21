@@ -176,3 +176,7 @@ If you encounter issues with the Carbon Component, check the following:
 - [CodeCarbon Documentation](https://codecarbon.io/)
 - [CodeCarbon GitHub Repository](https://github.com/mlco2/codecarbon)
 - [Carbon Tracking Component Source Code](../../src/components/carbon_component.py)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Docker/Carbon]]

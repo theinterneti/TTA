@@ -99,3 +99,7 @@ git push
 - content/*: New therapeutic content
 - narrative/*: Story elements
 - ux/*: User experience changes
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Github_setup]]

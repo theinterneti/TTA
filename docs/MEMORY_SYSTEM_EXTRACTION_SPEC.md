@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Memory System Extraction Specification.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Memory_system_extraction_spec]]

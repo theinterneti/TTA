@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/Docker Services Status Report - November 1, 2025.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Docker_services_status]]

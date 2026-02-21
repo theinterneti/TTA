@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Config_manager]]
 Real-time configuration management for WebSocket and event systems.
 
 This module provides dynamic configuration management for real-time features,

@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Consequence_system/Causality_explainer]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Consequence_system/Causality_explainer]]
 Causality Explainer for Therapeutic Text Adventure
 
 This module implements causality explanation functionality that provides clear,

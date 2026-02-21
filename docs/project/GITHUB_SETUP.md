@@ -68,3 +68,7 @@ git push
    git commit -m "Update tta.dev submodule reference"
    git push
    ```
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Github_setup]]

@@ -213,3 +213,7 @@ pyproject.toml             # Project config
 gh help                      # GitHub CLI help
 git help <command>          # Git command help
 ```
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Agentic-primitives/Github_quick_ref]]

@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/.storybook/Main]]
 import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {

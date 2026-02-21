@@ -170,3 +170,7 @@ The integration works seamlessly with your existing:
 - ✅ Pytest test fixtures
 
 Happy debugging! 🚀
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Vscode-database]]

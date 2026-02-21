@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Comprehensive_frontend_test]]
 Comprehensive Frontend Testing for TTA Core Gameplay Loop Integration
 
 This script performs systematic testing of the frontend-to-backend integration,

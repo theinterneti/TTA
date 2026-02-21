@@ -133,3 +133,7 @@ git checkout -b feat/workflow-primitives-v1
 4. After merge, move to Phase 2 (workflow primitives)
 
 This gives you a clean path forward!
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Strategic_migration_plan]]

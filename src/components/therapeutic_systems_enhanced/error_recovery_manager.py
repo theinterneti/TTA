@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Error_recovery_manager]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Error_recovery_manager]]
 Production Therapeutic ErrorRecoveryManager Implementation
 
 This module provides comprehensive error handling and recovery mechanisms

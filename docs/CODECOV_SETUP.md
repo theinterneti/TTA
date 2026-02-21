@@ -217,3 +217,7 @@ For Codecov issues:
 1. Check [Codecov Support](https://about.codecov.io/support/)
 2. Review [GitHub Action Logs](https://github.com/theinterneti/TTA/actions)
 3. Contact TTA team for repository-specific questions
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Codecov_setup]]

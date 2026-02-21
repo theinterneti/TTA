@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/__init__]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/__init__]]
 Core Gameplay Loop Data Models
 
 This module provides the foundational data models for the therapeutic text adventure

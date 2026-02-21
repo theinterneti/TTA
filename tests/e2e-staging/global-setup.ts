@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/Global-setup]]
 /**
  * Global Setup for Staging E2E Tests
  *

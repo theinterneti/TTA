@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/GitHub Setup.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Github/Readme]]

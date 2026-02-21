@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/Validation]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/Validation]]
 Validation Models for Gameplay Loop
 
 This module defines models for validation, safety checks, and therapeutic validation
@@ -81,9 +84,6 @@ class ValidationResult(BaseModel):
     validated_at: datetime = Field(default_factory=datetime.utcnow)
     validator_version: str = Field(default="1.0.0")
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class SafetyCheck(BaseModel):
     """Safety check for user emotional state and content appropriateness."""
@@ -122,9 +122,6 @@ class SafetyCheck(BaseModel):
     # Metadata
     checked_at: datetime = Field(default_factory=datetime.utcnow)
     expires_at: datetime | None = Field(None, description="When this check expires")
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class TherapeuticValidation(BaseModel):
@@ -175,9 +172,6 @@ class TherapeuticValidation(BaseModel):
     validated_at: datetime = Field(default_factory=datetime.utcnow)
     validator_credentials: str | None = Field(None)
 
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class ContentValidation(BaseModel):
     """Validation of narrative content for safety and appropriateness."""
@@ -217,6 +211,3 @@ class ContentValidation(BaseModel):
     # Metadata
     validated_at: datetime = Field(default_factory=datetime.utcnow)
     validation_version: str = Field(default="1.0.0")
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}

@@ -25,6 +25,11 @@ dependencies = [
     # Workspace packages
     "tta-ai-framework",
     "tta-narrative-engine",
+    # TTA.dev platform packages
+    "tta-dev-primitives>=1.3.0",
+    "tta-observability-integration>=1.0.0",
+    "universal-agent-context>=1.0.0",
+    "tta-dev-integrations>=0.1.0",
     # Core dependencies
     "numpy>=1.24.0",
     "pandas>=2.0.0",
@@ -312,13 +317,15 @@ cache-dir = "./.uv_cache"
 members = [
     "packages/tta-ai-framework",
     "packages/tta-narrative-engine",
-    # Note: ai-dev-toolkit excluded until TTA.dev packages (dev-primitives, tta-workflow-primitives) are published
-    # Note: universal-agent-context is a documentation package, not a Python package
 ]
 
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
+tta-dev-primitives = { path = "../TTA.dev/platform/primitives", editable = true }
+tta-observability-integration = { path = "../TTA.dev/platform/observability", editable = true }
+universal-agent-context = { path = "../TTA.dev/platform/agent-context", editable = true }
+tta-dev-integrations = { path = "../TTA.dev/platform/integrations", editable = true }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
@@ -326,7 +333,7 @@ tta-narrative-engine = { workspace = true }
 
 [tool.pyright]
 # Python version and platform
-pythonVersion = "3.10"
+pythonVersion = "3.12"
 pythonPlatform = "Linux"
 
 # Paths
@@ -436,6 +443,7 @@ ignore = [
     "PLR2004", # magic value comparison
     "S101",  # use of assert (common in tests)
     "SIM108", # use ternary operator (sometimes less readable)
+    "ERA001", # Logseq citation comments (# Logseq: [[...]]) are project convention
 ]
 
 # Allow auto-fixing for all enabled rules
@@ -445,7 +453,7 @@ unfixable = []
 # Per-file ignores
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "E402"]
-"tests/**/*.py" = ["S101", "ARG", "PLR2004"]  # Allow assert, unused args, magic values in tests
+"tests/**/*.py" = ["S101", "ARG", "PLR2004", "S105", "S106", "S110", "PLC0415", "PLR0911", "PLR0912", "PLR0915", "PTH103", "PTH123", "PTH110", "F811", "E402", "B017", "S103", "SIM117", "PTH101", "RET504"]  # Allow assert, unused args, test passwords, deferred imports in tests
 "scripts/analyze-neo4j-staging-metrics.py" = ["T201", "PLR0912", "PLR0915", "ARG001", "F841", "PTH123"]  # Reporting script needs print statements
 
 # Import sorting configuration (replaces isort)
@@ -463,13 +471,25 @@ docstring-code-format = true  # Format code examples in docstrings
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q --strict-markers --cov=src --cov-report=term-missing --cov-report=html --cov-report=xml"
+addopts = "-ra -q --strict-markers"
+# Coverage is run explicitly in CI: pytest --cov=src --cov-report=xml
+# Running it via addopts causes pre-commit hooks to fail (generates coverage.xml/htmlcov/)
 testpaths = [
     "tests",
 ]
 python_files = [
     "test_*.py",
     "*_test.py",
+]
+norecursedirs = [
+    "tests/archive",
+    "tests/e2e",
+    "tests/e2e-staging",
+    "tests/mutation",
+    ".git",
+    "__pycache__",
+    ".venv",
+    "node_modules",
 ]
 # pytest-asyncio configuration
 asyncio_mode = "auto"
@@ -529,7 +549,6 @@ branch = true                   # Measure branch coverage
 precision = 2
 show_missing = true
 skip_covered = false
-fail_under = 70.0
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",

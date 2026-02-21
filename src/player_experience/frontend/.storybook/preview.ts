@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/.storybook/Preview]]
 import type { Preview } from '@storybook/react';
 import '../src/index.css';
 

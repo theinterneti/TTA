@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_narrative_coherence_validators]]
 Tests for Narrative Coherence validators.
 
 This module tests the coherence validation, contradiction detection,

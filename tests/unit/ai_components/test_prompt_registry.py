@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Ai_components/Test_prompt_registry]]
 Unit tests for PromptRegistry.
 """
 

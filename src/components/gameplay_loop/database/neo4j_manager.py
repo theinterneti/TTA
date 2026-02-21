@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Database/Neo4j_manager]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Database/Neo4j_manager]]
 Neo4j Manager for Gameplay Loop
 
 This module provides Neo4j database management functionality for the therapeutic text adventure

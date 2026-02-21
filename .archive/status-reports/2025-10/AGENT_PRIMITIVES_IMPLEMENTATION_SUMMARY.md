@@ -286,3 +286,7 @@ Closes #[issue-number] (if applicable)
 ---
 
 **Ready to create PR!** 🚀
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Agent_primitives_implementation_summary]]

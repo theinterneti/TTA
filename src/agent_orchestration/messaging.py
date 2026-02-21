@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Messaging]]
 Message passing data structures for Agent Orchestration (Task 2.2, 4.2).
 
 Adds reliability primitives used by MessageCoordinator implementations:

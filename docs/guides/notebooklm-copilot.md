@@ -181,3 +181,7 @@ sudo apt upgrade google-chrome-stable
 ---
 
 **Happy researching with NotebookLM + Copilot! 🚀**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Guides/Notebooklm-copilot]]

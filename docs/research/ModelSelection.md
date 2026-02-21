@@ -196,3 +196,7 @@ Leverage FP16 Compute: Configure quantization (bnb_4bit_compute_dtype) or load m
 Utilize Accelerate for Flexibility: Employ device_map="auto" during model loading. This leverages the 60GB system RAM for CPU offloading if a quantized model slightly exceeds VRAM, providing flexibility at the cost of some performance.
 Optimize Attention: Ensure PyTorch 2.1.1+ is used for automatic SDPA benefits. Consider installing and enabling FlashAttention-2 for potentially further speed improvements with FP16 compute.
 By implementing these strategies, particularly combining 4-bit NF4 quantization with FP16 compute and optimized attention mechanisms, the user can achieve satisfactory inference speeds (potentially 15-60+ tokens/s depending on the specific 7-9B model and task) on their hardware. This setup enables the local exploration and application of powerful AI models, bridging the gap between cutting-edge research and consumer-grade hardware. Continuous experimentation and benchmarking with specific models and workloads remain essential for fine-tuning performance.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Research/Modelselection]]

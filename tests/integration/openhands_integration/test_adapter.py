@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Openhands_integration/Test_adapter]]
 Tests for OpenHandsAdapter.
 
 Tests adapter initialization, task execution, retry logic, fallback mechanism,

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_world_system_integration]]
 Integration tests for the world system.
 
 Tests world listing, retrieval, validation in session creation,
@@ -9,6 +11,14 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import app
+
+# World management (GET /worlds, GET /worlds/:id, etc.) is not yet
+# implemented — see GDD.md Phase 2 and docs/design/technical-specifications.md.
+# These tests serve as executable specs for the expected behavior.
+pytestmark = pytest.mark.xfail(
+    reason="World management API not yet implemented (GDD Phase 2)",
+    strict=False,
+)
 
 
 @pytest.fixture

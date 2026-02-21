@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_circuit_breaker_integration]]
 Integration tests for circuit breaker functionality.
 
 Tests the complete circuit breaker system including state transitions,

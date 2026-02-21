@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_tool_models]]
 import pytest
 from tta_ai.orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Test_suites/Standard_test_suite]]
 Standard Test Suite
 
 Tests normal user interactions and story generation flows including:

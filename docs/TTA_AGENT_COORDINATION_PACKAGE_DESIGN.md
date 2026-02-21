@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/TTA Agent Coordination Package Design.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Tta_agent_coordination_package_design]]

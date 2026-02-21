@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/Performance_monitor]]
 Performance monitoring system with real-time tracking and optimization.
 
 This module provides comprehensive performance monitoring including request tracking,

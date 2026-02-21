@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Player]]
 Player profile and related data models.
 """
 

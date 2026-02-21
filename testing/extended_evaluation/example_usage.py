@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Extended_evaluation/Example_usage]]
 Example Usage of TTA Extended Session Quality Evaluation Framework
 
 This script demonstrates how to use the extended evaluation framework

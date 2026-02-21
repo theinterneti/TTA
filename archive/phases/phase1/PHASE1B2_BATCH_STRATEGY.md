@@ -100,3 +100,7 @@ except Exception as e:
 | 7 | 20 | 121 | 0 |
 
 **Total Estimated Time:** 2-3 hours
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Phases/Phase1/Phase1b2_batch_strategy]]

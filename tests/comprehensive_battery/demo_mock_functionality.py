@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Demo_mock_functionality]]
 Demonstration of TTA Comprehensive Test Battery Mock Functionality
 
 This script demonstrates the comprehensive test battery's ability to:

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Metrics]]
 Tool execution metrics aggregator for dynamic tools.
 """
 

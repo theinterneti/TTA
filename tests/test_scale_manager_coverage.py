@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_scale_manager_coverage]]
 Coverage tests for ScaleManager to reach 70%+ coverage.
 
 This module contains tests specifically designed to cover previously

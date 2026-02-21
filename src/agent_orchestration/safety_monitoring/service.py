@@ -1,5 +1,7 @@
 """Safety service orchestration and global service management."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_monitoring/Service]]
+
 from __future__ import annotations
 
 import contextlib  # BUG FIX: Added missing import (line 3513 uses contextlib.suppress())

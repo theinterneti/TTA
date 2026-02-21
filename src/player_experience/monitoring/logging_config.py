@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/Logging_config]]
 Comprehensive logging configuration for production-grade monitoring.
 
 This module provides structured logging, log aggregation, and integration

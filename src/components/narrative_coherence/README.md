@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Narrative Coherence Component.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA/Components/Narrative_coherence/Readme]]

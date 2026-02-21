@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Ai_components/Prompts/Prompt_registry]]
 Prompt Registry for centralized prompt management and versioning.
 
 Provides:

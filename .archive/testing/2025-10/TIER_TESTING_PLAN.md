@@ -294,3 +294,7 @@ Once PRs are created, add links here for easy tracking.
 
 **Status**: Ready to create test PRs
 **Action Required**: Run commands above to create PRs and validate workflows
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Testing/2025-10/Tier_testing_plan]]

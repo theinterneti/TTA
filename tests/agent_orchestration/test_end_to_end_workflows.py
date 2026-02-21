@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_end_to_end_workflows]]
 End-to-end workflow integration tests for multi-agent orchestration.
 
 This module implements the actual integration tests that validate complete IPA → WBA → NGA workflows,

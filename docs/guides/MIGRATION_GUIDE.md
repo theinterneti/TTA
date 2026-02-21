@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Migration Guide - Universal Agent Context System.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Guides/Migration_guide]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Observability_integration/Apm_setup]]
 APM (Application Performance Monitoring) Setup
 
 Initializes OpenTelemetry tracing and metrics for TTA platform.

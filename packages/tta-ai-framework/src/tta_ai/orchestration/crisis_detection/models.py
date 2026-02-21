@@ -1,5 +1,7 @@
 """Crisis detection data models."""
 
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Crisis_detection/Models]]
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

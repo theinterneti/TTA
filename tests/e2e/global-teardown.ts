@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Global-teardown]]
 import { FullConfig } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';

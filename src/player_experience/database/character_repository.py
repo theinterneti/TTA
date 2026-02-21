@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Character_repository]]
 Character Repository for database operations.
 
 This module provides the CharacterRepository class that handles all database

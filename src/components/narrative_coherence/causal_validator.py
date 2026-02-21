@@ -3,6 +3,8 @@
 Ensures logical cause-and-effect across narrative branches.
 """
 
+# Logseq: [[TTA/Components/Narrative_coherence/Causal_validator]]
+
 from __future__ import annotations
 
 import logging

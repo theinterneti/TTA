@@ -147,3 +147,7 @@ The WebSocket URL is derived from the API URL (which is correct at `http://local
 2. **Start with selected issue**
 3. **Document findings** as we go
 4. **Update this file** with progress
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Issues/Remaining-priority-issues]]

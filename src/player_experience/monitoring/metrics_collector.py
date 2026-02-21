@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/Metrics_collector]]
 Comprehensive metrics collection system for performance monitoring.
 
 This module provides classes and utilities for collecting, aggregating, and

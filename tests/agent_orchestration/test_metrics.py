@@ -1,5 +1,7 @@
 """Tests for agent_orchestration.metrics module."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_metrics]]
+
 
 class TestMetricsModule:
     """Tests for metrics module."""

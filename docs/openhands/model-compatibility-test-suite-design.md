@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/OpenHands Model Compatibility Test Suite - Design Document.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Model-compatibility-test-suite-design]]

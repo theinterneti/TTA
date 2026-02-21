@@ -880,3 +880,7 @@ Our agentic workflow primitives are **production-ready** with strong foundations
 2. Current Implementation: `/packages/tta-workflow-primitives/`
 3. Test Results: `AGENTIC_PRIMITIVES_IMPLEMENTATION.md`
 4. Related: `PHASE7_FINAL_REPORT.md`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Primitives-improvements]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_real_agent_error_scenarios]]
 Error scenario testing for real agent communication.
 
 This module tests error handling, failure conditions, and recovery mechanisms

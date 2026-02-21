@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Utils/Python/Find_absolute_imports]]
 Script to find absolute imports from src in the TTA.prototype repository.
 """
 

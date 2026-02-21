@@ -125,3 +125,7 @@ All GitLeaks findings were example values in documentation. The repository does 
 - GitLeaks Action: https://github.com/gitleaks/gitleaks-action
 - Workflow Run: https://github.com/theinterneti/TTA/actions/runs/18146449593
 - Commit: 859735ad6aaabb90579602b5b803d5ef448279f2
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Security/Gitleaks-remediation-2025-10-01]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Maturity/__init__]]
 Component Maturity Automation System
 
 This package provides automated tracking and updating of component maturity status.

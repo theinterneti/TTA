@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_websocket_chat_backend]]
 Tests for WebSocket Chat Interface Backend (Task 8).
 """
 
@@ -44,6 +46,15 @@ def test_ws_connects_with_token_and_welcome(client: TestClient) -> None:
         assert "Connected to therapeutic chat" in msg["content"]["text"]
 
 
+def _recv_assistant(ws, max_messages: int = 20) -> dict:
+    """Receive messages until we get a non-system (assistant) message."""
+    for _ in range(max_messages):
+        msg = json.loads(ws.receive_text())
+        if msg.get("role") != "system":
+            return msg
+    raise AssertionError("Did not receive an assistant message within expected count")
+
+
 def test_user_message_roundtrip(client: TestClient) -> None:
     token = _auth_token("player-xyz")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
@@ -55,7 +66,7 @@ def test_user_message_roundtrip(client: TestClient) -> None:
             "metadata": {"character_id": "char-1", "world_id": "world-1"},
         }
         ws.send_text(json.dumps(payload))
-        reply = json.loads(ws.receive_text())
+        reply = _recv_assistant(ws)
         assert reply["role"] == "assistant"
         assert "text" in reply["content"]
         assert reply["metadata"].get("safety", {}).get("crisis") is False

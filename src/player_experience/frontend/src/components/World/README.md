@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/World Selection Components.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Frontend/Src/Components/World/Readme]]

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Start_with_gameplay]]
 TTA Startup Script with Gameplay Loop Integration
 
 This script demonstrates how to start the TTA system with the integrated

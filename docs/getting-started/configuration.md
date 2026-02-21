@@ -619,3 +619,7 @@ docker-compose exec redis redis-cli ping
 - **[Environment Setup Guide](../../ENVIRONMENT_SETUP.md)**: Detailed environment configuration
 - **[Docker Setup Guide](../../Documentation/docker/docker_setup_guide.md)**: Advanced Docker configuration
 - **[API Documentation](../api/tta-application.md)**: API configuration options
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Getting-started/Configuration]]

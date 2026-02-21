@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Gameplay_service]]
 Gameplay Service
 
 This module provides the service layer for gameplay loop operations,

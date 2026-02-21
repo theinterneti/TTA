@@ -327,3 +327,7 @@ See [Architecture](.augment/kb/TTA___Architecture___Application Architecture.md)
 **Maintainer:** TTA Development Team
 **Version:** 1.0
 **Next Review:** February 2026
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Reference/Documentation-migration-map]]

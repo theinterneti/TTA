@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Missing Chat Modes Implementation Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Missing_chat_modes_implementation_guide]]

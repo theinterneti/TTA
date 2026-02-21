@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Page-objects/Dashboardpage]]
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/Complexity_adapter]]
 Narrative Complexity Adapter for Therapeutic Text Adventure
 
 This module implements adaptive complexity management for narrative content,

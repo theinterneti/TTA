@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Test_character_arc_integration]]
 Test Character Arc Integration
 
 This module provides tests for the integration between CharacterArcManager

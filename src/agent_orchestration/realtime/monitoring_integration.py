@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Monitoring_integration]]
 Integration between monitoring system and real-time event broadcasting.
 
 This module connects the monitoring system from Task 16.2 with the real-time

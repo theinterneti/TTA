@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Primitive Specification: Error Recovery.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Scripts/Primitives/Specs/Error_recovery_spec]]

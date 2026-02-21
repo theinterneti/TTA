@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/🎯 Sentry Integration Guide for TTA Storytelling.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Integration/Sentry_integration_guide]]

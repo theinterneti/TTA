@@ -135,3 +135,7 @@ Related to #<!-- issue number -->
 ---
 
 *Thank you for helping improve TTA! 🐛➡️✨*
+
+
+---
+**Logseq:** [[TTA.dev/.github/Pull_request_template/Bug_fix]]

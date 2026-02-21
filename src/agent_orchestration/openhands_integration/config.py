@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Config]]
 Configuration models for OpenHands integration.
 
 Provides:

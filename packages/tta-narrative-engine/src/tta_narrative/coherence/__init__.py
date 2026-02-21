@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Coherence/__init__]]
 from .models import (
     ConsistencyIssue,
     ConsistencyIssueType,

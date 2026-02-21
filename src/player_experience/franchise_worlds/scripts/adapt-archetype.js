@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Scripts/Adapt-archetype]]
 #!/usr/bin/env node
 
 /**

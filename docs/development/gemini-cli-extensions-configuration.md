@@ -365,3 +365,7 @@ Consider:
 **Last Updated:** 2025-10-20
 **Status:** Credentials located, partial configuration complete
 **Next Action:** Create gemini-cli-env.sh script and test full configuration
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Gemini-cli-extensions-configuration]]

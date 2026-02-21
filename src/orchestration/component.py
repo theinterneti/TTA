@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Orchestration/Component]]
 TTA Component
 
 This module provides the base class for TTA components.

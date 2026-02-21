@@ -3,6 +3,8 @@
 Implements validation across lore, character, world rules, and therapeutic alignment.
 """
 
+# Logseq: [[TTA/Components/Narrative_coherence/Coherence_validator]]
+
 from __future__ import annotations
 
 import logging

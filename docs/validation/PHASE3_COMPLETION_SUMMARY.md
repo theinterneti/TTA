@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/Phase 3: Implement Automatic Rotation and Retry System - Completion Summary.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Phase3_completion_summary]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Component Maturity Promotion Session Summary.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Promotion_session_summary_2025-10-08]]

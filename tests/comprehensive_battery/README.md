@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Testing/TTA Comprehensive Test Battery.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Tests/Comprehensive_battery/Readme]]

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/Phase 3: Critical Backend Fixes - Summary Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Phase_3_critical_fixes_summary]]

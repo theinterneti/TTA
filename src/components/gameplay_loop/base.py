@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Base]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Base]]
 Base classes and interfaces for the Core Gameplay Loop system.
 
 This module provides the foundational abstract classes and interfaces that all

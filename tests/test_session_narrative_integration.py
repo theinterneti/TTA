@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_session_narrative_integration]]
 Integration tests for SessionIntegrationManager with InteractiveNarrativeEngine.
 
 Tests the integration between session management and narrative engine

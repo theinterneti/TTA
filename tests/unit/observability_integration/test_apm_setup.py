@@ -1,5 +1,7 @@
 """Unit tests for APM setup (OpenTelemetry initialization)."""
 
+# Logseq: [[TTA.dev/Tests/Unit/Observability_integration/Test_apm_setup]]
+
 from unittest.mock import patch
 
 from src.observability_integration.apm_setup import (

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Environment Setup Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Environments/Environment_setup_guide]]

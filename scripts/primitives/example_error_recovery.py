@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Primitives/Example_error_recovery]]
 Example usage of the Error Recovery Framework.
 
 This demonstrates how to use retry decorators, error classification,

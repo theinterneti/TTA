@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Qa_test_runner]]
 TTA Home Lab QA Test Runner
 Comprehensive quality assurance testing orchestrator for TTA storytelling system
 """

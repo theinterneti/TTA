@@ -179,3 +179,7 @@ Add to `.vscode/tasks.json`:
 - [Keploy Docs](https://github.com/keploy/keploy)
 - TTA API Docs: `http://localhost:8080/docs` (when server running)
 - Your API structure: `tests/test_api_structure.py`
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Tooling/2025-10/Keploy_setup]]

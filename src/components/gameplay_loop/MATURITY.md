@@ -10,3 +10,10 @@
 > Otherwise, see: `.augment/kb/Components/Gameplay Loop Maturity Status.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA/Components/Gameplay_loop/Maturity]]
+
+---
+**Logseq:** [[TTA.dev/Components/Gameplay_loop/Maturity]]

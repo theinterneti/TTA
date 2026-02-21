@@ -199,3 +199,7 @@ uv run pytest tests/agent_orchestration/test_<module_name>.py \
 - **Test Generation Workflow:** `docs/testing/TEST_GENERATION_WORKFLOW.md`
 - **Generated Tests Summary:** `docs/testing/GENERATED_TESTS_SUMMARY.md`
 - **Phase 1 Completion:** `CI_CD_INTEGRATION_COMPLETE.md`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Test-targets]]

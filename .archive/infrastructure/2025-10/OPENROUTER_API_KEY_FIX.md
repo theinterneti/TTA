@@ -241,3 +241,7 @@ print(os.getenv("OPENROUTER_API_KEY"))
 **Status:** ✅ FIXED AND VERIFIED
 **Last Updated:** 2025-10-24
 **Next Review:** After first CI/CD integration
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Openrouter_api_key_fix]]

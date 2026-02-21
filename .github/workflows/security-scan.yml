@@ -225,6 +225,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -346,6 +349,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
 
       - name: Set up Python
         uses: actions/setup-python@v5

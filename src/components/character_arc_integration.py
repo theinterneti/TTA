@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Character_arc_integration]]
+
+# Logseq: [[TTA/Components/Character_arc_integration]]
 Character Arc Integration Module
 
 This module provides integration between the new CharacterArcManager component

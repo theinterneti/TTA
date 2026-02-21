@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Component Maturity Assessment Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Component-maturity-assessment-2025-10-22]]

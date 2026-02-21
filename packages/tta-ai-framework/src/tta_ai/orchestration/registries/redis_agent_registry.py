@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Registries/Redis_agent_registry]]
 from __future__ import annotations
 
 import asyncio

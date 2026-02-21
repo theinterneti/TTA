@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_end_to_end_validation]]
 Comprehensive end-to-end system validation tests.
 
 This module provides comprehensive end-to-end testing for the complete therapeutic

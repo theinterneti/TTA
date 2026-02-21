@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Models]]
 Data models for the Model Management System.
 
 This module contains the core data structures used throughout the model

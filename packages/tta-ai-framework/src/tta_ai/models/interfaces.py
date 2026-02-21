@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Interfaces]]
 Core interfaces for the Model Management System.
 
 This module defines the fundamental interfaces and enums used throughout

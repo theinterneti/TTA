@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/Phase 4: Task-Specific Model Mapping.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Phase4_task_model_mapping]]

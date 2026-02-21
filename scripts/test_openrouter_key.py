@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test OpenRouter API key validity."""
 
+# Logseq: [[TTA.dev/Scripts/Test_openrouter_key]]
+
 import os
 import sys
 from pathlib import Path

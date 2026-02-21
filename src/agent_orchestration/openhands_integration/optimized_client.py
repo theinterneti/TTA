@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Optimized_client]]
 Optimized OpenHands SDK client with instance caching and reuse.
 
 Provides:

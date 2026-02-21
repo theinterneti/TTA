@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Workflow/Test_quality_gates]]
 Unit tests for quality gate validators.
 
 Tests the InstructionsValidationGate and other quality gates.

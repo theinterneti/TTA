@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Adapters]]
 Agent communication adapters for bridging orchestration proxies with real agent implementations.
 
 This module provides adapter classes that enable communication between the agent orchestration

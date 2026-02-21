@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Franchise_worlds]]
 Franchise Worlds API Router
 
 Provides REST API endpoints for the franchise world system,

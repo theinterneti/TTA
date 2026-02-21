@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Migrate-to-kb]]
 Documentation migration tool for TTA-notes knowledge base integration.
 
 This script helps migrate TTA documentation from scattered locations into

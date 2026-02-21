@@ -378,3 +378,7 @@ category: global
 **Status**: Ready to Begin
 **Last Updated**: 2025-10-22
 **Next Review**: After Session 1.1 completion
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-current-session]]

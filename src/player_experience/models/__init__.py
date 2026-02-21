@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/__init__]]
 Data models for the Player Experience Interface.
 
 This module contains all data models used in the player experience system,

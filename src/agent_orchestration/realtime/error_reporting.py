@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Error_reporting]]
 Real-time error reporting and recovery notifications.
 
 This module provides comprehensive error reporting and recovery notification

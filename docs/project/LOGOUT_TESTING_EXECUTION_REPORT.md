@@ -167,3 +167,7 @@ The `/api/v1/auth/logout` endpoint has issues with Response object injection in 
 The logout functionality has been partially implemented with proper backend support, but the frontend-backend integration is broken due to endpoint mismatch and Docker build issues. Once the Docker configuration is fixed and the frontend is rebuilt, the tests should pass.
 
 **Status**: 🔴 **BLOCKED** - Awaiting Docker configuration fix and frontend rebuild
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Logout_testing_execution_report]]

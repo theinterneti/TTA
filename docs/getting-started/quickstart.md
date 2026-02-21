@@ -292,3 +292,7 @@ Now that you have TTA running:
 - **[Testing Guide](../development/testing.md)**: Learn about the testing framework
 - **[Component Maturity](../development/component-maturity.md)**: Understand the development workflow
 - **[Troubleshooting](../../Documentation/docker/devcontainer_troubleshooting_guide.md)**: Common issues and solutions
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Getting-started/Quickstart]]

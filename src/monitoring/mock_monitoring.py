@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Mock_monitoring]]
 Mock Monitoring Implementation
 
 Provides mock implementations of monitoring components for environments
@@ -74,7 +76,7 @@ class MockPrometheusClient:
     def query(self, query: str) -> dict[str, Any]:
         """Mock Prometheus query."""
         # Parse query to determine metric type
-        metric_name = query.split("{")[0].split("(")[0].strip()
+        metric_name = query.split("{", maxsplit=1)[0].split("(", maxsplit=1)[0].strip()
 
         # Generate mock data
         current_time = time.time()

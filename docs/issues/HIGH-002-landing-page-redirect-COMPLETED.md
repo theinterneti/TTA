@@ -165,3 +165,7 @@ The fix ensures that:
 2. A loading spinner is shown while session restoration completes
 3. ProtectedRoute waits for session restoration before checking authentication
 4. The user experience is smooth without premature redirects or blank pages
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Issues/High-002-landing-page-redirect-completed]]

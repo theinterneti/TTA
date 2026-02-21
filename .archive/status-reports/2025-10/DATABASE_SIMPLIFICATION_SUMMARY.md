@@ -144,3 +144,7 @@ See `DATABASE_QUICK_REF.md` for daily usage patterns.
 **Tested**: Ready for migration
 **Documentation**: Complete
 **Next**: Run migration script
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Database_simplification_summary]]

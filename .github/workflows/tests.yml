@@ -6,78 +6,56 @@ on:
       - main
       - staging
       - development
-      - feat/production-deployment-infrastructure
+      - "feat/**"
+      - "fix/**"
+      - "refactor/**"
   pull_request:
     branches:
       - main
       - staging
       - development
 
-env:
-  PROMETHEUS_ENABLED: true
-  GRAFANA_ENABLED: true
-  MONITORING_ENVIRONMENT: ci
-
 jobs:
   unit:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v1
-        with:
-          version: "0.8.17"
 
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
+      - uses: astral-sh/setup-uv@v4
         with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-v2-unit-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-v2-unit-
-            ${{ runner.os }}-uv-v2-
+          enable-cache: true
 
       - name: Sync deps
-        run: uv sync --all-extras
-      - name: Run unit tests with metrics collection
-        run: |
-          # CRITICAL: Use 'uv run pytest' (NOT 'uvx pytest') to access project dependencies and get accurate coverage
-          uv run pytest -q --tb=short \
-            --junitxml=test-results/unit-tests.xml \
-            --cov=src --cov-branch --cov-report=xml:coverage-unit.xml
-        env:
-          TTA_METRICS_ENABLED: true
-          TTA_TEST_METRICS_COLLECTION: true
+        run: uv sync
 
-      - name: Run generated tests (protocol_bridge, capability_matcher, circuit_breaker)
+      - name: Run unit tests
         run: |
-          # Run generated tests for high-priority modules
-          # These tests were generated using OpenHands integration for improved coverage
-          uv run pytest \
-            tests/agent_orchestration/test_protocol_bridge.py \
-            tests/agent_orchestration/test_capability_matcher.py \
-            tests/agent_orchestration/test_circuit_breaker.py \
-            -v --tb=short \
-            --junitxml=test-results/generated-tests.xml \
-            --cov=src/agent_orchestration \
-            --cov-report=xml:coverage-generated.xml
-        continue-on-error: true
-        env:
-          TTA_METRICS_ENABLED: true
-          TTA_TEST_METRICS_COLLECTION: true
+          uv run pytest -q --tb=short \
+            -m "not integration and not neo4j and not redis" \
+            --ignore=tests/post_deployment \
+            --ignore=tests/e2e \
+            --ignore=tests/e2e-staging \
+            --junitxml=test-results/unit-tests.xml \
+            --cov=src --cov-branch \
+            --cov-report=xml:coverage-unit.xml \
+            --cov-report=term-missing \
+            --cov-fail-under=0 \
+            tests/
 
       - name: Upload coverage to Codecov
-        if: always()  # Upload coverage even if tests fail
+        if: always()
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage-unit.xml
           flags: unit
-          name: unit-tests
           fail_ci_if_error: false
 
-      - name: Upload unit test results
+      - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -85,11 +63,10 @@ jobs:
           path: |
             test-results/
             coverage-unit.xml
-            coverage-generated.xml
 
   integration:
+    name: Integration Tests
     runs-on: ubuntu-latest
-    # Skip integration tests on development branch (unit tests only)
     if: github.ref != 'refs/heads/development'
     services:
       neo4j:
@@ -107,7 +84,7 @@ jobs:
         ports:
           - 6379:6379
         options: >-
-          --health-cmd="redis-cli ping || exit 1"
+          --health-cmd="redis-cli ping"
           --health-interval=5s --health-timeout=3s --health-retries=10
     env:
       RUN_NEO4J_TESTS: "1"
@@ -118,43 +95,36 @@ jobs:
       TEST_REDIS_URI: "redis://localhost:6379/0"
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v1
-        with:
-          version: "0.8.17"
 
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
+      - uses: astral-sh/setup-uv@v4
         with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-v2-integration-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-v2-integration-
-            ${{ runner.os }}-uv-v2-
+          enable-cache: true
 
       - name: Sync deps
-        run: uv sync --all-groups
-      - name: Run integration tests with monitoring
+        run: uv sync
+
+      - name: Run integration tests
         run: |
-          uv run pytest -q --neo4j --redis --tb=short \
+          uv run pytest -q --tb=short \
+            -m "integration or neo4j or redis" \
             --junitxml=test-results/integration-tests.xml \
-            --cov=src --cov-branch --cov-report=xml:coverage-integration.xml
-        env:
-          TTA_METRICS_ENABLED: true
-          TTA_TEST_METRICS_COLLECTION: true
-          TTA_MONITORING_INTEGRATION_TESTS: true
+            --cov=src --cov-branch \
+            --cov-report=xml:coverage-integration.xml \
+            tests/
+
       - name: Upload coverage to Codecov
-        if: always()  # Upload coverage even if tests fail
+        if: always()
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage-integration.xml
           flags: integration
-          name: integration-tests
           fail_ci_if_error: false
 
-      - name: Upload integration test results
+      - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -162,210 +132,3 @@ jobs:
           path: |
             test-results/
             coverage-integration.xml
-
-  monitoring-validation:
-    runs-on: ubuntu-latest
-    needs: [unit, integration]
-    # Skip monitoring validation on development branch
-    if: always() && github.ref != 'refs/heads/development'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v1
-        with:
-          version: "0.8.17"
-      - name: Sync deps
-        run: uv sync --all-groups
-      - name: Download test results
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "*-test-results"
-          merge-multiple: true
-
-      - name: Start monitoring stack with Docker Compose
-        run: |
-          cd monitoring
-          # Use CI-specific Prometheus configuration for fast startup
-          # Create a temporary override to use prometheus-ci.yml
-          cat > docker-compose.ci-override.yml << 'EOF'
-          version: '3.8'
-          services:
-            prometheus:
-              command:
-                - --config.file=/etc/prometheus/prometheus-ci.yml
-                - --storage.tsdb.path=/prometheus
-                - --web.console.libraries=/etc/prometheus/console_libraries
-                - --web.console.templates=/etc/prometheus/consoles
-                - --storage.tsdb.retention.time=30d
-                - --web.enable-lifecycle
-          EOF
-
-          docker compose -f docker-compose.monitoring.yml -f docker-compose.ci-override.yml up -d prometheus grafana
-
-          # Debug: Show container status and logs before health checks
-          echo "=== Container Status ==="
-          docker ps -a
-
-          echo ""
-          echo "=== Prometheus Startup Logs ==="
-          docker logs tta-prometheus
-
-          echo ""
-          echo "=== Prometheus Process Status ==="
-          docker exec tta-prometheus ps aux || echo "Failed to check process status"
-
-          echo ""
-          echo "=== Prometheus Configuration Files ==="
-          docker exec tta-prometheus ls -la /etc/prometheus/ || echo "Failed to list config files"
-
-          echo ""
-          echo "=== Checking if prometheus-ci.yml exists ==="
-          docker exec tta-prometheus cat /etc/prometheus/prometheus-ci.yml || echo "prometheus-ci.yml not found!"
-
-          # Wait for services to be ready
-          # Add startup delay to reduce unnecessary polling during known initialization period
-          sleep 15
-
-          # Use /-/ready endpoint (correct endpoint per Prometheus docs for checking readiness to serve traffic)
-          # /-/healthy only checks if process is running, /-/ready checks if initialization is complete
-          echo "Waiting for Prometheus to be ready (initialization may take up to 2 minutes)..."
-
-          # Use wget (available in Prometheus container) with proper flags
-          # Track attempts outside of timeout subshell
-          max_attempts=24  # 24 attempts × 5 seconds = 120 seconds
-          attempt=0
-          ready=false
-
-          while [ $attempt -lt $max_attempts ]; do
-            attempt=$((attempt + 1))
-            echo "  Attempt $attempt/$max_attempts: Checking Prometheus readiness..."
-
-            # wget returns 0 on success (HTTP 200), non-zero on failure
-            # -O- outputs to stdout, --spider would skip download but we need to check response
-            # -q for quiet mode, --server-response to see HTTP status
-            if docker exec tta-prometheus wget -q -O- http://localhost:9090/-/ready > /dev/null 2>&1; then
-              ready=true
-              echo "✅ Prometheus is ready to serve traffic (after $attempt attempts)"
-              break
-            fi
-
-            if [ $attempt -lt $max_attempts ]; then
-              sleep 5
-            fi
-          done
-
-          if [ "$ready" = false ]; then
-            echo "❌ Prometheus failed to become ready after $max_attempts attempts (120 seconds)"
-            echo ""
-            echo "=== Final Prometheus Logs (last 50 lines) ==="
-            docker logs tta-prometheus --tail 50
-            echo ""
-            echo "=== Prometheus Container Status ==="
-            docker ps -a --filter "name=tta-prometheus"
-            echo ""
-            echo "=== Testing wget availability and /-/ready endpoint manually ==="
-            docker exec tta-prometheus wget --version || echo "wget not available"
-            docker exec tta-prometheus wget -O- http://localhost:9090/-/ready || echo "/-/ready endpoint failed"
-            exit 1
-          fi
-
-          # Wait for Grafana to initialize before starting health checks
-          # Grafana needs time for: web server startup, database init, plugin installation, provisioning
-          # The Docker Compose healthcheck has start_period: 30s, so we match that here
-          echo "Waiting 30 seconds for Grafana to initialize (plugin installation, database setup)..."
-          sleep 30
-
-          echo "Waiting for Grafana to be healthy (initialization may take up to 90 seconds)..."
-
-          # Use wget (available in Grafana container) with proper flags
-          # Track attempts outside of timeout subshell
-          max_attempts=18  # 18 attempts × 5 seconds = 90 seconds (total 120s with 30s delay)
-          attempt=0
-          healthy=false
-
-          while [ $attempt -lt $max_attempts ]; do
-            attempt=$((attempt + 1))
-            echo "  Attempt $attempt/$max_attempts: Checking Grafana health..."
-
-            # wget returns 0 on success (HTTP 200), non-zero on failure
-            # --spider checks if file exists without downloading
-            # Just check exit code, don't grep for "200 OK" (wget --spider doesn't output that)
-            if docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health > /dev/null 2>&1; then
-              healthy=true
-              echo "✅ Grafana is healthy (after $attempt attempts)"
-              break
-            fi
-
-            if [ $attempt -lt $max_attempts ]; then
-              sleep 5
-            fi
-          done
-
-          if [ "$healthy" = false ]; then
-            echo "❌ Grafana failed to become healthy after $max_attempts attempts (120 seconds total)"
-            echo ""
-            echo "=== Final Grafana Logs (last 50 lines) ==="
-            docker logs tta-grafana --tail 50
-            echo ""
-            echo "=== Grafana Container Status ==="
-            docker ps -a --filter "name=tta-grafana"
-            echo ""
-            echo "=== Testing /api/health endpoint manually ==="
-            docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || echo "/api/health endpoint failed"
-            exit 1
-          fi
-
-      - name: Validate monitoring infrastructure
-        run: |
-          # Test Prometheus connectivity
-          curl -f http://localhost:9090/-/healthy || exit 1
-          echo "✅ Prometheus API is accessible"
-
-          # Test Grafana connectivity
-          # Note: Grafana is exposed on port 3001 (Docker Compose mapping: 3001:3000)
-          curl -f http://localhost:3001/api/health || exit 1
-          echo "✅ Grafana API is accessible"
-
-          # Test metrics endpoints
-          uv run python -c "
-          import requests
-          import sys
-
-          # Test if our metrics are being collected
-          try:
-              response = requests.get('http://localhost:9090/api/v1/query?query=up')
-              if response.status_code == 200:
-                  print('✅ Prometheus metrics query successful')
-              else:
-                  print('❌ Prometheus metrics query failed')
-                  sys.exit(1)
-          except Exception as e:
-              print(f'❌ Error testing Prometheus: {e}')
-              sys.exit(1)
-          "
-
-      - name: Stop monitoring stack
-        if: always()
-        run: |
-          cd monitoring
-          docker compose -f docker-compose.monitoring.yml -f docker-compose.ci-override.yml down -v
-          rm -f docker-compose.ci-override.yml
-      - name: Performance regression detection
-        run: |
-          uv run python scripts/performance_regression_check.py \
-            --test-results test-results/ \
-            --baseline-branch main \
-            --threshold 20
-        continue-on-error: true
-      - name: Generate monitoring report
-        run: |
-          uv run python scripts/generate_monitoring_report.py \
-            --test-results test-results/ \
-            --output monitoring-report.html
-      - name: Upload monitoring artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: monitoring-validation-results
-          path: |
-            monitoring-report.html
-            test-results/

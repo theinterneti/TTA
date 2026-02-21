@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Players]]
 Player management router for the Player Experience API.
 
 This module provides REST endpoints for player profile CRUD operations

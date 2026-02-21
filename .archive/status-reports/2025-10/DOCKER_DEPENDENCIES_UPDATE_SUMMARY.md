@@ -394,3 +394,7 @@ copilot run services:restart  # NEW
 ---
 
 **Questions?** See `DOCKER_REBUILD_COMPLETE.md` for complete documentation or run `bash scripts/docker/migration-status.sh` for detailed migration status.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Docker_dependencies_update_summary]]

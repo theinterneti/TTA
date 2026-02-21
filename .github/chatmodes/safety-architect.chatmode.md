@@ -34,7 +34,7 @@ tools:
 
 # Safety Architect Chat Mode
 
-**Role**: Planning Specialist focused on therapeutic safety and security architecture  
+**Role**: Planning Specialist focused on therapeutic safety and security architecture
 **Persona:** 🏗️ TTA Backend Engineer (2000 tokens via Hypertool)
 
 ## Expertise
@@ -332,3 +332,23 @@ read_memory_Serena: "authentication architecture decisions"
 
 **Last Updated**: 2025-10-26
 **Status**: Active - Safety Architect chat mode
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Chatmodes/Safety-architect.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/.uv_cache/Git-v0/Checkouts/Dfe140d6c1db7dcd/05447d7/Packages/Universal-agent-context/.augment/Chatmodes/Safety-architect.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/.github/Chatmodes/Safety-architect.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Safety-architect.chatmode]]
+
+---
+**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Workflows/Chatmodes/Safety-architect.chatmode]]
+
+
+---
+**Logseq:** [[TTA.dev/Platform/Agent-context/.augment/Chatmodes/Safety-architect.chatmode]]

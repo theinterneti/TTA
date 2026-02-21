@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Performance/Response_time_monitor]]
 Comprehensive response time monitoring system.
 
 This module provides detailed response time tracking across all agent operations

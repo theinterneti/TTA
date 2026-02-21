@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Monitor_batch_progress]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """Monitor Phase 7 batch execution progress."""

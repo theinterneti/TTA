@@ -1,5 +1,7 @@
 """Comprehensive unit tests for agent_orchestration.models module."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_models]]
+
 import pytest
 
 from src.agent_orchestration.models import (
@@ -140,7 +142,7 @@ class TestRoutingKey:
     def test_routing_key_serialization(self):
         """Test RoutingKey serialization."""
         key = RoutingKey(topic="test", tags=["tag1"])
-        data = key.dict()
+        data = key.model_dump()
         assert data["topic"] == "test"
         assert data["tags"] == ["tag1"]
 
@@ -237,7 +239,7 @@ class TestAgentMessage:
             MessagePriority.HIGH,
         ]:
             msg = AgentMessage(
-                message_id=f"msg_{priority.value}",
+                message_id=f"msg_{priority.name.lower()}",
                 sender=AgentId(type=AgentType.IPA),
                 recipient=AgentId(type=AgentType.WBA),
                 message_type=MessageType.EVENT,

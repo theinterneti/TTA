@@ -110,3 +110,7 @@ fn = creg.resolve_callable(spec)  # spec.name="math.add", spec.version="1.0.0"
 - GET `/tools/summary`: pagination and filtering with query params:
   - `page`, `limit`, `status`, `name_prefix`, `sort_by` (last_used_at|name|version|status), `order` (asc|desc)
   - Includes summary counts and naive most/least used derivations from in-memory metrics.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Orchestration/Agent_orchestration_tools]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Optimization/Optimization_engine]]
 Optimization algorithm engine for agent orchestration performance tuning.
 
 This module provides adaptive algorithms that automatically adjust system

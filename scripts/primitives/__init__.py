@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Primitives/__init__]]
 Agentic Primitives - Error Recovery
 
 Reusable error recovery patterns for development operations.

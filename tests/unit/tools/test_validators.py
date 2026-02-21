@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Tools/Test_validators]]
 Unit tests for validators (Phase 3 Tool Optimization).
 
 Parametrized tests for naming and description validators.

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Analytics/Services/Realtime_monitoring_service]]
 Enhanced Real-time Monitoring Service for TTA Analytics
 
 This service provides advanced alerting, anomaly detection, performance analytics,
@@ -171,8 +173,9 @@ class TherapeuticInterventionTrigger:
                 "message": "User engagement is critically low. Consider intervention.",
             },
             "extended_session": {
-                "condition": lambda data: data.get("session_duration", 0)
-                > 120,  # 2 hours
+                "condition": lambda data: (
+                    data.get("session_duration", 0) > 120
+                ),  # 2 hours
                 "intervention": "session_break_reminder",
                 "message": "User has been in session for over 2 hours. Suggest a break.",
             },

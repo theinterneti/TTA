@@ -1,5 +1,7 @@
 """Sessions router: minimal endpoints to support test workflows."""
 
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Sessions]]
+
 from __future__ import annotations
 
 import uuid
@@ -9,7 +11,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-from ...database.world_repository import WorldRepository
+from ...managers.world_management_module import WorldManagementModule
 from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
@@ -17,16 +19,16 @@ router = APIRouter()
 # In-memory session store for tests (non-persistent)
 _SESSIONS: dict[str, dict[str, Any]] = {}
 
-# Global world repository instance
-_world_repository: WorldRepository | None = None
+# Global world manager instance
+_world_manager: WorldManagementModule | None = None
 
 
-async def get_world_repository() -> WorldRepository:
-    """Get or create world repository (shared singleton)."""
-    global _world_repository
-    if _world_repository is None:
-        _world_repository = WorldRepository()
-    return _world_repository
+async def get_world_manager() -> WorldManagementModule:
+    """Get or create world manager (shared singleton)."""
+    global _world_manager  # noqa: PLW0603
+    if _world_manager is None:
+        _world_manager = WorldManagementModule()
+    return _world_manager
 
 
 class TherapeuticSettings(BaseModel):
@@ -49,11 +51,11 @@ class UpdateSessionRequest(BaseModel):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_session(
     request: CreateSessionRequest,
-    current_player: TokenData = Depends(get_current_active_player),
-    world_repo: WorldRepository = Depends(get_world_repository),
+    current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
+    world_manager: WorldManagementModule = Depends(get_world_manager),
 ) -> dict[str, Any]:
     # Validate world exists
-    world = world_repo.get_world(request.world_id)
+    world = world_manager.get_world_details(request.world_id)
     if world is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -84,7 +86,7 @@ async def create_session(
 @router.get("/{session_id}")
 async def get_session(
     session_id: str,
-    current_player: TokenData = Depends(get_current_active_player),
+    current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
 ) -> dict[str, Any]:
     s = _SESSIONS.get(session_id)
     if not s:
@@ -110,7 +112,7 @@ async def get_session(
 async def update_session(
     session_id: str,
     request: UpdateSessionRequest,
-    current_player: TokenData = Depends(get_current_active_player),
+    current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
 ) -> dict[str, Any]:
     s = _SESSIONS.get(session_id)
     if not s:
@@ -138,7 +140,7 @@ async def update_session(
 @router.get("/{session_id}/progress")
 async def get_session_progress(
     session_id: str,
-    current_player: TokenData = Depends(get_current_active_player),
+    current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
 ) -> dict[str, Any]:
     s = _SESSIONS.get(session_id)
     if not s:

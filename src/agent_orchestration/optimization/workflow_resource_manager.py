@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Optimization/Workflow_resource_manager]]
 Workflow resource manager for concurrent workflow optimization.
 
 This module provides efficient resource allocation and scheduling for

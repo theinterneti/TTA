@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Therapeutic_profile_integration]]
 Therapeutic Profile Integration Service.
 
 This module provides integration between character data and therapeutic profiles,

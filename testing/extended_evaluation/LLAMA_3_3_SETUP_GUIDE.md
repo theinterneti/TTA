@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Extended Evaluation with Meta Llama 3.3 8B - Setup Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Testing/Extended_evaluation/Llama_3_3_setup_guide]]

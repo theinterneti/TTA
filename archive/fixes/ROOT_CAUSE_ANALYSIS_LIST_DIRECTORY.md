@@ -278,3 +278,7 @@ rm -rf list && uv sync && ls -la | grep list
 **Status:** ✅ Root cause identified and documented
 **Solution:** ✅ Complete fix provided
 **Prevention:** ✅ Configuration added
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Fixes/Root_cause_analysis_list_directory]]

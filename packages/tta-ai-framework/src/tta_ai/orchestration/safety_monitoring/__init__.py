@@ -4,6 +4,8 @@ This component provides safety rules management, service orchestration,
 and global service access for therapeutic safety validation.
 """
 
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Safety_monitoring/__init__]]
+
 from .dashboard import SafetyMonitoringDashboard
 from .provider import SafetyRulesProvider
 from .service import (

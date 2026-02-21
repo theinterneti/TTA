@@ -346,3 +346,7 @@ Validation Points:
 - **Security**: Zero critical security vulnerabilities
 
 This testing framework ensures comprehensive validation of all user journeys while maintaining focus on therapeutic effectiveness, user safety, and system reliability.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Testing-framework]]

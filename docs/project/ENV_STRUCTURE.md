@@ -184,3 +184,7 @@ For troubleshooting:
 ## Legacy Structure (Deprecated)
 
 The previous hierarchical structure with TTA.prototype/.env and TTA.dev/.env has been consolidated into this unified approach for better security and maintainability.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Env_structure]]

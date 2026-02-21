@@ -321,3 +321,7 @@
 **Status**: ✅ Investigation Complete
 **Next Action**: Execute Option A (Quick Wins) - Create fixtures for orchestrator path mocking
 **Estimated Completion**: 2-3 hours for Quick Wins, 12-15 hours for full resolution
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Failing_tests_investigation]]

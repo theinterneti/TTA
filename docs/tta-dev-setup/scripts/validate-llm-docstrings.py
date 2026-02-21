@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Docs/Tta-dev-setup/Scripts/Validate-llm-docstrings]]
 LLM-Friendly Docstring Validator
 
 Uses an LLM to evaluate if docstrings are clear and understandable to AI agents.

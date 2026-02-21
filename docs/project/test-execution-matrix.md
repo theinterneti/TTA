@@ -202,3 +202,7 @@ This matrix provides a comprehensive mapping of test scenarios across user types
 | Security | Zero critical vulnerabilities | Security scans | Weekly |
 
 This comprehensive test execution matrix ensures thorough validation of all user journeys while maintaining focus on therapeutic effectiveness, user safety, and system reliability across all user categories and system components.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Test-execution-matrix]]

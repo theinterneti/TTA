@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Openhands_integration/Test_error_recovery]]
 Tests for OpenHandsErrorRecovery.
 
 Tests error classification, recovery strategy selection, retry logic,

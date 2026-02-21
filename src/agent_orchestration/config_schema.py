@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Config_schema]]
 Configuration schema validation for Agent Orchestration.
 
 This module provides Pydantic models for validating agent orchestration
@@ -7,10 +9,11 @@ configuration, including discovery and auto-registration settings.
 
 from __future__ import annotations
 
+import re
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class CapabilityMatchingAlgorithm(str, Enum):
@@ -65,11 +68,10 @@ class AgentCapabilityConfig(BaseModel):
     )
     version: str = Field(default="1.0.0", description="Capability set version")
 
-    @validator("version")
-    def validate_version(cls, v):
+    @field_validator("version")
+    @classmethod
+    def validate_version(cls, v: str) -> str:
         """Validate semantic version format."""
-        import re
-
         if not re.match(r"^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$", v):
             raise ValueError(
                 'Version must follow semantic versioning (e.g., "1.0.0" or "1.0.0-beta.1")'
@@ -101,16 +103,14 @@ class AgentConfig(BaseModel):
         default_factory=AgentCapabilityConfig, description="Capability configuration"
     )
 
-    @validator("instance")
-    def validate_instance_name(cls, v):
+    @field_validator("instance")
+    @classmethod
+    def validate_instance_name(cls, v: str | None) -> str | None:
         """Validate instance name format if provided."""
-        if v is not None:
-            import re
-
-            if not re.match(r"^[a-zA-Z0-9_-]+$", v):
-                raise ValueError(
-                    "Instance name must contain only alphanumeric characters, underscores, and hyphens"
-                )
+        if v is not None and not re.match(r"^[a-zA-Z0-9_-]+$", v):
+            raise ValueError(
+                "Instance name must contain only alphanumeric characters, underscores, and hyphens"
+            )
         return v
 
 
@@ -152,16 +152,15 @@ class AgentsConfig(BaseModel):
         description="OpenHands Development Agent configuration",
     )
 
-    @validator("heartbeat_interval")
-    def validate_heartbeat_interval(cls, v, values):
+    @model_validator(mode="after")
+    def validate_heartbeat_interval(self) -> AgentsConfig:
         """Validate heartbeat interval against TTL."""
-        if v is not None:
-            ttl = values.get("heartbeat_ttl", 30.0)
-            if v <= 0 or v >= ttl:
-                raise ValueError(
-                    "Heartbeat interval must be positive and less than heartbeat_ttl"
-                )
-        return v
+        v = self.heartbeat_interval
+        if v is not None and (v <= 0 or v >= self.heartbeat_ttl):
+            raise ValueError(
+                "Heartbeat interval must be positive and less than heartbeat_ttl"
+            )
+        return self
 
     def get_effective_heartbeat_interval(self) -> float:
         """Get the effective heartbeat interval (calculated if not set)."""

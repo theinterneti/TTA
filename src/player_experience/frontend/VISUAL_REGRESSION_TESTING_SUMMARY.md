@@ -198,3 +198,7 @@ The TherapeuticGoalsSelector component now has comprehensive visual regression t
 - **CI/CD integration** for automated quality assurance
 
 This implementation provides a robust foundation for maintaining visual quality as the TTA therapeutic platform continues to evolve!
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Frontend/Visual_regression_testing_summary]]

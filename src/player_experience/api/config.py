@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Config]]
 Configuration settings for the Player Experience API.
 
 This module provides configuration management for the FastAPI application.

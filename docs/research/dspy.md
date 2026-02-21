@@ -194,3 +194,7 @@ Leverage the official documentation, tutorials, and research papers.
 Engage with the growing community (Discord, GitHub) for support and shared learning.
 Carefully consider the data requirements and define robust evaluation metrics crucial for successful optimization.
 By embracing its programming-centric philosophy and leveraging its optimization power, organizations can utilize DSPy to build next-generation AI systems that are not only powerful but also systematically engineered for success.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Research/Dspy]]

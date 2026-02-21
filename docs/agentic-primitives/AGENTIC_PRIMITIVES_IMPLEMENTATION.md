@@ -384,3 +384,7 @@ Optional:
 Both primitive packages are **complete, tested, and ready for adoption**. The composable workflow primitives provide a solid foundation for building reliable, observable, and maintainable agent workflows while the dev primitives support robust development processes.
 
 **Start using them today** to improve workflow reliability, observability, and maintainability!
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Agentic-primitives/Agentic_primitives_implementation]]

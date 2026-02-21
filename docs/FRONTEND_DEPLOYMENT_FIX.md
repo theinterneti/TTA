@@ -217,3 +217,7 @@ After deployment:
 - Docker Multi-Stage Builds: https://docs.docker.com/build/building/multi-stage/
 - Nginx Caching: https://www.nginx.com/blog/nginx-caching-guide/
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Frontend_deployment_fix]]

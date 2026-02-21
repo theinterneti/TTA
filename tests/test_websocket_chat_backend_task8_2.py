@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_websocket_chat_backend_task8_2]]
 Additional tests for Task 8.2: therapeutic chat message processing enhancements.
 """
 
@@ -29,6 +31,15 @@ def _auth_token(player_id: str = "player-8-2") -> str:
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
+def _recv_assistant(ws, max_messages: int = 20) -> dict:
+    """Receive messages until we get a non-system (assistant) message."""
+    for _ in range(max_messages):
+        msg = json.loads(ws.receive_text())
+        if msg.get("role") != "system":
+            return msg
+    raise AssertionError("Did not receive an assistant message within expected count")
+
+
 def test_user_message_includes_recommendations_and_no_crisis_by_default(
     client: TestClient,
 ) -> None:
@@ -45,7 +56,7 @@ def test_user_message_includes_recommendations_and_no_crisis_by_default(
                 }
             )
         )
-        reply = json.loads(ws.receive_text())
+        reply = _recv_assistant(ws)
         assert reply["role"] == "assistant"
         # recommendations present in metadata (may be empty list depending on defaults)
         assert "recommendations" in reply.get("metadata", {})
@@ -67,7 +78,7 @@ def test_crisis_detection_includes_resources(client: TestClient) -> None:
                 }
             )
         )
-        reply = json.loads(ws.receive_text())
+        reply = _recv_assistant(ws)
         assert reply["role"] == "assistant"
         safety = reply.get("metadata", {}).get("safety", {})
         assert safety.get("crisis") is True

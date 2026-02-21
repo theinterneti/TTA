@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Narrative Coherence Component - Staging Promotion Confirmed.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Narrative_coherence_staging_ready]]

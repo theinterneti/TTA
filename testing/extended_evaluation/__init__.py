@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Testing/Extended_evaluation/__init__]]
 TTA Extended Quality Evaluation Framework
 
 This package provides comprehensive testing infrastructure for evaluating

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Observability/__init__]]
 Agentic Primitives - Development Observability
 
 Track and visualize development operation metrics.

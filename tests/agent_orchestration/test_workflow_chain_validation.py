@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_workflow_chain_validation]]
 Complete IPA → WBA → NGA workflow chain validation tests.
 
 This module provides detailed validation of the complete agent workflow chain,

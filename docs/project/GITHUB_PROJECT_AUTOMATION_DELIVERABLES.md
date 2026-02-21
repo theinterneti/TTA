@@ -327,3 +327,7 @@ This document summarizes all deliverables for the TTA Component Maturity Tracker
 ```
 
 🚀 **Start automating your project board management now!**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Github_project_automation_deliverables]]

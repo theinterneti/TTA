@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/🎯 TTA Component Promotion Plan.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Components/2025-10/Component_promotion_plan]]

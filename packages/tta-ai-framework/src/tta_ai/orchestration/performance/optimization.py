@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Performance/Optimization]]
 Intelligent agent coordination optimization with predictive scheduling.
 
 This module provides advanced optimization algorithms for agent coordination,

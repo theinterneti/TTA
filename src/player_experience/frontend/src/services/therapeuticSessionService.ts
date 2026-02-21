@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Services/Therapeuticsessionservice]]
 import { TherapeuticGoal } from '../types/preferences';
 import { generateGoalSuggestions, GoalSuggestion } from './goalSuggestionEngine';
 import { analyzeGoalRelationships, GoalRelationshipMap } from './goalRelationshipService';

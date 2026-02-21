@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Database/Queries]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Database/Queries]]
 Database Queries for Gameplay Loop
 
 This module provides pre-defined Cypher queries for common gameplay loop operations

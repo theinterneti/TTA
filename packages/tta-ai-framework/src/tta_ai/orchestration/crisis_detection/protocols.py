@@ -1,5 +1,7 @@
 """Emergency protocol execution engine."""
 
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Crisis_detection/Protocols]]
+
 from __future__ import annotations
 
 import logging

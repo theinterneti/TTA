@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/Phase 7: Execution Metrics & Outcomes Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Phase7_metrics_report]]

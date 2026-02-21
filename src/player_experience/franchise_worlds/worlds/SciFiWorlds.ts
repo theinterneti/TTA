@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Worlds/Scifiworlds]]
 /**
  * Science Fiction World Configurations
  *

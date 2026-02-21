@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Examples/Mvp_option1_final]]
 MVP Option 1: Complete Production-Ready Workflow
 
 This demonstrates Router + Timeout + Cache primitives working together

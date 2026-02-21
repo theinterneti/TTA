@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Capability_matcher]]
 Capability matching algorithms for agent discovery.
 
 This module provides sophisticated algorithms for matching agent capabilities

@@ -247,3 +247,7 @@ result = feature.do_something()
 ---
 
 *Thank you for contributing to TTA! ✨*
+
+
+---
+**Logseq:** [[TTA.dev/.github/Pull_request_template/Feature]]

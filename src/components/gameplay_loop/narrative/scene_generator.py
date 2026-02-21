@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Narrative/Scene_generator]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Narrative/Scene_generator]]
 Scene Generator for Therapeutic Text Adventure
 
 This module implements scene generation functionality for creating immersive,

@@ -351,3 +351,7 @@ All documentation correctly reflects the dual usage of Pylance (IDE) and Pyright
 - **Pylance GitHub:** https://github.com/microsoft/pylance-release
 - **Pyright Documentation:** https://microsoft.github.io/pyright/
 - **Pylance Documentation:** https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Pyright-vs-pylance-analysis]]

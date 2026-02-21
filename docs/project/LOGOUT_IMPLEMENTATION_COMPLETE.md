@@ -277,3 +277,7 @@ For issues or questions:
 2. Check `docs/LOGOUT_FLOW_INVESTIGATION.md` for detailed investigation
 3. Run debug tests: `./scripts/test-logout-flow.sh debug`
 4. Check backend logs: `docker logs tta-api-staging | grep -i logout`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Logout_implementation_complete]]

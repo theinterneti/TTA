@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Carbon_component]]
 Carbon Tracking Component
 
 This module provides a component for tracking carbon emissions across the TTA project.

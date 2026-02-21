@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_impact_analysis_coverage]]
 Coverage tests for impact_analysis module to reach 70%+ coverage.
 
 This module contains tests specifically designed to cover previously

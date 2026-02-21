@@ -338,3 +338,7 @@ cat src/player_experience/frontend/package.json | grep "storybook.*wrapper"
 **Implementation Time**: ~45 minutes
 **Risk Level**: Low (all changes reversible)
 **Impact**: High (improved consistency + modern tooling)
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Dependency_resolution_complete]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_enhanced_therapeutic_safety]]
 Comprehensive unit tests for enhanced TherapeuticValidator (Task 17.1).
 
 Tests all validation algorithms, safety rules, crisis detection, and edge cases.

@@ -171,3 +171,7 @@ except ValueError as e:
 ## Notes
 
 This is a minimal example component designed to demonstrate the workflow system. Real components would have more complex requirements and dependencies.
+
+
+---
+**Logseq:** [[TTA.dev/Specs/Example_component]]

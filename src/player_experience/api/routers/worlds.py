@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Worlds]]
 World management router for the Player Experience API.
 
 This module provides endpoints for world discovery and management.

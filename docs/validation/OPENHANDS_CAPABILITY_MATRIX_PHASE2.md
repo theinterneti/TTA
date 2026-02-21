@@ -270,3 +270,7 @@ We've successfully expanded model coverage and identified a robust rotation stra
 ---
 
 **End of Phase 2 Capability Matrix Update**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Openhands_capability_matrix_phase2]]

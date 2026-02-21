@@ -155,3 +155,7 @@ To work with the `TTA.prototype` repository:
 3. Select the `TTA.prototype` directory
 
 For more information about Docker and container setup, see the [Docker Setup Guide](../docker/README.md).
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Setup]]

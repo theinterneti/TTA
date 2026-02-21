@@ -61,3 +61,7 @@ The TTA project consists of three repositories:
 - main: Production-ready TTA
 - content/*: New therapeutic content
 - feature/*: TTA-specific features
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Github/Setup]]

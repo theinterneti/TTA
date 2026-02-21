@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_privacy_api]]
 Tests for privacy API endpoints.
 
 This module tests the GDPR compliance features including data encryption,

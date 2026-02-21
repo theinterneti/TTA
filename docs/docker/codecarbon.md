@@ -206,3 +206,7 @@ If measurements seem inaccurate:
    ```
 
 For more information about CodeCarbon, see the [official documentation](https://codecarbon.io/docs).
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Docker/Codecarbon]]

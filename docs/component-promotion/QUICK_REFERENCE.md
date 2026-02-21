@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Component Promotion Quick Reference.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Quick_reference]]

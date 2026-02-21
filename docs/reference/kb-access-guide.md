@@ -406,3 +406,7 @@ logseq ~/repos/TTA-notes
 **Last Updated:** November 2, 2025
 **Maintainer:** TTA Development Team
 **Version:** 1.0
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Reference/Kb-access-guide]]

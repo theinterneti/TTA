@@ -1,7 +1,7 @@
 # Sub-Agent Orchestration Analysis for TTA Development Workflow
 
-**Date**: 2025-10-28  
-**Status**: Research & Recommendation  
+**Date**: 2025-10-28
+**Status**: Research & Recommendation
 **Context**: Replacing OpenHands with more effective sub-agent solutions
 
 ## Executive Summary
@@ -270,11 +270,11 @@ from tta_ai.orchestration import CircuitBreaker
 
 class TestGenerationAgent:
     """Specialized agent for generating comprehensive tests."""
-    
+
     def __init__(self, llm_router: Router, circuit_breaker: CircuitBreaker):
         self.router = llm_router
         self.circuit_breaker = circuit_breaker
-    
+
     async def generate_tests(
         self,
         source_code: str,
@@ -282,9 +282,9 @@ class TestGenerationAgent:
         coverage_target: float = 0.80,
     ) -> dict[str, Any]:
         """Generate tests for given source code."""
-        
+
         prompt = self._build_test_prompt(source_code, test_type, coverage_target)
-        
+
         # Use circuit breaker for resilience
         response = await self.circuit_breaker.call(
             self.router.acompletion,
@@ -292,7 +292,7 @@ class TestGenerationAgent:
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,  # Lower temp for code generation
         )
-        
+
         return {
             "test_code": response.choices[0].message.content,
             "test_type": test_type,
@@ -390,7 +390,7 @@ model_list:
     model_info:
       max_tokens: 8192
       cost_per_token: 0.0  # Free tier
-  
+
   - model_name: dev-agent-premium
     litellm_params:
       model: openai/gpt-4-turbo-preview
@@ -487,3 +487,7 @@ router_settings:
 
 This approach aligns with your existing architecture, respects your circuit breaker patterns, and provides a clear path forward without introducing unnecessary complexity.
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Sub-agent-orchestration-analysis]]

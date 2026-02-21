@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Post_deployment/Test_player_profile_creation]]
 Post-Deployment Tests: Player Profile Auto-Creation (Issue #3)
 
 These tests verify that the player profile auto-creation fix remains effective.

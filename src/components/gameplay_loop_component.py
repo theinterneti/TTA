@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop_component]]
+
+# Logseq: [[TTA/Components/Gameplay_loop_component]]
 Core Gameplay Loop Component
 
 This component provides the main integration point for the therapeutic text adventure

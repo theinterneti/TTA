@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Auth_service]]
 Enhanced authentication service with MFA and RBAC support.
 
 This service provides comprehensive authentication, authorization, and security
@@ -14,10 +16,10 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
+import bcrypt
 import pyotp
 import qrcode
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from ..models.auth import (
     DEFAULT_ROLE_PERMISSIONS,
@@ -62,7 +64,6 @@ class SecurityService:
 
     def __init__(self, settings: SecuritySettings):
         self.settings = settings
-        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def validate_password_strength(self, password: str) -> tuple[bool, list[str]]:
         """
@@ -105,11 +106,14 @@ class SecurityService:
 
     def hash_password(self, password: str) -> str:
         """Hash a password using bcrypt."""
-        return self.pwd_context.hash(password)
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
-        return self.pwd_context.verify(plain_password, hashed_password)
+        try:
+            return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+        except Exception:
+            return False
 
     def generate_secure_token(self, length: int = 32) -> str:
         """Generate a cryptographically secure random token."""
@@ -127,7 +131,7 @@ class MFAService:
         self.config = config
         self.active_challenges: dict[str, MFAChallenge] = {}
 
-    def generate_totp_secret(self, user_id: str, username: str) -> tuple[str, str]:
+    def generate_totp_secret(self, user_id: str, username: str) -> tuple[str, str]:  # noqa: ARG002
         """
         Generate TOTP secret and QR code for user.
 
@@ -173,7 +177,7 @@ class MFAService:
         totp = pyotp.TOTP(secret)
         return totp.verify(code, valid_window=window)
 
-    def create_mfa_challenge(self, user_id: str, method: MFAMethod) -> MFAChallenge:
+    def create_mfa_challenge(self, user_id: str, method: MFAMethod) -> MFAChallenge:  # noqa: ARG002
         """
         Create an MFA challenge for a user.
 
@@ -384,16 +388,19 @@ class EnhancedAuthService:
         if not user and credentials.username == "demo_user":
             logger.info("🧪 Using demo user fallback for testing")
             # Verify demo password
-            if credentials.password == "DemoPassword123!":  # pragma: allowlist secret
+            if (
+                credentials.password
+                == "DemoPassword123!"  # pragma: allowlist secret  # nosec B105  # noqa: S105
+            ):
                 # Create a temporary demo user object
-                from ..database.user_repository import User
+                from ..database.user_repository import User  # noqa: PLC0415
 
                 user = User(
                     user_id="demo-user-001",
                     username="demo_user",
                     email="demo@test.tta",
                     password_hash=self.security_service.hash_password(
-                        "DemoPassword123!"
+                        "DemoPassword123!"  # pragma: allowlist secret  # nosec B105
                     ),
                     role=UserRole.PLAYER,
                 )
@@ -542,7 +549,9 @@ class EnhancedAuthService:
         finally:
             duration = time.time() - start_time
             try:
-                from src.monitoring.prometheus_metrics import get_metrics_collector
+                from src.monitoring.prometheus_metrics import (  # noqa: PLC0415
+                    get_metrics_collector,
+                )
 
                 collector = get_metrics_collector("player-experience")
                 collector.record_jwt_token_generation(success, duration)
@@ -618,7 +627,9 @@ class EnhancedAuthService:
         finally:
             # Record JWT verification metrics
             try:
-                from src.monitoring.prometheus_metrics import get_metrics_collector
+                from src.monitoring.prometheus_metrics import (  # noqa: PLC0415
+                    get_metrics_collector,
+                )
 
                 collector = get_metrics_collector("player-experience")
                 collector.record_jwt_token_verification(success, has_player_id)

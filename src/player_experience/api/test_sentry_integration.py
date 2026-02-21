@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Test_sentry_integration]]
 Test script to verify Sentry integration is working correctly.
 
 This script can be run to test that Sentry is properly configured

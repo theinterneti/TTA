@@ -330,3 +330,7 @@ When adding new features:
 ---
 
 **Questions?** Check `tests/e2e-staging/README.md` for detailed documentation.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Staging_e2e_quick_start]]

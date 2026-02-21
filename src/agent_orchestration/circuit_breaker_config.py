@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Circuit_breaker_config]]
 Circuit breaker configuration schema and validation.
 
 Provides configuration loading, validation, and default value handling

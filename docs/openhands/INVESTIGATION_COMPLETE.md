@@ -221,3 +221,7 @@ All investigation documents are located in `docs/openhands/`:
 **Date**: 2025-10-27
 **Effort**: 4 hours investigation + documentation
 **Ready for**: Implementation phase
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Investigation_complete]]

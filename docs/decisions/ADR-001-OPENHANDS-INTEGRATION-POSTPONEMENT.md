@@ -1,8 +1,8 @@
 # ADR-001: OpenHands Integration Postponement
 
-**Status:** Accepted  
-**Date:** 2025-10-27  
-**Decision Makers:** TTA Development Team  
+**Status:** Accepted
+**Date:** 2025-10-27
+**Decision Makers:** TTA Development Team
 **Related Documents:**
 - `OPENHANDS_CONDENSATION_BUG_INVESTIGATION.md`
 - `OPENHANDS_INVESTIGATION_EXECUTIVE_SUMMARY.md`
@@ -277,9 +277,13 @@ response = await model.generate(prompt)
 
 ## Approval
 
-**Approved by:** TTA Development Team  
-**Date:** 2025-10-27  
+**Approved by:** TTA Development Team
+**Date:** 2025-10-27
 **Status:** ✅ Accepted and Implemented
 
 **Next Review:** 2026-01-27 (3 months) - Re-evaluate OpenHands status
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Decisions/Adr-001-openhands-integration-postponement]]

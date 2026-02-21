@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Optimization/__init__]]
 Response time optimization engine for agent orchestration.
 
 This module provides comprehensive response time monitoring, optimization algorithms,

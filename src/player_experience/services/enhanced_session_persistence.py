@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Enhanced_session_persistence]]
 Enhanced Session Persistence Service with Redis Integration
 
 This service provides comprehensive session persistence, recovery, and analytics

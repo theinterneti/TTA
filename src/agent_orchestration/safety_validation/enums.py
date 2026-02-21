@@ -1,5 +1,7 @@
 """Safety validation enumerations."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_validation/Enums]]
+
 from enum import Enum
 
 

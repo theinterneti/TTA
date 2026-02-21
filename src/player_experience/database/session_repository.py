@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Session_repository]]
 Session repository for database operations.
 
 Handles persistence and retrieval of session data including session context,

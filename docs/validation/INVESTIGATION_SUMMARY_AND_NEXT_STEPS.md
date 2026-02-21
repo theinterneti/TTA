@@ -234,3 +234,7 @@ Phase 2 Expansion testing had a 90% failure rate (18 out of 20 models failed):
 
 **End of Investigation Summary**
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Investigation_summary_and_next_steps]]

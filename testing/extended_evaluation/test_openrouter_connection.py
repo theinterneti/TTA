@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Extended_evaluation/Test_openrouter_connection]]
 Test OpenRouter API Connection for Llama 3.3 8B Instruct
 
 Simple test to verify OpenRouter API key and model access before running

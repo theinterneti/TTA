@@ -32,10 +32,6 @@ core_gameplay_loop:
     enabled: true
     therapeutic_goal_tracking: true
   session_timeout_minutes: 30
-deeply:
-  nested:
-    new:
-      key: 42
 docker:
   compose_profiles:
     - default
@@ -44,13 +40,10 @@ docker:
   ensure_consistent_extensions: true
   ensure_consistent_services: true
   standardize_container_names: true
-  use_gpu: not_a_bool
+  use_gpu: false
 environment:
-  log_level: invalid_level
+  log_level: info
   name: development
-level1:
-  level2:
-    level3: deep_value
 model_management:
   default_provider: openrouter
   enabled: true
@@ -128,11 +121,6 @@ model_management:
     crisis_detection: true
     enabled: true
     minimum_safety_score: 7.0
-new:
-  section:
-    key: value
-new_key: new_value
-new_setting: test_value
 orchestration:
   components:
     agent_orchestration:
@@ -185,18 +173,6 @@ player_experience:
   world_management:
     compatibility_threshold: 0.6
     world_cache_ttl: 86400
-test:
-  key: updated
-test_save_key: test_save_value
-test_save_key_json: test_save_value_json
-tta:
-  dev:
-    components:
-      llm:
-        api_base: http://test:1234/v1
-        model: test-model
-      neo4j:
-        port: 7688
 tta.dev:
   components:
     llm:

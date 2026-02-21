@@ -1,5 +1,7 @@
 """Safety rules provider with Redis caching and file fallback."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_monitoring/Provider]]
+
 from __future__ import annotations
 
 import contextlib  # BUG FIX: Added missing import (line 3375 uses contextlib.suppress())

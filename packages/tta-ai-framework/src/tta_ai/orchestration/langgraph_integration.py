@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Langgraph_integration]]
 LangGraph integration (Task 3.2).
 
 This module provides optional integration with LangGraph. If LangGraph is not

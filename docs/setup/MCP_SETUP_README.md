@@ -231,3 +231,7 @@ For issues specific to:
 - **TTA Integration**: Check TTA documentation
 - **MCP Servers**: Refer to individual server repositories
 - **Docker Environment**: Verify docker-compose configuration
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Mcp_setup_readme]]

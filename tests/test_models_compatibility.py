@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Test_models_compatibility]]
 from tta_narrative.coherence import (
     ConsistencyIssue,
     ConsistencyIssueType,

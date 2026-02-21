@@ -1,5 +1,7 @@
 """Tests for player_experience.utils.validation module."""
 
+# Logseq: [[TTA.dev/Tests/Player_experience/Utils/Test_validation]]
+
 
 class TestValidationUtils:
     """Tests for validation utilities."""

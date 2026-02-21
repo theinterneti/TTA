@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Models]]
 Data models for real-time communication in agent orchestration.
 
 This module defines Pydantic models for WebSocket events, agent status updates,

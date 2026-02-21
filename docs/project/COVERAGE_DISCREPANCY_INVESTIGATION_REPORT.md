@@ -393,3 +393,7 @@ TOTAL                                                               380    108  
 **Prepared By**: Augment Agent
 **Date**: 2025-10-13
 **Status**: Investigation Complete - Awaiting Decision
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Coverage_discrepancy_investigation_report]]

@@ -158,3 +158,7 @@ If you're still experiencing issues after trying the solutions above:
 3. Include logs and error messages to help diagnose the issue
 
 For more information about the Docker and devcontainer setup, see the [Docker Setup Guide](../docker/README.md).
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Troubleshooting]]

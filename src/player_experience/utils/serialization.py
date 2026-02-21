@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Utils/Serialization]]
 Serialization utilities for player experience data models.
 """
 

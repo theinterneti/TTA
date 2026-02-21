@@ -505,3 +505,7 @@ git branch --show-current
 
 **Status:** Ready for execution
 **Requires Confirmation:** Yes (before pushing to remote)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Git_commit_strategy]]

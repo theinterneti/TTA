@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Progressive_feedback]]
 Progressive feedback mechanisms for long-running agent orchestration operations.
 
 This module provides streaming response systems, incremental update mechanisms,

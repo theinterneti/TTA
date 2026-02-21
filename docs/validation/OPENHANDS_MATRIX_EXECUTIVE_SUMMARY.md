@@ -363,3 +363,7 @@ You now have a comprehensive, data-driven capability matrix for OpenHands integr
 ---
 
 **Start Here:** docs/validation/OPENHANDS_MATRIX_INDEX.md
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Openhands_matrix_executive_summary]]

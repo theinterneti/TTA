@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Service]]
 AgentOrchestrationService - Main API for multi-agent coordination (Task 16.1).
 
 This service provides the primary interface for processing user input and coordinating

@@ -467,3 +467,7 @@ If "no" to any → **Keep it in TTA repo until proven**
 
 **Last Updated:** 2025-10-27
 **Maintained By:** @theinterneti
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Tta_dev_quick_reference]]

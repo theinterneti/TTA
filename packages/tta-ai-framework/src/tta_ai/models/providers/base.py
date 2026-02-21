@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Providers/Base]]
 Base Provider Implementation
 
 This module provides the abstract base class for all model providers,

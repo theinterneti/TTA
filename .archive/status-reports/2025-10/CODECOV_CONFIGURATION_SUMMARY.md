@@ -261,3 +261,7 @@ See `COVERAGE_BASELINE_REPORT.md` for 8-week improvement plan.
 **Action Required**: Add `CODECOV_TOKEN` to GitHub Secrets
 **Time to Complete**: < 5 minutes
 **Next Review**: After first coverage upload
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Codecov_configuration_summary]]

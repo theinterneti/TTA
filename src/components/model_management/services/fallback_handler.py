@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Services/Fallback_handler]]
 Fallback Handler Service
 
 This module provides automatic fallback mechanisms for model failures,

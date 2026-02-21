@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Docker_component]]
 Docker Component.
 
 This module provides a component for managing Docker configurations across repositories.
@@ -104,9 +106,7 @@ class DockerComponent(Component):
             self._check_docker_installed()
 
             # Ensure Docker consistency across repositories
-            self.ensure_consistency()
-
-            return True
+            return self.ensure_consistency()
         except Exception as e:
             logger.error(f"Error starting Docker component: {e}")
             return False

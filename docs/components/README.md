@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/TTA Components.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Components/Readme]]

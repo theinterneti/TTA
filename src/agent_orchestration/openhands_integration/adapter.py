@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Adapter]]
 OpenHands adapter for TTA communication.
 
 Provides:

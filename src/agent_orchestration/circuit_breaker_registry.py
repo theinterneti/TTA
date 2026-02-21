@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Circuit_breaker_registry]]
 Circuit breaker registry for managing multiple circuit breakers with centralized
 state persistence and cleanup operations.
 """

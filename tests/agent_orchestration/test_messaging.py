@@ -1,5 +1,7 @@
 """Comprehensive unit tests for agent_orchestration.messaging module."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_messaging]]
+
 from src.agent_orchestration.messaging import (
     FailureType,
     MessageResult,
@@ -198,54 +200,43 @@ class TestQueueMessage:
 
 
 class TestReceivedMessage:
-    """Tests for ReceivedMessage model."""
+    """Tests for ReceivedMessage model (reservation wrapper for queue consumers)."""
 
-    def test_received_message_success(self):
-        """Test ReceivedMessage with successful receipt."""
+    def test_received_message_basic(self):
+        """Test ReceivedMessage wraps a QueueMessage with a token."""
         msg = AgentMessage(
             message_id="msg_001",
             sender=AgentId(type=AgentType.IPA),
             recipient=AgentId(type=AgentType.WBA),
             message_type=MessageType.REQUEST,
         )
-        rm = ReceivedMessage(message=msg, success=True)
-        assert rm.message == msg
-        assert rm.success is True
-        assert rm.failure_type is None
+        qm = QueueMessage(message=msg)
+        rm = ReceivedMessage(token="tok_001", queue_message=qm)
+        assert rm.token == "tok_001"
+        assert rm.queue_message == qm
+        assert rm.visibility_deadline is None
 
-    def test_received_message_failure(self):
-        """Test ReceivedMessage with failure."""
+    def test_received_message_with_deadline(self):
+        """Test ReceivedMessage with visibility deadline."""
         msg = AgentMessage(
             message_id="msg_002",
             sender=AgentId(type=AgentType.WBA),
             recipient=AgentId(type=AgentType.NGA),
             message_type=MessageType.RESPONSE,
         )
+        qm = QueueMessage(message=msg)
+        deadline = "2025-10-25T10:35:00Z"
         rm = ReceivedMessage(
-            message=msg,
-            success=False,
-            failure_type=FailureType.TIMEOUT,
+            token="tok_002", queue_message=qm, visibility_deadline=deadline
         )
-        assert rm.message == msg
-        assert rm.success is False
-        assert rm.failure_type == FailureType.TIMEOUT
+        assert rm.token == "tok_002"
+        assert rm.visibility_deadline == deadline
 
     def test_received_message_with_error_details(self):
-        """Test ReceivedMessage with error details."""
-        msg = AgentMessage(
-            message_id="msg_003",
-            sender=AgentId(type=AgentType.IPA),
-            recipient=AgentId(type=AgentType.WBA),
-            message_type=MessageType.EVENT,
-        )
-        rm = ReceivedMessage(
-            message=msg,
-            success=False,
-            failure_type=FailureType.VALIDATION_ERROR,
-            error_details="Invalid payload format",
-        )
-        assert rm.failure_type == FailureType.VALIDATION_ERROR
-        assert rm.error_details == "Invalid payload format"
+        """Test ReceivedMessage uses FailureType for transient/permanent failures."""
+        assert FailureType.TRANSIENT.value == "transient"
+        assert FailureType.PERMANENT.value == "permanent"
+        assert FailureType.TIMEOUT.value == "timeout"
 
     def test_received_message_serialization(self):
         """Test ReceivedMessage serialization."""
@@ -255,7 +246,8 @@ class TestReceivedMessage:
             recipient=AgentId(type=AgentType.WBA),
             message_type=MessageType.REQUEST,
         )
-        rm = ReceivedMessage(message=msg, success=True)
+        qm = QueueMessage(message=msg)
+        rm = ReceivedMessage(token="tok_004", queue_message=qm)
         data = rm.model_dump()
-        assert data["success"] is True
-        assert data["message"]["message_id"] == "msg_004"
+        assert data["token"] == "tok_004"
+        assert data["queue_message"]["message"]["message_id"] == "msg_004"

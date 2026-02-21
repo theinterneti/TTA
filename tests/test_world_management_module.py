@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_world_management_module]]
 Unit tests for WorldManagementModule.
 """
 
@@ -25,7 +27,7 @@ class TestWorldManagementModule(unittest.TestCase):
         # Test basic initialization
         manager = WorldManagementModule()
         self.assertIsNotNone(manager)
-        self.assertEqual(len(manager._world_cache), 2)  # Two default worlds
+        self.assertEqual(len(manager._world_cache), 5)  # Five default worlds
 
         # Test initialization with external components
         mock_world_state_manager = Mock()
@@ -49,7 +51,7 @@ class TestWorldManagementModule(unittest.TestCase):
         worlds = self.world_manager.get_available_worlds(self.test_player_id)
 
         self.assertIsInstance(worlds, list)
-        self.assertEqual(len(worlds), 2)  # Two default worlds
+        self.assertEqual(len(worlds), 5)  # Five default worlds
 
         # Check that worlds are sorted by rating (highest first)
         self.assertGreaterEqual(worlds[0].average_rating, worlds[1].average_rating)
@@ -72,7 +74,7 @@ class TestWorldManagementModule(unittest.TestCase):
         )
 
         self.assertIsInstance(worlds, list)
-        self.assertEqual(len(worlds), 2)
+        self.assertEqual(len(worlds), 5)
 
         # Check that compatibility scores are calculated
         for world in worlds:

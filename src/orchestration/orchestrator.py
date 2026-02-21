@@ -24,8 +24,10 @@ Example:
     ```
 """
 
+# Logseq: [[TTA.dev/Orchestration/Orchestrator]]
+
 import logging
-import subprocess
+import subprocess  # nosec B404
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -35,6 +37,7 @@ from rich.table import Table
 from src.common.process_utils import run as safe_run
 
 from .component import Component, ComponentStatus
+from .component_loader import FilesystemComponentLoader
 from .component_registry import ComponentRegistry
 from .config import TTAConfig
 from .decorators import log_entry_exit, retry, timing_decorator, validate_args
@@ -82,15 +85,39 @@ class TTAOrchestrator:
         # Initialize component registry
         self.component_registry = ComponentRegistry(self.config, self.root_dir)
 
+        # Use FilesystemComponentLoader as default when no loader provided
+        if component_loader is None:
+            component_loader = FilesystemComponentLoader(
+                config=self.config,
+                root_dir=self.root_dir,
+                tta_dev_path=self.root_dir / "tta.dev",
+                tta_prototype_path=self.root_dir / "tta.prototype",
+            )
+
         self.component_loader = component_loader
 
-        # Validate paths and import components using the loader
-        self.component_loader.validate_paths()
-        self.components = self.component_loader.discover_components()
+        # Validate paths and import components using stub methods (patchable for testing).
+        # Called via class to ensure self is passed even when patched at class level.
+        TTAOrchestrator._validate_repositories(self)
+        TTAOrchestrator._import_core_components(self)
 
         logger.info(
             f"TTAOrchestrator initialized with {len(self.components)} components"
         )
+
+    def _validate_repositories(self) -> None:
+        """Validate repository paths via the component loader."""
+        if self.component_loader is not None:
+            try:
+                self.component_loader.validate_paths()
+            except FileNotFoundError as e:
+                logger.warning(f"Repository paths not found, skipping validation: {e}")
+
+    def _import_core_components(self) -> None:
+        """Import core components via the component loader."""
+        if self.component_loader is not None:
+            discovered = self.component_loader.discover_components()
+            self.components.update(discovered)
 
     @log_entry_exit
     @timing_decorator

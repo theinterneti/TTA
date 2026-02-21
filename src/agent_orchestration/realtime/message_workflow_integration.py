@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Message_workflow_integration]]
 Integration layer between RedisMessageCoordinator and workflow progress tracking.
 
 This module provides integration between the existing message coordination system

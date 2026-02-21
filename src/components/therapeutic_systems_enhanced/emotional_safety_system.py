@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Emotional_safety_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Emotional_safety_system]]
 Therapeutic EmotionalSafetySystem Implementation
 
 This module provides production-ready emotional safety monitoring, crisis detection,

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Developer_dashboard/Test_battery_integration]]
 Developer Dashboard Integration for TTA Comprehensive Test Battery.
 
 Provides real-time test execution monitoring, results visualization,

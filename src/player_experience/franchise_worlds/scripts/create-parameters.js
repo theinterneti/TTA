@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Scripts/Create-parameters]]
 #!/usr/bin/env node
 
 /**

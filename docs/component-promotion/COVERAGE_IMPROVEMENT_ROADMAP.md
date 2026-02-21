@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Coverage Improvement Roadmap.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Coverage_improvement_roadmap]]

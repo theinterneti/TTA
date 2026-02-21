@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Testing/Comprehensive_validation/Excellence_narrative_quality_assessor]]
 Excellence-Focused Narrative Quality Assessment for TTA
 
 This module enhances the existing narrative analysis systems to meet higher

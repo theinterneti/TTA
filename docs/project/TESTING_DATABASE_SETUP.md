@@ -252,3 +252,7 @@ pytest --ff
 - **Mock fixtures available** for unit tests that need database-like behavior
 
 The current test design is **correct and follows best practices** for separating unit tests from integration tests.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Testing_database_setup]]

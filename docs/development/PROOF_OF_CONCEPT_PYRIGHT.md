@@ -406,3 +406,7 @@ $ uv run mypy src/player_experience/api/auth.py --no-error-summary 2>&1 | head -
 **Status:** Proof of Concept COMPLETE
 **Next Action:** Fix circular imports (Stage 1), then begin annotation with Pyright
 **Tool Recommendation:** Pyright + Pylance (VS Code)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Development/Proof_of_concept_pyright]]

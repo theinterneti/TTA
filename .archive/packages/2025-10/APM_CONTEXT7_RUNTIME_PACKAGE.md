@@ -575,3 +575,7 @@ This creates a **self-aware AI runtime** that:
 4. Iterate based on learnings
 
 This integrates perfectly with our existing AI Dev Toolkit and takes it to the next level! 🚀
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Packages/2025-10/Apm_context7_runtime_package]]

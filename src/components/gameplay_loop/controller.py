@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Controller]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Controller]]
 Gameplay Loop Controller for Therapeutic Text Adventure
 
 This module implements the main gameplay loop controller that orchestrates

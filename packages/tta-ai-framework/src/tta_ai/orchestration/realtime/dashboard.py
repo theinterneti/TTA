@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Dashboard]]
 Real-time system health and performance dashboards.
 
 This module provides real-time dashboard capabilities for monitoring system

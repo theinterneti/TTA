@@ -276,3 +276,7 @@ results = orchestrator.run_docker_compose_command(['up', '-d'], 'both')
 ## Notes
 
 This component is critical infrastructure for TTA development and deployment. It must be highly reliable and well-tested. The orchestrator is used by developers daily for local development and by CI/CD for automated deployments.
+
+
+---
+**Logseq:** [[TTA.dev/Specs/Orchestration]]

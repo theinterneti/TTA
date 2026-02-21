@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Generate_tests_batch]]
 Batch test generation for multiple modules with comprehensive reporting.
 
 Generates tests for:

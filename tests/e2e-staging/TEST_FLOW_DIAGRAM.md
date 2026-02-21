@@ -375,3 +375,7 @@ graph TD
 ---
 
 **Note:** These diagrams provide a visual representation of the test flow, system architecture, and decision points. Use them to understand how the tests work and troubleshoot issues.
+
+
+---
+**Logseq:** [[TTA.dev/Tests/E2e-staging/Test_flow_diagram]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Progress]]
 Progress tracking and analytics data models.
 """
 

@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Choice_architecture/Validator]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Choice_architecture/Validator]]
 Choice Validator for Therapeutic Text Adventure
 
 This module implements choice validation functionality that ensures choices

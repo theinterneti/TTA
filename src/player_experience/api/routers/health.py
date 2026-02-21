@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Health]]
 Health check API endpoints for TTA system monitoring.
 
 Provides endpoints for checking system health and component status.

@@ -237,3 +237,7 @@ From OpenRouter's catalog, these models ARE available:
 ---
 
 **End of Root Cause Analysis**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Validation/Root_cause_analysis_90_percent_failure]]

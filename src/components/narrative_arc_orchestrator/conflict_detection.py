@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA/Components/Narrative_arc_orchestrator/Conflict_detection]]
 Conflict detection helpers extracted from ScaleManager.
 These are simple, testable utilities for finding cross-scale issues.
 """

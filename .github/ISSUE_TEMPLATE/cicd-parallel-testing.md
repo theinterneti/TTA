@@ -227,3 +227,7 @@ pytest tests/integration -n 4
 **Priority**: Medium (for efficient testing)
 **Complexity**: Medium
 **Estimated Effort**: 1-2 weeks
+
+
+---
+**Logseq:** [[TTA.dev/.github/Issue_template/Cicd-parallel-testing]]

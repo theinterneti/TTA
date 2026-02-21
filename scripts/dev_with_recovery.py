@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Dev_with_recovery]]
 Development commands with error recovery.
 
 This is a Python wrapper around common development tasks that adds

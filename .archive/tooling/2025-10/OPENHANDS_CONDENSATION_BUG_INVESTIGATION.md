@@ -418,3 +418,7 @@ The condensation loop bug is **real, documented, and unresolved** in OpenHands 0
 **Investigation Complete** - 2025-10-27
 **Status:** ✅ Working alternative implemented and tested
 **Recommendation:** Use direct LLM API for TTA code generation needs
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Tooling/2025-10/Openhands_condensation_bug_investigation]]

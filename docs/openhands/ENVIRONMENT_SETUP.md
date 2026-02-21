@@ -239,3 +239,7 @@ For issues or questions:
 2. Review OpenRouter documentation: https://openrouter.ai/docs
 3. Check OpenHands documentation: https://docs.all-hands.ai
 4. Review the integration documentation: `docs/openhands/INTEGRATION_ANALYSIS_AND_RECOMMENDATION.md`
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Environment_setup]]

@@ -264,3 +264,7 @@ fetch('http://localhost:8080/api/v1/players/player-123/progress/viz?days=30', {
 ## Support
 
 For issues or questions about the Progress Tracking API, please contact support@example.com or create an issue on GitHub.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Api/Progress_tracking_api]]

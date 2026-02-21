@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Narrative/Complexity_adapter]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Narrative/Complexity_adapter]]
 Narrative Complexity Adapter for Therapeutic Text Adventure
 
 This module implements adaptive complexity management for narrative content,

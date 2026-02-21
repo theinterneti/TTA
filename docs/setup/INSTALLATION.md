@@ -195,3 +195,7 @@ After installation, you can:
 1. **Explore the Documentation**: See the [Documentation Index](../index.md)
 2. **Run Tests**: See the [Testing Guide](../development/testing/testing-guidelines.md)
 3. **Start Development**: See the [Development Guide](../development/README.md)
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Setup/Installation]]

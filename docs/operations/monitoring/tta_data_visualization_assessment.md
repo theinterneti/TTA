@@ -333,3 +333,7 @@ The TTA system has a **strong foundation** for data visualization and analytics 
 3. **Medium-term**: Implement aggregate analytics and therapeutic reporting
 
 The foundation is solid and can support comprehensive user data visualization with focused development effort.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Operations/Monitoring/Tta_data_visualization_assessment]]

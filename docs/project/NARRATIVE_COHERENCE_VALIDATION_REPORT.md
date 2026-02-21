@@ -342,3 +342,7 @@ The system demonstrates:
 ---
 
 **END OF NARRATIVE COHERENCE VALIDATION REPORT**
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Narrative_coherence_validation_report]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Enums]]
 Enumerations used throughout the Player Experience Interface.
 """
 

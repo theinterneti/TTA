@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_player_profile_database]]
 Unit tests for PlayerProfile database schema and repository operations.
 """
 

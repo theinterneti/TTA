@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/State]]
 Agent state and context models for Orchestration (Task 2.1).
 """
 

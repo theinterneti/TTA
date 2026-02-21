@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_phase2a_integration]]
 Integration tests for Phase 2A TTA Platform components
 Tests multi-stakeholder web interfaces, AI/ML integration, and Neo4j living worlds
 """

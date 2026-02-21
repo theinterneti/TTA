@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Openrouter]]
 OpenRouter Provider Implementation.
 
 This module provides integration with OpenRouter API for accessing

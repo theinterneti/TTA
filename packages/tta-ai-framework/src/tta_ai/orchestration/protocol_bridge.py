@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Protocol_bridge]]
 Protocol bridge for translating between orchestration system messages and real agent communication.
 
 This module provides message routing and protocol translation capabilities to enable

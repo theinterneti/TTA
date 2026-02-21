@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Test-system]]
 /**
  * Simple test script to validate the franchise world system
  * Uses CommonJS for easier execution without complex module resolution

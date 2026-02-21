@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_resource_manager]]
 import pytest
 from tta_ai.orchestration.resources import ResourceManager, ResourceRequirements
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Setup_neo4j_schema]]
 Setup Neo4j Schema for TTA Living Worlds
 
 This script sets up the required Neo4j constraints and indexes for the TTA system.

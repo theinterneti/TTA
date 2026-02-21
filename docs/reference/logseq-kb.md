@@ -6,8 +6,8 @@
 
 ## Access
 
-**Location:** `.augment/kb/` (306 documents)
-**Logseq Repo:** `~/repos/TTA-notes/logseq/pages/TTA/`
+**Location:** `~/repos/TTA-notes/pages/` (306 documents)
+**Logseq Repo:** `~/repos/TTA-notes/`
 
 ## Quick Navigation
 
@@ -60,3 +60,7 @@ This `docs/` directory contains:
 - **Development:** Process and workflow docs
 
 For deep architectural docs, agent behavior, and historical context, see the KB.
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Reference/Logseq-kb]]

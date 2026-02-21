@@ -242,3 +242,7 @@ Successfully consolidated and organized TTA's incomplete work, TODOs, and GitHub
 
 All incomplete work consolidated into `.augment/TODO-AUDIT.md`
 Ready for Logseq integration and intelligent querying
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-11/Todo-cleanup-report]]

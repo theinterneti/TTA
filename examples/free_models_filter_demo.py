@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Examples/Free_models_filter_demo]]
 OpenRouter Free Models Filter Demo
 
 This script demonstrates the free models filtering functionality

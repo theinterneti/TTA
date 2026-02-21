@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Consequence_system/System]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Consequence_system/System]]
 Main Consequence System for Therapeutic Text Adventure
 
 This module implements the main consequence system that orchestrates the

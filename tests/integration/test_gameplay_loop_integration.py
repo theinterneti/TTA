@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_gameplay_loop_integration]]
 Integration tests for the Core Gameplay Loop system.
 
 These tests validate the complete flow from user authentication through
@@ -9,6 +11,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from src.agent_orchestration.therapeutic_safety import SafetyLevel
 from src.components.gameplay_loop_component import GameplayLoopComponent
 from src.integration.gameplay_loop_integration import GameplayLoopIntegration
 from src.player_experience.services.gameplay_service import GameplayService
@@ -145,9 +148,9 @@ class TestGameplayLoopIntegration:
         """Test successful session creation with authentication."""
         # Mock authentication
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user", "username": "testuser"}
+            mock_auth.return_value = Mock(player_id="test-user", username="testuser")
 
             result = await integration_layer.create_authenticated_session(
                 auth_token="valid-token",
@@ -165,7 +168,7 @@ class TestGameplayLoopIntegration:
         from src.player_experience.api.auth import AuthenticationError
 
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
             mock_auth.side_effect = AuthenticationError("Invalid token")
 
@@ -181,9 +184,9 @@ class TestGameplayLoopIntegration:
     async def test_process_validated_choice_success(self, integration_layer):
         """Test successful choice processing with validation."""
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user", "username": "testuser"}
+            mock_auth.return_value = Mock(player_id="test-user", username="testuser")
 
             result = await integration_layer.process_validated_choice(
                 session_id="test-session-123",
@@ -209,9 +212,9 @@ class TestGameplayLoopIntegration:
         }
 
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user", "username": "testuser"}
+            mock_auth.return_value = Mock(player_id="test-user", username="testuser")
 
             result = await integration_layer.process_validated_choice(
                 session_id="test-session-123",
@@ -227,15 +230,15 @@ class TestGameplayLoopIntegration:
         self, integration_layer, mock_safety_service
     ):
         """Test safety validation with high-risk content."""
-        # Mock high-risk validation result
+        # Mock blocked validation result
         validation_result = Mock()
-        validation_result.level.value = 9  # High risk level
+        validation_result.level = SafetyLevel.BLOCKED
         mock_safety_service.validate_text.return_value = validation_result
 
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user", "username": "testuser"}
+            mock_auth.return_value = Mock(player_id="test-user", username="testuser")
 
             result = await integration_layer.create_authenticated_session(
                 auth_token="valid-token",
@@ -244,15 +247,15 @@ class TestGameplayLoopIntegration:
 
             assert result["success"] is False
             assert result["code"] == "SAFETY_ERROR"
-            assert result["safety_level"] == 9
+            assert result["safety_level"] == SafetyLevel.BLOCKED.value
 
     @pytest.mark.asyncio
     async def test_get_session_with_auth_success(self, integration_layer):
         """Test getting session status with authentication."""
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user", "username": "testuser"}
+            mock_auth.return_value = Mock(player_id="test-user", username="testuser")
 
             result = await integration_layer.get_session_with_auth(
                 session_id="test-session-123", auth_token="valid-token"
@@ -266,9 +269,9 @@ class TestGameplayLoopIntegration:
     async def test_end_session_with_auth_success(self, integration_layer):
         """Test ending session with authentication."""
         with patch(
-            "src.integration.gameplay_loop_integration.get_current_player"
+            "src.integration.gameplay_loop_integration.verify_token"
         ) as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user", "username": "testuser"}
+            mock_auth.return_value = Mock(player_id="test-user", username="testuser")
 
             result = await integration_layer.end_session_with_auth(
                 session_id="test-session-123", auth_token="valid-token"

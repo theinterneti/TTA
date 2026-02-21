@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Scripts/Send-slack-notification]]
 #!/usr/bin/env node
 
 /**

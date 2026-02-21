@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Player_experience/Test_deployment]]
 Player Experience Interface Deployment Validation Tests
 
 This script validates that the Player Experience Interface deployment is working correctly

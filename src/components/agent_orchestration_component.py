@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Agent_orchestration_component]]
 Agent Orchestration Component
 
 Provides a lightweight entrypoint component that will host workflow management,

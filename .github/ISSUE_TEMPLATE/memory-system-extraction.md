@@ -143,3 +143,7 @@ Extract the generic Redis-based agent coordination system from the TTA repositor
 - Use semantic versioning: v0.1.0 for initial release
 - Ensure backward compatibility for future versions
 
+
+
+---
+**Logseq:** [[TTA.dev/.github/Issue_template/Memory-system-extraction]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_therapeutic_effectiveness_integration]]
 Integration tests for therapeutic effectiveness validation.
 
 This module tests integration with existing TTA therapeutic components

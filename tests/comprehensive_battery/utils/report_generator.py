@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Utils/Report_generator]]
 Test Report Generator
 
 Generates comprehensive reports from test execution results including:

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_redis_agent_registry]]
 import asyncio
 import json
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Tools/Test_cursor]]
 Unit tests for cursor system (Phase 3 Tool Optimization).
 
 Security-focused tests with property-based testing using Hypothesis.

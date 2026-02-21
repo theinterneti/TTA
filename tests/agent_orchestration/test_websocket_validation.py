@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_websocket_validation]]
 Validation tests for WebSocket connection management and authentication.
 
 This module tests the existing WebSocket infrastructure to ensure it works

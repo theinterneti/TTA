@@ -400,3 +400,7 @@ npx playwright test tests/e2e-staging/complete-user-journey.staging.spec.ts
 **Time to resolution**: ~2 hours
 **Files modified**: 3 (`.env`, `docker-compose.staging-homelab.yml`, `Dockerfile.staging`)
 **Tests passed**: 5/5 verification steps
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Project/Staging_auth_debug_report]]

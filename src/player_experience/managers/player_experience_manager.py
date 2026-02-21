@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Player_experience_manager]]
 Central orchestrator for all player experience functionality (Task 10).
 
 Responsibilities:

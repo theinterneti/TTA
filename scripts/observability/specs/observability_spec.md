@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Primitive Specification: Development Observability.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Scripts/Observability/Specs/Observability_spec]]

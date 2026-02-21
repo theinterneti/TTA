@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Response_models]]
 Standardized response models for MCP tools (Phase 3 Tool Optimization).
 
 Provides consistent, versioned response schemas for all tools including:

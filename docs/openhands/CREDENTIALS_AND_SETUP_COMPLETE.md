@@ -268,3 +268,7 @@ You can now:
 4. Deploy to production
 
 **Status:** 🟢 Ready for Production
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Credentials_and_setup_complete]]

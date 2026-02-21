@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Examples/Model_management_demo]]
 Model Management System Demo
 
 This script demonstrates the comprehensive model management system for TTA,

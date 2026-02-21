@@ -310,3 +310,7 @@ npm run test:staging:advanced
 For detailed information, see:
 - ADVANCED_TESTING_INFRASTRUCTURE.md
 - .github/ADVANCED_TESTING_SETUP.md
+
+
+---
+**Logseq:** [[TTA.dev/Tests/E2e-staging/Advanced_testing_quick_reference]]

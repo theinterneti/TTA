@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_callable_registry_and_execute_endpoint]]
 import asyncio
 import os
 

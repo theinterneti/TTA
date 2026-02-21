@@ -135,3 +135,7 @@ openrouter/meta-llama/llama-3.2-1b:free
 - **Official Docs:** https://docs.all-hands.dev/openhands/usage/how-to/headless-mode
 - **OpenRouter API:** https://openrouter.ai/
 
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Openhands/Quick_start_docker]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Model_management/Test_service_integration]]
 Integration Tests for Model Management Service Interactions.
 
 Tests the interactions between ModelSelector, FallbackHandler, and PerformanceMonitor

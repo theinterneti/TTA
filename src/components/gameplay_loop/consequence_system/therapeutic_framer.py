@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Consequence_system/Therapeutic_framer]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Consequence_system/Therapeutic_framer]]
 Therapeutic Framer for Therapeutic Text Adventure
 
 This module implements therapeutic framing functionality that frames all

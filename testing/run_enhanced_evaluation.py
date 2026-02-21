@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Testing/Run_enhanced_evaluation]]
 Enhanced TTA Extended Session Quality Evaluation Runner
 
 Comprehensive testing framework with all systematic improvements:

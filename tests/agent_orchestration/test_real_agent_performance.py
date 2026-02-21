@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_real_agent_performance]]
 Performance benchmarks for real agent communication.
 
 This module tests performance characteristics of real agent communication,

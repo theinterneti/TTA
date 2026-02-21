@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Top 3 Priority Components for Staging Promotion.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Docs/Component-promotion/Top_3_priorities]]

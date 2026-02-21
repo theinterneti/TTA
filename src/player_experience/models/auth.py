@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Auth]]
 Authentication and authorization models for the Player Experience system.
 
 This module defines user roles, permissions, and multi-factor authentication
