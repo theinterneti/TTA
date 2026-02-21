@@ -10,11 +10,10 @@ specifics; richer models can be added in follow-up tasks.
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from enum import Enum
 from typing import Any
-
-import re
 
 from pydantic import BaseModel, Field, field_validator
 

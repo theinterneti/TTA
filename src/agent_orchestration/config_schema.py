@@ -9,10 +9,9 @@ configuration, including discovery and auto-registration settings.
 
 from __future__ import annotations
 
+import re
 from enum import Enum
 from typing import Any
-
-import re
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -154,7 +153,7 @@ class AgentsConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_heartbeat_interval(self) -> "AgentsConfig":
+    def validate_heartbeat_interval(self) -> AgentsConfig:
         """Validate heartbeat interval against TTL."""
         v = self.heartbeat_interval
         if v is not None and (v <= 0 or v >= self.heartbeat_ttl):
