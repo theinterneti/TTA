@@ -317,13 +317,11 @@ cache-dir = "./.uv_cache"
 members = [
     "packages/tta-ai-framework",
     "packages/tta-narrative-engine",
-    "packages/ai-dev-toolkit",
 ]
 
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
-ai-dev-toolkit = { workspace = true }
 tta-dev-primitives = { path = "../TTA.dev/platform/primitives", editable = true }
 tta-observability-integration = { path = "../TTA.dev/platform/observability", editable = true }
 universal-agent-context = { path = "../TTA.dev/platform/agent-context", editable = true }
@@ -335,7 +333,7 @@ tta-dev-integrations = { path = "../TTA.dev/platform/integrations", editable = t
 
 [tool.pyright]
 # Python version and platform
-pythonVersion = "3.10"
+pythonVersion = "3.12"
 pythonPlatform = "Linux"
 
 # Paths

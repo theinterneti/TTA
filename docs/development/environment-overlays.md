@@ -1,30 +1,14 @@
 # Host-Aware Environment Overlays
 
 
-> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
-> See https://github.com/yourusername/TTA.dev for the toolkit components.
-
-
-
-This guide explains the new workflow for generating `.env` files that adapt to
+This guide explains the workflow for generating `.env` files that adapt to
 the local host (e.g., Ubuntu on bare metal vs. WSL). The generator merges the
 project template, a profile-specific overlay, and a secret bundle that lives
 *outside* the repository, then injects host metadata such as the WSL bridge IP.
 
-## Platform Reorg Context
-
-TTA has completed the platform split outlined in
-`docs/development/reorg/tta-separation-roadmap.md`. Environment artifacts now
-map to the following directories:
-
-- `app_tta/config/env/…`: player-facing runtime overlays and samples.
-- `platform_tta_dev/components/*/config/env/…`: tooling overlays for Serena, ACE,
-  Hypertool, e2b, cline CLI, and other developer agents.
-- `legacy/*/config/env/…`: quarantined overlays that will be retired after the
-  migration completes.
-
-As of 2025-11-17, all agentic components have been migrated to `platform_tta_dev/components/`
-with backward-compatibility symlinks. See `MIGRATION_SUMMARY.md` for complete details.
+> **Migration note:** Agentic tooling components (Serena, Hypertool, Cline, Augment)
+> were moved from `platform_tta_dev/` to the TTA.dev repository (`../TTA.dev`).
+> See `docs/development/reorg/tta-separation-roadmap.md` for the historical migration plan.
 
 ## Components
 

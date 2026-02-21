@@ -1,8 +1,9 @@
 # TTA ↔︎ TTA.dev Separation Roadmap
 
 
-> **Note**: The `platform_tta_dev` directory has been migrated to the TTA.dev repository.
-> See https://github.com/yourusername/TTA.dev for the toolkit components.
+> **Status:** Migration complete. The `platform_tta_dev` directory no longer exists.
+> Agentic platform primitives now live in `/home/thein/repos/TTA.dev`.
+> TTA consumes them via path sources in `pyproject.toml`.
 
 
 

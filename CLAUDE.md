@@ -26,7 +26,7 @@ src/                    # Game application code (324 Python files)
 packages/               # Workspace packages
   tta-ai-framework/     # AI orchestration framework (game-specific)
   tta-narrative-engine/ # Narrative/story engine (game-specific)
-  ai-dev-toolkit/       # Dev tools (excluded from workspace — depends on unpublished TTA.dev packages)
+  ai-dev-toolkit/       # Dev tools stub (no code yet — placeholder for future toolkit)
 
 tests/                  # Test suite
   conftest.py           # Shared fixtures
@@ -40,8 +40,10 @@ tests/                  # Test suite
 | Agent | Role | Config |
 |---|---|---|
 | **Claude Code** | **Main agent — primary decision maker** | `CLAUDE.md` (this file) |
-| Gemini | Secondary review | `GEMINI.md` |
 | GitHub Copilot | IDE suggestions | `.github/copilot-instructions.md` |
+| Augment | Code intelligence | `.augment/instructions.md` |
+| Cline | AI coding assistant | `.cline/instructions.md` |
+| Gemini | Secondary review | `GEMINI.md` |
 
 ## Non-Negotiable Standards
 
@@ -115,8 +117,8 @@ uv sync --all-extras
 ## Known Issues (Fix in Progress)
 
 1. **httpx conflict**: `codecarbon>=3.0.7` conflicts with `openhands-sdk` on httpx version. Codecarbon is temporarily disabled in `pyproject.toml`.
-2. **ai-dev-toolkit excluded**: `packages/ai-dev-toolkit` depends on unpublished TTA.dev packages — excluded from workspace until TTA.dev packages are published to PyPI.
-3. **CI/CD**: Reduced from 35 → 6 workflows. Some workflows referenced scripts/services that don't exist in CI.
+2. **CI/CD**: Reduced from 35 → 6 workflows. Some workflows referenced scripts/services that don't exist in CI.
+3. **Pydantic v2**: Some validators still use v1 style (`@validator`) — tracked in issue #117.
 
 ## What NOT to Do
 
