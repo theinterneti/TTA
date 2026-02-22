@@ -129,9 +129,11 @@ async def get_gameplay_service() -> GameplayService:
 
 
 async def get_message_service() -> MessageService:
-    """Get the message service singleton."""
+    """Get the message service singleton, sharing the session store with the sessions router."""
     if not hasattr(get_message_service, "_instance"):
-        get_message_service._instance = MessageService()
+        from ..routers.sessions import get_session_store  # noqa: PLC0415
+
+        get_message_service._instance = MessageService(session_store=get_session_store())
     return get_message_service._instance
 
 
