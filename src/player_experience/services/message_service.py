@@ -4,8 +4,8 @@ AI-powered message service for active gameplay sessions.
 
 Handles real-time narrative generation using the LLM factory,
 maintaining per-session conversation history for contextual responses.
-Conversation history is kept in-memory for MVP; persistence will be
-added in issue #63 (Redis + Neo4j data layer).
+Auto-saves every message to SessionStore (SQLite-backed) so conversations
+persist across server restarts and survive logout/login.
 """
 
 from __future__ import annotations
@@ -18,13 +18,15 @@ from typing import TYPE_CHECKING, Any
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from src.ai_components.llm_factory import get_llm
 
+from .session_store import SessionStore
+
 if TYPE_CHECKING:
     from langchain_core.language_models import BaseChatModel
 
 logger = logging.getLogger(__name__)
 
-# Per-session conversation history: {session_id: [{"role": ..., "content": ...}]}
-# Module-level so the singleton service shares state across requests.
+# Per-session in-memory cache: {session_id: [{role, content}]}
+# Populated on first access from SessionStore; acts as a write-through cache.
 _SESSION_HISTORY: dict[str, list[dict[str, str]]] = {}
 
 _MAX_HISTORY_MESSAGES = 20  # Trim to last N turns to keep context window bounded
@@ -53,8 +55,9 @@ _FALLBACK_RESPONSE = (
 class MessageService:
     """AI-powered message handler for active gameplay sessions."""
 
-    def __init__(self) -> None:
+    def __init__(self, session_store: SessionStore | None = None) -> None:
         self._llm: BaseChatModel | None = None
+        self._store = session_store or SessionStore()
         logger.info("MessageService initialized")
 
     def _get_llm(self) -> BaseChatModel | None:
@@ -66,6 +69,13 @@ class MessageService:
                 logger.warning("LLM unavailable for MessageService: %s", exc)
         return self._llm
 
+    def _load_history_from_store(self, session_id: str) -> list[dict[str, str]]:
+        """Populate the in-memory cache from the store if not already loaded."""
+        if session_id not in _SESSION_HISTORY:
+            stored = self._store.load_messages(session_id)
+            _SESSION_HISTORY[session_id] = stored
+        return _SESSION_HISTORY[session_id]
+
     async def send_message(
         self,
         session_id: str,
@@ -75,6 +85,9 @@ class MessageService:
         world_name: str | None = None,
     ) -> dict[str, Any]:
         """Process a player message and return an AI narrative response.
+
+        Auto-saves both the user message and AI response to the SessionStore
+        so the full conversation persists across server restarts.
 
         Args:
             session_id: Active session identifier.
@@ -86,8 +99,13 @@ class MessageService:
         Returns:
             dict with keys: success, message_id, session_id, response, timestamp.
         """
-        history = _SESSION_HISTORY.setdefault(session_id, [])
+        # Restore from store if this is the first access after a restart
+        history = self._load_history_from_store(session_id)
+
+        now = datetime.now(UTC).isoformat()
+        user_mid = str(uuid.uuid4())
         history.append({"role": "user", "content": message})
+        self._store.save_message(session_id, player_id, "user", message, user_mid, now)
 
         response_text = await self._generate_response(
             history=history,
@@ -95,19 +113,22 @@ class MessageService:
             world_name=world_name or "a mindfulness garden",
         )
 
+        ai_mid = str(uuid.uuid4())
+        ai_ts = datetime.now(UTC).isoformat()
         history.append({"role": "assistant", "content": response_text})
+        self._store.save_message(session_id, player_id, "assistant", response_text, ai_mid, ai_ts)
 
-        # Trim to avoid unbounded growth
+        # Trim in-memory cache to avoid unbounded growth
         if len(history) > _MAX_HISTORY_MESSAGES * 2:
             _SESSION_HISTORY[session_id] = history[-_MAX_HISTORY_MESSAGES:]
 
         logger.info("Message processed for session %s player %s", session_id, player_id)
         return {
             "success": True,
-            "message_id": str(uuid.uuid4()),
+            "message_id": ai_mid,
             "session_id": session_id,
             "response": response_text,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": ai_ts,
         }
 
     async def _generate_response(
@@ -143,10 +164,11 @@ class MessageService:
             return _FALLBACK_RESPONSE
 
     def clear_session_history(self, session_id: str) -> None:
-        """Remove conversation history for a session (call on session end)."""
+        """Remove conversation history for a session from cache and store."""
         _SESSION_HISTORY.pop(session_id, None)
+        self._store.clear_messages(session_id)
         logger.debug("Cleared conversation history for session %s", session_id)
 
     def get_session_history(self, session_id: str) -> list[dict[str, str]]:
         """Return a copy of the conversation history for a session."""
-        return list(_SESSION_HISTORY.get(session_id, []))
+        return list(self._load_history_from_store(session_id))
