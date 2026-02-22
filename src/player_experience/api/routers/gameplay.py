@@ -15,7 +15,8 @@ from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 
 from ...services.gameplay_service import GameplayService
-from ..auth import security
+from ...services.message_service import MessageService
+from ..auth import security, verify_token
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +93,31 @@ class UserSessionsResponse(BaseModel):
     code: str | None = None
 
 
+class SendMessageRequest(BaseModel):
+    """Request model for sending a player message in a gameplay session."""
+
+    session_id: str = Field(..., description="Active session ID")
+    message: str = Field(
+        ..., min_length=1, max_length=2000, description="Player's message"
+    )
+    character_name: str | None = Field(
+        None, description="Character name for narrative context"
+    )
+    world_name: str | None = Field(None, description="World name for narrative context")
+
+
+class SendMessageResponse(BaseModel):
+    """Response model for a gameplay message."""
+
+    success: bool
+    message_id: str | None = None
+    session_id: str | None = None
+    response: str | None = None
+    timestamp: str | None = None
+    error: str | None = None
+    code: str | None = None
+
+
 # Dependency to get gameplay service
 async def get_gameplay_service() -> GameplayService:
     """Get the gameplay service instance."""
@@ -100,6 +126,48 @@ async def get_gameplay_service() -> GameplayService:
     if not hasattr(get_gameplay_service, "_instance"):
         get_gameplay_service._instance = GameplayService()
     return get_gameplay_service._instance
+
+
+async def get_message_service() -> MessageService:
+    """Get the message service singleton."""
+    if not hasattr(get_message_service, "_instance"):
+        get_message_service._instance = MessageService()
+    return get_message_service._instance
+
+
+@router.post("/message", response_model=SendMessageResponse)
+async def send_gameplay_message(
+    request: SendMessageRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    message_service: MessageService = Depends(get_message_service),
+) -> SendMessageResponse:
+    """Send a player message in an active session and receive an AI narrative response.
+
+    Calls the LLM (OpenRouter or Ollama) with the full conversation history
+    to generate a contextual therapeutic narrative response.
+    Falls back to a static supportive message if the LLM is unavailable.
+    """
+    try:
+        token_data = verify_token(credentials.credentials)
+        player_id = token_data.player_id or "anonymous"
+
+        result = await message_service.send_message(
+            session_id=request.session_id,
+            player_id=player_id,
+            message=request.message,
+            character_name=request.character_name,
+            world_name=request.world_name,
+        )
+        return SendMessageResponse(**result)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Failed to process gameplay message: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        ) from e
 
 
 @router.post("/sessions", response_model=CreateSessionResponse)
