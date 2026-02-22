@@ -7,6 +7,7 @@ This module provides JWT token handling, password hashing, and authentication
 decorators for securing API endpoints.
 """
 
+import logging
 import os
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -17,7 +18,27 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
+from ..database.redis_cache import (
+    TokenCache,
+    _deserialize_token_data,
+    _serialize_token_data,
+)
 from ..models.player import PlayerProfile
+
+logger = logging.getLogger(__name__)
+
+# Lazy-initialized Redis token cache (None if Redis unavailable)
+_token_cache: TokenCache | None = None
+
+
+def _get_token_cache() -> TokenCache | None:
+    global _token_cache  # noqa: PLW0603
+    if _token_cache is None:
+        try:
+            _token_cache = TokenCache.from_env()
+        except Exception as exc:
+            logger.debug("TokenCache unavailable (ignored): %s", exc)
+    return _token_cache
 
 # Configuration - Use same secret key as EnhancedAuthService
 SECRET_KEY = os.getenv("TTA_AUTH_SECRET_KEY") or os.getenv(
@@ -223,11 +244,25 @@ async def get_current_player(
         HTTPException: If authentication fails
     """
     try:
-        token_data = verify_token(credentials.credentials)
+        raw_token = credentials.credentials
+
+        # Fast path: check Redis cache to avoid repeated HMAC verification
+        cache = _get_token_cache()
+        if cache is not None:
+            cached = await cache.get(raw_token)
+            if cached is not None:
+                return TokenData(**_deserialize_token_data(cached))
+
+        token_data = verify_token(raw_token)
 
         # Check if token is expired
         if token_data.exp and datetime.now(UTC) > token_data.exp:
             raise AuthenticationError("Token has expired")
+
+        # Cache for the token's remaining lifetime
+        if cache is not None and token_data.exp:
+            remaining = int((token_data.exp - datetime.now(UTC)).total_seconds())
+            await cache.set(raw_token, _serialize_token_data(token_data), remaining)
 
         return token_data
     except AuthenticationError as e:

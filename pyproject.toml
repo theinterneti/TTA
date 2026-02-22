@@ -126,6 +126,7 @@ dependencies = [
     "notebooklm-mcp>=2.0.11",
     "task>=0.1.0",
     "serena>=0.9.1",
+    "aiomysql>=0.3.2",
 ]
 
 # DEPRECATED: Use dependency-groups instead (see below)

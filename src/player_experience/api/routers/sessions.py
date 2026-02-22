@@ -26,10 +26,25 @@ _session_store: SessionStore | None = None
 
 
 def get_session_store() -> SessionStore:
-    """Return the shared SessionStore singleton."""
+    """Return the shared session store singleton.
+
+    Prefers DoltSessionStore (MySQL-backed, cross-server) when Dolt is
+    reachable; falls back to the SQLite-backed SessionStore otherwise.
+    The returned object always exposes the same public interface.
+    """
     global _session_store  # noqa: PLW0603
     if _session_store is None:
-        _session_store = SessionStore()
+        try:
+            from ...database.dolt_session_store import DoltSessionStore  # noqa: PLC0415
+
+            _session_store = DoltSessionStore()  # type: ignore[assignment]
+        except Exception as exc:
+            import logging as _logging  # noqa: PLC0415
+
+            _logging.getLogger(__name__).warning(
+                "Dolt unavailable (%s); falling back to SQLite SessionStore", exc
+            )
+            _session_store = SessionStore()
     return _session_store
 
 # Global world manager instance
@@ -262,7 +277,7 @@ async def clear_session_messages(
     deleted = store.clear_messages(session_id)
 
     # Also evict from the MessageService in-memory cache
-    from ...services.message_service import _SESSION_HISTORY
+    from ...services.message_service import _SESSION_HISTORY  # noqa: PLC0415
 
     _SESSION_HISTORY.pop(session_id, None)
 
