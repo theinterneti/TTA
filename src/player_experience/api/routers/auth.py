@@ -47,6 +47,7 @@ from ..auth import (
     LoginRequest,
     RefreshTokenRequest,
     Token,
+    _get_token_cache,
     security,
 )
 
@@ -703,18 +704,25 @@ async def refresh_token(refresh_request: RefreshTokenRequest) -> Token:
 
 @router.post("/logout")
 async def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     user: AuthenticatedUser = Depends(get_current_authenticated_user),
 ) -> dict[str, str]:
     """
     Logout the current user and revoke their session.
 
     Args:
+        credentials: Raw HTTP Bearer credentials (used to invalidate Redis cache)
         user: The current authenticated user
 
     Returns:
         dict: Success message
     """
     try:
+        # Evict token from Redis cache so subsequent requests are rejected immediately
+        cache = _get_token_cache()
+        if cache is not None:
+            await cache.delete(credentials.credentials)
+
         # Revoke the user's session
         if user.session_id:
             auth_service.revoke_session(user.session_id)
@@ -743,18 +751,25 @@ async def logout(
 
 @router.post("/logout-all")
 async def logout_all_sessions(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     user: AuthenticatedUser = Depends(get_current_authenticated_user),
 ) -> dict[str, str]:
     """
     Logout from all sessions for the current user.
 
     Args:
+        credentials: Raw HTTP Bearer credentials (used to invalidate Redis cache)
         user: The current authenticated user
 
     Returns:
         dict: Success message
     """
     try:
+        # Evict the current token from Redis cache immediately
+        cache = _get_token_cache()
+        if cache is not None:
+            await cache.delete(credentials.credentials)
+
         # Revoke all user sessions
         auth_service.revoke_all_user_sessions(user.user_id)
 
