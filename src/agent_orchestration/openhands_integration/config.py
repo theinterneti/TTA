@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 
-class CompatibilityStatus(str, Enum):
+class CompatibilityStatus(StrEnum):
     """Model compatibility status."""
 
     VERIFIED = "verified"
@@ -40,7 +40,7 @@ class CompatibilityStatus(str, Enum):
     RATE_LIMITED = "rate_limited"
 
 
-class QualityTier(str, Enum):
+class QualityTier(StrEnum):
     """Model quality tier."""
 
     HIGH = "high"
@@ -169,7 +169,7 @@ def get_model_registry() -> ModelRegistry | None:
     Returns:
         ModelRegistry instance or None if loading failed
     """
-    global _registry_cache, _registry_loaded
+    global _registry_cache, _registry_loaded  # noqa: PLW0603
 
     if not _registry_loaded:
         _registry_cache = load_model_registry()
@@ -180,7 +180,7 @@ def get_model_registry() -> ModelRegistry | None:
 
 def _clear_registry_cache() -> None:
     """Clear registry cache (for testing purposes)."""
-    global _registry_cache, _registry_loaded
+    global _registry_cache, _registry_loaded  # noqa: PLW0603
     _registry_cache = None
     _registry_loaded = False
 
@@ -270,9 +270,8 @@ def filter_models(
             continue
 
         # Filter by capabilities
-        if capabilities:
-            if not all(cap in model.capabilities for cap in capabilities):
-                continue
+        if capabilities and not all(cap in model.capabilities for cap in capabilities):
+            continue
 
         filtered.append(model)
 
@@ -497,7 +496,7 @@ class OpenHandsConfig(BaseModel):
         description="OpenRouter API base URL",
     )
     workspace_path: Path = Field(
-        default_factory=lambda: Path.cwd(),
+        default_factory=Path.cwd,
         description="Workspace directory for OpenHands execution",
     )
     cli_mode: bool = Field(default=True, description="Enable CLI mode for agent")

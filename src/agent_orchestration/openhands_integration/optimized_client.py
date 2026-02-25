@@ -115,7 +115,7 @@ class OptimizedOpenHandsClient:
 
         # Initialize new LLM (only once per config)
         try:
-            from openhands.sdk import LLM
+            from openhands.sdk import LLM  # noqa: PLC0415
 
             self._llm = LLM(
                 model=self.config.model,
@@ -144,7 +144,7 @@ class OptimizedOpenHandsClient:
 
         # Initialize new Agent (only once per config)
         try:
-            from openhands.sdk import Agent
+            from openhands.sdk import Agent  # noqa: PLC0415
 
             self._agent = Agent(llm=self._llm)
             self._agent_cache[cache_key] = self._agent
@@ -156,7 +156,7 @@ class OptimizedOpenHandsClient:
     def _reset_conversation(self) -> None:
         """Reset conversation for next task instead of creating new one."""
         try:
-            from openhands.sdk import Conversation
+            from openhands.sdk import Conversation  # noqa: PLC0415
 
             # Create new conversation (lightweight operation)
             self._conversation = Conversation(
@@ -251,11 +251,3 @@ class OptimizedOpenHandsClient:
         )
         # Note: We don't clear the cache here to allow reuse across client instances
         self._conversation = None
-
-    @classmethod
-    def clear_cache(cls) -> None:
-        """Clear all cached instances (use with caution)."""
-        cls._llm_cache.clear()
-        cls._agent_cache.clear()
-        cls._conversation_cache.clear()
-        logger.info("Cleared all cached SDK instances")

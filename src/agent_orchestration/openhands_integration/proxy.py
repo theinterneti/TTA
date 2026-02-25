@@ -99,7 +99,7 @@ class OpenHandsAgentProxy(Agent):
 
         # Real-time event integration
         try:
-            from ..realtime.agent_event_integration import (
+            from ..realtime.agent_event_integration import (  # noqa: PLC0415
                 get_agent_event_integrator,
             )
 
@@ -117,7 +117,7 @@ class OpenHandsAgentProxy(Agent):
 
         # Initialize adapter and client
         if self.enable_real_agent:
-            from ..adapters import RetryConfig
+            from ..adapters import RetryConfig  # noqa: PLC0415
 
             # Create OpenHandsConfig from integration config
             client_config = OpenHandsConfig(

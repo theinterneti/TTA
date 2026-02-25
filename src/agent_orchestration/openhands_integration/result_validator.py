@@ -15,14 +15,14 @@ import logging
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class ValidationLevel(str, Enum):
+class ValidationLevel(StrEnum):
     """Validation severity levels."""
 
     ERROR = "error"  # Must pass

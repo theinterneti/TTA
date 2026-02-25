@@ -145,8 +145,8 @@ class FilesystemComponentLoader:
         # Import docker component if enabled
         if self.config.get("docker.enabled", False):
             try:
-                from src.components.docker_component import (
-                    DockerComponent,  # noqa: PLC0415
+                from src.components.docker_component import (  # noqa: PLC0415
+                    DockerComponent,
                 )
 
                 comp = DockerComponent(self.config)
@@ -158,8 +158,8 @@ class FilesystemComponentLoader:
         # Import carbon component if enabled
         if self.config.get("carbon.enabled", False):
             try:
-                from src.components.carbon_component import (
-                    CarbonComponent,  # noqa: PLC0415
+                from src.components.carbon_component import (  # noqa: PLC0415
+                    CarbonComponent,
                 )
 
                 comp = CarbonComponent(self.config)
@@ -171,8 +171,8 @@ class FilesystemComponentLoader:
         # Import gameplay loop component if enabled
         if self.config.get("gameplay_loop.enabled", False):
             try:
-                from src.components.gameplay_loop import (
-                    GameplayLoopComponent,  # noqa: PLC0415
+                from src.components.gameplay_loop import (  # noqa: PLC0415
+                    GameplayLoopComponent,
                 )
 
                 comp = GameplayLoopComponent(self.config)

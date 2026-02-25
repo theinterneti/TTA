@@ -191,10 +191,12 @@ class Component:
         logger.info(f"Restarting component {self.name}")
 
         # Stop the component if it's running
-        if self.status in [ComponentStatus.RUNNING, ComponentStatus.STARTING]:
-            if not self.stop():
-                logger.error(f"Failed to stop component {self.name} during restart")
-                return False
+        if (
+            self.status in [ComponentStatus.RUNNING, ComponentStatus.STARTING]
+            and not self.stop()
+        ):
+            logger.error(f"Failed to stop component {self.name} during restart")
+            return False
 
         # Start the component
         return self.start()

@@ -82,7 +82,7 @@ class RetryConfig:
         if self.jitter:
             # Add random jitter: ±20% of delay
             jitter_amount = delay * 0.2
-            delay += random.uniform(-jitter_amount, jitter_amount)
+            delay += random.uniform(-jitter_amount, jitter_amount)  # noqa: S311
             delay = max(0, delay)  # Ensure non-negative
 
         return delay

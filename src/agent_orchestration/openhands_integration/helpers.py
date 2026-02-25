@@ -61,8 +61,8 @@ def track_execution_async(name: str, metadata: dict | None = None):
     """
 
     def decorator(func):
-        import functools
-        import inspect
+        import functools  # noqa: PLC0415
+        import inspect  # noqa: PLC0415
 
         if not _OBSERVABILITY_AVAILABLE:
             # No-op if observability not available

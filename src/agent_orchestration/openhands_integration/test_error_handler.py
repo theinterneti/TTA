@@ -16,7 +16,7 @@ from .test_generation_models import TestGenerationError, TestTaskSpecification
 logger = logging.getLogger(__name__)
 
 
-def classify_error(result: OpenHandsTaskResult) -> TestGenerationError:
+def classify_error(result: OpenHandsTaskResult) -> TestGenerationError:  # noqa: PLR0911
     """Classify error from OpenHands task result.
 
     Analyzes error message and output to determine error type.
@@ -209,7 +209,7 @@ def extract_syntax_errors(output: str) -> list[str]:
     return syntax_errors
 
 
-def create_retry_feedback(
+def create_retry_feedback(  # noqa: PLR0911
     error_type: TestGenerationError,
     spec: TestTaskSpecification,
     result: OpenHandsTaskResult,
@@ -267,7 +267,7 @@ Please fix these failing tests and ensure all tests pass.
         uncovered_lines = extract_uncovered_lines(result.output or "")
         if uncovered_lines:
             lines_list = "\n".join(
-                f"- Lines {l}" for l in uncovered_lines[:10]
+                f"- Lines {ln}" for ln in uncovered_lines[:10]
             )  # Limit to 10
             return f"""
 The previous test generation had insufficient coverage. These lines are not covered:

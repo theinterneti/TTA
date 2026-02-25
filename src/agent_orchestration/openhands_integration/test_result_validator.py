@@ -164,7 +164,7 @@ async def _check_syntax(test_file: Path, workspace_path: Path) -> bool:
 
     try:
         # Try to compile the file
-        with open(full_path) as f:
+        with full_path.open() as f:
             compile(f.read(), str(full_path), "exec")
         return True
     except SyntaxError:

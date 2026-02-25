@@ -84,7 +84,7 @@ class OpenHandsClient:
         """Initialize OpenHands SDK components (LLM, Agent)."""
         if self._llm is None:
             try:
-                from openhands.sdk import LLM
+                from openhands.sdk import LLM  # noqa: PLC0415
 
                 self._llm = LLM(
                     model=self.config.model,
@@ -106,7 +106,7 @@ class OpenHandsClient:
 
         if self._agent is None:
             try:
-                from openhands.sdk import Agent
+                from openhands.sdk import Agent  # noqa: PLC0415
 
                 # Create agent with LLM
                 self._agent = Agent(llm=self._llm)
@@ -148,7 +148,7 @@ class OpenHandsClient:
 
             # Create conversation
             try:
-                from openhands.sdk import Conversation
+                from openhands.sdk import Conversation  # noqa: PLC0415
 
                 self._conversation = Conversation(
                     agent=self._agent,
@@ -264,7 +264,7 @@ def create_openhands_client(
 
     # Create appropriate client
     if should_use_docker:
-        from .docker_client import DockerOpenHandsClient
+        from .docker_client import DockerOpenHandsClient  # noqa: PLC0415
 
         logger.info("Creating DockerOpenHandsClient (full tool access)")
         return DockerOpenHandsClient(

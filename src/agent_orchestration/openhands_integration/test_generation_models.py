@@ -6,7 +6,7 @@ validating test results, and classifying errors during the test generation proce
 
 # Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Test_generation_models]]
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -123,7 +123,7 @@ class TestValidationResult(BaseModel):
     model_config = ConfigDict(frozen=False)  # Allow modification during validation
 
 
-class TestGenerationError(str, Enum):
+class TestGenerationError(StrEnum):
     """Error types that can occur during test generation.
 
     This enum classifies different types of errors that may occur during the

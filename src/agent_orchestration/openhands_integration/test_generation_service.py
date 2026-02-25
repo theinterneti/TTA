@@ -36,7 +36,6 @@ try:
 
     from context.conversation_manager import (
         AIConversationContextManager,
-        create_tta_session,
     )
 
     AI_CONTEXT_AVAILABLE = True
@@ -90,7 +89,7 @@ class UnitTestGenerationService:
             # No error recovery for OpenHandsConfig
             self.error_recovery = None
 
-    async def generate_tests(
+    async def generate_tests(  # noqa: PLR0912, PLR0915
         self,
         spec: TestTaskSpecification,
         max_iterations: int = 5,
@@ -309,7 +308,7 @@ class UnitTestGenerationService:
 
         # If no validation result (all iterations failed), create a failure result
         if validation_result is None:
-            from .test_generation_models import TestValidationResult
+            from .test_generation_models import TestValidationResult  # noqa: PLC0415
 
             validation_result = TestValidationResult(
                 syntax_valid=False,
