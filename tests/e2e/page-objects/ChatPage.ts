@@ -43,15 +43,15 @@ export class ChatPage extends BasePage {
 
     // Initialize locators
     this.chatContainer = page.locator('[data-testid="chat-container"], .chat-container');
-    this.messageHistory = page.locator('[data-testid="message-history"], .message-history');
-    this.messageInput = page.locator('input[data-testid="message-input"], textarea[placeholder*="message"]');
-    this.sendButton = page.locator('button[data-testid="send-button"], button').filter({ hasText: /send/i });
+    this.messageHistory = page.locator('[data-testid="chat-messages-area"], .message-history');
+    this.messageInput = page.locator('input[data-testid="chat-message-input"], textarea[placeholder*="message"]');
+    this.sendButton = page.locator('button[data-testid="chat-send-button"]');
     this.messageList = page.locator('[data-testid="message-list"], .message-list');
-    this.userMessages = page.locator('[data-testid="user-message"], .user-message');
-    this.assistantMessages = page.locator('[data-testid="assistant-message"], .assistant-message');
-    this.systemMessages = page.locator('[data-testid="system-message"], .system-message');
-    this.typingIndicator = page.locator('[data-testid="typing-indicator"], .typing-indicator');
-    this.connectionStatus = page.locator('[data-testid="connection-status"], .connection-status');
+    this.userMessages = page.locator('[data-testid="user-message"]');
+    this.assistantMessages = page.locator('[data-testid="assistant-message"]');
+    this.systemMessages = page.locator('[data-testid="system-message"]');
+    this.typingIndicator = page.locator('[data-testid="chat-typing-indicator"], .typing-indicator');
+    this.connectionStatus = page.locator('[data-testid="chat-connection-status"], .connection-status');
 
     // Session info
     this.sessionInfo = page.locator('[data-testid="session-info"], .session-info');
@@ -64,9 +64,9 @@ export class ChatPage extends BasePage {
     this.helpButton = page.locator('button[data-testid="help"], .help-button');
 
     // Interactive elements
-    this.interactiveButtons = page.locator('[data-testid="interactive-button"], .interactive-button');
-    this.choiceButtons = page.locator('[data-testid="choice-button"], .choice-button');
-    this.guidedExercises = page.locator('[data-testid="guided-exercise"], .guided-exercise');
+    this.interactiveButtons = page.locator('[data-testid="interactive-button"]');
+    this.choiceButtons = page.locator('[data-testid="interactive-button"], [data-testid="choice-button"]');
+    this.guidedExercises = page.locator('[data-testid="guided-exercise"]');
     this.progressFeedback = page.locator('[data-testid="progress-feedback"], .progress-feedback');
     this.feedbackButtons = page.locator('[data-testid="feedback-button"], .feedback-button');
     this.crisisAlert = page.locator('[data-testid="crisis-alert"], .crisis-alert');

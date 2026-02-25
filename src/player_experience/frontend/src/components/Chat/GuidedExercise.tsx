@@ -134,7 +134,7 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 my-3">
+    <div data-testid="guided-exercise" className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 my-3">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
