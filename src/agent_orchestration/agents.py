@@ -265,12 +265,28 @@ class Agent(AgentProxy):
     def process_sync(
         self, input_payload: dict, *, timeout_s: float | None = None
     ) -> dict:
-        return asyncio.run(
-            self.process_with_timeout(input_payload, timeout_s=timeout_s)
-        )
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(
+                self.process_with_timeout(input_payload, timeout_s=timeout_s)
+            )
+        else:
+            raise RuntimeError(
+                "process_sync cannot run inside an active event loop; "
+                "call process_with_timeout directly from async code"
+            )
 
     def health_check_sync(self) -> dict[str, Any]:
-        return asyncio.run(self.health_check())
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self.health_check())
+        else:
+            raise RuntimeError(
+                "health_check_sync cannot run inside an active event loop; "
+                "call health_check directly from async code"
+            )
 
     # ---- Degradation control ----
     def set_degraded(self, degraded: bool = True) -> None:
