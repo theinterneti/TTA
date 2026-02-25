@@ -10,9 +10,9 @@ using Hugging Face Transformers.
 import asyncio
 import gc
 import logging
-import os
 from collections.abc import AsyncGenerator
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import psutil
@@ -194,7 +194,7 @@ class LocalModelProvider(BaseProvider):
         self._gpu_memory_fraction = config.get("gpu_memory_fraction", 0.8)
 
         # Create cache directory if it doesn't exist
-        os.makedirs(self._models_cache_dir, exist_ok=True)
+        Path(self._models_cache_dir).mkdir(parents=True, exist_ok=True)
 
         return True
 

@@ -12,7 +12,7 @@ immersion or feeling clinical.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import DifficultyLevel, EmotionalState, Scene, TherapeuticContext
@@ -20,7 +20,7 @@ from ..models.core import DifficultyLevel, EmotionalState, Scene, TherapeuticCon
 logger = logging.getLogger(__name__)
 
 
-class TherapeuticApproach(str, Enum):
+class TherapeuticApproach(StrEnum):
     """Therapeutic approaches that can be integrated into storytelling."""
 
     CBT = "cognitive_behavioral_therapy"
@@ -32,7 +32,7 @@ class TherapeuticApproach(str, Enum):
     SOLUTION_FOCUSED = "solution_focused_therapy"
 
 
-class StorytellingTechnique(str, Enum):
+class StorytellingTechnique(StrEnum):
     """Storytelling techniques for therapeutic integration."""
 
     METAPHOR = "metaphor"
@@ -347,7 +347,7 @@ class TherapeuticStoryteller:
             return TherapeuticApproach.HUMANISTIC
         return TherapeuticApproach.CBT  # Default approach
 
-    async def _select_storytelling_techniques(
+    async def _select_storytelling_techniques(  # noqa: ARG002
         self, approach: TherapeuticApproach, scene_type: str, goals: list[str]
     ) -> list[StorytellingTechnique]:
         """Select appropriate storytelling techniques for the therapeutic approach."""
@@ -372,7 +372,7 @@ class TherapeuticStoryteller:
             :2
         ]  # Limit to 2
 
-    async def _apply_storytelling_technique(
+    async def _apply_storytelling_technique(  # noqa: ARG002
         self,
         scene: Scene,
         technique: StorytellingTechnique,
@@ -411,7 +411,7 @@ class TherapeuticStoryteller:
 
         return scene
 
-    async def _apply_character_modeling(
+    async def _apply_character_modeling(  # noqa: ARG002
         self, scene: Scene, therapeutic_context: TherapeuticContext
     ) -> Scene:
         """Add therapeutic character modeling to the scene."""
@@ -425,7 +425,7 @@ class TherapeuticStoryteller:
         scene.narrative_content += f"\n\n{modeling_content}"
         return scene
 
-    async def _apply_guided_imagery(
+    async def _apply_guided_imagery(  # noqa: ARG002
         self, scene: Scene, therapeutic_context: TherapeuticContext
     ) -> Scene:
         """Add guided imagery elements to the scene."""
@@ -438,7 +438,7 @@ class TherapeuticStoryteller:
         scene.narrative_content += f"\n\n{imagery_content}"
         return scene
 
-    async def _apply_reflective_dialogue(
+    async def _apply_reflective_dialogue(  # noqa: ARG002
         self, scene: Scene, therapeutic_context: TherapeuticContext
     ) -> Scene:
         """Add reflective dialogue elements to the scene."""
@@ -451,7 +451,7 @@ class TherapeuticStoryteller:
         scene.narrative_content += f"\n\n{dialogue_content}"
         return scene
 
-    async def _apply_experiential_learning(
+    async def _apply_experiential_learning(  # noqa: ARG002
         self, scene: Scene, therapeutic_context: TherapeuticContext
     ) -> Scene:
         """Add experiential learning elements to the scene."""
@@ -481,7 +481,7 @@ class TherapeuticStoryteller:
         scene.narrative_content += f"\n\n{depth_content}"
         return scene
 
-    async def _get_intervention_enhancements(
+    async def _get_intervention_enhancements(  # noqa: ARG002
         self, intervention_type: str, therapeutic_context: TherapeuticContext
     ) -> dict[str, Any]:
         """Get narrative enhancements for specific interventions."""

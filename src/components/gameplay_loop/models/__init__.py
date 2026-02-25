@@ -20,6 +20,7 @@ from .core import (
 )
 from .interactions import (
     ChoiceOutcome,
+    GameplaySession,
     NarrativeEvent,
     TherapeuticIntervention,
     UserChoice,
@@ -27,6 +28,7 @@ from .interactions import (
 from .progress import (
     CharacterState,
     ProgressMarker,
+    ProgressType,
     SkillDevelopment,
     TherapeuticProgress,
 )
@@ -45,10 +47,12 @@ __all__ = [
     # Interaction models
     "UserChoice",
     "ChoiceOutcome",
+    "GameplaySession",
     "NarrativeEvent",
     "TherapeuticIntervention",
     # Progress models
     "ProgressMarker",
+    "ProgressType",
     "TherapeuticProgress",
     "CharacterState",
     "SkillDevelopment",

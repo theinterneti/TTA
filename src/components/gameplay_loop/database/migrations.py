@@ -40,7 +40,7 @@ class InitialSchemaMigration(Migration):
     async def up(self, neo4j_driver) -> bool:
         """Create initial schema."""
         try:
-            from .schema import GameplayLoopSchema
+            from .schema import GameplayLoopSchema  # noqa: PLC0415
 
             schema = GameplayLoopSchema()
 
@@ -71,7 +71,7 @@ class InitialSchemaMigration(Migration):
     async def down(self, neo4j_driver) -> bool:
         """Remove initial schema."""
         try:
-            from .schema import GameplayLoopSchema
+            from .schema import GameplayLoopSchema  # noqa: PLC0415
 
             schema = GameplayLoopSchema()
 
@@ -115,7 +115,7 @@ class SampleDataMigration(Migration):
     async def up(self, neo4j_driver) -> bool:
         """Create sample data."""
         try:
-            from .schema import GameplayLoopSchema
+            from .schema import GameplayLoopSchema  # noqa: PLC0415
 
             schema = GameplayLoopSchema()
 

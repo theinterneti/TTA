@@ -15,11 +15,11 @@ from collections.abc import AsyncGenerator
 from datetime import datetime
 from typing import Any
 
+import docker.errors
+import docker.types
 import httpx
 
 import docker
-import docker.errors
-import docker.types
 
 from ..interfaces import (
     GenerationRequest,
@@ -279,7 +279,7 @@ class OllamaProvider(BaseProvider):
             raise
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
+        self, model_id: str, config: dict[str, Any]  # noqa: ARG002
     ) -> OllamaModelInstance:
         """Load an Ollama model instance."""
         if not self._client:

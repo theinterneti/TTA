@@ -11,7 +11,7 @@ within the therapeutic text adventure gameplay system.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 from .core import ChoiceType, DifficultyLevel, EmotionalState
 
 
-class InterventionType(str, Enum):
+class InterventionType(StrEnum):
     """Types of therapeutic interventions."""
 
     MINDFULNESS = "mindfulness"
@@ -32,7 +32,7 @@ class InterventionType(str, Enum):
     SKILL_PRACTICE = "skill_practice"
 
 
-class OutcomeType(str, Enum):
+class OutcomeType(StrEnum):
     """Types of choice outcomes."""
 
     SUCCESS = "success"
@@ -43,7 +43,7 @@ class OutcomeType(str, Enum):
     THERAPEUTIC_OPPORTUNITY = "therapeutic_opportunity"
 
 
-class EventType(str, Enum):
+class EventType(StrEnum):
     """Types of narrative events."""
 
     SCENE_TRANSITION = "scene_transition"
@@ -65,6 +65,8 @@ class UserChoice(BaseModel):
     choice_text: str = Field(..., description="Text of the choice made")
     choice_type: ChoiceType = Field(..., description="Type of choice")
     therapeutic_value: float = Field(default=0.0, ge=0.0, le=1.0)
+    therapeutic_tags: list[str] = Field(default_factory=list)
+    agency_level: float = Field(default=0.5, ge=0.0, le=1.0)
 
     # Context
     emotional_state_before: EmotionalState = Field(
@@ -94,11 +96,11 @@ class ChoiceOutcome(BaseModel):
 
     outcome_id: str = Field(default_factory=lambda: str(uuid4()))
     choice_id: str = Field(..., description="Associated choice ID")
-    session_id: str = Field(..., description="Session identifier")
+    session_id: str = Field(default="", description="Session identifier")
 
     # Outcome details
-    outcome_type: OutcomeType = Field(..., description="Type of outcome")
-    narrative_response: str = Field(..., description="Narrative response to the choice")
+    outcome_type: str = Field(..., description="Type of outcome")
+    narrative_response: str = Field(default="", description="Narrative response to the choice")
 
     # Effects
     immediate_effects: dict[str, Any] = Field(default_factory=dict)
@@ -107,11 +109,19 @@ class ChoiceOutcome(BaseModel):
 
     # Therapeutic impact
     therapeutic_progress: dict[str, float] = Field(default_factory=dict)
+    therapeutic_impact: dict[str, Any] = Field(default_factory=dict)
     skills_developed: list[str] = Field(default_factory=list)
     insights_gained: list[str] = Field(default_factory=list)
+    learning_opportunities: list[str] = Field(default_factory=list)
+    skill_development: list[str] = Field(default_factory=list)
+    progress_markers: list[Any] = Field(default_factory=list)
+
+    # Narrative
+    narrative_consequences: list[str] = Field(default_factory=list)
+    emotional_response: str = Field(default="neutral")
 
     # Next steps
-    next_scene_id: str | None = Field(None, description="Next scene to transition to")
+    next_scene_id: str | None = Field(default=None, description="Next scene to transition to")
     available_choices: list[str] = Field(
         default_factory=list, description="Next available choice IDs"
     )
@@ -230,10 +240,16 @@ class GameplaySession(BaseModel):
 
     # Session state
     current_scene_id: str | None = Field(None, description="Current scene ID")
-    current_scene: dict[str, Any] | None = Field(None, description="Current scene data")
-    available_choices: list[dict[str, Any]] = Field(
+    current_scene: Any | None = Field(None, description="Current scene data")
+    available_choices: list[Any] = Field(
         default_factory=list, description="Available choices"
     )
+
+    # Extended session state (holds SessionState object as dict)
+    session_state: Any = Field(default=None, description="Full session state object")
+    session_start_time: datetime | None = Field(default=None)
+    session_end_time: datetime | None = Field(default=None)
+    session_recap: str | None = Field(default=None)
 
     # Session metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)

@@ -57,16 +57,16 @@ class NarrativeEngine:
 
         # Initialize narrative components
         self.scene_generator = SceneGenerator(
-            config.get("scene_generation", {}), llm=llm
+            self.config.get("scene_generation", {}), llm=llm
         )
         self.therapeutic_storyteller = TherapeuticStoryteller(
-            config.get("therapeutic_storytelling", {})
+            self.config.get("therapeutic_storytelling", {})
         )
         self.complexity_adapter = NarrativeComplexityAdapter(
-            config.get("complexity_adaptation", {})
+            self.config.get("complexity_adaptation", {})
         )
-        self.immersion_manager = ImmersionManager(config.get("immersion", {}))
-        self.pacing_controller = PacingController(config.get("pacing", {}))
+        self.immersion_manager = ImmersionManager(self.config.get("immersion", {}))
+        self.pacing_controller = PacingController(self.config.get("pacing", {}))
 
         # Engine state
         self._active_sessions: dict[str, SessionState] = {}
@@ -157,8 +157,8 @@ class NarrativeEngine:
     async def generate_next_scene(
         self,
         session_state: SessionState,
-        previous_choice: UserChoice,
-        choice_outcome: ChoiceOutcome,
+        previous_choice: UserChoice | None = None,
+        choice_outcome: ChoiceOutcome | None = None,
     ) -> Scene | None:
         """
         Generate the next scene based on player choice and outcome.
@@ -349,7 +349,7 @@ class NarrativeEngine:
             return None
 
     # Helper Methods
-    async def _determine_opening_scene_parameters(
+    async def _determine_opening_scene_parameters(  # noqa: ARG002
         self,
         therapeutic_context,
         emotional_state: EmotionalState,
@@ -387,7 +387,9 @@ class NarrativeEngine:
         return params
 
     async def _analyze_choice_for_narrative_direction(
-        self, choice: UserChoice, outcome: ChoiceOutcome
+        self,
+        choice: UserChoice | None,
+        outcome: ChoiceOutcome | None,
     ) -> dict[str, Any]:
         """Analyze choice and outcome to determine narrative direction."""
         direction = {
@@ -398,19 +400,21 @@ class NarrativeEngine:
         }
 
         # Analyze choice type and therapeutic value
-        if choice.therapeutic_value > 0.7:
-            direction["therapeutic_progress"] = "advanced"
-            direction["narrative_momentum"] = "accelerated"
-        elif choice.therapeutic_value < 0.3:
-            direction["therapeutic_progress"] = "needs_support"
-            direction["complexity_adjustment"] = "simplify"
+        if choice is not None:
+            if choice.therapeutic_value > 0.7:
+                direction["therapeutic_progress"] = "advanced"
+                direction["narrative_momentum"] = "accelerated"
+            elif choice.therapeutic_value < 0.3:
+                direction["therapeutic_progress"] = "needs_support"
+                direction["complexity_adjustment"] = "simplify"
 
         # Analyze outcome type
-        if outcome.outcome_type.value in ["success", "therapeutic_opportunity"]:
-            direction["emotional_trajectory"] = "positive"
-        elif outcome.outcome_type.value in ["challenge", "failure"]:
-            direction["emotional_trajectory"] = "needs_support"
-            direction["narrative_momentum"] = "reflective"
+        if outcome is not None:
+            if outcome.outcome_type in ["success", "therapeutic_opportunity"]:
+                direction["emotional_trajectory"] = "positive"
+            elif outcome.outcome_type in ["challenge", "failure"]:
+                direction["emotional_trajectory"] = "needs_support"
+                direction["narrative_momentum"] = "reflective"
 
         return direction
 
@@ -461,8 +465,10 @@ class NarrativeEngine:
 
         return params
 
-    def _determine_emotional_tone(self, choice_outcome: ChoiceOutcome) -> str:
+    def _determine_emotional_tone(self, choice_outcome: ChoiceOutcome | None) -> str:
         """Determine emotional tone based on choice outcome."""
+        if choice_outcome is None:
+            return "neutral"
         tone_mapping = {
             "success": "encouraging",
             "partial_success": "supportive",
@@ -471,7 +477,7 @@ class NarrativeEngine:
             "failure": "compassionate",
             "therapeutic_opportunity": "hopeful",
         }
-        return tone_mapping.get(choice_outcome.outcome_type.value, "neutral")
+        return tone_mapping.get(choice_outcome.outcome_type, "neutral")
 
     async def _apply_calming_adaptations(self, scene: Scene) -> Scene:
         """Apply calming adaptations to a scene."""

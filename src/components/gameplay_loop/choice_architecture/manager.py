@@ -34,9 +34,9 @@ class ChoiceArchitectureManager:
         self.config = config or {}
 
         # Initialize components
-        self.choice_generator = ChoiceGenerator(config.get("choice_generation", {}))
-        self.choice_validator = ChoiceValidator(config.get("choice_validation", {}))
-        self.agency_protector = AgencyProtector(config.get("agency_protection", {}))
+        self.choice_generator = ChoiceGenerator(self.config.get("choice_generation", {}))
+        self.choice_validator = ChoiceValidator(self.config.get("choice_validation", {}))
+        self.agency_protector = AgencyProtector(self.config.get("agency_protection", {}))
 
         # Choice architecture settings
         self.min_choices = self.config.get("min_choices", 2)
@@ -324,9 +324,21 @@ class ChoiceArchitectureManager:
         score += therapeutic_relevance * 0.3
 
         # Difficulty appropriateness score
+        _difficulty_order = {
+            DifficultyLevel.GENTLE: 0,
+            DifficultyLevel.STANDARD: 1,
+            DifficultyLevel.CHALLENGING: 2,
+            DifficultyLevel.INTENSIVE: 3,
+        }
         if choice.difficulty_level == scene.difficulty_level:
             score += 0.2
-        elif abs(choice.difficulty_level.value - scene.difficulty_level.value) == 1:
+        elif (
+            abs(
+                _difficulty_order.get(choice.difficulty_level, 1)
+                - _difficulty_order.get(scene.difficulty_level, 1)
+            )
+            == 1
+        ):
             score += 0.1
 
         # Emotional appropriateness score
@@ -339,7 +351,7 @@ class ChoiceArchitectureManager:
 
         return score
 
-    async def _analyze_narrative_impact(
+    async def _analyze_narrative_impact(  # noqa: ARG002
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState
     ) -> dict[str, Any]:
         """Analyze the narrative impact of a user's choice."""
@@ -416,7 +428,7 @@ class ChoiceArchitectureManager:
 
         return adapted_choice
 
-    async def _generate_fallback_choices(
+    async def _generate_fallback_choices(  # noqa: ARG002
         self, scene: Scene, session_state: SessionState
     ) -> list[Choice]:
         """Generate safe fallback choices when normal generation fails."""

@@ -93,7 +93,7 @@ class ChoiceValidator:
             logger.error(f"Failed to validate choices: {e}")
             return choices  # Return original choices if validation fails
 
-    async def validate_for_emotional_state(
+    async def validate_for_emotional_state(  # noqa: ARG002
         self, choice: Choice, emotional_state: str, session_state: SessionState
     ) -> bool:
         """
@@ -378,9 +378,11 @@ class ChoiceValidator:
 
         # Check for prohibited content
         prohibited_content = self.safety_criteria["prohibited_content"]
-        for tag in choice.therapeutic_tags:
-            if tag in prohibited_content:
-                safety_issues.append(f"Contains prohibited content: {tag}")
+        safety_issues.extend(
+            f"Contains prohibited content: {tag}"
+            for tag in choice.therapeutic_tags
+            if tag in prohibited_content
+        )
 
         # Check crisis state requirements
         if session_state.emotional_state == EmotionalState.CRISIS:
@@ -476,7 +478,6 @@ class ChoiceValidator:
             is_therapeutically_appropriate=is_valid,
             therapeutic_alignment_score=therapeutic_alignment,
             issues=therapeutic_issues,
-            recommendations=[],
             therapeutic_benefits=choice.therapeutic_tags,
         )
 
@@ -508,7 +509,7 @@ class ChoiceValidator:
         return threshold_issues
 
     # Analysis Methods
-    async def _analyze_skill_development(
+    async def _analyze_skill_development(  # noqa: ARG002
         self, user_choice: UserChoice, session_state: SessionState
     ) -> list[str]:
         """Analyze skill development from a choice."""
@@ -527,7 +528,7 @@ class ChoiceValidator:
 
         return skills_developed
 
-    async def _identify_learning_opportunities(
+    async def _identify_learning_opportunities(  # noqa: ARG002
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState
     ) -> list[str]:
         """Identify learning opportunities from a choice."""
@@ -623,7 +624,7 @@ class ChoiceValidator:
         return emotional_growth
 
     async def _calculate_therapeutic_alignment(
-        self, choice: Choice, scene: Scene, session_state: SessionState
+        self, choice: Choice | UserChoice, scene: Scene, session_state: SessionState
     ) -> float:
         """Calculate therapeutic alignment score for a choice."""
         alignment_score = 0.0
@@ -651,8 +652,8 @@ class ChoiceValidator:
 
         return min(alignment_score, 1.0)
 
-    async def _calculate_emotional_alignment(
-        self, choice: Choice, session_state: SessionState
+    async def _calculate_emotional_alignment(  # noqa: PLR0911
+        self, choice: Choice | UserChoice, session_state: SessionState
     ) -> float:
         """Calculate alignment with emotional state needs."""
         emotional_state = session_state.emotional_state
@@ -689,7 +690,7 @@ class ChoiceValidator:
         return 0.7
 
     async def _calculate_type_appropriateness(
-        self, choice: Choice, scene: Scene
+        self, choice: Choice | UserChoice, scene: Scene
     ) -> float:
         """Calculate choice type appropriateness for scene."""
         scene_type_preferences = {

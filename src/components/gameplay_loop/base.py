@@ -15,17 +15,41 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 
 from tta_ai.orchestration.service import AgentOrchestrationService
 
-from src.components.base import Component
+try:
+    from src.components.base import Component  # type: ignore[import]
+except ImportError:
+
+    class Component(ABC):  # type: ignore[no-redef]  # noqa: B024
+        """Stub Component base class when src.components.base is not available."""
+
+        name: str = ""
+
+        def __init__(self, name: str, dependencies: list, config: dict) -> None:
+            self.name = name
+            self.dependencies = dependencies
+            self.config = config
+
+        async def start(self) -> None:  # noqa: B027
+            pass
+
+        async def stop(self) -> None:  # noqa: B027
+            pass
+
+        async def health_check(self) -> dict:
+            return {"status": "unknown"}
+
+        def get_component(self, component_type: type) -> object | None:  # noqa: ARG002
+            return None
 
 logger = logging.getLogger(__name__)
 
 
-class GameplayLoopState(str, Enum):
+class GameplayLoopState(StrEnum):
     """States of the gameplay loop."""
 
     INITIALIZING = "initializing"
@@ -77,7 +101,7 @@ class GameplayLoopContext:
     last_error: str | None = None
 
 
-class GameplayLoopComponent(Component, ABC):
+class GameplayLoopComponent(Component, ABC):  # type: ignore[misc]
     """
     Abstract base class for all gameplay loop components.
 
@@ -125,7 +149,7 @@ class GameplayLoopComponent(Component, ABC):
 
         # Initialize agent orchestration integration
         try:
-            from src.components.agent_orchestration_component import (
+            from src.components.agent_orchestration_component import (  # noqa: PLC0415
                 AgentOrchestrationComponent,
             )
 

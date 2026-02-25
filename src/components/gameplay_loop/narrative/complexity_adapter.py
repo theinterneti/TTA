@@ -12,7 +12,7 @@ user state, progress, and therapeutic needs.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import DifficultyLevel, EmotionalState, Scene, SessionState
@@ -20,7 +20,7 @@ from ..models.core import DifficultyLevel, EmotionalState, Scene, SessionState
 logger = logging.getLogger(__name__)
 
 
-class ComplexityDimension(str, Enum):
+class ComplexityDimension(StrEnum):
     """Dimensions of narrative complexity that can be adapted."""
 
     COGNITIVE_LOAD = "cognitive_load"
@@ -32,7 +32,7 @@ class ComplexityDimension(str, Enum):
     CONCEPTUAL_ABSTRACTION = "conceptual_abstraction"
 
 
-class AdaptationStrategy(str, Enum):
+class AdaptationStrategy(StrEnum):
     """Strategies for complexity adaptation."""
 
     SIMPLIFY = "simplify"
@@ -399,7 +399,7 @@ class NarrativeComplexityAdapter:
 
         return strategies
 
-    async def _apply_complexity_adaptation(
+    async def _apply_complexity_adaptation(  # noqa: ARG002, PLR0911
         self,
         scene: Scene,
         dimension: ComplexityDimension,
@@ -536,10 +536,9 @@ class NarrativeComplexityAdapter:
         elif strategy in (
             AdaptationStrategy.INCREASE,
             AdaptationStrategy.GRADUAL_INCREASE,
-        ):
+        ) and "self_awareness" not in scene.therapeutic_focus:
             # Add deeper therapeutic elements
-            if "self_awareness" not in scene.therapeutic_focus:
-                scene.therapeutic_focus.append("self_awareness")
+            scene.therapeutic_focus.append("self_awareness")
 
         return scene
 

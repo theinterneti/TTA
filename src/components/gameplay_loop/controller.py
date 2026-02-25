@@ -20,7 +20,14 @@ from src.ai_components.llm_factory import get_llm
 from .choice_architecture.manager import ChoiceArchitectureManager
 from .consequence_system.system import ConsequenceSystem
 from .database.neo4j_manager import Neo4jGameplayManager
-from .models.core import Choice, ConsequenceSet, EmotionalState, Scene, SessionState
+from .models.core import (
+    Choice,
+    ConsequenceSet,
+    EmotionalState,
+    Scene,
+    SessionState,
+    TherapeuticContext,
+)
 from .models.interactions import GameplaySession, UserChoice
 from .narrative.engine import NarrativeEngine
 
@@ -38,7 +45,7 @@ class GameplayLoopController:
         self.config = config or {}
 
         # Initialize core components
-        db_config = config.get("database", {})
+        db_config = self.config.get("database", {})
         self.database_manager = Neo4jGameplayManager(
             neo4j_uri=db_config.get("neo4j_uri", "bolt://localhost:7688"),
             neo4j_user=db_config.get("neo4j_user", "neo4j"),
@@ -55,13 +62,13 @@ class GameplayLoopController:
             _llm = None
 
         self.narrative_engine = NarrativeEngine(
-            self.database_manager, config.get("narrative", {}), llm=_llm
+            self.database_manager, self.config.get("narrative", {}), llm=_llm
         )
         self.choice_architecture = ChoiceArchitectureManager(
-            config.get("choice_architecture", {})
+            self.config.get("choice_architecture", {})
         )
         self.consequence_system = ConsequenceSystem(
-            config.get("consequence_system", {})
+            self.config.get("consequence_system", {})
         )
 
         # Session management
@@ -94,7 +101,7 @@ class GameplayLoopController:
             return False
 
     # Session Lifecycle Management
-    async def start_session(
+    async def start_session(  # noqa: ARG002
         self, user_id: str, therapeutic_context: dict[str, Any] | None = None
     ) -> GameplaySession:
         """
@@ -113,8 +120,12 @@ class GameplayLoopController:
             # Create session state
             session_state = SessionState(
                 user_id=user_id,
-                therapeutic_context=therapeutic_context or {},
+                therapeutic_context=TherapeuticContext(),
                 emotional_state=EmotionalState.CALM,
+                character_id=None,
+                world_id=None,
+                current_scene=None,
+                current_scene_id=None,
             )
 
             # Generate opening scene
@@ -139,6 +150,7 @@ class GameplayLoopController:
                 user_id=user_id,
                 session_state=session_state,
                 current_scene=opening_scene,
+                current_scene_id=(opening_scene.scene_id if opening_scene else None),
                 available_choices=initial_choices,
                 session_start_time=datetime.utcnow(),
                 is_active=True,
@@ -175,7 +187,7 @@ class GameplayLoopController:
                 return session
 
             # Load session from database
-            session_state = await self.database_manager.load_session_state(session_id)
+            session_state = await self.database_manager.get_session(session_id)
             if not session_state:
                 logger.warning(f"Session {session_id} not found")
                 return None
@@ -206,6 +218,7 @@ class GameplayLoopController:
                 user_id=session_state.user_id,
                 session_state=session_state,
                 current_scene=current_scene,
+                current_scene_id=(current_scene.scene_id if current_scene else None),
                 available_choices=available_choices,
                 session_start_time=datetime.utcnow(),  # Resume time
                 is_active=True,
@@ -244,7 +257,7 @@ class GameplayLoopController:
             session.last_activity_time = datetime.utcnow()
 
             # Save session state to database
-            await self.database_manager.save_session_state(session.session_state)
+            await self.database_manager.update_session(session.session_state)
 
             # Remove from active sessions
             del self.active_sessions[session_id]
@@ -275,7 +288,7 @@ class GameplayLoopController:
                 session.session_end_time = datetime.utcnow()
 
                 # Save final session state
-                await self.database_manager.save_session_state(session.session_state)
+                await self.database_manager.update_session(session.session_state)
 
                 # Generate session summary
                 session_summary = await self._generate_session_summary(session)
@@ -333,14 +346,21 @@ class GameplayLoopController:
                 return None, [], None
 
             # Create user choice object
+            session_state_for_choice: SessionState = session.session_state  # type: ignore[assignment]
             user_choice = UserChoice(
                 choice_id=choice_id,
+                session_id=session_id,
+                scene_id=(session_state_for_choice.current_scene_id or ""),
                 choice_text=selected_choice.choice_text,
                 choice_type=selected_choice.choice_type,
                 therapeutic_tags=selected_choice.therapeutic_tags,
                 therapeutic_value=selected_choice.therapeutic_value,
                 agency_level=selected_choice.agency_level,
-                timestamp=datetime.utcnow(),
+                emotional_state_before=session_state_for_choice.emotional_state,
+                emotional_state_after=None,
+                user_confidence=None,
+                difficulty_perceived=None,
+                choice_made_at=datetime.utcnow(),
             )
 
             # Generate consequences
@@ -387,7 +407,7 @@ class GameplayLoopController:
             session.last_activity_time = datetime.utcnow()
 
             # Save updated session state
-            await self.database_manager.save_session_state(session_state)
+            await self.database_manager.update_session(session_state)
 
             # Check response time
             processing_time = (datetime.utcnow() - start_time).total_seconds()

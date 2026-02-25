@@ -282,7 +282,7 @@ class AgencyProtector:
         }
 
     # Core Protection Methods
-    async def _assess_choice_agency(
+    async def _assess_choice_agency(  # noqa: ARG002
         self, choices: list[Choice], scene: Scene, session_state: SessionState
     ) -> dict[str, Any]:
         """Assess the overall agency level of a choice set."""
@@ -395,7 +395,7 @@ class AgencyProtector:
 
         return choices
 
-    async def _validate_final_agency(
+    async def _validate_final_agency(  # noqa: ARG002
         self, choices: list[Choice], session_state: SessionState
     ) -> list[Choice]:
         """Final validation of agency protection."""
@@ -504,7 +504,7 @@ class AgencyProtector:
             in [DifficultyLevel.CHALLENGING, DifficultyLevel.INTENSIVE]
         )
 
-    async def _enhance_single_choice_agency(
+    async def _enhance_single_choice_agency(  # noqa: ARG002
         self, choice: Choice, scene: Scene, session_state: SessionState
     ) -> Choice:
         """Enhance the agency level of a single choice."""
@@ -572,7 +572,7 @@ class AgencyProtector:
 
         return choices
 
-    async def _generate_safe_agency_choice(
+    async def _generate_safe_agency_choice(  # noqa: ARG002
         self, scene: Scene, session_state: SessionState
     ) -> Choice | None:
         """Generate a safe choice with good agency."""
@@ -697,9 +697,12 @@ class AgencyProtector:
 
         # Check for agency-enhancing elements
         agency_enhancing = self.agency_criteria["agency_enhancing_elements"]
-        for element in agency_enhancing:
-            if element.replace("_", " ") in choice.description.lower():
-                empowerment_factors.append(element)
+        choice_desc_lower = (choice.description or "").lower()
+        empowerment_factors.extend(
+            element
+            for element in agency_enhancing
+            if element.replace("_", " ") in choice_desc_lower
+        )
 
         # Check therapeutic tags for empowerment
         empowering_tags = [
@@ -709,9 +712,11 @@ class AgencyProtector:
             "choice",
             "empowerment",
         ]
-        for tag in choice.therapeutic_tags:
-            if tag in empowering_tags:
-                empowerment_factors.append(f"therapeutic_{tag}")
+        empowerment_factors.extend(
+            f"therapeutic_{tag}"
+            for tag in choice.therapeutic_tags
+            if tag in empowering_tags
+        )
 
         # High agency level
         if choice.agency_level > 0.8:
@@ -737,9 +742,11 @@ class AgencyProtector:
         agency_reducing = self.agency_criteria["agency_reducing_elements"]
         choice_content = f"{choice.choice_text} {choice.description}".lower()
 
-        for element in agency_reducing:
-            if element.replace("_", " ") in choice_content:
-                concerns.append(element)
+        concerns.extend(
+            element
+            for element in agency_reducing
+            if element.replace("_", " ") in choice_content
+        )
 
         # Inappropriate difficulty for emotional state
         if session_state.emotional_state in [
@@ -793,14 +800,15 @@ class AgencyProtector:
         # Check for empowering therapeutic approaches
         empowering_approaches = self.empowerment_guidelines["therapeutic_empowerment"]
 
+        choice_desc_lower = (choice.description or "").lower()
         for approach in empowering_approaches:
-            if approach.replace("_", " ") in choice.description.lower():
+            if approach.replace("_", " ") in choice_desc_lower:
                 empowerment_score += 0.1
 
         # Check for empowerment principles
         empowerment_principles = self.empowerment_guidelines["empowerment_principles"]
         for principle in empowerment_principles:
-            if principle.replace("_", " ") in choice.description.lower():
+            if principle.replace("_", " ") in choice_desc_lower:
                 empowerment_score += 0.05
 
         return min(empowerment_score, 1.0)
@@ -816,9 +824,10 @@ class AgencyProtector:
             relevance_score += 0.3
 
         # Therapeutic focus alignment (if available in session state)
-        if hasattr(session_state, "therapeutic_focus"):
+        therapeutic_focus = getattr(session_state, "therapeutic_focus", None)
+        if therapeutic_focus is not None:
             focus_alignment = len(
-                set(choice.therapeutic_tags) & set(session_state.therapeutic_focus)
+                set(choice.therapeutic_tags) & set(therapeutic_focus)
             )
             relevance_score += focus_alignment * 0.1
 

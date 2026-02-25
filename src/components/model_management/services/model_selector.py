@@ -108,7 +108,7 @@ class ModelSelector(IModelSelector):
             logger.error(f"Model ranking failed: {e}")
             return models  # Return unranked models as fallback
 
-    async def validate_model_compatibility(
+    async def validate_model_compatibility(  # noqa: PLR0911, PLR0912
         self, model_info: ModelInfo, requirements: ModelRequirements
     ) -> bool:
         """Check if a model is compatible with the requirements."""
@@ -121,14 +121,20 @@ class ModelSelector(IModelSelector):
                     return False
 
             # Check cost requirements
-            if requirements.max_cost_per_token and model_info.cost_per_token:
-                if model_info.cost_per_token > requirements.max_cost_per_token:
-                    return False
+            if (
+                requirements.max_cost_per_token
+                and model_info.cost_per_token
+                and model_info.cost_per_token > requirements.max_cost_per_token
+            ):
+                return False
 
             # Check quality requirements
-            if requirements.min_quality_score and model_info.performance_score:
-                if model_info.performance_score < requirements.min_quality_score:
-                    return False
+            if (
+                requirements.min_quality_score
+                and model_info.performance_score
+                and model_info.performance_score < requirements.min_quality_score
+            ):
+                return False
 
             # Check therapeutic safety
             if requirements.therapeutic_safety_required:
@@ -145,9 +151,12 @@ class ModelSelector(IModelSelector):
                     return False
 
             # Check context length
-            if requirements.context_length_needed and model_info.context_length:
-                if model_info.context_length < requirements.context_length_needed:
-                    return False
+            if (
+                requirements.context_length_needed
+                and model_info.context_length
+                and model_info.context_length < requirements.context_length_needed
+            ):
+                return False
 
             # Check required capabilities
             if requirements.required_capabilities:
@@ -194,7 +203,7 @@ class ModelSelector(IModelSelector):
 
         for model in models:
             if await self.validate_model_compatibility(model, requirements):
-                compatible_models.append(model)
+                compatible_models.append(model)  # noqa: PERF401
 
         return compatible_models
 

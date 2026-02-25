@@ -119,7 +119,7 @@ class TherapeuticFramer:
             logger.error(f"Failed to frame outcomes therapeutically: {e}")
             return await self._generate_fallback_framing(user_choice)
 
-    async def adapt_framing_for_emotion(
+    async def adapt_framing_for_emotion(  # noqa: ARG002
         self,
         consequence_set: ConsequenceSet,
         emotional_state: str,
@@ -307,3 +307,173 @@ class TherapeuticFramer:
                 ],
             },
         }
+
+    # Core Framing Methods
+    async def _generate_therapeutic_insights(  # noqa: ARG002
+        self,
+        outcomes: dict[str, Any],
+        user_choice: UserChoice,
+        session_state: SessionState,
+    ) -> list[str]:
+        """Generate therapeutic insights from outcomes and choice."""
+        insights = []
+
+        if user_choice.therapeutic_value > 0.7:
+            insights.append(
+                "Your choice demonstrates strong therapeutic engagement and self-awareness."
+            )
+        elif user_choice.therapeutic_value > 0.4:
+            insights.append(
+                "This choice reflects your ongoing therapeutic journey and growth."
+            )
+        else:
+            insights.append("Every choice offers an opportunity for learning and growth.")
+
+        if outcomes.get("emotional_impact", {}).get("primary_emotion") in [
+            "positive",
+            "hopeful",
+            "empowered",
+        ]:
+            insights.append(
+                "Notice the positive emotional shift this choice creates."
+            )
+
+        return insights
+
+    async def _identify_learning_opportunities(  # noqa: ARG002
+        self,
+        outcomes: dict[str, Any],
+        user_choice: UserChoice,
+    ) -> list[str]:
+        """Identify learning opportunities from outcomes and choice."""
+        opportunities = []
+
+        for tag in user_choice.therapeutic_tags:
+            if tag in self.learning_opportunity_patterns:
+                opportunities.extend(self.learning_opportunity_patterns[tag][:1])
+
+        if not opportunities:
+            opportunities.append("Reflect on what this choice reveals about your values.")
+
+        return opportunities
+
+    async def _calculate_therapeutic_value(
+        self,
+        outcomes: dict[str, Any],
+        user_choice: UserChoice,
+    ) -> float:
+        """Calculate the therapeutic value of outcomes."""
+        base_value = user_choice.therapeutic_value
+
+        # Boost for positive emotional outcomes
+        emotional_impact = outcomes.get("emotional_impact", {})
+        if emotional_impact.get("primary_emotion") in ["positive", "hopeful", "empowered"]:
+            base_value = min(1.0, base_value + 0.1)
+
+        return base_value
+
+    async def _identify_growth_aspects(  # noqa: ARG002
+        self,
+        outcomes: dict[str, Any],
+        user_choice: UserChoice,
+        session_state: SessionState,
+    ) -> list[str]:
+        """Identify aspects of growth demonstrated in choice and outcomes."""
+        growth_aspects = []
+
+        if user_choice.therapeutic_value > 0.6:
+            growth_aspects.append("therapeutic_engagement")
+
+        growth_aspects.extend(
+            tag
+            for tag in user_choice.therapeutic_tags
+            if tag in ["resilience", "self_compassion", "mindfulness"]
+        )
+
+        return growth_aspects
+
+    async def _generate_positive_reframes(  # noqa: ARG002
+        self,
+        outcomes: dict[str, Any],
+        session_state: SessionState,
+    ) -> list[str]:
+        """Generate positive reframes for outcomes."""
+        reframes = []
+
+        strategy = self.growth_framing_strategies.get("reframe_challenges", {})
+        templates = strategy.get("templates", [])
+        if templates:
+            reframes.append(
+                templates[0].format(
+                    skill="self-awareness",
+                    strength="inner resilience",
+                    therapeutic_capacity="emotional regulation",
+                )
+            )
+
+        reframes.append("This experience contributes to your ongoing growth and healing.")
+
+        return reframes
+
+    async def _generate_fallback_framing(
+        self, user_choice: UserChoice
+    ) -> dict[str, Any]:
+        """Generate safe fallback therapeutic framing."""
+        return {
+            "insights": ["Every experience offers an opportunity for learning and growth."],
+            "learning_opportunities": ["Reflect on what this moment reveals about your journey."],
+            "therapeutic_value": max(0.3, user_choice.therapeutic_value),
+            "growth_aspects": ["therapeutic_participation"],
+            "positive_reframes": ["This experience is part of your healing journey."],
+        }
+
+    async def _adapt_insights_for_emotion(
+        self,
+        insights: list[str],
+        emotional_state: EmotionalState,
+    ) -> list[str]:
+        """Adapt therapeutic insights for a specific emotional state."""
+        if not insights:
+            return ["Every experience offers an opportunity for growth."]
+
+        if emotional_state in [EmotionalState.CRISIS, EmotionalState.DISTRESSED]:
+            return [
+                "You are safe. Focus on what feels grounding and supportive right now."
+            ]
+
+        if emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
+            return [insight + " Take it one step at a time." for insight in insights[:1]]
+
+        return insights
+
+    async def _adapt_learning_for_emotion(
+        self,
+        learning_opportunities: list[str],
+        emotional_state: EmotionalState,
+    ) -> list[str]:
+        """Adapt learning opportunities for a specific emotional state."""
+        if emotional_state in [EmotionalState.CRISIS, EmotionalState.DISTRESSED]:
+            return ["Focus on safety and grounding in this moment."]
+
+        if emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
+            return learning_opportunities[:1] if learning_opportunities else [
+                "Practice one small grounding technique."
+            ]
+
+        return learning_opportunities
+
+    async def _adjust_therapeutic_value_for_emotion(
+        self,
+        therapeutic_value: float,
+        emotional_state: EmotionalState,
+    ) -> float:
+        """Adjust therapeutic value based on emotional state appropriateness."""
+        if emotional_state in [EmotionalState.CRISIS, EmotionalState.DISTRESSED]:
+            # In crisis, any engagement has high therapeutic value
+            return max(therapeutic_value, 0.7)
+
+        if emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
+            # Slightly boost value for anxious states to encourage engagement
+            return min(1.0, therapeutic_value + 0.05)
+
+        return therapeutic_value

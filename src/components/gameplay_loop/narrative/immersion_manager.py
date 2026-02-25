@@ -12,7 +12,7 @@ while maintaining therapeutic effectiveness.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import EmotionalState, Scene, SceneType, SessionState
@@ -20,7 +20,7 @@ from ..models.core import EmotionalState, Scene, SceneType, SessionState
 logger = logging.getLogger(__name__)
 
 
-class ImmersionTechnique(str, Enum):
+class ImmersionTechnique(StrEnum):
     """Techniques for enhancing narrative immersion."""
 
     SENSORY_DETAIL = "sensory_detail"
@@ -32,7 +32,7 @@ class ImmersionTechnique(str, Enum):
     PERSONAL_CONNECTION = "personal_connection"
 
 
-class ImmersionLevel(str, Enum):
+class ImmersionLevel(StrEnum):
     """Levels of immersion to target."""
 
     MINIMAL = "minimal"
@@ -276,7 +276,7 @@ class ImmersionManager:
         }
 
     # Core Enhancement Methods
-    async def _determine_immersion_level(
+    async def _determine_immersion_level(  # noqa: ARG002
         self, scene: Scene, session_state: SessionState
     ) -> ImmersionLevel:
         """Determine appropriate immersion level based on context."""
@@ -295,7 +295,7 @@ class ImmersionManager:
             return ImmersionLevel.HIGH  # Full immersion
         return ImmersionLevel.MODERATE  # Default
 
-    async def _select_immersion_techniques(
+    async def _select_immersion_techniques(  # noqa: ARG002
         self,
         scene_type: SceneType,
         target_level: ImmersionLevel,
@@ -311,7 +311,7 @@ class ImmersionManager:
             return available_techniques[:2]  # Use two techniques
         return available_techniques  # Use all available techniques
 
-    async def _apply_immersion_technique(
+    async def _apply_immersion_technique(  # noqa: PLR0911
         self, scene: Scene, technique: ImmersionTechnique, session_state: SessionState
     ) -> Scene:
         """Apply a specific immersion technique to the scene."""
@@ -439,7 +439,7 @@ class ImmersionManager:
         scene.narrative_content += f"\n\n{connection_enhancement}"
         return scene
 
-    async def _integrate_therapeutic_immersion(
+    async def _integrate_therapeutic_immersion(  # noqa: ARG002
         self, scene: Scene, session_state: SessionState
     ) -> Scene:
         """Ensure immersion enhancements support therapeutic goals."""

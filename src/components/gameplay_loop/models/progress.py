@@ -11,7 +11,7 @@ and skill acquisition within the therapeutic text adventure system.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 from .core import DifficultyLevel, EmotionalState
 
 
-class ProgressType(str, Enum):
+class ProgressType(StrEnum):
     """Types of progress markers."""
 
     SKILL_ACQUIRED = "skill_acquired"
@@ -29,9 +29,14 @@ class ProgressType(str, Enum):
     SOCIAL_INTERACTION = "social_interaction"
     COPING_STRATEGY = "coping_strategy"
     INSIGHT_GAINED = "insight_gained"
+    # Extended types used by progress tracker
+    THERAPEUTIC_ENGAGEMENT = "therapeutic_engagement"
+    SKILL_DEVELOPMENT = "skill_development"
+    SELF_AWARENESS = "self_awareness"
+    RESILIENCE_BUILDING = "resilience_building"
 
 
-class SkillCategory(str, Enum):
+class SkillCategory(StrEnum):
     """Categories of skills that can be developed."""
 
     EMOTIONAL_REGULATION = "emotional_regulation"
@@ -44,7 +49,7 @@ class SkillCategory(str, Enum):
     EMPATHY = "empathy"
 
 
-class CharacterAttribute(str, Enum):
+class CharacterAttribute(StrEnum):
     """Character attributes that can be developed."""
 
     CONFIDENCE = "confidence"
@@ -61,13 +66,15 @@ class ProgressMarker(BaseModel):
     """A marker indicating progress in therapeutic development."""
 
     marker_id: str = Field(default_factory=lambda: str(uuid4()))
-    session_id: str = Field(..., description="Session identifier")
-    user_id: str = Field(..., description="User identifier")
+    session_id: str = Field(default="", description="Session identifier")
+    user_id: str = Field(default="", description="User identifier")
 
-    # Progress details
-    progress_type: ProgressType = Field(..., description="Type of progress")
-    title: str = Field(..., description="Progress title")
-    description: str = Field(..., description="Progress description")
+    # Progress details — marker_type is an alias for progress_type
+    progress_type: ProgressType = Field(default=ProgressType.INSIGHT_GAINED, description="Type of progress")
+    marker_type: ProgressType | None = Field(None, description="Alias for progress_type")
+    title: str = Field(default="", description="Progress title")
+    description: str = Field(default="", description="Progress description")
+    significance: str = Field(default="", description="Significance of this marker")
 
     # Context
     triggered_by_choice: str | None = Field(

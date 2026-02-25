@@ -127,7 +127,7 @@ class SceneGenerator:
             logger.error(f"Failed to generate therapeutic scene: {e}")
             return None
 
-    async def generate_intervention_scene(
+    async def generate_intervention_scene(  # noqa: ARG002
         self,
         intervention_type: str,
         emotional_state: str,
@@ -565,7 +565,7 @@ class SceneGenerator:
             pattern, setting, therapeutic_focus, emotional_tone, **kwargs
         )
 
-    async def _generate_narrative_content_llm(
+    async def _generate_narrative_content_llm(  # noqa: ARG002
         self,
         setting: dict[str, Any],
         therapeutic_focus: list[str],
@@ -573,7 +573,7 @@ class SceneGenerator:
         **kwargs,
     ) -> str:
         """Generate narrative content using the LLM."""
-        from langchain_core.messages import HumanMessage, SystemMessage
+        from langchain_core.messages import HumanMessage, SystemMessage  # noqa: PLC0415
 
         focus_str = ", ".join(therapeutic_focus) if therapeutic_focus else "general wellbeing"
         setting_name = setting.get("name", "peaceful space")
@@ -595,10 +595,12 @@ class SceneGenerator:
         )
 
         try:
+            assert self.llm is not None
             response = await self.llm.ainvoke(
                 [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
             )
-            return response.content.strip()
+            content = response.content
+            return content.strip() if isinstance(content, str) else str(content)
         except Exception as e:
             logger.warning("LLM scene generation failed, using template fallback: %s", e)
             # Fall back to template if LLM call fails
@@ -613,7 +615,7 @@ class SceneGenerator:
                 parts.append(tone_content)
             return " ".join(parts)
 
-    async def _generate_narrative_content_template(
+    async def _generate_narrative_content_template(  # noqa: ARG002
         self,
         pattern: dict[str, str],
         setting: dict[str, Any],
@@ -640,7 +642,7 @@ class SceneGenerator:
         content_parts.append(pattern["therapeutic_integration"])
         return " ".join(content_parts)
 
-    async def _generate_therapeutic_content(
+    async def _generate_therapeutic_content(  # noqa: ARG002
         self, therapeutic_focus: list[str], emotional_tone: str
     ) -> str:
         """Generate therapeutic content based on focus areas."""
@@ -713,7 +715,7 @@ class SceneGenerator:
 
         return objectives[:3]  # Limit to 3 objectives
 
-    async def _generate_intervention_content(
+    async def _generate_intervention_content(  # noqa: ARG002
         self,
         intervention_type: str,
         emotional_state: str,

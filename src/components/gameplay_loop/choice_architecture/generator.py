@@ -150,7 +150,7 @@ class ChoiceGenerator:
             logger.error(f"Failed to generate emotion-appropriate choice: {e}")
             return None
 
-    async def generate_safe_choice(
+    async def generate_safe_choice(  # noqa: ARG002
         self, emotional_state: str, session_state: SessionState
     ) -> Choice | None:
         """
@@ -421,7 +421,7 @@ class ChoiceGenerator:
             ChoiceType.NARRATIVE, scene, session_state, requirements
         )
 
-    async def _select_template(
+    async def _select_template(  # noqa: ARG002
         self, templates: list[ChoiceTemplate], scene: Scene, session_state: SessionState
     ) -> ChoiceTemplate:
         """Select the most appropriate template for the context."""
@@ -564,9 +564,8 @@ class ChoiceGenerator:
             adapted_choice.therapeutic_value = min(
                 adapted_choice.therapeutic_value, 0.7
             )
-        elif complexity == "increased":
-            if adapted_choice.difficulty_level == DifficultyLevel.GENTLE:
-                adapted_choice.difficulty_level = DifficultyLevel.STANDARD
+        elif complexity == "increased" and adapted_choice.difficulty_level == DifficultyLevel.GENTLE:
+            adapted_choice.difficulty_level = DifficultyLevel.STANDARD
 
         # Add therapeutic emphasis tags
         if therapeutic_emphasis not in adapted_choice.therapeutic_tags:
@@ -578,7 +577,7 @@ class ChoiceGenerator:
         return adapted_choice
 
     # Helper Calculation Methods
-    async def _generate_choice_description(
+    async def _generate_choice_description(  # noqa: ARG002
         self, template: ChoiceTemplate, scene: Scene, session_state: SessionState
     ) -> str:
         """Generate a description for a choice based on template and context."""

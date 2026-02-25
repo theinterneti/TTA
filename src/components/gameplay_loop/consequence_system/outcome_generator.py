@@ -508,3 +508,75 @@ class OutcomeGenerator:
                 "Social engagement enriches life experience",
             ],
         }
+
+    # Outcome Generation Methods
+    async def _generate_immediate_outcomes(  # noqa: ARG002
+        self, user_choice: UserChoice, scene: Scene, session_state: SessionState
+    ) -> list[str]:
+        """Generate immediate outcomes from choice."""
+        patterns = self.outcome_templates.get(user_choice.choice_type, [])
+        if patterns:
+            template = patterns[0]
+            return template.immediate_patterns[:2]
+        return ["Your choice creates an immediate shift in your journey"]
+
+    async def _generate_delayed_outcomes(  # noqa: ARG002
+        self, user_choice: UserChoice, scene: Scene, session_state: SessionState
+    ) -> list[str]:
+        """Generate delayed outcomes from choice."""
+        patterns = self.outcome_templates.get(user_choice.choice_type, [])
+        if patterns:
+            template = patterns[0]
+            return template.delayed_patterns[:1]
+        return []
+
+    async def _generate_emotional_impact(  # noqa: ARG002
+        self, user_choice: UserChoice, scene: Scene, session_state: SessionState
+    ) -> dict[str, Any]:
+        """Generate emotional impact from choice."""
+        emotional_mapping = self.emotional_outcome_mappings.get(
+            session_state.emotional_state, {}
+        )
+        return {
+            "primary_emotion": emotional_mapping.get("positive_transition", "neutral"),
+            "intensity": user_choice.therapeutic_value,
+        }
+
+    async def _generate_narrative_consequences(  # noqa: ARG002
+        self, user_choice: UserChoice, scene: Scene, session_state: SessionState
+    ) -> list[str]:
+        """Generate narrative consequences from choice."""
+        patterns = self.outcome_templates.get(user_choice.choice_type, [])
+        if patterns:
+            template = patterns[0]
+            return template.narrative_consequences[:2]
+        return ["The story continues to unfold"]
+
+    async def _generate_character_development(  # noqa: ARG002
+        self, user_choice: UserChoice, session_state: SessionState
+    ) -> dict[str, Any]:
+        """Generate character development from choice."""
+        development: dict[str, Any] = {}
+        if user_choice.therapeutic_value > 0.5:
+            development["resilience"] = user_choice.therapeutic_value * 0.1
+            development["self_awareness"] = user_choice.therapeutic_value * 0.1
+        return development
+
+    async def _generate_world_state_changes(  # noqa: ARG002
+        self, user_choice: UserChoice, scene: Scene, session_state: SessionState
+    ) -> dict[str, Any]:
+        """Generate world state changes from choice."""
+        return {}
+
+    async def _generate_fallback_outcomes(  # noqa: ARG002
+        self, user_choice: UserChoice
+    ) -> dict[str, Any]:
+        """Generate safe fallback outcomes when normal generation fails."""
+        return {
+            "immediate": ["Your choice leads to new understanding"],
+            "delayed": [],
+            "emotional_impact": {"primary_emotion": "neutral", "intensity": 0.5},
+            "narrative": ["The story continues"],
+            "character_development": {},
+            "world_state_changes": {},
+        }

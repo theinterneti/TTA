@@ -456,6 +456,7 @@ unfixable = []
 "__init__.py" = ["F401", "E402"]
 "tests/**/*.py" = ["S101", "ARG", "PLR2004", "S105", "S106", "S110", "PLC0415", "PLR0911", "PLR0912", "PLR0915", "PTH103", "PTH123", "PTH110", "F811", "E402", "B017", "S103", "SIM117", "PTH101", "RET504"]  # Allow assert, unused args, test passwords, deferred imports in tests
 "scripts/analyze-neo4j-staging-metrics.py" = ["T201", "PLR0912", "PLR0915", "ARG001", "F841", "PTH123"]  # Reporting script needs print statements
+"src/components/gameplay_loop/**/*.py" = ["ARG002"]  # Stub implementations use params as API contracts
 
 # Import sorting configuration (replaces isort)
 [tool.ruff.lint.isort]

@@ -50,7 +50,7 @@ class CausalityExplainer:
             logger.error(f"CausalityExplainer initialization failed: {e}")
             return False
 
-    async def explain_causality(
+    async def explain_causality(  # noqa: ARG002
         self,
         user_choice: UserChoice,
         outcomes: dict[str, Any],
@@ -229,7 +229,7 @@ class CausalityExplainer:
         }
 
     # Core Methods
-    async def _determine_explanation_approach(
+    async def _determine_explanation_approach(  # noqa: ARG002
         self,
         user_choice: UserChoice,
         outcomes: dict[str, Any],
@@ -249,7 +249,7 @@ class CausalityExplainer:
             user_choice.choice_type.value, "direct_causality"
         )
 
-    async def _generate_core_explanation(
+    async def _generate_core_explanation(  # noqa: ARG002
         self, user_choice: UserChoice, outcomes: dict[str, Any], approach: str
     ) -> str:
         """Generate core causality explanation."""
@@ -268,7 +268,7 @@ class CausalityExplainer:
             therapeutic_process="evidence-based practices",
         )
 
-    async def _add_therapeutic_context(
+    async def _add_therapeutic_context(  # noqa: ARG002
         self,
         core_explanation: str,
         user_choice: UserChoice,

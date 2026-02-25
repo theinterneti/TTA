@@ -208,9 +208,9 @@ class ModelManagementComponent(Component):
                     keys_to_remove.append(cache_key)
             else:
                 # Find all instances of this model across providers
-                for key in self.active_models:
-                    if key.endswith(f":{model_id}"):
-                        keys_to_remove.append(key)
+                keys_to_remove.extend(
+                    key for key in self.active_models if key.endswith(f":{model_id}")
+                )
 
             # Unload found instances
             for key in keys_to_remove:
@@ -291,13 +291,15 @@ class ModelManagementComponent(Component):
         """Get models within the specified cost threshold."""
         all_models = await self.get_available_models(provider_name=provider_name)
 
-        affordable_models = []
-        for model in all_models:
-            if model.is_free or (
+        affordable_models = [
+            model
+            for model in all_models
+            if model.is_free
+            or (
                 model.cost_per_token is not None
                 and model.cost_per_token <= max_cost_per_token
-            ):
-                affordable_models.append(model)
+            )
+        ]
 
         logger.info(
             f"Found {len(affordable_models)} affordable models (max cost: {max_cost_per_token})"

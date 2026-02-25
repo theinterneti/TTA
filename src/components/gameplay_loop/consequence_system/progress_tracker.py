@@ -34,7 +34,7 @@ class ProgressTracker:
         self.progress_patterns: dict[str, dict[str, Any]] = {}
         self.milestone_definitions: dict[str, dict[str, Any]] = {}
         self.skill_development_tracks: dict[str, list[str]] = {}
-        self.growth_indicators: dict[str, list[str]] = {}
+        self.growth_indicators: dict[str, str] = {}
 
         logger.info("ProgressTracker initialized")
 
@@ -261,7 +261,7 @@ class ProgressTracker:
         }
 
     # Core Tracking Methods
-    async def _identify_progress_markers(
+    async def _identify_progress_markers(  # noqa: ARG002
         self,
         user_choice: UserChoice,
         outcomes: dict[str, Any],
@@ -277,7 +277,8 @@ class ProgressTracker:
                     marker_type=ProgressType.THERAPEUTIC_ENGAGEMENT,
                     description="High therapeutic value choice",
                     significance="Strong therapeutic engagement",
-                    timestamp=None,  # Would be set by system
+                    triggered_by_choice=user_choice.choice_id,
+                    scene_context=None,
                 )
             )
 
@@ -288,7 +289,8 @@ class ProgressTracker:
                     marker_type=ProgressType.SKILL_DEVELOPMENT,
                     description="Skill building choice made",
                     significance="Active skill development",
-                    timestamp=None,
+                    triggered_by_choice=user_choice.choice_id,
+                    scene_context=None,
                 )
             )
 
@@ -299,7 +301,8 @@ class ProgressTracker:
                     marker_type=ProgressType.EMOTIONAL_REGULATION,
                     description="Emotional regulation practice",
                     significance="Emotional skill development",
-                    timestamp=None,
+                    triggered_by_choice=user_choice.choice_id,
+                    scene_context=None,
                 )
             )
 
@@ -313,13 +316,14 @@ class ProgressTracker:
                     marker_type=ProgressType.SELF_AWARENESS,
                     description="Self-awareness demonstration",
                     significance="Growing self-understanding",
-                    timestamp=None,
+                    triggered_by_choice=user_choice.choice_id,
+                    scene_context=None,
                 )
             )
 
         return progress_markers
 
-    async def _track_skill_development(
+    async def _track_skill_development(  # noqa: ARG002
         self, user_choice: UserChoice, outcomes: dict[str, Any]
     ) -> list[str]:
         """Track skill development from choice."""
@@ -336,9 +340,11 @@ class ProgressTracker:
             "communication": "interpersonal_skills",
         }
 
-        for tag in user_choice.therapeutic_tags:
-            if tag in tag_to_skill_mapping:
-                skills_developed.append(tag_to_skill_mapping[tag])
+        skills_developed.extend(
+            tag_to_skill_mapping[tag]
+            for tag in user_choice.therapeutic_tags
+            if tag in tag_to_skill_mapping
+        )
 
         # Add skill based on choice type
         if user_choice.choice_type == ChoiceType.SKILL_BUILDING:
