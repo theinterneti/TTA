@@ -221,7 +221,7 @@ class WorkflowMonitor:
         with contextlib.suppress(Exception):
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                self._bg_task = loop.create_task(self._bg_loop(interval_s))
+                self._bg_task = loop.create_task(self._bg_loop(interval_s))  # type: ignore[attr-defined]
 
     def stop_background_checks(self) -> None:
         t = self._bg_task
@@ -296,7 +296,7 @@ class WorkflowMonitor:
 
     def _from_dump(self, d: dict[str, Any]) -> RunRecord:
         rr = RunRecord(
-            run_id=d.get("run_id"),
+            run_id=d.get("run_id") or "",
             workflow=d.get("workflow"),
             status=d.get("status", "running"),
             started_at=float(d.get("started_at") or time.time()),

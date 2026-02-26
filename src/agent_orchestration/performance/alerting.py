@@ -216,7 +216,7 @@ class PerformanceAlerting:
             description=f"{operation_type.value} response time ({metric_value:.2f}s) exceeded {severity.value} threshold ({threshold_value:.2f}s)",
             operation_type=operation_type,
             metric_value=metric_value,
-            threshold_value=threshold_value,
+            threshold_value=threshold_value or 0.0,
             timestamp=time.time(),
             metadata=metadata or {},
         )

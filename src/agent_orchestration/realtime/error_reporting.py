@@ -242,11 +242,12 @@ class ErrorReportingManager:
                 # Agent-specific error
                 event = create_agent_status_event(
                     agent_id=error_report.agent_id,
+                    agent_type="unknown",
                     status=AgentStatus.ERROR,
-                    message=error_report.error_message,
                     metadata={
                         "error_id": error_report.error_id,
                         "error_type": error_report.error_type,
+                        "error_message": error_report.error_message,
                         "severity": error_report.severity.value,
                         "workflow_id": error_report.workflow_id,
                         "operation_id": error_report.operation_id,
@@ -258,23 +259,16 @@ class ErrorReportingManager:
                 # Workflow-specific error
                 event = create_workflow_progress_event(
                     workflow_id=error_report.workflow_id,
+                    workflow_type="unknown",
                     status=WorkflowStatus.FAILED,
-                    progress=0.0,
-                    message=error_report.error_message,
-                    metadata={
-                        "error_id": error_report.error_id,
-                        "error_type": error_report.error_type,
-                        "severity": error_report.severity.value,
-                        "exception_type": error_report.exception_type,
-                        "context": error_report.context,
-                    },
+                    progress_percentage=0.0,
                 )
             else:
                 # System-wide error
                 event = create_error_event(
-                    error_type=error_report.error_type,
+                    error_code=error_report.error_type,
                     error_message=error_report.error_message,
-                    metadata={
+                    error_details={
                         "error_id": error_report.error_id,
                         "severity": error_report.severity.value,
                         "exception_type": error_report.exception_type,
@@ -282,7 +276,7 @@ class ErrorReportingManager:
                     },
                 )
 
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast error event: {e}")
@@ -308,9 +302,10 @@ class ErrorReportingManager:
             if error_report.agent_id:
                 event = create_agent_status_event(
                     agent_id=error_report.agent_id,
+                    agent_type="unknown",
                     status=status,
-                    message=message,
                     metadata={
+                        "message": message,
                         "error_id": error_report.error_id,
                         "recovery_attempts": error_report.recovery_attempts,
                         "recovery_success": success,
@@ -318,7 +313,7 @@ class ErrorReportingManager:
                         "recovery_messages": error_report.recovery_messages,
                     },
                 )
-                await self.event_publisher.publish_event(event)
+                await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast recovery event: {e}")

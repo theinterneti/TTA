@@ -138,19 +138,19 @@ class CircuitBreakerConfigManager:
         if os.getenv("TTA_CIRCUIT_BREAKER_FAILURE_THRESHOLD"):
             env_config["circuit_breaker"] = env_config.get("circuit_breaker", {})
             env_config["circuit_breaker"]["failure_threshold"] = int(
-                os.getenv("TTA_CIRCUIT_BREAKER_FAILURE_THRESHOLD")
+                os.getenv("TTA_CIRCUIT_BREAKER_FAILURE_THRESHOLD") or "5"
             )
 
         if os.getenv("TTA_CIRCUIT_BREAKER_TIMEOUT_SECONDS"):
             env_config["circuit_breaker"] = env_config.get("circuit_breaker", {})
             env_config["circuit_breaker"]["timeout_seconds"] = int(
-                os.getenv("TTA_CIRCUIT_BREAKER_TIMEOUT_SECONDS")
+                os.getenv("TTA_CIRCUIT_BREAKER_TIMEOUT_SECONDS") or "60"
             )
 
         if os.getenv("TTA_CIRCUIT_BREAKER_RECOVERY_TIMEOUT_SECONDS"):
             env_config["circuit_breaker"] = env_config.get("circuit_breaker", {})
             env_config["circuit_breaker"]["recovery_timeout_seconds"] = int(
-                os.getenv("TTA_CIRCUIT_BREAKER_RECOVERY_TIMEOUT_SECONDS")
+                os.getenv("TTA_CIRCUIT_BREAKER_RECOVERY_TIMEOUT_SECONDS") or "300"
             )
 
         # Workflow error handling settings
@@ -161,12 +161,12 @@ class CircuitBreakerConfigManager:
 
         if os.getenv("TTA_WORKFLOW_TIMEOUT_SECONDS"):
             env_config["timeout_seconds"] = int(
-                os.getenv("TTA_WORKFLOW_TIMEOUT_SECONDS")
+                os.getenv("TTA_WORKFLOW_TIMEOUT_SECONDS") or "300"
             )
 
         if os.getenv("TTA_WORKFLOW_STEP_TIMEOUT_SECONDS"):
             env_config["step_timeout_seconds"] = int(
-                os.getenv("TTA_WORKFLOW_STEP_TIMEOUT_SECONDS")
+                os.getenv("TTA_WORKFLOW_STEP_TIMEOUT_SECONDS") or "60"
             )
 
         # Resource monitoring settings
@@ -175,7 +175,7 @@ class CircuitBreakerConfigManager:
                 "resource_monitoring", {}
             )
             env_config["resource_monitoring"]["memory_threshold_percent"] = int(
-                os.getenv("TTA_RESOURCE_MEMORY_THRESHOLD")
+                os.getenv("TTA_RESOURCE_MEMORY_THRESHOLD") or "80"
             )
 
         if os.getenv("TTA_RESOURCE_CPU_THRESHOLD"):
@@ -183,7 +183,7 @@ class CircuitBreakerConfigManager:
                 "resource_monitoring", {}
             )
             env_config["resource_monitoring"]["cpu_threshold_percent"] = int(
-                os.getenv("TTA_RESOURCE_CPU_THRESHOLD")
+                os.getenv("TTA_RESOURCE_CPU_THRESHOLD") or "90"
             )
 
         self.config_data.update(env_config)
@@ -208,6 +208,7 @@ class CircuitBreakerConfigManager:
         """Get CircuitBreakerConfig instance for a specific circuit breaker."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
 
         cb_config = self.validated_config.circuit_breaker
 
@@ -223,6 +224,7 @@ class CircuitBreakerConfigManager:
         """Check if circuit breaker functionality is enabled."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
         return (
             self.validated_config.enabled
             and self.validated_config.circuit_breaker.enabled
@@ -232,6 +234,7 @@ class CircuitBreakerConfigManager:
         """Get workflow timeout configuration."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
 
         return {
             "timeout_seconds": self.validated_config.timeout_seconds,
@@ -242,30 +245,35 @@ class CircuitBreakerConfigManager:
         """Get resource monitoring configuration."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
         return self.validated_config.resource_monitoring
 
     def get_notifications_config(self) -> dict[str, Any]:
         """Get notifications configuration."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
         return self.validated_config.notifications
 
     def get_rollback_retention_days(self) -> int:
         """Get rollback retention period in days."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
         return self.validated_config.rollback_retention_days
 
     def to_dict(self) -> dict[str, Any]:
         """Export configuration as dictionary."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
         return self.validated_config.dict()
 
     def get_config_summary(self) -> dict[str, Any]:
         """Get a summary of current configuration."""
         if not self.validated_config:
             self._validate_config()
+        assert self.validated_config is not None
 
         return {
             "error_handling_enabled": self.validated_config.enabled,
@@ -320,8 +328,8 @@ def validate_circuit_breaker_config(config_dict: dict[str, Any]) -> list[str]:
     try:
         WorkflowErrorHandlingConfigSchema(**config_dict)
     except Exception as e:
-        if hasattr(e, "errors"):
-            for error in e.errors():
+        if hasattr(e, "errors") and callable(e.errors):  # type: ignore[union-attr]
+            for error in e.errors():  # type: ignore[union-attr]
                 field = ".".join(str(loc) for loc in error["loc"])
                 errors.append(f"{field}: {error['msg']}")
         else:

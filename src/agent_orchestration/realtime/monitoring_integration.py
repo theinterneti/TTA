@@ -27,8 +27,8 @@ from ..performance.response_time_monitor import (
 from .event_publisher import EventPublisher
 from .models import (
     AgentStatus,
-    AgentStatusEvent,
     SystemMetricsEvent,
+    create_agent_status_event,
     create_system_metrics_event,
 )
 
@@ -103,7 +103,7 @@ class MonitoringEventIntegrator:
 
         # Set up alert handler
         if self.alert_manager:
-            self.alert_manager.add_handler(self._handle_alert)
+            self.alert_manager.add_alert_handler(self._handle_alert)
 
         # Set up performance alert handler
         if self.performance_alerting:
@@ -157,29 +157,24 @@ class MonitoringEventIntegrator:
             return
 
         try:
-            # Get system metrics
+            # Get system metrics (returns SystemMetrics dataclass)
             metrics = self.system_monitor.get_system_metrics()
 
             # Create system metrics event
             event = SystemMetricsEvent(
-                cpu_usage=metrics.get("cpu_usage", 0.0),
-                memory_usage=metrics.get("memory_usage", 0.0),
-                active_connections=metrics.get("active_connections", 0),
-                queue_depth=metrics.get("queue_depth", 0),
-                response_time_avg=metrics.get("response_time_avg", 0.0),
-                error_rate=metrics.get("error_rate", 0.0),
-                throughput_rps=metrics.get("throughput_rps", 0.0),
-                metadata={
-                    "disk_usage": metrics.get("disk_usage", 0.0),
-                    "network_io": metrics.get("network_io", {}),
-                    "process_count": metrics.get("process_count", 0),
-                    "uptime": metrics.get("uptime", 0.0),
-                },
+                cpu_usage=metrics.cpu_usage_percent,
+                memory_usage=None,
+                memory_usage_mb=metrics.memory_usage_mb,
+                active_connections=metrics.active_connections,
+                active_workflows=metrics.concurrent_workflows,
+                message_queue_size=metrics.queue_depth,
+                response_time_avg=None,
+                error_rate=None,
                 source="monitoring_system",
             )
 
             # Publish event
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast system metrics: {e}")
@@ -192,35 +187,34 @@ class MonitoringEventIntegrator:
         try:
             # Broadcast metrics for each agent monitor
             for agent_id, agent_monitor in self.agent_monitors.items():
-                metrics = agent_monitor.get_metrics()
+                agent_metrics = agent_monitor.get_current_metrics()
 
                 # Determine agent status based on metrics
-                status = self._determine_agent_status(metrics)
+                status = self._determine_agent_status_from_metrics(agent_metrics)
 
                 # Create agent status event
-                event = AgentStatusEvent(
+                event = create_agent_status_event(
                     agent_id=agent_id,
+                    agent_type=agent_metrics.agent_type,
+                    instance=agent_metrics.agent_instance,
                     status=status,
-                    message="Agent metrics update",
                     metadata={
-                        "response_time_avg": metrics.get("response_time_avg", 0.0),
-                        "error_rate": metrics.get("error_rate", 0.0),
-                        "throughput_rps": metrics.get("throughput_rps", 0.0),
-                        "queue_depth": metrics.get("queue_depth", 0),
-                        "memory_usage": metrics.get("memory_usage", 0.0),
-                        "last_activity": metrics.get("last_activity", 0.0),
+                        "response_time_avg": agent_metrics.average_response_time,
+                        "error_rate": agent_metrics.error_rate,
+                        "throughput_rps": agent_metrics.requests_per_second,
+                        "total_requests": agent_metrics.total_requests,
                     },
                     source="monitoring_system",
                 )
 
                 # Publish event
-                await self.event_publisher.publish_event(event)
+                await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast agent metrics: {e}")
 
     def _determine_agent_status(self, metrics: dict[str, Any]) -> AgentStatus:
-        """Determine agent status based on metrics."""
+        """Determine agent status based on metrics dict."""
         error_rate = metrics.get("error_rate", 0.0)
         response_time = metrics.get("response_time_avg", 0.0)
         last_activity = metrics.get("last_activity", 0.0)
@@ -235,11 +229,35 @@ class MonitoringEventIntegrator:
 
         # Check for slow response times
         if response_time > 30.0:  # 30 seconds
-            return AgentStatus.BUSY  # Use BUSY instead of non-existent DEGRADED
+            return AgentStatus.DEGRADED
 
         # Check if actively processing
         if last_activity > time.time() - 60:  # Active in last minute
-            return AgentStatus.BUSY  # Use BUSY instead of non-existent PROCESSING
+            return AgentStatus.PROCESSING
+
+        return AgentStatus.IDLE
+
+    def _determine_agent_status_from_metrics(self, metrics: Any) -> AgentStatus:
+        """Determine agent status based on AgentMetrics dataclass."""
+        error_rate = metrics.error_rate
+        response_time = metrics.average_response_time
+        last_activity = metrics.last_request_time or 0.0
+
+        # Check if agent is inactive
+        if time.time() - last_activity > 300:  # 5 minutes
+            return AgentStatus.IDLE
+
+        # Check for high error rate
+        if error_rate > 0.2:  # 20% error rate
+            return AgentStatus.ERROR
+
+        # Check for slow response times
+        if response_time > 30.0:  # 30 seconds
+            return AgentStatus.DEGRADED
+
+        # Check if actively processing
+        if last_activity > time.time() - 60:  # Active in last minute
+            return AgentStatus.PROCESSING
 
         return AgentStatus.IDLE
 
@@ -251,11 +269,7 @@ class MonitoringEventIntegrator:
         try:
             # Determine event type based on alert
             if alert.get("type") == "system":
-                event = SystemMetricsEvent(
-                    cpu_usage=alert.get("cpu_usage", 0.0),
-                    memory_usage=alert.get("memory_usage", 0.0),
-                    active_connections=alert.get("active_connections", 0),
-                    queue_depth=alert.get("queue_depth", 0),
+                event = create_system_metrics_event(
                     metadata={
                         "alert": True,
                         "alert_message": alert.get("message", ""),
@@ -266,11 +280,11 @@ class MonitoringEventIntegrator:
                 )
             else:
                 # Agent-specific alert
-                agent_id = alert.get("agent_id", "unknown")
-                event = AgentStatusEvent(
+                agent_id = str(alert.get("agent_id", "unknown"))
+                event = create_agent_status_event(
                     agent_id=agent_id,
+                    agent_type=str(alert.get("agent_type", "unknown")),
                     status=AgentStatus.ERROR,
-                    message=alert.get("message", "Alert triggered"),
                     metadata={
                         "alert": True,
                         "alert_severity": alert.get("severity", "unknown"),
@@ -281,7 +295,7 @@ class MonitoringEventIntegrator:
                 )
 
             # Publish alert event
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast alert: {e}")
@@ -300,7 +314,7 @@ class MonitoringEventIntegrator:
                 cpu_usage=0.0,  # Will be filled by system monitor
                 memory_usage=0.0,  # Will be filled by system monitor
                 active_connections=performance_summary.get("active_operations", 0),
-                queue_depth=0,  # Will be filled by system monitor
+                message_queue_size=None,  # Will be filled by system monitor
                 metadata={
                     "performance_metrics": True,
                     "total_operations": performance_summary.get("total_operations", 0),
@@ -316,7 +330,7 @@ class MonitoringEventIntegrator:
             )
 
             # Publish event
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast performance metrics: {e}")
@@ -330,14 +344,14 @@ class MonitoringEventIntegrator:
             # Create alert event based on alert type
             if alert.operation_type:
                 # Agent-specific performance alert
-                event = AgentStatusEvent(
+                event = create_agent_status_event(
                     agent_id=f"performance_{alert.operation_type.value}",
+                    agent_type=str(alert.operation_type.value),
                     status=(
                         AgentStatus.ERROR
                         if alert.severity.value in ["error", "critical"]
                         else AgentStatus.DEGRADED
                     ),
-                    message=alert.description,
                     metadata={
                         "alert": True,
                         "alert_id": alert.alert_id,
@@ -354,10 +368,6 @@ class MonitoringEventIntegrator:
             else:
                 # System-wide performance alert
                 event = create_system_metrics_event(
-                    cpu_usage=0.0,
-                    memory_usage=0.0,
-                    active_connections=0,
-                    queue_depth=0,
                     metadata={
                         "alert": True,
                         "alert_id": alert.alert_id,
@@ -372,7 +382,7 @@ class MonitoringEventIntegrator:
                 )
 
             # Publish alert event
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast performance alert: {e}")
@@ -387,10 +397,6 @@ class MonitoringEventIntegrator:
         try:
             # Create performance analysis event
             event = create_system_metrics_event(
-                cpu_usage=0.0,
-                memory_usage=0.0,
-                active_connections=0,
-                queue_depth=0,
                 metadata={
                     "performance_analysis": True,
                     "analysis_timestamp": analysis_results.get(
@@ -408,7 +414,7 @@ class MonitoringEventIntegrator:
                 },
             )
 
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast performance analysis: {e}")
@@ -441,10 +447,10 @@ class MonitoringEventIntegrator:
         try:
             if agent_id:
                 # Agent-specific threshold breach
-                event = AgentStatusEvent(
+                event = create_agent_status_event(
                     agent_id=agent_id,
+                    agent_type="unknown",
                     status=AgentStatus.DEGRADED,
-                    message=f"Performance threshold breached: {threshold_type}",
                     metadata={
                         "threshold_type": threshold_type,
                         "current_value": current_value,
@@ -459,13 +465,15 @@ class MonitoringEventIntegrator:
                 )
             else:
                 # System-wide threshold breach
-                event = SystemMetricsEvent(
-                    cpu_usage=current_value if threshold_type == "cpu" else 0.0,
-                    memory_usage=current_value if threshold_type == "memory" else 0.0,
+                event = create_system_metrics_event(
+                    cpu_usage=current_value if threshold_type == "cpu" else None,
+                    memory_usage=current_value if threshold_type == "memory" else None,
                     active_connections=(
-                        int(current_value) if threshold_type == "connections" else 0
+                        int(current_value) if threshold_type == "connections" else None
                     ),
-                    queue_depth=int(current_value) if threshold_type == "queue" else 0,
+                    message_queue_size=(
+                        int(current_value) if threshold_type == "queue" else None
+                    ),
                     metadata={
                         "threshold_breach": True,
                         "threshold_type": threshold_type,
@@ -475,7 +483,7 @@ class MonitoringEventIntegrator:
                     source="performance_monitor",
                 )
 
-            await self.event_publisher.publish_event(event)
+            await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
 
         except Exception as e:
             logger.error(f"Failed to broadcast performance threshold event: {e}")

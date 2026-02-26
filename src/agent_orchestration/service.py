@@ -289,7 +289,7 @@ class AgentOrchestrationService:
             logger.info(
                 f"Successfully coordinated agents for {workflow_type.value} workflow"
             )
-            return response, run_id, error
+            return response, run_id, error  # type: ignore[return-value]
 
         except Exception as e:
             logger.error(f"Error coordinating agents: {e}")
@@ -301,7 +301,7 @@ class AgentOrchestrationService:
         """Get therapeutic safety metrics from the validator."""
         try:
             if hasattr(self.therapeutic_validator, "get_monitoring_metrics"):
-                return self.therapeutic_validator.get_monitoring_metrics()
+                return self.therapeutic_validator.get_monitoring_metrics()  # type: ignore[union-attr]
             return {
                 "error": "Therapeutic validator does not support metrics",
                 "validator_available": self.therapeutic_validator is not None,
@@ -644,11 +644,11 @@ class AgentOrchestrationService:
             }
 
             # Perform comprehensive validation
-            result = validator.validate_text(user_input, context=validation_context)
+            result = validator.validate_text(user_input, context=validation_context)  # type: ignore[union-attr]
 
             # Check if we should alert on this result
             should_alert = (
-                validator.should_alert(result)
+                validator.should_alert(result)  # type: ignore[union-attr]
                 if hasattr(validator, "should_alert")
                 else False
             )
@@ -660,7 +660,7 @@ class AgentOrchestrationService:
                 "score": result.score,
                 "reason": f"Therapeutic validation: {result.level.value}",
                 "crisis_detected": result.crisis_detected,
-                "crisis_types": [ct.value for ct in result.crisis_types],
+                "crisis_types": [getattr(ct, "value", ct) for ct in result.crisis_types],
                 "escalation_recommended": result.escalation_recommended,
                 "alternative_content": result.alternative_content,
                 "therapeutic_appropriateness": result.therapeutic_appropriateness,

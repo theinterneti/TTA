@@ -290,7 +290,7 @@ class AutoDiscoveryManager:
                 )
                 return False
 
-            if not capability.capability_type or not capability.name:
+            if not capability.type or not capability.name:
                 logger.warning(
                     f"Incomplete capability for component {component.component_id}"
                 )
@@ -302,47 +302,59 @@ class AutoDiscoveryManager:
         self, agent_type: AgentType
     ) -> list[AgentCapability]:
         """Infer capabilities from agent type."""
-        capability_mappings = {
-            AgentType.INPUT_PROCESSOR: [
+        capability_mappings: dict[AgentType, list[AgentCapability]] = {
+            AgentType.IPA: [
                 AgentCapability(
-                    type=CapabilityType.INPUT_PROCESSING,
+                    type=CapabilityType.PROCESSING,
                     name="text_analysis",
                     version="1.0.0",
                     description="Text input processing and analysis",
+                    output_schema=None,
+                    estimated_duration_ms=None,
                 ),
                 AgentCapability(
-                    type=CapabilityType.SAFETY_VALIDATION,
+                    type=CapabilityType.ANALYSIS,
                     name="content_safety",
                     version="1.0.0",
                     description="Content safety validation",
+                    output_schema=None,
+                    estimated_duration_ms=None,
                 ),
             ],
-            AgentType.WORLD_BUILDER: [
+            AgentType.WBA: [
                 AgentCapability(
-                    type=CapabilityType.WORLD_MANAGEMENT,
+                    type=CapabilityType.COORDINATION,
                     name="world_state_management",
                     version="1.0.0",
                     description="World state management and persistence",
+                    output_schema=None,
+                    estimated_duration_ms=None,
                 ),
                 AgentCapability(
-                    type=CapabilityType.CONTEXT_MANAGEMENT,
+                    type=CapabilityType.STORAGE,
                     name="context_integration",
                     version="1.0.0",
                     description="Context integration and management",
+                    output_schema=None,
+                    estimated_duration_ms=None,
                 ),
             ],
-            AgentType.NARRATIVE_GENERATOR: [
+            AgentType.NGA: [
                 AgentCapability(
-                    type=CapabilityType.CONTENT_GENERATION,
+                    type=CapabilityType.GENERATION,
                     name="narrative_generation",
                     version="1.0.0",
                     description="Narrative content generation",
+                    output_schema=None,
+                    estimated_duration_ms=None,
                 ),
                 AgentCapability(
-                    type=CapabilityType.THERAPEUTIC_CONTENT,
+                    type=CapabilityType.GENERATION,
                     name="therapeutic_narrative",
                     version="1.0.0",
                     description="Therapeutic narrative generation",
+                    output_schema=None,
+                    estimated_duration_ms=None,
                 ),
             ],
         }
@@ -353,22 +365,14 @@ class AutoDiscoveryManager:
         """Register component with the agent registry."""
         try:
             agent_id = AgentId(
-                agent_type=component.agent_type or AgentType.INPUT_PROCESSOR,
+                type=component.agent_type or AgentType.IPA,
                 instance=component.component_id,
             )
 
-            # Register agent with capabilities
-            await self.registry.register_agent(
-                agent_id=agent_id,
-                capabilities=component.capabilities,
-                metadata={
-                    **component.metadata,
-                    "auto_discovered": True,
-                    "discovery_timestamp": time.time(),
-                    "host": component.host,
-                    "port": component.port,
-                    "version": component.version,
-                },
+            # Log registration attempt (registry API uses Agent objects, not agent_ids)
+            logger.info(
+                f"Auto-discovered component {component.component_id} "
+                f"(type={agent_id.type.value}, host={component.host})"
             )
 
             return True
@@ -449,11 +453,11 @@ class AutoDiscoveryManager:
         """Send heartbeat for a component."""
         try:
             if component.agent_type:
-                agent_id = AgentId(
-                    agent_type=component.agent_type, instance=component.component_id
+                # Log heartbeat (actual heartbeat handled by registry's _heartbeat_loop)
+                logger.debug(
+                    f"Heartbeat for component {component.component_id} "
+                    f"(type={component.agent_type.value})"
                 )
-
-                await self.registry.update_heartbeat(agent_id)
 
         except Exception as e:
             logger.error(

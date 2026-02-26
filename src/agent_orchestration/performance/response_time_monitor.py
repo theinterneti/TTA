@@ -476,7 +476,8 @@ class ResponseTimeMonitor:
         sla_compliance = sla_compliant_types / len(statistics) if statistics else 0.0
 
         # Determine overall performance level
-        avg_p95 = statistics.mean([stats.p95_duration for stats in statistics.values()])
+        _p95_vals = [stats.p95_duration for stats in statistics.values()]
+        avg_p95 = sum(_p95_vals) / len(_p95_vals) if _p95_vals else 0.0
         if avg_p95 < 0.5:
             overall_performance = PerformanceLevel.EXCELLENT
         elif avg_p95 < 1.0:

@@ -17,7 +17,7 @@ import logging
 import os
 from enum import StrEnum
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal, cast
 
 import yaml
 from dotenv import load_dotenv
@@ -751,7 +751,7 @@ class OpenHandsIntegrationConfig(BaseModel):
         return cls(
             api_key=SecretStr(api_key),
             base_url=os.getenv("OPENHANDS_BASE_URL", "https://openrouter.ai/api/v1"),
-            model_preset=os.getenv("OPENHANDS_MODEL", "gemini-flash"),
+            model_preset=cast(Any, os.getenv("OPENHANDS_MODEL", "gemini-flash")),
             workspace_root=Path(
                 os.getenv("OPENHANDS_WORKSPACE_ROOT", "./openhands_workspace")
             ),

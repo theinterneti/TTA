@@ -479,15 +479,16 @@ class ProgressiveFeedbackManager:
         if self.event_publisher:
             initial_event = create_agent_status_event(
                 agent_id=agent_id,
+                agent_type="unknown",
                 status=AgentStatus.PROCESSING,
-                message=f"Started {operation_type} operation",
                 metadata={
+                    "message": f"Started {operation_type} operation",
                     "operation_id": operation_id,
                     "workflow_id": workflow_id,
                     "estimated_duration": estimated_duration,
                 },
             )
-            await self.event_publisher.publish_event(initial_event)
+            await self.event_publisher._publish_event(initial_event)  # type: ignore[union-attr]
 
         logger.debug(f"Started tracking agent operation: {operation_id}")
         return operation_id
@@ -505,7 +506,6 @@ class ProgressiveFeedbackManager:
             return False
 
         operation = self.active_operations[operation_id]
-        agent_id = operation.intermediate_results.get("agent_id")
 
         # Update operation progress
         operation.update_progress(
@@ -522,13 +522,14 @@ class ProgressiveFeedbackManager:
         # Send progressive feedback event
         if self.event_publisher:
             feedback_event = create_progressive_feedback_event(
-                agent_id=agent_id or "unknown",
                 operation_id=operation_id,
-                progress=progress,
+                operation_type=operation.operation_type,
+                stage=stage,
                 message=message or f"Stage: {stage}",
+                progress_percentage=progress * 100,
                 intermediate_result=intermediate_result,
             )
-            await self.event_publisher.publish_event(feedback_event)
+            await self.event_publisher._publish_event(feedback_event)  # type: ignore[union-attr]
 
         return True
 
@@ -559,16 +560,17 @@ class ProgressiveFeedbackManager:
             status = AgentStatus.COMPLETED if success else AgentStatus.ERROR
             completion_event = create_agent_status_event(
                 agent_id=agent_id,
+                agent_type="unknown",
                 status=status,
-                message=error_message or f"Completed {operation.operation_type}",
                 metadata={
+                    "message": error_message or f"Completed {operation.operation_type}",
                     "operation_id": operation_id,
                     "duration": time.time() - operation.start_time,
                     "final_result": final_result,
                     "success": success,
                 },
             )
-            await self.event_publisher.publish_event(completion_event)
+            await self.event_publisher._publish_event(completion_event)  # type: ignore[union-attr]
 
         # Mark for cleanup
         operation.last_update = time.time()

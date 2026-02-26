@@ -165,7 +165,7 @@ class WorkflowManager:
 
             # Compose response using context, history, and graph metadata
             # Aggregate safety findings from step results (if present)
-            agg_safety: dict[str, Any] = {
+            agg_safety: dict[str, Any] | None = {
                 "level": "safe",
                 "findings": [],
                 "by_step": [],
@@ -316,7 +316,7 @@ class WorkflowManager:
                 "graph_response": graph_response,
             },
             performance_metrics=(
-                self._aggregator.get_metrics() if self._aggregator else {}
+                self._aggregator.snapshot() if self._aggregator else {}
             ),
             therapeutic_validation=agg_safety,
         )

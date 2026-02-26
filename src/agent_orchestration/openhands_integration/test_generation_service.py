@@ -10,6 +10,9 @@ import logging
 from datetime import UTC, datetime
 from pathlib import Path
 
+# Import AI context management
+from typing import Any as _Any
+
 from ..openhands_integration.client import create_openhands_client
 from ..openhands_integration.config import OpenHandsConfig, OpenHandsIntegrationConfig
 from .error_recovery import OpenHandsErrorRecovery
@@ -24,7 +27,8 @@ from .test_task_builder import (
     create_test_generation_task,
 )
 
-# Import AI context management
+AIConversationContextManager: _Any = None
+_ai_context_available = False
 try:
     import sys
     from pathlib import Path as PathLib
@@ -34,14 +38,14 @@ try:
     if str(augment_path) not in sys.path:
         sys.path.insert(0, str(augment_path))
 
-    from context.conversation_manager import (
+    from context.conversation_manager import (  # type: ignore[import]
         AIConversationContextManager,
     )
 
-    AI_CONTEXT_AVAILABLE = True
+    _ai_context_available = True
 except ImportError:
-    AI_CONTEXT_AVAILABLE = False
     logging.warning("AI context management not available, session tracking disabled")
+AI_CONTEXT_AVAILABLE = _ai_context_available
 
 logger = logging.getLogger(__name__)
 

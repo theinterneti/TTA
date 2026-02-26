@@ -58,7 +58,7 @@ class AgentEventIntegrator:
             return False
 
         try:
-            return await self.event_publisher.publish_event(event)
+            return await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
         except Exception as e:
             logger.error(f"Failed to publish event: {e}")
             return False
@@ -254,7 +254,7 @@ class WorkflowEventIntegrator:
             return False
 
         try:
-            return await self.event_publisher.publish_event(event)
+            return await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
         except Exception as e:
             logger.error(f"Failed to publish workflow event: {e}")
             return False
@@ -307,7 +307,7 @@ class WorkflowEventIntegrator:
             }
 
             # Send completion event
-            time.time() - start_time
+            _elapsed = time.time() - start_time
             completion_event = create_workflow_progress_event(
                 workflow_id=workflow_id,
                 workflow_type=workflow_type,
@@ -321,7 +321,7 @@ class WorkflowEventIntegrator:
 
         except Exception as e:
             # Send error event
-            time.time() - start_time
+            _elapsed = time.time() - start_time
             current_step = self.active_workflows[workflow_id]["current_step"]
             total_steps = max(self.active_workflows[workflow_id]["total_steps"], 1)
             error_event = create_workflow_progress_event(

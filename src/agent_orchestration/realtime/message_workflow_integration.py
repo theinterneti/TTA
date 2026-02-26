@@ -171,7 +171,7 @@ class WorkflowAwareMessageCoordinator:
         if received_message and self.track_message_workflows:
             # Check if this message is part of a workflow
             workflow_id = self.message_to_workflow.get(
-                received_message.message.message_id
+                received_message.queue_message.message.message_id
             )
             if workflow_id:
                 await self._update_workflow_on_message_received(
@@ -194,7 +194,8 @@ class WorkflowAwareMessageCoordinator:
         success = await self.redis_coordinator.ack(agent_id, token)
 
         if success and self.track_message_workflows and message_info:
-            workflow_id = self.message_to_workflow.get(message_info.get("message_id"))
+            mid = message_info.get("message_id")
+            workflow_id = self.message_to_workflow.get(mid) if mid is not None else None
             if workflow_id:
                 await self._update_workflow_on_message_ack(
                     workflow_id, message_info, agent_id, workflow_result
@@ -217,7 +218,8 @@ class WorkflowAwareMessageCoordinator:
         success = await self.redis_coordinator.nack(agent_id, token, failure, error)
 
         if success and self.track_message_workflows and message_info:
-            workflow_id = self.message_to_workflow.get(message_info.get("message_id"))
+            mid2 = message_info.get("message_id")
+            workflow_id = self.message_to_workflow.get(mid2) if mid2 is not None else None
             if workflow_id:
                 await self._update_workflow_on_message_nack(
                     workflow_id, message_info, agent_id, failure, error
@@ -331,9 +333,9 @@ class WorkflowAwareMessageCoordinator:
                 workflow_id,
                 current_step=f"Message received by {agent_id.type.value}",
                 metadata={
-                    "received_message_id": received_message.message.message_id,
+                    "received_message_id": received_message.queue_message.message.message_id,
                     "receiving_agent": agent_id.type.value,
-                    "message_type": received_message.message.message_type.value,
+                    "message_type": received_message.queue_message.message.message_type.value,
                 },
             )
 
@@ -423,7 +425,7 @@ class WorkflowAwareMessageCoordinator:
             redis_client = self.redis_coordinator._redis
             reserved_hash_key = self.redis_coordinator._reserved_hash(agent_id)
 
-            payload = await redis_client.hget(reserved_hash_key, token)
+            payload = await redis_client.hget(reserved_hash_key, token)  # type: ignore[misc]
             if payload:
                 import json
 

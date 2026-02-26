@@ -110,7 +110,8 @@ class AgentCoordinationProfiler:
 
         # Extract top functions
         top_functions = []
-        for func_info, (cc, _nc, tt, ct, _callers) in stats.stats.items():
+        raw_stats: dict = stats.stats  # type: ignore[attr-defined]
+        for func_info, (cc, _nc, tt, ct, _callers) in raw_stats.items():
             filename, line_num, func_name = func_info
             top_functions.append(
                 {
@@ -128,11 +129,11 @@ class AgentCoordinationProfiler:
 
         return ProfileResult(
             duration=duration,
-            function_calls=stats.total_calls,
-            primitive_calls=stats.prim_calls,
-            total_time=stats.total_tt,
+            function_calls=stats.total_calls,  # type: ignore[attr-defined]
+            primitive_calls=stats.prim_calls,  # type: ignore[attr-defined]
+            total_time=stats.total_tt,  # type: ignore[attr-defined]
             cumulative_time=sum(
-                ct for (cc, nc, tt, ct, callers) in stats.stats.values()
+                ct for (cc, nc, tt, ct, callers) in raw_stats.values()
             ),
             top_functions=top_functions,
             memory_usage=memory_usage,

@@ -106,7 +106,7 @@ class RedisToolRegistry:
                 return False
             payload = json.dumps(spec.model_dump())
             await self._redis.set(key, payload)
-            await self._redis.sadd(self._idx, f"{spec.name}:{spec.version}")
+            await self._redis.sadd(self._idx, f"{spec.name}:{spec.version}")  # type: ignore[misc]
             await self._redis.set(
                 self._status_key(spec.name, spec.version), ToolStatus.ACTIVE.value
             )
@@ -116,7 +116,7 @@ class RedisToolRegistry:
     async def get_tool(self, name: str, version: str | None = None) -> ToolSpec | None:
         if version is None:
             # pick latest by lexicographic version ordering (simple heuristic)
-            members = await self._redis.smembers(self._idx)
+            members = await self._redis.smembers(self._idx)  # type: ignore[misc]
             candidates: list[tuple[str, str]] = []
             for b in members:
                 s = b.decode() if isinstance(b, (bytes, bytearray)) else b
@@ -189,7 +189,7 @@ class RedisToolRegistry:
                 prefix = filters["prefix"]
 
         # Get all tool IDs
-        members = await self._redis.smembers(self._idx)
+        members = await self._redis.smembers(self._idx)  # type: ignore[misc]
         all_ids: list[str] = []
         for b in members:
             s = b.decode() if isinstance(b, (bytes, bytearray)) else b
@@ -225,7 +225,7 @@ class RedisToolRegistry:
         return out, next_cursor
 
     async def list_tool_ids(self) -> list[str]:
-        members = await self._redis.smembers(self._idx)
+        members = await self._redis.smembers(self._idx)  # type: ignore[misc]
         ids: list[str] = []
         for b in members:
             s = b.decode() if isinstance(b, (bytes, bytearray)) else b
@@ -263,7 +263,7 @@ class RedisToolRegistry:
         await self._redis.set(key, json.dumps(data))
 
     async def cleanup_expired(self, max_idle_seconds: float) -> int:
-        members = await self._redis.smembers(self._idx)
+        members = await self._redis.smembers(self._idx)  # type: ignore[misc]
         removed = 0
         now = time.time()
         for b in members:
@@ -287,6 +287,6 @@ class RedisToolRegistry:
                 await self._redis.set(
                     self._status_key(nm, ver), ToolStatus.DEPRECATED.value
                 )
-                await self._redis.srem(self._idx, f"{nm}:{ver}")
+                await self._redis.srem(self._idx, f"{nm}:{ver}")  # type: ignore[misc]
                 removed += 1
         return removed

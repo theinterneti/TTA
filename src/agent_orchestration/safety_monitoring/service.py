@@ -56,7 +56,7 @@ class SafetyService:
 
     def suggest_alternative(self, level: SafetyLevel, original: str) -> str:
         """Suggest alternative content for unsafe text."""
-        self._validator or TherapeuticValidator()
+        _ = self._validator or TherapeuticValidator()
         # Generate therapeutic alternative based on level
         if level == SafetyLevel.BLOCKED:
             return (

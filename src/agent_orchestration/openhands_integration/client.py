@@ -151,7 +151,7 @@ class OpenHandsClient:
                 from openhands.sdk import Conversation  # noqa: PLC0415
 
                 self._conversation = Conversation(
-                    agent=self._agent,
+                    agent=self._agent,  # type: ignore[arg-type]
                     workspace=str(workspace),
                 )
             except ImportError as e:

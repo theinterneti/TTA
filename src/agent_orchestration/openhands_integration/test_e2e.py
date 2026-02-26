@@ -63,6 +63,7 @@ async def test_task_queue() -> bool:
 
     # Dequeue and verify priority
     task1 = await queue.dequeue()
+    assert task1 is not None, "Dequeue returned None"
     assert task1.priority == TaskPriority.HIGH, "Priority ordering failed"
 
     # Mark completed

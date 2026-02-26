@@ -143,7 +143,7 @@ class ResponseTimeCollector:
         )
 
         # Active timing contexts
-        self.active_timings: dict[str, float] = {}  # context_id -> start_time
+        self.active_timings: dict[str, Any] = {}  # context_id -> start_time
 
         # Statistics cache
         self.stats_cache: dict[str, ResponseTimeStats] = {}

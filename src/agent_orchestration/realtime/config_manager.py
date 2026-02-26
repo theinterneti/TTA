@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
@@ -37,7 +37,7 @@ class WebSocketConfig:
     connection_timeout: float = 60.0
     max_connections: int = 1000
     auth_required: bool = True
-    cors_origins: list[str] = None
+    cors_origins: list[str] = field(default_factory=lambda: ["*"])
 
     def __post_init__(self):
         if self.cors_origins is None:
@@ -86,10 +86,10 @@ class RealtimeConfig:
 
     enabled: bool = False
     environment: RealtimeEnvironment = RealtimeEnvironment.DEVELOPMENT
-    websocket: WebSocketConfig = None
-    events: EventConfig = None
-    progressive_feedback: ProgressiveFeedbackConfig = None
-    optimization: OptimizationConfig = None
+    websocket: WebSocketConfig = field(default_factory=WebSocketConfig)
+    events: EventConfig = field(default_factory=EventConfig)
+    progressive_feedback: ProgressiveFeedbackConfig = field(default_factory=ProgressiveFeedbackConfig)
+    optimization: OptimizationConfig = field(default_factory=OptimizationConfig)
 
     def __post_init__(self):
         if self.websocket is None:

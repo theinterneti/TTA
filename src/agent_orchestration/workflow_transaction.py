@@ -136,7 +136,7 @@ class WorkflowTransaction:
         }
 
     def _from_dump(self, d: dict[str, Any]) -> TxState:
-        tx = TxState(run_id=d.get("run_id"))
+        tx = TxState(run_id=d.get("run_id") or "")
         for s in d.get("savepoints", []) or []:
             tx.savepoints.append(
                 Savepoint(

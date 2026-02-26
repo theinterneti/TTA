@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -21,10 +22,12 @@ if str(tta_prod_path) not in sys.path:
     sys.path.insert(0, str(tta_prod_path))
 
 try:
-    from agents.base import BaseAgent
-    from agents.dynamic_agents import WorldBuildingAgent
-    from agents.ipa import IntentSchema, process_input
-    from agents.narrative_generator import generate_narrative_response
+    from agents.base import BaseAgent  # type: ignore[import]
+    from agents.dynamic_agents import WorldBuildingAgent  # type: ignore[import]
+    from agents.ipa import IntentSchema, process_input  # type: ignore[import]
+    from agents.narrative_generator import (  # type: ignore[import-not-found]
+        generate_narrative_response,
+    )
 except ImportError as e:
     logging.warning(
         f"Could not import real agents: {e}. Using fallback implementations."
@@ -63,7 +66,7 @@ class RetryConfig:
 
 
 async def retry_with_backoff(
-    func: callable, retry_config: RetryConfig, *args, **kwargs
+    func: Callable[..., Any], retry_config: RetryConfig, *args: Any, **kwargs: Any
 ) -> Any:
     """
     Execute a function with exponential backoff retry logic.
@@ -154,7 +157,7 @@ class IPAAdapter:
             # Run the synchronous IPA function in a thread pool with retry logic
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
-                return await loop.run_in_executor(None, process_input, text)
+                return await loop.run_in_executor(None, process_input, text)  # type: ignore[misc]
 
             intent_result = await retry_with_backoff(
                 _process_with_executor, self.retry_config
@@ -219,7 +222,7 @@ class WBAAdapter:
 
         if self._available and neo4j_manager:
             try:
-                self._wba_instance = WorldBuildingAgent(neo4j_manager, self.tools)
+                self._wba_instance = WorldBuildingAgent(neo4j_manager, self.tools)  # type: ignore[misc]
             except Exception as e:
                 logger.warning(f"Failed to initialize WBA instance: {e}")
                 self._available = False
@@ -260,7 +263,7 @@ class WBAAdapter:
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(
-                    None, self._wba_instance.process, wba_input
+                    None, self._wba_instance.process, wba_input  # type: ignore[union-attr]
                 )
 
             result = await retry_with_backoff(_process_with_executor, self.retry_config)
@@ -345,7 +348,7 @@ class NGAAdapter:
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(
-                    None, generate_narrative_response, nga_input
+                    None, generate_narrative_response, nga_input  # type: ignore[misc]
                 )
 
             result = await retry_with_backoff(_process_with_executor, self.retry_config)

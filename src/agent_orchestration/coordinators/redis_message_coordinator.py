@@ -100,7 +100,7 @@ class RedisMessageCoordinator(MessageCoordinator):
     ) -> MessageResult:
         try:
             # Queue backpressure (graceful overflow handling)
-            qlen = await self._redis.llen(self._queue_key(recipient))
+            qlen = await self._redis.llen(self._queue_key(recipient))  # type: ignore[misc]
             if qlen is not None and qlen >= self._queue_size:
                 return MessageResult(
                     message_id=message.message_id, delivered=False, error="queue full"
@@ -118,7 +118,7 @@ class RedisMessageCoordinator(MessageCoordinator):
             )
             payload = json.dumps(qmsg.model_dump())
             # Legacy/audit list
-            await self._redis.rpush(self._queue_key(recipient), payload)
+            await self._redis.rpush(self._queue_key(recipient), payload)  # type: ignore[misc]
             # Schedule into priority zset (available now)
             score = _now_us()
             await self._redis.zadd(
@@ -153,7 +153,7 @@ class RedisMessageCoordinator(MessageCoordinator):
         async def _store():
             with contextlib.suppress(Exception):
                 if message_types:
-                    await self._redis.sadd(
+                    await self._redis.sadd(  # type: ignore[misc]
                         self._subs_key(agent_id), *[mt.value for mt in message_types]
                     )
 
@@ -186,8 +186,8 @@ class RedisMessageCoordinator(MessageCoordinator):
             token = f"res_{uuid.uuid4().hex[:16]}"
             deadline = now + int(visibility_timeout * 1_000_000)
             # Store reservation
-            await self._redis.hset(self._reserved_hash(agent_id), token, payload)
-            await self._redis.zadd(
+            await self._redis.hset(self._reserved_hash(agent_id), token, payload)  # type: ignore[misc]
+            await self._redis.zadd(  # type: ignore[misc]
                 self._reserved_deadlines(agent_id), {token: deadline}
             )
             # Return wrapper
@@ -203,13 +203,13 @@ class RedisMessageCoordinator(MessageCoordinator):
 
     async def ack(self, agent_id: AgentId, token: str) -> bool:
         # Remove reservation and underlying audit list entry
-        payload = await self._redis.hget(self._reserved_hash(agent_id), token)
-        await self._redis.hdel(self._reserved_hash(agent_id), token)
-        await self._redis.zrem(self._reserved_deadlines(agent_id), token)
+        payload = await self._redis.hget(self._reserved_hash(agent_id), token)  # type: ignore[misc]
+        await self._redis.hdel(self._reserved_hash(agent_id), token)  # type: ignore[misc]
+        await self._redis.zrem(self._reserved_deadlines(agent_id), token)  # type: ignore[misc]
         if payload:
             # Remove one occurrence from audit list
             with contextlib.suppress(Exception):
-                await self._redis.lrem(self._queue_key(agent_id), 1, payload)
+                await self._redis.lrem(self._queue_key(agent_id), 1, payload)  # type: ignore[misc]
             return True
         return False
 
@@ -220,9 +220,9 @@ class RedisMessageCoordinator(MessageCoordinator):
         failure: FailureType = FailureType.TRANSIENT,
         error: str | None = None,
     ) -> bool:
-        payload = await self._redis.hget(self._reserved_hash(agent_id), token)
-        await self._redis.hdel(self._reserved_hash(agent_id), token)
-        await self._redis.zrem(self._reserved_deadlines(agent_id), token)
+        payload = await self._redis.hget(self._reserved_hash(agent_id), token)  # type: ignore[misc]
+        await self._redis.hdel(self._reserved_hash(agent_id), token)  # type: ignore[misc]
+        await self._redis.zrem(self._reserved_deadlines(agent_id), token)  # type: ignore[misc]
         if not payload:
             return False
         try:
@@ -233,15 +233,15 @@ class RedisMessageCoordinator(MessageCoordinator):
             qm.last_error = error
             updated = json.dumps(qm.model_dump())
             # Also ensure audit list has a canonical payload form for LREM cleanup later
-            await self._redis.lrem(self._queue_key(agent_id), 1, payload)
-            await self._redis.rpush(self._queue_key(agent_id), updated)
+            await self._redis.lrem(self._queue_key(agent_id), 1, payload)  # type: ignore[misc]
+            await self._redis.rpush(self._queue_key(agent_id), updated)  # type: ignore[misc]
 
             # DLQ on permanent failure or when attempts exceed allowed retries
             if (
                 failure == FailureType.PERMANENT
                 or qm.delivery_attempts > self._retry_attempts
             ):
-                await self._redis.rpush(self._dlq_key(agent_id), updated)
+                await self._redis.rpush(self._dlq_key(agent_id), updated)  # type: ignore[misc]
                 with contextlib.suppress(Exception):
                     self.metrics.inc_permanent(1)
                 # Alert/notify: administrator visibility for persistent failures
@@ -255,7 +255,7 @@ class RedisMessageCoordinator(MessageCoordinator):
                         error,
                     )
                 # Also remove the latest audit copy to avoid duplication
-                await self._redis.lrem(self._queue_key(agent_id), 1, updated)
+                await self._redis.lrem(self._queue_key(agent_id), 1, updated)  # type: ignore[misc]
                 return True
 
             # Schedule retry with exponential backoff
@@ -265,7 +265,7 @@ class RedisMessageCoordinator(MessageCoordinator):
                 self._backoff_max,
             )
             score = _now_us() + int(delay * 1_000_000)
-            await self._redis.zadd(
+            await self._redis.zadd(  # type: ignore[misc]
                 self._sched_key(agent_id, int(qm.priority)), {updated: score}
             )
             with contextlib.suppress(Exception):
@@ -274,7 +274,7 @@ class RedisMessageCoordinator(MessageCoordinator):
             return True
         except Exception:
             # If we cannot parse, dead-letter to avoid poison-pill loops
-            await self._redis.rpush(self._dlq_key(agent_id), payload)
+            await self._redis.rpush(self._dlq_key(agent_id), payload)  # type: ignore[misc]
             return False
 
     async def recover_pending(self, agent_id: AgentId | None = None) -> int:
@@ -315,7 +315,7 @@ class RedisMessageCoordinator(MessageCoordinator):
             tokens = await self._redis.zrangebyscore(dkey, min=-1, max=now)
             for t in tokens:
                 token = t.decode() if isinstance(t, (bytes, bytearray)) else t
-                payload = await self._redis.hget(self._reserved_hash(aid), token)
+                payload = await self._redis.hget(self._reserved_hash(aid), token)  # type: ignore[misc]
                 if payload:
                     try:
                         pdata = (
@@ -325,15 +325,15 @@ class RedisMessageCoordinator(MessageCoordinator):
                         qm = QueueMessage(**data)
                         score = _now_us()
                         # Re-schedule using the original payload to preserve audit list matching
-                        await self._redis.zadd(
+                        await self._redis.zadd(  # type: ignore[misc]
                             self._sched_key(aid, int(qm.priority)), {payload: score}
                         )
                         recovered_total += 1
                         recovered_for_agent += 1
                     except Exception:
-                        await self._redis.rpush(self._dlq_key(aid), payload)
-                await self._redis.hdel(self._reserved_hash(aid), token)
-                await self._redis.zrem(self._reserved_deadlines(aid), token)
+                        await self._redis.rpush(self._dlq_key(aid), payload)  # type: ignore[misc]
+                await self._redis.hdel(self._reserved_hash(aid), token)  # type: ignore[misc]
+                await self._redis.zrem(self._reserved_deadlines(aid), token)  # type: ignore[misc]
             if recovered_for_agent:
                 agent_key = f"{aid.type.name.lower()}:{aid.instance or 'default'}"
                 per_agent_counts[agent_key] = recovered_for_agent

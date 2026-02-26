@@ -357,7 +357,7 @@ class ResourceManager:
                 meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
                 usage.gpu_memory_total_bytes.append(int(meminfo.total))
                 usage.gpu_memory_used_bytes.append(int(meminfo.used))
-                pct = (meminfo.used / meminfo.total * 100.0) if meminfo.total else 0.0
+                pct = (int(meminfo.used) / int(meminfo.total) * 100.0) if meminfo.total else 0.0
                 usage.gpu_utilization.append(float(pct))
             pynvml.nvmlShutdown()
             return

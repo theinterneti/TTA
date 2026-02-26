@@ -56,6 +56,7 @@ class WebSocketConnection:
         self.subscriptions: set[EventType] = set()
         self.filters: EventFilter = EventFilter()
         self.is_authenticated = False
+        self.agent_subscriptions: set[str] = set()
 
     def to_dict(self) -> dict[str, Any]:
         """Convert connection to dictionary representation."""
@@ -311,9 +312,16 @@ class WebSocketConnectionManager:
         self, connection: WebSocketConnection, token: str
     ) -> bool:
         """Authenticate connection with JWT token using existing auth system."""
+        # Define fallback AuthenticationError in case the import fails
+        _AuthenticationError: type[Exception] = Exception
         try:
             # Import the existing JWT verification function
-            from src.player_experience.api.auth import AuthenticationError, verify_token
+            from src.player_experience.api.auth import (  # type: ignore[assignment]
+                AuthenticationError as _AuthenticationError,
+            )
+            from src.player_experience.api.auth import (
+                verify_token,
+            )
 
             # Verify the token using existing auth system
             token_data = verify_token(token)
@@ -367,7 +375,7 @@ class WebSocketConnectionManager:
 
             return True
 
-        except AuthenticationError as e:
+        except _AuthenticationError as e:
             await self._send_error(
                 connection, "INVALID_TOKEN", f"Token verification failed: {str(e)}"
             )
@@ -1088,27 +1096,28 @@ class WebSocketConnectionManager:
 
         # Agent type filtering
         if filters.agent_types and hasattr(event, "agent_type"):
-            if event.agent_type not in filters.agent_types:
+            if event.agent_type not in filters.agent_types:  # type: ignore[union-attr]
                 return False
 
         # Workflow type filtering
         if filters.workflow_types and hasattr(event, "workflow_type"):
-            if event.workflow_type not in filters.workflow_types:
+            if event.workflow_type not in filters.workflow_types:  # type: ignore[union-attr]
                 return False
 
         # User ID filtering
         if filters.user_ids and hasattr(event, "user_id"):
-            if event.user_id and event.user_id not in filters.user_ids:
+            uid = event.user_id  # type: ignore[union-attr]
+            if uid and uid not in filters.user_ids:
                 return False
 
         # Severity level filtering (for error events)
         if filters.severity_levels and hasattr(event, "severity"):
-            if event.severity not in filters.severity_levels:
+            if event.severity not in filters.severity_levels:  # type: ignore[union-attr]
                 return False
 
         # Progress filtering (for progress events)
         if hasattr(event, "progress_percentage"):
-            progress = event.progress_percentage
+            progress: float = event.progress_percentage  # type: ignore[union-attr]
 
             if filters.min_progress is not None and progress < filters.min_progress:
                 return False
@@ -1119,7 +1128,7 @@ class WebSocketConnectionManager:
         # Agent-specific filtering
         if hasattr(event, "agent_id"):
             # Check if user is authorized to see this agent's events
-            if not self._is_authorized_for_agent(connection, event.agent_id):
+            if not self._is_authorized_for_agent(connection, event.agent_id):  # type: ignore[union-attr]
                 return False
 
         return True
@@ -1141,9 +1150,6 @@ class WebSocketConnectionManager:
             return False
 
         # Add agent-specific subscription
-        if not hasattr(connection, "agent_subscriptions"):
-            connection.agent_subscriptions = set()
-
         connection.agent_subscriptions.add(agent_id)
 
         # Also subscribe to agent status events if not already subscribed
@@ -1160,8 +1166,7 @@ class WebSocketConnectionManager:
         if not connection:
             return False
 
-        if hasattr(connection, "agent_subscriptions"):
-            connection.agent_subscriptions.discard(agent_id)
+        connection.agent_subscriptions.discard(agent_id)
 
         logger.debug(f"Connection {connection_id} unsubscribed from agent {agent_id}")
         return True
@@ -1240,6 +1245,7 @@ class WebSocketConnectionManager:
             channel_prefix = self.config.get(
                 "agent_orchestration.realtime.events.redis_channel_prefix", "ao:events"
             )
+            assert self.redis_client is not None
             self._event_subscriber = EventSubscriber(
                 redis_client=self.redis_client,
                 channel_prefix=channel_prefix,

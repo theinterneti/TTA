@@ -12,20 +12,21 @@ from __future__ import annotations
 
 from typing import Any
 
+_langgraph_available = False
 try:  # Optional dependency
     from langgraph.graph import END, START, StateGraph  # type: ignore
 
-    _LANGGRAPH_AVAILABLE = True
+    _langgraph_available = True
 except Exception:  # pragma: no cover - runtime optional
     StateGraph = None  # type: ignore
     START = "START"  # type: ignore
     END = "END"  # type: ignore
-    _LANGGRAPH_AVAILABLE = False
+_LANGGRAPH_AVAILABLE = _langgraph_available
 
-from .workflow import (
+from .workflow import (  # noqa: E402
     OrchestrationResponse as WorkflowOrchestrationResponse,
 )
-from .workflow import (
+from .workflow import (  # noqa: E402
     WorkflowDefinition,
 )
 
@@ -42,7 +43,7 @@ class LangGraphWorkflowBuilder:
             }
 
         # Create a minimal StateGraph where each step is a node that appends to history
-        sg = StateGraph(dict)
+        sg = StateGraph(dict)  # type: ignore[operator]
 
         def _node_fn_factory(agent_name: str):
             def _fn(state: dict[str, Any]) -> dict[str, Any]:
@@ -55,7 +56,7 @@ class LangGraphWorkflowBuilder:
 
         # Add nodes for sequential steps
         for step in definition.agent_sequence:
-            sg.add_node(step.agent.value, _node_fn_factory(step.agent.value))
+            sg.add_node(step.agent.value, _node_fn_factory(step.agent.value))  # type: ignore[arg-type]
 
         # Wire edges for the sequence
         if definition.agent_sequence:

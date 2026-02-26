@@ -193,7 +193,7 @@ class IntelligentAgentCoordinator:
         self.agent_profiles[agent_id] = profile
         logger.info(f"Registered agent {agent_id} ({agent_type.value})")
 
-    async def schedule_workflow(self, request: WorkflowRequest) -> SchedulingDecision:
+    async def schedule_workflow(self, request: WorkflowRequest) -> SchedulingDecision | None:
         """Schedule a workflow for execution."""
         # Add to scheduling queue with priority
         priority_score = self._calculate_priority_score(request)

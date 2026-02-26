@@ -26,11 +26,15 @@ Example:
 import logging
 from pathlib import Path
 
+# Import development observability
+from typing import Any as _Any
+
 from .config import OpenHandsIntegrationConfig
 from .test_generation_models import TestTaskSpecification, TestValidationResult
 from .test_generation_service import UnitTestGenerationService
 
-# Import development observability
+_observability_available = False
+get_collector: _Any = None
 try:
     import sys
     from pathlib import Path as PathLib
@@ -42,14 +46,14 @@ try:
     if str(observability_path) not in sys.path:
         sys.path.insert(0, str(observability_path))
 
-    from dev_metrics import get_collector
+    from dev_metrics import get_collector  # type: ignore[import]
 
-    _OBSERVABILITY_AVAILABLE = True
+    _observability_available = True
 except ImportError:
-    _OBSERVABILITY_AVAILABLE = False
     logging.warning(
         "Development observability not available, metrics tracking disabled"
     )
+_OBSERVABILITY_AVAILABLE = _observability_available
 
 
 # Create async-compatible track_execution decorator

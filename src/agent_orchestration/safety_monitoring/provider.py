@@ -7,12 +7,14 @@ from __future__ import annotations
 import contextlib  # BUG FIX: Added missing import (line 3375 uses contextlib.suppress())
 import json
 import time
-from typing import Any, cast
+from typing import Any
 
 try:
     import yaml  # type: ignore
 except Exception:  # pragma: no cover
     yaml = None  # Optional; JSON works without it
+
+from typing import Any as _Any  # noqa: E402
 
 try:
     from redis.asyncio import Redis as _Redis
@@ -30,7 +32,7 @@ class SafetyRulesProvider:
 
     def __init__(
         self,
-        redis_client: _Redis | None = None,
+        redis_client: _Any | None = None,
         *,
         redis_key: str = "ao:safety:rules",
         cache_ttl_s: float = 2.0,
@@ -54,7 +56,7 @@ class SafetyRulesProvider:
         raw: str | None = None
         if self._redis is not None:
             try:
-                b = await cast("_Redis", self._redis).get(self._key)
+                b = await self._redis.get(self._key)
                 if b:
                     raw = b.decode() if isinstance(b, (bytes, bytearray)) else str(b)
                     cfg = json.loads(raw)

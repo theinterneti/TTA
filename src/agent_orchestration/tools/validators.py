@@ -14,6 +14,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Any
 
 
 class ValidationSeverity(StrEnum):
@@ -41,7 +42,7 @@ class ValidationResult:
     is_valid: bool
     score: float  # 0.0-1.0 for overall quality, or 1-5 for description quality
     findings: list[ValidationFinding] = field(default_factory=list)
-    details: dict[str, any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 class ToolNameValidator:

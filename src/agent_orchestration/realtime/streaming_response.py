@@ -72,7 +72,7 @@ class StreamingWorkflowResponse:
             # Add callback for progress updates
             if self.operation_id:
                 self.feedback_manager.add_operation_callback(
-                    self.operation_id, self._handle_progress_update
+                    self.operation_id, self._handle_progress_update  # type: ignore[arg-type]
                 )
 
         logger.info(f"Started streaming for workflow: {self.workflow_id}")

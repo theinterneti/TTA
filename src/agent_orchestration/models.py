@@ -298,7 +298,7 @@ class CapabilityMatchResult(BaseModel):
         default=True, description="Agent availability at match time"
     )
     estimated_wait_time_ms: int | None = Field(
-        None, description="Estimated wait time for agent"
+        default=None, description="Estimated wait time for agent"
     )
 
 

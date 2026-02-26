@@ -21,12 +21,15 @@ from ..monitoring import SystemMonitor, get_system_monitor
 from .event_publisher import EventPublisher
 
 # Import alerting system with fallback
+_alerting_available = False
 try:
-    from ...monitoring.realtime_alerts import get_alert_manager
+    from ...monitoring.realtime_alerts import get_alert_manager as _get_alert_manager
 
-    ALERTING_AVAILABLE = True
+    _alerting_available = True
 except ImportError:
-    ALERTING_AVAILABLE = False
+    _get_alert_manager = None  # type: ignore[assignment]
+
+ALERTING_AVAILABLE = _alerting_available
 
 logger = logging.getLogger(__name__)
 
@@ -88,11 +91,11 @@ class RealtimeDashboardManager:
 
         # Alert manager integration
         self.alert_manager = None
-        if ALERTING_AVAILABLE:
+        if ALERTING_AVAILABLE and _get_alert_manager is not None:
             try:
-                self.alert_manager = get_alert_manager()
+                self.alert_manager = _get_alert_manager()
                 self.alert_manager.add_notification_handler(
-                    self._handle_alert_notification
+                    self._handle_alert_notification_sync
                 )
             except Exception as e:
                 logger.warning(f"Could not initialize alert manager: {e}")
@@ -233,13 +236,12 @@ class RealtimeDashboardManager:
             dashboard_type=DashboardType.SYSTEM_HEALTH,
             timestamp=time.time(),
             data={
-                "cpu_usage": metrics.get("cpu_usage", 0.0),
-                "memory_usage": metrics.get("memory_usage", 0.0),
-                "disk_usage": metrics.get("disk_usage", 0.0),
-                "network_io": metrics.get("network_io", {}),
-                "active_connections": metrics.get("active_connections", 0),
-                "uptime": metrics.get("uptime", 0.0),
-                "health_status": self._determine_health_status(metrics),
+                "cpu_usage": metrics.cpu_usage_percent,
+                "memory_usage_mb": metrics.memory_usage_mb,
+                "active_connections": metrics.active_connections,
+                "concurrent_workflows": metrics.concurrent_workflows,
+                "queue_depth": metrics.queue_depth,
+                "health_status": self._determine_health_status_from_metrics(metrics),
             },
             metadata={
                 "update_count": self.update_counts.get(DashboardType.SYSTEM_HEALTH, 0)
@@ -255,26 +257,29 @@ class RealtimeDashboardManager:
 
         agent_metrics = self.system_monitor.get_all_agent_metrics()
 
+        # Convert AgentMetrics dataclasses to dicts for the dashboard
+        agent_metrics_dicts: dict[str, dict[str, Any]] = {
+            agent_id: {
+                "response_time_avg": m.average_response_time,
+                "throughput_rps": m.requests_per_second,
+                "error_rate": m.error_rate,
+                "total_requests": m.total_requests,
+                "last_activity": m.last_request_time or 0.0,
+            }
+            for agent_id, m in agent_metrics.items()
+        }
+
         dashboard_data = DashboardData(
             dashboard_type=DashboardType.AGENT_PERFORMANCE,
             timestamp=time.time(),
             data={
                 "total_agents": len(agent_metrics),
                 "active_agents": len(
-                    [m for m in agent_metrics.values() if m.get("status") == "active"]
+                    [m for m in agent_metrics.values() if m.total_requests > 0]
                 ),
-                "agent_details": {
-                    agent_id: {
-                        "response_time_avg": metrics.get("response_time_avg", 0.0),
-                        "throughput_rps": metrics.get("throughput_rps", 0.0),
-                        "error_rate": metrics.get("error_rate", 0.0),
-                        "queue_depth": metrics.get("queue_depth", 0),
-                        "last_activity": metrics.get("last_activity", 0.0),
-                    }
-                    for agent_id, metrics in agent_metrics.items()
-                },
+                "agent_details": agent_metrics_dicts,
                 "performance_summary": self._calculate_performance_summary(
-                    agent_metrics
+                    agent_metrics_dicts
                 ),
             },
         )
@@ -326,15 +331,13 @@ class RealtimeDashboardManager:
             dashboard_type=DashboardType.RESOURCE_USAGE,
             timestamp=time.time(),
             data={
-                "cpu_cores": metrics.get("cpu_cores", 1),
-                "cpu_usage_per_core": metrics.get("cpu_usage_per_core", []),
-                "memory_total": metrics.get("memory_total", 0),
-                "memory_available": metrics.get("memory_available", 0),
-                "disk_total": metrics.get("disk_total", 0),
-                "disk_free": metrics.get("disk_free", 0),
-                "network_bytes_sent": metrics.get("network_bytes_sent", 0),
-                "network_bytes_recv": metrics.get("network_bytes_recv", 0),
-                "process_count": metrics.get("process_count", 0),
+                "cpu_usage_percent": metrics.cpu_usage_percent,
+                "memory_usage_mb": metrics.memory_usage_mb,
+                "active_connections": metrics.active_connections,
+                "queue_depth": metrics.queue_depth,
+                "concurrent_workflows": metrics.concurrent_workflows,
+                "peak_concurrent_workflows": metrics.peak_concurrent_workflows,
+                "total_workflows": metrics.total_workflows,
             },
         )
 
@@ -380,7 +383,7 @@ class RealtimeDashboardManager:
         # Send recent data points
         recent_data = data_list[-10:]  # Last 10 data points
 
-        {
+        _ = {
             "event_type": "dashboard_snapshot",
             "dashboard_type": dashboard_type.value,
             "data_points": [
@@ -417,13 +420,23 @@ class RealtimeDashboardManager:
                 logger.error(f"Error in dashboard cleanup loop: {e}")
 
     def _determine_health_status(self, metrics: dict[str, Any]) -> str:
-        """Determine overall system health status."""
+        """Determine overall system health status from dict."""
         cpu_usage = metrics.get("cpu_usage", 0.0)
         memory_usage = metrics.get("memory_usage", 0.0)
 
         if cpu_usage > 90 or memory_usage > 90:
             return "critical"
         if cpu_usage > 70 or memory_usage > 70:
+            return "warning"
+        return "healthy"
+
+    def _determine_health_status_from_metrics(self, metrics: Any) -> str:
+        """Determine overall system health status from SystemMetrics dataclass."""
+        cpu_usage = metrics.cpu_usage_percent
+
+        if cpu_usage > 90:
+            return "critical"
+        if cpu_usage > 70:
             return "warning"
         return "healthy"
 
@@ -449,6 +462,19 @@ class RealtimeDashboardManager:
             "total_throughput": sum(throughputs),
             "avg_error_rate": sum(error_rates) / len(error_rates),
         }
+
+    def _handle_alert_notification_sync(self, alert) -> None:
+        """Sync wrapper for alert notification handler (required by alert manager API)."""
+        import asyncio as _asyncio
+
+        try:
+            loop = _asyncio.get_event_loop()
+            if loop.is_running():
+                loop.create_task(self._handle_alert_notification(alert))
+            else:
+                loop.run_until_complete(self._handle_alert_notification(alert))
+        except Exception as e:
+            logger.error(f"Error scheduling alert notification: {e}")
 
     async def _handle_alert_notification(self, alert):
         """Handle alert notifications from the alert manager."""
@@ -483,7 +509,7 @@ class RealtimeDashboardManager:
             self.dashboard_data[DashboardType.ALERTS].append(alert_data)
 
             # Broadcast to subscribers
-            await self._broadcast_dashboard_update(DashboardType.ALERTS, alert_data)
+            await self._broadcast_dashboard_update(alert_data)
 
         except Exception as e:
             logger.error(f"Error handling alert notification: {e}")
@@ -525,7 +551,7 @@ class RealtimeDashboardManager:
             )
 
             self.dashboard_data[DashboardType.ALERTS].append(dashboard_data)
-            await self._broadcast_dashboard_update(DashboardType.ALERTS, dashboard_data)
+            await self._broadcast_dashboard_update(dashboard_data)
 
         except Exception as e:
             logger.error(f"Error updating alerts data: {e}")

@@ -74,7 +74,7 @@ class RedisAgentRegistry(AgentRegistry):
         self._default_matching_strategy = MatchingStrategy.WEIGHTED_SCORE
 
     # ---- Key helpers ----
-    def _key(self, agent_id: AgentId) -> str:
+    def _key(self, agent_id: AgentId) -> str:  # type: ignore[override]
         return (
             f"{self._pfx}:agents:{agent_id.type.value}:{agent_id.instance or 'default'}"
         )
@@ -134,10 +134,11 @@ class RedisAgentRegistry(AgentRegistry):
                     cap_set = await agent.get_capabilities()
                     if isinstance(cap_set, AgentCapabilitySet):
                         capabilities = cap_set.dict()
-                elif hasattr(agent, "capabilities") and agent.capabilities:
+                elif hasattr(agent, "capabilities") and getattr(agent, "capabilities", None):
                     # Fallback for agents with direct capabilities attribute
-                    if isinstance(agent.capabilities, AgentCapabilitySet):
-                        capabilities = agent.capabilities.dict()
+                    cap_attr = agent.capabilities  # type: ignore[union-attr]
+                    if isinstance(cap_attr, AgentCapabilitySet):
+                        capabilities = cap_attr.dict()
             except Exception:
                 capabilities = None
 
@@ -157,14 +158,14 @@ class RedisAgentRegistry(AgentRegistry):
                 payload["capabilities"] = capabilities
 
             px = max(1, int(self._ttl * 1000))
-            await self._redis.set(key, json.dumps(payload), px=px)
-            await self._redis.sadd(self._index_key(), key)
+            await self._redis.set(key, json.dumps(payload), px=px)  # type: ignore[misc]
+            await self._redis.sadd(self._index_key(), key)  # type: ignore[misc]
 
             # Store capabilities separately for efficient searching
             if capabilities is not None:
                 cap_key = self._capability_key(agent.agent_id)
-                await self._redis.set(cap_key, json.dumps(capabilities), px=px)
-                await self._redis.sadd(self._capability_index_key(), cap_key)
+                await self._redis.set(cap_key, json.dumps(capabilities), px=px)  # type: ignore[misc]
+                await self._redis.sadd(self._capability_index_key(), cap_key)  # type: ignore[misc]
 
             # Detect and publish status changes
             await self._detect_and_publish_status_changes(agent)
@@ -177,12 +178,12 @@ class RedisAgentRegistry(AgentRegistry):
         cap_key = self._capability_key(agent_id)
         with contextlib.suppress(Exception):
             # Remove agent data
-            await self._redis.delete(key)
-            await self._redis.srem(self._index_key(), key)
+            await self._redis.delete(key)  # type: ignore[misc]
+            await self._redis.srem(self._index_key(), key)  # type: ignore[misc]
 
             # Remove capability data
-            await self._redis.delete(cap_key)
-            await self._redis.srem(self._capability_index_key(), cap_key)
+            await self._redis.delete(cap_key)  # type: ignore[misc]
+            await self._redis.srem(self._capability_index_key(), cap_key)  # type: ignore[misc]
 
             # Publish deregistration event
             await self._publish_agent_deregistered(agent_id)
@@ -235,10 +236,11 @@ class RedisAgentRegistry(AgentRegistry):
                     cap_set = await agent.get_capabilities()
                     if isinstance(cap_set, AgentCapabilitySet):
                         capabilities = cap_set.dict()
-                elif hasattr(agent, "capabilities") and agent.capabilities:
+                elif hasattr(agent, "capabilities") and getattr(agent, "capabilities", None):
                     # Fallback for agents with direct capabilities attribute
-                    if isinstance(agent.capabilities, AgentCapabilitySet):
-                        capabilities = agent.capabilities.dict()
+                    cap_attr = agent.capabilities  # type: ignore[union-attr]
+                    if isinstance(cap_attr, AgentCapabilitySet):
+                        capabilities = cap_attr.dict()
             except Exception:
                 capabilities = None
 
@@ -258,13 +260,13 @@ class RedisAgentRegistry(AgentRegistry):
                 payload["capabilities"] = capabilities
 
             px = max(1, int(self._ttl * 1000))
-            await self._redis.set(key, json.dumps(payload), px=px)
+            await self._redis.set(key, json.dumps(payload), px=px)  # type: ignore[misc]
 
             # Update capability data separately for efficient searching
             if capabilities is not None:
                 cap_key = self._capability_key(agent.agent_id)
-                await self._redis.set(cap_key, json.dumps(capabilities), px=px)
-                await self._redis.sadd(self._capability_index_key(), cap_key)
+                await self._redis.set(cap_key, json.dumps(capabilities), px=px)  # type: ignore[misc]
+                await self._redis.sadd(self._capability_index_key(), cap_key)  # type: ignore[misc]
 
             # Detect and publish status changes (including heartbeat events)
             await self._detect_and_publish_status_changes(agent)
@@ -298,7 +300,7 @@ class RedisAgentRegistry(AgentRegistry):
     # ---- Discovery across processes ----
     async def list_registered(self) -> list[dict[str, Any]]:
         try:
-            keys = await self._redis.smembers(self._index_key())
+            keys = await self._redis.smembers(self._index_key())  # type: ignore[misc]
             agents: list[dict[str, Any]] = []
             for bkey in keys:
                 k = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
@@ -450,8 +452,8 @@ class RedisAgentRegistry(AgentRegistry):
             capabilities_data = capability_set.dict()
             px = max(1, int(self._ttl * 1000))
 
-            await self._redis.set(cap_key, json.dumps(capabilities_data), px=px)
-            await self._redis.sadd(self._capability_index_key(), cap_key)
+            await self._redis.set(cap_key, json.dumps(capabilities_data), px=px)  # type: ignore[misc]
+            await self._redis.sadd(self._capability_index_key(), cap_key)  # type: ignore[misc]
 
             logger.debug(
                 f"Registered {len(capability_set.capabilities)} capabilities for {agent_id.type.value}:{agent_id.instance}"
@@ -483,7 +485,7 @@ class RedisAgentRegistry(AgentRegistry):
     async def list_all_capabilities(self) -> list[AgentCapabilitySet]:
         """List all registered agent capabilities."""
         try:
-            cap_keys = await self._redis.smembers(self._capability_index_key())
+            cap_keys = await self._redis.smembers(self._capability_index_key())  # type: ignore[misc]
             capability_sets = []
 
             for bkey in cap_keys:
@@ -655,8 +657,8 @@ class RedisAgentRegistry(AgentRegistry):
         """
         try:
             # Get all capability keys
-            cap_keys = await self._redis.smembers(self._capability_index_key())
-            agent_keys = await self._redis.smembers(self._index_key())
+            cap_keys = await self._redis.smembers(self._capability_index_key())  # type: ignore[misc]
+            agent_keys = await self._redis.smembers(self._index_key())  # type: ignore[misc]
 
             # Convert agent keys to expected capability key format
             expected_cap_keys = set()
@@ -682,8 +684,8 @@ class RedisAgentRegistry(AgentRegistry):
             removed_count = 0
             for stale_key in stale_keys:
                 try:
-                    await self._redis.delete(stale_key)
-                    await self._redis.srem(self._capability_index_key(), stale_key)
+                    await self._redis.delete(stale_key)  # type: ignore[misc]
+                    await self._redis.srem(self._capability_index_key(), stale_key)  # type: ignore[misc]
                     removed_count += 1
                 except Exception as e:
                     logger.warning(
@@ -733,8 +735,8 @@ class RedisAgentRegistry(AgentRegistry):
             Dictionary with freshness statistics
         """
         try:
-            cap_keys = await self._redis.smembers(self._capability_index_key())
-            agent_keys = await self._redis.smembers(self._index_key())
+            cap_keys = await self._redis.smembers(self._capability_index_key())  # type: ignore[misc]
+            agent_keys = await self._redis.smembers(self._index_key())  # type: ignore[misc]
 
             total_capabilities = len(cap_keys)
             total_agents = len(agent_keys)

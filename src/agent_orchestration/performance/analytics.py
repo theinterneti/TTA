@@ -458,7 +458,8 @@ class PerformanceAnalytics:
             recommendations.append(rec)
 
         # General optimization recommendations
-        overall_p95 = statistics.mean([s.p95_duration for s in statistics.values()])
+        _p95_values = [s.p95_duration for s in statistics.values()]
+        overall_p95 = sum(_p95_values) / len(_p95_values) if _p95_values else 0.0
         if overall_p95 > 2.0:
             rec = OptimizationRecommendation(
                 recommendation_id="general_optimization",

@@ -146,7 +146,7 @@ class OptimizedOpenHandsClient:
         try:
             from openhands.sdk import Agent  # noqa: PLC0415
 
-            self._agent = Agent(llm=self._llm)
+            self._agent = Agent(llm=self._llm)  # type: ignore[arg-type]
             self._agent_cache[cache_key] = self._agent
             logger.debug(f"Initialized new Agent instance (cache_key={cache_key})")
         except ImportError as e:
@@ -160,7 +160,7 @@ class OptimizedOpenHandsClient:
 
             # Create new conversation (lightweight operation)
             self._conversation = Conversation(
-                agent=self._agent,
+                agent=self._agent,  # type: ignore[arg-type]
                 workspace=str(self.config.workspace_path),
             )
             logger.debug("Reset conversation for next task")
@@ -187,6 +187,7 @@ class OptimizedOpenHandsClient:
 
             # Execute task
             logger.info(f"Executing task: {task_description[:80]}...")
+            assert self._conversation is not None
             self._conversation.send_message(task_description)
             self._conversation.run()
 

@@ -299,20 +299,23 @@ class EventPublisher:
     async def _publish_to_redis(self, event: WebSocketEvent) -> bool:
         """Publish event to Redis pub/sub channels."""
         try:
+            if not self.redis_client:
+                return False
             event_json = event.model_dump_json()
 
             # Publish to general event channel
-            await self.redis_client.publish(f"{self.channel_prefix}:all", event_json)
+            await self.redis_client.publish(f"{self.channel_prefix}:all", event_json)  # type: ignore[misc]
 
             # Publish to event-type specific channel
-            await self.redis_client.publish(
+            await self.redis_client.publish(  # type: ignore[misc]
                 f"{self.channel_prefix}:{event.event_type.value}", event_json
             )
 
             # Publish to user-specific channel if user_id is available
-            if hasattr(event, "user_id") and event.user_id:
-                await self.redis_client.publish(
-                    f"{self.channel_prefix}:user:{event.user_id}", event_json
+            user_id = getattr(event, "user_id", None)
+            if user_id:
+                await self.redis_client.publish(  # type: ignore[misc]
+                    f"{self.channel_prefix}:user:{user_id}", event_json
                 )
 
             logger.debug(f"Published event to Redis: {event.event_type.value}")

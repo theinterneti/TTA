@@ -159,7 +159,7 @@ class UnifiedAgentOrchestrator:
         try:
             # Connect to Redis
             self.redis = aioredis.from_url(self.redis_url, decode_responses=True)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             self.initialized = True
             logger.info("Unified Agent Orchestrator initialized successfully")
@@ -246,8 +246,8 @@ class UnifiedAgentOrchestrator:
             return {
                 "workflow_id": workflow_id,
                 "success": True,
-                "narrative": state.nga_result.get("story", ""),
-                "intent": state.ipa_result.get("routing", {}).get("intent"),
+                "narrative": (state.nga_result or {}).get("story", ""),
+                "intent": (state.ipa_result or {}).get("routing", {}).get("intent"),
                 "world_updates": state.wba_result,
                 "safety_level": state.safety_level.value,
                 "complete_state": state.to_dict(),
@@ -295,8 +295,8 @@ class UnifiedAgentOrchestrator:
         """Process world updates through WBA."""
         try:
             # Extract intent and entities from IPA result
-            intent = state.ipa_result.get("routing", {}).get("intent", "unknown")
-            entities = state.ipa_result.get("routing", {}).get("entities", {})
+            intent = (state.ipa_result or {}).get("routing", {}).get("intent", "unknown")
+            entities = (state.ipa_result or {}).get("routing", {}).get("entities", {})
 
             # Build world update request
             world_id = state.world_context.get("world_id", state.session_id)
@@ -337,8 +337,8 @@ class UnifiedAgentOrchestrator:
             # Prepare context for NGA
             nga_context = {
                 "world_state": state.world_context,
-                "intent": state.ipa_result.get("routing", {}).get("intent"),
-                "entities": state.ipa_result.get("routing", {}).get("entities", {}),
+                "intent": (state.ipa_result or {}).get("routing", {}).get("intent"),
+                "entities": (state.ipa_result or {}).get("routing", {}).get("entities", {}),
                 "world_updates": state.wba_result,
                 "therapeutic_context": state.therapeutic_context,
                 "safety_level": state.safety_level.value,
@@ -360,8 +360,8 @@ class UnifiedAgentOrchestrator:
 
     def _build_narrative_prompt(self, state: OrchestrationState) -> str:
         """Build a narrative generation prompt from the current state."""
-        intent = state.ipa_result.get("routing", {}).get("intent", "unknown")
-        world_updates = state.wba_result.get("description", "")
+        intent = (state.ipa_result or {}).get("routing", {}).get("intent", "unknown")
+        world_updates = (state.wba_result or {}).get("description", "")
 
         prompt = f"Player input: {state.user_input}\n"
         prompt += f"Detected intent: {intent}\n"

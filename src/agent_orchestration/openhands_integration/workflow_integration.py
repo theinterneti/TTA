@@ -64,7 +64,7 @@ class OpenHandsTestGenerator:
         """
         self.config = config
         self.use_docker = use_docker
-        self.engine = ExecutionEngine(config, max_concurrent_tasks=3)
+        self.engine = ExecutionEngine(config.to_client_config(), max_concurrent_tasks=3)
         self.validator = ResultValidator()
 
         # Circuit breaker will be initialized lazily when needed
@@ -344,7 +344,7 @@ Requirements:
 
         while True:
             # Check task status
-            task_status = await self.engine.get_task_status(task_id)
+            task_status = await self.get_task_status(task_id)
 
             if task_status.get("completed"):
                 result = task_status.get("result", {})

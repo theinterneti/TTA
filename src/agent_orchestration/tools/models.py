@@ -25,7 +25,7 @@ class ToolParameter(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
     description: str | None = Field(default=None, max_length=1024)  # Increased from 512
     required: bool = True
-    schema: dict[str, Any] = Field(
+    schema: dict[str, Any] = Field(  # type: ignore[override]
         default_factory=dict, description="JSON schema for the parameter"
     )
 

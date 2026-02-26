@@ -187,7 +187,7 @@ class OpenHandsAgentProxy(Agent):
         # Publish start event
         if self.event_integrator:
             try:
-                await self.event_integrator.publish_agent_event(
+                await self.event_integrator.publish_agent_event(  # type: ignore[attr-defined]
                     event_type="task_started",
                     data={"task": task_description, "context": context},
                 )
@@ -211,7 +211,7 @@ class OpenHandsAgentProxy(Agent):
             # Publish completion event
             if self.event_integrator:
                 try:
-                    await self.event_integrator.publish_agent_event(
+                    await self.event_integrator.publish_agent_event(  # type: ignore[attr-defined]
                         event_type="task_completed",
                         data={"task": task_description, "result": result},
                     )
@@ -224,7 +224,7 @@ class OpenHandsAgentProxy(Agent):
             # Publish error event
             if self.event_integrator:
                 try:
-                    await self.event_integrator.publish_agent_event(
+                    await self.event_integrator.publish_agent_event(  # type: ignore[attr-defined]
                         event_type="task_failed",
                         data={"task": task_description, "error": str(e)},
                     )
@@ -242,7 +242,7 @@ class OpenHandsAgentProxy(Agent):
             "metadata": {"mock": True},
         }
 
-    async def get_capabilities(self) -> dict[str, Any]:
+    async def get_capabilities(self) -> dict[str, Any]:  # type: ignore[override]
         """
         Advertise OpenHands capabilities for discovery.
 
