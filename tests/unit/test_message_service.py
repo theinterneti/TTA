@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from src.player_experience.services.message_service import (
-    MessageService,
     _SESSION_HISTORY,
+    MessageService,
 )
 
 
