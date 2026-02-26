@@ -17,7 +17,7 @@ import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models import AgentType
@@ -26,7 +26,7 @@ from .response_time_monitor import ResponseTimeMonitor
 logger = logging.getLogger(__name__)
 
 
-class OptimizationStrategy(str, Enum):
+class OptimizationStrategy(StrEnum):
     """Optimization strategies."""
 
     FASTEST_FIRST = "fastest_first"
@@ -35,7 +35,7 @@ class OptimizationStrategy(str, Enum):
     ADAPTIVE = "adaptive"
 
 
-class AgentLoadLevel(str, Enum):
+class AgentLoadLevel(StrEnum):
     """Agent load levels."""
 
     IDLE = "idle"

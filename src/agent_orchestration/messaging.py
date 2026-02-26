@@ -11,7 +11,7 @@ Adds reliability primitives used by MessageCoordinator implementations:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
@@ -30,7 +30,7 @@ class MessageSubscription(BaseModel):
     message_types: list[MessageType] = Field(default_factory=list)
 
 
-class FailureType(str, Enum):
+class FailureType(StrEnum):
     TRANSIENT = "transient"
     PERMANENT = "permanent"
     TIMEOUT = "timeout"

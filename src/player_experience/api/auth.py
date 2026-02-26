@@ -40,6 +40,7 @@ def _get_token_cache() -> TokenCache | None:
             logger.debug("TokenCache unavailable (ignored): %s", exc)
     return _token_cache
 
+
 # Configuration - Use same secret key as EnhancedAuthService
 SECRET_KEY = os.getenv("TTA_AUTH_SECRET_KEY") or os.getenv(
     "JWT_SECRET_KEY", "your-secret-key-change-in-production"

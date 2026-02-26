@@ -12,7 +12,7 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 try:
     import requests
@@ -24,7 +24,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -32,7 +32,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     """Alert status."""
 
     ACTIVE = "active"

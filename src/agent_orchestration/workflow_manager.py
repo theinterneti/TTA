@@ -16,7 +16,7 @@ import logging
 import time
 import uuid
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError
@@ -40,7 +40,7 @@ def _utc_now() -> str:
     return datetime.utcnow().isoformat() + "Z"
 
 
-class WorkflowRunStatus(str, Enum):
+class WorkflowRunStatus(StrEnum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"

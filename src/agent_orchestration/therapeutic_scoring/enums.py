@@ -2,10 +2,10 @@
 
 # Logseq: [[TTA.dev/Agent_orchestration/Therapeutic_scoring/Enums]]
 
-from enum import Enum
+from enum import StrEnum
 
 
-class TherapeuticContext(str, Enum):
+class TherapeuticContext(StrEnum):
     """Therapeutic contexts for content validation."""
 
     GENERAL_THERAPY = "general_therapy"

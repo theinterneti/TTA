@@ -55,7 +55,7 @@ OPENROUTER_REDIRECT_URI = os.getenv(
 )
 
 # Redis-backed session manager (replaces in-memory storage)
-from ..session_manager import RedisSessionManager
+from ..session_manager import RedisSessionManager  # noqa: E402
 
 _session_manager: RedisSessionManager | None = None
 

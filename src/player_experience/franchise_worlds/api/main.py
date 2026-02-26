@@ -8,11 +8,12 @@ including all production-ready features like monitoring, security, and error han
 """
 
 import os
+import time
 from contextlib import asynccontextmanager
 
 import sentry_sdk
 import structlog  # type: ignore[import-not-found]
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.openapi.utils import get_openapi
@@ -326,11 +327,6 @@ async def root():
         },
     }
 
-
-# Import time for metrics
-import time
-
-from fastapi import Response
 
 if __name__ == "__main__":
     import uvicorn

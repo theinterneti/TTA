@@ -16,7 +16,7 @@ import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -29,7 +29,7 @@ from .response_time_monitor import (
 logger = logging.getLogger(__name__)
 
 
-class OptimizationStrategy(str, Enum):
+class OptimizationStrategy(StrEnum):
     """Available optimization strategies."""
 
     CONSERVATIVE = "conservative"  # Small, safe adjustments
@@ -38,7 +38,7 @@ class OptimizationStrategy(str, Enum):
     STATISTICAL = "statistical"  # Uses statistical analysis for decisions
 
 
-class OptimizationTarget(str, Enum):
+class OptimizationTarget(StrEnum):
     """Optimization targets."""
 
     RESPONSE_TIME = "response_time"

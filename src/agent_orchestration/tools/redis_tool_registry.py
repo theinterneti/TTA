@@ -9,12 +9,15 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import json
+import logging
 import time
 from typing import Any
 
 from redis.asyncio import Redis
 
-from .models import ToolSpec, ToolStatus
+logger = logging.getLogger(__name__)
+
+from .models import ToolSpec, ToolStatus  # noqa: E402
 
 
 class _LRU:

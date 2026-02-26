@@ -60,9 +60,7 @@ class PacingController:
         self.config = config or {}
 
         # Pacing configuration
-        self.pacing_rules: dict[
-            SessionPhase, dict[str, PacingStrategy]
-        ] = {}
+        self.pacing_rules: dict[SessionPhase, dict[str, PacingStrategy]] = {}
         self.emotional_pacing_adjustments: dict[
             EmotionalState, dict[str, PacingStrategy]
         ] = {}

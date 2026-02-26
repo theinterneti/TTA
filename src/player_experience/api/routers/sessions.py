@@ -47,6 +47,7 @@ def get_session_store() -> SessionStore:
             _session_store = SessionStore()
     return _session_store
 
+
 # Global world manager instance
 _world_manager: WorldManagementModule | None = None
 
@@ -223,7 +224,9 @@ async def get_session_messages(
     player_id = getattr(current_player, "player_id", "") or ""
     meta = store.get_session(session_id)
     if meta and meta["player_id"] != player_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
 
     messages = store.load_messages_full(session_id)
     return {
@@ -247,7 +250,9 @@ async def copy_session(
     player_id = getattr(current_player, "player_id", "") or ""
     meta = store.get_session(session_id)
     if meta and meta["player_id"] != player_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
 
     new_meta = store.copy_session(source_session_id=session_id, player_id=player_id)
     if new_meta is None:
@@ -272,7 +277,9 @@ async def clear_session_messages(
     player_id = getattr(current_player, "player_id", "") or ""
     meta = store.get_session(session_id)
     if meta and meta["player_id"] != player_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
 
     deleted = store.clear_messages(session_id)
 

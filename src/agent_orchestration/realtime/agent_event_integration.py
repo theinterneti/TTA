@@ -396,8 +396,6 @@ def get_agent_event_integrator(
     enabled: bool = True,
 ) -> AgentEventIntegrator:
     """Get or create agent event integrator."""
-    global _agent_integrators
-
     if agent_id not in _agent_integrators or event_publisher is not None:
         _agent_integrators[agent_id] = AgentEventIntegrator(
             event_publisher=event_publisher, agent_id=agent_id, enabled=enabled

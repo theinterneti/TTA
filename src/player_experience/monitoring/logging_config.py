@@ -7,6 +7,7 @@ This module provides structured logging, log aggregation, and integration
 with monitoring systems for the Player Experience Interface.
 """
 
+import contextlib
 import logging
 import logging.handlers
 import os
@@ -16,14 +17,14 @@ import threading
 import traceback
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 from pythonjsonlogger import jsonlogger
 
 
-class LogLevel(str, Enum):
+class LogLevel(StrEnum):
     """Log levels for structured logging."""
 
     DEBUG = "DEBUG"
@@ -33,7 +34,7 @@ class LogLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
-class LogCategory(str, Enum):
+class LogCategory(StrEnum):
     """Categories for log messages."""
 
     SYSTEM = "system"
@@ -229,12 +230,8 @@ class AsyncLogHandler(logging.Handler):
 
     def emit(self, record):
         """Emit a log record asynchronously."""
-        try:
+        with contextlib.suppress(queue.Full):
             self.queue.put_nowait(record)
-        except queue.Full:
-            # Drop the log record if queue is full
-            # In production, you might want to implement a different strategy
-            pass
 
     def close(self):
         """Close the handler and clean up resources."""

@@ -10,14 +10,14 @@ workflow progress messages, and other real-time communication data structures.
 from __future__ import annotations
 
 import time
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class EventType(str, Enum):
+class EventType(StrEnum):
     """Types of real-time events."""
 
     AGENT_STATUS = "agent_status"
@@ -30,7 +30,7 @@ class EventType(str, Enum):
     HEARTBEAT = "heartbeat"
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     """Agent status values."""
 
     ONLINE = "online"
@@ -42,7 +42,7 @@ class AgentStatus(str, Enum):
     STOPPING = "stopping"
 
 
-class WorkflowStatus(str, Enum):
+class WorkflowStatus(StrEnum):
     """Workflow status values."""
 
     PENDING = "pending"

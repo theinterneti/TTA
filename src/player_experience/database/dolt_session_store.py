@@ -23,6 +23,7 @@ import pymysql.cursors
 
 logger = logging.getLogger(__name__)
 
+
 class DoltSessionStore:
     """Dolt MySQL-compatible session store.
 

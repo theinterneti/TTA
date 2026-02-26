@@ -11,7 +11,7 @@ import json
 import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class ReportType(str, Enum):
+class ReportType(StrEnum):
     """Types of reports that can be generated."""
 
     THERAPEUTIC_OUTCOMES = "therapeutic_outcomes"
@@ -38,7 +38,7 @@ class ReportType(str, Enum):
     CUSTOM_DASHBOARD = "custom_dashboard"
 
 
-class ReportFormat(str, Enum):
+class ReportFormat(StrEnum):
     """Output formats for reports."""
 
     JSON = "json"

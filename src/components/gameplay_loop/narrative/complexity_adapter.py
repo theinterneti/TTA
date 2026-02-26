@@ -533,10 +533,14 @@ class NarrativeComplexityAdapter:
             # Focus on basic therapeutic elements
             scene.therapeutic_focus = scene.therapeutic_focus[:2]  # Limit focus areas
 
-        elif strategy in (
-            AdaptationStrategy.INCREASE,
-            AdaptationStrategy.GRADUAL_INCREASE,
-        ) and "self_awareness" not in scene.therapeutic_focus:
+        elif (
+            strategy
+            in (
+                AdaptationStrategy.INCREASE,
+                AdaptationStrategy.GRADUAL_INCREASE,
+            )
+            and "self_awareness" not in scene.therapeutic_focus
+        ):
             # Add deeper therapeutic elements
             scene.therapeutic_focus.append("self_awareness")
 

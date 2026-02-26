@@ -100,7 +100,9 @@ class ChoiceOutcome(BaseModel):
 
     # Outcome details
     outcome_type: str = Field(..., description="Type of outcome")
-    narrative_response: str = Field(default="", description="Narrative response to the choice")
+    narrative_response: str = Field(
+        default="", description="Narrative response to the choice"
+    )
 
     # Effects
     immediate_effects: dict[str, Any] = Field(default_factory=dict)
@@ -121,7 +123,9 @@ class ChoiceOutcome(BaseModel):
     emotional_response: str = Field(default="neutral")
 
     # Next steps
-    next_scene_id: str | None = Field(default=None, description="Next scene to transition to")
+    next_scene_id: str | None = Field(
+        default=None, description="Next scene to transition to"
+    )
     available_choices: list[str] = Field(
         default_factory=list, description="Next available choice IDs"
     )

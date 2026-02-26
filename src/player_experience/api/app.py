@@ -7,6 +7,7 @@ This module sets up the FastAPI application with middleware, error handling,
 authentication, and CORS configuration.
 """
 
+import contextlib
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -189,7 +190,7 @@ def create_app() -> FastAPI:
     async def prometheus_metrics():
         """Prometheus metrics endpoint for monitoring (no auth required)."""
         try:
-            import prometheus_client
+            import prometheus_client  # noqa: F401
             from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
             # Generate basic metrics for the TTA Player API

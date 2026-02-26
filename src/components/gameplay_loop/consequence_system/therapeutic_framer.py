@@ -327,16 +327,16 @@ class TherapeuticFramer:
                 "This choice reflects your ongoing therapeutic journey and growth."
             )
         else:
-            insights.append("Every choice offers an opportunity for learning and growth.")
+            insights.append(
+                "Every choice offers an opportunity for learning and growth."
+            )
 
         if outcomes.get("emotional_impact", {}).get("primary_emotion") in [
             "positive",
             "hopeful",
             "empowered",
         ]:
-            insights.append(
-                "Notice the positive emotional shift this choice creates."
-            )
+            insights.append("Notice the positive emotional shift this choice creates.")
 
         return insights
 
@@ -353,7 +353,9 @@ class TherapeuticFramer:
                 opportunities.extend(self.learning_opportunity_patterns[tag][:1])
 
         if not opportunities:
-            opportunities.append("Reflect on what this choice reveals about your values.")
+            opportunities.append(
+                "Reflect on what this choice reveals about your values."
+            )
 
         return opportunities
 
@@ -367,7 +369,11 @@ class TherapeuticFramer:
 
         # Boost for positive emotional outcomes
         emotional_impact = outcomes.get("emotional_impact", {})
-        if emotional_impact.get("primary_emotion") in ["positive", "hopeful", "empowered"]:
+        if emotional_impact.get("primary_emotion") in [
+            "positive",
+            "hopeful",
+            "empowered",
+        ]:
             base_value = min(1.0, base_value + 0.1)
 
         return base_value
@@ -411,7 +417,9 @@ class TherapeuticFramer:
                 )
             )
 
-        reframes.append("This experience contributes to your ongoing growth and healing.")
+        reframes.append(
+            "This experience contributes to your ongoing growth and healing."
+        )
 
         return reframes
 
@@ -420,8 +428,12 @@ class TherapeuticFramer:
     ) -> dict[str, Any]:
         """Generate safe fallback therapeutic framing."""
         return {
-            "insights": ["Every experience offers an opportunity for learning and growth."],
-            "learning_opportunities": ["Reflect on what this moment reveals about your journey."],
+            "insights": [
+                "Every experience offers an opportunity for learning and growth."
+            ],
+            "learning_opportunities": [
+                "Reflect on what this moment reveals about your journey."
+            ],
             "therapeutic_value": max(0.3, user_choice.therapeutic_value),
             "growth_aspects": ["therapeutic_participation"],
             "positive_reframes": ["This experience is part of your healing journey."],
@@ -442,7 +454,9 @@ class TherapeuticFramer:
             ]
 
         if emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
-            return [insight + " Take it one step at a time." for insight in insights[:1]]
+            return [
+                insight + " Take it one step at a time." for insight in insights[:1]
+            ]
 
         return insights
 
@@ -456,9 +470,11 @@ class TherapeuticFramer:
             return ["Focus on safety and grounding in this moment."]
 
         if emotional_state in [EmotionalState.ANXIOUS, EmotionalState.OVERWHELMED]:
-            return learning_opportunities[:1] if learning_opportunities else [
-                "Practice one small grounding technique."
-            ]
+            return (
+                learning_opportunities[:1]
+                if learning_opportunities
+                else ["Practice one small grounding technique."]
+            )
 
         return learning_opportunities
 

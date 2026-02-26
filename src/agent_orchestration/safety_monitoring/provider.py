@@ -70,11 +70,13 @@ class SafetyRulesProvider:
 
                     path = os.environ.get("TTA_SAFETY_RULES_CONFIG")
                 if path:
+                    from pathlib import Path as _Path
+
                     if path.lower().endswith((".yaml", ".yml")) and yaml is not None:
-                        with open(path, encoding="utf-8") as f:
+                        with _Path(path).open(encoding="utf-8") as f:
                             cfg = yaml.safe_load(f)
                     else:
-                        with open(path, encoding="utf-8") as f:
+                        with _Path(path).open(encoding="utf-8") as f:
                             cfg = json.load(f)
                     raw = json.dumps(cfg)
                     self._last_source = f"file:{path}"

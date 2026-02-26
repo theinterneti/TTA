@@ -27,20 +27,6 @@ from ..orchestration.component import Component
 logger = logging.getLogger(__name__)
 
 
-# NOTE: Models moved to src/components/narrative_arc_orchestrator/models.py
-from .narrative_arc_orchestrator.models import (
-    EmergentEvent,
-    ImpactAssessment,
-    NarrativeEvent,
-    NarrativeResponse,
-    NarrativeScale,
-    NarrativeStatus,
-    PlayerChoice,
-    Resolution,
-    ScaleConflict,
-)
-
-
 class NarrativeScale(Enum):
     """Temporal scales for narrative management."""
 

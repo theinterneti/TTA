@@ -58,8 +58,12 @@ class ValidationResult(BaseModel):
     session_id: str = Field(default="", description="Session identifier")
 
     # Validation details
-    validation_type: ValidationType = Field(default=ValidationType.CHOICE_VALIDITY, description="Type of validation")
-    status: ValidationStatus = Field(default=ValidationStatus.PENDING, description="Validation status")
+    validation_type: ValidationType = Field(
+        default=ValidationType.CHOICE_VALIDITY, description="Type of validation"
+    )
+    status: ValidationStatus = Field(
+        default=ValidationStatus.PENDING, description="Validation status"
+    )
 
     # Content being validated
     content_type: str = Field(default="", description="Type of content validated")
@@ -73,7 +77,9 @@ class ValidationResult(BaseModel):
 
     # Issues and recommendations
     issues_found: list[str] = Field(default_factory=list)
-    issues: list[str] = Field(default_factory=list, description="Alias for issues_found")
+    issues: list[str] = Field(
+        default_factory=list, description="Alias for issues_found"
+    )
     warnings: list[str] = Field(default_factory=list)
     recommendations: list[str] = Field(default_factory=list)
     validation_details: dict[str, Any] = Field(default_factory=dict)
@@ -96,7 +102,9 @@ class SafetyCheck(BaseModel):
 
     # Safety assessment (safety_level can be a string or SafetyLevel enum)
     safety_level: str = Field(default="safe", description="Assessed safety level")
-    emotional_state: EmotionalState = Field(default=EmotionalState.CALM, description="User's emotional state")
+    emotional_state: EmotionalState = Field(
+        default=EmotionalState.CALM, description="User's emotional state"
+    )
 
     # Simplified safety flags used by validator
     is_safe: bool = Field(default=True, description="Whether content/choice is safe")
@@ -127,7 +135,9 @@ class SafetyCheck(BaseModel):
 
     # Metadata
     checked_at: datetime = Field(default_factory=datetime.utcnow)
-    expires_at: datetime | None = Field(default=None, description="When this check expires")
+    expires_at: datetime | None = Field(
+        default=None, description="When this check expires"
+    )
 
 
 class TherapeuticValidation(BaseModel):

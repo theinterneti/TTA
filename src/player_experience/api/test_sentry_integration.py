@@ -15,8 +15,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.player_experience.api.config import get_settings
-from src.player_experience.api.sentry_config import (
+from src.player_experience.api.config import get_settings  # noqa: E402
+from src.player_experience.api.sentry_config import (  # noqa: E402
     capture_therapeutic_error,
     capture_therapeutic_message,
     init_sentry,

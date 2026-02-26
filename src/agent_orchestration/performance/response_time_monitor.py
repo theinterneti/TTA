@@ -17,13 +17,13 @@ from collections import defaultdict, deque
 from collections.abc import Callable
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class OperationType(str, Enum):
+class OperationType(StrEnum):
     """Types of operations to monitor."""
 
     AGENT_PROCESSING = "agent_processing"
@@ -36,7 +36,7 @@ class OperationType(str, Enum):
     TRANSFORMATION = "transformation"
 
 
-class PerformanceLevel(str, Enum):
+class PerformanceLevel(StrEnum):
     """Performance level classifications."""
 
     EXCELLENT = "excellent"  # < 0.5s

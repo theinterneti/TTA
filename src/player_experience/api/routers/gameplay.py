@@ -133,7 +133,9 @@ async def get_message_service() -> MessageService:
     if not hasattr(get_message_service, "_instance"):
         from ..routers.sessions import get_session_store  # noqa: PLC0415
 
-        get_message_service._instance = MessageService(session_store=get_session_store())
+        get_message_service._instance = MessageService(
+            session_store=get_session_store()
+        )
     return get_message_service._instance
 
 

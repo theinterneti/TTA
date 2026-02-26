@@ -197,7 +197,7 @@ async def setup_metrics_monitoring(app: FastAPI, config: DashboardConfig):
             recent_results = []
             for result_file in results_dir.glob("*/test_summary.json"):
                 try:
-                    with open(result_file) as f:
+                    with result_file.open() as f:
                         import json
 
                         data = json.load(f)

@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 
-class ValidationSeverity(str, Enum):
+class ValidationSeverity(StrEnum):
     """Severity level for validation findings."""
 
     ERROR = "error"  # Blocks tool registration

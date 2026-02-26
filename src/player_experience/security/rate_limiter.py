@@ -14,7 +14,7 @@ from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import redis
@@ -25,7 +25,7 @@ from ..monitoring.logging_config import LogCategory, LogContext, get_logger
 logger = get_logger(__name__)
 
 
-class RateLimitStrategy(str, Enum):
+class RateLimitStrategy(StrEnum):
     """Rate limiting strategies."""
 
     TOKEN_BUCKET = "token_bucket"
@@ -34,7 +34,7 @@ class RateLimitStrategy(str, Enum):
     LEAKY_BUCKET = "leaky_bucket"
 
 
-class RateLimitScope(str, Enum):
+class RateLimitScope(StrEnum):
     """Scope for rate limiting."""
 
     GLOBAL = "global"
@@ -215,7 +215,7 @@ class SlidingWindowRateLimiter(RateLimiter):
 
     def __init__(self, config: RateLimitConfig):
         super().__init__(config)
-        self.windows: dict[str, deque] = defaultdict(lambda: deque())
+        self.windows: dict[str, deque] = defaultdict(deque)
 
     def check_limit(
         self, identifier: str, endpoint: str | None = None

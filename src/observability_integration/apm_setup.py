@@ -232,7 +232,7 @@ def shutdown_observability() -> None:
         >>> from observability_integration import shutdown_observability
         >>> atexit.register(shutdown_observability)
     """
-    global _tracer_provider, _meter_provider, _initialized
+    global _initialized
 
     if not _initialized:
         return

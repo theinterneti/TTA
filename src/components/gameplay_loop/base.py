@@ -46,6 +46,7 @@ except ImportError:
         def get_component(self, component_type: type) -> object | None:  # noqa: ARG002
             return None
 
+
 logger = logging.getLogger(__name__)
 
 

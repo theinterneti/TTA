@@ -16,13 +16,13 @@ import time
 import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class CircuitBreakerState(str, Enum):
+class CircuitBreakerState(StrEnum):
     """Circuit breaker states following the standard pattern."""
 
     CLOSED = "closed"  # Normal operation, failures counted

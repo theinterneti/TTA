@@ -353,7 +353,7 @@ class LivingWorldsManager:
                         dict(n) for n in record["narrative_threads"] if n
                     ],
                     "events": [dict(e) for e in record["events"] if e],
-                    "locations": [dict(l) for l in record["locations"] if l],
+                    "locations": [dict(loc) for loc in record["locations"] if loc],
                 }
 
             return {

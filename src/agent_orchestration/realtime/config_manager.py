@@ -12,13 +12,13 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class RealtimeEnvironment(str, Enum):
+class RealtimeEnvironment(StrEnum):
     """Environment types for real-time configuration."""
 
     DEVELOPMENT = "development"
@@ -163,12 +163,10 @@ class RealtimeConfigManager:
 
     def _get_default_enabled(self) -> bool:
         """Get default enabled state based on environment."""
-        if self._environment in [
+        return self._environment in [
             RealtimeEnvironment.DEVELOPMENT,
             RealtimeEnvironment.TESTING,
-        ]:
-            return True  # Enable by default in dev/test
-        return False  # Disabled by default in staging/production
+        ]
 
     def _load_websocket_config(self, ws_config: dict[str, Any]) -> WebSocketConfig:
         """Load WebSocket configuration."""

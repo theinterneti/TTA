@@ -564,7 +564,10 @@ class ChoiceGenerator:
             adapted_choice.therapeutic_value = min(
                 adapted_choice.therapeutic_value, 0.7
             )
-        elif complexity == "increased" and adapted_choice.difficulty_level == DifficultyLevel.GENTLE:
+        elif (
+            complexity == "increased"
+            and adapted_choice.difficulty_level == DifficultyLevel.GENTLE
+        ):
             adapted_choice.difficulty_level = DifficultyLevel.STANDARD
 
         # Add therapeutic emphasis tags

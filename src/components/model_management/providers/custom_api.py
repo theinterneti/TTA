@@ -449,7 +449,9 @@ class CustomAPIProvider(BaseProvider):
         ]
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]  # noqa: ARG002
+        self,
+        model_id: str,
+        config: dict[str, Any],  # noqa: ARG002
     ) -> CustomAPIModelInstance:
         """Load a custom API model instance."""
         # Find which provider has this model

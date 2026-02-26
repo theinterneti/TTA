@@ -85,7 +85,7 @@ def get_global_safety_service() -> SafetyService:
     using TEST_REDIS_URI or default localhost. Disabled by default, can be enabled
     via env AGENT_ORCHESTRATION_SAFETY_ENABLED=true for ad-hoc use or via tests.
     """
-    global _global_safety_service, _global_safety_locked
+    global _global_safety_service
     import os
 
     if _global_safety_service is None:

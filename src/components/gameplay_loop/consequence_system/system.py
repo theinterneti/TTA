@@ -35,14 +35,18 @@ class ConsequenceSystem:
         self.config = config or {}
 
         # Initialize subsystems
-        self.outcome_generator = OutcomeGenerator(self.config.get("outcome_generation", {}))
+        self.outcome_generator = OutcomeGenerator(
+            self.config.get("outcome_generation", {})
+        )
         self.therapeutic_framer = TherapeuticFramer(
             self.config.get("therapeutic_framing", {})
         )
         self.causality_explainer = CausalityExplainer(
             self.config.get("causality_explanation", {})
         )
-        self.progress_tracker = ProgressTracker(self.config.get("progress_tracking", {}))
+        self.progress_tracker = ProgressTracker(
+            self.config.get("progress_tracking", {})
+        )
 
         # System configuration
         self.consequence_depth = self.config.get("consequence_depth", "moderate")

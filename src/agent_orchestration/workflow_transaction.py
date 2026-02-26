@@ -4,8 +4,8 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
-import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -102,7 +102,7 @@ class WorkflowTransaction:
                 await self._redis.delete(item.value)
         elif item.kind == "tmp_file":
             with contextlib.suppress(FileNotFoundError):
-                os.unlink(item.value)
+                Path(item.value).unlink()
         except_list = {"custom"}
         if item.kind in except_list:
             # Custom cleanup types should be handled by callers; we mark done

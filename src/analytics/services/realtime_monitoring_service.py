@@ -13,7 +13,7 @@ import logging
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -26,7 +26,7 @@ from scipy import stats
 logger = logging.getLogger(__name__)
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     LOW = "low"
@@ -35,7 +35,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertType(str, Enum):
+class AlertType(StrEnum):
     """Types of alerts."""
 
     THERAPEUTIC_INTERVENTION = "therapeutic_intervention"

@@ -70,8 +70,12 @@ class ProgressMarker(BaseModel):
     user_id: str = Field(default="", description="User identifier")
 
     # Progress details — marker_type is an alias for progress_type
-    progress_type: ProgressType = Field(default=ProgressType.INSIGHT_GAINED, description="Type of progress")
-    marker_type: ProgressType | None = Field(None, description="Alias for progress_type")
+    progress_type: ProgressType = Field(
+        default=ProgressType.INSIGHT_GAINED, description="Type of progress"
+    )
+    marker_type: ProgressType | None = Field(
+        None, description="Alias for progress_type"
+    )
     title: str = Field(default="", description="Progress title")
     description: str = Field(default="", description="Progress description")
     significance: str = Field(default="", description="Significance of this marker")

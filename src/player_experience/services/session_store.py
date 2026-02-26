@@ -358,7 +358,12 @@ class SessionStore:
 
         self._mem_meta[new_id] = new_meta
         self._mem_msgs[new_id] = [
-            {"role": m["role"], "content": m["content"], "message_id": str(uuid.uuid4()), "created_at": m.get("created_at", now)}
+            {
+                "role": m["role"],
+                "content": m["content"],
+                "message_id": str(uuid.uuid4()),
+                "created_at": m.get("created_at", now),
+            }
             for m in source_messages
         ]
         return new_meta

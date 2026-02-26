@@ -30,8 +30,8 @@ except ImportError:
     ServiceUnavailable = Exception
     ClientError = Exception
 
-from ..models.enums import IntensityLevel, TherapeuticApproach
-from ..models.player import (
+from ..models.enums import IntensityLevel, TherapeuticApproach  # noqa: E402
+from ..models.player import (  # noqa: E402
     CrisisContactInfo,
     PlayerProfile,
     PrivacySettings,

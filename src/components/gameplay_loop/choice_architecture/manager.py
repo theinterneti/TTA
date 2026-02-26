@@ -34,9 +34,15 @@ class ChoiceArchitectureManager:
         self.config = config or {}
 
         # Initialize components
-        self.choice_generator = ChoiceGenerator(self.config.get("choice_generation", {}))
-        self.choice_validator = ChoiceValidator(self.config.get("choice_validation", {}))
-        self.agency_protector = AgencyProtector(self.config.get("agency_protection", {}))
+        self.choice_generator = ChoiceGenerator(
+            self.config.get("choice_generation", {})
+        )
+        self.choice_validator = ChoiceValidator(
+            self.config.get("choice_validation", {})
+        )
+        self.agency_protector = AgencyProtector(
+            self.config.get("agency_protection", {})
+        )
 
         # Choice architecture settings
         self.min_choices = self.config.get("min_choices", 2)

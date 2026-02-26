@@ -10,36 +10,19 @@ configuration, including discovery and auto-registration settings.
 from __future__ import annotations
 
 import re
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-class CapabilityMatchingAlgorithm(str, Enum):
+class CapabilityMatchingAlgorithm(StrEnum):
     """Available capability matching algorithms."""
 
     WEIGHTED_SCORE = "weighted_score"
     EXACT_MATCH = "exact_match"
     FUZZY_MATCH = "fuzzy_match"
     PRIORITY_BASED = "priority_based"
-
-
-class DiscoveryConfig(BaseModel):
-    """Configuration for agent discovery system."""
-
-    enabled: bool = Field(default=True, description="Enable agent discovery system")
-    cache_ttl: int = Field(
-        default=300, ge=60, le=3600, description="Discovery cache TTL in seconds"
-    )
-    max_search_results: int = Field(
-        default=50, ge=1, le=1000, description="Maximum results for capability searches"
-    )
-
-    capability_matching: CapabilityMatchingConfig = Field(
-        default_factory=lambda: CapabilityMatchingConfig(),
-        description="Capability matching configuration",
-    )
 
 
 class CapabilityMatchingConfig(BaseModel):
@@ -57,6 +40,23 @@ class CapabilityMatchingConfig(BaseModel):
     )
     include_deprecated: bool = Field(
         default=False, description="Include deprecated capabilities in search results"
+    )
+
+
+class DiscoveryConfig(BaseModel):
+    """Configuration for agent discovery system."""
+
+    enabled: bool = Field(default=True, description="Enable agent discovery system")
+    cache_ttl: int = Field(
+        default=300, ge=60, le=3600, description="Discovery cache TTL in seconds"
+    )
+    max_search_results: int = Field(
+        default=50, ge=1, le=1000, description="Maximum results for capability searches"
+    )
+
+    capability_matching: CapabilityMatchingConfig = Field(
+        default_factory=CapabilityMatchingConfig,
+        description="Capability matching configuration",
     )
 
 

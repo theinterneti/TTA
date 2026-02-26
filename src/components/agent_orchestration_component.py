@@ -1459,7 +1459,7 @@ class AgentOrchestrationComponent(Component):
                                     )
                                 )
                                 try:
-                                    mtime = os.path.getmtime(self._policy_cfg_path)
+                                    mtime = os.path.getmtime(self._policy_cfg_path)  # noqa: PTH204
                                 except Exception:
                                     mtime = None
                                 if mtime and mtime != self._policy_cfg_mtime:
@@ -1992,8 +1992,7 @@ class AgentOrchestrationComponent(Component):
                     if hasattr(self, "_tools_cfg")
                     else 200
                 )
-                count = 0
-                for key, stats in tool_exec.items():
+                for count, (key, stats) in enumerate(tool_exec.items()):
                     if count >= max_tools:
                         break
                     name, version = key.split(":", 1)
@@ -2019,7 +2018,6 @@ class AgentOrchestrationComponent(Component):
                     for b, c in buckets.items():
                         for _ in range(int(c)):
                             tool_dur.labels(name, version).observe(midpoint.get(b, 0.1))
-                    count += 1
 
             return generate_latest(prom_reg).decode()
 
@@ -2159,7 +2157,7 @@ class AgentOrchestrationComponent(Component):
                 cfg_path = os.environ.get("TTA_TOOL_POLICY_CONFIG")
                 ok = False
                 err = None
-                if cfg_path and os.path.exists(cfg_path):
+                if cfg_path and os.path.exists(cfg_path):  # noqa: PTH110
                     new_cfg = load_tool_policy_config_from(cfg_path)
                 else:
                     new_cfg = load_tool_policy_config()
@@ -2169,8 +2167,8 @@ class AgentOrchestrationComponent(Component):
                         ok = True
                         with contextlib.suppress(Exception):
                             self._policy_cfg_mtime = (
-                                os.path.getmtime(cfg_path)
-                                if cfg_path and os.path.exists(cfg_path)
+                                os.path.getmtime(cfg_path)  # noqa: PTH204
+                                if cfg_path and os.path.exists(cfg_path)  # noqa: PTH110
                                 else None
                             )
                 with contextlib.suppress(Exception):
@@ -2462,7 +2460,7 @@ class AgentOrchestrationComponent(Component):
                     import os
 
                     p = os.environ.get("TTA_TOOL_POLICY_CONFIG")
-                    if p and os.path.exists(p):
+                    if p and os.path.exists(p):  # noqa: PTH110
                         src = p
                 return {
                     "source": src,

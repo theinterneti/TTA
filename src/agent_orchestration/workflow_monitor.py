@@ -26,7 +26,7 @@ class RunRecord:
     run_id: str
     workflow: str | None = None
     status: str = "running"  # running|completed|failed|timed_out
-    started_at: float = field(default_factory=lambda: time.time())
+    started_at: float = field(default_factory=time.time)
     ended_at: float | None = None
     steps: list[RunStep] = field(default_factory=list)
     total_timeout_s: float = 300.0

@@ -52,7 +52,9 @@ class SceneGenerator:
         self.therapeutic_settings = {}
         self.narrative_patterns = {}
 
-        logger.info("SceneGenerator initialized (llm=%s)", type(llm).__name__ if llm else "none")
+        logger.info(
+            "SceneGenerator initialized (llm=%s)", type(llm).__name__ if llm else "none"
+        )
 
     async def initialize(self) -> bool:
         """Initialize scene templates and therapeutic content."""
@@ -575,7 +577,9 @@ class SceneGenerator:
         """Generate narrative content using the LLM."""
         from langchain_core.messages import HumanMessage, SystemMessage  # noqa: PLC0415
 
-        focus_str = ", ".join(therapeutic_focus) if therapeutic_focus else "general wellbeing"
+        focus_str = (
+            ", ".join(therapeutic_focus) if therapeutic_focus else "general wellbeing"
+        )
         setting_name = setting.get("name", "peaceful space")
         setting_desc = setting.get("description", "a calm and welcoming environment")
 
@@ -597,12 +601,17 @@ class SceneGenerator:
         try:
             assert self.llm is not None
             response = await self.llm.ainvoke(
-                [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=user_prompt),
+                ]
             )
             content = response.content
             return content.strip() if isinstance(content, str) else str(content)
         except Exception as e:
-            logger.warning("LLM scene generation failed, using template fallback: %s", e)
+            logger.warning(
+                "LLM scene generation failed, using template fallback: %s", e
+            )
             # Fall back to template if LLM call fails
             therapeutic_content = await self._generate_therapeutic_content(
                 therapeutic_focus, emotional_tone

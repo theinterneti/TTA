@@ -9,17 +9,17 @@ These stubs can be expanded later; for now, they provide structure needed by mon
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     INFO = "info"
     WARNING = "warning"
     CRITICAL = "critical"
 
 
-class AlertChannel(str, Enum):
+class AlertChannel(StrEnum):
     LOG = "log"
     EMAIL = "email"
     WEBHOOK = "webhook"

@@ -14,14 +14,14 @@ import secrets
 import zipfile
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from cryptography.fernet import Fernet
 from pydantic import BaseModel, Field
 
 
-class DataCategory(str, Enum):
+class DataCategory(StrEnum):
     """Categories of data for privacy management."""
 
     PERSONAL_IDENTIFIABLE = "personal_identifiable"
@@ -32,7 +32,7 @@ class DataCategory(str, Enum):
     PREFERENCE_DATA = "preference_data"
 
 
-class ProcessingPurpose(str, Enum):
+class ProcessingPurpose(StrEnum):
     """Legal purposes for data processing under GDPR."""
 
     CONSENT = "consent"
@@ -43,7 +43,7 @@ class ProcessingPurpose(str, Enum):
     LEGITIMATE_INTERESTS = "legitimate_interests"
 
 
-class DataRetentionPeriod(str, Enum):
+class DataRetentionPeriod(StrEnum):
     """Standard data retention periods."""
 
     IMMEDIATE = "immediate"  # Delete immediately

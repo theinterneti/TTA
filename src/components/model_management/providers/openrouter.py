@@ -323,7 +323,9 @@ class OpenRouterProvider(BaseProvider):
             raise
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]  # noqa: ARG002
+        self,
+        model_id: str,
+        config: dict[str, Any],  # noqa: ARG002
     ) -> OpenRouterModelInstance:
         """Load an OpenRouter model instance."""
         if not self._client:

@@ -461,7 +461,7 @@ class TherapeuticConsequenceSystem:
             impact["resilience"] = 0.05  # Small resilience boost for making any choice
 
         # Cap all impacts at reasonable levels
-        for attr in impact:
+        for attr in impact:  # noqa: PLC0206
             impact[attr] = min(impact[attr], 0.2)  # Cap at 0.2 per choice
 
         return impact

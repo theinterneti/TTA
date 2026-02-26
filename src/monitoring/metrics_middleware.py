@@ -141,42 +141,6 @@ def add_metrics_endpoint(app, path: str = "/metrics"):
             )
 
 
-class MockMetricsMiddleware(BaseHTTPMiddleware):
-    """Mock metrics middleware for environments without full monitoring infrastructure."""
-
-    def __init__(self, app, service_name: str = "tta"):
-        super().__init__(app)
-        self.service_name = service_name
-        logger.info(f"Using mock metrics middleware for service: {service_name}")
-
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        """Process request with minimal overhead."""
-        start_time = time.time()
-
-        try:
-            response = await call_next(request)
-            duration = time.time() - start_time
-
-            # Add timing header for debugging
-            response.headers["X-Process-Time"] = str(duration)
-
-            # Log basic metrics to console in debug mode
-            logger.debug(
-                f"Request: {request.method} {request.url.path} "
-                f"Status: {response.status_code} Duration: {duration:.3f}s"
-            )
-
-            return response
-
-        except Exception as e:
-            duration = time.time() - start_time
-            logger.debug(
-                f"Request failed: {request.method} {request.url.path} "
-                f"Duration: {duration:.3f}s Error: {e}"
-            )
-            raise
-
-
 def add_mock_metrics_endpoint(app, path: str = "/metrics"):
     """Add mock metrics endpoint for environments without Prometheus."""
 
@@ -234,7 +198,7 @@ def setup_monitoring_middleware(
         try:
             if enable_prometheus:
                 # Try to use full Prometheus metrics
-                import prometheus_client
+                import prometheus_client  # noqa: F401
 
                 app.add_middleware(
                     PrometheusMetricsMiddleware, service_name=service_name

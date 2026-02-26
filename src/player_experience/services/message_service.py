@@ -117,7 +117,9 @@ class MessageService:
         ai_mid = str(uuid.uuid4())
         ai_ts = datetime.now(UTC).isoformat()
         history.append({"role": "assistant", "content": response_text})
-        self._store.save_message(session_id, player_id, "assistant", response_text, ai_mid, ai_ts)
+        self._store.save_message(
+            session_id, player_id, "assistant", response_text, ai_mid, ai_ts
+        )
 
         # Trim in-memory cache to avoid unbounded growth
         if len(history) > _MAX_HISTORY_MESSAGES * 2:

@@ -826,9 +826,7 @@ class AgencyProtector:
         # Therapeutic focus alignment (if available in session state)
         therapeutic_focus = getattr(session_state, "therapeutic_focus", None)
         if therapeutic_focus is not None:
-            focus_alignment = len(
-                set(choice.therapeutic_tags) & set(therapeutic_focus)
-            )
+            focus_alignment = len(set(choice.therapeutic_tags) & set(therapeutic_focus))
             relevance_score += focus_alignment * 0.1
 
         return min(relevance_score, 1.0)

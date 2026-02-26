@@ -30,23 +30,6 @@ from ..orchestration.component import Component
 logger = logging.getLogger(__name__)
 
 
-# NOTE: Models moved to src/components/narrative_coherence/models.py
-from .narrative_coherence.models import (
-    ConsistencyIssue,
-    ConsistencyIssueType,
-    Contradiction,
-    ConvergenceValidation,
-    CreativeSolution,
-    LoreEntry,
-    NarrativeContent,
-    NarrativeResolution,
-    RetroactiveChange,
-    StorylineThread,
-    ValidationResult,
-    ValidationSeverity,
-)
-
-
 class ValidationSeverity(Enum):
     """Severity levels for validation issues."""
 
