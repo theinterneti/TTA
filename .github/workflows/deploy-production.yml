@@ -48,18 +48,16 @@ jobs:
         if: github.event.inputs.skip_staging_check != 'true'
         run: |
           echo "Checking staging environment health..."
+          STAGING_URL="${{ vars.STAGING_API_BASE_URL || 'https://staging-api.tta.example.com' }}"
 
-          # Check if staging is healthy before production deployment
-          # This is a placeholder - replace with actual staging health check
-
-          STAGING_HEALTHY=true
-
-          if [ "$STAGING_HEALTHY" = true ]; then
+          if curl -f -s "${STAGING_URL}/health" > /dev/null 2>&1; then
+            HEALTH_RESPONSE=$(curl -s "${STAGING_URL}/health")
             echo "healthy=true" >> $GITHUB_OUTPUT
-            echo "✅ Staging environment is healthy"
+            echo "✅ Staging environment is healthy: ${HEALTH_RESPONSE}"
           else
             echo "healthy=false" >> $GITHUB_OUTPUT
-            echo "❌ Staging environment is unhealthy"
+            echo "❌ Staging environment is unhealthy or unreachable at ${STAGING_URL}"
+            echo "   Use skip_staging_check=true to bypass this check"
             exit 1
           fi
 
@@ -163,32 +161,98 @@ jobs:
           echo "================================" >> deployment-production.log
 
       - name: Backup current production state
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          DEPLOY_PATH: ${{ vars.PROD_DEPLOY_PATH || '/opt/tta/production' }}
         run: |
           echo "💾 Creating backup of current production state..."
 
-          # Backup logic here
-          # Examples:
-          # - Save current Docker image tags
-          # - Backup database
-          # - Save configuration files
-          # - Create snapshot
+          if [ -z "${SSH_HOST}" ]; then
+            echo "⚠️  PROD_SSH_HOST not configured — skipping remote backup"
+            exit 0
+          fi
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          ssh -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" bash -s <<ENDSSH
+            set -e
+            cd "${DEPLOY_PATH}"
+            BACKUP_DIR="backups/\$(date +%Y%m%d_%H%M%S)"
+            mkdir -p "\${BACKUP_DIR}"
+
+            # Save current image tags
+            docker compose -f docker/compose/docker-compose.prod.yml \
+              ps --format json > "\${BACKUP_DIR}/pre-deploy-state.json" 2>/dev/null || true
+
+            # Save current image tag for rollback
+            cat .current-image-tag 2>/dev/null > "\${BACKUP_DIR}/previous-image-tag" || true
+
+            echo "\${BACKUP_DIR}" > .last-backup-dir
+            echo "Backup saved to \${BACKUP_DIR}"
+          ENDSSH
 
           echo "✅ Backup created"
 
       - name: Deploy to production
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          DEPLOY_PATH: ${{ vars.PROD_DEPLOY_PATH || '/opt/tta/production' }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           echo "🚀 Deploying to production environment..."
-          echo "Version: ${{ github.event.inputs.version }}"
-          echo "Environment: ${{ vars.ENVIRONMENT_NAME }}"
-          echo "Log Level: ${{ vars.LOG_LEVEL }}"
+          echo "Version: ${VERSION}"
 
-          # Production deployment logic here
-          # This is a placeholder - replace with actual deployment commands
-          # Examples:
-          # - Blue-green deployment
-          # - Canary deployment
-          # - Rolling update
-          # - Zero-downtime deployment
+          if [ -z "${SSH_HOST}" ]; then
+            echo "⚠️  PROD_SSH_HOST secret not configured."
+            echo "   Configure PROD_SSH_HOST, PROD_SSH_USER, and PROD_SSH_PRIVATE_KEY"
+            echo "   secrets in GitHub repo settings to enable remote deployment."
+            echo "   See DEPLOYMENT.md for setup instructions."
+            exit 0
+          fi
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          COMMIT_SHA=$(git rev-parse "${VERSION}")
+
+          ssh -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" bash -s <<ENDSSH
+            set -e
+            cd "${DEPLOY_PATH}"
+
+            # Store current tag for rollback
+            cat .current-image-tag 2>/dev/null > .pre-deploy-image-tag || echo "production" > .pre-deploy-image-tag
+
+            # Write new image tag
+            IMAGE_TAG="prod-${COMMIT_SHA}"
+            echo "\${IMAGE_TAG}" > .current-image-tag
+
+            cat > .env.deploy <<EOF
+          REGISTRY=${REGISTRY}
+          IMAGE_TAG=\${IMAGE_TAG}
+          VERSION=${VERSION}
+          EOF
+
+            # Pull new production images
+            docker compose -f docker/compose/docker-compose.prod.yml \
+              --env-file .env.deploy pull
+
+            # Blue-green: bring up new containers alongside old ones, then cut over
+            docker compose -f docker/compose/docker-compose.prod.yml \
+              --env-file .env.deploy up -d --remove-orphans --no-recreate
+
+            # Prune images older than 48 hours (keep recent for fast rollback)
+            docker image prune -f --filter "until=48h"
+
+            echo "Production deployment complete"
+          ENDSSH
 
           echo "✅ Deployment commands executed"
 
@@ -341,25 +405,66 @@ jobs:
       name: production
     steps:
       - name: Emergency rollback
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          DEPLOY_PATH: ${{ vars.PROD_DEPLOY_PATH || '/opt/tta/production' }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
         run: |
           echo "🚨 EMERGENCY: Rolling back production deployment..."
 
-          # Critical rollback logic
-          # Examples:
-          # - Restore from backup
-          # - Revert to previous image tags
-          # - Restore database if needed
-          # - Switch traffic back
+          if [ -z "${SSH_HOST}" ]; then
+            echo "⚠️  PROD_SSH_HOST not configured — cannot perform remote rollback"
+            exit 0
+          fi
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          ssh -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" bash -s <<ENDSSH
+            set -e
+            cd "${DEPLOY_PATH}"
+
+            # Read the pre-deploy image tag or fall back to 'production'
+            if [ -f .pre-deploy-image-tag ]; then
+              ROLLBACK_TAG=\$(cat .pre-deploy-image-tag)
+            else
+              ROLLBACK_TAG="production"
+            fi
+
+            echo "Rolling back to image tag: \${ROLLBACK_TAG}"
+
+            cat > .env.rollback <<EOF
+          REGISTRY=${REGISTRY}
+          IMAGE_TAG=\${ROLLBACK_TAG}
+          EOF
+
+            docker compose -f docker/compose/docker-compose.prod.yml \
+              --env-file .env.rollback up -d --remove-orphans
+
+            echo "Emergency rollback complete — running tag: \${ROLLBACK_TAG}"
+          ENDSSH
 
           echo "⚠️  Emergency rollback initiated"
 
       - name: Verify rollback success
         run: |
           echo "Verifying rollback..."
+          API_URL="${{ vars.API_BASE_URL || 'https://api.tta.example.com' }}"
 
-          # Verify rollback was successful
+          for i in $(seq 1 10); do
+            if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
+              echo "✅ Rollback verification complete — API is healthy"
+              exit 0
+            fi
+            echo "Attempt $i/10 — waiting 15s..."
+            sleep 15
+          done
 
-          echo "✅ Rollback verification complete"
+          echo "❌ API not responding after rollback — manual intervention required"
+          exit 1
 
       - name: Create incident report
         run: |

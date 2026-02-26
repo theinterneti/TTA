@@ -1,0 +1,131 @@
+name: Post-Deployment Tests
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to test (staging, production)'
+        required: true
+        type: string
+      api_base_url:
+        description: 'API base URL to test against'
+        required: true
+        type: string
+      frontend_base_url:
+        description: 'Frontend base URL to test against'
+        required: true
+        type: string
+    secrets:
+      NEO4J_URI:
+        required: false
+      NEO4J_USERNAME:
+        required: false
+      NEO4J_PASSWORD:
+        required: false
+      REDIS_HOST:
+        required: false
+      REDIS_PORT:
+        required: false
+      REDIS_PASSWORD:
+        required: false
+      TEST_USER_USERNAME:
+        required: false
+      TEST_USER_PASSWORD:
+        required: false
+      TEST_USER_EMAIL:
+        required: false
+
+jobs:
+  post-deployment-tests:
+    name: Post-Deployment Tests (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_ENV: ${{ inputs.environment }}
+      API_BASE_URL: ${{ inputs.api_base_url }}
+      FRONTEND_BASE_URL: ${{ inputs.frontend_base_url }}
+      NEO4J_URI: ${{ secrets.NEO4J_URI }}
+      NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      TEST_USER_USERNAME: ${{ secrets.TEST_USER_USERNAME }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Wait for API to be ready
+        run: |
+          API_URL="${{ inputs.api_base_url }}"
+          echo "Waiting for API at ${API_URL}/health..."
+
+          for i in $(seq 1 18); do
+            if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
+              echo "✅ API is ready"
+              exit 0
+            fi
+            echo "Attempt $i/18 — waiting 10s..."
+            sleep 10
+          done
+
+          echo "⚠️  API not ready after 3 minutes — proceeding with tests anyway"
+
+      - name: Run post-deployment tests
+        id: run-tests
+        run: |
+          uv run pytest \
+            tests/post_deployment/ \
+            -v --tb=short \
+            --junitxml=test-results/post-deployment-${{ inputs.environment }}.xml \
+            --timeout=60
+        # Staging failures are non-blocking; production failures are hard failures
+        continue-on-error: ${{ inputs.environment == 'staging' }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: post-deployment-results-${{ inputs.environment }}-${{ github.sha }}
+          path: test-results/
+          retention-days: 30
+
+      - name: Summarize test results
+        if: always()
+        run: |
+          echo "## Post-Deployment Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | ${{ inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **API URL** | ${{ inputs.api_base_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Frontend URL** | ${{ inputs.frontend_base_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
+            echo "**Status:** ✅ All post-deployment tests passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ inputs.environment }}" == "staging" ]; then
+            echo "**Status:** ⚠️  Some tests failed (non-blocking for staging)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Post-deployment tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail for production test failures
+        if: inputs.environment == 'production' && steps.run-tests.outcome == 'failure'
+        run: |
+          echo "❌ Post-deployment tests failed in production — triggering rollback signal"
+          exit 1

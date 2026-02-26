@@ -45,7 +45,10 @@ jobs:
         if: steps.check.outputs.should_deploy == 'true'
         run: |
           echo "Running quick validation tests..."
-          # Add quick smoke tests here
+          git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+          pip install uv --quiet
+          uv sync --quiet
+          uv run pytest -q -m "not integration and not neo4j and not redis" tests/ --tb=short -x
           echo "✅ Quick tests passed"
 
   build-images:
@@ -114,18 +117,64 @@ jobs:
           echo "Environment: staging" >> deployment.log
 
       - name: Deploy to staging
+        env:
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          DEPLOY_PATH: ${{ vars.STAGING_DEPLOY_PATH || '/opt/tta/staging' }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
+          IMAGE_TAG: staging-${{ github.sha }}
         run: |
           echo "🚀 Deploying to staging environment..."
-          echo "Environment: ${{ vars.ENVIRONMENT_NAME }}"
-          echo "Log Level: ${{ vars.LOG_LEVEL }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
 
-          # Deployment logic here
-          # This is a placeholder - replace with actual deployment commands
-          # Examples:
-          # - SSH to staging server and pull images
-          # - Use kubectl for Kubernetes deployment
-          # - Use docker-compose for Docker Swarm
-          # - Use Ansible/Terraform for infrastructure
+          if [ -z "${SSH_HOST}" ]; then
+            echo "⚠️  STAGING_SSH_HOST secret not configured."
+            echo "   Configure STAGING_SSH_HOST, STAGING_SSH_USER, and STAGING_SSH_PRIVATE_KEY"
+            echo "   secrets in GitHub repo settings to enable remote deployment."
+            echo "   See DEPLOYMENT.md for setup instructions."
+            exit 0
+          fi
+
+          # Set up SSH
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          # Deploy via SSH
+          ssh -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" bash -s <<ENDSSH
+            set -e
+            DEPLOY_PATH="${DEPLOY_PATH}"
+            REGISTRY="${REGISTRY}"
+            IMAGE_TAG="${IMAGE_TAG}"
+
+            cd "\${DEPLOY_PATH}"
+
+            # Record pre-deploy state for rollback
+            echo "${IMAGE_TAG}" > .current-image-tag
+            docker compose -f docker/compose/docker-compose.staging-homelab.yml \
+              ps --format json > .pre-deploy-state.json 2>/dev/null || true
+
+            # Write deployment env
+            cat > .env.deploy <<EOF
+          REGISTRY=\${REGISTRY}
+          IMAGE_TAG=\${IMAGE_TAG}
+          EOF
+
+            # Pull latest images from GHCR
+            docker compose -f docker/compose/docker-compose.staging-homelab.yml \
+              --env-file .env.deploy pull
+
+            # Bring up updated containers
+            docker compose -f docker/compose/docker-compose.staging-homelab.yml \
+              --env-file .env.deploy up -d --remove-orphans
+
+            # Prune images older than 24 hours
+            docker image prune -f --filter "until=24h"
+
+            echo "Staging deployment complete"
+          ENDSSH
 
           echo "✅ Deployment commands executed"
 
@@ -224,25 +273,68 @@ jobs:
       name: staging
     steps:
       - name: Rollback deployment
+        env:
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          DEPLOY_PATH: ${{ vars.STAGING_DEPLOY_PATH || '/opt/tta/staging' }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
         run: |
           echo "🔄 Rolling back staging deployment..."
 
-          # Rollback logic here
-          # Examples:
-          # - Revert to previous Docker image tags
-          # - Restore previous configuration
-          # - Use kubectl rollout undo
-          # - Redeploy previous version
+          if [ -z "${SSH_HOST}" ]; then
+            echo "⚠️  STAGING_SSH_HOST not configured — cannot perform remote rollback"
+            exit 0
+          fi
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          ssh -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" bash -s <<ENDSSH
+            set -e
+            cd "${DEPLOY_PATH}"
+
+            # Read the pre-deploy state or fall back to the 'staging' tag
+            if [ -f .pre-deploy-image-tag ]; then
+              ROLLBACK_TAG=\$(cat .pre-deploy-image-tag)
+            else
+              ROLLBACK_TAG="staging"
+            fi
+
+            echo "Rolling back to image tag: \${ROLLBACK_TAG}"
+
+            cat > .env.rollback <<EOF
+          REGISTRY=${REGISTRY}
+          IMAGE_TAG=\${ROLLBACK_TAG}
+          EOF
+
+            docker compose -f docker/compose/docker-compose.staging-homelab.yml \
+              --env-file .env.rollback up -d --remove-orphans
+
+            echo "Rollback complete"
+          ENDSSH
 
           echo "⚠️  Rollback initiated"
 
       - name: Verify rollback
+        env:
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
         run: |
           echo "Verifying rollback..."
+          API_URL="${{ vars.API_BASE_URL || 'https://staging-api.tta.example.com' }}"
 
-          # Add rollback verification
+          for i in $(seq 1 6); do
+            if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
+              echo "✅ Rollback verification complete — API is healthy"
+              exit 0
+            fi
+            echo "Attempt $i/6 — waiting 15s..."
+            sleep 15
+          done
 
-          echo "✅ Rollback verification complete"
+          echo "❌ API not responding after rollback"
+          exit 1
 
       - name: Create rollback summary
         run: |
