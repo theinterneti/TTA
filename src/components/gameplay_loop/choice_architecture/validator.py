@@ -354,7 +354,7 @@ class ChoiceValidator:
 
         return ValidationResult(
             is_valid=is_valid,
-            confidence_score=1.0 - (len(issues) * 0.2),
+            confidence_score=max(0.0, 1.0 - (len(issues) * 0.2)),
             issues=issues,
             warnings=warnings,
             validation_details={

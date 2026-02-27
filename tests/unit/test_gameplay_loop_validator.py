@@ -255,10 +255,12 @@ class TestValidateForEmotionalState:
 
     async def test_crisis_state_with_required_tags_passes(self, initialized_validator):
         session = _make_session(EmotionalState.CRISIS)
+        # Crisis requires GENTLE difficulty (max_difficulty_level=1)
         choice = _make_choice(
             choice_type=ChoiceType.THERAPEUTIC,
             therapeutic_tags=["immediate_safety", "crisis_support"],
             therapeutic_value=1.0,
+            difficulty_level=DifficultyLevel.GENTLE,
         )
         result = await initialized_validator.validate_for_emotional_state(
             choice, EmotionalState.CRISIS.value, session

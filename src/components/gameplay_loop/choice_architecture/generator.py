@@ -92,9 +92,9 @@ class ChoiceGenerator:
             max_choices = requirements.get("max_choices", 4)
 
             # Generate choices for each required type
-            for choice_type in choice_types_needed:
+            for slot_index, choice_type in enumerate(choice_types_needed):
                 choice = await self._generate_choice_by_type(
-                    choice_type, scene, session_state, requirements
+                    choice_type, scene, session_state, requirements, slot_index
                 )
                 if choice:
                     generated_choices.append(choice)
@@ -379,18 +379,21 @@ class ChoiceGenerator:
         scene: Scene,
         session_state: SessionState,
         requirements: dict[str, Any],
+        slot_index: int = 0,
     ) -> Choice | None:
         """Generate a choice of a specific type."""
         templates = self.choice_templates.get(choice_type, [])
         if not templates:
             return None
 
-        # Select appropriate template
-        template = await self._select_template(templates, scene, session_state)
+        # Select appropriate template, rotating by slot to avoid repetition
+        template = await self._select_template(
+            templates, scene, session_state, slot_index
+        )
 
         # Generate choice from template
         return await self._generate_from_template(
-            template, scene, session_state, requirements
+            template, scene, session_state, requirements, slot_index
         )
 
     async def _generate_additional_choice(
@@ -403,6 +406,7 @@ class ChoiceGenerator:
         """Generate an additional choice to fill remaining slots."""
         # Determine what type of choice would be most beneficial
         existing_types = [choice.choice_type for choice in existing_choices]
+        slot_index = len(existing_choices)
 
         # Prefer therapeutic choices if we don't have enough
         therapeutic_count = sum(
@@ -413,40 +417,42 @@ class ChoiceGenerator:
 
         if therapeutic_count / (total_choices + 1) < therapeutic_ratio:
             return await self._generate_choice_by_type(
-                ChoiceType.THERAPEUTIC, scene, session_state, requirements
+                ChoiceType.THERAPEUTIC, scene, session_state, requirements, slot_index
             )
 
         # Otherwise, generate a narrative choice
         return await self._generate_choice_by_type(
-            ChoiceType.NARRATIVE, scene, session_state, requirements
+            ChoiceType.NARRATIVE, scene, session_state, requirements, slot_index
         )
 
     async def _select_template(  # noqa: ARG002
-        self, templates: list[ChoiceTemplate], scene: Scene, session_state: SessionState
+        self,
+        templates: list[ChoiceTemplate],
+        scene: Scene,
+        session_state: SessionState,
+        slot_index: int = 0,
     ) -> ChoiceTemplate:
         """Select the most appropriate template for the context."""
         if not templates:
             return templates[0]
 
         # Score templates based on therapeutic focus alignment
-        best_template = None
-        best_score = 0
-
-        for template in templates:
+        scored: list[tuple[int, int, ChoiceTemplate]] = []
+        for i, template in enumerate(templates):
             score = 0
-
-            # Score based on therapeutic tag alignment
             for tag in template.therapeutic_tags:
                 if tag in scene.therapeutic_focus:
                     score += 2
                 elif any(tag in focus for focus in scene.therapeutic_focus):
                     score += 1
+            scored.append((score, i, template))
 
-            if score > best_score:
-                best_score = score
-                best_template = template
+        scored.sort(key=lambda x: x[0], reverse=True)
+        best_score = scored[0][0]
 
-        return best_template or templates[0]
+        # Among equally-scored templates, rotate by slot_index to avoid repetition
+        top_templates = [t for s, _, t in scored if s == best_score]
+        return top_templates[slot_index % len(top_templates)]
 
     async def _generate_from_template(
         self,
@@ -454,6 +460,7 @@ class ChoiceGenerator:
         scene: Scene,
         session_state: SessionState,
         requirements: dict[str, Any],
+        slot_index: int = 0,
     ) -> Choice:
         """Generate a choice from a template."""
         # Determine difficulty level
@@ -465,16 +472,16 @@ class ChoiceGenerator:
         elif complexity_preference == "complex":
             difficulty_level = DifficultyLevel.CHALLENGING
 
-        # Get appropriate text variant
-        difficulty_key = difficulty_level.value
-        choice_text = template.difficulty_variants.get(
-            difficulty_key,
-            (
-                template.text_patterns[0]
-                if template.text_patterns
-                else "Continue your journey"
-            ),
-        )
+        # Rotate through text_patterns by slot_index to avoid identical choices.
+        # Fall back to difficulty_variants if no patterns available.
+        patterns = template.text_patterns
+        if patterns:
+            choice_text = patterns[slot_index % len(patterns)]
+        else:
+            difficulty_key = difficulty_level.value
+            choice_text = template.difficulty_variants.get(
+                difficulty_key, "Continue your journey"
+            )
 
         # Generate description
         description = await self._generate_choice_description(

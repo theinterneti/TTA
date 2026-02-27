@@ -56,6 +56,7 @@ class ProcessChoiceResponse(BaseModel):
     success: bool
     session_id: str | None = None
     choice_result: dict[str, Any] | None = None
+    session_status: dict[str, Any] | None = None
     processed_at: str | None = None
     safety_warning: str | None = None
     error: str | None = None

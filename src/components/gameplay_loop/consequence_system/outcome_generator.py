@@ -509,26 +509,86 @@ class OutcomeGenerator:
             ],
         }
 
+    def _build_substitutions(
+        self, user_choice: UserChoice, scene: Scene, session_state: SessionState
+    ) -> dict[str, str]:
+        """Build substitution values for filling outcome pattern placeholders."""
+        tags = user_choice.therapeutic_tags
+        technique = tags[0].replace("_", " ") if tags else "this practice"
+        skill = tags[1].replace("_", " ") if len(tags) > 1 else "wellbeing"
+        emotion = session_state.emotional_state.value
+        return {
+            # therapeutic
+            "emotional_response": emotion,
+            "action": user_choice.choice_text.lower(),
+            "therapeutic_technique": technique,
+            "immediate_benefit": "clarity and calm",
+            "awareness_insight": "something meaningful",
+            "skill_area": skill,
+            "technique": technique,
+            "therapeutic_goal": "growth and healing",
+            # narrative
+            "new_location": "new terrain",
+            "interesting_element": "something unexpected",
+            "significance": "draws your attention",
+            "path_description": "stretches ahead with possibility",
+            "future_opportunity": "new possibilities",
+            "future_challenge": "similar moments",
+            "time_frame": "your journey",
+            # skill building
+            "skill_name": technique,
+            "situation": "this moment",
+            "difficulty_level": "manageable",
+            "encouraging_aspect": "meaningful",
+            # emotional regulation
+            "regulation_action": "soften",
+            "emotion": emotion,
+            "change_direction": "eases",
+            "positive_emotion": "relief",
+            # social
+            "interaction_style": "open approach",
+            "social_outcome": "a sense of connection",
+            "response_type": "openness and warmth",
+            "social_emotion": "warmth",
+            "relationship_aspect": "connections",
+            "positive_element": "warmth",
+            "interaction_learning": "this exchange",
+        }
+
     # Outcome Generation Methods
-    async def _generate_immediate_outcomes(  # noqa: ARG002
+    async def _generate_immediate_outcomes(
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState
     ) -> list[str]:
         """Generate immediate outcomes from choice."""
         patterns = self.outcome_templates.get(user_choice.choice_type, [])
-        if patterns:
-            template = patterns[0]
-            return template.immediate_patterns[:2]
-        return ["Your choice creates an immediate shift in your journey"]
+        if not patterns:
+            return ["Your choice creates an immediate shift in your journey"]
+        template = patterns[0]
+        subs = self._build_substitutions(user_choice, scene, session_state)
+        result = []
+        for pattern in template.immediate_patterns[:2]:
+            try:
+                result.append(pattern.format(**subs))
+            except KeyError:
+                result.append(pattern)
+        return result
 
-    async def _generate_delayed_outcomes(  # noqa: ARG002
+    async def _generate_delayed_outcomes(
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState
     ) -> list[str]:
         """Generate delayed outcomes from choice."""
         patterns = self.outcome_templates.get(user_choice.choice_type, [])
-        if patterns:
-            template = patterns[0]
-            return template.delayed_patterns[:1]
-        return []
+        if not patterns:
+            return []
+        template = patterns[0]
+        subs = self._build_substitutions(user_choice, scene, session_state)
+        result = []
+        for pattern in template.delayed_patterns[:1]:
+            try:
+                result.append(pattern.format(**subs))
+            except KeyError:
+                result.append(pattern)
+        return result
 
     async def _generate_emotional_impact(  # noqa: ARG002
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState

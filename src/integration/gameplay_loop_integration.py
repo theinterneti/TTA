@@ -225,10 +225,16 @@ class GameplayLoopIntegration:
                 except Exception as e:
                     logger.warning(f"Agent orchestration integration failed: {e}")
 
+            # Fetch updated session status so callers can see incremented total_choices
+            updated_session_status = await self.gameplay_component.get_session_status(
+                session_id
+            )
+
             return {
                 "success": True,
                 "session_id": session_id,
                 "choice_result": choice_result,
+                "session_status": updated_session_status,
                 "processed_at": datetime.utcnow().isoformat(),
             }
 
