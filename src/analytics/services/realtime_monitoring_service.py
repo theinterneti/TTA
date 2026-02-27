@@ -145,7 +145,11 @@ class AnomalyDetector:
 
         # Calculate trend using linear regression
         x = np.arange(len(values))
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, values)
+        _reg = stats.linregress(x, values)  # type: ignore[arg-type]
+        slope = float(_reg.slope)  # type: ignore[arg-type]
+        std_err = float(_reg.stderr)  # type: ignore[arg-type]
+        p_value = float(_reg.pvalue)  # type: ignore[arg-type]
+        r_value = float(_reg.rvalue)  # type: ignore[arg-type]
 
         # Check for sudden trend changes
         if abs(slope) > 2 * std_err and p_value < 0.05:

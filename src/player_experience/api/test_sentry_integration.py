@@ -99,7 +99,7 @@ def test_data_filtering():
         capture_therapeutic_error(
             e,
             context={
-                "request_data": sensitive_data,
+                "request_data": sensitive_data,  # type: ignore[possibly-unbound]
                 "endpoint": "/api/v1/test",
                 "method": "POST",
             },

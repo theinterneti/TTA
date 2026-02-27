@@ -437,7 +437,7 @@ Focus on evidence-based therapeutic assessment. Be objective and supportive."""
                                 analysis_data = json.loads(json_match.group())
                                 analysis_data["analysis_available"] = True
                                 return analysis_data
-                        except json.JSONDecodeError:
+                        except json.JSONDecodeError:  # type: ignore[possibly-unbound]
                             pass
 
         except Exception as e:

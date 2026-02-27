@@ -90,7 +90,7 @@ class TokenCache:
     async def ping(self) -> bool:
         """Return True if Redis is reachable."""
         try:
-            return bool(await self._client.ping())
+            return bool(await self._client.ping())  # type: ignore[misc]
         except Exception:
             return False
 

@@ -124,8 +124,8 @@ async def get_gameplay_service() -> GameplayService:
     # This would be dependency injected in a real implementation
     # For now, we'll create a singleton instance
     if not hasattr(get_gameplay_service, "_instance"):
-        get_gameplay_service._instance = GameplayService()
-    return get_gameplay_service._instance
+        get_gameplay_service._instance = GameplayService()  # type: ignore[attr-defined]
+    return get_gameplay_service._instance  # type: ignore[attr-defined]
 
 
 async def get_message_service() -> MessageService:
@@ -133,10 +133,10 @@ async def get_message_service() -> MessageService:
     if not hasattr(get_message_service, "_instance"):
         from ..routers.sessions import get_session_store  # noqa: PLC0415
 
-        get_message_service._instance = MessageService(
+        get_message_service._instance = MessageService(  # type: ignore[attr-defined]
             session_store=get_session_store()
         )
-    return get_message_service._instance
+    return get_message_service._instance  # type: ignore[attr-defined]
 
 
 @router.post("/message", response_model=SendMessageResponse)

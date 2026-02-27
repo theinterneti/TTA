@@ -519,9 +519,9 @@ class RateLimitMiddleware:
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="Rate limit exceeded",
                 headers={
-                    "Retry-After": str(result.retry_after),
+                    "Retry-After": str(result.retry_after),  # type: ignore[possibly-unbound]
                     "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(int(result.reset_time.timestamp())),
+                    "X-RateLimit-Reset": str(int(result.reset_time.timestamp())),  # type: ignore[possibly-unbound]
                 },
             ) from None
 

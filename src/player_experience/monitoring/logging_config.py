@@ -114,7 +114,7 @@ class StructuredFormatter(jsonlogger.JsonFormatter):  # type: ignore[name-define
         self.service_name = "player-experience-interface"
         self.version = "1.0.0"  # Should be loaded from config
 
-    def add_fields(self, log_record, record, message_dict):
+    def add_fields(self, log_record, record, message_dict):  # type: ignore[override]
         """Add custom fields to log record."""
         super().add_fields(log_record, record, message_dict)
 

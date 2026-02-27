@@ -17,11 +17,11 @@ from uuid import uuid4
 
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+import plotly.express as px  # type: ignore[import-not-found]
+import plotly.graph_objects as go  # type: ignore[import-not-found]
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from jinja2 import Template
-from plotly.utils import PlotlyJSONEncoder
+from plotly.utils import PlotlyJSONEncoder  # type: ignore[import-not-found]
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -154,12 +154,14 @@ class TrendAnalyzer:
 
         # Calculate trend direction
         engagement_scores = df_grouped[("engagement_score", "mean")].values
+        slope = 0.0
         if len(engagement_scores) < 2:
             trend_direction = "insufficient_data"
         else:
             # Simple linear trend calculation
             x = np.arange(len(engagement_scores))
-            slope = np.polyfit(x, engagement_scores, 1)[0]
+            scores_arr = np.asarray(engagement_scores, dtype=float)
+            slope = float(np.polyfit(x, scores_arr, 1)[0])
 
             if slope > 0.01:
                 trend_direction = "increasing"
@@ -170,8 +172,10 @@ class TrendAnalyzer:
 
         return {
             "trend": trend_direction,
-            "slope": float(slope) if len(engagement_scores) >= 2 else 0.0,
-            "avg_engagement": float(np.mean(engagement_scores)),
+            "slope": slope,
+            "avg_engagement": float(
+                np.mean(np.asarray(engagement_scores, dtype=float))
+            ),
             "data_points": len(engagement_scores),
             "analysis": f"Engagement trend is {trend_direction} over {time_period} periods",
             "time_series_data": df_grouped.to_dict("records"),
@@ -208,12 +212,13 @@ class TrendAnalyzer:
 
         success_rates = weekly_outcomes[("success", "mean")].values
 
-        if len(success_rates) < 2:
+        rates_arr = np.asarray(success_rates, dtype=float)
+        if len(rates_arr) < 2:
             trend_direction = "insufficient_data"
             slope = 0.0
         else:
-            x = np.arange(len(success_rates))
-            slope = np.polyfit(x, success_rates, 1)[0]
+            x = np.arange(len(rates_arr))
+            slope = float(np.polyfit(x, rates_arr, 1)[0])
 
             if slope > 0.05:
                 trend_direction = "improving"
@@ -224,8 +229,8 @@ class TrendAnalyzer:
 
         return {
             "trend": trend_direction,
-            "slope": float(slope),
-            "avg_success_rate": float(np.mean(success_rates)),
+            "slope": slope,
+            "avg_success_rate": float(np.mean(rates_arr)),
             "total_outcomes": len(outcome_data),
             "analysis": f"Therapeutic outcomes are {trend_direction}",
             "weekly_data": weekly_outcomes.to_dict("records"),

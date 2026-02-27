@@ -17,8 +17,8 @@ try:
     from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
         CONTENT_TYPE_LATEST,
     )
-    from ...monitoring.prometheus_metrics import (
-        get_metrics_collector as get_prometheus_collector,  # type: ignore[import-not-found]
+    from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
+        get_metrics_collector as get_prometheus_collector,
     )
 
     prometheus_available = True
@@ -33,7 +33,9 @@ router = APIRouter()
 def _metrics_allowed() -> None:
     # Only allow when debug/testing is enabled; import settings at runtime to honor test overrides
     try:
-        from ..config import settings as current_settings  # noqa: PLC0415
+        from ..config import (
+            settings as current_settings,  # type: ignore[attr-defined]  # noqa: PLC0415
+        )
 
         if not getattr(current_settings, "debug", False):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -69,9 +71,9 @@ async def get_prometheus_metrics():
         )
 
     try:
-        collector = get_prometheus_collector("player-experience")
+        collector = get_prometheus_collector("player-experience")  # type: ignore[possibly-unbound]
         metrics_data = collector.get_metrics()
-        return PlainTextResponse(content=metrics_data, media_type=CONTENT_TYPE_LATEST)
+        return PlainTextResponse(content=metrics_data, media_type=CONTENT_TYPE_LATEST)  # type: ignore[possibly-unbound]
     except Exception as e:
         return PlainTextResponse(
             content=f"# Error generating Prometheus metrics: {e}\n",

@@ -84,7 +84,7 @@ def _make_ollama_llm(
         base_url=base_url,
         model=model_name,
         temperature=temperature,
-        max_tokens=max_tokens,
+        max_tokens=max_tokens,  # type: ignore[call-arg]
     )
 
 
@@ -109,5 +109,5 @@ def _make_openrouter_llm(
         base_url=_OPENROUTER_BASE_URL,
         model=model_name,
         temperature=temperature,
-        max_tokens=max_tokens,
+        max_tokens=max_tokens,  # type: ignore[call-arg]
     )

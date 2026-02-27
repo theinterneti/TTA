@@ -456,7 +456,7 @@ async def login(
         finally:
             # Record player profile auto-creation metrics
             if autocreation_start_time is not None:
-                duration = time.time() - autocreation_start_time
+                duration = time.time() - autocreation_start_time  # type: ignore[possibly-unbound]
                 try:
                     from src.monitoring.prometheus_metrics import get_metrics_collector
 

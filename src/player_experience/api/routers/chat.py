@@ -338,7 +338,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         )
 
                         # Get agent event integrator
-                        agent_integrator = get_agent_event_integrator(
+                        agent_integrator = get_agent_event_integrator(  # type: ignore[possibly-unbound]
                             agent_id=f"chat_agent_{player_id}"
                         )
 
@@ -385,7 +385,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         # Therapeutic Safety Validation: Validate AI-generated response
                         if therapeutic_safety_available:
                             try:
-                                safety_service = get_global_safety_service()
+                                safety_service = get_global_safety_service()  # type: ignore[possibly-unbound]
                                 safety_validation_result = (
                                     await safety_service.validate_text(ai_response_text)
                                 )
@@ -393,7 +393,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                 # If response is blocked, use alternative content
                                 if (
                                     safety_validation_result.level
-                                    == SafetyLevel.BLOCKED
+                                    == SafetyLevel.BLOCKED  # type: ignore[possibly-unbound]
                                 ):
                                     logger.warning(
                                         f"AI response blocked by safety validation for session {session_id}"
@@ -401,14 +401,15 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                     ai_response_text = (
                                         safety_validation_result.alternative_content
                                         or safety_service.suggest_alternative(
-                                            SafetyLevel.BLOCKED, ai_response_text
+                                            SafetyLevel.BLOCKED,  # type: ignore[possibly-unbound]
+                                            ai_response_text,
                                         )
                                     )
                                     metadata["safety_override"] = True
 
                                 # If crisis detected in AI response, initiate intervention
                                 if safety_validation_result.crisis_detected:
-                                    crisis_manager = CrisisInterventionManager()
+                                    crisis_manager = CrisisInterventionManager()  # type: ignore[possibly-unbound]
                                     crisis_assessment = crisis_manager.assess_crisis(
                                         safety_validation_result,
                                         {

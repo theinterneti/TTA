@@ -125,7 +125,7 @@ class PlayerProfileRepository:
 
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
-                elif isinstance(e, (AuthError, _ServiceUnavailable)):
+                elif isinstance(e, AuthError | _ServiceUnavailable):
                     raise PlayerProfileRepositoryError(
                         f"Failed to connect to Neo4j after retries: {e}"
                     ) from e
@@ -551,11 +551,11 @@ class PlayerProfileRepository:
                     # Restore authentication data if present (temporary solution)
                     # Using setattr for dynamic attributes not in PrivacySettings dataclass
                     if "password_hash" in privacy_settings_data:
-                        privacy_settings.password_hash = privacy_settings_data[
+                        privacy_settings.password_hash = privacy_settings_data[  # type: ignore[attr-defined]
                             "password_hash"
                         ]
                     if "role" in privacy_settings_data:
-                        privacy_settings.role = privacy_settings_data["role"]
+                        privacy_settings.role = privacy_settings_data["role"]  # type: ignore[attr-defined]
 
                 # Reconstruct progress summary
                 progress_summary = ProgressSummary()

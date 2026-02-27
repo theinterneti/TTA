@@ -139,8 +139,8 @@ class UserRepository:
             # Store authentication data in privacy settings metadata (temporary solution)
             # In production, this should be in a separate User authentication table
             # Using setattr for dynamic attributes not in the dataclass definition
-            player_profile.privacy_settings.password_hash = password_hash
-            player_profile.privacy_settings.role = role.value
+            player_profile.privacy_settings.password_hash = password_hash  # type: ignore[attr-defined]
+            player_profile.privacy_settings.role = role.value  # type: ignore[attr-defined]
 
             # Save to database
             success = self.player_repo.create_player_profile(player_profile)

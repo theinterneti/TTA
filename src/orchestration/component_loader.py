@@ -172,7 +172,7 @@ class FilesystemComponentLoader:
         if self.config.get("gameplay_loop.enabled", False):
             try:
                 from src.components.gameplay_loop import (  # noqa: PLC0415
-                    GameplayLoopComponent,
+                    GameplayLoopComponent,  # type: ignore[attr-defined]
                 )
 
                 comp = GameplayLoopComponent(self.config)

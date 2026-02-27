@@ -160,7 +160,7 @@ class MessageService:
                     lc_messages.append(AIMessage(content=turn["content"]))
 
             ai_response = await llm.ainvoke(lc_messages)
-            return ai_response.content.strip()
+            return ai_response.content.strip()  # type: ignore[union-attr]
 
         except Exception as exc:
             logger.warning("LLM call failed; returning fallback response: %s", exc)

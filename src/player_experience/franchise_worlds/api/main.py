@@ -37,8 +37,8 @@ from slowapi.util import get_remote_address  # type: ignore[import-not-found]
 from ..integration.PlayerExperienceIntegration import FranchiseWorldAPI
 
 # Import routers
-from .routers.franchise_worlds import (
-    router as franchise_worlds_router,  # type: ignore[import-not-found]
+from .routers.franchise_worlds import (  # type: ignore[import-not-found]
+    router as franchise_worlds_router,
 )
 
 # Configure structured logging

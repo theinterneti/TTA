@@ -89,6 +89,8 @@ def retry(
     """
 
     def decorator(func: F) -> F:
+        _exc = tuple(exceptions) if isinstance(exceptions, list) else exceptions
+
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             attempt = 1
@@ -97,7 +99,7 @@ def retry(
             while attempt <= max_attempts:
                 try:
                     return func(*args, **kwargs)
-                except exceptions as e:
+                except _exc as e:  # type: ignore[misc]
                     if attempt == max_attempts:
                         logger.error(
                             f"Final attempt {attempt}/{max_attempts} for {func.__name__} failed: {e}"
@@ -177,8 +179,8 @@ def deprecated(reason: str) -> Callable[[F], F]:
             logger.warning(f"Call to deprecated function {func.__name__}. {reason}")
             return func(*args, **kwargs)
 
-        wrapper.__deprecated__ = True
-        wrapper.__deprecated_reason__ = reason
+        wrapper.__deprecated__ = True  # type: ignore[attr-defined]
+        wrapper.__deprecated_reason__ = reason  # type: ignore[attr-defined]
         return cast(F, wrapper)
 
     return decorator
@@ -202,7 +204,7 @@ def singleton[T](cls: type[T]) -> type[T]:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
 
-    get_instance._instances = instances  # Expose the instances dictionary
+    get_instance._instances = instances  # type: ignore[attr-defined]  # Expose the instances dictionary
 
     return cast(type[T], get_instance)
 

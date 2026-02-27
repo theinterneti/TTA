@@ -135,7 +135,9 @@ class TTAOrchestrator:
                     self.component_registry.get_component_class(component_name)
                 )
                 comp = component_class(
-                    component_name, self.config, dependencies=dependencies
+                    component_name,
+                    self.config,
+                    dependencies=dependencies,  # type: ignore[arg-type]
                 )  # Pass dependencies here
                 self.components[comp.name] = comp
                 logger.info(f"Imported component {comp.name}")

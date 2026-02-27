@@ -45,7 +45,7 @@ def get_session_store() -> SessionStore:
                 "Dolt unavailable (%s); falling back to SQLite SessionStore", exc
             )
             _session_store = SessionStore()
-    return _session_store
+    return _session_store  # type: ignore[return-value]
 
 
 # Global world manager instance
