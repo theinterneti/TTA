@@ -169,10 +169,10 @@ class FilesystemComponentLoader:
                 logger.debug(f"CarbonComponent not available: {e}")
 
         # Import gameplay loop component if enabled
-        if self.config.get("gameplay_loop.enabled", False):
+        if self.config.get("core_gameplay_loop.enabled", False):
             try:
-                from src.components.gameplay_loop import (  # noqa: PLC0415
-                    GameplayLoopComponent,  # type: ignore[attr-defined]
+                from src.components.gameplay_loop_component import (  # noqa: PLC0415
+                    GameplayLoopComponent,
                 )
 
                 comp = GameplayLoopComponent(self.config)

@@ -499,9 +499,10 @@ class SceneGenerator:
         # Generate description
         description = setting["description"]
 
-        # Generate narrative content
+        # Generate narrative content (exclude 'setting' from kwargs to avoid duplicate arg)
+        content_kwargs = {k: v for k, v in kwargs.items() if k != "setting"}
         narrative_content = await self._generate_narrative_content(
-            pattern, setting, therapeutic_focus, emotional_tone, **kwargs
+            pattern, setting, therapeutic_focus, emotional_tone, **content_kwargs
         )
 
         # Generate learning objectives

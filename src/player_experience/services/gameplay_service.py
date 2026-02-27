@@ -8,6 +8,7 @@ integrating with the GameplayLoopIntegration layer and providing
 a clean interface for API endpoints.
 """
 
+import asyncio
 import logging
 from typing import Any
 
@@ -46,6 +47,15 @@ class GameplayService:
             if not gameplay_component:
                 logger.error("GameplayLoopComponent not found in orchestrator")
                 return
+
+            # Start the component if controller not yet initialized
+            # Run in executor to avoid event loop conflict (component.start() uses run_until_complete)
+            if not getattr(gameplay_component, "gameplay_controller", None):
+                loop = asyncio.get_event_loop()
+                started = await loop.run_in_executor(None, gameplay_component.start)
+                if not started:
+                    logger.error("Failed to start GameplayLoopComponent")
+                    return
 
             # Get agent orchestration service if available
             agent_orchestration_component = orchestrator.components.get(
