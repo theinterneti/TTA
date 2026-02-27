@@ -141,9 +141,14 @@ class NarrativeEngine:
                     scene, session_state
                 )
 
-                # Store scene in database and cache
-                await self.db_manager.create_scene(scene)
+                # Cache in-memory always; attempt DB persist (non-blocking)
                 self._scene_cache[scene.scene_id] = scene
+                persisted = await self.db_manager.create_scene(scene)
+                if not persisted:
+                    logger.warning(
+                        f"Scene {scene.scene_id} generated but DB persist failed; "
+                        "using in-memory cache only"
+                    )
 
                 logger.info(f"Generated opening scene: {scene.scene_id}")
                 return scene
@@ -194,7 +199,20 @@ class NarrativeEngine:
                 session_state, narrative_direction, pacing_adjustment
             )
 
-            # Generate the scene
+            # Generate the scene (strip keys already passed as explicit args)
+            extra_params = {
+                k: v
+                for k, v in scene_params.items()
+                if k
+                not in {
+                    "scene_type",
+                    "therapeutic_focus",
+                    "emotional_tone",
+                    "difficulty_level",
+                    "previous_scene_context",
+                    "choice_context",
+                }
+            }
             scene = await self.scene_generator.generate_therapeutic_scene(
                 scene_type=scene_type,
                 therapeutic_focus=session_state.therapeutic_context.primary_goals,
@@ -202,7 +220,7 @@ class NarrativeEngine:
                 difficulty_level=session_state.difficulty_level,
                 previous_scene_context=session_state.current_scene,
                 choice_context=previous_choice,
-                **scene_params,
+                **extra_params,
             )
 
             if scene:
@@ -226,9 +244,14 @@ class NarrativeEngine:
                     scene, pacing_adjustment
                 )
 
-                # Store and cache
-                await self.db_manager.create_scene(scene)
+                # Cache in-memory always; attempt DB persist (non-blocking)
                 self._scene_cache[scene.scene_id] = scene
+                persisted = await self.db_manager.create_scene(scene)
+                if not persisted:
+                    logger.warning(
+                        f"Scene {scene.scene_id} generated but DB persist failed; "
+                        "using in-memory cache only"
+                    )
 
                 logger.info(f"Generated next scene: {scene.scene_id}")
                 return scene
@@ -335,9 +358,14 @@ class NarrativeEngine:
                     scene, session_state
                 )
 
-                # Store and cache
-                await self.db_manager.create_scene(scene)
+                # Cache in-memory always; attempt DB persist (non-blocking)
                 self._scene_cache[scene.scene_id] = scene
+                persisted = await self.db_manager.create_scene(scene)
+                if not persisted:
+                    logger.warning(
+                        f"Scene {scene.scene_id} generated but DB persist failed; "
+                        "using in-memory cache only"
+                    )
 
                 logger.info(f"Generated intervention scene: {scene.scene_id}")
                 return scene

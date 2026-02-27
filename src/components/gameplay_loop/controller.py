@@ -554,6 +554,15 @@ class GameplayLoopController:
                 "emotional_state": session_state.emotional_state.value,
                 "total_choices": len(session_state.choice_history),
                 "available_choices_count": len(session.available_choices),
+                "available_choices": [
+                    {
+                        "choice_id": c.choice_id,
+                        "choice_text": c.choice_text,
+                        "description": c.description,
+                        "therapeutic_value": c.therapeutic_value,
+                    }
+                    for c in session.available_choices
+                ],
                 "therapeutic_engagement": 0.0,
                 "last_activity": (
                     session.last_activity_time.isoformat()
