@@ -136,8 +136,8 @@ class TTAOrchestrator:
                 )
                 comp = component_class(
                     component_name,
-                    self.config,
-                    dependencies=dependencies,  # type: ignore[arg-type]
+                    self.config,  # type: ignore[arg-type]
+                    dependencies=dependencies,
                 )  # Pass dependencies here
                 self.components[comp.name] = comp
                 logger.info(f"Imported component {comp.name}")
