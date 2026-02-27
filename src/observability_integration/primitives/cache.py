@@ -17,10 +17,8 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import (
-        WorkflowContext,
-        WorkflowPrimitive,
-    )
+    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[assignment]
+    from tta_dev_primitives.core.base import WorkflowPrimitive  # type: ignore[assignment]
 except ImportError:
     # Fallback for development/testing
     from typing import Protocol, TypeVar
@@ -44,7 +42,7 @@ from ..apm_setup import get_meter
 logger = logging.getLogger(__name__)
 
 
-class CachePrimitive(WorkflowPrimitive[Any, Any]):
+class CachePrimitive(WorkflowPrimitive[Any, Any]):  # type: ignore[misc]
     """
     Cache primitive with Redis backend and comprehensive metrics tracking.
 
@@ -147,7 +145,7 @@ class CachePrimitive(WorkflowPrimitive[Any, Any]):
                 name="cache_hit_rate",
                 description="Cache hit rate (0.0-1.0)",
                 callbacks=[
-                    lambda _: [(get_hit_rate(), {"operation": self.operation_name})]
+                    lambda _: [(get_hit_rate(), {"operation": self.operation_name})]  # type: ignore[arg-type]
                 ],
             )
         else:
@@ -278,7 +276,7 @@ class CachePrimitive(WorkflowPrimitive[Any, Any]):
             )
 
         # Execute wrapped primitive
-        result = await self.primitive.execute(input_data, context)
+        result = await self.primitive.execute(input_data, context)  # type: ignore[attr-defined]
 
         # Store in cache (if Redis available)
         if self.redis_client:

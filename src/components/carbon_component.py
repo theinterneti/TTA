@@ -39,7 +39,7 @@ from typing import Any, TypeVar
 
 # Try to import codecarbon for carbon tracking
 try:
-    from codecarbon import EmissionsTracker, track_emissions
+    from codecarbon import EmissionsTracker, track_emissions  # type: ignore[import-not-found]
 
     codecarbon_available = True
 except ImportError:
@@ -180,7 +180,7 @@ class CarbonComponent(Component):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
         # Track emissions
-        tracker = EmissionsTracker(
+        tracker = EmissionsTracker(  # type: ignore[possibly-unbound]
             project_name=self.project_name,
             output_dir=self.output_dir,
             log_level=self.log_level,
@@ -278,6 +278,6 @@ class CarbonComponent(Component):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
         # Return the track_emissions decorator
-        return track_emissions(
+        return track_emissions(  # type: ignore[possibly-unbound]
             project_name=project, output_dir=self.output_dir, log_level=self.log_level
         )

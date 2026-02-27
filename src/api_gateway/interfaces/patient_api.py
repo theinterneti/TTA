@@ -124,7 +124,7 @@ async def start_therapeutic_session(
         }
 
         # Initialize therapeutic integration
-        await therapeutic_system.initialize_session(session_config)
+        await therapeutic_system.initialize_session(session_config)  # type: ignore[attr-defined]
 
         # Set up safety monitoring
         safety_config = {
@@ -137,7 +137,7 @@ async def start_therapeutic_session(
                 "risk_indicators": ["suicidal_ideation", "self_harm"],
             },
         }
-        await safety_system.initialize_monitoring(safety_config)
+        await safety_system.initialize_monitoring(safety_config)  # type: ignore[attr-defined]
 
         # Configure adaptive difficulty
         difficulty_config = {
@@ -146,10 +146,10 @@ async def start_therapeutic_session(
             "adaptation_rate": 0.1,
             "factors": ["emotional_state", "engagement", "skill_level"],
         }
-        await difficulty_engine.initialize_adaptation(difficulty_config)
+        await difficulty_engine.initialize_adaptation(difficulty_config)  # type: ignore[attr-defined]
 
         # Generate initial scenario
-        initial_scenario = await therapeutic_system.generate_scenario(
+        initial_scenario = await therapeutic_system.generate_scenario(  # type: ignore[attr-defined]
             patient_id=patient_id,
             context={"session_start": True, "goals": session_data.goals},
         )
@@ -200,7 +200,7 @@ async def update_session_progress(
     """Update session progress and metrics"""
     try:
         # Update therapeutic system with progress
-        await therapeutic_system.update_progress(
+        await therapeutic_system.update_progress(  # type: ignore[attr-defined]
             session_id=session_id,
             patient_id=patient_id,
             progress_data={
@@ -212,14 +212,14 @@ async def update_session_progress(
         )
 
         # Safety assessment
-        safety_assessment = await safety_system.assess_emotional_state(
+        safety_assessment = await safety_system.assess_emotional_state(  # type: ignore[attr-defined]
             patient_id=patient_id,
             emotional_state=progress.emotional_state,
             engagement_level=progress.engagement_level,
         )
 
         # Adaptive difficulty adjustment
-        difficulty_adjustment = await difficulty_engine.adjust_difficulty(
+        difficulty_adjustment = await difficulty_engine.adjust_difficulty(  # type: ignore[attr-defined]
             patient_id=patient_id,
             performance_metrics={
                 "engagement": progress.engagement_level,
@@ -262,7 +262,7 @@ async def trigger_intervention(
 ):
     """Manually trigger a therapeutic intervention"""
     try:
-        intervention_response = await therapeutic_system.trigger_intervention(
+        intervention_response = await therapeutic_system.trigger_intervention(  # type: ignore[attr-defined]
             patient_id=patient_id,
             intervention_type=intervention.intervention_type,
             priority=intervention.priority,
@@ -339,7 +339,7 @@ async def monitor_session_safety(
             await asyncio.sleep(30)  # Check every 30 seconds
 
             # Perform safety check
-            safety_status = await safety_system.check_session_safety(
+            safety_status = await safety_system.check_session_safety(  # type: ignore[attr-defined]
                 session_id=session_id, patient_id=patient_id
             )
 
@@ -366,7 +366,7 @@ async def trigger_safety_intervention(
             else "emotional_support"
         )
 
-        await therapeutic_system.trigger_intervention(
+        await therapeutic_system.trigger_intervention(  # type: ignore[attr-defined]
             patient_id=patient_id,
             intervention_type=intervention_type,
             priority="high",

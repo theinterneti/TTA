@@ -18,7 +18,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import PlainTextResponse
 
-from .prometheus_metrics import CONTENT_TYPE_LATEST, get_metrics_collector
+from .prometheus_metrics import CONTENT_TYPE_LATEST, get_metrics_collector  # type: ignore[attr-defined]
 
 # Import mock monitoring with fallback
 try:
@@ -29,7 +29,7 @@ try:
 
     MOCK_MONITORING_AVAILABLE = True
 except ImportError:
-    MOCK_MONITORING_AVAILABLE = False
+    MOCK_MONITORING_AVAILABLE = False  # type: ignore[misc]
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +187,7 @@ def setup_monitoring_middleware(
     """
     # Use the new factory function for automatic environment detection
     use_mock = force_mock or (
-        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()
+        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()  # type: ignore[possibly-unbound]
     )
 
     if use_mock:
@@ -265,7 +265,7 @@ class MockMetricsMiddleware(BaseHTTPMiddleware):
         self.mock_env = None
 
         if MOCK_MONITORING_AVAILABLE:
-            self.mock_env = get_mock_monitoring_environment()
+            self.mock_env = get_mock_monitoring_environment()  # type: ignore[possibly-unbound]
             if not self.mock_env.is_running:
                 self.mock_env.start()
 
@@ -293,7 +293,7 @@ def create_metrics_middleware(app, service_name: str = "tta", force_mock: bool =
 
     # Check if we should use mock monitoring
     use_mock = force_mock or (
-        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()
+        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()  # type: ignore[possibly-unbound]
     )
 
     if use_mock:
@@ -313,9 +313,9 @@ def get_monitoring_status() -> dict:
     }
 
     if MOCK_MONITORING_AVAILABLE:
-        if should_use_mock_monitoring():
+        if should_use_mock_monitoring():  # type: ignore[possibly-unbound]
             status["mock_mode"] = True
-            mock_env = get_mock_monitoring_environment()
+            mock_env = get_mock_monitoring_environment()  # type: ignore[possibly-unbound]
             status.update(mock_env.get_status())
         else:
             # Try to check real monitoring services

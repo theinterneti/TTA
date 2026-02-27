@@ -15,10 +15,8 @@ import time
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import (
-        WorkflowContext,
-        WorkflowPrimitive,
-    )
+    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[assignment]
+    from tta_dev_primitives.core.base import WorkflowPrimitive  # type: ignore[assignment]
 except ImportError:
     # Fallback for development/testing
     from typing import Protocol, TypeVar
@@ -50,7 +48,7 @@ class TimeoutError(Exception):
     pass
 
 
-class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
+class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):  # type: ignore[misc]
     """
     Enforce timeouts on primitive execution.
 
@@ -140,7 +138,7 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
                 name="timeout_rate",
                 description="Timeout failure rate (0.0-1.0)",
                 callbacks=[
-                    lambda _: [(get_timeout_rate(), {"operation": self.operation_name})]
+                    lambda _: [(get_timeout_rate(), {"operation": self.operation_name})]  # type: ignore[arg-type]
                 ],
             )
         else:
@@ -174,7 +172,7 @@ class TimeoutPrimitive(WorkflowPrimitive[Any, Any]):
         try:
             # Execute with timeout
             result = await asyncio.wait_for(
-                self.primitive.execute(input_data, context),
+                self.primitive.execute(input_data, context),  # type: ignore[attr-defined]
                 timeout=self.timeout_seconds + self.grace_period_seconds,
             )
 

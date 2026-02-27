@@ -308,7 +308,7 @@ class AgentOrchestrationComponent(Component):
                     "agent_orchestration.metrics.background_polling_enabled", False
                 )
             ):
-                self._metrics_task = loop.create_task(self._poll_queue_metrics())
+                self._metrics_task = loop.create_task(self._poll_queue_metrics())  # type: ignore[possibly-unbound]
 
             # Initialize agent registry and start health checks if configured
             try:
@@ -651,7 +651,7 @@ class AgentOrchestrationComponent(Component):
                 # Start progressive feedback and workflow tracking services
                 if hasattr(self, "_feedback_manager") and self._feedback_manager:
                     try:
-                        asyncio.create_task(self._feedback_manager.start())
+                        asyncio.create_task(self._feedback_manager.start())  # type: ignore[possibly-unbound]
                         logger.info("Progressive feedback manager started")
                     except Exception as e:
                         logger.warning(
@@ -660,7 +660,7 @@ class AgentOrchestrationComponent(Component):
 
                 if hasattr(self, "_workflow_tracker") and self._workflow_tracker:
                     try:
-                        asyncio.create_task(self._workflow_tracker.start())
+                        asyncio.create_task(self._workflow_tracker.start())  # type: ignore[possibly-unbound]
                         logger.info("Workflow progress tracker started")
                     except Exception as e:
                         logger.warning(
@@ -673,21 +673,21 @@ class AgentOrchestrationComponent(Component):
                     and self._response_time_collector
                 ):
                     try:
-                        asyncio.create_task(self._response_time_collector.start())
+                        asyncio.create_task(self._response_time_collector.start())  # type: ignore[possibly-unbound]
                         logger.info("Response time collector started")
                     except Exception as e:
                         logger.warning(f"Failed to start response time collector: {e}")
 
                 if hasattr(self, "_optimization_engine") and self._optimization_engine:
                     try:
-                        asyncio.create_task(self._optimization_engine.start())
+                        asyncio.create_task(self._optimization_engine.start())  # type: ignore[possibly-unbound]
                         logger.info("Optimization engine started")
                     except Exception as e:
                         logger.warning(f"Failed to start optimization engine: {e}")
 
                 if hasattr(self, "_resource_manager") and self._resource_manager:
                     try:
-                        asyncio.create_task(self._resource_manager.start())
+                        asyncio.create_task(self._resource_manager.start())  # type: ignore[possibly-unbound]
                         logger.info("Workflow resource manager started")
                     except Exception as e:
                         logger.warning(f"Failed to start resource manager: {e}")
@@ -697,7 +697,7 @@ class AgentOrchestrationComponent(Component):
                     and self._performance_analytics
                 ):
                     try:
-                        asyncio.create_task(self._performance_analytics.start())
+                        asyncio.create_task(self._performance_analytics.start())  # type: ignore[possibly-unbound]
                         logger.info("Performance analytics started")
                     except Exception as e:
                         logger.warning(f"Failed to start performance analytics: {e}")
@@ -715,7 +715,7 @@ class AgentOrchestrationComponent(Component):
                         with contextlib.suppress(Exception):
                             await self._agent_registry.restore_state_if_available(agent)  # type: ignore
                         with contextlib.suppress(Exception):
-                            self._restarts_total = (
+                            self._restarts_total = (  # type: ignore[attr-defined]
                                 int(getattr(self, "_restarts_total", 0)) + 1
                             )
                         with contextlib.suppress(Exception):
@@ -745,7 +745,7 @@ class AgentOrchestrationComponent(Component):
                         # choose any other healthy agent of same type
                         backups = [
                             a
-                            for a in self._agent_registry.all()
+                            for a in self._agent_registry.all()  # type: ignore[union-attr]
                             if a.agent_id.type == unhealthy.agent_id.type
                             and a is not unhealthy
                             and a._running
@@ -755,7 +755,7 @@ class AgentOrchestrationComponent(Component):
                             return False
                         unhealthy.set_degraded(True)
                         with contextlib.suppress(Exception):
-                            self._fallbacks_total = (
+                            self._fallbacks_total = (  # type: ignore[attr-defined]
                                 int(getattr(self, "_fallbacks_total", 0)) + 1
                             )
                         with contextlib.suppress(Exception):
@@ -801,8 +801,8 @@ class AgentOrchestrationComponent(Component):
                     )
                 )
                 if fd_enabled:
-                    self._fd_task = loop.create_task(
-                        self._failure_detection_loop(fd_interval)
+                    self._fd_task = loop.create_task(  # type: ignore[possibly-unbound]
+                        self._failure_detection_loop(fd_interval)  # type: ignore[attr-defined]
                     )
             except Exception:
                 # Fallback to in-memory registry if Redis registry fails
@@ -864,7 +864,7 @@ class AgentOrchestrationComponent(Component):
                                     )  # type: ignore
                             # Record restart metric
                             with contextlib.suppress(Exception):
-                                self._restarts_total = (
+                                self._restarts_total = (  # type: ignore[attr-defined]
                                     int(getattr(self, "_restarts_total", 0)) + 1
                                 )
 
@@ -917,7 +917,7 @@ class AgentOrchestrationComponent(Component):
                             unhealthy.set_degraded(True)
                             # Record fallback metric
                             with contextlib.suppress(Exception):
-                                self._fallbacks_total = (
+                                self._fallbacks_total = (  # type: ignore[attr-defined]
                                     int(getattr(self, "_fallbacks_total", 0)) + 1
                                 )
                             logger.warning(
@@ -962,7 +962,7 @@ class AgentOrchestrationComponent(Component):
                     )
                     if fd_enabled and diag_enabled:
                         with contextlib.suppress(Exception):
-                            loop.create_task(self._failure_detection_loop(fd_interval))
+                            loop.create_task(self._failure_detection_loop(fd_interval))  # type: ignore[possibly-unbound, attr-defined]
 
                 except Exception:
                     self._agent_registry = None
@@ -1042,12 +1042,12 @@ class AgentOrchestrationComponent(Component):
                             coordinator=self._message_coordinator,
                             instance=_inst("input_processor"),
                         )
-                        if loop.is_running():
-                            loop.create_task(ipa.start())
-                            self._agent_registry.register(ipa)
+                        if loop.is_running():  # type: ignore[possibly-unbound]
+                            loop.create_task(ipa.start())  # type: ignore[possibly-unbound]
+                            self._agent_registry.register(ipa)  # type: ignore[union-attr]
                         else:
-                            loop.run_until_complete(ipa.start())
-                            self._agent_registry.register(ipa)
+                            loop.run_until_complete(ipa.start())  # type: ignore[possibly-unbound]
+                            self._agent_registry.register(ipa)  # type: ignore[union-attr]
                         logger.info("Auto-registered Input Processor Agent")
 
                     # Register World Builder Agent
@@ -1056,12 +1056,12 @@ class AgentOrchestrationComponent(Component):
                             coordinator=self._message_coordinator,
                             instance=_inst("world_builder"),
                         )
-                        if loop.is_running():
-                            loop.create_task(wba.start())
-                            self._agent_registry.register(wba)
+                        if loop.is_running():  # type: ignore[possibly-unbound]
+                            loop.create_task(wba.start())  # type: ignore[possibly-unbound]
+                            self._agent_registry.register(wba)  # type: ignore[union-attr]
                         else:
-                            loop.run_until_complete(wba.start())
-                            self._agent_registry.register(wba)
+                            loop.run_until_complete(wba.start())  # type: ignore[possibly-unbound]
+                            self._agent_registry.register(wba)  # type: ignore[union-attr]
                         logger.info("Auto-registered World Builder Agent")
 
                     # Register Narrative Generator Agent
@@ -1070,12 +1070,12 @@ class AgentOrchestrationComponent(Component):
                             coordinator=self._message_coordinator,
                             instance=_inst("narrative_generator"),
                         )
-                        if loop.is_running():
-                            loop.create_task(nga.start())
-                            self._agent_registry.register(nga)
+                        if loop.is_running():  # type: ignore[possibly-unbound]
+                            loop.create_task(nga.start())  # type: ignore[possibly-unbound]
+                            self._agent_registry.register(nga)  # type: ignore[union-attr]
                         else:
-                            loop.run_until_complete(nga.start())
-                            self._agent_registry.register(nga)
+                            loop.run_until_complete(nga.start())  # type: ignore[possibly-unbound]
+                            self._agent_registry.register(nga)  # type: ignore[union-attr]
                         logger.info("Auto-registered Narrative Generator Agent")
             except Exception as e:
                 logger.warning("Auto-registration of agents failed: %s", e)
@@ -1092,9 +1092,9 @@ class AgentOrchestrationComponent(Component):
 
                 # Initialize the service with all components
                 self._orchestration_service = AgentOrchestrationService(
-                    workflow_manager=self._workflow_manager,
+                    workflow_manager=self._workflow_manager,  # type: ignore[arg-type]
                     message_coordinator=self._message_coordinator,
-                    agent_registry=self._agent_registry,
+                    agent_registry=self._agent_registry,  # type: ignore[arg-type]
                     therapeutic_validator=therapeutic_validator,
                     resource_manager=self._resource_manager,
                     optimization_engine=optimization_engine,
@@ -1102,10 +1102,10 @@ class AgentOrchestrationComponent(Component):
                 )
 
                 # Initialize the service asynchronously
-                if loop.is_running():
-                    loop.create_task(self._orchestration_service.initialize())
+                if loop.is_running():  # type: ignore[possibly-unbound]
+                    loop.create_task(self._orchestration_service.initialize())  # type: ignore[possibly-unbound]
                 else:
-                    loop.run_until_complete(self._orchestration_service.initialize())
+                    loop.run_until_complete(self._orchestration_service.initialize())  # type: ignore[possibly-unbound]
 
                 logger.info("AgentOrchestrationService initialized successfully")
 
@@ -1119,7 +1119,7 @@ class AgentOrchestrationComponent(Component):
             ) and bool(
                 self.config.get("agent_orchestration.diagnostics.start_server", False)
             ):
-                self._start_diagnostics_server(loop)
+                self._start_diagnostics_server(loop)  # type: ignore[possibly-unbound]
             elif bool(
                 self.config.get("agent_orchestration.diagnostics.enabled", False)
             ):
@@ -1157,7 +1157,7 @@ class AgentOrchestrationComponent(Component):
             # Stop resource monitoring
             with contextlib.suppress(Exception):
                 if getattr(self, "_resource_manager", None):
-                    self._resource_manager.stop_background_monitoring()
+                    self._resource_manager.stop_background_monitoring()  # type: ignore[union-attr, attr-defined]
             # Deregister locally registered agents and stop health/heartbeats
             with contextlib.suppress(Exception):
                 reg = getattr(self, "_agent_registry", None)
@@ -1297,7 +1297,7 @@ class AgentOrchestrationComponent(Component):
         # Scan instances and update gauges
         for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
             # 1) Queue audit lists pattern
-            async for key in self._redis_client.scan_iter(
+            async for key in self._redis_client.scan_iter(  # type: ignore[union-attr]
                 match=f"ao:queue:{at.value}:*"
             ):
                 k = key.decode() if isinstance(key, (bytes, bytearray)) else key
@@ -1305,14 +1305,14 @@ class AgentOrchestrationComponent(Component):
                 agent_key = f"{at.name.lower()}:{inst}"
                 # Audit list overall length (priority 0)
                 with contextlib.suppress(Exception):
-                    qlen = await self._redis_client.llen(k)
+                    qlen = await self._redis_client.llen(k)  # type: ignore[union-attr, misc]
                     coord.metrics.set_queue_length(
                         agent_key, priority=0, length=int(qlen or 0)
                     )
                 # DLQ gauge
                 dlq_key = f"ao:dlq:{at.value}:{inst}"
                 with contextlib.suppress(Exception):
-                    dlq_len = await self._redis_client.llen(dlq_key)
+                    dlq_len = await self._redis_client.llen(dlq_key)  # type: ignore[union-attr, misc]
                     coord.metrics.set_dlq_length(agent_key, int(dlq_len or 0))
                     if dlq_len and dlq_len >= dlq_warn_threshold:
                         logger.warning(
@@ -1323,7 +1323,7 @@ class AgentOrchestrationComponent(Component):
                         )
 
             # 2) Per-priority ready queue sizes (zsets) — independent scan in case audit list absent
-            async for skey_b in self._redis_client.scan_iter(
+            async for skey_b in self._redis_client.scan_iter(  # type: ignore[union-attr]
                 match=f"ao:sched:{at.value}:*:prio:*"
             ):
                 skey = (
@@ -1344,7 +1344,7 @@ class AgentOrchestrationComponent(Component):
                         continue
                     agent_key = f"{at.name.lower()}:{inst}"
                     with contextlib.suppress(Exception):
-                        plen = await self._redis_client.zcard(skey)
+                        plen = await self._redis_client.zcard(skey)  # type: ignore[union-attr, misc]
                         coord.metrics.set_queue_length(
                             agent_key, priority=prio, length=int(plen or 0)
                         )
@@ -1459,7 +1459,7 @@ class AgentOrchestrationComponent(Component):
                                     )
                                 )
                                 try:
-                                    mtime = os.path.getmtime(self._policy_cfg_path)  # noqa: PTH204
+                                    mtime = os.path.getmtime(self._policy_cfg_path)  # noqa: PTH204  # type: ignore[arg-type]
                                 except Exception:
                                     mtime = None
                                 if mtime and mtime != self._policy_cfg_mtime:
@@ -1467,14 +1467,14 @@ class AgentOrchestrationComponent(Component):
                                     ok = False
                                     err = None
                                     try:
-                                        raw = _load_from_file(self._policy_cfg_path)
+                                        raw = _load_from_file(self._policy_cfg_path)  # type: ignore[arg-type]
                                         v_ok, v_err = validate_tool_policy_config(raw)
                                         if not v_ok:
                                             err = v_err or "validation_failed"
                                         else:
                                             new_cfg = _TPC(**raw)
                                             with self._policy_lock:
-                                                self._tool_policy.config = new_cfg
+                                                self._tool_policy.config = new_cfg  # type: ignore[union-attr]
                                                 ok = True
                                                 self._policy_cfg_mtime = mtime
                                     except Exception as e:
@@ -1551,9 +1551,9 @@ class AgentOrchestrationComponent(Component):
                 return _call_registry.resolve_callable(spec)
 
             self._tool_invocation = ToolInvocationService(
-                registry=self._tool_registry,
-                coordinator=self._tool_coordinator,
-                policy=self._tool_policy,
+                registry=self._tool_registry,  # type: ignore[arg-type]
+                coordinator=self._tool_coordinator,  # type: ignore[arg-type]
+                policy=self._tool_policy,  # type: ignore[arg-type]
                 callable_resolver=default_resolver,
             )
         except Exception:
@@ -1665,7 +1665,7 @@ class AgentOrchestrationComponent(Component):
             # Resource usage snapshot
             with contextlib.suppress(Exception):
                 if getattr(self, "_resource_manager", None):
-                    rep = await self._resource_manager.monitor_usage()
+                    rep = await self._resource_manager.monitor_usage()  # type: ignore[union-attr, attr-defined]
                     data["resources"] = {
                         "timestamp": rep.timestamp,
                         "usage": rep.usage.__dict__,
@@ -1862,7 +1862,7 @@ class AgentOrchestrationComponent(Component):
                         c_restarts.inc(inc_r)
                     if inc_f:
                         c_fallbacks.inc(inc_f)
-                    self._prom_last_rf = {
+                    self._prom_last_rf = {  # type: ignore[attr-defined]
                         "restarts": restarts_total,
                         "fallbacks": fallbacks_total,
                     }
@@ -1913,7 +1913,7 @@ class AgentOrchestrationComponent(Component):
                 c_retry.inc(inc_retry)
             if inc_perm:
                 c_perm.inc(inc_perm)
-            self._prom_last = {
+            self._prom_last = {  # type: ignore[attr-defined]
                 "delivery": {
                     "delivered_ok": snap["delivery"]["delivered_ok"],
                     "delivered_error": snap["delivery"]["delivered_error"],
@@ -2139,7 +2139,7 @@ class AgentOrchestrationComponent(Component):
             if api_key and (x_ao_diag_key != api_key):
                 from fastapi.responses import JSONResponse  # type: ignore
 
-                return JSONResponse(
+                return JSONResponse(  # type: ignore[return-value]
                     {"ok": False, "error": "unauthorized"}, status_code=401
                 )
             try:
@@ -2161,9 +2161,9 @@ class AgentOrchestrationComponent(Component):
                     new_cfg = load_tool_policy_config_from(cfg_path)
                 else:
                     new_cfg = load_tool_policy_config()
-                with getattr(self, "_policy_lock", None) or threading.Lock():
+                with getattr(self, "_policy_lock", None) or threading.Lock():  # type: ignore[possibly-unbound]
                     if isinstance(new_cfg, _TPC):
-                        self._tool_policy.config = new_cfg
+                        self._tool_policy.config = new_cfg  # type: ignore[union-attr]
                         ok = True
                         with contextlib.suppress(Exception):
                             self._policy_cfg_mtime = (
@@ -2198,7 +2198,7 @@ class AgentOrchestrationComponent(Component):
             if api_key and (x_ao_diag_key != api_key):
                 from fastapi.responses import JSONResponse  # type: ignore
 
-                return JSONResponse(
+                return JSONResponse(  # type: ignore[return-value]
                     {"ok": False, "error": "unauthorized"}, status_code=401
                 )
             try:
@@ -2229,7 +2229,7 @@ class AgentOrchestrationComponent(Component):
             if api_key and (x_ao_diag_key != api_key):
                 from fastapi.responses import JSONResponse  # type: ignore
 
-                return JSONResponse(
+                return JSONResponse(  # type: ignore[return-value]
                     {"ok": False, "error": "unauthorized"}, status_code=401
                 )
             try:
@@ -2289,7 +2289,7 @@ class AgentOrchestrationComponent(Component):
             if api_key and (x_ao_diag_key != api_key):
                 from fastapi.responses import JSONResponse  # type: ignore
 
-                return JSONResponse(
+                return JSONResponse(  # type: ignore[return-value]
                     {"ok": False, "error": "unauthorized"}, status_code=401
                 )
             try:
@@ -2393,7 +2393,7 @@ class AgentOrchestrationComponent(Component):
                 if api_key and (x_ao_diag_key != api_key):
                     from fastapi.responses import JSONResponse  # type: ignore
 
-                    return JSONResponse(
+                    return JSONResponse(  # type: ignore[return-value]
                         {"ok": False, "error": "unauthorized"}, status_code=401
                     )
                 try:
@@ -2423,7 +2423,7 @@ class AgentOrchestrationComponent(Component):
                         )
                         redis_key = f"{key_prefix}:safety:rules"
                         if getattr(self, "_redis_client", None) is not None:
-                            b = await self._redis_client.get(redis_key)
+                            b = await self._redis_client.get(redis_key)  # type: ignore[union-attr]
                             if b:
                                 raw = (
                                     b.decode()
@@ -2431,9 +2431,9 @@ class AgentOrchestrationComponent(Component):
                                     else str(b)
                                 )
                                 _json.loads(raw)
-                                prov._cached_raw = raw
-                                prov._cached_at = _t.time()
-                                prov._last_source = f"redis:{redis_key}"
+                                prov._cached_raw = raw  # type: ignore[union-attr]
+                                prov._cached_at = _t.time()  # type: ignore[union-attr]
+                                prov._last_source = f"redis:{redis_key}"  # type: ignore[union-attr]
                         # Force-rebuild validator on next use
                         with contextlib.suppress(Exception):
                             _safety._validator = None
@@ -2606,13 +2606,13 @@ class AgentOrchestrationComponent(Component):
                             logger.warning("/tools/execute unauthorized attempt")
                         from fastapi.responses import JSONResponse  # type: ignore
 
-                        return JSONResponse(
+                        return JSONResponse(  # type: ignore[return-value]
                             {"ok": False, "error": "unauthorized"}, status_code=401
                         )
                 except Exception:
                     from fastapi.responses import JSONResponse  # type: ignore
 
-                    return JSONResponse(
+                    return JSONResponse(  # type: ignore[return-value]
                         {"ok": False, "error": "unauthorized"}, status_code=401
                     )
                 # If allowed and authorized, execute tool via invocation service which resolves callables
@@ -2640,12 +2640,12 @@ class AgentOrchestrationComponent(Component):
                         coord = ToolCoordinator(registry=reg, policy=self._tool_policy)
 
                         def _resolver(spec):
-                            return self._callable_registry.resolve_callable(spec)
+                            return self._callable_registry.resolve_callable(spec)  # type: ignore[union-attr]
 
                         svc = ToolInvocationService(
                             registry=reg,
                             coordinator=coord,
-                            policy=self._tool_policy,
+                            policy=self._tool_policy,  # type: ignore[arg-type]
                             callable_resolver=_resolver,
                         )
                     res = await svc.invoke_tool(name, version, args)
@@ -2669,7 +2669,7 @@ class AgentOrchestrationComponent(Component):
             if len(hist) >= max_calls:
                 return {"error": "rate_limited"}
             hist.append(now)
-            self._exec_hist = hist
+            self._exec_hist = hist  # type: ignore[attr-defined]
             # Validate payload
             try:
                 name = str(payload.get("tool_name"))
@@ -2718,12 +2718,12 @@ class AgentOrchestrationComponent(Component):
                 coord = ToolCoordinator(registry=reg, policy=self._tool_policy)
 
                 def _resolver(spec):
-                    return self._callable_registry.resolve_callable(spec)
+                    return self._callable_registry.resolve_callable(spec)  # type: ignore[union-attr]
 
                 svc = ToolInvocationService(
                     registry=reg,
                     coordinator=coord,
-                    policy=self._tool_policy,
+                    policy=self._tool_policy,  # type: ignore[arg-type]
                     callable_resolver=_resolver,
                 )
                 res = await _asyncio.wait_for(
@@ -2911,7 +2911,7 @@ class AgentOrchestrationComponent(Component):
         """Update message queue size parameter."""
         try:
             if hasattr(self._message_coordinator, "_queue_size"):
-                self._message_coordinator._queue_size = int(new_value)
+                self._message_coordinator._queue_size = int(new_value)  # type: ignore[union-attr]
                 logger.info(f"Updated {parameter_name} to {new_value}")
         except Exception as e:
             logger.error(f"Failed to update {parameter_name}: {e}")

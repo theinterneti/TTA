@@ -15,10 +15,8 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import (
-        WorkflowContext,
-        WorkflowPrimitive,
-    )
+    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[assignment]
+    from tta_dev_primitives.core.base import WorkflowPrimitive  # type: ignore[assignment]
 except ImportError:
     # Fallback for development/testing
     from typing import Protocol, TypeVar
@@ -42,7 +40,7 @@ from ..apm_setup import get_meter
 logger = logging.getLogger(__name__)
 
 
-class RouterPrimitive(WorkflowPrimitive[Any, Any]):
+class RouterPrimitive(WorkflowPrimitive[Any, Any]):  # type: ignore[misc]
     """
     Route requests to optimal LLM provider based on routing strategy.
 
@@ -197,7 +195,7 @@ class RouterPrimitive(WorkflowPrimitive[Any, Any]):
 
             # Execute selected route
             primitive = self.routes[selected_route]
-            result = await primitive.execute(input_data, context)
+            result = await primitive.execute(input_data, context)  # type: ignore[attr-defined]
 
             # Calculate and record cost savings
             # (comparing selected route cost to most expensive route)

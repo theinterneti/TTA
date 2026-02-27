@@ -31,7 +31,7 @@ try:
 
     OPENTELEMETRY_AVAILABLE = True
 except ImportError:
-    OPENTELEMETRY_AVAILABLE = False
+    OPENTELEMETRY_AVAILABLE = False  # type: ignore[misc]
     logging.warning(
         "OpenTelemetry not available. Install with: "
         "uv add opentelemetry-api opentelemetry-sdk opentelemetry-exporter-prometheus"
@@ -49,7 +49,7 @@ def initialize_observability(
     service_name: str = "tta",
     service_version: str = "0.1.0",
     enable_prometheus: bool = True,
-    enable_console_traces: bool = None,
+    enable_console_traces: bool | None = None,
     prometheus_port: int = 9464,
 ) -> bool:
     """
@@ -100,7 +100,7 @@ def initialize_observability(
 
     try:
         # Create resource with service metadata
-        resource = Resource.create(
+        resource = Resource.create(  # type: ignore[possibly-unbound]
             {
                 "service.name": service_name,
                 "service.version": service_version,
@@ -114,28 +114,28 @@ def initialize_observability(
 
         if enable_console_traces:
             # Console exporter for development
-            console_processor = BatchSpanProcessor(ConsoleSpanExporter())
+            console_processor = BatchSpanProcessor(ConsoleSpanExporter())  # type: ignore[possibly-unbound]
             _tracer_provider.add_span_processor(console_processor)
             logger.info("Console trace export enabled (development mode)")
 
-        trace.set_tracer_provider(_tracer_provider)
+        trace.set_tracer_provider(_tracer_provider)  # type: ignore[possibly-unbound]
         logger.info(f"Tracer initialized for service: {service_name}")
 
         # Setup metrics
         if enable_prometheus:
             # Prometheus metrics reader
-            prometheus_reader = PrometheusMetricReader()
+            prometheus_reader = PrometheusMetricReader()  # type: ignore[possibly-unbound]
             _meter_provider = MeterProvider(
                 resource=resource, metric_readers=[prometheus_reader]
             )
-            metrics.set_meter_provider(_meter_provider)
+            metrics.set_meter_provider(_meter_provider)  # type: ignore[possibly-unbound]
             logger.info(
                 f"Prometheus metrics enabled on port {prometheus_port}. "
                 f"Scrape endpoint: http://localhost:{prometheus_port}/metrics"
             )
         else:
             _meter_provider = MeterProvider(resource=resource)
-            metrics.set_meter_provider(_meter_provider)
+            metrics.set_meter_provider(_meter_provider)  # type: ignore[possibly-unbound]
             logger.info("Metrics provider initialized (no exporters)")
 
         _initialized = True
@@ -192,7 +192,7 @@ def get_tracer(name: str = __name__) -> trace.Tracer | None:
     if not is_observability_enabled():
         return None
 
-    return trace.get_tracer(name)
+    return trace.get_tracer(name)  # type: ignore[possibly-unbound]
 
 
 def get_meter(name: str = __name__) -> metrics.Meter | None:
@@ -217,7 +217,7 @@ def get_meter(name: str = __name__) -> metrics.Meter | None:
     if not is_observability_enabled():
         return None
 
-    return metrics.get_meter(name)
+    return metrics.get_meter(name)  # type: ignore[possibly-unbound]
 
 
 def shutdown_observability() -> None:

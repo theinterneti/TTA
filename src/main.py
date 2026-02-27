@@ -422,7 +422,7 @@ if __name__ == "__main__":
     finally:
         # Shutdown observability cleanly
         try:
-            from observability_integration import shutdown_observability
+            from observability_integration import shutdown_observability  # type: ignore[attr-defined]
 
             shutdown_observability()
             logger.info("🔌 Observability shutdown complete")

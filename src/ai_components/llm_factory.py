@@ -1,4 +1,5 @@
 """
+Logseq: [[TTA.dev/Ai_components/Llm_factory]]
 Factory for creating free or local LLM clients.
 
 Supports two providers (both free):

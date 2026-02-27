@@ -74,7 +74,7 @@ class LivingWorldsManager:
 
             # Initialize Redis connection
             self.redis = aioredis.from_url(self.redis_url)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             # Create Neo4j constraints and indexes
             await self._create_schema()

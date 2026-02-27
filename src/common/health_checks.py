@@ -16,6 +16,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from collections.abc import Callable
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -58,9 +59,9 @@ class HealthChecker:
 
     def __init__(self):
         """Initialize health checker."""
-        self._checks: dict[str, callable] = {}
+        self._checks: dict[str, Callable] = {}
 
-    def register_check(self, name: str, check_func: callable) -> None:
+    def register_check(self, name: str, check_func: Callable) -> None:
         """
         Register a health check function.
 
