@@ -559,7 +559,7 @@ async def process_metric(metric: MetricData):
 @app.post("/users/process")
 async def process_user_data(user_data: UserDataModel):
     """Process user data for therapeutic monitoring."""
-    await monitoring_service.process_user_data(user_data.dict())
+    await monitoring_service.process_user_data(user_data.model_dump())
     return {"status": "processed", "user_id": user_data.user_id}
 
 
