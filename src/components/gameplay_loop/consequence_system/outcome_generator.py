@@ -12,7 +12,10 @@ and therapeutic goals while maintaining narrative coherence.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 from ..models.core import ChoiceType, EmotionalState, Scene, SessionState
 from ..models.interactions import UserChoice
@@ -38,8 +41,13 @@ class OutcomeGenerator:
     choice analysis, scene context, and therapeutic goals.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
+        self.llm = llm
 
         # Outcome generation resources
         self.outcome_templates: dict[ChoiceType, list[OutcomeTemplate]] = {}
@@ -559,7 +567,15 @@ class OutcomeGenerator:
     async def _generate_immediate_outcomes(
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState
     ) -> list[str]:
-        """Generate immediate outcomes from choice."""
+        """Generate immediate outcomes from choice, using LLM when available."""
+        if self.llm is not None:
+            llm_outcomes = await self._generate_outcomes_llm(
+                user_choice, scene, session_state, kind="immediate"
+            )
+            if llm_outcomes:
+                return llm_outcomes
+
+        # Template fallback
         patterns = self.outcome_templates.get(user_choice.choice_type, [])
         if not patterns:
             return ["Your choice creates an immediate shift in your journey"]
@@ -576,7 +592,15 @@ class OutcomeGenerator:
     async def _generate_delayed_outcomes(
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState
     ) -> list[str]:
-        """Generate delayed outcomes from choice."""
+        """Generate delayed outcomes from choice, using LLM when available."""
+        if self.llm is not None:
+            llm_outcomes = await self._generate_outcomes_llm(
+                user_choice, scene, session_state, kind="delayed"
+            )
+            if llm_outcomes:
+                return llm_outcomes[:1]
+
+        # Template fallback
         patterns = self.outcome_templates.get(user_choice.choice_type, [])
         if not patterns:
             return []
@@ -589,6 +613,71 @@ class OutcomeGenerator:
             except KeyError:
                 result.append(pattern)
         return result
+
+    async def _generate_outcomes_llm(
+        self,
+        user_choice: UserChoice,
+        scene: Scene,
+        session_state: SessionState,
+        kind: str,
+    ) -> list[str]:
+        """Ask the LLM to write contextualised outcome sentences."""
+        from langchain_core.messages import HumanMessage, SystemMessage  # noqa: PLC0415
+
+        if self.llm is None:
+            return []
+
+        tags_str = (
+            ", ".join(user_choice.therapeutic_tags)
+            if user_choice.therapeutic_tags
+            else "general wellbeing"
+        )
+        if kind == "immediate":
+            instruction = (
+                "Write 1–2 short sentences (present tense) describing what the player "
+                "notices or feels IMMEDIATELY after making this choice. Be specific to "
+                "the scene and emotional state. Each sentence on a new line."
+            )
+        else:
+            instruction = (
+                "Write ONE short sentence (future tense) describing a meaningful "
+                "long-term benefit the player might experience because of this choice."
+            )
+
+        system_prompt = (
+            "You are a compassionate writer for a therapeutic text adventure. "
+            "Write in second person ('You feel…', 'You notice…'). "
+            "Be warm, specific, and non-clinical. No bullet points."
+        )
+        user_prompt = (
+            f"Scene: {scene.title}\n"
+            f"Scene context: {scene.description[:120]}\n"
+            f"Player emotional state: {session_state.emotional_state.value}\n"
+            f"Choice made: {user_choice.choice_text}\n"
+            f"Choice type: {user_choice.choice_type.value}\n"
+            f"Therapeutic focus: {tags_str}\n\n"
+            f"{instruction}"
+        )
+
+        try:
+            response = await self.llm.ainvoke(
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=user_prompt),
+                ]
+            )
+            content = response.content
+            text = content.strip() if isinstance(content, str) else str(content).strip()
+            if not text:
+                return []
+            lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+            # Sanity: each line should be a sentence, not a list marker
+            lines = [ln.lstrip("•-*123456789. ") for ln in lines]
+            lines = [ln for ln in lines if ln and len(ln) <= 300]
+            return lines[:2] if kind == "immediate" else lines[:1]
+        except Exception as e:
+            logger.warning("LLM outcome generation failed, using template: %s", e)
+            return []
 
     async def _generate_emotional_impact(  # noqa: ARG002
         self, user_choice: UserChoice, scene: Scene, session_state: SessionState

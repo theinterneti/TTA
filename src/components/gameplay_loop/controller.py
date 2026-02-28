@@ -68,7 +68,7 @@ class GameplayLoopController:
             self.config.get("choice_architecture", {}), llm=_llm
         )
         self.consequence_system = ConsequenceSystem(
-            self.config.get("consequence_system", {})
+            self.config.get("consequence_system", {}), llm=_llm
         )
 
         # Session management
