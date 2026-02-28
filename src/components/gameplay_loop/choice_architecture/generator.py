@@ -12,8 +12,11 @@ therapeutic goals while maintaining player agency.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 from ..models.core import (
     Choice,
@@ -44,8 +47,13 @@ class ChoiceGenerator:
     progression and therapeutic goals while maintaining player agency.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
+        self.llm = llm
 
         # Choice generation resources
         self.choice_templates: dict[ChoiceType, list[ChoiceTemplate]] = {}
@@ -472,16 +480,10 @@ class ChoiceGenerator:
         elif complexity_preference == "complex":
             difficulty_level = DifficultyLevel.CHALLENGING
 
-        # Rotate through text_patterns by slot_index to avoid identical choices.
-        # Fall back to difficulty_variants if no patterns available.
-        patterns = template.text_patterns
-        if patterns:
-            choice_text = patterns[slot_index % len(patterns)]
-        else:
-            difficulty_key = difficulty_level.value
-            choice_text = template.difficulty_variants.get(
-                difficulty_key, "Continue your journey"
-            )
+        # Generate choice text: try LLM first, fall back to template patterns.
+        choice_text = await self._generate_choice_text(
+            template, scene, session_state, difficulty_level, slot_index
+        )
 
         # Generate description
         description = await self._generate_choice_description(
@@ -511,6 +513,90 @@ class ChoiceGenerator:
             emotional_context=[session_state.emotional_state.value],
             therapeutic_value=therapeutic_value,
         )
+
+    async def _generate_choice_text(
+        self,
+        template: ChoiceTemplate,
+        scene: Scene,
+        session_state: SessionState,
+        difficulty_level: DifficultyLevel,
+        slot_index: int,
+    ) -> str:
+        """Return choice text, using LLM when available with template fallback."""
+        if self.llm is not None:
+            llm_text = await self._generate_choice_text_llm(
+                template, scene, session_state, slot_index
+            )
+            if llm_text:
+                return llm_text
+
+        # Template fallback: rotate through patterns by slot_index
+        patterns = template.text_patterns
+        if patterns:
+            return patterns[slot_index % len(patterns)]
+        difficulty_key = difficulty_level.value
+        return template.difficulty_variants.get(difficulty_key, "Continue your journey")
+
+    async def _generate_choice_text_llm(
+        self,
+        template: ChoiceTemplate,
+        scene: Scene,
+        session_state: SessionState,
+        slot_index: int,
+    ) -> str | None:
+        """Ask the LLM to write a contextualised choice based on the template."""
+        from langchain_core.messages import HumanMessage, SystemMessage  # noqa: PLC0415
+
+        patterns = template.text_patterns
+        base_pattern = (
+            patterns[slot_index % len(patterns)]
+            if patterns
+            else "Take a meaningful step"
+        )
+        tags_str = (
+            ", ".join(template.therapeutic_tags)
+            if template.therapeutic_tags
+            else "wellbeing"
+        )
+
+        system_prompt = (
+            "You are a compassionate writer for a therapeutic text adventure game. "
+            "Write supportive, non-clinical choice text in second person (starting with a verb). "
+            "Keep it to 10–20 words."
+        )
+        user_prompt = (
+            f"Scene: {scene.title}\n"
+            f"Scene summary: {scene.description[:120]}\n"
+            f"Player emotional state: {session_state.emotional_state.value}\n"
+            f"Choice type: {template.choice_type.value}\n"
+            f"Therapeutic focus: {tags_str}\n"
+            f"Base pattern: {base_pattern}\n\n"
+            "Write ONE choice option (10–20 words) that:\n"
+            "- Is contextually specific to this scene\n"
+            "- Keeps the therapeutic intent of the base pattern\n"
+            "- Feels natural and encouraging\n"
+            "Return only the choice text, no quotes or explanation."
+        )
+
+        try:
+            if self.llm is None:
+                return None
+            response = await self.llm.ainvoke(
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=user_prompt),
+                ]
+            )
+            content = response.content
+            text = content.strip() if isinstance(content, str) else str(content).strip()
+            # Sanity-check: must be non-empty and reasonably short
+            if text and len(text) <= 200:
+                return text
+            logger.warning("LLM choice text too long or empty, using template")
+            return None
+        except Exception as e:
+            logger.warning("LLM choice generation failed, using template: %s", e)
+            return None
 
     async def _generate_base_choice(
         self, choice_type: ChoiceType, session_state: SessionState

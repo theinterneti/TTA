@@ -65,7 +65,7 @@ class GameplayLoopController:
             self.database_manager, self.config.get("narrative", {}), llm=_llm
         )
         self.choice_architecture = ChoiceArchitectureManager(
-            self.config.get("choice_architecture", {})
+            self.config.get("choice_architecture", {}), llm=_llm
         )
         self.consequence_system = ConsequenceSystem(
             self.config.get("consequence_system", {})
