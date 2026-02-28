@@ -41,17 +41,24 @@ class GameplayLoopController:
     and consequence generation.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        db_manager: Any | None = None,
+    ):
         self.config = config or {}
 
         # Initialize core components
-        db_config = self.config.get("database", {})
-        self.database_manager = Neo4jGameplayManager(
-            neo4j_uri=db_config.get("neo4j_uri", "bolt://localhost:7688"),
-            neo4j_user=db_config.get("neo4j_user", "neo4j"),
-            neo4j_password=db_config.get("neo4j_password", "password"),
-            redis_url=db_config.get("redis_url", "redis://localhost:6379"),
-        )
+        if db_manager is not None:
+            self.database_manager = db_manager
+        else:
+            db_config = self.config.get("database", {})
+            self.database_manager = Neo4jGameplayManager(
+                neo4j_uri=db_config.get("neo4j_uri", "bolt://localhost:7688"),
+                neo4j_user=db_config.get("neo4j_user", "neo4j"),
+                neo4j_password=db_config.get("neo4j_password", "password"),
+                redis_url=db_config.get("redis_url", "redis://localhost:6379"),
+            )
         # Build LLM — gracefully skip if no provider is configured
         try:
             _llm = get_llm()

@@ -19,6 +19,7 @@ from typing import Any
 from ..orchestration.component import Component, ComponentStatus
 from ..orchestration.decorators import log_entry_exit, require_config, timing_decorator
 from .gameplay_loop import GameplayLoopController
+from .gameplay_loop.database.dolt_manager import DoltGameplayManager
 
 logger = logging.getLogger(__name__)
 
@@ -174,8 +175,23 @@ class GameplayLoopComponent(Component):
                 "performance_tracking_enabled": self.performance_tracking,
             }
 
+            # Try Dolt persistence first; fall back to Neo4j defaults
+            dolt_manager = DoltGameplayManager()
+            loop2 = asyncio.new_event_loop()
+            try:
+                dolt_ok = loop2.run_until_complete(dolt_manager.initialize())
+            finally:
+                loop2.close()
+
             # Create and initialize gameplay controller
-            self.gameplay_controller = GameplayLoopController(controller_config)
+            if dolt_ok:
+                logger.info("Using DoltGameplayManager for gameplay persistence")
+                self.gameplay_controller = GameplayLoopController(
+                    controller_config, db_manager=dolt_manager
+                )
+            else:
+                logger.info("Dolt unavailable; using Neo4jGameplayManager")
+                self.gameplay_controller = GameplayLoopController(controller_config)
 
             # Initialize controller asynchronously
             loop = asyncio.new_event_loop()
