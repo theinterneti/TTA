@@ -541,54 +541,82 @@ class GameplayLoopController:
             }
 
     async def get_session_status(self, session_id: str) -> dict[str, Any] | None:
-        """Get current status of a session."""
+        """Get current status of a session.
+
+        Checks active in-memory sessions first; falls back to the database for
+        paused/persisted sessions so callers get a valid status even after a
+        process restart.
+        """
         try:
-            if session_id not in self.active_sessions:
+            if session_id in self.active_sessions:
+                session = self.active_sessions[session_id]
+                session_state = session.session_state
+
+                status: dict[str, Any] = {
+                    "session_id": session_id,
+                    "user_id": session.user_id,
+                    "is_active": session.is_active,
+                    "current_scene_id": (
+                        session_state.current_scene.scene_id
+                        if session_state.current_scene
+                        else None
+                    ),
+                    "emotional_state": session_state.emotional_state.value,
+                    "total_choices": len(session_state.choice_history),
+                    "available_choices_count": len(session.available_choices),
+                    "available_choices": [
+                        {
+                            "choice_id": c.choice_id,
+                            "choice_text": c.choice_text,
+                            "description": c.description,
+                            "therapeutic_value": c.therapeutic_value,
+                        }
+                        for c in session.available_choices
+                    ],
+                    "therapeutic_engagement": 0.0,
+                    "last_activity": (
+                        session.last_activity_time.isoformat()
+                        if session.last_activity_time
+                        else None
+                    ),
+                }
+
+                if session_state.choice_history:
+                    therapeutic_values = [
+                        choice.get("therapeutic_value", 0)
+                        for choice in session_state.choice_history
+                    ]
+                    status["therapeutic_engagement"] = sum(
+                        therapeutic_values
+                    ) / len(therapeutic_values)
+
+                return status
+
+            # Fall back to DB for paused / persisted sessions
+            session_state = await self.database_manager.get_session(session_id)
+            if session_state is None:
                 return None
 
-            session = self.active_sessions[session_id]
-            session_state = session.session_state
+            therapeutic_engagement = 0.0
+            if session_state.choice_history:
+                vals = [
+                    c.get("therapeutic_value", 0)
+                    for c in session_state.choice_history
+                ]
+                therapeutic_engagement = sum(vals) / len(vals)
 
-            status = {
+            return {
                 "session_id": session_id,
-                "user_id": session.user_id,
-                "is_active": session.is_active,
-                "current_scene_id": (
-                    session_state.current_scene.scene_id
-                    if session_state.current_scene
-                    else None
-                ),
+                "user_id": session_state.user_id,
+                "is_active": False,
+                "current_scene_id": session_state.current_scene_id,
                 "emotional_state": session_state.emotional_state.value,
                 "total_choices": len(session_state.choice_history),
-                "available_choices_count": len(session.available_choices),
-                "available_choices": [
-                    {
-                        "choice_id": c.choice_id,
-                        "choice_text": c.choice_text,
-                        "description": c.description,
-                        "therapeutic_value": c.therapeutic_value,
-                    }
-                    for c in session.available_choices
-                ],
-                "therapeutic_engagement": 0.0,
-                "last_activity": (
-                    session.last_activity_time.isoformat()
-                    if session.last_activity_time
-                    else None
-                ),
+                "available_choices_count": 0,
+                "available_choices": [],
+                "therapeutic_engagement": therapeutic_engagement,
+                "last_activity": None,
             }
-
-            # Calculate therapeutic engagement
-            if session_state.choice_history:
-                therapeutic_values = [
-                    choice.get("therapeutic_value", 0)
-                    for choice in session_state.choice_history
-                ]
-                status["therapeutic_engagement"] = sum(therapeutic_values) / len(
-                    therapeutic_values
-                )
-
-            return status
 
         except Exception as e:
             logger.error(f"Failed to get session status for {session_id}: {e}")

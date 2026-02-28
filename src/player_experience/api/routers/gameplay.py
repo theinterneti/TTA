@@ -94,6 +94,27 @@ class UserSessionsResponse(BaseModel):
     code: str | None = None
 
 
+class PauseSessionResponse(BaseModel):
+    """Response model for pausing a session."""
+
+    success: bool
+    session_id: str | None = None
+    paused_at: str | None = None
+    error: str | None = None
+    code: str | None = None
+
+
+class ResumeSessionResponse(BaseModel):
+    """Response model for resuming a session."""
+
+    success: bool
+    session_id: str | None = None
+    session_data: dict[str, Any] | None = None
+    resumed_at: str | None = None
+    error: str | None = None
+    code: str | None = None
+
+
 class SendMessageRequest(BaseModel):
     """Request model for sending a player message in a gameplay session."""
 
@@ -376,6 +397,88 @@ async def get_user_sessions(
         raise
     except Exception as e:
         logger.error(f"Failed to get user sessions: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        ) from e
+
+
+@router.post("/sessions/{session_id}/pause", response_model=PauseSessionResponse)
+async def pause_session(
+    session_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    gameplay_service: GameplayService = Depends(get_gameplay_service),
+):
+    """
+    Pause a gameplay session.
+
+    Saves current progress to the database and removes the session from
+    active memory so it can be resumed later.
+    """
+    try:
+        result = await gameplay_service.pause_session(
+            session_id=session_id, auth_token=credentials.credentials
+        )
+
+        if result.get("success"):
+            return PauseSessionResponse(**result)
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") == "SESSION_NOT_FOUND":
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
+
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to pause session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        ) from e
+
+
+@router.post("/sessions/{session_id}/resume", response_model=ResumeSessionResponse)
+async def resume_session(
+    session_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    gameplay_service: GameplayService = Depends(get_gameplay_service),
+):
+    """
+    Resume a paused gameplay session.
+
+    Loads session state from the database, generates a recap and current
+    choices, and returns the session ready to continue.
+    """
+    try:
+        result = await gameplay_service.resume_session(
+            session_id=session_id, auth_token=credentials.credentials
+        )
+
+        if result.get("success"):
+            return ResumeSessionResponse(**result)
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") in ("SESSION_NOT_FOUND", "SESSION_ERROR"):
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
+
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to resume session: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error",
