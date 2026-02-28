@@ -410,3 +410,479 @@ class TestResumeSessionRoute:
         assert resp.status_code == 200
         data = resp.json()
         assert data["session_data"]["session_recap"] == "You have made 3 choices."
+
+
+# ---------------------------------------------------------------------------
+# POST /sessions — create session
+# ---------------------------------------------------------------------------
+
+
+class TestCreateSessionRoute:
+    def test_create_returns_200_on_success(self):
+        svc = _make_service_mock()
+        svc.create_authenticated_session.return_value = {
+            "success": True,
+            "session_id": "sess-new",
+            "user_id": "user-1",
+            "session_status": {"is_active": True},
+            "created_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions",
+            headers={"Authorization": "Bearer tok"},
+            json={"therapeutic_context": {"goal": "reduce anxiety"}},
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["session_id"] == "sess-new"
+
+    def test_create_passes_therapeutic_context(self):
+        svc = _make_service_mock()
+        svc.create_authenticated_session.return_value = {
+            "success": True,
+            "session_id": "sess-x",
+            "user_id": "u1",
+            "created_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        client.post(
+            "/sessions",
+            headers={"Authorization": "Bearer tok"},
+            json={"therapeutic_context": {"focus": "stress"}},
+        )
+
+        svc.create_authenticated_session.assert_called_once_with(
+            auth_token="tok",
+            therapeutic_context={"focus": "stress"},
+        )
+
+    def test_create_returns_401_on_auth_error(self):
+        svc = _make_service_mock()
+        svc.create_authenticated_session.return_value = {
+            "success": False,
+            "error": "Authentication failed",
+            "code": "AUTH_ERROR",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions",
+            headers={"Authorization": "Bearer bad"},
+            json={},
+        )
+
+        assert resp.status_code == 401
+
+    def test_create_returns_422_on_safety_error(self):
+        svc = _make_service_mock()
+        svc.create_authenticated_session.return_value = {
+            "success": False,
+            "error": "Unsafe context",
+            "code": "SAFETY_ERROR",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions",
+            headers={"Authorization": "Bearer tok"},
+            json={},
+        )
+
+        assert resp.status_code == 422
+
+    def test_create_accepts_empty_therapeutic_context(self):
+        svc = _make_service_mock()
+        svc.create_authenticated_session.return_value = {
+            "success": True,
+            "session_id": "sess-y",
+            "user_id": "u2",
+            "created_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions",
+            headers={"Authorization": "Bearer tok"},
+            json={},
+        )
+
+        assert resp.status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# POST /sessions/{id}/choices — process choice
+# ---------------------------------------------------------------------------
+
+
+class TestProcessChoiceRoute:
+    def test_choice_returns_200_on_success(self):
+        svc = _make_service_mock()
+        svc.process_validated_choice.return_value = {
+            "success": True,
+            "session_id": "sess-1",
+            "choice_result": {"next_scene": {"title": "The River"}},
+            "session_status": {"total_choices": 1},
+            "processed_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions/sess-1/choices",
+            headers={"Authorization": "Bearer tok"},
+            json={"choice_id": "choice-abc"},
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["choice_result"]["next_scene"]["title"] == "The River"
+
+    def test_choice_passes_correct_args(self):
+        svc = _make_service_mock()
+        svc.process_validated_choice.return_value = {
+            "success": True,
+            "session_id": "sess-1",
+            "processed_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        client.post(
+            "/sessions/sess-1/choices",
+            headers={"Authorization": "Bearer mytoken"},
+            json={"choice_id": "choice-xyz"},
+        )
+
+        svc.process_validated_choice.assert_called_once_with(
+            session_id="sess-1",
+            choice_id="choice-xyz",
+            auth_token="mytoken",
+        )
+
+    def test_choice_returns_401_on_auth_error(self):
+        svc = _make_service_mock()
+        svc.process_validated_choice.return_value = {
+            "success": False,
+            "error": "Auth failed",
+            "code": "AUTH_ERROR",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions/sess-1/choices",
+            headers={"Authorization": "Bearer bad"},
+            json={"choice_id": "c1"},
+        )
+
+        assert resp.status_code == 401
+
+    def test_choice_returns_404_on_session_not_found(self):
+        svc = _make_service_mock()
+        svc.process_validated_choice.return_value = {
+            "success": False,
+            "error": "Not found",
+            "code": "SESSION_NOT_FOUND",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions/missing/choices",
+            headers={"Authorization": "Bearer tok"},
+            json={"choice_id": "c1"},
+        )
+
+        assert resp.status_code == 404
+
+    def test_choice_returns_403_on_access_denied(self):
+        svc = _make_service_mock()
+        svc.process_validated_choice.return_value = {
+            "success": False,
+            "error": "Access denied",
+            "code": "ACCESS_DENIED",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.post(
+            "/sessions/sess-1/choices",
+            headers={"Authorization": "Bearer tok"},
+            json={"choice_id": "c1"},
+        )
+
+        assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# GET /sessions/{id} — get session status
+# ---------------------------------------------------------------------------
+
+
+class TestGetSessionStatusRoute:
+    def test_get_status_returns_200_on_success(self):
+        svc = _make_service_mock()
+        svc.get_session_with_auth.return_value = {
+            "success": True,
+            "session_status": {"is_active": True, "total_choices": 2},
+            "retrieved_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions/sess-1",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["session_status"]["is_active"] is True
+
+    def test_get_status_returns_404_on_not_found(self):
+        svc = _make_service_mock()
+        svc.get_session_with_auth.return_value = {
+            "success": False,
+            "error": "Not found",
+            "code": "SESSION_NOT_FOUND",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions/missing",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 404
+
+    def test_get_status_returns_403_on_access_denied(self):
+        svc = _make_service_mock()
+        svc.get_session_with_auth.return_value = {
+            "success": False,
+            "error": "Denied",
+            "code": "ACCESS_DENIED",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions/sess-other",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 403
+
+    def test_get_status_returns_401_on_auth_error(self):
+        svc = _make_service_mock()
+        svc.get_session_with_auth.return_value = {
+            "success": False,
+            "error": "Auth failed",
+            "code": "AUTH_ERROR",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions/sess-1",
+            headers={"Authorization": "Bearer bad"},
+        )
+
+        assert resp.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# DELETE /sessions/{id} — end session
+# ---------------------------------------------------------------------------
+
+
+class TestEndSessionRoute:
+    def test_end_returns_200_on_success(self):
+        svc = _make_service_mock()
+        svc.end_session_with_auth.return_value = {
+            "success": True,
+            "session_id": "sess-1",
+            "ended_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.delete(
+            "/sessions/sess-1",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["session_id"] == "sess-1"
+
+    def test_end_returns_401_on_auth_error(self):
+        svc = _make_service_mock()
+        svc.end_session_with_auth.return_value = {
+            "success": False,
+            "error": "Auth failed",
+            "code": "AUTH_ERROR",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.delete(
+            "/sessions/sess-1",
+            headers={"Authorization": "Bearer bad"},
+        )
+
+        assert resp.status_code == 401
+
+    def test_end_returns_404_on_not_found(self):
+        svc = _make_service_mock()
+        svc.end_session_with_auth.return_value = {
+            "success": False,
+            "error": "Not found",
+            "code": "SESSION_NOT_FOUND",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.delete(
+            "/sessions/missing",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 404
+
+    def test_end_returns_403_on_access_denied(self):
+        svc = _make_service_mock()
+        svc.end_session_with_auth.return_value = {
+            "success": False,
+            "error": "Denied",
+            "code": "ACCESS_DENIED",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.delete(
+            "/sessions/sess-other",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 403
+
+    def test_end_calls_service_with_correct_args(self):
+        svc = _make_service_mock()
+        svc.end_session_with_auth.return_value = {
+            "success": True,
+            "session_id": "sess-abc",
+            "ended_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        client.delete(
+            "/sessions/sess-abc",
+            headers={"Authorization": "Bearer mytoken"},
+        )
+
+        svc.end_session_with_auth.assert_called_once_with(
+            session_id="sess-abc",
+            auth_token="mytoken",
+        )
+
+
+# ---------------------------------------------------------------------------
+# GET /sessions — list user sessions
+# ---------------------------------------------------------------------------
+
+
+class TestGetUserSessionsRoute:
+    def test_list_returns_200_on_success(self):
+        svc = _make_service_mock()
+        svc.get_user_sessions.return_value = {
+            "success": True,
+            "user_id": "user-1",
+            "session_metrics": {"sessions": [], "total_count": 0},
+            "retrieved_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["user_id"] == "user-1"
+
+    def test_list_returns_sessions(self):
+        svc = _make_service_mock()
+        svc.get_user_sessions.return_value = {
+            "success": True,
+            "user_id": "user-1",
+            "session_metrics": {
+                "sessions": [{"session_id": "s1"}, {"session_id": "s2"}],
+                "total_count": 2,
+            },
+            "retrieved_at": "2026-01-01T00:00:00",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions",
+            headers={"Authorization": "Bearer tok"},
+        )
+
+        assert resp.status_code == 200
+        assert resp.json()["session_metrics"]["total_count"] == 2
+
+    def test_list_returns_401_on_auth_error(self):
+        svc = _make_service_mock()
+        svc.get_user_sessions.return_value = {
+            "success": False,
+            "error": "Auth failed",
+            "code": "AUTH_ERROR",
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get(
+            "/sessions",
+            headers={"Authorization": "Bearer bad"},
+        )
+
+        assert resp.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# GET /health — health check
+# ---------------------------------------------------------------------------
+
+
+class TestHealthRoute:
+    def test_health_returns_200(self):
+        svc = _make_service_mock()
+        svc.get_integration_status.return_value = {
+            "gameplay_component": {"available": True}
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get("/health")
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "healthy"
+
+    def test_health_includes_real_timestamp(self):
+        svc = _make_service_mock()
+        svc.get_integration_status.return_value = {}
+        client = _build_test_app(svc)
+
+        resp = client.get("/health")
+
+        data = resp.json()
+        # Must not be the old hardcoded value
+        assert data["timestamp"] != "2024-01-01T00:00:00Z"
+        assert "T" in data["timestamp"]  # ISO format
+
+    def test_health_includes_integration_status(self):
+        svc = _make_service_mock()
+        svc.get_integration_status.return_value = {
+            "gameplay_service": {"initialized": True}
+        }
+        client = _build_test_app(svc)
+
+        resp = client.get("/health")
+
+        data = resp.json()
+        assert "integration_status" in data
+        assert data["integration_status"]["gameplay_service"]["initialized"] is True

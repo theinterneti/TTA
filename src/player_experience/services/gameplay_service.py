@@ -52,7 +52,7 @@ class GameplayService:
             # Start the component if controller not yet initialized
             # Run in executor to avoid event loop conflict (component.start() uses run_until_complete)
             if not getattr(gameplay_component, "gameplay_controller", None):
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 started = await loop.run_in_executor(None, gameplay_component.start)
                 if not started:
                     logger.error("Failed to start GameplayLoopComponent")

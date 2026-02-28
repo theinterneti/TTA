@@ -43,9 +43,7 @@ class GameplayLoopComponent(Component):
         super().__init__(
             config,
             name="core_gameplay_loop",
-            dependencies=[
-                "tta.prototype_neo4j"
-            ],  # Depends on Neo4j for data persistence
+            dependencies=[],  # Dolt is now the primary persistence layer (no hard dep)
         )
 
         self.root_dir = Path(__file__).parent.parent.parent
@@ -408,9 +406,7 @@ class GameplayLoopComponent(Component):
             logger.error(f"Failed to process user choice: {e}")
             return {"error": str(e)}
 
-    async def get_user_sessions_for_player(
-        self, user_id: str
-    ) -> list[dict[str, Any]]:
+    async def get_user_sessions_for_player(self, user_id: str) -> list[dict[str, Any]]:
         """Return status dicts for all sessions belonging to user_id."""
         if not self.gameplay_controller:
             return []

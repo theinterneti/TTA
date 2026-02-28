@@ -8,6 +8,7 @@ including session management, choice processing, and progress tracking.
 """
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -500,7 +501,7 @@ async def gameplay_health_check(
 
         return {
             "status": "healthy",
-            "timestamp": "2024-01-01T00:00:00Z",  # Would use actual timestamp
+            "timestamp": datetime.utcnow().isoformat(),
             "integration_status": integration_status,
         }
 
@@ -508,6 +509,6 @@ async def gameplay_health_check(
         logger.error(f"Health check failed: {e}")
         return {
             "status": "unhealthy",
-            "timestamp": "2024-01-01T00:00:00Z",  # Would use actual timestamp
+            "timestamp": datetime.utcnow().isoformat(),
             "error": str(e),
         }
