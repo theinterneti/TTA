@@ -330,3 +330,87 @@ class TestRoundTrip:
         restored = Scene.model_validate_json(json_str)
         assert restored.scene_id == scene.scene_id
         assert restored.scene_type == SceneType.THERAPEUTIC
+
+
+# ---------------------------------------------------------------------------
+# get_sessions_for_user
+# ---------------------------------------------------------------------------
+
+
+def _mock_connection_fetchall(rows: list[dict]) -> MagicMock:
+    """Return a fake pymysql connection whose cursor.fetchall returns rows."""
+    cursor = MagicMock()
+    cursor.__enter__ = MagicMock(return_value=cursor)
+    cursor.__exit__ = MagicMock(return_value=False)
+    cursor.fetchall.return_value = rows
+
+    conn = MagicMock()
+    conn.cursor.return_value = cursor
+    return conn
+
+
+class TestGetSessionsForUser:
+    async def test_returns_empty_when_unavailable(self):
+        mgr = DoltGameplayManager()
+        result = await mgr.get_sessions_for_user("user-1")
+        assert result == []
+
+    async def test_returns_empty_when_no_sessions(self):
+        mgr = DoltGameplayManager()
+        mgr._available = True
+        conn = _mock_connection_fetchall([])
+        with patch.object(mgr, "_connect", return_value=conn):
+            result = await mgr.get_sessions_for_user("user-1")
+        assert result == []
+
+    async def test_returns_session_states_for_user(self):
+        mgr = DoltGameplayManager()
+        mgr._available = True
+        ss1 = SessionState(user_id="user-1")
+        ss2 = SessionState(user_id="user-1")
+        rows = [
+            {"state_json": ss1.model_dump_json()},
+            {"state_json": ss2.model_dump_json()},
+        ]
+        conn = _mock_connection_fetchall(rows)
+        with patch.object(mgr, "_connect", return_value=conn):
+            result = await mgr.get_sessions_for_user("user-1")
+        assert len(result) == 2
+        assert all(isinstance(s, SessionState) for s in result)
+        assert all(s.user_id == "user-1" for s in result)
+
+    async def test_skips_corrupt_json_rows(self):
+        mgr = DoltGameplayManager()
+        mgr._available = True
+        ss = SessionState(user_id="user-1")
+        rows = [
+            {"state_json": "{not valid json}"},
+            {"state_json": ss.model_dump_json()},
+        ]
+        conn = _mock_connection_fetchall(rows)
+        with patch.object(mgr, "_connect", return_value=conn):
+            result = await mgr.get_sessions_for_user("user-1")
+        assert len(result) == 1
+        assert result[0].session_id == ss.session_id
+
+    async def test_returns_empty_on_db_error(self):
+        mgr = DoltGameplayManager()
+        mgr._available = True
+        with patch.object(
+            mgr, "_connect", side_effect=RuntimeError("db error")
+        ):
+            result = await mgr.get_sessions_for_user("user-1")
+        assert result == []
+
+    async def test_create_session_stores_user_id(self):
+        """create_session now passes user_id to the INSERT statement."""
+        mgr = DoltGameplayManager()
+        mgr._available = True
+        ss = SessionState(user_id="user-42")
+        conn = _mock_connection()
+        with patch.object(mgr, "_connect", return_value=conn):
+            await mgr.create_session(ss)
+        # Verify the cursor.execute was called with user_id in args
+        cursor = conn.cursor.return_value.__enter__.return_value
+        call_args = cursor.execute.call_args
+        assert "user-42" in call_args[0][1]  # positional args tuple

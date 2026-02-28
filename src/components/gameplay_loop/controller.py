@@ -49,6 +49,7 @@ class GameplayLoopController:
         self.config = config or {}
 
         # Initialize core components
+        self.database_manager: Any  # Neo4jGameplayManager or DoltGameplayManager
         if db_manager is not None:
             self.database_manager = db_manager
         else:
@@ -629,6 +630,49 @@ class GameplayLoopController:
         except Exception as e:
             logger.error(f"Failed to get session status for {session_id}: {e}")
             return None
+
+    async def get_sessions_for_user(self, user_id: str) -> list[dict[str, Any]]:
+        """Return status dicts for all sessions belonging to user_id.
+
+        Merges in-memory active sessions with persisted sessions from the DB
+        (when the database manager supports get_sessions_for_user).
+        """
+        sessions: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+
+        # Active in-memory sessions
+        for session_id, session in self.active_sessions.items():
+            if session.session_state.user_id == user_id:
+                status = await self.get_session_status(session_id)
+                if status:
+                    sessions.append(status)
+                    seen_ids.add(session_id)
+
+        # Persisted sessions from DB (DoltGameplayManager supports this)
+        if hasattr(self.database_manager, "get_sessions_for_user"):
+            db_sessions = await self.database_manager.get_sessions_for_user(user_id)
+            for ss in db_sessions:
+                if ss.session_id not in seen_ids:
+                    therapeutic_engagement = 0.0
+                    if ss.choice_history:
+                        vals = [c.get("therapeutic_value", 0) for c in ss.choice_history]
+                        therapeutic_engagement = sum(vals) / len(vals)
+                    sessions.append(
+                        {
+                            "session_id": ss.session_id,
+                            "user_id": ss.user_id,
+                            "is_active": False,
+                            "current_scene_id": ss.current_scene_id,
+                            "emotional_state": ss.emotional_state.value,
+                            "total_choices": len(ss.choice_history),
+                            "available_choices_count": 0,
+                            "available_choices": [],
+                            "therapeutic_engagement": therapeutic_engagement,
+                            "last_activity": None,
+                        }
+                    )
+
+        return sessions
 
     async def cleanup_inactive_sessions(self) -> int:
         """Clean up inactive sessions that have exceeded timeout."""

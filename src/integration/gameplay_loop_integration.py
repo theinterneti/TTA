@@ -412,13 +412,17 @@ class GameplayLoopIntegration:
                     "code": "AUTH_ERROR",
                 }
 
-            # Get session metrics (this would need to be enhanced to filter by user)
-            session_metrics = await self.gameplay_component.get_session_metrics()
+            sessions = await self.gameplay_component.get_user_sessions_for_player(
+                user_id
+            )
 
             return {
                 "success": True,
                 "user_id": user_id,
-                "session_metrics": session_metrics,
+                "session_metrics": {
+                    "sessions": sessions,
+                    "total_count": len(sessions),
+                },
                 "retrieved_at": datetime.utcnow().isoformat(),
             }
 

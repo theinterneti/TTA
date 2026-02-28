@@ -408,6 +408,18 @@ class GameplayLoopComponent(Component):
             logger.error(f"Failed to process user choice: {e}")
             return {"error": str(e)}
 
+    async def get_user_sessions_for_player(
+        self, user_id: str
+    ) -> list[dict[str, Any]]:
+        """Return status dicts for all sessions belonging to user_id."""
+        if not self.gameplay_controller:
+            return []
+        try:
+            return await self.gameplay_controller.get_sessions_for_user(user_id)
+        except Exception as e:
+            logger.error(f"Failed to get sessions for user {user_id}: {e}")
+            return []
+
     async def get_session_status(self, session_id: str) -> dict[str, Any] | None:
         """Get the status of a gameplay session."""
         if not self.gameplay_controller:

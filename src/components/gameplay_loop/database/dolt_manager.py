@@ -15,6 +15,7 @@ all subsequent operations are no-ops that return safe defaults.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import os
 from datetime import UTC, datetime
@@ -31,9 +32,15 @@ logger = logging.getLogger(__name__)
 _CREATE_STATE_TABLE = """
 CREATE TABLE IF NOT EXISTS gameplay_state (
     session_id  VARCHAR(255) NOT NULL PRIMARY KEY,
+    user_id     VARCHAR(255),
     state_json  MEDIUMTEXT   NOT NULL,
     updated_at  DATETIME     NOT NULL
 )
+"""
+
+# Migration: add user_id column to existing tables that pre-date this schema.
+_MIGRATE_STATE_USER_ID = """
+ALTER TABLE gameplay_state ADD COLUMN user_id VARCHAR(255)
 """
 
 _CREATE_SCENES_TABLE = """
@@ -93,13 +100,16 @@ class DoltGameplayManager:
         )
 
     def _ensure_tables(self) -> None:
-        """Create gameplay tables if they don't exist (sync)."""
+        """Create gameplay tables if they don't exist; run any pending migrations."""
         conn = self._connect()
         try:
             with conn.cursor() as cur:
                 cur.execute(_CREATE_STATE_TABLE)
                 cur.execute(_CREATE_SCENES_TABLE)
                 cur.execute(_CREATE_SUMMARIES_TABLE)
+                # Add user_id column to tables created before this migration.
+                with contextlib.suppress(Exception):
+                    cur.execute(_MIGRATE_STATE_USER_ID)
             conn.commit()
         finally:
             conn.close()
@@ -146,14 +156,17 @@ class DoltGameplayManager:
                 with conn.cursor() as cur:
                     cur.execute(
                         """
-                        INSERT INTO gameplay_state (session_id, state_json, updated_at)
-                        VALUES (%s, %s, %s)
+                        INSERT INTO gameplay_state
+                            (session_id, user_id, state_json, updated_at)
+                        VALUES (%s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
+                            user_id    = VALUES(user_id),
                             state_json = VALUES(state_json),
                             updated_at = VALUES(updated_at)
                         """,
                         (
                             session_state.session_id,
+                            session_state.user_id,
                             session_state.model_dump_json(),
                             datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
                         ),
@@ -212,10 +225,11 @@ class DoltGameplayManager:
                     cur.execute(
                         """
                         UPDATE gameplay_state
-                        SET state_json = %s, updated_at = %s
+                        SET user_id = %s, state_json = %s, updated_at = %s
                         WHERE session_id = %s
                         """,
                         (
+                            session_state.user_id,
                             session_state.model_dump_json(),
                             datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
                             session_state.session_id,
@@ -237,6 +251,39 @@ class DoltGameplayManager:
                 exc,
             )
             return False
+
+    async def get_sessions_for_user(self, user_id: str) -> list[SessionState]:
+        """Return all persisted sessions belonging to user_id."""
+        if not self._available:
+            return []
+
+        def _read() -> list[str]:
+            conn = self._connect()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "SELECT state_json FROM gameplay_state WHERE user_id = %s",
+                        (user_id,),
+                    )
+                    rows = cur.fetchall()
+                    return [r["state_json"] for r in rows]  # type: ignore[index]
+            finally:
+                conn.close()
+
+        try:
+            json_rows: list[str] = await asyncio.to_thread(_read)
+            sessions: list[SessionState] = []
+            for json_str in json_rows:
+                with contextlib.suppress(Exception):
+                    sessions.append(SessionState.model_validate_json(json_str))
+            return sessions
+        except Exception as exc:
+            logger.error(
+                "DoltGameplayManager: failed to get sessions for user %s: %s",
+                user_id,
+                exc,
+            )
+            return []
 
     # ── Scene Management ─────────────────────────────────────────────────────
 

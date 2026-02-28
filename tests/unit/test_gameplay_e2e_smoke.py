@@ -86,6 +86,9 @@ class FakeDb:
         self._summaries[session_id] = summary
         return True
 
+    async def get_sessions_for_user(self, user_id: str) -> list:
+        return [ss for ss in self._sessions.values() if ss.user_id == user_id]
+
 
 # ---------------------------------------------------------------------------
 # Fixture helpers
@@ -521,3 +524,66 @@ class TestAutoResume:
         status = await ctrl.get_session_status(sid)
         assert status is not None
         assert status["total_choices"] == 2
+
+
+# ---------------------------------------------------------------------------
+# get_sessions_for_user (Task 46)
+# ---------------------------------------------------------------------------
+
+
+class TestGetSessionsForUser:
+    """Controller.get_sessions_for_user merges active + DB sessions for a user."""
+
+    async def test_returns_active_session_for_user(self, controller_with_fake_db):
+        ctrl, _ = controller_with_fake_db
+        session = await ctrl.start_session(user_id="player-alpha")
+
+        sessions = await ctrl.get_sessions_for_user("player-alpha")
+
+        assert len(sessions) == 1
+        assert sessions[0]["user_id"] == "player-alpha"
+        assert sessions[0]["session_id"] == session.session_id
+
+    async def test_does_not_return_other_users_sessions(
+        self, controller_with_fake_db
+    ):
+        ctrl, _ = controller_with_fake_db
+        await ctrl.start_session(user_id="player-alpha")
+        await ctrl.start_session(user_id="player-beta")
+
+        sessions = await ctrl.get_sessions_for_user("player-alpha")
+
+        assert all(s["user_id"] == "player-alpha" for s in sessions)
+        assert len(sessions) == 1
+
+    async def test_returns_paused_session_via_db(self, controller_with_fake_db):
+        ctrl, _ = controller_with_fake_db
+        session = await ctrl.start_session(user_id="player-alpha")
+        sid = session.session_id
+        await ctrl.pause_session(sid)
+
+        sessions = await ctrl.get_sessions_for_user("player-alpha")
+
+        # FakeDb.get_sessions_for_user returns persisted sessions
+        assert any(s["session_id"] == sid for s in sessions)
+
+    async def test_returns_empty_for_unknown_user(self, controller_with_fake_db):
+        ctrl, _ = controller_with_fake_db
+
+        sessions = await ctrl.get_sessions_for_user("nobody")
+
+        assert sessions == []
+
+    async def test_active_session_not_duplicated_with_db(
+        self, controller_with_fake_db
+    ):
+        ctrl, _ = controller_with_fake_db
+        session = await ctrl.start_session(user_id="player-alpha")
+        sid = session.session_id
+
+        sessions = await ctrl.get_sessions_for_user("player-alpha")
+
+        # Session is both in active_sessions AND in DB (created on start)
+        # Should only appear once
+        ids = [s["session_id"] for s in sessions]
+        assert ids.count(sid) == 1
