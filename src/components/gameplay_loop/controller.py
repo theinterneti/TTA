@@ -333,10 +333,18 @@ class GameplayLoopController:
             start_time = datetime.utcnow()
             logger.info(f"Processing choice {choice_id} for session {session_id}")
 
-            # Get active session
+            # Get active session — auto-resume from DB if not in memory
             if session_id not in self.active_sessions:
-                logger.error(f"Session {session_id} not active")
-                return None, [], None
+                logger.info(
+                    f"Session {session_id} not in active_sessions; "
+                    "attempting auto-resume from DB"
+                )
+                resumed = await self.resume_session(session_id)
+                if not resumed:
+                    logger.error(
+                        f"Session {session_id} not found in DB; cannot process choice"
+                    )
+                    return None, [], None
 
             session = self.active_sessions[session_id]
             session_state = session.session_state
