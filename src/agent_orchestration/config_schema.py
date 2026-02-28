@@ -239,4 +239,4 @@ def validate_agent_orchestration_config(
 
 def get_default_agent_orchestration_config() -> dict[str, Any]:
     """Get default agent orchestration configuration as a dictionary."""
-    return AgentOrchestrationConfig().dict()
+    return AgentOrchestrationConfig().model_dump()

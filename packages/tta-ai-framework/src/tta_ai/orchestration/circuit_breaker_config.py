@@ -239,7 +239,7 @@ class CircuitBreakerConfigManager:
         """Export configuration as dictionary."""
         if not self.validated_config:
             self._validate_config()
-        return self.validated_config.dict()
+        return self.validated_config.model_dump()
 
     def get_config_summary(self) -> dict[str, Any]:
         """Get a summary of current configuration."""
