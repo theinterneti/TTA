@@ -164,9 +164,7 @@ class IPAAdapter:
             )
 
             # Convert IntentSchema to dict format expected by orchestration system
-            if hasattr(intent_result, "dict"):
-                intent_dict = intent_result.dict()
-            elif hasattr(intent_result, "model_dump"):
+            if hasattr(intent_result, "model_dump"):
                 intent_dict = intent_result.model_dump()
             else:
                 intent_dict = {"intent": str(intent_result), "confidence": 0.8}
@@ -263,7 +261,9 @@ class WBAAdapter:
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(
-                    None, self._wba_instance.process, wba_input  # type: ignore[union-attr]
+                    None,
+                    self._wba_instance.process,
+                    wba_input,  # type: ignore[union-attr]
                 )
 
             result = await retry_with_backoff(_process_with_executor, self.retry_config)
@@ -348,7 +348,9 @@ class NGAAdapter:
             async def _process_with_executor():
                 loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(
-                    None, generate_narrative_response, nga_input  # type: ignore[misc]
+                    None,
+                    generate_narrative_response,
+                    nga_input,  # type: ignore[misc]
                 )
 
             result = await retry_with_backoff(_process_with_executor, self.retry_config)
