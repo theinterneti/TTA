@@ -54,7 +54,7 @@ dependencies = [
     "tensorboardX>=2.6.0",
     # NLP
     "spacy>=3.5.0",
-    "nltk>=3.8.0",
+    "nltk>=3.9.3",
     "sacremoses>=0.1.1",
     "sacrebleu>=1.5.1",
     "rouge-score>=0.1.2",

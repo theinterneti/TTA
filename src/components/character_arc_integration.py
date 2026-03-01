@@ -548,8 +548,8 @@ class CharacterArcIntegration:
             )
 
             # Get dialogue context from development system
-            from models.data_models import (
-                DialogueContext,  # type: ignore[import-not-found]
+            from models.data_models import (  # type: ignore[import-not-found]
+                DialogueContext,
             )
 
             dialogue_context = DialogueContext(
