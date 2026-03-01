@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
-from collections.abc import Callable
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -90,15 +90,15 @@ class HealthChecker:
                 checked_at=datetime.utcnow(),
             )
 
-        start_time = asyncio.get_event_loop().time()
+        start_time = asyncio.get_running_loop().time()
         try:
             result = await self._checks[name]()
-            end_time = asyncio.get_event_loop().time()
+            end_time = asyncio.get_running_loop().time()
             result.response_time_ms = (end_time - start_time) * 1000
             result.checked_at = datetime.utcnow()
             return result
         except Exception as e:
-            end_time = asyncio.get_event_loop().time()
+            end_time = asyncio.get_running_loop().time()
             logger.error(f"Health check failed for {name}: {e}")
             return HealthCheckResult(
                 component=name,
