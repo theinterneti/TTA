@@ -9,13 +9,13 @@ configuration, including discovery and auto-registration settings.
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-class CapabilityMatchingAlgorithm(str, Enum):
+class CapabilityMatchingAlgorithm(StrEnum):
     """Available capability matching algorithms."""
 
     WEIGHTED_SCORE = "weighted_score"

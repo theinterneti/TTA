@@ -6,7 +6,7 @@ Workflow definitions and orchestration responses (Task 2.1).
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -14,14 +14,14 @@ from pydantic import BaseModel, Field
 from .models import AgentType
 
 
-class WorkflowType(str, Enum):
+class WorkflowType(StrEnum):
     INPUT_PROCESSING = "input_processing"
     WORLD_BUILDING = "world_building"
     NARRATIVE_GENERATION = "narrative_generation"
     COLLABORATIVE = "collaborative"
 
 
-class ErrorHandlingStrategy(str, Enum):
+class ErrorHandlingStrategy(StrEnum):
     FAIL_FAST = "fail_fast"
     RETRY = "retry"
     SKIP_ON_ERROR = "skip_on_error"

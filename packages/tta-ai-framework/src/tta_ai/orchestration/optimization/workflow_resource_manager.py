@@ -15,7 +15,7 @@ import logging
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..realtime.workflow_progress import WorkflowProgressTracker
@@ -24,7 +24,7 @@ from .response_time_monitor import ResponseTimeCategory, ResponseTimeCollector
 logger = logging.getLogger(__name__)
 
 
-class WorkflowPriority(str, Enum):
+class WorkflowPriority(StrEnum):
     """Workflow priority levels."""
 
     LOW = "low"
@@ -33,7 +33,7 @@ class WorkflowPriority(str, Enum):
     CRITICAL = "critical"
 
 
-class ResourceType(str, Enum):
+class ResourceType(StrEnum):
     """Types of resources that can be allocated."""
 
     CPU = "cpu"

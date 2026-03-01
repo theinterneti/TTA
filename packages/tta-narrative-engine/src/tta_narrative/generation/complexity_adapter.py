@@ -11,7 +11,7 @@ user state, progress, and therapeutic needs.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import DifficultyLevel, EmotionalState, Scene, SessionState
@@ -19,7 +19,7 @@ from ..models.core import DifficultyLevel, EmotionalState, Scene, SessionState
 logger = logging.getLogger(__name__)
 
 
-class ComplexityDimension(str, Enum):
+class ComplexityDimension(StrEnum):
     """Dimensions of narrative complexity that can be adapted."""
 
     COGNITIVE_LOAD = "cognitive_load"
@@ -31,7 +31,7 @@ class ComplexityDimension(str, Enum):
     CONCEPTUAL_ABSTRACTION = "conceptual_abstraction"
 
 
-class AdaptationStrategy(str, Enum):
+class AdaptationStrategy(StrEnum):
     """Strategies for complexity adaptation."""
 
     SIMPLIFY = "simplify"
