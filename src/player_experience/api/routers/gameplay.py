@@ -222,7 +222,7 @@ async def create_session(
         if result.get("code") == "AUTH_ERROR":
             status_code = status.HTTP_401_UNAUTHORIZED
         elif result.get("code") == "SAFETY_ERROR":
-            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+            status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
 
         raise HTTPException(
             status_code=status_code, detail=result.get("error", "Unknown error")
