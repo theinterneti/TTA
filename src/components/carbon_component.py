@@ -39,7 +39,10 @@ from typing import Any, TypeVar
 
 # Try to import codecarbon for carbon tracking
 try:
-    from codecarbon import EmissionsTracker, track_emissions  # type: ignore[import-not-found]
+    from codecarbon import (  # type: ignore[import-not-found]
+        EmissionsTracker,
+        track_emissions,
+    )
 
     codecarbon_available = True
 except ImportError:
