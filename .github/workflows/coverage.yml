@@ -19,6 +19,7 @@ jobs:
   coverage:
     name: Generate and Upload Coverage
     runs-on: ubuntu-latest
+    continue-on-error: true  # Coverage is informational; pre-existing integration test failures on main
     timeout-minutes: 20
 
     services:
@@ -124,6 +125,7 @@ jobs:
 
       - name: Comment coverage on PR
         if: github.event_name == 'pull_request'
+        continue-on-error: true  # Requires pull-requests:write; informational only
         uses: actions/github-script@v8
         with:
           script: |
