@@ -9,6 +9,8 @@ from pathlib import Path
 
 import pytest
 import yaml
+
+pytest.importorskip("tta_ai")
 from tta_ai.prompts import PromptMetrics, PromptRegistry, PromptTemplate
 
 

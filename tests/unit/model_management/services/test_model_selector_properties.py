@@ -12,6 +12,8 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
+
+pytest.importorskip("tta_ai")
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,
