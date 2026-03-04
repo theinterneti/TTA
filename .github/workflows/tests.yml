@@ -20,6 +20,9 @@ concurrency:
   group: tests-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   unit:
     name: Unit Tests (split ${{ matrix.group }}/3)
