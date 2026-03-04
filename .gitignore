@@ -81,6 +81,9 @@ mutation-report.html
 cosmic-ray*.toml
 session*.sqlite
 
+# pytest-profiling output
+prof/
+
 # Batch processing and generation results
 batch*_results.json
 batch*_generation_results.json

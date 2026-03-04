@@ -1478,6 +1478,15 @@ wheels = [
 ]
 
 [[package]]
+name = "gprof2dot"
+version = "2025.4.14"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/fd/cad13fa1f7a463a607176432c4affa33ea162f02f58cc36de1d40d3e6b48/gprof2dot-2025.4.14.tar.gz", hash = "sha256:35743e2d2ca027bf48fa7cba37021aaf4a27beeae1ae8e05a50b55f1f921a6ce", size = 39536, upload-time = "2025-04-14T07:21:45.76Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/ed/89d760cb25279109b89eb52975a7b5479700d3114a2421ce735bfb2e7513/gprof2dot-2025.4.14-py3-none-any.whl", hash = "sha256:0742e4c0b4409a5e8777e739388a11e1ed3750be86895655312ea7c20bd0090e", size = 37555, upload-time = "2025-04-14T07:21:43.319Z" },
+]
+
+[[package]]
 name = "greenlet"
 version = "3.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -4174,6 +4183,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-flakefinder"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest", marker = "sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ec/53/69c56a93ea057895b5761c5318455804873a6cd9d796d7c55d41c2358125/pytest-flakefinder-1.1.0.tar.gz", hash = "sha256:e2412a1920bdb8e7908783b20b3d57e9dad590cc39a93e8596ffdd493b403e0e", size = 6795, upload-time = "2022-10-26T18:27:54.243Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/8b/06787150d0fd0cbd3a8054262b56f91631c7778c1bc91bf4637e47f909ad/pytest_flakefinder-1.1.0-py2.py3-none-any.whl", hash = "sha256:741e0e8eea427052f5b8c89c2b3c3019a50c39a59ce4df6a305a2c2d9ba2bd13", size = 4644, upload-time = "2022-10-26T18:27:52.128Z" },
+]
+
+[[package]]
 name = "pytest-order"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4183,6 +4204,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1d/66/02ae17461b14a52ce5a29ae2900156b9110d1de34721ccc16ccd79419876/pytest_order-1.3.0.tar.gz", hash = "sha256:51608fec3d3ee9c0adaea94daa124a5c4c1d2bb99b00269f098f414307f23dde", size = 47544, upload-time = "2024-08-22T12:29:54.512Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1b/73/59b038d1aafca89f8e9936eaa8ffa6bb6138d00459d13a32ce070be4f280/pytest_order-1.3.0-py3-none-any.whl", hash = "sha256:2cd562a21380345dd8d5774aa5fd38b7849b6ee7397ca5f6999bbe6e89f07f6e", size = 14609, upload-time = "2024-08-22T12:29:53.156Z" },
+]
+
+[[package]]
+name = "pytest-profiling"
+version = "1.8.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "gprof2dot", marker = "sys_platform == 'linux'" },
+    { name = "pytest", marker = "sys_platform == 'linux'" },
+    { name = "six", marker = "sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/44/74/806cafd6f2108d37979ec71e73b2ff7f7db88eabd19d3b79c5d6cc229c36/pytest-profiling-1.8.1.tar.gz", hash = "sha256:3f171fa69d5c82fa9aab76d66abd5f59da69135c37d6ae5bf7557f1b154cb08d", size = 33135, upload-time = "2024-11-29T19:34:13.85Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e3/ac/c428c66241a144617a8af7a28e2e055e1438d23b949b62ac4b401a69fb79/pytest_profiling-1.8.1-py3-none-any.whl", hash = "sha256:3dd8713a96298b42d83de8f5951df3ada3e61b3e5d2a06956684175529e17aea", size = 9929, upload-time = "2024-11-29T19:33:02.111Z" },
 ]
 
 [[package]]
@@ -4213,6 +4248,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-split"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest", marker = "sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2f/16/8af4c5f2ceb3640bb1f78dfdf5c184556b10dfe9369feaaad7ff1c13f329/pytest_split-0.11.0.tar.gz", hash = "sha256:8ebdb29cc72cc962e8eb1ec07db1eeb98ab25e215ed8e3216f6b9fc7ce0ec2b5", size = 13421, upload-time = "2026-02-03T09:14:31.469Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ae/a1/d4423657caaa8be9b31e491592b49cebdcfd434d3e74512ce71f6ec39905/pytest_split-0.11.0-py3-none-any.whl", hash = "sha256:899d7c0f5730da91e2daf283860eb73b503259cb416851a65599368849c7f382", size = 11911, upload-time = "2026-02-03T09:14:33.708Z" },
+]
+
+[[package]]
 name = "pytest-timeout"
 version = "2.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4222,6 +4269,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ac/82/4c9ecabab13363e72d880f2fb504c5f750433b2b6f16e99f4ec21ada284c/pytest_timeout-2.4.0.tar.gz", hash = "sha256:7e68e90b01f9eff71332b25001f85c75495fc4e3a836701876183c4bcfd0540a", size = 17973, upload-time = "2025-05-05T19:44:34.99Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/b6/3127540ecdf1464a00e5a01ee60a1b09175f6913f0644ac748494d9c4b21/pytest_timeout-2.4.0-py3-none-any.whl", hash = "sha256:c42667e5cdadb151aeb5b26d114aff6bdf5a907f176a007a30b940d3d865b5c2", size = 14382, upload-time = "2025-05-05T19:44:33.502Z" },
+]
+
+[[package]]
+name = "pytest-unused-fixtures"
+version = "0.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest", marker = "sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/23/12/cd20cc256ef8d7dbc206d3acb3dd99816dafbe5356bed3de0722ff69bc39/pytest_unused_fixtures-0.3.1.tar.gz", hash = "sha256:e7102edf1f2b7d977218fb282bfd1b8879415747e17ef0e9f78a29dcb31cf3a6", size = 6473, upload-time = "2025-12-23T13:56:13.968Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/14/dd/d5bb101ecae4abbe33a256cbca62c5575ad36eb074408f221a053b83f3d5/pytest_unused_fixtures-0.3.1-py3-none-any.whl", hash = "sha256:5455f970aadbebd527930fa767111aba5f484b6c514ac5a37f830669a16832bd", size = 8307, upload-time = "2025-12-23T13:56:13.021Z" },
 ]
 
 [[package]]
@@ -5791,11 +5850,16 @@ dev = [
     { name = "pytest-asyncio", marker = "sys_platform == 'linux'" },
     { name = "pytest-benchmark", marker = "sys_platform == 'linux'" },
     { name = "pytest-cov", marker = "sys_platform == 'linux'" },
+    { name = "pytest-flakefinder", marker = "sys_platform == 'linux'" },
     { name = "pytest-order", marker = "sys_platform == 'linux'" },
+    { name = "pytest-profiling", marker = "sys_platform == 'linux'" },
     { name = "pytest-rerunfailures", marker = "sys_platform == 'linux'" },
     { name = "pytest-rich", marker = "sys_platform == 'linux'" },
+    { name = "pytest-split", marker = "sys_platform == 'linux'" },
     { name = "pytest-timeout", marker = "sys_platform == 'linux'" },
+    { name = "pytest-unused-fixtures", marker = "sys_platform == 'linux'" },
     { name = "pytest-xdist", marker = "sys_platform == 'linux'" },
+    { name = "tenacity", marker = "sys_platform == 'linux'" },
     { name = "testcontainers", marker = "sys_platform == 'linux'" },
     { name = "yamale", marker = "sys_platform == 'linux'" },
 ]
@@ -5968,11 +6032,16 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.0.0" },
     { name = "pytest-benchmark", specifier = ">=5.0.0" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
+    { name = "pytest-flakefinder", specifier = ">=1.1.0" },
     { name = "pytest-order", specifier = ">=1.3.0" },
+    { name = "pytest-profiling", specifier = ">=1.8.0" },
     { name = "pytest-rerunfailures", specifier = ">=15.0.0" },
     { name = "pytest-rich", specifier = ">=0.2.0" },
+    { name = "pytest-split", specifier = ">=0.11.0" },
     { name = "pytest-timeout", specifier = ">=2.3.0" },
+    { name = "pytest-unused-fixtures", specifier = ">=0.3.0" },
     { name = "pytest-xdist", specifier = ">=3.6.0" },
+    { name = "tenacity", specifier = ">=9.0.0" },
     { name = "testcontainers", specifier = ">=4.12.0" },
     { name = "yamale", specifier = ">=6.0.0" },
 ]

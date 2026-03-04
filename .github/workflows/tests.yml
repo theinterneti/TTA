@@ -15,11 +15,23 @@ on:
       - staging
       - development
 
+# Cancel in-progress runs for the same PR/branch to save CI costs
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   unit:
-    name: Unit Tests
+    name: Unit Tests (split ${{ matrix.group }}/3)
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3]
     steps:
       - uses: actions/checkout@v6
 
@@ -43,6 +55,10 @@ jobs:
             --ignore=tests/performance \
             --ignore=tests/contract \
             --ignore=tests/contracts \
+            -n auto \
+            --splitting-algorithm=least_duration \
+            --group=${{ matrix.group }} \
+            --splits=3 \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-branch \
             --cov-report=xml:coverage-unit.xml \
@@ -67,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: unit-test-results
+          name: unit-test-results-${{ matrix.group }}
           path: |
             test-results/
             coverage-unit.xml

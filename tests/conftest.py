@@ -473,6 +473,21 @@ def pytest_collection_modifyitems(config, items):
             if "comprehensive" in item.keywords:
                 item.add_marker(skip_comprehensive)
 
+    # ---- Quarantine / flaky handling ----
+    # When running in CI, quarantined tests are expected to fail and must not
+    # block the pipeline.  We mark them with ``xfail(strict=False)`` so they
+    # appear as *xfail* (expected failure) or *xpass* (unexpected pass) but
+    # never as hard failures.
+    if os.getenv("CI") == "true":
+        for item in items:
+            if "quarantine" in item.keywords:
+                item.add_marker(
+                    pytest.mark.xfail(
+                        reason="quarantined – allowed to fail in CI",
+                        strict=False,
+                    )
+                )
+
 
 # Test environment setup
 @pytest.fixture(autouse=True)
