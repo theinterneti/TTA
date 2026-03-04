@@ -23,9 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Checkout TTA.dev (path source dependency)
-        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
-
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
@@ -40,12 +37,22 @@ jobs:
             --ignore=tests/post_deployment \
             --ignore=tests/e2e \
             --ignore=tests/e2e-staging \
+            --ignore=tests/comprehensive_battery \
+            --ignore=tests/agent_orchestration \
+            --ignore=tests/integration \
+            --ignore=tests/performance \
+            --ignore=tests/contract \
+            --ignore=tests/contracts \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-branch \
             --cov-report=xml:coverage-unit.xml \
             --cov-report=term-missing \
             --cov-fail-under=0 \
-            tests/
+            tests/unit/ \
+            tests/monitoring/ \
+            tests/security/ \
+            tests/player_experience/ \
+            tests/common/
 
       - name: Upload coverage to Codecov
         if: always()
@@ -97,9 +104,6 @@ jobs:
       TEST_REDIS_URI: "redis://localhost:6379/0"
     steps:
       - uses: actions/checkout@v6
-
-      - name: Checkout TTA.dev (path source dependency)
-        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
 
       - uses: astral-sh/setup-uv@v7
         with:

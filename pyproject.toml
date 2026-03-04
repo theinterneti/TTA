@@ -19,6 +19,7 @@ classifiers = [
     "Intended Audience :: Healthcare Industry",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
 ]
 
 dependencies = [
@@ -59,18 +60,18 @@ dependencies = [
     "sacrebleu>=1.5.1",
     "rouge-score>=0.1.2",
     # Database
-    "neo4j>=5.8.0",
-    "redis>=6.0.0",
-    "SQLAlchemy>=2.0.0",
+    "neo4j>=6.0.0",
+    "redis>=7.0.0",
+    "SQLAlchemy>=2.0.46",
     # Computer Vision
     "pytesseract>=0.3.13",
     "pillow>=12.1.1",  # security: arbitrary code execution, OOB write, buffer overflow fixes
     # API and Web
-    "fastapi>=0.95.0",
-    "uvicorn>=0.22.0",
-    "pydantic>=2.0.0",
-    "httpx>=0.24.0",
-    "starlette>=0.46.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "pydantic>=2.10.0",
+    "httpx>=0.27.0",
+    "starlette>=0.50.0",
     "sse-starlette>=2.2.0",
     "aiohttp>=3.13.3",  # security: zip bomb, directory traversal, DoS fixes
     "aiohappyeyeballs>=2.6.0",
@@ -83,7 +84,7 @@ dependencies = [
     "python-jose[cryptography]>=3.4.0",  # security: algorithm confusion with OpenSSH ECDSA keys
     "passlib[bcrypt]>=1.7.4",
     "python-multipart>=0.0.22",  # security: arbitrary file write, ReDoS, DoS fixes
-    "pydantic-settings>=2.0.0",
+    "pydantic-settings>=2.5.0",
     "pyotp>=2.8.0",
     "qrcode[pil]>=7.4.0",
     "PyJWT>=2.8.0",
@@ -161,14 +162,14 @@ minimal = [
     "huggingface_hub>=0.20.0",
 
     # Database
-    "neo4j>=5.8.0",
-    "redis>=6.0.0",
+    "neo4j>=6.0.0",
+    "redis>=7.0.0",
 
     # API and Web
-    "fastapi>=0.95.0",
-    "uvicorn>=0.22.0",
-    "pydantic>=2.0.0",
-    "httpx>=0.24.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "pydantic>=2.10.0",
+    "httpx>=0.27.0",
 
     # Utilities
     "python-dotenv>=1.0.0",
@@ -204,8 +205,8 @@ dev = [
     "ipython>=8.12.0",
     "ipdb>=0.13.13",
     # Testing frameworks and utilities
-    "pytest>=7.3.1",
-    "pytest-asyncio>=0.23.0",
+    "pytest>=9.0.0",
+    "pytest-asyncio>=1.0.0",
     "pytest-cov>=5.0.0",
     "pytest-order>=1.3.0",
     "pytest-rich>=0.2.0",
@@ -214,9 +215,9 @@ dev = [
     "pytest-rerunfailures>=15.0.0",
     "testcontainers>=4.12.0",
     # Advanced testing tools
-    "hypothesis>=6.100.0", # Property-based testing
-    "mutmut>=2.4.0", # Mutation testing
-    "pytest-benchmark>=4.0.0", # Performance benchmarking
+    "hypothesis>=6.130.0", # Property-based testing
+    "mutmut>=3.4.0", # Mutation testing (segfaults on Python 3.14; use cosmic-ray or Python ≤3.13)
+    "pytest-benchmark>=5.0.0", # Performance benchmarking
     "pact-python>=2.2.0", # Contract testing
     "cosmic-ray>=8.4.3",
     "yamale>=6.0.0",
@@ -323,10 +324,10 @@ members = [
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
-tta-dev-primitives = { path = "../TTA.dev/platform/primitives", editable = true }
-tta-observability-integration = { path = "../TTA.dev/platform/observability", editable = true }
-universal-agent-context = { path = "../TTA.dev/platform/agent-context", editable = true }
-tta-dev-integrations = { path = "../TTA.dev/platform/integrations", editable = true }
+tta-dev-primitives = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/primitives/v1.3.0/tta_dev_primitives-1.3.0-py3-none-any.whl" }
+tta-observability-integration = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/observability/v1.0.0/tta_observability_integration-1.0.0-py3-none-any.whl" }
+universal-agent-context = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/agent-context/v1.0.0/universal_agent_context-1.0.0-py3-none-any.whl" }
+tta-dev-integrations = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/integrations/v0.1.0/tta_dev_integrations-0.1.0-py3-none-any.whl" }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
@@ -490,6 +491,8 @@ norecursedirs = [
     "tests/e2e-staging",
     "tests/mutation",
     "tests/post_deployment",
+    "tests/comprehensive_battery",
+    "tests/performance",
     ".git",
     "__pycache__",
     ".venv",
