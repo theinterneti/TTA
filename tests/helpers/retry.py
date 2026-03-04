@@ -57,9 +57,9 @@ async def wait_until(
     """
     import asyncio
 
-    deadline = asyncio.get_event_loop().time() + timeout
+    deadline = asyncio.get_running_loop().time() + timeout
     last_result = None
-    while asyncio.get_event_loop().time() < deadline:
+    while asyncio.get_running_loop().time() < deadline:
         last_result = predicate()
         if last_result:
             return last_result

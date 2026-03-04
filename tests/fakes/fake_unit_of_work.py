@@ -8,7 +8,6 @@ memory); ``rollback()`` restores the snapshot taken at construction time.
 
 from __future__ import annotations
 
-import copy
 from typing import Any
 
 from .fake_repository import FakeRepository
@@ -62,11 +61,11 @@ class FakeUnitOfWork:
         """Restore every repository to the last snapshot."""
         for name, snapshot in self._snapshots.items():
             repo = self._repos[name]
-            repo._store = copy.deepcopy(snapshot)
+            repo._restore(snapshot)
         self.rolled_back = True
 
     # -- internals -------------------------------------------------------------
 
     def _take_snapshot(self) -> None:
         for name, repo in self._repos.items():
-            self._snapshots[name] = copy.deepcopy(repo._store)
+            self._snapshots[name] = repo._snapshot()

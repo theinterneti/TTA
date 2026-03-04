@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   unit:
-    name: Unit Tests (split ${{ matrix.group }}/${{ strategy.job-total }})
+    name: Unit Tests (split ${{ matrix.group }}/3)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:

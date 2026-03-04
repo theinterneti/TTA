@@ -74,3 +74,11 @@ class FakeRepository:
     def committed_data(self) -> dict[str, Any]:
         """Direct (non-copied) access for assertions inside tests."""
         return self._store
+
+    def _restore(self, snapshot: dict[str, Any]) -> None:
+        """Replace internal store from a snapshot (used by FakeUnitOfWork)."""
+        self._store = copy.deepcopy(snapshot)
+
+    def _snapshot(self) -> dict[str, Any]:
+        """Return a deep copy of the internal store for snapshotting."""
+        return copy.deepcopy(self._store)
