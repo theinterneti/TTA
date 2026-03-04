@@ -1456,7 +1456,9 @@ class CharacterArcManagerComponent(Component):
                 return len(character_arc.character_history) > 5
             if "relationship" in requirement:
                 player_relationship = character_arc.relationship_dynamics.get("player")
-                return bool(player_relationship and player_relationship.trust_level > 0.5)
+                return bool(
+                    player_relationship and player_relationship.trust_level > 0.5
+                )
             if "growth" in requirement:
                 return any(
                     value > 0.6 for value in character_arc.growth_potential.values()

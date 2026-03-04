@@ -140,8 +140,13 @@ class TestFrameOutcomes:
     async def test_returns_dict_with_all_keys(self, framer):
         uc = _make_choice()
         result = await framer.frame_outcomes(_make_outcomes(), uc, _make_session())
-        for key in ("insights", "learning_opportunities", "therapeutic_value",
-                    "growth_aspects", "positive_reframes"):
+        for key in (
+            "insights",
+            "learning_opportunities",
+            "therapeutic_value",
+            "growth_aspects",
+            "positive_reframes",
+        ):
             assert key in result
 
     async def test_high_value_insight_content(self, framer):
@@ -157,8 +162,9 @@ class TestFrameOutcomes:
     async def test_low_value_insight_content(self, framer):
         uc = _make_choice(therapeutic_value=0.2)
         result = await framer.frame_outcomes(_make_outcomes(), uc, _make_session())
-        assert any("learning" in i.lower() or "growth" in i.lower()
-                   for i in result["insights"])
+        assert any(
+            "learning" in i.lower() or "growth" in i.lower() for i in result["insights"]
+        )
 
     async def test_positive_emotion_adds_insight(self, framer):
         uc = _make_choice(therapeutic_value=0.9)
@@ -189,7 +195,9 @@ class TestFrameOutcomes:
         result_positive = await framer.frame_outcomes(
             _make_outcomes("positive"), uc, _make_session()
         )
-        assert result_positive["therapeutic_value"] >= result_neutral["therapeutic_value"]
+        assert (
+            result_positive["therapeutic_value"] >= result_neutral["therapeutic_value"]
+        )
 
     async def test_growth_aspects_include_resilience_tag(self, framer):
         uc = _make_choice(
@@ -223,9 +231,12 @@ class TestAdaptFramingForEmotion:
 
     async def test_distressed_returns_safety_insight(self, framer):
         cs = _make_consequence_set()
-        result = await framer.adapt_framing_for_emotion(cs, "distressed", _make_session())
-        assert any("safe" in i.lower() or "grounding" in i.lower()
-                   for i in result["insights"])
+        result = await framer.adapt_framing_for_emotion(
+            cs, "distressed", _make_session()
+        )
+        assert any(
+            "safe" in i.lower() or "grounding" in i.lower() for i in result["insights"]
+        )
 
     async def test_anxious_appends_one_step_at_a_time(self, framer):
         cs = _make_consequence_set()
@@ -264,8 +275,13 @@ class TestTherapeuticFramerFallback:
     async def test_fallback_has_all_keys(self, framer):
         uc = _make_choice()
         result = await framer._generate_fallback_framing(uc)
-        for key in ("insights", "learning_opportunities", "therapeutic_value",
-                    "growth_aspects", "positive_reframes"):
+        for key in (
+            "insights",
+            "learning_opportunities",
+            "therapeutic_value",
+            "growth_aspects",
+            "positive_reframes",
+        ):
             assert key in result
 
     async def test_fallback_value_at_least_03(self, framer):
@@ -324,7 +340,9 @@ class TestExplainCausality:
         result = await explainer.explain_causality(
             uc, _make_outcomes(), _make_scene(), _make_session(EmotionalState.CALM)
         )
-        assert not result.lower().startswith("gently") and not result.lower().startswith("naturally")
+        assert not result.lower().startswith(
+            "gently"
+        ) and not result.lower().startswith("naturally")
 
     async def test_anxious_state_prefixes_naturally(self, explainer):
         uc = _make_choice()
@@ -336,7 +354,10 @@ class TestExplainCausality:
     async def test_overwhelmed_state_prefixes_gently(self, explainer):
         uc = _make_choice()
         result = await explainer.explain_causality(
-            uc, _make_outcomes(), _make_scene(), _make_session(EmotionalState.OVERWHELMED)
+            uc,
+            _make_outcomes(),
+            _make_scene(),
+            _make_session(EmotionalState.OVERWHELMED),
         )
         assert result.lower().startswith("gently")
 
@@ -399,7 +420,9 @@ class TestAdaptExplanationForEmotion:
 
     async def test_invalid_emotion_returns_original(self, explainer):
         original = "Your choice leads forward."
-        result = await explainer.adapt_explanation_for_emotion(original, "unknown_state")
+        result = await explainer.adapt_explanation_for_emotion(
+            original, "unknown_state"
+        )
         assert result == original
 
 
@@ -464,8 +487,13 @@ class TestTrackProgress:
     async def test_returns_dict_with_all_keys(self, tracker):
         uc = _make_choice()
         result = await tracker.track_progress(uc, _make_outcomes(), _make_session())
-        for key in ("progress_markers", "skill_development", "growth_patterns",
-                    "milestone_achievements", "therapeutic_gains"):
+        for key in (
+            "progress_markers",
+            "skill_development",
+            "growth_patterns",
+            "milestone_achievements",
+            "therapeutic_gains",
+        ):
             assert key in result
 
     async def test_on_exception_returns_safe_fallback(self, tracker):
@@ -648,10 +676,9 @@ class TestCheckMilestoneAchievements:
         assert "high_value_choice" in milestones
 
     async def test_consistent_engagement_milestone(self, tracker):
-        history = (
-            [{"choice_type": "therapeutic", "therapeutic_tags": []}] * 5
-            + [{"choice_type": "narrative", "therapeutic_tags": []}] * 5
-        )
+        history = [{"choice_type": "therapeutic", "therapeutic_tags": []}] * 5 + [
+            {"choice_type": "narrative", "therapeutic_tags": []}
+        ] * 5
         uc = _make_choice()
         milestones = await tracker._check_milestone_achievements(
             uc, _make_session(choice_history=history)

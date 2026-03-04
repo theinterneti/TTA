@@ -227,9 +227,7 @@ class TestScene:
         assert scene.narrative_content == "The narrative"
 
     def test_default_values(self):
-        scene = Scene(
-            title="T", description="D", narrative_content="N"
-        )
+        scene = Scene(title="T", description="D", narrative_content="N")
         assert scene.scene_type == SceneType.EXPLORATION
         assert scene.difficulty_level == DifficultyLevel.STANDARD
         assert scene.estimated_duration == 300
@@ -677,9 +675,7 @@ class TestAgencyAssessment:
 
     def test_empowerment_score_bounds(self):
         with pytest.raises(ValidationError):
-            AgencyAssessment(
-                choice_id="c1", agency_level="HIGH", empowerment_score=1.5
-            )
+            AgencyAssessment(choice_id="c1", agency_level="HIGH", empowerment_score=1.5)
 
     def test_defaults(self):
         aa = AgencyAssessment(
@@ -1036,9 +1032,7 @@ class TestContentValidation:
         assert cv.content_text == "Some narrative text"
 
     def test_defaults(self):
-        cv = ContentValidation(
-            content_id="c1", content_type="scene", content_text="T"
-        )
+        cv = ContentValidation(content_id="c1", content_type="scene", content_text="T")
         assert cv.contains_triggers is False
         assert cv.trigger_types == []
         assert cv.safety_rating == SafetyLevel.SAFE
@@ -1058,4 +1052,6 @@ class TestContentValidation:
 
     def test_missing_required_raises(self):
         with pytest.raises(ValidationError):
-            ContentValidation(content_id="c1", content_type="scene")  # missing content_text
+            ContentValidation(
+                content_id="c1", content_type="scene"
+            )  # missing content_text

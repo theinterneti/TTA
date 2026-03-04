@@ -32,6 +32,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -52,6 +55,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-codeql-
             ${{ runner.os }}-uv-
+
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
 
       - name: Install dependencies
         run: |
@@ -232,6 +238,7 @@ jobs:
 
       - name: Comment PR with CodeQL results
         if: github.event_name == 'pull_request'
+        continue-on-error: true  # Requires pull-requests:write; informational only
         uses: actions/github-script@v8
         with:
           script: |

@@ -250,7 +250,9 @@ class TestMFAService:
 class TestEnhancedAuthServiceRegistration:
     def test_register_user_success_without_repository(self):
         svc = _make_service()
-        reg = UserRegistration(username="alice", email="alice@ex.com", password=_VALID_PW)
+        reg = UserRegistration(
+            username="alice", email="alice@ex.com", password=_VALID_PW
+        )
         success, errors = svc.register_user(reg)
         assert success is True
         assert errors == []
@@ -267,7 +269,9 @@ class TestEnhancedAuthServiceRegistration:
 
     def test_register_user_logs_security_event(self):
         svc = _make_service()
-        reg = UserRegistration(username="carol", email="carol@ex.com", password=_VALID_PW)
+        reg = UserRegistration(
+            username="carol", email="carol@ex.com", password=_VALID_PW
+        )
         svc.register_user(reg)
         event_types = [e.event_type for e in svc.security_events]
         assert "user_registration" in event_types

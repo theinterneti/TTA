@@ -176,16 +176,36 @@ class TestBuildSubstitutions:
     async def test_all_required_keys_present(self, gen: OutcomeGenerator):
         """Every placeholder used in templates must be in the substitutions dict."""
         required = {
-            "emotional_response", "action", "therapeutic_technique",
-            "immediate_benefit", "awareness_insight", "skill_area",
-            "technique", "therapeutic_goal",
-            "new_location", "interesting_element", "significance",
-            "path_description", "future_opportunity", "future_challenge",
-            "time_frame", "skill_name", "situation", "difficulty_level",
-            "encouraging_aspect", "regulation_action", "emotion",
-            "change_direction", "positive_emotion", "interaction_style",
-            "social_outcome", "response_type", "social_emotion",
-            "relationship_aspect", "positive_element", "interaction_learning",
+            "emotional_response",
+            "action",
+            "therapeutic_technique",
+            "immediate_benefit",
+            "awareness_insight",
+            "skill_area",
+            "technique",
+            "therapeutic_goal",
+            "new_location",
+            "interesting_element",
+            "significance",
+            "path_description",
+            "future_opportunity",
+            "future_challenge",
+            "time_frame",
+            "skill_name",
+            "situation",
+            "difficulty_level",
+            "encouraging_aspect",
+            "regulation_action",
+            "emotion",
+            "change_direction",
+            "positive_emotion",
+            "interaction_style",
+            "social_outcome",
+            "response_type",
+            "social_emotion",
+            "relationship_aspect",
+            "positive_element",
+            "interaction_learning",
         }
         uc = _make_user_choice()
         scene = _make_scene()
@@ -215,9 +235,7 @@ class TestGenerateImmediateOutcomes:
         result = await gen._generate_immediate_outcomes(uc, scene, session)
         assert len(result) > 0
 
-    async def test_no_unfilled_placeholders_therapeutic(
-        self, gen: OutcomeGenerator
-    ):
+    async def test_no_unfilled_placeholders_therapeutic(self, gen: OutcomeGenerator):
         uc = _make_user_choice(choice_type=ChoiceType.THERAPEUTIC)
         scene = _make_scene()
         session = _make_session()
@@ -227,9 +245,7 @@ class TestGenerateImmediateOutcomes:
                 f"Unfilled placeholder in: {text!r}"
             )
 
-    async def test_no_unfilled_placeholders_narrative(
-        self, gen: OutcomeGenerator
-    ):
+    async def test_no_unfilled_placeholders_narrative(self, gen: OutcomeGenerator):
         uc = _make_user_choice(choice_type=ChoiceType.NARRATIVE)
         scene = _make_scene(scene_type=SceneType.EXPLORATION)
         session = _make_session()
@@ -239,9 +255,7 @@ class TestGenerateImmediateOutcomes:
                 f"Unfilled placeholder in: {text!r}"
             )
 
-    async def test_no_unfilled_placeholders_skill_building(
-        self, gen: OutcomeGenerator
-    ):
+    async def test_no_unfilled_placeholders_skill_building(self, gen: OutcomeGenerator):
         uc = _make_user_choice(
             choice_type=ChoiceType.SKILL_BUILDING,
             therapeutic_tags=["coping_skills"],
@@ -355,9 +369,7 @@ class TestGenerateOutcomes:
                 f"Unfilled placeholder leaked into output: {text!r}"
             )
 
-    async def test_emotional_impact_has_primary_emotion(
-        self, gen: OutcomeGenerator
-    ):
+    async def test_emotional_impact_has_primary_emotion(self, gen: OutcomeGenerator):
         uc = _make_user_choice()
         outcomes = await gen.generate_outcomes(uc, _make_scene(), _make_session())
         assert "primary_emotion" in outcomes["emotional_impact"]

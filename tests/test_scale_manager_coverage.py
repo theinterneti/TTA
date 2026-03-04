@@ -8,6 +8,8 @@ untested code paths in scale_manager.py.
 """
 
 import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.orchestration.conflict_detection import (
     ScaleConflict,
 )

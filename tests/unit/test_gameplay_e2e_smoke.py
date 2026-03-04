@@ -79,9 +79,7 @@ class FakeDb:
         self._scenes[scene.scene_id] = scene
         return True
 
-    async def save_session_summary(
-        self, session_id: str, summary: dict
-    ) -> bool:
+    async def save_session_summary(self, session_id: str, summary: dict) -> bool:
         self.call_counts["save_session_summary"] += 1
         self._summaries[session_id] = summary
         return True
@@ -206,9 +204,7 @@ class TestFullLoopSmoke:
         assert session.user_id == "player-1"
         assert db.call_counts["create_session"] == 1
 
-    async def test_start_session_generates_opening_scene(
-        self, controller_with_fake_db
-    ):
+    async def test_start_session_generates_opening_scene(self, controller_with_fake_db):
         ctrl, _ = controller_with_fake_db
         session = await ctrl.start_session(user_id="player-1")
 
@@ -544,9 +540,7 @@ class TestGetSessionsForUser:
         assert sessions[0]["user_id"] == "player-alpha"
         assert sessions[0]["session_id"] == session.session_id
 
-    async def test_does_not_return_other_users_sessions(
-        self, controller_with_fake_db
-    ):
+    async def test_does_not_return_other_users_sessions(self, controller_with_fake_db):
         ctrl, _ = controller_with_fake_db
         await ctrl.start_session(user_id="player-alpha")
         await ctrl.start_session(user_id="player-beta")
@@ -574,9 +568,7 @@ class TestGetSessionsForUser:
 
         assert sessions == []
 
-    async def test_active_session_not_duplicated_with_db(
-        self, controller_with_fake_db
-    ):
+    async def test_active_session_not_duplicated_with_db(self, controller_with_fake_db):
         ctrl, _ = controller_with_fake_db
         session = await ctrl.start_session(user_id="player-alpha")
         sid = session.session_id

@@ -660,7 +660,9 @@ class AgentOrchestrationService:
                 "score": result.score,
                 "reason": f"Therapeutic validation: {result.level.value}",
                 "crisis_detected": result.crisis_detected,
-                "crisis_types": [getattr(ct, "value", ct) for ct in result.crisis_types],
+                "crisis_types": [
+                    getattr(ct, "value", ct) for ct in result.crisis_types
+                ],
                 "escalation_recommended": result.escalation_recommended,
                 "alternative_content": result.alternative_content,
                 "therapeutic_appropriateness": result.therapeutic_appropriateness,

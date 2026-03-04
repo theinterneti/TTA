@@ -128,9 +128,7 @@ class TestBaseProvider:
     async def test_get_available_models_applies_max_cost_filter(self, provider):
         await provider.initialize({})
         provider._available_models = [
-            ModelInfo(
-                "cheap", "Cheap", ProviderType.OPENROUTER, cost_per_token=0.0001
-            ),
+            ModelInfo("cheap", "Cheap", ProviderType.OPENROUTER, cost_per_token=0.0001),
             ModelInfo(
                 "expensive", "Expensive", ProviderType.OPENROUTER, cost_per_token=0.01
             ),
@@ -144,12 +142,8 @@ class TestBaseProvider:
     async def test_get_available_models_applies_min_context_filter(self, provider):
         await provider.initialize({})
         provider._available_models = [
-            ModelInfo(
-                "large", "Large", ProviderType.OPENROUTER, context_length=32000
-            ),
-            ModelInfo(
-                "small", "Small", ProviderType.OPENROUTER, context_length=1024
-            ),
+            ModelInfo("large", "Large", ProviderType.OPENROUTER, context_length=32000),
+            ModelInfo("small", "Small", ProviderType.OPENROUTER, context_length=1024),
         ]
         models = await provider.get_available_models(
             filters={"min_context_length": 8192}
@@ -495,7 +489,9 @@ class TestLMStudioProvider:
         assert provider._base_url == "http://localhost:1234"
 
     async def test_validate_config_uses_provided_url(self, provider):
-        result = await provider._validate_config({"base_url": "http://192.168.1.5:1234"})
+        result = await provider._validate_config(
+            {"base_url": "http://192.168.1.5:1234"}
+        )
         assert result is True
         assert provider._base_url == "http://192.168.1.5:1234"
 
@@ -613,7 +609,11 @@ class TestLMStudioModelInstanceGenerate:
         instance = self._make_instance(
             {
                 "choices": [{"message": {"content": "LMS response"}}],
-                "usage": {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5},
+                "usage": {
+                    "prompt_tokens": 3,
+                    "completion_tokens": 2,
+                    "total_tokens": 5,
+                },
             }
         )
         req = GenerationRequest(prompt="Hello")
@@ -786,7 +786,11 @@ class TestOpenRouterProvider:
         provider._max_cost_per_token = 0.01  # allow paid
         provider._available_models = [
             ModelInfo(
-                "paid/m", "Paid", ProviderType.OPENROUTER, is_free=False, cost_per_token=0.001
+                "paid/m",
+                "Paid",
+                ProviderType.OPENROUTER,
+                is_free=False,
+                cost_per_token=0.001,
             ),
             ModelInfo("free/m", "Free", ProviderType.OPENROUTER, is_free=True),
         ]
@@ -886,8 +890,12 @@ class TestOpenRouterProvider:
         provider._client = mock_client
         await provider._refresh_available_models()
         assert len(provider._available_models) == 2
-        free_model = next(m for m in provider._available_models if m.model_id == "free-model")
-        paid_model = next(m for m in provider._available_models if m.model_id == "paid-model")
+        free_model = next(
+            m for m in provider._available_models if m.model_id == "free-model"
+        )
+        paid_model = next(
+            m for m in provider._available_models if m.model_id == "paid-model"
+        )
         assert free_model.cost_per_token == pytest.approx(0.0)
         assert paid_model.cost_per_token is not None and paid_model.cost_per_token > 0
 
@@ -952,19 +960,13 @@ class TestCustomAPIProvider:
 
     async def test_validate_config_fails_if_missing_api_key(self, provider):
         config = {
-            "custom_providers": {
-                "my-api": {"base_url": "https://api.example.com"}
-            }
+            "custom_providers": {"my-api": {"base_url": "https://api.example.com"}}
         }
         result = await provider._validate_config(config)
         assert result is False
 
     async def test_validate_config_fails_if_missing_base_url(self, provider):
-        config = {
-            "custom_providers": {
-                "my-api": {"api_key": "sk-123"}
-            }
-        }
+        config = {"custom_providers": {"my-api": {"api_key": "sk-123"}}}
         result = await provider._validate_config(config)
         assert result is False
 
@@ -1008,7 +1010,10 @@ class TestCustomAPIProvider:
         assert provider._get_model_context_length("any", "gpt-4o-mini") == 128000
 
     def test_get_model_context_length_claude(self, provider):
-        assert provider._get_model_context_length("any", "claude-3-haiku-20240307") == 200000
+        assert (
+            provider._get_model_context_length("any", "claude-3-haiku-20240307")
+            == 200000
+        )
 
     def test_get_model_context_length_default(self, provider):
         assert provider._get_model_context_length("any", "unknown-model") == 4096
@@ -1156,45 +1161,35 @@ class TestCustomAPIModelInstance:
     def test_extract_openai_response(self):
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
-        instance = CustomAPIModelInstance(
-            "custom/model", provider, mock_client, {}
-        )
+        instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
         data = {"choices": [{"message": {"content": "hello"}}]}
         assert instance._extract_openai_response(data) == "hello"
 
     def test_extract_openai_response_raises_on_no_choices(self):
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
-        instance = CustomAPIModelInstance(
-            "custom/model", provider, mock_client, {}
-        )
+        instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
         with pytest.raises(ValueError, match="No choices"):
             instance._extract_openai_response({"choices": []})
 
     def test_extract_anthropic_response_list_content(self):
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
-        instance = CustomAPIModelInstance(
-            "custom/model", provider, mock_client, {}
-        )
+        instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
         data = {"content": [{"text": "anthropic reply"}]}
         assert instance._extract_anthropic_response(data) == "anthropic reply"
 
     def test_extract_anthropic_response_raises_on_empty_content(self):
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
-        instance = CustomAPIModelInstance(
-            "custom/model", provider, mock_client, {}
-        )
+        instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
         with pytest.raises(ValueError, match="No content"):
             instance._extract_anthropic_response({"content": []})
 
     def test_extract_anthropic_usage(self):
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
-        instance = CustomAPIModelInstance(
-            "custom/model", provider, mock_client, {}
-        )
+        instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
         data = {"usage": {"input_tokens": 10, "output_tokens": 5}}
         usage = instance._extract_anthropic_usage(data)
         assert usage["prompt_tokens"] == 10

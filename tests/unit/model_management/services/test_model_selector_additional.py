@@ -197,9 +197,7 @@ class TestCalculateTaskBonus:
         assert bonus >= 0
 
     async def test_task_bonus_known_model_prefix_gets_extra(self, selector):
-        model = _make_model(
-            model_id="anthropic/claude-3-haiku", capabilities=[]
-        )
+        model = _make_model(model_id="anthropic/claude-3-haiku", capabilities=[])
         bonus_narrative = await selector._calculate_task_bonus(
             model, TaskType.NARRATIVE_GENERATION
         )
@@ -207,9 +205,7 @@ class TestCalculateTaskBonus:
         assert bonus_narrative >= 2.0
 
     async def test_task_bonus_therapeutic_claude_gets_highest(self, selector):
-        model = _make_model(
-            model_id="anthropic/claude-3-opus", capabilities=[]
-        )
+        model = _make_model(model_id="anthropic/claude-3-opus", capabilities=[])
         bonus = await selector._calculate_task_bonus(
             model, TaskType.THERAPEUTIC_RESPONSE
         )
@@ -240,7 +236,9 @@ class TestCalculateHardwareCompatibilityBonus:
         bonus = await sel._calculate_hardware_compatibility_bonus(model)
         assert bonus >= 1.0  # Plenty of RAM bonus
 
-    async def test_bonus_when_sufficient_but_not_plenty_ram(self, mock_hardware_detector):
+    async def test_bonus_when_sufficient_but_not_plenty_ram(
+        self, mock_hardware_detector
+    ):
         mock_hardware_detector.detect_system_resources = AsyncMock(
             return_value={
                 "available_ram_gb": 5,  # >= required(4) but < 4*1.5=6
@@ -439,7 +437,9 @@ class TestCacheManagement:
         selector.update_performance_metrics("model-a", recent_metric)
         # Old metrics (>24h) should be pruned
         remaining = selector._performance_cache["model-a"]
-        assert all(m.timestamp > datetime.now() - timedelta(hours=24) for m in remaining)
+        assert all(
+            m.timestamp > datetime.now() - timedelta(hours=24) for m in remaining
+        )
 
     def test_clear_cache_empties_all_caches(self, selector):
         selector._model_cache["prov"] = [_make_model()]
