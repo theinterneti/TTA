@@ -7,6 +7,9 @@ This module contains tests specifically designed to cover previously
 untested code paths in causal_graph.py.
 """
 
+import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.orchestration.causal_graph import (
     add_edge,
     detect_simple_cycles,

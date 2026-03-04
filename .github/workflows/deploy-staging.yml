@@ -45,7 +45,6 @@ jobs:
         if: steps.check.outputs.should_deploy == 'true'
         run: |
           echo "Running quick validation tests..."
-          git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
           pip install uv --quiet
           uv sync --quiet
           uv run pytest -q -m "not integration and not neo4j and not redis" tests/ --tb=short -x

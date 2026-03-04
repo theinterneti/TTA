@@ -5,9 +5,9 @@ pydantic==2.5.0
 python-multipart==0.0.18
 
 # Database and caching
-redis==5.0.1
+redis==7.2.0
 psycopg2-binary==2.9.9
-sqlalchemy==2.0.23
+sqlalchemy==2.0.46
 alembic==1.13.1
 
 # Data processing and analytics
