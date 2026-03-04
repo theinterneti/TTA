@@ -1,4 +1,7 @@
 # Logseq: [[TTA.dev/Tests/Test_models_compatibility]]
+import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.coherence import (
     ConsistencyIssue,
     ConsistencyIssueType,

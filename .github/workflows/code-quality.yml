@@ -23,9 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Checkout TTA.dev (path source dependency)
-        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
-
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
@@ -54,9 +51,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-
-      - name: Checkout TTA.dev (path source dependency)
-        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
 
       - uses: astral-sh/setup-uv@v7
         with:
