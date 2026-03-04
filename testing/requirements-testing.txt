@@ -28,9 +28,9 @@ pytest-benchmark==5.2.1
 # Database testing
 pytest-postgresql==5.0.0
 pytest-redis==3.0.2
-neo4j==5.14.1
+neo4j==6.1.0
 psycopg2-binary==2.9.9
-redis==5.0.1
+redis==7.2.0
 
 # Data generation and mocking
 faker==20.1.0
