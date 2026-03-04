@@ -8,9 +8,9 @@ import tempfile
 from pathlib import Path
 
 import pytest
+import yaml
 
 pytest.importorskip("tta_ai")
-import yaml
 from tta_ai.prompts import PromptMetrics, PromptRegistry, PromptTemplate
 
 
