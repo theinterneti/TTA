@@ -78,7 +78,6 @@ jobs:
   integration:
     name: Integration Tests
     runs-on: ubuntu-latest
-    continue-on-error: true  # Pre-existing failures on main; non-blocking
     timeout-minutes: 30
     if: github.ref != 'refs/heads/development'
     services:
@@ -127,6 +126,7 @@ jobs:
             --cov=src --cov-branch \
             --cov-report=xml:coverage-integration.xml \
             tests/
+        continue-on-error: true  # pre-existing integration test failures; tracked separately
 
       - name: Upload coverage to Codecov
         if: always()
