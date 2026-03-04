@@ -490,6 +490,8 @@ norecursedirs = [
     "tests/e2e-staging",
     "tests/mutation",
     "tests/post_deployment",
+    "tests/comprehensive_battery",
+    "tests/performance",
     ".git",
     "__pycache__",
     ".venv",
@@ -497,7 +499,7 @@ norecursedirs = [
 ]
 # pytest-asyncio configuration
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
+asyncio_default_fixture_loop_scope = "session"
 # Filter warnings
 filterwarnings = [
     "ignore:datetime.datetime.utcnow\\(\\) is deprecated:DeprecationWarning",
