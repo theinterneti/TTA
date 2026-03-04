@@ -215,7 +215,7 @@ dev = [
     "testcontainers>=4.12.0",
     # Advanced testing tools
     "hypothesis>=6.130.0", # Property-based testing
-    "mutmut>=3.4.0", # Mutation testing (note: segfaults on Python 3.14, see docs/research/testing-stack-audit.md)
+    "mutmut>=3.4.0", # Mutation testing (segfaults on Python 3.14; use cosmic-ray or Python ≤3.13)
     "pytest-benchmark>=5.0.0", # Performance benchmarking
     "pact-python>=2.2.0", # Contract testing
     "cosmic-ray>=8.4.3",
