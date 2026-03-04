@@ -235,6 +235,7 @@ jobs:
 
       - name: Comment PR with CodeQL results
         if: github.event_name == 'pull_request'
+        continue-on-error: true  # Requires pull-requests:write; informational only
         uses: actions/github-script@v8
         with:
           script: |
