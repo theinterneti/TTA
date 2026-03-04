@@ -190,6 +190,9 @@ jobs:
         with:
           fail-on-severity: moderate
           allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, HPND, MIT-CMU, LicenseRef-scancode-secret-labs-2011, PSF-2.0, Unlicense, 0BSD
+          # HPND, MIT-CMU, LicenseRef-scancode-secret-labs-2011: required by Pillow (PIL)
+          # PSF-2.0: Python Software Foundation license
+          # 0BSD: BSD Zero Clause License (permissive)
 
   secrets-scan:
     name: Secrets Detection
