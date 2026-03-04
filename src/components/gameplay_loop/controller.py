@@ -595,9 +595,9 @@ class GameplayLoopController:
                         choice.get("therapeutic_value", 0)
                         for choice in session_state.choice_history
                     ]
-                    status["therapeutic_engagement"] = sum(
+                    status["therapeutic_engagement"] = sum(therapeutic_values) / len(
                         therapeutic_values
-                    ) / len(therapeutic_values)
+                    )
 
                 return status
 
@@ -609,8 +609,7 @@ class GameplayLoopController:
             therapeutic_engagement = 0.0
             if session_state.choice_history:
                 vals = [
-                    c.get("therapeutic_value", 0)
-                    for c in session_state.choice_history
+                    c.get("therapeutic_value", 0) for c in session_state.choice_history
                 ]
                 therapeutic_engagement = sum(vals) / len(vals)
 
@@ -655,7 +654,9 @@ class GameplayLoopController:
                 if ss.session_id not in seen_ids:
                     therapeutic_engagement = 0.0
                     if ss.choice_history:
-                        vals = [c.get("therapeutic_value", 0) for c in ss.choice_history]
+                        vals = [
+                            c.get("therapeutic_value", 0) for c in ss.choice_history
+                        ]
                         therapeutic_engagement = sum(vals) / len(vals)
                     sessions.append(
                         {

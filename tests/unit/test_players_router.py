@@ -112,7 +112,9 @@ class TestCreatePlayer:
 
     def test_general_manager_error_returns_400(self):
         manager = _mock_manager()
-        manager.create_player_profile.side_effect = PlayerProfileManagerError("some error")
+        manager.create_player_profile.side_effect = PlayerProfileManagerError(
+            "some error"
+        )
         client = _build_app(manager)
         resp = client.post("/", json=_CREATE_PAYLOAD)
         assert resp.status_code == 400
@@ -195,7 +197,9 @@ class TestUpdatePlayer:
 
     def test_general_manager_error_returns_400(self):
         manager = _mock_manager()
-        manager.update_player_profile.side_effect = PlayerProfileManagerError("some error")
+        manager.update_player_profile.side_effect = PlayerProfileManagerError(
+            "some error"
+        )
         client = _build_app(manager)
         resp = client.put("/player-1", json={})
         assert resp.status_code == 400

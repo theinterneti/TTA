@@ -178,7 +178,9 @@ class DoltGameplayManager:
 
         try:
             result: bool = await asyncio.to_thread(_write)
-            logger.info("DoltGameplayManager: created session %s", session_state.session_id)
+            logger.info(
+                "DoltGameplayManager: created session %s", session_state.session_id
+            )
             return result
         except Exception as exc:
             logger.error("DoltGameplayManager: failed to create session: %s", exc)

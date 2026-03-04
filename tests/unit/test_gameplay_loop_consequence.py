@@ -60,7 +60,9 @@ def _make_scene(therapeutic_focus: list[str] | None = None) -> Scene:
     )
 
 
-def _make_session(emotional_state: EmotionalState = EmotionalState.CALM) -> SessionState:
+def _make_session(
+    emotional_state: EmotionalState = EmotionalState.CALM,
+) -> SessionState:
     ss = SessionState(user_id="test-user")
     ss.emotional_state = emotional_state
     return ss
@@ -193,9 +195,7 @@ class TestGenerateConsequences:
                 "therapeutic_value": 0.75,
             }
         )
-        cs.causality_explainer.explain_causality = AsyncMock(
-            return_value=causality
-        )
+        cs.causality_explainer.explain_causality = AsyncMock(return_value=causality)
         cs.progress_tracker.track_progress = AsyncMock(
             return_value=progress
             or {
@@ -218,27 +218,37 @@ class TestGenerateConsequences:
 
     async def test_consequence_set_has_immediate_outcomes(self):
         cs = self._make_system_with_mocks()
-        result = await cs.generate_consequences(_make_user_choice(), _make_scene(), _make_session())
+        result = await cs.generate_consequences(
+            _make_user_choice(), _make_scene(), _make_session()
+        )
         assert "You feel calmer" in result.immediate_outcomes
 
     async def test_consequence_set_has_therapeutic_insights(self):
         cs = self._make_system_with_mocks()
-        result = await cs.generate_consequences(_make_user_choice(), _make_scene(), _make_session())
+        result = await cs.generate_consequences(
+            _make_user_choice(), _make_scene(), _make_session()
+        )
         assert "You showed courage" in result.therapeutic_insights
 
     async def test_consequence_set_has_causality_explanation(self):
         cs = self._make_system_with_mocks()
-        result = await cs.generate_consequences(_make_user_choice(), _make_scene(), _make_session())
+        result = await cs.generate_consequences(
+            _make_user_choice(), _make_scene(), _make_session()
+        )
         assert result.causality_explanation == "Because of your choice"
 
     async def test_consequence_set_has_progress_markers(self):
         cs = self._make_system_with_mocks()
-        result = await cs.generate_consequences(_make_user_choice(), _make_scene(), _make_session())
+        result = await cs.generate_consequences(
+            _make_user_choice(), _make_scene(), _make_session()
+        )
         assert "therapeutic_milestone" in result.progress_markers
 
     async def test_consequence_set_has_skill_development(self):
         cs = self._make_system_with_mocks()
-        result = await cs.generate_consequences(_make_user_choice(), _make_scene(), _make_session())
+        result = await cs.generate_consequences(
+            _make_user_choice(), _make_scene(), _make_session()
+        )
         assert "coping_strategies" in result.skill_development
 
     async def test_falls_back_on_exception(self):
@@ -317,9 +327,7 @@ class TestEvaluateConsequenceImpact:
 
     async def test_growth_indicators_multiple_learning_paths(self):
         cs = self._make_system()
-        cs_set = _make_consequence_set(
-            learning_opportunities=["path1", "path2"]
-        )
+        cs_set = _make_consequence_set(learning_opportunities=["path1", "path2"])
         result = await cs.evaluate_consequence_impact(cs_set, _make_session())
         assert "multiple_learning_paths" in result["growth_indicators"]
 
@@ -549,7 +557,9 @@ class TestFrameOutcomes:
         combined = " ".join(result["insights"])
         assert "positive emotional shift" in combined
 
-    async def test_therapeutic_value_boosted_for_positive_emotion(self, initialized_framer):
+    async def test_therapeutic_value_boosted_for_positive_emotion(
+        self, initialized_framer
+    ):
         uc = _make_user_choice(therapeutic_value=0.7)
         outcomes = {"emotional_impact": {"primary_emotion": "hopeful"}}
         result = await initialized_framer.frame_outcomes(outcomes, uc, _make_session())
@@ -561,7 +571,9 @@ class TestFrameOutcomes:
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert len(result["learning_opportunities"]) > 0
 
-    async def test_learning_opportunities_fallback_when_no_tags(self, initialized_framer):
+    async def test_learning_opportunities_fallback_when_no_tags(
+        self, initialized_framer
+    ):
         uc = _make_user_choice(therapeutic_tags=[])
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert len(result["learning_opportunities"]) > 0
@@ -573,9 +585,7 @@ class TestFrameOutcomes:
         assert "therapeutic_engagement" in result["growth_aspects"]
 
     async def test_growth_aspects_resilience_tag(self, initialized_framer):
-        uc = _make_user_choice(
-            therapeutic_value=0.7, therapeutic_tags=["resilience"]
-        )
+        uc = _make_user_choice(therapeutic_value=0.7, therapeutic_tags=["resilience"])
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert "resilience" in result["growth_aspects"]
 

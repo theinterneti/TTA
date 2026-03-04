@@ -186,7 +186,9 @@ class TestClearMessages:
 class TestCopySession:
     def test_copy_creates_new_session(self, store):
         session_id, player_id = sid(), pid()
-        store.create_session(session_id, player_id, character_name="Aria", world_name="Forest")
+        store.create_session(
+            session_id, player_id, character_name="Aria", world_name="Forest"
+        )
         store.save_message(session_id, player_id, "user", "Hello")
         store.save_message(session_id, player_id, "assistant", "Hi")
 

@@ -295,7 +295,9 @@ class UnifiedAgentOrchestrator:
         """Process world updates through WBA."""
         try:
             # Extract intent and entities from IPA result
-            intent = (state.ipa_result or {}).get("routing", {}).get("intent", "unknown")
+            intent = (
+                (state.ipa_result or {}).get("routing", {}).get("intent", "unknown")
+            )
             entities = (state.ipa_result or {}).get("routing", {}).get("entities", {})
 
             # Build world update request
@@ -338,7 +340,9 @@ class UnifiedAgentOrchestrator:
             nga_context = {
                 "world_state": state.world_context,
                 "intent": (state.ipa_result or {}).get("routing", {}).get("intent"),
-                "entities": (state.ipa_result or {}).get("routing", {}).get("entities", {}),
+                "entities": (state.ipa_result or {})
+                .get("routing", {})
+                .get("entities", {}),
                 "world_updates": state.wba_result,
                 "therapeutic_context": state.therapeutic_context,
                 "safety_level": state.safety_level.value,

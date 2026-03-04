@@ -53,6 +53,9 @@ jobs:
             ${{ runner.os }}-uv-codeql-
             ${{ runner.os }}-uv-
 
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
       - name: Install dependencies
         run: |
           echo "Installing Python dependencies for CodeQL analysis..."

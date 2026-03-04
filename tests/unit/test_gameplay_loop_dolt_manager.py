@@ -109,9 +109,7 @@ class TestCreateSession:
     async def test_returns_false_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.create_session(_make_session())
         assert result is False
 
@@ -149,9 +147,7 @@ class TestGetSession:
     async def test_returns_none_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.get_session("session-1")
         assert result is None
 
@@ -194,9 +190,7 @@ class TestUpdateSession:
     async def test_returns_false_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.update_session(_make_session())
         assert result is False
 
@@ -223,9 +217,7 @@ class TestCreateScene:
     async def test_returns_false_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.create_scene(_make_scene())
         assert result is False
 
@@ -262,9 +254,7 @@ class TestGetScene:
     async def test_returns_none_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.get_scene("scene-1")
         assert result is None
 
@@ -293,9 +283,7 @@ class TestSaveSessionSummary:
     async def test_returns_false_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.save_session_summary("session-1", {})
         assert result is False
 
@@ -396,9 +384,7 @@ class TestGetSessionsForUser:
     async def test_returns_empty_on_db_error(self):
         mgr = DoltGameplayManager()
         mgr._available = True
-        with patch.object(
-            mgr, "_connect", side_effect=RuntimeError("db error")
-        ):
+        with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
             result = await mgr.get_sessions_for_user("user-1")
         assert result == []
 
