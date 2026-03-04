@@ -12,8 +12,11 @@ decision-making experiences that support therapeutic goals.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 from ..models.core import Choice, ChoiceType, DifficultyLevel, Scene, SessionState
 from ..models.interactions import ChoiceOutcome, UserChoice
@@ -30,12 +33,16 @@ class ChoiceArchitectureManager:
     validation, and agency protection to create meaningful therapeutic choices.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
 
         # Initialize components
         self.choice_generator = ChoiceGenerator(
-            self.config.get("choice_generation", {})
+            self.config.get("choice_generation", {}), llm=llm
         )
         self.choice_validator = ChoiceValidator(
             self.config.get("choice_validation", {})

@@ -2,10 +2,10 @@
 
 # Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Safety_validation/Enums]]
 
-from enum import Enum
+from enum import StrEnum
 
 
-class SafetyLevel(str, Enum):
+class SafetyLevel(StrEnum):
     """Safety level for content validation."""
 
     SAFE = "safe"
@@ -13,7 +13,7 @@ class SafetyLevel(str, Enum):
     BLOCKED = "blocked"
 
 
-class ValidationType(str, Enum):
+class ValidationType(StrEnum):
     """Types of validation algorithms available."""
 
     KEYWORD = "keyword"

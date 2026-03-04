@@ -17,8 +17,10 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[assignment]
-    from tta_dev_primitives.core.base import WorkflowPrimitive  # type: ignore[assignment]
+    from tta_dev_primitives.core.base import (
+        WorkflowContext,  # type: ignore[assignment]
+        WorkflowPrimitive,  # type: ignore[assignment]
+    )
 except ImportError:
     # Fallback for development/testing
     from typing import Protocol, TypeVar

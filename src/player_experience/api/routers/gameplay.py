@@ -8,6 +8,7 @@ including session management, choice processing, and progress tracking.
 """
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -56,6 +57,7 @@ class ProcessChoiceResponse(BaseModel):
     success: bool
     session_id: str | None = None
     choice_result: dict[str, Any] | None = None
+    session_status: dict[str, Any] | None = None
     processed_at: str | None = None
     safety_warning: str | None = None
     error: str | None = None
@@ -89,6 +91,27 @@ class UserSessionsResponse(BaseModel):
     user_id: str | None = None
     session_metrics: dict[str, Any] | None = None
     retrieved_at: str | None = None
+    error: str | None = None
+    code: str | None = None
+
+
+class PauseSessionResponse(BaseModel):
+    """Response model for pausing a session."""
+
+    success: bool
+    session_id: str | None = None
+    paused_at: str | None = None
+    error: str | None = None
+    code: str | None = None
+
+
+class ResumeSessionResponse(BaseModel):
+    """Response model for resuming a session."""
+
+    success: bool
+    session_id: str | None = None
+    session_data: dict[str, Any] | None = None
+    resumed_at: str | None = None
     error: str | None = None
     code: str | None = None
 
@@ -199,7 +222,7 @@ async def create_session(
         if result.get("code") == "AUTH_ERROR":
             status_code = status.HTTP_401_UNAUTHORIZED
         elif result.get("code") == "SAFETY_ERROR":
-            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+            status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
 
         raise HTTPException(
             status_code=status_code, detail=result.get("error", "Unknown error")
@@ -381,6 +404,88 @@ async def get_user_sessions(
         ) from e
 
 
+@router.post("/sessions/{session_id}/pause", response_model=PauseSessionResponse)
+async def pause_session(
+    session_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    gameplay_service: GameplayService = Depends(get_gameplay_service),
+):
+    """
+    Pause a gameplay session.
+
+    Saves current progress to the database and removes the session from
+    active memory so it can be resumed later.
+    """
+    try:
+        result = await gameplay_service.pause_session(
+            session_id=session_id, auth_token=credentials.credentials
+        )
+
+        if result.get("success"):
+            return PauseSessionResponse(**result)
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") == "SESSION_NOT_FOUND":
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
+
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to pause session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        ) from e
+
+
+@router.post("/sessions/{session_id}/resume", response_model=ResumeSessionResponse)
+async def resume_session(
+    session_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    gameplay_service: GameplayService = Depends(get_gameplay_service),
+):
+    """
+    Resume a paused gameplay session.
+
+    Loads session state from the database, generates a recap and current
+    choices, and returns the session ready to continue.
+    """
+    try:
+        result = await gameplay_service.resume_session(
+            session_id=session_id, auth_token=credentials.credentials
+        )
+
+        if result.get("success"):
+            return ResumeSessionResponse(**result)
+        status_code = status.HTTP_400_BAD_REQUEST
+        if result.get("code") == "AUTH_ERROR":
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif result.get("code") in ("SESSION_NOT_FOUND", "SESSION_ERROR"):
+            status_code = status.HTTP_404_NOT_FOUND
+        elif result.get("code") == "ACCESS_DENIED":
+            status_code = status.HTTP_403_FORBIDDEN
+
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to resume session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        ) from e
+
+
 @router.get("/health")
 async def gameplay_health_check(
     gameplay_service: GameplayService = Depends(get_gameplay_service),
@@ -396,7 +501,7 @@ async def gameplay_health_check(
 
         return {
             "status": "healthy",
-            "timestamp": "2024-01-01T00:00:00Z",  # Would use actual timestamp
+            "timestamp": datetime.utcnow().isoformat(),
             "integration_status": integration_status,
         }
 
@@ -404,6 +509,6 @@ async def gameplay_health_check(
         logger.error(f"Health check failed: {e}")
         return {
             "status": "unhealthy",
-            "timestamp": "2024-01-01T00:00:00Z",  # Would use actual timestamp
+            "timestamp": datetime.utcnow().isoformat(),
             "error": str(e),
         }

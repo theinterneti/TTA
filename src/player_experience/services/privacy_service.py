@@ -509,11 +509,7 @@ class DataPrivacyService:
         # Log deletion
         deletion_log_entry = {
             "user_id": request.user_id,
-            "deletion_request": (
-                request.model_dump()
-                if hasattr(request, "model_dump")
-                else request.dict()
-            ),
+            "deletion_request": request.model_dump(),
             "deletion_summary": deletion_summary,
             "timestamp": datetime.utcnow(),
         }

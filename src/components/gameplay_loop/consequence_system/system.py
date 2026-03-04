@@ -12,8 +12,11 @@ ensuring therapeutic value and clear causality understanding.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 from ..models.core import ConsequenceSet, Scene, SessionState
 from ..models.interactions import UserChoice
@@ -31,12 +34,16 @@ class ConsequenceSystem:
     meaningful outcomes from player choices with therapeutic framing.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
 
         # Initialize subsystems
         self.outcome_generator = OutcomeGenerator(
-            self.config.get("outcome_generation", {})
+            self.config.get("outcome_generation", {}), llm=llm
         )
         self.therapeutic_framer = TherapeuticFramer(
             self.config.get("therapeutic_framing", {})

@@ -125,8 +125,11 @@ class ChoiceValidator:
 
             # Check if choice difficulty is appropriate
             max_difficulty = rules.get("max_difficulty_level")
-            if max_difficulty and choice.difficulty_level.value > max_difficulty:
-                return False
+            if max_difficulty:
+                difficulty_rank = {"gentle": 1, "standard": 2, "challenging": 3}
+                choice_rank = difficulty_rank.get(choice.difficulty_level.value, 2)
+                if choice_rank > max_difficulty:
+                    return False
 
             # Check therapeutic value threshold
             min_therapeutic_value = rules.get("min_therapeutic_value", 0.0)
@@ -351,7 +354,7 @@ class ChoiceValidator:
 
         return ValidationResult(
             is_valid=is_valid,
-            confidence_score=1.0 - (len(issues) * 0.2),
+            confidence_score=max(0.0, 1.0 - (len(issues) * 0.2)),
             issues=issues,
             warnings=warnings,
             validation_details={

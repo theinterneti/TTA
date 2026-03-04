@@ -171,7 +171,7 @@ Requirements:
             RuntimeError: If task fails or not found
         """
         timeout = timeout or self.config.default_timeout_seconds
-        start_time = asyncio.get_event_loop().time()
+        start_time = asyncio.get_running_loop().time()
 
         while True:
             task_status = await self.engine.get_task_status(task_id)
@@ -203,7 +203,7 @@ Requirements:
                 }
 
             # Check timeout
-            elapsed = asyncio.get_event_loop().time() - start_time
+            elapsed = asyncio.get_running_loop().time() - start_time
             if elapsed > timeout:
                 logger.error(f"Test generation timeout after {elapsed:.1f}s")
                 raise TimeoutError(f"Task {task_id} exceeded timeout of {timeout}s")
@@ -340,7 +340,7 @@ Requirements:
 
         # Wait for completion
         timeout = timeout or self.config.default_timeout_seconds
-        start_time = asyncio.get_event_loop().time()
+        start_time = asyncio.get_running_loop().time()
 
         while True:
             # Check task status
@@ -368,7 +368,7 @@ Requirements:
                 }
 
             # Check timeout
-            elapsed = asyncio.get_event_loop().time() - start_time
+            elapsed = asyncio.get_running_loop().time() - start_time
             if elapsed > timeout:
                 logger.error(f"Test generation timeout after {elapsed:.1f}s")
                 return {
