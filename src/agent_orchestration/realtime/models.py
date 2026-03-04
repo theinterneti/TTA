@@ -109,11 +109,15 @@ class WorkflowProgressEvent(WebSocketEvent):
     )
     current_step: str | None = Field(default=None, description="Current workflow step")
     total_steps: int | None = Field(default=None, description="Total number of steps")
-    completed_steps: int | None = Field(default=None, description="Number of completed steps")
+    completed_steps: int | None = Field(
+        default=None, description="Number of completed steps"
+    )
     estimated_completion: float | None = Field(
         None, description="Estimated completion timestamp"
     )
-    user_id: str | None = Field(default=None, description="User associated with the workflow")
+    user_id: str | None = Field(
+        default=None, description="User associated with the workflow"
+    )
 
 
 class SystemMetricsEvent(WebSocketEvent):
@@ -137,7 +141,9 @@ class SystemMetricsEvent(WebSocketEvent):
     active_workflows: int | None = Field(
         None, ge=0, description="Number of active workflows"
     )
-    message_queue_size: int | None = Field(default=None, ge=0, description="Message queue size")
+    message_queue_size: int | None = Field(
+        default=None, ge=0, description="Message queue size"
+    )
     response_time_avg: float | None = Field(
         None, ge=0.0, description="Average response time in seconds"
     )
@@ -165,7 +171,9 @@ class ProgressiveFeedbackEvent(WebSocketEvent):
     estimated_remaining: float | None = Field(
         None, description="Estimated remaining time in seconds"
     )
-    user_id: str | None = Field(default=None, description="User associated with the operation")
+    user_id: str | None = Field(
+        default=None, description="User associated with the operation"
+    )
 
 
 class OptimizationEvent(WebSocketEvent):
@@ -178,8 +186,12 @@ class OptimizationEvent(WebSocketEvent):
     parameter_name: str = Field(..., description="Parameter being optimized")
     old_value: float | int | str = Field(..., description="Previous parameter value")
     new_value: float | int | str = Field(..., description="New parameter value")
-    improvement_metric: str | None = Field(default=None, description="Metric that improved")
-    improvement_value: float | None = Field(default=None, description="Amount of improvement")
+    improvement_metric: str | None = Field(
+        default=None, description="Metric that improved"
+    )
+    improvement_value: float | None = Field(
+        default=None, description="Amount of improvement"
+    )
     confidence_score: float | None = Field(
         None, ge=0.0, le=1.0, description="Confidence in optimization"
     )
@@ -195,7 +207,9 @@ class ConnectionStatusEvent(WebSocketEvent):
     status: str = Field(
         ..., description="Connection status (connected, disconnected, error)"
     )
-    user_id: str | None = Field(default=None, description="User associated with the connection")
+    user_id: str | None = Field(
+        default=None, description="User associated with the connection"
+    )
     client_info: dict[str, Any] = Field(
         default_factory=dict, description="Client information"
     )
@@ -240,13 +254,17 @@ class EventSubscription(BaseModel):
         ..., description="List of event types to subscribe to"
     )
     filters: dict[str, Any] = Field(default_factory=dict, description="Event filters")
-    user_id: str | None = Field(default=None, description="User ID for user-specific events")
+    user_id: str | None = Field(
+        default=None, description="User ID for user-specific events"
+    )
 
 
 class EventFilter(BaseModel):
     """Model for event filtering criteria."""
 
-    agent_types: list[str] | None = Field(default=None, description="Filter by agent types")
+    agent_types: list[str] | None = Field(
+        default=None, description="Filter by agent types"
+    )
     workflow_types: list[str] | None = Field(
         default=None, description="Filter by workflow types"
     )

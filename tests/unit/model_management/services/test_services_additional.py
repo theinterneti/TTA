@@ -85,7 +85,9 @@ class TestFallbackHandlerAdditional:
         config = FallbackConfiguration(max_retries=2)
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[])
-        handler = FallbackHandler(providers={"test": mock_provider}, fallback_config=config)
+        handler = FallbackHandler(
+            providers={"test": mock_provider}, fallback_config=config
+        )
 
         # Two failures should not trigger critical
         await handler.handle_model_failure("model-x", RuntimeError("err"))
@@ -95,7 +97,9 @@ class TestFallbackHandlerAdditional:
         await handler.handle_model_failure("model-x", RuntimeError("err"))
         assert handler._failure_counts["model-x"] == 2
 
-    async def test_handle_model_failure_updates_provider_health_on_connection_error(self):
+    async def test_handle_model_failure_updates_provider_health_on_connection_error(
+        self,
+    ):
         model = _make_model("model-a")
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[model])
@@ -378,7 +382,9 @@ class TestPerformanceMonitorAdditional:
 
     async def test_record_metrics_stores_in_memory_cache(self):
         monitor = PerformanceMonitor()
-        await monitor.record_metrics("model-a", {"response_time_ms": 150, "total_tokens": 50})
+        await monitor.record_metrics(
+            "model-a", {"response_time_ms": 150, "total_tokens": 50}
+        )
         assert len(monitor._metrics_cache["model-a"]) == 1
         metric = monitor._metrics_cache["model-a"][0]
         assert metric.response_time_ms == 150
@@ -520,6 +526,7 @@ class TestModelSelectorAdditional:
                 providers=providers,
                 hardware_detector=mock_hardware_detector,
             )
+
         return _make
 
     async def test_select_model_returns_none_when_no_models(self, make_selector):
@@ -550,9 +557,7 @@ class TestModelSelectorAdditional:
         result = await selector.select_model(requirements)
         assert result is None
 
-    async def test_get_all_available_models_aggregates_providers(
-        self, make_selector
-    ):
+    async def test_get_all_available_models_aggregates_providers(self, make_selector):
         model_a = _make_model("model-a")
         model_b = _make_model("model-b")
         mock_prov_1 = AsyncMock()
@@ -565,9 +570,7 @@ class TestModelSelectorAdditional:
         assert "model-a" in ids
         assert "model-b" in ids
 
-    async def test_get_all_available_models_handles_provider_error(
-        self, make_selector
-    ):
+    async def test_get_all_available_models_handles_provider_error(self, make_selector):
         mock_prov = AsyncMock()
         mock_prov.get_available_models = AsyncMock(side_effect=RuntimeError("fail"))
         selector = make_selector({"bad-prov": mock_prov})
@@ -617,8 +620,12 @@ class TestModelSelectorAdditional:
         assert "expensive" not in ids
 
     async def test_rank_models_returns_sorted_list(self, make_selector):
-        model_high = _make_model("high", performance_score=9.0, therapeutic_safety_score=9.0)
-        model_low = _make_model("low", performance_score=2.0, therapeutic_safety_score=2.0)
+        model_high = _make_model(
+            "high", performance_score=9.0, therapeutic_safety_score=9.0
+        )
+        model_low = _make_model(
+            "low", performance_score=2.0, therapeutic_safety_score=2.0
+        )
         mock_prov = AsyncMock()
         selector = make_selector({"p": mock_prov})
         requirements = _make_requirements()
@@ -671,7 +678,9 @@ class TestModelSelectorAdditional:
 class TestFallbackHandlerPreferDifferentProvider:
     async def test_prefer_different_provider_selects_different_provider(self):
         model_same = _make_model(
-            "same-prov-model", provider_type=ProviderType.OPENROUTER, performance_score=9.5
+            "same-prov-model",
+            provider_type=ProviderType.OPENROUTER,
+            performance_score=9.5,
         )
         model_diff = _make_model(
             "diff-prov-model", provider_type=ProviderType.OLLAMA, performance_score=7.0
@@ -687,10 +696,14 @@ class TestFallbackHandlerPreferDifferentProvider:
             fallback_strategy="performance_based",
             prefer_different_provider=True,
         )
-        handler = FallbackHandler(providers={"test": mock_provider}, fallback_config=config)
+        handler = FallbackHandler(
+            providers={"test": mock_provider}, fallback_config=config
+        )
         requirements = _make_requirements()
 
         # The failed model was from openrouter, so we prefer a different provider
         # Note: _get_model_provider uses simple heuristics
-        result = await handler.get_fallback_model("failed-openrouter-model", requirements)
+        result = await handler.get_fallback_model(
+            "failed-openrouter-model", requirements
+        )
         assert result is not None

@@ -88,7 +88,9 @@ class RealtimeConfig:
     environment: RealtimeEnvironment = RealtimeEnvironment.DEVELOPMENT
     websocket: WebSocketConfig = field(default_factory=WebSocketConfig)
     events: EventConfig = field(default_factory=EventConfig)
-    progressive_feedback: ProgressiveFeedbackConfig = field(default_factory=ProgressiveFeedbackConfig)
+    progressive_feedback: ProgressiveFeedbackConfig = field(
+        default_factory=ProgressiveFeedbackConfig
+    )
     optimization: OptimizationConfig = field(default_factory=OptimizationConfig)
 
     def __post_init__(self):

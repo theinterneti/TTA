@@ -20,7 +20,9 @@ class TestGetLlm:
 
     def test_openrouter_explicit(self):
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}):
-            llm = get_llm(provider="openrouter", model="mistralai/mistral-7b-instruct:free")
+            llm = get_llm(
+                provider="openrouter", model="mistralai/mistral-7b-instruct:free"
+            )
         assert isinstance(llm, ChatOpenAI)
         assert llm.model_name == "mistralai/mistral-7b-instruct:free"
         assert "openrouter.ai" in str(llm.openai_api_base)

@@ -115,7 +115,9 @@ def mock_controller():
         nar_instance = MockNarrativeEngine.return_value
         nar_instance.initialize = AsyncMock(return_value=True)
         nar_instance.generate_opening_scene = AsyncMock(return_value=_make_scene())
-        nar_instance.generate_next_scene = AsyncMock(return_value=_make_scene("scene-2"))
+        nar_instance.generate_next_scene = AsyncMock(
+            return_value=_make_scene("scene-2")
+        )
 
         choice_instance = MockChoiceArch.return_value
         choice_instance.initialize = AsyncMock(return_value=True)
@@ -292,9 +294,7 @@ class TestResumeSession:
         # Simulate session that was paused (not in active_sessions) but in DB
         db_state = SessionState(user_id="user-db")
         db_state.current_scene = _make_scene()
-        mock_controller.database_manager.get_session = AsyncMock(
-            return_value=db_state
-        )
+        mock_controller.database_manager.get_session = AsyncMock(return_value=db_state)
         result = await mock_controller.resume_session(db_state.session_id)
         assert result is not None
         assert result.session_id == db_state.session_id
@@ -302,18 +302,14 @@ class TestResumeSession:
     async def test_resume_from_db_with_no_scene_generates_scene(self, mock_controller):
         db_state = SessionState(user_id="user-db")
         db_state.current_scene = None
-        mock_controller.database_manager.get_session = AsyncMock(
-            return_value=db_state
-        )
+        mock_controller.database_manager.get_session = AsyncMock(return_value=db_state)
         result = await mock_controller.resume_session(db_state.session_id)
         assert result is not None
 
     async def test_resume_generates_recap(self, mock_controller):
         db_state = SessionState(user_id="user-db")
         db_state.current_scene = _make_scene()
-        mock_controller.database_manager.get_session = AsyncMock(
-            return_value=db_state
-        )
+        mock_controller.database_manager.get_session = AsyncMock(return_value=db_state)
         result = await mock_controller.resume_session(db_state.session_id)
         assert result.session_recap is not None
 
@@ -402,9 +398,11 @@ class TestProcessUserChoice:
     async def test_process_choice_returns_tuple(self, mock_controller):
         session = await mock_controller.start_session("user-1")
         choice_id = session.available_choices[0].choice_id
-        next_scene, new_choices, consequences = await mock_controller.process_user_choice(
-            session.session_id, choice_id
-        )
+        (
+            next_scene,
+            new_choices,
+            consequences,
+        ) = await mock_controller.process_user_choice(session.session_id, choice_id)
         assert next_scene is not None or next_scene is None  # returns any Scene or None
         assert isinstance(new_choices, list)
 
@@ -640,7 +638,10 @@ class TestGenerateSessionSummary:
     async def test_skills_practiced_collected_from_history(self, mock_controller):
         session = await mock_controller.start_session("user-1")
         session.session_state.choice_history = [
-            {"therapeutic_tags": ["mindfulness", "grounding"], "therapeutic_value": 0.8},
+            {
+                "therapeutic_tags": ["mindfulness", "grounding"],
+                "therapeutic_value": 0.8,
+            },
             {"therapeutic_tags": ["resilience"], "therapeutic_value": 0.7},
         ]
         summary = await mock_controller._generate_session_summary(session)
@@ -653,9 +654,7 @@ class TestGenerateSessionSummary:
             {"therapeutic_tags": [], "therapeutic_value": 0.9}
         ] * 5
         summary = await mock_controller._generate_session_summary(session)
-        assert "strong therapeutic engagement" in " ".join(
-            summary["key_insights"]
-        )
+        assert "strong therapeutic engagement" in " ".join(summary["key_insights"])
 
     async def test_key_insights_many_skills(self, mock_controller):
         session = await mock_controller.start_session("user-1")
@@ -663,9 +662,7 @@ class TestGenerateSessionSummary:
             {"therapeutic_tags": ["a", "b", "c"], "therapeutic_value": 0.5}
         ]
         summary = await mock_controller._generate_session_summary(session)
-        assert "multiple therapeutic approaches" in " ".join(
-            summary["key_insights"]
-        )
+        assert "multiple therapeutic approaches" in " ".join(summary["key_insights"])
 
     async def test_key_insights_sustained_participation(self, mock_controller):
         session = await mock_controller.start_session("user-1")

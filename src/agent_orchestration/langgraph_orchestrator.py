@@ -84,7 +84,10 @@ class LangGraphAgentOrchestrator:
 
         # Initialize LLM
         self.llm = ChatOpenAI(
-            api_key=SecretStr(openai_api_key), model=model_name, temperature=0.7, max_completion_tokens=1000
+            api_key=SecretStr(openai_api_key),
+            model=model_name,
+            temperature=0.7,
+            max_completion_tokens=1000,
         )
 
         # Initialize unified orchestrator

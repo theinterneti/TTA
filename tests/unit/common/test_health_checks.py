@@ -112,10 +112,14 @@ class TestHealthCheckerRegisterAndCheck:
         checker = HealthChecker()
 
         async def _a():
-            return HealthCheckResult(component="a", status=HealthStatus.HEALTHY, message="")
+            return HealthCheckResult(
+                component="a", status=HealthStatus.HEALTHY, message=""
+            )
 
         async def _b():
-            return HealthCheckResult(component="b", status=HealthStatus.DEGRADED, message="")
+            return HealthCheckResult(
+                component="b", status=HealthStatus.DEGRADED, message=""
+            )
 
         checker.register_check("a", _a)
         checker.register_check("b", _b)
@@ -145,7 +149,10 @@ class TestGetSystemStatus:
         return overall
 
     async def test_all_healthy_returns_healthy(self):
-        assert await self._status_for([HealthStatus.HEALTHY, HealthStatus.HEALTHY]) == HealthStatus.HEALTHY
+        assert (
+            await self._status_for([HealthStatus.HEALTHY, HealthStatus.HEALTHY])
+            == HealthStatus.HEALTHY
+        )
 
     async def test_any_unhealthy_returns_unhealthy(self):
         assert (
@@ -166,13 +173,18 @@ class TestGetSystemStatus:
         assert overall == HealthStatus.HEALTHY
 
     async def test_unknown_present_returns_unknown(self):
-        assert await self._status_for([HealthStatus.HEALTHY, HealthStatus.UNKNOWN]) == HealthStatus.UNKNOWN
+        assert (
+            await self._status_for([HealthStatus.HEALTHY, HealthStatus.UNKNOWN])
+            == HealthStatus.UNKNOWN
+        )
 
     async def test_details_dict_contains_to_dict_output(self):
         checker = HealthChecker()
 
         async def _ok():
-            return HealthCheckResult(component="svc", status=HealthStatus.HEALTHY, message="up")
+            return HealthCheckResult(
+                component="svc", status=HealthStatus.HEALTHY, message="up"
+            )
 
         checker.register_check("svc", _ok)
         _, details = await checker.get_system_status()

@@ -173,7 +173,9 @@ class TestOllamaModelResolution:
         return mock_cls.call_args.kwargs["model"]
 
     def test_explicit_arg_wins(self, monkeypatch):
-        assert self._ollama_model(monkeypatch, arg="gemma3:4b", env="other") == "gemma3:4b"
+        assert (
+            self._ollama_model(monkeypatch, arg="gemma3:4b", env="other") == "gemma3:4b"
+        )
 
     def test_env_var_used_when_no_arg(self, monkeypatch):
         assert self._ollama_model(monkeypatch, env="qwen3:1.7b") == "qwen3:1.7b"
@@ -234,7 +236,9 @@ class TestOpenRouterModelResolution:
 
     def test_tta_llm_model_beats_openrouter_model(self, monkeypatch):
         assert (
-            self._openrouter_model(monkeypatch, tta_model="tta/model", or_model="or/model")
+            self._openrouter_model(
+                monkeypatch, tta_model="tta/model", or_model="or/model"
+            )
             == "tta/model"
         )
 

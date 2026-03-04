@@ -185,10 +185,13 @@ class TestLifespanCleanupTask:
                 cleanup_cancelled.append(True)
                 raise
 
-        with patch(
-            "src.player_experience.api.app._session_cleanup_loop",
-            side_effect=fake_cleanup_loop,
-        ), patch("src.player_experience.api.app.init_sentry"):
+        with (
+            patch(
+                "src.player_experience.api.app._session_cleanup_loop",
+                side_effect=fake_cleanup_loop,
+            ),
+            patch("src.player_experience.api.app.init_sentry"),
+        ):
             from src.player_experience.api.app import create_app
 
             app = create_app()
@@ -213,14 +216,16 @@ class TestLifespanCleanupTask:
             except asyncio.CancelledError:
                 raise
 
-        with patch(
-            "src.player_experience.api.app.asyncio.create_task",
-            side_effect=capturing_create_task,
-        ), patch(
-            "src.player_experience.api.app._session_cleanup_loop",
-            side_effect=fake_cleanup_loop,
-        ), patch(
-            "src.player_experience.api.app.init_sentry"
+        with (
+            patch(
+                "src.player_experience.api.app.asyncio.create_task",
+                side_effect=capturing_create_task,
+            ),
+            patch(
+                "src.player_experience.api.app._session_cleanup_loop",
+                side_effect=fake_cleanup_loop,
+            ),
+            patch("src.player_experience.api.app.init_sentry"),
         ):
             from fastapi.testclient import TestClient
 

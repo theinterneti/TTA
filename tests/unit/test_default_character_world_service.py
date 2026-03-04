@@ -38,7 +38,9 @@ def _make_service(
     world_manager = MagicMock()
 
     # Default: new player (no existing characters)
-    char_manager.get_player_characters.return_value = player_characters if player_characters is not None else []
+    char_manager.get_player_characters.return_value = (
+        player_characters if player_characters is not None else []
+    )
 
     # Default: character creation succeeds
     if create_character_result is None:

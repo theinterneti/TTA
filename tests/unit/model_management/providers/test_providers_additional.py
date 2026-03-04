@@ -256,7 +256,10 @@ class TestLMStudioModelInstanceGenerateStream:
         provider = LMStudioProvider()
         instance = LMStudioModelInstance("lms-model", provider, mock_client)
 
-        collected = [chunk async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))]
+        collected = [
+            chunk
+            async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))
+        ]
 
         assert "Hi" in collected
         assert " there" in collected
@@ -286,7 +289,10 @@ class TestLMStudioModelInstanceGenerateStream:
         provider = LMStudioProvider()
         instance = LMStudioModelInstance("lms-model", provider, mock_client)
 
-        collected = [chunk async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))]
+        collected = [
+            chunk
+            async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))
+        ]
 
         assert "text" in collected
 
@@ -322,7 +328,10 @@ class TestOpenRouterModelInstanceGenerateStream:
         provider = OpenRouterProvider()
         instance = OpenRouterModelInstance("or/model", provider, mock_client)
 
-        collected = [chunk async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))]
+        collected = [
+            chunk
+            async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))
+        ]
 
         assert "OR chunk 1" in collected
         assert " OR chunk 2" in collected
@@ -386,9 +395,7 @@ class TestCustomAPIProviderInitialize:
             }
         }
 
-        with patch(
-            "httpx.AsyncClient", side_effect=RuntimeError("connection refused")
-        ):
+        with patch("httpx.AsyncClient", side_effect=RuntimeError("connection refused")):
             result = await provider._initialize_provider()
 
         assert result is False
@@ -539,13 +546,19 @@ class TestCustomAPIModelInstanceGenerateStream:
             "custom/model", provider, mock_client, {"api_type": "openai"}
         )
 
-        collected = [chunk async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))]
+        collected = [
+            chunk
+            async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))
+        ]
 
         assert "Hello" in collected
 
     async def test_generate_stream_anthropic_format(self):
         sse_lines = [
-            "data: " + json.dumps({"type": "content_block_delta", "delta": {"text": "Ant chunk"}}),
+            "data: "
+            + json.dumps(
+                {"type": "content_block_delta", "delta": {"text": "Ant chunk"}}
+            ),
             "data: " + json.dumps({"type": "message_stop"}),
         ]
 
@@ -569,7 +582,10 @@ class TestCustomAPIModelInstanceGenerateStream:
             "custom/model", provider, mock_client, {"api_type": "anthropic"}
         )
 
-        collected = [chunk async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))]
+        collected = [
+            chunk
+            async for chunk in instance.generate_stream(GenerationRequest(prompt="hi"))
+        ]
 
         assert "Ant chunk" in collected
 
@@ -687,17 +703,21 @@ class TestBaseProviderLoadModel:
             async def _refresh_available_models(self):
                 self._available_models = []
                 from datetime import datetime
+
                 self._last_model_refresh = datetime.now()
 
             async def _load_model_impl(self, model_id, config):
                 from src.components.model_management.interfaces import (
                     GenerationResponse,
                 )
+
                 instance = MagicMock()
                 instance.model_id = model_id
                 instance.health_check = AsyncMock(return_value=True)
                 instance.generate = AsyncMock(
-                    return_value=GenerationResponse(text="ok", model_id=model_id, latency_ms=1.0)
+                    return_value=GenerationResponse(
+                        text="ok", model_id=model_id, latency_ms=1.0
+                    )
                 )
                 return instance
 

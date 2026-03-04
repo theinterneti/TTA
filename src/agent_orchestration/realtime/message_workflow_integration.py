@@ -219,7 +219,9 @@ class WorkflowAwareMessageCoordinator:
 
         if success and self.track_message_workflows and message_info:
             mid2 = message_info.get("message_id")
-            workflow_id = self.message_to_workflow.get(mid2) if mid2 is not None else None
+            workflow_id = (
+                self.message_to_workflow.get(mid2) if mid2 is not None else None
+            )
             if workflow_id:
                 await self._update_workflow_on_message_nack(
                     workflow_id, message_info, agent_id, failure, error

@@ -134,7 +134,9 @@ class RedisAgentRegistry(AgentRegistry):
                     cap_set = await agent.get_capabilities()
                     if isinstance(cap_set, AgentCapabilitySet):
                         capabilities = cap_set.model_dump()
-                elif hasattr(agent, "capabilities") and getattr(agent, "capabilities", None):
+                elif hasattr(agent, "capabilities") and getattr(
+                    agent, "capabilities", None
+                ):
                     # Fallback for agents with direct capabilities attribute
                     cap_attr = agent.capabilities  # type: ignore[union-attr]
                     if isinstance(cap_attr, AgentCapabilitySet):
@@ -236,7 +238,9 @@ class RedisAgentRegistry(AgentRegistry):
                     cap_set = await agent.get_capabilities()
                     if isinstance(cap_set, AgentCapabilitySet):
                         capabilities = cap_set.model_dump()
-                elif hasattr(agent, "capabilities") and getattr(agent, "capabilities", None):
+                elif hasattr(agent, "capabilities") and getattr(
+                    agent, "capabilities", None
+                ):
                     # Fallback for agents with direct capabilities attribute
                     cap_attr = agent.capabilities  # type: ignore[union-attr]
                     if isinstance(cap_attr, AgentCapabilitySet):
