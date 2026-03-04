@@ -26,7 +26,7 @@ jobs:
       staging_healthy: ${{ steps.staging-check.outputs.healthy }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.version }}
 
@@ -91,7 +91,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.version }}
 
@@ -145,7 +145,7 @@ jobs:
       url: ${{ vars.API_BASE_URL || 'https://api.tta.example.com' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.version }}
 
