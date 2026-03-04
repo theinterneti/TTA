@@ -513,9 +513,15 @@ monitoring_service = RealTimeMonitoringService()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage monitoring service lifecycle."""
-    await monitoring_service.start_monitoring()
+    try:
+        await monitoring_service.start_monitoring()
+    except Exception:
+        logger.exception("Failed to start monitoring service")
     yield
-    await monitoring_service.stop_monitoring()
+    try:
+        await monitoring_service.stop_monitoring()
+    except Exception:
+        logger.exception("Failed to stop monitoring service")
 
 
 # FastAPI app for the real-time monitoring service
