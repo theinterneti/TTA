@@ -1,0 +1,140 @@
+name: Python 3.14 Compatibility
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - development
+  pull_request:
+    branches:
+      - main
+      - staging
+      - development
+  workflow_dispatch:
+
+jobs:
+  py314-unit:
+    name: Unit Tests (Python 3.14)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true  # Pre-release; failures are expected and tracked
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install Python 3.14
+        run: uv python install 3.14
+
+      - name: Sync deps (Python 3.14)
+        run: uv sync --python 3.14
+        continue-on-error: true  # Some deps may not have 3.14 wheels yet
+
+      - name: Run unit tests
+        run: |
+          uv run --python 3.14 pytest -q --tb=short \
+            -m "not integration and not neo4j and not redis" \
+            --ignore=tests/post_deployment \
+            --ignore=tests/e2e \
+            --ignore=tests/e2e-staging \
+            --junitxml=test-results/py314-unit-tests.xml \
+            tests/
+        continue-on-error: true
+
+      - name: Collect benchmark baselines
+        run: |
+          uv run --python 3.14 pytest -q --tb=short \
+            -m "performance" \
+            --benchmark-only \
+            --benchmark-json=test-results/py314-benchmarks.json \
+            tests/performance/ || true
+
+      - name: Python 3.14 version info
+        if: always()
+        run: |
+          echo "## Python 3.14 Compatibility Results" >> $GITHUB_STEP_SUMMARY
+          uv run --python 3.14 python --version >> $GITHUB_STEP_SUMMARY 2>&1 || echo "Python 3.14 not available" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See artifacts for detailed test results and benchmarks." >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: py314-test-results
+          path: |
+            test-results/
+          retention-days: 30
+
+  py314-import-check:
+    name: Import Compatibility (Python 3.14)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Checkout TTA.dev (path source dependency)
+        run: git clone --depth=1 https://github.com/theinterneti/TTA.dev.git ../TTA.dev
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install Python 3.14
+        run: uv python install 3.14
+
+      - name: Sync deps (Python 3.14)
+        run: uv sync --python 3.14
+        continue-on-error: true
+
+      - name: Check core imports
+        run: |
+          uv run --python 3.14 python -c "
+          import sys
+          print(f'Python {sys.version}')
+          results = []
+          modules = [
+              'src.common',
+              'src.agent_orchestration',
+              'src.api_gateway',
+              'src.monitoring',
+              'src.components',
+              'src.player_experience',
+              'src.living_worlds',
+              'src.orchestration',
+          ]
+          for mod in modules:
+              try:
+                  __import__(mod)
+                  results.append(f'  ✅ {mod}')
+              except Exception as e:
+                  results.append(f'  ❌ {mod}: {e}')
+          print('\n'.join(results))
+          "
+        continue-on-error: true
+
+      - name: Measure import times
+        run: |
+          uv run --python 3.14 python -X importtime -c "import src" 2>test-results/py314-import-times.txt || true
+          if [ -f test-results/py314-import-times.txt ]; then
+            echo "## Import Time Analysis" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            head -50 test-results/py314-import-times.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+
+      - name: Upload import analysis
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: py314-import-analysis
+          path: test-results/
+          retention-days: 30
