@@ -240,7 +240,9 @@ class TestAvailableModelsEndpoint:
         assert "performance_score" in model
 
     def test_get_available_models_exception_returns_500(self, mock_component):
-        mock_component.get_available_models = AsyncMock(side_effect=Exception("db error"))
+        mock_component.get_available_models = AsyncMock(
+            side_effect=Exception("db error")
+        )
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/available")
         assert resp.status_code == 500

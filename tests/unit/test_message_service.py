@@ -60,8 +60,12 @@ class TestSendMessage:
         service._llm = mock_llm
         session_id = str(uuid.uuid4())
 
-        await service.send_message(session_id=session_id, player_id="p1", message="Turn 1")
-        await service.send_message(session_id=session_id, player_id="p1", message="Turn 2")
+        await service.send_message(
+            session_id=session_id, player_id="p1", message="Turn 1"
+        )
+        await service.send_message(
+            session_id=session_id, player_id="p1", message="Turn 2"
+        )
 
         history = _SESSION_HISTORY[session_id]
         assert len(history) == 4  # user + assistant × 2
@@ -75,8 +79,12 @@ class TestSendMessage:
         sid_a = str(uuid.uuid4())
         sid_b = str(uuid.uuid4())
 
-        await service.send_message(session_id=sid_a, player_id="p1", message="Session A")
-        await service.send_message(session_id=sid_b, player_id="p2", message="Session B")
+        await service.send_message(
+            session_id=sid_a, player_id="p1", message="Session A"
+        )
+        await service.send_message(
+            session_id=sid_b, player_id="p2", message="Session B"
+        )
 
         assert len(_SESSION_HISTORY[sid_a]) == 2
         assert len(_SESSION_HISTORY[sid_b]) == 2
@@ -159,8 +167,12 @@ class TestSendMessage:
             side_effect=[MagicMock(content="R1"), MagicMock(content="R2")]
         )
 
-        r1 = await service.send_message(session_id=session_id, player_id="p1", message="A")
-        r2 = await service.send_message(session_id=session_id, player_id="p1", message="B")
+        r1 = await service.send_message(
+            session_id=session_id, player_id="p1", message="A"
+        )
+        r2 = await service.send_message(
+            session_id=session_id, player_id="p1", message="B"
+        )
 
         assert r1["message_id"] != r2["message_id"]
 

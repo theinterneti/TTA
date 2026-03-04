@@ -132,9 +132,7 @@ class AgentCoordinationProfiler:
             function_calls=stats.total_calls,  # type: ignore[attr-defined]
             primitive_calls=stats.prim_calls,  # type: ignore[attr-defined]
             total_time=stats.total_tt,  # type: ignore[attr-defined]
-            cumulative_time=sum(
-                ct for (cc, nc, tt, ct, callers) in raw_stats.values()
-            ),
+            cumulative_time=sum(ct for (cc, nc, tt, ct, callers) in raw_stats.values()),
             top_functions=top_functions,
             memory_usage=memory_usage,
         )

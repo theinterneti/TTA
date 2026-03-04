@@ -175,9 +175,7 @@ class TestValidateChoices:
         )
         scene = _make_scene(scene_type=SceneType.EXPLORATION)
         session = _make_session(emotional_state=EmotionalState.CALM)
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         # At least the choice should make it through (may or may not pass all criteria)
         assert isinstance(result, list)
 
@@ -369,15 +367,15 @@ class TestAnalyzeTherapeuticImpact:
         """Uninitialized validator should return fallback dict."""
         v = ChoiceValidator()
         uc = _make_user_choice()
-        result = await v.analyze_therapeutic_impact(
-            uc, _make_scene(), _make_session()
-        )
+        result = await v.analyze_therapeutic_impact(uc, _make_scene(), _make_session())
         assert "therapeutic_impact_score" in result
 
     async def test_learning_opportunities_for_therapeutic_choice(
         self, initialized_validator
     ):
-        uc = _make_user_choice(choice_type=ChoiceType.THERAPEUTIC, therapeutic_value=0.7)
+        uc = _make_user_choice(
+            choice_type=ChoiceType.THERAPEUTIC, therapeutic_value=0.7
+        )
         scene = _make_scene()
         session = _make_session()
         result = await initialized_validator.analyze_therapeutic_impact(
@@ -494,9 +492,7 @@ class TestValidateThresholds:
         )
         scene = _make_scene(scene_type=SceneType.EXPLORATION)
         session = _make_session()
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         assert choice not in result
 
     async def test_choice_below_agency_level_threshold_fails(
@@ -511,9 +507,7 @@ class TestValidateThresholds:
         )
         scene = _make_scene(scene_type=SceneType.EXPLORATION)
         session = _make_session()
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         assert choice not in result
 
     async def test_choice_below_meaningfulness_threshold_fails(
@@ -528,9 +522,7 @@ class TestValidateThresholds:
         )
         scene = _make_scene(scene_type=SceneType.EXPLORATION)
         session = _make_session()
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         assert choice not in result
 
 
@@ -547,9 +539,7 @@ class TestSafetyValidation:
         )
         session = _make_session(emotional_state=EmotionalState.DISTRESSED)
         scene = _make_scene()
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         assert choice not in result
 
     async def test_crisis_state_with_prohibited_tags(self, initialized_validator):
@@ -562,9 +552,7 @@ class TestSafetyValidation:
         )
         session = _make_session(emotional_state=EmotionalState.CRISIS)
         scene = _make_scene()
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         # "challenge" is prohibited in crisis state
         assert choice not in result
 
@@ -578,7 +566,5 @@ class TestSafetyValidation:
         )
         session = _make_session(emotional_state=EmotionalState.CALM)
         scene = _make_scene(scene_type=SceneType.EXPLORATION)
-        result = await initialized_validator.validate_choices(
-            [choice], scene, session
-        )
+        result = await initialized_validator.validate_choices([choice], scene, session)
         assert choice in result

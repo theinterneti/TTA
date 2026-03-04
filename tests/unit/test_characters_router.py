@@ -20,7 +20,10 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.auth import TokenData, get_current_active_player
-from src.player_experience.api.routers.characters import get_character_manager_dep, router
+from src.player_experience.api.routers.characters import (
+    get_character_manager_dep,
+    router,
+)
 from src.player_experience.managers.character_avatar_manager import (
     CharacterLimitExceededError,
     CharacterNotFoundError,
@@ -39,7 +42,9 @@ from src.player_experience.models.character import (
 # ---------------------------------------------------------------------------
 
 
-def _make_character(player_id: str = "player-1", character_id: str = "char-1") -> Character:
+def _make_character(
+    player_id: str = "player-1", character_id: str = "char-1"
+) -> Character:
     goal = TherapeuticGoal(goal_id="g1", description="Reduce anxiety")
     profile = TherapeuticProfile(
         primary_concerns=["anxiety"],
@@ -195,7 +200,9 @@ _CREATE_PAYLOAD = {
 class TestCreateCharacter:
     def test_character_limit_exceeded_returns_400(self):
         manager = _mock_manager()
-        manager.create_character.side_effect = CharacterLimitExceededError("Limit reached")
+        manager.create_character.side_effect = CharacterLimitExceededError(
+            "Limit reached"
+        )
         client = _build_app(manager)
         resp = client.post("/", json=_CREATE_PAYLOAD)
         assert resp.status_code == 400
@@ -333,7 +340,9 @@ class TestGetTherapeuticProfile:
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
-        manager.get_character_therapeutic_profile.return_value = char.therapeutic_profile
+        manager.get_character_therapeutic_profile.return_value = (
+            char.therapeutic_profile
+        )
         client = _build_app(manager, player_id="player-1")
         resp = client.get("/c1/therapeutic-profile")
         assert resp.status_code == 200
