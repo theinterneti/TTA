@@ -148,12 +148,14 @@ class AgentOrchestrationComponent(Component):
         try:
             return bool(super().start())
         except Exception:
+            logger.warning("AgentOrchestrationComponent.start() failed", exc_info=True)
             return False
 
     async def stop(self) -> bool:  # type: ignore[override]
         try:
             return bool(super().stop())
         except Exception:
+            logger.warning("AgentOrchestrationComponent.stop() failed", exc_info=True)
             return False
 
     @log_entry_exit
