@@ -7,8 +7,6 @@ Mirrors the conventions established in test_gameplay_loop_narrative_engine.py.
 
 from __future__ import annotations
 
-import pytest
-
 from src.components.gameplay_loop.models.core import (
     ChoiceType,
     DifficultyLevel,
@@ -23,10 +21,9 @@ from src.components.gameplay_loop.models.interactions import (
     ChoiceOutcome,
     UserChoice,
 )
-from src.components.gameplay_loop.models.progress import ProgressMarker, ProgressType
+from src.components.gameplay_loop.models.progress import ProgressMarker
 from src.components.gameplay_loop.narrative.adaptive_difficulty_engine import (
     AdaptiveDifficultyEngine,
-    AdjustmentType,
     PerformanceLevel,
 )
 from src.components.gameplay_loop.narrative.character_development_system import (
@@ -35,12 +32,11 @@ from src.components.gameplay_loop.narrative.character_development_system import 
     DevelopmentDomain,
 )
 from src.components.gameplay_loop.narrative.collaborative_system import (
-    CollaborativeSystem,
     CollaborationType,
+    CollaborativeSystem,
     ParticipantRole,
 )
 from src.components.gameplay_loop.narrative.emotional_safety_system import (
-    ContentFlag,
     EmotionalSafetySystem,
     SafetyLevel,
 )
@@ -55,14 +51,11 @@ from src.components.gameplay_loop.narrative.narrative_consequence_system import 
     NarrativeConsequenceSystem,
 )
 from src.components.gameplay_loop.narrative.replayability_system import (
-    BranchType,
     ReplayabilitySystem,
-    TimelineStatus,
 )
 from src.components.gameplay_loop.narrative.therapeutic_integration_system import (
     EvidenceType,
     TherapeuticIntegrationSystem,
-    TherapeuticGoalStatus,
 )
 from src.components.gameplay_loop.narrative.therapeutic_integrator import (
     IntegrationMode,
@@ -213,9 +206,7 @@ class TestEmotionalSafetySystem:
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CRISIS)
-        result = await system.assess_content_safety(
-            "The darkness closes in.", session
-        )
+        result = await system.assess_content_safety("The darkness closes in.", session)
         assert isinstance(result, dict)
 
     async def test_filter_unsafe_content_safe_passthrough(self):
@@ -470,8 +461,10 @@ class TestNarrativeConsequenceSystem:
         system = NarrativeConsequenceSystem()
         await system.initialize()
         session = _make_session()
+        scene = _make_scene()
         choice = _make_user_choice(session_id=session.session_id)
         consequences = await system.evaluate_consequences(choice, session)
+        await system.apply_consequences(scene, consequences)
         active = await system.get_active_consequences(session.session_id)
         assert isinstance(active, list)
 
@@ -590,9 +583,7 @@ class TestReplayabilitySystem:
         await system.initialize()
         session = _make_session()
         scene = _make_scene()
-        branch_id = await system.register_branch_point(
-            session, scene, ["Only option"]
-        )
+        branch_id = await system.register_branch_point(session, scene, ["Only option"])
         assert isinstance(branch_id, str)
 
     async def test_explore_alternative_path(self):
@@ -609,9 +600,7 @@ class TestReplayabilitySystem:
     async def test_explore_alternative_invalid_branch(self):
         system = ReplayabilitySystem()
         await system.initialize()
-        result = await system.explore_alternative_path(
-            "nonexistent-branch", "Go right"
-        )
+        result = await system.explore_alternative_path("nonexistent-branch", "Go right")
         assert result is None
 
     async def test_get_timeline_summary(self):
@@ -641,9 +630,7 @@ class TestReplayabilitySystem:
         await system.initialize()
         session = _make_session()
         scene = _make_scene()
-        branch_id = await system.register_branch_point(
-            session, scene, ["A", "B", "C"]
-        )
+        branch_id = await system.register_branch_point(session, scene, ["A", "B", "C"])
         await system.explore_alternative_path(branch_id, "A")
         pct = await system.calculate_discovery_percentage(session.session_id)
         assert isinstance(pct, float)
@@ -816,6 +803,4 @@ class TestErrorRecoveryManager:
     async def test_log_error_critical(self):
         manager = ErrorRecoveryManager()
         await manager.initialize()
-        await manager.log_error(
-            "s1", RuntimeError("crash"), ErrorSeverity.CRITICAL
-        )
+        await manager.log_error("s1", RuntimeError("crash"), ErrorSeverity.CRITICAL)
