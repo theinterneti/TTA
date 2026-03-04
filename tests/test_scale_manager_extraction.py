@@ -1,4 +1,7 @@
 # Logseq: [[TTA.dev/Tests/Test_scale_manager_extraction]]
+import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.orchestration.models import (
     NarrativeScale,
     PlayerChoice,

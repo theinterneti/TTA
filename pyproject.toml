@@ -59,9 +59,9 @@ dependencies = [
     "sacrebleu>=1.5.1",
     "rouge-score>=0.1.2",
     # Database
-    "neo4j>=5.8.0",
-    "redis>=6.0.0",
-    "SQLAlchemy>=2.0.0",
+    "neo4j>=6.0.0",
+    "redis>=7.0.0",
+    "SQLAlchemy>=2.0.46",
     # Computer Vision
     "pytesseract>=0.3.13",
     "pillow>=12.1.1",  # security: arbitrary code execution, OOB write, buffer overflow fixes
@@ -161,8 +161,8 @@ minimal = [
     "huggingface_hub>=0.20.0",
 
     # Database
-    "neo4j>=5.8.0",
-    "redis>=6.0.0",
+    "neo4j>=6.0.0",
+    "redis>=7.0.0",
 
     # API and Web
     "fastapi>=0.115.0",
@@ -323,10 +323,10 @@ members = [
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
-tta-dev-primitives = { path = "../TTA.dev/platform/primitives", editable = true }
-tta-observability-integration = { path = "../TTA.dev/platform/observability", editable = true }
-universal-agent-context = { path = "../TTA.dev/platform/agent-context", editable = true }
-tta-dev-integrations = { path = "../TTA.dev/platform/integrations", editable = true }
+tta-dev-primitives = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/primitives/v1.3.0/tta_dev_primitives-1.3.0-py3-none-any.whl" }
+tta-observability-integration = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/observability/v1.0.0/tta_observability_integration-1.0.0-py3-none-any.whl" }
+universal-agent-context = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/agent-context/v1.0.0/universal_agent_context-1.0.0-py3-none-any.whl" }
+tta-dev-integrations = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/integrations/v0.1.0/tta_dev_integrations-0.1.0-py3-none-any.whl" }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 
@@ -490,6 +490,8 @@ norecursedirs = [
     "tests/e2e-staging",
     "tests/mutation",
     "tests/post_deployment",
+    "tests/comprehensive_battery",
+    "tests/performance",
     ".git",
     "__pycache__",
     ".venv",
