@@ -7,6 +7,8 @@ Provides REST API endpoints for the franchise world system,
 enabling integration with the TTA player experience interface.
 """
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -21,8 +23,23 @@ from ..dependencies import get_current_player  # type: ignore[import-not-found]
 # Initialize the franchise world API
 franchise_api = FranchiseWorldAPI()
 
+
+@asynccontextmanager
+async def lifespan(app: Any) -> AsyncIterator[None]:
+    """Initialize the franchise world system on startup."""
+    try:
+        success = await franchise_api.initialize()
+        if not success:
+            pass
+    except Exception:
+        pass
+    yield
+
+
 # Create the router
-router = APIRouter(prefix="/franchise-worlds", tags=["franchise-worlds"])
+router = APIRouter(
+    prefix="/franchise-worlds", tags=["franchise-worlds"], lifespan=lifespan
+)
 
 
 # Pydantic models for API requests/responses
@@ -101,17 +118,6 @@ class RegistrationResult(BaseModel):
 
 
 # API Endpoints
-
-
-@router.on_event("startup")
-async def initialize_franchise_system():
-    """Initialize the franchise world system on startup"""
-    try:
-        success = await franchise_api.initialize()
-        if not success:
-            pass
-    except Exception:
-        pass
 
 
 @router.get("/", response_model=list[FranchiseWorldSummary])
