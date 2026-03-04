@@ -204,8 +204,8 @@ dev = [
     "ipython>=8.12.0",
     "ipdb>=0.13.13",
     # Testing frameworks and utilities
-    "pytest>=7.3.1",
-    "pytest-asyncio>=0.23.0",
+    "pytest>=9.0.0",
+    "pytest-asyncio>=1.0.0",
     "pytest-cov>=5.0.0",
     "pytest-order>=1.3.0",
     "pytest-rich>=0.2.0",
@@ -214,9 +214,9 @@ dev = [
     "pytest-rerunfailures>=15.0.0",
     "testcontainers>=4.12.0",
     # Advanced testing tools
-    "hypothesis>=6.100.0", # Property-based testing
-    "mutmut>=2.4.0", # Mutation testing
-    "pytest-benchmark>=4.0.0", # Performance benchmarking
+    "hypothesis>=6.130.0", # Property-based testing
+    "mutmut>=3.4.0", # Mutation testing (segfaults on Python 3.14; use cosmic-ray or Python ≤3.13)
+    "pytest-benchmark>=5.0.0", # Performance benchmarking
     "pact-python>=2.2.0", # Contract testing
     "cosmic-ray>=8.4.3",
     "yamale>=6.0.0",
