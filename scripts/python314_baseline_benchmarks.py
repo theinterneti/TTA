@@ -96,14 +96,19 @@ def benchmark_import_times() -> list[BenchmarkResult]:
         times = []
         for _ in range(5):
             # Use subprocess for clean import measurement
-            code = (
-                f"import time; s=time.perf_counter(); "
-                f"import {module_name}; "
-                f"print(time.perf_counter()-s)"
-            )
+            # Module names are from the hardcoded list above; validated for safety
+            if not module_name.replace(".", "_").replace("_", "").isalnum():
+                times.append(0.0)
+                continue
             try:
                 proc = subprocess.run(
-                    [python_exe, "-c", code],
+                    [
+                        python_exe,
+                        "-c",
+                        "import time; s=time.perf_counter(); "
+                        f"import {module_name}; "
+                        "print(time.perf_counter()-s)",
+                    ],
                     capture_output=True,
                     text=True,
                     timeout=30,

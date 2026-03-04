@@ -18,7 +18,6 @@ jobs:
     name: Unit Tests (Python 3.14)
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    continue-on-error: true  # Pre-release; failures are expected and tracked
     steps:
       - uses: actions/checkout@v6
 
@@ -76,7 +75,6 @@ jobs:
     name: Import Compatibility (Python 3.14)
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
 

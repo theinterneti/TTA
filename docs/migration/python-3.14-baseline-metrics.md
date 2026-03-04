@@ -45,17 +45,17 @@ push to `main`, `staging`, and `development` branches, as well as on pull reques
 | scipy | >=1.15.0 | ⚠️ Verify | Fortran/C extensions |
 | torch | >=2.0.0 | ⚠️ Verify | Complex C++ extensions |
 | transformers | >=4.30.0 | ✅ Likely | Pure Python + optional C |
-| fastapi | >=0.115.0 | ✅ Likely | Pure Python |
-| pydantic | >=2.10.0 | ⚠️ Verify | Rust extensions (pydantic-core) |
-| uvicorn | >=0.32.0 | ✅ Likely | Pure Python |
+| fastapi | >=0.95.0 | ✅ Likely | Pure Python |
+| pydantic | >=2.0.0 | ⚠️ Verify | Rust extensions (pydantic-core) |
+| uvicorn | >=0.22.0 | ✅ Likely | Pure Python |
 
 ### Database Drivers
 
 | Package | Min Version | Py3.14 Status | Notes |
 |---|---|---|---|
-| neo4j | >=6.0.0 | ✅ Likely | Pure Python driver |
-| redis | >=7.0.0 | ✅ Likely | Pure Python + optional hiredis |
-| sqlalchemy | >=2.0.46 | ⚠️ Verify | C extensions (greenlet) |
+| neo4j | >=5.8.0 | ✅ Likely | Pure Python driver |
+| redis | >=6.0.0 | ✅ Likely | Pure Python + optional hiredis |
+| sqlalchemy | >=2.0.0 | ⚠️ Verify | C extensions (greenlet) |
 
 ### Testing Stack
 
