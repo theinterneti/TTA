@@ -23,5 +23,4 @@ __all__ = [
     "PersonalizationServiceManager",
     "SessionIntegrationManager",
     "ProgressTrackingService",
-    "PlayerExperienceManager",
 ]

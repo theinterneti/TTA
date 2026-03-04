@@ -372,19 +372,6 @@ def redis_container(pytestconfig):
 import pytest_asyncio
 
 
-@pytest.fixture(scope="session")
-def redis_client_sync(redis_container):
-    # Synchronous client for sync tests
-    import redis
-
-    client = redis.Redis.from_url(redis_container)
-    try:
-        client.ping()
-        yield client
-    finally:
-        client.close()
-
-
 @pytest_asyncio.fixture()
 async def redis_client(redis_container):
     # Async client for async repository tests
