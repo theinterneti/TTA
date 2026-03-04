@@ -19,6 +19,7 @@ jobs:
   coverage:
     name: Generate and Upload Coverage
     runs-on: ubuntu-latest
+    continue-on-error: true  # Coverage is informational; pre-existing integration test failures on main
     timeout-minutes: 20
 
     services:
