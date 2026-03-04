@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import uuid
 from datetime import datetime
 from typing import Any
 
@@ -12,12 +11,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from ...managers.world_management_module import WorldManagementModule
+from ...services import session_service
+from ...uow.session_unit_of_work import AbstractSessionUnitOfWork, DoltSessionUnitOfWork
 from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
-
-# In-memory session store for tests (non-persistent)
-_SESSIONS: dict[str, dict[str, Any]] = {}
 
 # Global world manager instance
 _world_manager: WorldManagementModule | None = None
@@ -29,6 +27,11 @@ async def get_world_manager() -> WorldManagementModule:
     if _world_manager is None:
         _world_manager = WorldManagementModule()
     return _world_manager
+
+
+def get_session_uow() -> AbstractSessionUnitOfWork:
+    """Dependency: provide the real UoW (Dolt → in-memory fallback)."""
+    return DoltSessionUnitOfWork()
 
 
 class TherapeuticSettings(BaseModel):
@@ -51,8 +54,9 @@ class UpdateSessionRequest(BaseModel):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_session(
     request: CreateSessionRequest,
-    current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
+    current_player: TokenData = Depends(get_current_active_player),
     world_manager: WorldManagementModule = Depends(get_world_manager),
+    uow: AbstractSessionUnitOfWork = Depends(get_session_uow),
 ) -> dict[str, Any]:
     # Validate world exists
     world = world_manager.get_world_details(request.world_id)
@@ -62,24 +66,20 @@ async def create_session(
             detail=f"World {request.world_id} not found",
         )
 
-    session_id = str(uuid.uuid4())
-    now = datetime.utcnow().isoformat()
-    _SESSIONS[session_id] = {
-        "session_id": session_id,
-        "character_id": request.character_id,
-        "world_id": request.world_id,
-        "therapeutic_settings": request.therapeutic_settings.model_dump(),
-        "status": "active",
-        "created_at": now,
-        "updated_at": now,
-        "owner": getattr(current_player, "player_id", None),
-    }
+    player_id = getattr(current_player, "player_id", None) or ""
+    result = session_service.create_session(
+        uow,
+        player_id=player_id,
+        character_id=request.character_id,
+        world_id=request.world_id,
+        therapeutic_settings=request.therapeutic_settings.model_dump(),
+    )
     return {
-        "session_id": session_id,
-        "character_id": request.character_id,
-        "world_id": request.world_id,
-        "status": "active",
-        "created_at": now,
+        "session_id": result["session_id"],
+        "character_id": result["character_id"],
+        "world_id": result["world_id"],
+        "status": result["status"],
+        "created_at": result["created_at"],
     }
 
 
@@ -87,9 +87,10 @@ async def create_session(
 async def get_session(
     session_id: str,
     current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
+    uow: AbstractSessionUnitOfWork = Depends(get_session_uow),
 ) -> dict[str, Any]:
-    s = _SESSIONS.get(session_id)
-    if not s:
+    s = session_service.get_session(uow, session_id)
+    if s is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
         )
@@ -113,9 +114,10 @@ async def update_session(
     session_id: str,
     request: UpdateSessionRequest,
     current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
+    uow: AbstractSessionUnitOfWork = Depends(get_session_uow),
 ) -> dict[str, Any]:
-    s = _SESSIONS.get(session_id)
-    if not s:
+    s = session_service.get_session(uow, session_id)
+    if s is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
         )
@@ -141,13 +143,13 @@ async def update_session(
 async def get_session_progress(
     session_id: str,
     current_player: TokenData = Depends(get_current_active_player),  # noqa: ARG001
+    uow: AbstractSessionUnitOfWork = Depends(get_session_uow),
 ) -> dict[str, Any]:
-    s = _SESSIONS.get(session_id)
-    if not s:
+    s = session_service.get_session(uow, session_id)
+    if s is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
         )
-    # Minimal placeholder progress structure compatible with tests' basic checks
     return {
         "session_id": session_id,
         "character_id": s["character_id"],

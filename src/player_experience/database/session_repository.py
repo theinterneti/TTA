@@ -20,11 +20,12 @@ from ..models.session import (
     SessionSummary,
     TherapeuticSettings,
 )
+from .abstract_repository import AbstractSessionRepository
 
 logger = logging.getLogger(__name__)
 
 
-class SessionRepository:
+class SessionRepository(AbstractSessionRepository):
     """Repository for session data persistence and retrieval."""
 
     def __init__(self, redis_client=None, neo4j_driver=None):
