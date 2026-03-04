@@ -27,7 +27,18 @@ from .models import (
     UserChoice,
     ValidationResult,
 )
-from .narrative import NarrativeEngine
+from .narrative import (
+    AdaptiveDifficultyEngine,
+    CharacterDevelopmentSystem,
+    CollaborativeSystem,
+    EmotionalSafetySystem,
+    ErrorRecoveryManager,
+    NarrativeConsequenceSystem,
+    NarrativeEngine,
+    ReplayabilitySystem,
+    TherapeuticIntegrationSystem,
+    TherapeuticIntegrator,
+)
 
 __all__ = [
     # Models
@@ -49,4 +60,14 @@ __all__ = [
     "ChoiceArchitectureManager",
     "ConsequenceSystem",
     "GameplayLoopController",
+    # Therapeutic Narrative Modules
+    "AdaptiveDifficultyEngine",
+    "EmotionalSafetySystem",
+    "TherapeuticIntegrationSystem",
+    "TherapeuticIntegrator",
+    "NarrativeConsequenceSystem",
+    "CharacterDevelopmentSystem",
+    "ReplayabilitySystem",
+    "CollaborativeSystem",
+    "ErrorRecoveryManager",
 ]
