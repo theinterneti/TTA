@@ -13,6 +13,9 @@ on:
       - development
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   py314-unit:
     name: Unit Tests (Python 3.14)
