@@ -10,7 +10,8 @@ and real-time therapeutic intervention triggers.
 import asyncio
 import json
 import logging
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import StrEnum
@@ -505,11 +506,30 @@ class RealTimeMonitoringService:
                 await asyncio.sleep(600)
 
 
-# FastAPI app for the real-time monitoring service
-app = FastAPI(title="TTA Enhanced Real-time Monitoring Service", version="1.0.0")
-
 # Global service instance
 monitoring_service = RealTimeMonitoringService()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Manage monitoring service lifecycle."""
+    try:
+        await monitoring_service.start_monitoring()
+    except Exception:
+        logger.exception("Failed to start monitoring service")
+    yield
+    try:
+        await monitoring_service.stop_monitoring()
+    except Exception:
+        logger.exception("Failed to stop monitoring service")
+
+
+# FastAPI app for the real-time monitoring service
+app = FastAPI(
+    title="TTA Enhanced Real-time Monitoring Service",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 
 # API Models
@@ -530,18 +550,6 @@ class UserDataModel(BaseModel):
     session_duration: float | None = None
     sentiment_score: float | None = None
     recent_messages: list[str] = Field(default_factory=list)
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Start monitoring on application startup."""
-    await monitoring_service.start_monitoring()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Stop monitoring on application shutdown."""
-    await monitoring_service.stop_monitoring()
 
 
 @app.post("/metrics/process")

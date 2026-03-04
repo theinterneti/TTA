@@ -1,8 +1,8 @@
 # Web Framework Stack Audit: FastAPI, Pydantic, Uvicorn, Starlette
 
 **Date:** 2026-03-04
-**Scope:** Phase 1 — Dependency Audit & Research
-**Issue:** #153 — Audit Web Framework Stack
+**Scope:** Phase 1 — Dependency Audit & Research; Phase 2 — Version Floor Upgrade (PR #157)
+**Issue:** #153 — Audit Web Framework Stack, #83 — Upgrade FastAPI/Pydantic
 **Effort Estimate:** 4 hours (research), 8–12 hours (migration implementation)
 **Priority:** High
 
@@ -10,22 +10,22 @@
 
 ## Executive Summary
 
-TTA's web framework stack uses permissive lower-bound version constraints (`>=0.95.0` for FastAPI, `>=2.0.0` for Pydantic, etc.) that allow installation of the latest versions but do not enforce the minimum versions needed for full compatibility with modern features and Python 3.14. The codebase is **already fully migrated to Pydantic v2** (zero v1 patterns found), but has **65+ FastAPI endpoints using the legacy `Depends()` pattern** instead of the recommended `Annotated` pattern, and **2–3 instances of deprecated Starlette lifecycle decorators**. Raising the version floors and migrating these patterns is low-risk and positions TTA for Python 3.14 and Starlette 1.0.
+TTA's web framework stack version floors have been **raised and locked** to enforce minimum versions needed for full compatibility with modern features and Python 3.14. The codebase is **already fully migrated to Pydantic v2** (zero v1 patterns found), and all **deprecated Starlette lifecycle decorators have been migrated** to the modern `lifespan` context manager pattern (PR #157). There are still **65+ FastAPI endpoints using the legacy `Depends()` pattern** instead of the recommended `Annotated` pattern — this is a cosmetic/recommended change tracked separately. Resolved versions: FastAPI 0.129.0, Pydantic 2.12.5, Uvicorn 0.41.0, Starlette 0.52.1.
 
 ---
 
 ## 1. Version Compatibility Matrix
 
-| Package | Current Constraint | Latest Stable | Recommended Minimum | Python 3.14 Support |
+| Package | Current Constraint | Resolved Version | Recommended Minimum | Python 3.14 Support |
 |---|---|---|---|---|
-| **FastAPI** | `>=0.95.0` | 0.135.1 | `>=0.115.0` | ✅ Yes (0.126.0+) |
-| **Pydantic** | `>=2.0.0` | 2.12.5 | `>=2.10.0` | ✅ Yes (2.12.0+) |
-| **Pydantic-Settings** | `>=2.0.0` | 2.8.1 | `>=2.5.0` | ✅ Yes |
-| **Uvicorn** | `>=0.22.0` | 0.41.0 | `>=0.32.0` | ✅ Yes |
-| **Starlette** | `>=0.46.0` | 0.52.1 (1.0.0rc1 available) | `>=0.50.0` | ✅ Yes |
-| **SSE-Starlette** | `>=2.2.0` | 2.2.1 | `>=2.2.0` | ✅ Yes |
-| **httpx** | `>=0.24.0` | 0.28.1 | `>=0.27.0` | ✅ Yes |
-| **aiohttp** | `>=3.13.3` | 3.13.3 | `>=3.13.3` | ✅ Yes |
+| **FastAPI** | `>=0.115.0` | 0.129.0 | `>=0.115.0` ✅ | ✅ Yes (0.126.0+) |
+| **Pydantic** | `>=2.10.0` | 2.12.5 | `>=2.10.0` ✅ | ✅ Yes (2.12.0+) |
+| **Pydantic-Settings** | `>=2.5.0` | 2.13.1 | `>=2.5.0` ✅ | ✅ Yes |
+| **Uvicorn** | `>=0.32.0` | 0.41.0 | `>=0.32.0` ✅ | ✅ Yes |
+| **Starlette** | `>=0.50.0` | 0.52.1 | `>=0.50.0` ✅ | ✅ Yes |
+| **SSE-Starlette** | `>=2.2.0` | 2.2.1 | `>=2.2.0` ✅ | ✅ Yes |
+| **httpx** | `>=0.27.0` | 0.28.1 | `>=0.27.0` ✅ | ✅ Yes |
+| **aiohttp** | `>=3.13.3` | 3.13.3 | `>=3.13.3` ✅ | ✅ Yes |
 
 ### Python Version Requirements
 
