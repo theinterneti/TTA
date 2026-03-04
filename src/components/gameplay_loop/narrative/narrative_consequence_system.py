@@ -186,6 +186,16 @@ class NarrativeConsequenceSystem:
                 # Register as active
                 self.active_consequences[cid] = consequence
 
+            # Decay remaining_scenes for all active consequences after application
+            expired: list[str] = []
+            for aid, ac in self.active_consequences.items():
+                remaining = ac.get("remaining_scenes", 0)
+                ac["remaining_scenes"] = max(remaining - 1, 0)
+                if ac["remaining_scenes"] <= 0:
+                    expired.append(aid)
+            for aid in expired:
+                del self.active_consequences[aid]
+
             logger.info(
                 f"Applied {len(consequences)} consequences to scene {scene.scene_id}"
             )

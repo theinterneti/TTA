@@ -226,7 +226,13 @@ class AdaptiveDifficultyEngine:
         self, current: DifficultyLevel, adjustment: AdjustmentType
     ) -> DifficultyLevel:
         """Apply an adjustment type to a difficulty level."""
-        idx = _DIFFICULTY_ORDER.index(current) if current in _DIFFICULTY_ORDER else 1
+        if current in _DIFFICULTY_ORDER:
+            idx = _DIFFICULTY_ORDER.index(current)
+        else:
+            logger.warning(
+                f"Difficulty level {current} not in order list, defaulting to STANDARD"
+            )
+            idx = 1
 
         if adjustment == AdjustmentType.INCREASE:
             idx = min(idx + 1, len(_DIFFICULTY_ORDER) - 1)

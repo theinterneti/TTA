@@ -235,7 +235,7 @@ class ErrorRecoveryManager:
         Determine the appropriate recovery strategy for an error.
 
         Args:
-            error: The exception to analyse
+            error: The exception to analyze
 
         Returns:
             Selected recovery strategy
@@ -269,7 +269,7 @@ class ErrorRecoveryManager:
                 "error_type": type(error).__name__,
                 "message": str(error),
                 "severity": str(severity),
-                "traceback": traceback.format_exception(error)[-3:],
+                "traceback": traceback.format_exception(error)[-5:],
                 "logged_at": datetime.now(UTC).isoformat(),
             }
             self.error_log.append(entry)

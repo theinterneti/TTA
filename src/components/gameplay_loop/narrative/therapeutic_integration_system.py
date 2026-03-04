@@ -116,7 +116,7 @@ class TherapeuticIntegrationSystem:
         """
         try:
             for goal in goals:
-                goal_id = f"{session_state.session_id}_{goal[:20].replace(' ', '_')}"
+                goal_id = f"{session_state.session_id}_{goal[:32].replace(' ', '_')}_{hash(goal) & 0xFFFF:04x}"
                 self.active_goals[goal_id] = {
                     "description": goal,
                     "session_id": session_state.session_id,
