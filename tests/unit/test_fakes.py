@@ -9,6 +9,7 @@ from tests.fakes import FakeRepository, FakeUnitOfWork
 # FakeRepository
 # ---------------------------------------------------------------------------
 
+
 class TestFakeRepository:
     @pytest.fixture()
     def repo(self):
@@ -67,6 +68,7 @@ class TestFakeRepository:
 # ---------------------------------------------------------------------------
 # FakeUnitOfWork
 # ---------------------------------------------------------------------------
+
 
 class TestFakeUnitOfWork:
     async def test_commit_marks_committed(self):
