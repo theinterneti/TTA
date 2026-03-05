@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import abc
 
-from tta_dev_primitives.persistence import AbstractUnitOfWork
+from src.common.unit_of_work import AbstractUnitOfWork
 
 from ..database.abstract_repository import (
     AbstractCharacterRepository,
