@@ -18,7 +18,10 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import PlainTextResponse
 
-from .prometheus_metrics import CONTENT_TYPE_LATEST, get_metrics_collector  # type: ignore[attr-defined]
+from .prometheus_metrics import (
+    CONTENT_TYPE_LATEST,  # type: ignore[attr-defined]
+    get_metrics_collector,  # type: ignore[attr-defined]
+)
 
 # Import mock monitoring with fallback
 try:

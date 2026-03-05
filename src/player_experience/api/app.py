@@ -123,7 +123,7 @@ async def _session_cleanup_loop(interval: int = _SESSION_CLEANUP_INTERVAL) -> No
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     """
     Application lifespan manager.
 

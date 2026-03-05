@@ -100,9 +100,7 @@ class CustomAPIModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using custom API."""
         try:
             # Prepare request based on API type
@@ -198,7 +196,7 @@ class CustomAPIModelInstance(BaseModelInstance):
             + usage.get("output_tokens", 0),
         }
 
-    async def _stream_openai_response(self, response) -> AsyncGenerator[str, None]:
+    async def _stream_openai_response(self, response) -> AsyncGenerator[str]:
         """Stream OpenAI response."""
         async for line in response.aiter_lines():
             if line.startswith("data: "):
@@ -218,7 +216,7 @@ class CustomAPIModelInstance(BaseModelInstance):
                 except json.JSONDecodeError:
                     continue
 
-    async def _stream_anthropic_response(self, response) -> AsyncGenerator[str, None]:
+    async def _stream_anthropic_response(self, response) -> AsyncGenerator[str]:
         """Stream Anthropic response."""
         async for line in response.aiter_lines():
             if line.startswith("data: "):

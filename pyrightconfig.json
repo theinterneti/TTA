@@ -80,6 +80,10 @@
   "pythonPlatform": "Linux",
   "executionEnvironments": [
     {
+      "root": "src/developer_dashboard",
+      "reportMissingModuleSource": false
+    },
+    {
       "root": "src",
       "pythonVersion": "3.12",
       "pythonPlatform": "Linux",

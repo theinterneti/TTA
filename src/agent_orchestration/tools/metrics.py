@@ -130,7 +130,7 @@ def tool_execution(name: str, version: str) -> Callable[[F], F]:
 
 
 @contextmanager
-def tool_exec_context(name: str, version: str) -> Generator[None, None, None]:
+def tool_exec_context(name: str, version: str) -> Generator[None]:
     start = time.perf_counter()
     try:
         yield

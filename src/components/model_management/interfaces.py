@@ -135,7 +135,7 @@ class IModelInstance(ABC):
         pass
 
     @abstractmethod
-    def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
+    def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream."""
         ...
 
