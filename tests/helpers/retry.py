@@ -29,8 +29,7 @@ def retry_with_backoff(
     Usage::
 
         @retry_with_backoff(max_attempts=3)
-        def flaky_check():
-            ...
+        def flaky_check(): ...
     """
     return retry(
         retry=retry_if_exception_type(retry_on),

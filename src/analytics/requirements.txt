@@ -5,9 +5,9 @@ pydantic==2.5.0
 python-multipart==0.0.18
 
 # Database and caching
-redis==7.2.0
+redis==5.0.1
 psycopg2-binary==2.9.9
-sqlalchemy==2.0.46
+sqlalchemy==2.0.23
 alembic==1.13.1
 
 # Data processing and analytics
@@ -50,7 +50,7 @@ click==8.1.7
 aiosmtplib==3.0.1
 
 # PDF generation (for reports)
-weasyprint==60.2
+weasyprint>=68.0
 reportlab==4.0.7
 
 # Excel support

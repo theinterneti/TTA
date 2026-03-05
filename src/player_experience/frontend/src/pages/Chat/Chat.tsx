@@ -262,7 +262,7 @@ const Chat: React.FC = () => {
           messageHistory.map((message, index) => (
             <div
               key={message.id}
-              data-testid={`${message.type}-message`}
+              data-testid={`chat-message-${index}`}
               role="article"
               aria-label={`Message ${index + 1} from ${message.type}`}
               tabIndex={0}
@@ -313,11 +313,12 @@ const Chat: React.FC = () => {
                   isMobile ? 'px-3 py-2 text-base' : 'px-4 py-3'
                 } ${
                   !isConnected
-                    ? 'bg-gray-50 border-gray-300 text-gray-700'
+                    ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-white border-gray-300 text-gray-900'
                 } ${isInputFocused ? 'shadow-md' : 'shadow-sm'} ${
                   touchSupported ? 'min-h-[44px]' : ''
                 }`}
+                disabled={!isConnected}
                 maxLength={1000}
                 aria-describedby="message-help"
                 autoComplete="off"
@@ -334,13 +335,13 @@ const Chat: React.FC = () => {
             <button
               data-testid="chat-send-button"
               onClick={() => handleSendMessage(inputValue)}
-              disabled={!inputValue.trim()}
+              disabled={!isConnected || !inputValue.trim()}
               className={`rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 isMobile ? 'px-4 py-2' : 'px-6 py-3'
               } ${
                 touchSupported ? 'min-w-[44px] min-h-[44px]' : ''
               } ${
-                inputValue.trim()
+                isConnected && inputValue.trim()
                   ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}

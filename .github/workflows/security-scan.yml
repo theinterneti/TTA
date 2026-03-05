@@ -160,8 +160,7 @@ jobs:
         run: |
           echo "⚠️ High or critical security vulnerabilities found!"
           echo "Please review the security report and fix vulnerabilities."
-        # Pre-existing npm audit vulnerabilities; tracked separately
-        continue-on-error: true
+          # Pre-existing npm audit vulnerabilities; tracked separately
 
       - name: Notify security issues
         if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')

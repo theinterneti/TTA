@@ -1,0 +1,97 @@
+{
+  "session_id": "openhands-test-gen-adapters-20251025-174848",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Starting test generation for src/agent_orchestration/adapters.py (coverage threshold: 70.0%, max iterations: 5)",
+      "timestamp": "2025-10-25T17:48:48.230747+00:00",
+      "metadata": {
+        "event": "task_start",
+        "target_file": "src/agent_orchestration/adapters.py",
+        "coverage_threshold": 70.0,
+        "max_iterations": 5
+      },
+      "tokens": 28,
+      "importance": 0.9
+    },
+    {
+      "role": "user",
+      "content": "Starting iteration 1/5",
+      "timestamp": "2025-10-25T17:48:48.231182+00:00",
+      "metadata": {
+        "event": "iteration_start",
+        "iteration": 1,
+        "max_iterations": 5
+      },
+      "tokens": 6,
+      "importance": 0.7
+    },
+    {
+      "role": "user",
+      "content": "Starting iteration 2/5",
+      "timestamp": "2025-10-25T17:49:21.481635+00:00",
+      "metadata": {
+        "event": "iteration_start",
+        "iteration": 2,
+        "max_iterations": 5
+      },
+      "tokens": 6,
+      "importance": 0.7
+    },
+    {
+      "role": "user",
+      "content": "Starting iteration 3/5",
+      "timestamp": "2025-10-25T17:52:23.844769+00:00",
+      "metadata": {
+        "event": "iteration_start",
+        "iteration": 3,
+        "max_iterations": 5
+      },
+      "tokens": 6,
+      "importance": 0.7
+    },
+    {
+      "role": "user",
+      "content": "Starting iteration 4/5",
+      "timestamp": "2025-10-25T17:52:42.498949+00:00",
+      "metadata": {
+        "event": "iteration_start",
+        "iteration": 4,
+        "max_iterations": 5
+      },
+      "tokens": 6,
+      "importance": 0.7
+    },
+    {
+      "role": "user",
+      "content": "Starting iteration 5/5",
+      "timestamp": "2025-10-25T17:53:09.750944+00:00",
+      "metadata": {
+        "event": "iteration_start",
+        "iteration": 5,
+        "max_iterations": 5
+      },
+      "tokens": 6,
+      "importance": 0.7
+    },
+    {
+      "role": "assistant",
+      "content": "Test generation failed after 5 iterations. Last coverage: 0.0%",
+      "timestamp": "2025-10-25T17:54:09.534555+00:00",
+      "metadata": {
+        "event": "task_complete",
+        "status": "failure",
+        "iterations": 5,
+        "final_coverage": 0.0,
+        "issues": [
+          "All iterations failed - no tests generated"
+        ]
+      },
+      "tokens": 16,
+      "importance": 1.0
+    }
+  ],
+  "max_tokens": 8000,
+  "current_tokens": 74,
+  "metadata": {}
+}
