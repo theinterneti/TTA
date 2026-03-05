@@ -3,7 +3,7 @@ name = "tta-ai-framework"
 version = "0.1.0"
 description = "Reusable AI infrastructure for multi-agent orchestration and model management"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 authors = [
     {name = "TTA Development Team"}
 ]
@@ -13,7 +13,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
@@ -62,7 +62,7 @@ addopts = [
 ]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py314"
 line-length = 100
 src = ["src", "tests"]
 
@@ -88,7 +88,7 @@ ignore = [
 [tool.pyright]
 include = ["src", "tests"]
 exclude = ["**/__pycache__", ".venv"]
-pythonVersion = "3.12"
+pythonVersion = "3.14"
 typeCheckingMode = "basic"
 reportMissingImports = true
 reportMissingTypeStubs = false
