@@ -1,5 +1,5 @@
 # AGENTS.md - Universal Agent Context
-
+Boundary Rules: Write all project documentation, status updates, and notes exclusively to docs/kb-exports/. Never create or modify .md files in the project root or source directories unless explicitly asked to
 > ⚠️ **This document has moved to the TTA Knowledge Base!**
 >
 > **New location:** `TTA___References___Agents Document.md`
