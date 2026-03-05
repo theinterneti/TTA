@@ -420,7 +420,7 @@ reportDuplicateImport = "warning"
 
 [tool.ruff]
 # Target Python version - must match project.requires-python
-target-version = "py314"
+target-version = "py313"  # py314 causes ruff format bug: strips parens from except clauses
 
 # Line length - same as Black default for compatibility
 line-length = 88
