@@ -9,8 +9,9 @@
 - All function parameters MUST have type hints
 - All function return types MUST be annotated
 - Use `Optional[T]` or `T | None` for nullable types
-- Never use `Any` without justification in a comment
-- Use `TypedDict`, `Protocol`, or dataclasses for complex types
+- `dict[str, Any]` is acceptable for dynamic JSON payloads (add `# dynamic JSON` comment to document intent when not obvious from context)
+- Prefer `TypedDict`, `Protocol`, or dataclasses for complex types when a stable schema exists
+- Other uses of bare `Any` require a justification comment
 
 ```python
 # ❌ BAD
@@ -47,7 +48,8 @@ except HTTPError as e:
 - Standard library imports first
 - Third-party imports second (separated by blank line)
 - Local imports third (separated by blank line)
-- Use absolute imports, not relative imports for cross-module
+- Relative imports (`from .foo import Bar`, `from ..bar import Baz`) are allowed within a package
+- Use absolute imports only when importing across top-level packages (e.g. `src.player_experience` → `src.ai_components`)
 - No `from module import *`
 - No unused imports
 
@@ -115,10 +117,10 @@ def calculate_narrative_arc(events: list[Event], config: ArcConfig) -> Narrative
 
 ### API Endpoints
 - Use Pydantic models for request/response bodies
-- Always specify response_model in route decorators
+- Specify `response_model` when a Pydantic response schema exists; endpoints returning `dict[str, Any]` are exempt until a schema is defined
 - Use proper HTTP status codes (201 for create, 204 for delete, etc.)
-- Validate path parameters with Path()
-- Add summary and description to endpoints
+- Validate path parameters with `Path()` when constraints (min length, regex, etc.) are needed
+- Add `summary` and `description` to public-facing endpoints; internal/dev endpoints are exempt
 
 ```python
 # ❌ BAD
@@ -154,7 +156,7 @@ async def create_story(
 - Magic numbers without named constants
 - Commented-out code blocks
 - Functions with more than 3 levels of nesting
-- Variables named `data`, `result`, `temp`, `x`, `i` (without context)
+- Variables named `temp`, `x`, `i` (without context); `data` and `result` are acceptable when the context makes their meaning obvious
 - Duplicate code blocks (DRY violation)
 - Empty `except` blocks
 - `time.sleep()` in async code

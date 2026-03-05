@@ -1,0 +1,107 @@
+{
+  "name": "TTA Development Environment",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.debugpy",
+        "mgesbert.python-path",
+        "Augment.vscode-augment",
+        "google.geminicodeassist",
+        "ms-toolsai.jupyter",
+        "ms-python.jupyter",
+        "donjayamanne.vscode-default-python-kernel",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+        "neo4j-extensions.neo4j-for-vscode",
+        "humao.rest-client",
+        "GraphQL.vscode-graphql",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode-remote.remote-ssh",
+        "ms-vscode-remote.remote-wsl",
+        "njpwerner.autodocstring",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "ryanluker.vscode-coverage-gutters",
+        "christian-kohler.path-intellisense",
+        "oderwat.indent-rainbow",
+        "redhat.vscode-yaml",
+        "mechatroner.rainbow-csv",
+        "slightc.pip-manager",
+        "GitHub.remotehub"
+      ],
+      "settings": {
+        // Python settings
+        "python.defaultInterpreterPath": "/app/.venv/bin/python",
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.linting.mypyEnabled": true,
+        // Editor settings
+        "editor.formatOnSave": true,
+        "editor.rulers": [
+          88,
+          100
+        ],
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        },
+        // Terminal settings
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        },
+        // Python testing
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false,
+        "python.testing.pytestArgs": [
+          "tests"
+        ],
+        // File exclusions
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/.pytest_cache": true,
+          "**/*.pyc": true,
+          "**/.mypy_cache": true,
+          "**/.coverage": true
+        },
+        // Environment activation
+        "python.terminal.activateEnvironment": true,
+        // Jupyter settings
+        "jupyter.notebookFileRoot": "/app"
+      }
+    }
+  },
+  // Services to run
+  "runServices": [
+    "app",
+    "neo4j"
+  ],
+  // Ports to forward
+  "forwardPorts": [
+    7474, // Neo4j Browser
+    7687 // Neo4j Bolt
+  ],
+  // Post-create commands
+  "postCreateCommand": "bash /app/scripts/init_dev_environment.sh",
+  // Shutdown action
+  "shutdownAction": "stopCompose",
+  // Use a custom postCreateCommand to handle CUDA setup
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  // Use the non-root user from the Docker image
+  "remoteUser": "root"
+}

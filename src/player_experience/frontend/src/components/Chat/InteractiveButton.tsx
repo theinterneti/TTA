@@ -154,7 +154,6 @@ const InteractiveButton: React.FC<InteractiveButtonProps> = ({
   return (
     <div className="relative inline-block">
       <button
-        data-testid="interactive-button"
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
