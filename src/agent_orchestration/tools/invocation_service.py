@@ -121,23 +121,27 @@ class ToolInvocationService:
     ) -> Any:
         try:
             asyncio.get_running_loop()
-            raise RuntimeError(
-                "invoke_tool_sync cannot run inside an active event loop"
-            )
         except RuntimeError:
             return asyncio.run(self.invoke_tool(tool_name, version, arguments))
+        else:
+            raise RuntimeError(
+                "invoke_tool_sync cannot run inside an active event loop; "
+                "call invoke_tool directly from async code"
+            )
 
     def invoke_tool_by_spec_sync(
         self, spec: ToolSpec, callable_fn: Callable[..., Any], *args, **kwargs
     ) -> Any:
         try:
             asyncio.get_running_loop()
-            raise RuntimeError(
-                "invoke_tool_by_spec_sync cannot run inside an active event loop"
-            )
         except RuntimeError:
             return asyncio.run(
                 self.invoke_tool_by_spec(spec, callable_fn, *args, **kwargs)
+            )
+        else:
+            raise RuntimeError(
+                "invoke_tool_by_spec_sync cannot run inside an active event loop; "
+                "call invoke_tool_by_spec directly from async code"
             )
 
     def register_and_invoke_sync(
@@ -150,12 +154,14 @@ class ToolInvocationService:
     ) -> Any:
         try:
             asyncio.get_running_loop()
-            raise RuntimeError(
-                "register_and_invoke_sync cannot run inside an active event loop"
-            )
         except RuntimeError:
             return asyncio.run(
                 self.register_and_invoke(
                     factory_fn, signature, callable_fn, *args, **kwargs
                 )
+            )
+        else:
+            raise RuntimeError(
+                "register_and_invoke_sync cannot run inside an active event loop; "
+                "call register_and_invoke directly from async code"
             )

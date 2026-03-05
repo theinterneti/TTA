@@ -217,7 +217,7 @@ class TestBatteryDashboard:
             )
 
             manager = MockServiceManager()
-            status = await manager.get_service_status()
+            status = await manager.get_service_status()  # type: ignore[attr-defined]
             await manager.cleanup()
 
             return {

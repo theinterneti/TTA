@@ -16,7 +16,7 @@ import logging
 import time
 import uuid
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError
@@ -40,7 +40,7 @@ def _utc_now() -> str:
     return datetime.utcnow().isoformat() + "Z"
 
 
-class WorkflowRunStatus(str, Enum):
+class WorkflowRunStatus(StrEnum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -165,7 +165,7 @@ class WorkflowManager:
 
             # Compose response using context, history, and graph metadata
             # Aggregate safety findings from step results (if present)
-            agg_safety: dict[str, Any] = {
+            agg_safety: dict[str, Any] | None = {
                 "level": "safe",
                 "findings": [],
                 "by_step": [],
@@ -316,7 +316,7 @@ class WorkflowManager:
                 "graph_response": graph_response,
             },
             performance_metrics=(
-                self._aggregator.get_metrics() if self._aggregator else {}
+                self._aggregator.snapshot() if self._aggregator else {}
             ),
             therapeutic_validation=agg_safety,
         )

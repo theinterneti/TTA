@@ -81,7 +81,7 @@ class HardwareDetector(IHardwareDetector):
             logger.error(f"Failed to detect system resources: {e}")
             raise
 
-    async def recommend_models(self, task_type: TaskType) -> list[str]:
+    async def recommend_models(self, task_type: TaskType) -> list[str]:  # noqa: PLR0912
         """Recommend models based on available hardware and task type."""
         if not self._cached_resources:
             await self.detect_system_resources()
@@ -257,7 +257,7 @@ class HardwareDetector(IHardwareDetector):
     def _get_cpu_info(self) -> str:
         """Get CPU model information."""
         try:
-            import cpuinfo
+            import cpuinfo  # noqa: PLC0415
 
             info = cpuinfo.get_cpu_info()
             return info.get("brand_raw", "Unknown CPU")
@@ -271,7 +271,7 @@ class HardwareDetector(IHardwareDetector):
 
         try:
             # Try NVIDIA GPUs first
-            import pynvml
+            import pynvml  # noqa: PLC0415
 
             pynvml.nvmlInit()
             device_count = pynvml.nvmlDeviceGetCount()

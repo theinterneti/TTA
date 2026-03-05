@@ -10,10 +10,11 @@ and real-time therapeutic intervention triggers.
 import asyncio
 import json
 import logging
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -26,7 +27,7 @@ from scipy import stats
 logger = logging.getLogger(__name__)
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     LOW = "low"
@@ -35,7 +36,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertType(str, Enum):
+class AlertType(StrEnum):
     """Types of alerts."""
 
     THERAPEUTIC_INTERVENTION = "therapeutic_intervention"
@@ -145,7 +146,11 @@ class AnomalyDetector:
 
         # Calculate trend using linear regression
         x = np.arange(len(values))
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, values)
+        _reg = stats.linregress(x, values)  # type: ignore[arg-type]
+        slope = float(_reg.slope)  # type: ignore[arg-type]
+        std_err = float(_reg.stderr)  # type: ignore[arg-type]
+        p_value = float(_reg.pvalue)  # type: ignore[arg-type]
+        r_value = float(_reg.rvalue)  # type: ignore[arg-type]
 
         # Check for sudden trend changes
         if abs(slope) > 2 * std_err and p_value < 0.05:
@@ -501,11 +506,30 @@ class RealTimeMonitoringService:
                 await asyncio.sleep(600)
 
 
-# FastAPI app for the real-time monitoring service
-app = FastAPI(title="TTA Enhanced Real-time Monitoring Service", version="1.0.0")
-
 # Global service instance
 monitoring_service = RealTimeMonitoringService()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Manage monitoring service lifecycle."""
+    try:
+        await monitoring_service.start_monitoring()
+    except Exception:
+        logger.exception("Failed to start monitoring service")
+    yield
+    try:
+        await monitoring_service.stop_monitoring()
+    except Exception:
+        logger.exception("Failed to stop monitoring service")
+
+
+# FastAPI app for the real-time monitoring service
+app = FastAPI(
+    title="TTA Enhanced Real-time Monitoring Service",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 
 # API Models
@@ -528,18 +552,6 @@ class UserDataModel(BaseModel):
     recent_messages: list[str] = Field(default_factory=list)
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Start monitoring on application startup."""
-    await monitoring_service.start_monitoring()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Stop monitoring on application shutdown."""
-    await monitoring_service.stop_monitoring()
-
-
 @app.post("/metrics/process")
 async def process_metric(metric: MetricData):
     """Process a new metric value."""
@@ -555,7 +567,7 @@ async def process_metric(metric: MetricData):
 @app.post("/users/process")
 async def process_user_data(user_data: UserDataModel):
     """Process user data for therapeutic monitoring."""
-    await monitoring_service.process_user_data(user_data.dict())
+    await monitoring_service.process_user_data(user_data.model_dump())
     return {"status": "processed", "user_id": user_data.user_id}
 
 

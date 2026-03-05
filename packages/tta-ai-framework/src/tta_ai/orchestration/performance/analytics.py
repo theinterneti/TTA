@@ -14,7 +14,7 @@ import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from .response_time_monitor import (
@@ -25,7 +25,7 @@ from .response_time_monitor import (
 logger = logging.getLogger(__name__)
 
 
-class BottleneckType(str, Enum):
+class BottleneckType(StrEnum):
     """Types of performance bottlenecks."""
 
     AGENT_OVERLOAD = "agent_overload"
@@ -38,7 +38,7 @@ class BottleneckType(str, Enum):
     CONCURRENT_LIMIT = "concurrent_limit"
 
 
-class TrendDirection(str, Enum):
+class TrendDirection(StrEnum):
     """Performance trend directions."""
 
     IMPROVING = "improving"

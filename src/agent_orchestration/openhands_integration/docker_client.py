@@ -160,10 +160,10 @@ class DockerOpenHandsClient:
         # Try to parse JSON events from stdout
         events = []
         for line in stdout.splitlines():
-            line = line.strip()
-            if line.startswith("{") and line.endswith("}"):
+            decoded_line = line.strip()
+            if decoded_line.startswith("{") and decoded_line.endswith("}"):
                 try:
-                    event = json.loads(line)
+                    event = json.loads(decoded_line)
                     events.append(event)
                 except json.JSONDecodeError:
                     continue
@@ -244,7 +244,9 @@ class DockerOpenHandsClient:
                 # Kill container on timeout
                 result.kill()
                 await result.wait()
-                raise TimeoutError(f"Docker execution exceeded timeout of {timeout}s")
+                raise TimeoutError(
+                    f"Docker execution exceeded timeout of {timeout}s"
+                ) from None
 
             # Decode output
             stdout = stdout_bytes.decode("utf-8", errors="replace")

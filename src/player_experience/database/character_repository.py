@@ -22,12 +22,11 @@ from ..models.character import (
     TherapeuticProfile,
 )
 from ..models.enums import IntensityLevel, TherapeuticApproach
-from .abstract_repository import AbstractCharacterRepository
 
 logger = logging.getLogger(__name__)
 
 
-class CharacterRepository(AbstractCharacterRepository):
+class CharacterRepository:
     """Repository for character database operations."""
 
     def __init__(

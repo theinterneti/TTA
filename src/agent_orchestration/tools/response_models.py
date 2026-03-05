@@ -14,7 +14,7 @@ Provides consistent, versioned response schemas for all tools including:
 from __future__ import annotations
 
 import time
-from enum import Enum
+from enum import StrEnum
 from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field, field_validator
@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field, field_validator
 T = TypeVar("T")
 
 
-class ResponseStatus(str, Enum):
+class ResponseStatus(StrEnum):
     """Status of tool execution."""
 
     SUCCESS = "success"
@@ -78,7 +78,7 @@ class ToolError(BaseModel):
     )
 
 
-class SuggestionType(str, Enum):
+class SuggestionType(StrEnum):
     """Type of tool suggestion."""
 
     RELATED_TOOL = "related_tool"  # Suggest a related tool

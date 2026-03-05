@@ -200,6 +200,7 @@ class TherapeuticGameplayLoopController:
         Returns:
             SessionState representing the initialized session
         """
+        session_id: str | None = None
         try:
             start_time = datetime.utcnow()
 
@@ -261,7 +262,7 @@ class TherapeuticGameplayLoopController:
             logger.error(f"Error starting session for user {user_id}: {e}")
 
             # Clean up failed session
-            if "session_id" in locals():
+            if session_id is not None:
                 self.active_sessions.pop(session_id, None)
                 self.session_configurations.pop(session_id, None)
 
@@ -406,6 +407,7 @@ class TherapeuticGameplayLoopController:
         Returns:
             SessionOutcome with comprehensive session summary
         """
+        session_state: SessionState | None = None
         try:
             start_time = datetime.utcnow()
 

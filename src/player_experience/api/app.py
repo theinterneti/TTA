@@ -7,6 +7,9 @@ This module sets up the FastAPI application with middleware, error handling,
 authentication, and CORS configuration.
 """
 
+import asyncio
+import contextlib
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -17,6 +20,11 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import PlainTextResponse
+
+logger = logging.getLogger(__name__)
+
+# How often (seconds) the session cleanup task wakes up to evict timed-out sessions.
+_SESSION_CLEANUP_INTERVAL = 60
 
 # Try relative import first, fall back to absolute import
 try:
@@ -87,6 +95,33 @@ except ImportError:
     from src.player_experience.api.sentry_config import init_sentry
 
 
+async def _session_cleanup_loop(interval: int = _SESSION_CLEANUP_INTERVAL) -> None:
+    """Periodically evict timed-out gameplay sessions from active memory.
+
+    Runs every *interval* seconds.  Skips gracefully if the gameplay service
+    hasn't been initialised yet (e.g. no requests have arrived).
+    """
+    while True:
+        await asyncio.sleep(interval)
+        try:
+            from .routers.gameplay import get_gameplay_service  # noqa: PLC0415
+
+            svc = await get_gameplay_service()
+            integration = getattr(svc, "_integration", None)
+            if integration:
+                component = getattr(integration, "gameplay_component", None)
+                if component:
+                    n: int = await component.cleanup_inactive_sessions()
+                    if n:
+                        logger.info(
+                            "Session cleanup: evicted %d timed-out session(s)", n
+                        )
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            logger.warning("Session cleanup loop error (will retry): %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
@@ -100,15 +135,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     settings = get_settings()
     init_sentry(settings)
 
-    # Initialize any required services here
-    # e.g., database connections, cache connections, etc.
+    # Start periodic session cleanup background task
+    cleanup_task = asyncio.create_task(_session_cleanup_loop(), name="session-cleanup")
 
     yield
 
-    # Shutdown
-
-    # Cleanup any resources here
-    # e.g., close database connections, cache connections, etc.
+    # Shutdown — cancel cleanup task and wait for it to finish
+    cleanup_task.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await cleanup_task
 
 
 def create_app() -> FastAPI:
@@ -189,7 +224,7 @@ def create_app() -> FastAPI:
     async def prometheus_metrics():
         """Prometheus metrics endpoint for monitoring (no auth required)."""
         try:
-            import prometheus_client
+            import prometheus_client  # noqa: F401
             from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
             # Generate basic metrics for the TTA Player API
@@ -273,7 +308,7 @@ def register_exception_handlers(app: FastAPI) -> None:
 
         errs = jsonable_encoder(exc.errors())
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content={
                 "error": "Validation Error",
                 "message": "Invalid request data",

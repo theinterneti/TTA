@@ -27,12 +27,11 @@ if str(prototype_path) not in sys.path:
     sys.path.append(str(prototype_path))
 
 try:
-    from core.character_development_system import (
+    from core.character_development_system import (  # type: ignore[import-not-found]
         CharacterDevelopmentSystem,
         Interaction,
-        PersonalityTrait,
     )
-    from models.data_models import CharacterState, DialogueStyle, MemoryFragment
+    from models.data_models import CharacterState  # type: ignore[import-not-found]
 except ImportError as e:
     logging.warning(f"Could not import tta.prototype modules: {e}")
 
@@ -61,7 +60,7 @@ except ImportError as e:
                 setattr(self, k, v)
 
 
-from .character_arc_manager import (
+from .character_arc_manager import (  # noqa: E402
     CharacterArc,
     CharacterArcManagerComponent,
     InteractionContext,
@@ -208,7 +207,7 @@ class CharacterDataSynchronizer:
             for trait_name, value in character_arc.personality_evolution.items():
                 if trait_name in self.sync_mapping:
                     mapped_trait = self.sync_mapping[trait_name]
-                    character_state.personality_traits[mapped_trait] = value
+                    character_state.personality_traits[mapped_trait] = value  # type: ignore[attr-defined]
 
             logger.debug(
                 f"Synced {len(character_arc.personality_evolution)} personality traits"
@@ -234,7 +233,7 @@ class CharacterDataSynchronizer:
                     + relationship_state.respect_level * 0.3
                 ) * 2.0 - 1.0  # Convert from 0-1 to -1 to 1 range
 
-                character_state.relationship_scores[character_id] = max(
+                character_state.relationship_scores[character_id] = max(  # type: ignore[attr-defined]
                     -1.0, min(1.0, overall_score)
                 )
 
@@ -262,11 +261,11 @@ class CharacterDataSynchronizer:
                 # Check if this memory already exists
                 existing_memory = any(
                     memory_content in memory.content
-                    for memory in character_state.memory_fragments
+                    for memory in character_state.memory_fragments  # type: ignore[attr-defined]
                 )
 
                 if not existing_memory:
-                    character_state.add_memory(
+                    character_state.add_memory(  # type: ignore[attr-defined]
                         content=memory_content,
                         emotional_weight=emotional_weight,
                         tags=["interaction", "player"],
@@ -291,7 +290,7 @@ class RelationshipDynamicsManager:
         self,
         character_arc: CharacterArc,
         interactions: list[PlayerInteraction],
-        time_period: timedelta = None,
+        time_period: timedelta | None = None,
     ) -> dict[str, float]:
         """Evolve relationships across both systems based on interactions."""
         try:
@@ -412,7 +411,7 @@ class RelationshipDynamicsManager:
                 return 0.5  # Neutral compatibility if data unavailable
 
             # Use development system's compatibility calculation
-            return self.character_development_system.personality_manager.calculate_personality_compatibility(
+            return self.character_development_system.personality_manager.calculate_personality_compatibility(  # type: ignore[attr-defined]
                 char1_state.personality_traits, char2_state.personality_traits
             )
 
@@ -549,7 +548,9 @@ class CharacterArcIntegration:
             )
 
             # Get dialogue context from development system
-            from models.data_models import DialogueContext
+            from models.data_models import (  # type: ignore[import-not-found]
+                DialogueContext,
+            )
 
             dialogue_context = DialogueContext(
                 participants=[character_id] + context.participants,
@@ -558,7 +559,7 @@ class CharacterArcIntegration:
             )
 
             dev_context = (
-                self.character_development_system.generate_character_dialogue_context(
+                self.character_development_system.generate_character_dialogue_context(  # type: ignore[attr-defined]
                     character_id, dialogue_context
                 )
             )
@@ -569,7 +570,7 @@ class CharacterArcIntegration:
             )
             if character_state:
                 is_consistent, consistency_message = (
-                    self.character_development_system.validate_character_consistency(
+                    self.character_development_system.validate_character_consistency(  # type: ignore[attr-defined]
                         character_id, arc_response.response_text, dev_context
                     )
                 )
@@ -589,7 +590,7 @@ class CharacterArcIntegration:
                 "relationship_impact": arc_response.relationship_impact,
                 "arc_progression": arc_response.arc_progression,
                 "development_system_context": dev_context,
-                "consistency_validated": is_consistent if character_state else False,
+                "consistency_validated": is_consistent if character_state else False,  # type: ignore[possibly-unbound]
                 "metadata": {
                     **arc_response.metadata,
                     "integration_timestamp": datetime.now(),
@@ -660,7 +661,7 @@ class CharacterArcIntegration:
         self,
         character_id: str,
         interactions: list[PlayerInteraction],
-        time_period: timedelta = None,
+        time_period: timedelta | None = None,
     ) -> dict[str, Any]:
         """Evolve relationships across both systems."""
         try:
@@ -690,10 +691,10 @@ class CharacterArcIntegration:
             relationship_summary = {}
 
             if character_state:
-                for other_char_id, score in character_state.relationship_scores.items():
+                for other_char_id, score in character_state.relationship_scores.items():  # type: ignore[misc]
                     relationship_summary[other_char_id] = {
                         "score": score,
-                        "description": self.character_development_system.relationship_tracker.get_relationship_description(
+                        "description": self.character_development_system.relationship_tracker.get_relationship_description(  # type: ignore[attr-defined]
                             score
                         ),
                         "change": relationship_changes.get(other_char_id, 0.0),
@@ -729,7 +730,7 @@ class CharacterArcIntegration:
 
             # Get development system data
             dev_summary = (
-                self.character_development_system.get_character_development_summary(
+                self.character_development_system.get_character_development_summary(  # type: ignore[attr-defined]
                     character_id
                 )
             )
@@ -784,7 +785,7 @@ class CharacterArcIntegration:
             )
 
             if not character_arc or not character_state:
-                return {"overall": False, "reason": "Missing character data"}
+                return {"overall": False, "reason": "Missing character data"}  # type: ignore[return-value]
 
             consistency_checks = {
                 "personality_traits": self._check_personality_consistency(
@@ -802,7 +803,7 @@ class CharacterArcIntegration:
 
         except Exception as e:
             logger.error(f"Error checking data consistency: {e}")
-            return {"overall": False, "error": str(e)}
+            return {"overall": False, "error": str(e)}  # type: ignore[return-value]
 
     def _check_personality_consistency(
         self, character_arc: CharacterArc, character_state

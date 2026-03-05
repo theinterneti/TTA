@@ -16,7 +16,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,7 @@ from .metrics_collector import get_metrics_collector
 logger = get_logger(__name__)
 
 
-class BenchmarkType(str, Enum):
+class BenchmarkType(StrEnum):
     """Types of benchmarks."""
 
     LOAD_TEST = "load_test"
@@ -40,7 +40,7 @@ class BenchmarkType(str, Enum):
     BASELINE_TEST = "baseline_test"
 
 
-class LoadPattern(str, Enum):
+class LoadPattern(StrEnum):
     """Load patterns for testing."""
 
     CONSTANT = "constant"
@@ -585,14 +585,14 @@ class BenchmarkSuite:
         filename = f"{result.config.name}_{timestamp}.json"
         filepath = self.output_dir / filename
 
-        with open(filepath, "w") as f:
+        with filepath.open("w") as f:
             json.dump(result.to_dict(), f, indent=2, default=str)
 
         # Also save as CSV for easy analysis
         csv_filename = f"{result.config.name}_{timestamp}_response_times.csv"
         csv_filepath = self.output_dir / csv_filename
 
-        with open(csv_filepath, "w", newline="") as f:
+        with csv_filepath.open("w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["timestamp", "response_time"])
 
@@ -640,7 +640,7 @@ class BenchmarkSuite:
                 }
             )
 
-        with open(report_path, "w") as f:
+        with report_path.open("w") as f:
             json.dump(summary, f, indent=2, default=str)
 
         logger.info(f"Benchmark summary saved to {report_path}")

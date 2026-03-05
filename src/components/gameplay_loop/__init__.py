@@ -13,8 +13,32 @@ from .choice_architecture import ChoiceArchitectureManager
 from .consequence_system import ConsequenceSystem
 from .controller import GameplayLoopController
 from .database import Neo4jGameplayManager
-from .models import *
-from .narrative import NarrativeEngine
+from .models import (
+    Choice,
+    ChoiceOutcome,
+    ConsequenceSet,
+    GameplayMetrics,
+    GameplaySession,
+    ProgressMarker,
+    ProgressType,
+    Scene,
+    SessionState,
+    TherapeuticContext,
+    UserChoice,
+    ValidationResult,
+)
+from .narrative import (
+    AdaptiveDifficultyEngine,
+    CharacterDevelopmentSystem,
+    CollaborativeSystem,
+    EmotionalSafetySystem,
+    ErrorRecoveryManager,
+    NarrativeConsequenceSystem,
+    NarrativeEngine,
+    ReplayabilitySystem,
+    TherapeuticIntegrationSystem,
+    TherapeuticIntegrator,
+)
 
 __all__ = [
     # Models
@@ -36,4 +60,14 @@ __all__ = [
     "ChoiceArchitectureManager",
     "ConsequenceSystem",
     "GameplayLoopController",
+    # Therapeutic Narrative Modules
+    "AdaptiveDifficultyEngine",
+    "EmotionalSafetySystem",
+    "TherapeuticIntegrationSystem",
+    "TherapeuticIntegrator",
+    "NarrativeConsequenceSystem",
+    "CharacterDevelopmentSystem",
+    "ReplayabilitySystem",
+    "CollaborativeSystem",
+    "ErrorRecoveryManager",
 ]

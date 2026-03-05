@@ -314,6 +314,7 @@ class TherapeuticErrorRecoveryManager:
         Returns:
             RecoveryResult representing the recovery outcome
         """
+        error_context: ErrorContext | None = None
         try:
             start_time = datetime.utcnow()
 

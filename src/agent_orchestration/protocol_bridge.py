@@ -14,7 +14,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from .adapters import AgentCommunicationError, IPAAdapter, NGAAdapter, WBAAdapter
@@ -24,7 +24,7 @@ from .models import AgentMessage, AgentType
 logger = logging.getLogger(__name__)
 
 
-class ProtocolType(str, Enum):
+class ProtocolType(StrEnum):
     """Supported communication protocols."""
 
     ORCHESTRATION = "orchestration"  # Internal orchestration system protocol
@@ -275,7 +275,7 @@ class MessageRouter:
                 )
 
             # Extract text for IPA processing
-            translated_msg = translation.translated_message
+            translated_msg = translation.translated_message or {}
             text = translated_msg.get("text", "")
 
             if not text:
@@ -318,7 +318,7 @@ class MessageRouter:
                 )
 
             # Extract parameters for WBA processing
-            translated_msg = translation.translated_message
+            translated_msg = translation.translated_message or {}
             world_id = translated_msg.get("world_id", "default")
             updates = translated_msg.get("updates")
 
@@ -355,7 +355,7 @@ class MessageRouter:
                 )
 
             # Extract parameters for NGA processing
-            translated_msg = translation.translated_message
+            translated_msg = translation.translated_message or {}
             prompt = translated_msg.get("prompt", "")
             context = translated_msg.get("context", {})
 

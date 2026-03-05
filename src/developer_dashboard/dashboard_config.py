@@ -39,7 +39,7 @@ class DashboardConfig:
     max_history_records: int = 1000
 
     # Security settings
-    cors_origins: list = None
+    cors_origins: list = None  # type: ignore[assignment]
     api_key_required: bool = False
     api_key: str | None = None
 
@@ -66,7 +66,7 @@ class DashboardConfig:
             enable_historical_data=os.getenv("DASHBOARD_HISTORY", "true").lower()
             == "true",
             max_history_records=int(os.getenv("DASHBOARD_MAX_HISTORY", "1000")),
-            cors_origins=(
+            cors_origins=(  # type: ignore[arg-type]
                 os.getenv("DASHBOARD_CORS_ORIGINS", "").split(",")
                 if os.getenv("DASHBOARD_CORS_ORIGINS")
                 else None
@@ -197,7 +197,7 @@ async def setup_metrics_monitoring(app: FastAPI, config: DashboardConfig):
             recent_results = []
             for result_file in results_dir.glob("*/test_summary.json"):
                 try:
-                    with open(result_file) as f:
+                    with result_file.open() as f:
                         import json
 
                         data = json.load(f)

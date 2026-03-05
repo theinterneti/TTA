@@ -14,7 +14,7 @@ import json
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +30,7 @@ from .security.input_validator import get_security_validator
 logger = get_logger(__name__)
 
 
-class ReadinessLevel(str, Enum):
+class ReadinessLevel(StrEnum):
     """Production readiness levels."""
 
     NOT_READY = "not_ready"
@@ -39,7 +39,7 @@ class ReadinessLevel(str, Enum):
     ENTERPRISE = "enterprise"
 
 
-class CheckCategory(str, Enum):
+class CheckCategory(StrEnum):
     """Categories of readiness checks."""
 
     PERFORMANCE = "performance"
@@ -153,7 +153,7 @@ class ProductionReadinessValidator:
 
         if self.config_path and Path(self.config_path).exists():
             try:
-                with open(self.config_path) as f:
+                with Path(self.config_path).open() as f:
                     user_config = json.load(f)
                     # Merge with defaults
                     for category, settings in user_config.items():
@@ -750,18 +750,20 @@ class ProductionReadinessValidator:
         """Check HTTPS configuration."""
         try:
             https_url = self.base_url.replace("http://", "https://")
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{https_url}/health") as response:
-                    ssl_info = "N/A"
-                    if response.connection and response.connection.transport:
-                        ssl_info = str(
-                            response.connection.transport.get_extra_info("ssl_object")
-                        )
-                    return {
-                        "enabled": True,
-                        "status_code": response.status,
-                        "ssl_info": ssl_info,
-                    }
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(f"{https_url}/health") as response,
+            ):
+                ssl_info = "N/A"
+                if response.connection and response.connection.transport:
+                    ssl_info = str(
+                        response.connection.transport.get_extra_info("ssl_object")
+                    )
+                return {
+                    "enabled": True,
+                    "status_code": response.status,
+                    "ssl_info": ssl_info,
+                }
         except Exception as e:
             return {"enabled": False, "error": str(e)}
 
@@ -878,23 +880,25 @@ class ProductionReadinessValidator:
             }
 
             # Check for common security headers
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{self.base_url}/health") as response:
-                    headers = response.headers
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(f"{self.base_url}/health") as response,
+            ):
+                headers = response.headers
 
-                    security_headers = [
-                        "x-content-type-options",
-                        "x-frame-options",
-                        "x-xss-protection",
-                        "strict-transport-security",
-                        "content-security-policy",
-                    ]
+                security_headers = [
+                    "x-content-type-options",
+                    "x-frame-options",
+                    "x-xss-protection",
+                    "strict-transport-security",
+                    "content-security-policy",
+                ]
 
-                    missing_headers = [
-                        header for header in security_headers if header not in headers
-                    ]
+                missing_headers = [
+                    header for header in security_headers if header not in headers
+                ]
 
-                    vulnerabilities["medium"] += len(missing_headers)
+                vulnerabilities["medium"] += len(missing_headers)
 
             return vulnerabilities
 
@@ -1004,7 +1008,7 @@ class ProductionReadinessValidator:
             if has_dockerfile:
                 score += 50
                 # Check Dockerfile best practices
-                with open(dockerfile_path) as f:
+                with dockerfile_path.open() as f:
                     dockerfile_content = f.read()
 
                     if "USER" not in dockerfile_content:
@@ -1227,7 +1231,7 @@ class ProductionReadinessValidator:
             timestamp = report.timestamp.strftime("%Y%m%d_%H%M%S")
             report_file = output_dir / f"readiness_report_{timestamp}.json"
 
-            with open(report_file, "w") as f:
+            with report_file.open("w") as f:
                 json.dump(report.to_dict(), f, indent=2, default=str)
 
             logger.info(f"Production readiness report saved to {report_file}")

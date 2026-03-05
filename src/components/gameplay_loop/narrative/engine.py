@@ -12,7 +12,7 @@ therapeutic text adventure gameplay loop system.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from ..database.neo4j_manager import Neo4jGameplayManager
@@ -28,6 +28,9 @@ from .complexity_adapter import NarrativeComplexityAdapter
 from .immersion_manager import ImmersionManager
 from .pacing_controller import PacingController
 from .scene_generator import SceneGenerator
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 from .therapeutic_storyteller import TherapeuticStoryteller
 
 logger = logging.getLogger(__name__)
@@ -43,21 +46,27 @@ class NarrativeEngine:
     """
 
     def __init__(
-        self, db_manager: Neo4jGameplayManager, config: dict[str, Any] | None = None
+        self,
+        db_manager: Neo4jGameplayManager,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
     ):
         self.db_manager = db_manager
         self.config = config or {}
+        self._llm = llm
 
         # Initialize narrative components
-        self.scene_generator = SceneGenerator(config.get("scene_generation", {}))
+        self.scene_generator = SceneGenerator(
+            self.config.get("scene_generation", {}), llm=llm
+        )
         self.therapeutic_storyteller = TherapeuticStoryteller(
-            config.get("therapeutic_storytelling", {})
+            self.config.get("therapeutic_storytelling", {})
         )
         self.complexity_adapter = NarrativeComplexityAdapter(
-            config.get("complexity_adaptation", {})
+            self.config.get("complexity_adaptation", {})
         )
-        self.immersion_manager = ImmersionManager(config.get("immersion", {}))
-        self.pacing_controller = PacingController(config.get("pacing", {}))
+        self.immersion_manager = ImmersionManager(self.config.get("immersion", {}))
+        self.pacing_controller = PacingController(self.config.get("pacing", {}))
 
         # Engine state
         self._active_sessions: dict[str, SessionState] = {}
@@ -132,9 +141,14 @@ class NarrativeEngine:
                     scene, session_state
                 )
 
-                # Store scene in database and cache
-                await self.db_manager.create_scene(scene)
+                # Cache in-memory always; attempt DB persist (non-blocking)
                 self._scene_cache[scene.scene_id] = scene
+                persisted = await self.db_manager.create_scene(scene)
+                if not persisted:
+                    logger.warning(
+                        f"Scene {scene.scene_id} generated but DB persist failed; "
+                        "using in-memory cache only"
+                    )
 
                 logger.info(f"Generated opening scene: {scene.scene_id}")
                 return scene
@@ -148,8 +162,8 @@ class NarrativeEngine:
     async def generate_next_scene(
         self,
         session_state: SessionState,
-        previous_choice: UserChoice,
-        choice_outcome: ChoiceOutcome,
+        previous_choice: UserChoice | None = None,
+        choice_outcome: ChoiceOutcome | None = None,
     ) -> Scene | None:
         """
         Generate the next scene based on player choice and outcome.
@@ -185,7 +199,20 @@ class NarrativeEngine:
                 session_state, narrative_direction, pacing_adjustment
             )
 
-            # Generate the scene
+            # Generate the scene (strip keys already passed as explicit args)
+            extra_params = {
+                k: v
+                for k, v in scene_params.items()
+                if k
+                not in {
+                    "scene_type",
+                    "therapeutic_focus",
+                    "emotional_tone",
+                    "difficulty_level",
+                    "previous_scene_context",
+                    "choice_context",
+                }
+            }
             scene = await self.scene_generator.generate_therapeutic_scene(
                 scene_type=scene_type,
                 therapeutic_focus=session_state.therapeutic_context.primary_goals,
@@ -193,7 +220,7 @@ class NarrativeEngine:
                 difficulty_level=session_state.difficulty_level,
                 previous_scene_context=session_state.current_scene,
                 choice_context=previous_choice,
-                **scene_params,
+                **extra_params,
             )
 
             if scene:
@@ -217,9 +244,14 @@ class NarrativeEngine:
                     scene, pacing_adjustment
                 )
 
-                # Store and cache
-                await self.db_manager.create_scene(scene)
+                # Cache in-memory always; attempt DB persist (non-blocking)
                 self._scene_cache[scene.scene_id] = scene
+                persisted = await self.db_manager.create_scene(scene)
+                if not persisted:
+                    logger.warning(
+                        f"Scene {scene.scene_id} generated but DB persist failed; "
+                        "using in-memory cache only"
+                    )
 
                 logger.info(f"Generated next scene: {scene.scene_id}")
                 return scene
@@ -326,9 +358,14 @@ class NarrativeEngine:
                     scene, session_state
                 )
 
-                # Store and cache
-                await self.db_manager.create_scene(scene)
+                # Cache in-memory always; attempt DB persist (non-blocking)
                 self._scene_cache[scene.scene_id] = scene
+                persisted = await self.db_manager.create_scene(scene)
+                if not persisted:
+                    logger.warning(
+                        f"Scene {scene.scene_id} generated but DB persist failed; "
+                        "using in-memory cache only"
+                    )
 
                 logger.info(f"Generated intervention scene: {scene.scene_id}")
                 return scene
@@ -340,7 +377,7 @@ class NarrativeEngine:
             return None
 
     # Helper Methods
-    async def _determine_opening_scene_parameters(
+    async def _determine_opening_scene_parameters(  # noqa: ARG002
         self,
         therapeutic_context,
         emotional_state: EmotionalState,
@@ -378,7 +415,9 @@ class NarrativeEngine:
         return params
 
     async def _analyze_choice_for_narrative_direction(
-        self, choice: UserChoice, outcome: ChoiceOutcome
+        self,
+        choice: UserChoice | None,
+        outcome: ChoiceOutcome | None,
     ) -> dict[str, Any]:
         """Analyze choice and outcome to determine narrative direction."""
         direction = {
@@ -389,19 +428,21 @@ class NarrativeEngine:
         }
 
         # Analyze choice type and therapeutic value
-        if choice.therapeutic_value > 0.7:
-            direction["therapeutic_progress"] = "advanced"
-            direction["narrative_momentum"] = "accelerated"
-        elif choice.therapeutic_value < 0.3:
-            direction["therapeutic_progress"] = "needs_support"
-            direction["complexity_adjustment"] = "simplify"
+        if choice is not None:
+            if choice.therapeutic_value > 0.7:
+                direction["therapeutic_progress"] = "advanced"
+                direction["narrative_momentum"] = "accelerated"
+            elif choice.therapeutic_value < 0.3:
+                direction["therapeutic_progress"] = "needs_support"
+                direction["complexity_adjustment"] = "simplify"
 
         # Analyze outcome type
-        if outcome.outcome_type.value in ["success", "therapeutic_opportunity"]:
-            direction["emotional_trajectory"] = "positive"
-        elif outcome.outcome_type.value in ["challenge", "failure"]:
-            direction["emotional_trajectory"] = "needs_support"
-            direction["narrative_momentum"] = "reflective"
+        if outcome is not None:
+            if outcome.outcome_type in ["success", "therapeutic_opportunity"]:
+                direction["emotional_trajectory"] = "positive"
+            elif outcome.outcome_type in ["challenge", "failure"]:
+                direction["emotional_trajectory"] = "needs_support"
+                direction["narrative_momentum"] = "reflective"
 
         return direction
 
@@ -452,8 +493,10 @@ class NarrativeEngine:
 
         return params
 
-    def _determine_emotional_tone(self, choice_outcome: ChoiceOutcome) -> str:
+    def _determine_emotional_tone(self, choice_outcome: ChoiceOutcome | None) -> str:
         """Determine emotional tone based on choice outcome."""
+        if choice_outcome is None:
+            return "neutral"
         tone_mapping = {
             "success": "encouraging",
             "partial_success": "supportive",
@@ -462,7 +505,7 @@ class NarrativeEngine:
             "failure": "compassionate",
             "therapeutic_opportunity": "hopeful",
         }
-        return tone_mapping.get(choice_outcome.outcome_type.value, "neutral")
+        return tone_mapping.get(choice_outcome.outcome_type, "neutral")
 
     async def _apply_calming_adaptations(self, scene: Scene) -> Scene:
         """Apply calming adaptations to a scene."""

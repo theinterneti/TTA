@@ -74,7 +74,7 @@ class LivingWorldsManager:
 
             # Initialize Redis connection
             self.redis = aioredis.from_url(self.redis_url)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             # Create Neo4j constraints and indexes
             await self._create_schema()
@@ -353,7 +353,7 @@ class LivingWorldsManager:
                         dict(n) for n in record["narrative_threads"] if n
                     ],
                     "events": [dict(e) for e in record["events"] if e],
-                    "locations": [dict(l) for l in record["locations"] if l],
+                    "locations": [dict(loc) for loc in record["locations"] if loc],
                 }
 
             return {

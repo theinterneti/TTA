@@ -140,7 +140,7 @@ class OpenHandsErrorRecovery:
 
         # Retry configuration
         try:
-            from scripts.primitives.error_recovery import RetryConfig
+            from scripts.primitives.error_recovery import RetryConfig  # noqa: PLC0415
 
             self.retry_config = RetryConfig(
                 max_retries=config.max_retries,
@@ -156,7 +156,7 @@ class OpenHandsErrorRecovery:
             )
             self.retry_config = None
 
-    def classify_openhands_error(self, error: Exception) -> OpenHandsErrorType:
+    def classify_openhands_error(self, error: Exception) -> OpenHandsErrorType:  # noqa: PLR0911
         """
         Classify error into OpenHands error type.
 
@@ -217,7 +217,7 @@ class OpenHandsErrorRecovery:
         # Try with retry decorator if available
         if self.retry_config:
             try:
-                from scripts.primitives.error_recovery import (
+                from scripts.primitives.error_recovery import (  # noqa: PLC0415
                     with_retry_async,
                 )
 

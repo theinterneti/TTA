@@ -12,19 +12,19 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class AgentType(str, Enum):
+class AgentType(StrEnum):
     IPA = "input_processor"
     WBA = "world_builder"
     NGA = "narrative_generator"
 
 
-class MessageType(str, Enum):
+class MessageType(StrEnum):
     REQUEST = "request"
     RESPONSE = "response"
     EVENT = "event"
@@ -77,7 +77,7 @@ class OrchestrationResponse(BaseModel):
 # Agent Capability System Models
 
 
-class CapabilityType(str, Enum):
+class CapabilityType(StrEnum):
     """Types of capabilities that agents can advertise."""
 
     PROCESSING = "processing"  # Input/output processing capabilities
@@ -88,7 +88,7 @@ class CapabilityType(str, Enum):
     COMMUNICATION = "communication"  # Inter-agent communication capabilities
 
 
-class CapabilityScope(str, Enum):
+class CapabilityScope(StrEnum):
     """Scope of capability operation."""
 
     SESSION = "session"  # Session-scoped operations
@@ -96,7 +96,7 @@ class CapabilityScope(str, Enum):
     INSTANCE = "instance"  # Instance-specific operations
 
 
-class CapabilityStatus(str, Enum):
+class CapabilityStatus(StrEnum):
     """Status of a capability."""
 
     ACTIVE = "active"  # Capability is active and available

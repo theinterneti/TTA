@@ -45,17 +45,6 @@ tests/                  # Test suite
 | Cline | AI coding assistant | `.cline/instructions.md` |
 | Gemini | Secondary review | `GEMINI.md` |
 
-## Knowledge Base Access (MANDATORY)
-
-Before executing any non-trivial task, query the `tta-notes-kb` MCP server:
-
-1. Use `search_kb` to find relevant architectural decisions, prior work, and
-   design rationale for the area you are about to change.
-2. Use `get_high_priority_todos` to check for open work items related to your task.
-
-Do NOT rely solely on code inspection or this instructions file for project
-context — the KB is the canonical source of architectural truth.
-
 ## Non-Negotiable Standards
 
 - **Python version**: 3.12+ (`requires-python = ">=3.12"`)
@@ -140,14 +129,5 @@ uv sync --all-extras
 - Don't add `torch`, `transformers`, or GPU deps to new modules without justification
 
 
-## Documenting Your Work (MANDATORY)
-
-After completing any significant task (new feature, architecture decision, bug
-root-cause, resolved TODO), invoke the `create-atomic-note` skill:
-
-1. Create a new file in `docs/kb-exports/` following the naming convention and
-   frontmatter schema defined in `.claude/skills/create-atomic-note/SKILL.md`.
-2. Keep the note to a single topic — split complex work into multiple notes.
-3. The repo owner will ingest these files into `TTA-notes` manually.
-
 ---
+**Logseq:** [[TTA.dev/Claude]]

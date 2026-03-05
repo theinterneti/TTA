@@ -8,7 +8,9 @@ integrating with the GameplayLoopIntegration layer and providing
 a clean interface for API endpoints.
 """
 
+import asyncio
 import logging
+from datetime import datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -46,6 +48,15 @@ class GameplayService:
             if not gameplay_component:
                 logger.error("GameplayLoopComponent not found in orchestrator")
                 return
+
+            # Start the component if controller not yet initialized
+            # Run in executor to avoid event loop conflict (component.start() uses run_until_complete)
+            if not getattr(gameplay_component, "gameplay_controller", None):
+                loop = asyncio.get_running_loop()
+                started = await loop.run_in_executor(None, gameplay_component.start)
+                if not started:
+                    logger.error("Failed to start GameplayLoopComponent")
+                    return
 
             # Get agent orchestration service if available
             agent_orchestration_component = orchestrator.components.get(
@@ -265,7 +276,7 @@ class GameplayService:
             return {
                 "success": True,
                 "session_id": session_id,
-                "paused_at": "2024-01-01T00:00:00Z",  # Would use actual timestamp
+                "paused_at": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
@@ -305,6 +316,18 @@ class GameplayService:
                     "code": "AUTH_ERROR",
                 }
 
+            # Verify session ownership before resuming
+            session_status = (
+                await self._integration.gameplay_component.get_session_status(
+                    session_id
+                )
+            )
+            if not session_status:
+                return {"error": "Session not found", "code": "SESSION_NOT_FOUND"}
+
+            if session_status.get("user_id") != user_id:
+                return {"error": "Session access denied", "code": "ACCESS_DENIED"}
+
             # Resume the session
             session_data = await self._integration.gameplay_component.resume_session(
                 session_id
@@ -315,8 +338,9 @@ class GameplayService:
 
             return {
                 "success": True,
+                "session_id": session_id,
                 "session_data": session_data,
-                "resumed_at": "2024-01-01T00:00:00Z",  # Would use actual timestamp
+                "resumed_at": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:

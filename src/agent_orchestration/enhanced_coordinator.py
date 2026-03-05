@@ -52,12 +52,13 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
         super().__init__(
             redis=redis,
             key_prefix=key_prefix,
-            queue_size=queue_size,
-            retry_attempts=retry_attempts,
-            backoff_base=backoff_base,
-            backoff_factor=backoff_factor,
-            backoff_max=backoff_max,
         )
+        # Store extra config for internal use
+        self._queue_size = queue_size
+        self._retry_attempts = retry_attempts
+        self._backoff_base = backoff_base
+        self._backoff_factor = backoff_factor
+        self._backoff_max = backoff_max
 
         # Real agent communication setup
         self.enable_real_agents = enable_real_agents
@@ -197,7 +198,7 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
                 agent_type,
             )
 
-            if translation.success:
+            if translation.success and translation.translated_message is not None:
                 return translation.translated_message
             logger.warning(f"Response translation failed: {translation.error}")
             return response

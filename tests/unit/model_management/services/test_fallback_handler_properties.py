@@ -13,6 +13,8 @@ from unittest.mock import AsyncMock
 import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
+
+pytest.importorskip("tta_ai")
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,
@@ -299,10 +301,7 @@ class TestFallbackHandlerProperties:
         from dataclasses import replace
 
         # Ensure all models have context_length values that will fail the filter
-        models_with_context = []
-        for model in models:
-            # Create a copy with a small context_length
-            models_with_context.append(replace(model, context_length=1000))
+        models_with_context = [replace(model, context_length=1000) for model in models]
 
         # Create requirements that no model can satisfy
         impossible_requirements = ModelRequirements(

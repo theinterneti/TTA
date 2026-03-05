@@ -513,7 +513,7 @@ async def main():
 
     # Save results if output file specified
     if args.output:
-        with open(args.output, "w") as f:
+        with open(args.output, "w") as f:  # noqa: PTH123
             json.dump(summary, f, indent=2)
         logger.info(f"Test results saved to {args.output}")
 
