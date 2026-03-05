@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "tta-notes-kb": {
+      "command": "python",
+      "args": ["/home/thein/repos/TTA-notes/mcp_server.py"],
+      "env": {}
+    }
+  }
+}

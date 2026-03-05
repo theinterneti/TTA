@@ -1,41 +1,66 @@
-# AGENTS.md - Universal Agent Context
+# AGENTS.md — Universal Agent Context
 
-> ⚠️ **This document has moved to the TTA Knowledge Base!**
->
-> **New location:** `TTA___References___Agents Document.md`
->
-> **Access via:**
-> - **Logseq:** Open TTA-notes → Navigate to `TTA` namespace → Search for "Agents"
-> - **Direct path:** `.augment/kb/TTA___References___Agents Document.md`
-> - **Symlink:** `~/repos/TTA-notes/logseq/pages/TTA/TTA___References___Agents Document.md`
+This file is the shared entry point for all AI agents operating in the TTA
+repository. Read this before acting.
 
-## 📚 TTA Knowledge Base
+## What This Repo Is
 
-The TTA documentation has been consolidated into a centralized Logseq knowledge base:
+**Therapeutic Text Adventure (TTA)** — An AI-powered narrative game for mental
+health support. Players make choices that branch the story; a therapist/editorial
+layer curates which paths are safe and effective.
 
-### KB Structure
-- **Location:** `~/repos/TTA-notes/logseq/pages/TTA/`
-- **Files:** 306 documents (flat Logseq structure)
-- **Format:** Triple-underscore naming (`TTA___Category___Page.md`)
+**TTA.dev** (`/home/thein/repos/TTA.dev`) provides reusable platform primitives.
 
-### Key Documents
-- **[[TTA___References___Agents Document]]** - Universal agent context (this doc)
-- **[[TTA___References___Claude Document]]** - Claude-specific context
-- **[[TTA___References___Overview Document]]** - Project README
-- **[[TTA___Status___Project Timeline]]** - Phase 1-7 development history
-- **[[TTA___Status___Implementation Dashboard]]** - Current component status
-- **[[TTA___Architecture___Docs Architecture Agent Orchestration]]** - System design
+## Agent Roster
 
-### Navigation Tips
-1. Open Logseq and load `~/repos/TTA-notes`
-2. Use `Ctrl+K` (or `Cmd+K` on Mac) to search pages
-3. Click wiki-links to navigate: `[[TTA___Category___Page]]`
-4. Use bidirectional links to explore connections
-5. Tag search: Use `#TTA` to see all TTA-related pages
+| Agent | Role | Config |
+|---|---|---|
+| **Claude Code** | Main agent — primary decision maker | `CLAUDE.md` |
+| GitHub Copilot | IDE suggestions | `.github/copilot-instructions.md` |
+| Augment | Code intelligence | `.augment/instructions.md` |
+| Cline | AI coding assistant | `.cline/instructions.md` |
+| Gemini | Secondary review | `GEMINI.md` |
 
-**Migration date:** 2025-11-01
-**KB Coverage:** 507 documents consolidated into 306 files
+## Knowledge Base Access (MANDATORY)
 
+Before executing any non-trivial task, query the `tta-notes-kb` MCP server:
 
----
-**Logseq:** [[TTA.dev/Agents]]
+1. Use `search_kb` to find relevant architectural decisions, prior work, and
+   design rationale for the area you are about to change.
+2. Use `get_high_priority_todos` to check for open work items related to your task.
+
+The `tta-notes-kb` server runs from `/home/thein/repos/TTA-notes/mcp_server.py`
+and is configured in `.mcp.json` (Claude Code) and
+`.vscode/notebooklm-mcp-config.json` (VS Code).
+
+Do NOT rely solely on code inspection or this file for project context — the KB
+is the canonical source of architectural truth.
+
+## Non-Negotiable Standards
+
+- **Python**: 3.12+ only
+- **Package manager**: `uv` — never `pip install`
+- **Type hints**: `str | None` not `Optional[str]`
+- **Line length**: 88 chars (Ruff)
+- **Type checking**: Pyright `standard` mode
+- **Commits**: Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`)
+- **Tests**: pytest `asyncio_mode = "auto"`; integration tests use `@pytest.mark.integration`
+
+## Quality Gate (run before committing)
+
+```bash
+uv run ruff check src/ --fix
+uv run ruff format src/
+uv run pyright src/
+uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+```
+
+## Documenting Your Work (MANDATORY)
+
+After completing any significant task (new feature, architecture decision, bug
+root-cause, resolved TODO), invoke the `create-atomic-note` skill:
+
+1. Create a new file in `docs/kb-exports/` following the naming convention and
+   frontmatter schema defined in `.claude/skills/create-atomic-note/SKILL.md`.
+2. Keep the note to a single topic — split complex work into multiple notes.
+3. The repo owner will ingest these files into `TTA-notes` manually.
