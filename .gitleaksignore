@@ -55,3 +55,11 @@ f33cd7d384241501a9865cfc67aa799b8c8b85d4:platform_tta_dev/components/augment/cor
 # used for API documentation purposes. They are not complete, valid JWT tokens and cannot
 # be used for authentication. Real JWT tokens are generated at runtime and never committed
 # to the repository.
+
+# archive/phases/phase1/ - phase completion summary docs with example localhost curl commands
+# Commit ca8afd0 (merge: incorporate all open PRs) — example curl commands against localhost:3003
+# These are documentation/validation examples, not live credentials
+ca8afd067f53c24ad1aeb44bf7493442f76cfa6f:archive/phases/phase1/phase1_completion_summary.md:curl-auth-user:121
+ca8afd067f53c24ad1aeb44bf7493442f76cfa6f:archive/phases/phase1/phase1_completion_summary.md:curl-auth-user:127
+ca8afd067f53c24ad1aeb44bf7493442f76cfa6f:archive/phases/phase1/phase1_infrastructure_restoration_report.md:curl-auth-user:187
+ca8afd067f53c24ad1aeb44bf7493442f76cfa6f:patches/stash_exports/2025-10-26-workflow-primitives.patch:generic-api-key:7
