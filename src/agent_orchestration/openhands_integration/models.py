@@ -12,7 +12,7 @@ Provides:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -31,7 +31,7 @@ class OpenHandsTaskResult(BaseModel):
     )
 
 
-class OpenHandsErrorType(str, Enum):
+class OpenHandsErrorType(StrEnum):
     """Classification of OpenHands errors for recovery strategy selection."""
 
     CONNECTION_ERROR = "connection_error"  # Network/API connectivity issues
@@ -43,7 +43,7 @@ class OpenHandsErrorType(str, Enum):
     UNKNOWN_ERROR = "unknown_error"  # Unclassified error
 
 
-class OpenHandsRecoveryStrategy(str, Enum):
+class OpenHandsRecoveryStrategy(StrEnum):
     """Recovery strategies for different error types."""
 
     RETRY = "retry"  # Retry with exponential backoff

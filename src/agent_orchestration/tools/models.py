@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, field_validator
 from ..models import AgentId
 
 
-class ToolStatus(str, Enum):
+class ToolStatus(StrEnum):
     ACTIVE = "active"
     DEPRECATED = "deprecated"
 
@@ -25,7 +25,7 @@ class ToolParameter(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
     description: str | None = Field(default=None, max_length=1024)  # Increased from 512
     required: bool = True
-    schema: dict[str, Any] = Field(
+    schema: dict[str, Any] = Field(  # type: ignore[override]
         default_factory=dict, description="JSON schema for the parameter"
     )
 
@@ -144,7 +144,7 @@ class ToolInvocation(BaseModel):
     arguments: dict[str, Any] = Field(default_factory=dict)
 
 
-from .policy_config import ToolPolicyConfig
+from .policy_config import ToolPolicyConfig  # noqa: E402
 
 
 class ToolPolicy(BaseModel):

@@ -12,8 +12,11 @@ ensuring therapeutic value and clear causality understanding.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 from ..models.core import ConsequenceSet, Scene, SessionState
 from ..models.interactions import UserChoice
@@ -31,18 +34,26 @@ class ConsequenceSystem:
     meaningful outcomes from player choices with therapeutic framing.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
 
         # Initialize subsystems
-        self.outcome_generator = OutcomeGenerator(config.get("outcome_generation", {}))
+        self.outcome_generator = OutcomeGenerator(
+            self.config.get("outcome_generation", {}), llm=llm
+        )
         self.therapeutic_framer = TherapeuticFramer(
-            config.get("therapeutic_framing", {})
+            self.config.get("therapeutic_framing", {})
         )
         self.causality_explainer = CausalityExplainer(
-            config.get("causality_explanation", {})
+            self.config.get("causality_explanation", {})
         )
-        self.progress_tracker = ProgressTracker(config.get("progress_tracking", {}))
+        self.progress_tracker = ProgressTracker(
+            self.config.get("progress_tracking", {})
+        )
 
         # System configuration
         self.consequence_depth = self.config.get("consequence_depth", "moderate")
@@ -325,7 +336,7 @@ class ConsequenceSystem:
 
         return min(impact_score, 1.0)
 
-    async def _evaluate_emotional_impact(
+    async def _evaluate_emotional_impact(  # noqa: ARG002
         self, consequence_set: ConsequenceSet, session_state: SessionState
     ) -> float:
         """Evaluate the emotional impact of consequences."""

@@ -22,7 +22,6 @@ if str(src_path) not in sys.path:
     sys.path.append(str(src_path))
 
 try:
-    from components.character_arc_integration import CharacterArcIntegration
     from components.character_arc_manager import (
         CharacterArcManagerComponent,
         InteractionContext,

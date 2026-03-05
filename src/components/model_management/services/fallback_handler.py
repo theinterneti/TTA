@@ -194,13 +194,19 @@ class FallbackHandler(IFallbackHandler):
 
         for model in models:
             # Basic compatibility checks
-            if requirements.max_cost_per_token and model.cost_per_token:
-                if model.cost_per_token > requirements.max_cost_per_token:
-                    continue
+            if (
+                requirements.max_cost_per_token
+                and model.cost_per_token
+                and model.cost_per_token > requirements.max_cost_per_token
+            ):
+                continue
 
-            if requirements.context_length_needed and model.context_length:
-                if model.context_length < requirements.context_length_needed:
-                    continue
+            if (
+                requirements.context_length_needed
+                and model.context_length
+                and model.context_length < requirements.context_length_needed
+            ):
+                continue
 
             if requirements.required_capabilities and not all(
                 cap in model.capabilities for cap in requirements.required_capabilities
@@ -220,7 +226,7 @@ class FallbackHandler(IFallbackHandler):
     async def _select_fallback_model(
         self,
         models: list[ModelInfo],
-        failed_model_id: str,
+        _failed_model_id: str,
         requirements: ModelRequirements,
     ) -> ModelInfo | None:
         """Select the best fallback model based on strategy."""
@@ -239,7 +245,7 @@ class FallbackHandler(IFallbackHandler):
         return self._select_by_performance(models, requirements)
 
     def _select_by_performance(
-        self, models: list[ModelInfo], requirements: ModelRequirements
+        self, models: list[ModelInfo], _requirements: ModelRequirements
     ) -> ModelInfo:
         """Select model based on performance scores."""
         # Sort by performance score (descending)
@@ -269,7 +275,7 @@ class FallbackHandler(IFallbackHandler):
         return sorted_models[0]
 
     def _select_by_cost(
-        self, models: list[ModelInfo], requirements: ModelRequirements
+        self, models: list[ModelInfo], _requirements: ModelRequirements
     ) -> ModelInfo:
         """Select model based on cost (prefer lower cost)."""
         # Sort by cost (ascending), then by performance
@@ -287,7 +293,7 @@ class FallbackHandler(IFallbackHandler):
         return sorted_models[0]
 
     def _select_by_availability(
-        self, models: list[ModelInfo], requirements: ModelRequirements
+        self, models: list[ModelInfo], _requirements: ModelRequirements
     ) -> ModelInfo:
         """Select model based on availability and reliability."""
         # Sort by failure count (ascending), then by performance

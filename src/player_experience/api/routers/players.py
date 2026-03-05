@@ -289,7 +289,7 @@ class PlayerResponse(BaseModel):
 
 
 # Normalization helpers to accept flexible client/test payloads
-from ...utils.normalization import normalize_approaches
+from ...utils.normalization import normalize_approaches  # noqa: E402
 
 
 def _normalize_therapeutic_preferences_dict(data: dict[str, Any]) -> dict[str, Any]:

@@ -137,7 +137,7 @@ class PersonalityTraitsValidator:
 
         validated_traits = []
         for trait in traits:
-            trait = trait.strip()
+            trait = trait.strip()  # noqa: PLW2901
             if len(trait) < 2:
                 raise ValidationError(
                     "Each trait must be at least 2 characters", "personality_traits"

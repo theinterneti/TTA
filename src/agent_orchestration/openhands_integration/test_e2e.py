@@ -63,6 +63,7 @@ async def test_task_queue() -> bool:
 
     # Dequeue and verify priority
     task1 = await queue.dequeue()
+    assert task1 is not None, "Dequeue returned None"
     assert task1.priority == TaskPriority.HIGH, "Priority ordering failed"
 
     # Mark completed
@@ -100,7 +101,7 @@ async def test_model_selector() -> bool:
 async def test_result_validator() -> bool:
     """Test result validation."""
 
-    import tempfile
+    import tempfile  # noqa: PLC0415
 
     validator = ResultValidator()
 
@@ -141,7 +142,7 @@ async def test_result_validator() -> bool:
 async def test_metrics_collector() -> bool:
     """Test metrics collection."""
 
-    from .metrics_collector import ExecutionMetrics
+    from .metrics_collector import ExecutionMetrics  # noqa: PLC0415
 
     collector = MetricsCollector()
 
@@ -175,7 +176,7 @@ async def test_execution_engine() -> bool:
     """Test execution engine."""
 
     try:
-        from .config import OpenHandsIntegrationConfig
+        from .config import OpenHandsIntegrationConfig  # noqa: PLC0415
 
         integration_config = OpenHandsIntegrationConfig.from_env()
         # Convert to OpenHandsConfig
@@ -250,7 +251,7 @@ async def main():
         return 1
 
     except Exception:
-        import traceback
+        import traceback  # noqa: PLC0415
 
         traceback.print_exc()
         return 1

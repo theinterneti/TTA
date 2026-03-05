@@ -19,6 +19,7 @@ from typing import Any
 from ..orchestration.component import Component, ComponentStatus
 from ..orchestration.decorators import log_entry_exit, require_config, timing_decorator
 from .gameplay_loop import GameplayLoopController
+from .gameplay_loop.database.dolt_manager import DoltGameplayManager
 
 logger = logging.getLogger(__name__)
 
@@ -42,9 +43,7 @@ class GameplayLoopComponent(Component):
         super().__init__(
             config,
             name="core_gameplay_loop",
-            dependencies=[
-                "tta.prototype_neo4j"
-            ],  # Depends on Neo4j for data persistence
+            dependencies=[],  # Dolt is now the primary persistence layer (no hard dep)
         )
 
         self.root_dir = Path(__file__).parent.parent.parent
@@ -174,8 +173,23 @@ class GameplayLoopComponent(Component):
                 "performance_tracking_enabled": self.performance_tracking,
             }
 
+            # Try Dolt persistence first; fall back to Neo4j defaults
+            dolt_manager = DoltGameplayManager()
+            loop2 = asyncio.new_event_loop()
+            try:
+                dolt_ok = loop2.run_until_complete(dolt_manager.initialize())
+            finally:
+                loop2.close()
+
             # Create and initialize gameplay controller
-            self.gameplay_controller = GameplayLoopController(controller_config)
+            if dolt_ok:
+                logger.info("Using DoltGameplayManager for gameplay persistence")
+                self.gameplay_controller = GameplayLoopController(
+                    controller_config, db_manager=dolt_manager
+                )
+            else:
+                logger.info("Dolt unavailable; using Neo4jGameplayManager")
+                self.gameplay_controller = GameplayLoopController(controller_config)
 
             # Initialize controller asynchronously
             loop = asyncio.new_event_loop()
@@ -391,6 +405,16 @@ class GameplayLoopComponent(Component):
         except Exception as e:
             logger.error(f"Failed to process user choice: {e}")
             return {"error": str(e)}
+
+    async def get_user_sessions_for_player(self, user_id: str) -> list[dict[str, Any]]:
+        """Return status dicts for all sessions belonging to user_id."""
+        if not self.gameplay_controller:
+            return []
+        try:
+            return await self.gameplay_controller.get_sessions_for_user(user_id)
+        except Exception as e:
+            logger.error(f"Failed to get sessions for user {user_id}: {e}")
+            return []
 
     async def get_session_status(self, session_id: str) -> dict[str, Any] | None:
         """Get the status of a gameplay session."""

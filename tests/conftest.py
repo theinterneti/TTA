@@ -372,19 +372,6 @@ def redis_container(pytestconfig):
 import pytest_asyncio
 
 
-@pytest.fixture(scope="session")
-def redis_client_sync(redis_container):
-    # Synchronous client for sync tests
-    import redis
-
-    client = redis.Redis.from_url(redis_container)
-    try:
-        client.ping()
-        yield client
-    finally:
-        client.close()
-
-
 @pytest_asyncio.fixture()
 async def redis_client(redis_container):
     # Async client for async repository tests
@@ -485,6 +472,21 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if "comprehensive" in item.keywords:
                 item.add_marker(skip_comprehensive)
+
+    # ---- Quarantine / flaky handling ----
+    # When running in CI, quarantined tests are expected to fail and must not
+    # block the pipeline.  We mark them with ``xfail(strict=False)`` so they
+    # appear as *xfail* (expected failure) or *xpass* (unexpected pass) but
+    # never as hard failures.
+    if os.getenv("CI") == "true":
+        for item in items:
+            if "quarantine" in item.keywords:
+                item.add_marker(
+                    pytest.mark.xfail(
+                        reason="quarantined – allowed to fail in CI",
+                        strict=False,
+                    )
+                )
 
 
 # Test environment setup

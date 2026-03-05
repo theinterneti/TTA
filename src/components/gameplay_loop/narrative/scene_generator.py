@@ -11,9 +11,12 @@ therapeutically-focused narrative scenes within the gameplay loop system.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ..models.core import DifficultyLevel, Scene, SceneType, TherapeuticContext
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 logger = logging.getLogger(__name__)
 
@@ -33,15 +36,25 @@ class SceneGenerator:
     """
     Generates therapeutic narrative scenes with appropriate content,
     therapeutic elements, and immersive storytelling.
+
+    When an ``llm`` is provided, scene narrative is generated dynamically via
+    the model.  Otherwise the generator falls back to template-based assembly.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
+        self.llm = llm
         self.scene_templates: dict[SceneType, list[SceneTemplate]] = {}
         self.therapeutic_settings = {}
         self.narrative_patterns = {}
 
-        logger.info("SceneGenerator initialized")
+        logger.info(
+            "SceneGenerator initialized (llm=%s)", type(llm).__name__ if llm else "none"
+        )
 
     async def initialize(self) -> bool:
         """Initialize scene templates and therapeutic content."""
@@ -116,7 +129,7 @@ class SceneGenerator:
             logger.error(f"Failed to generate therapeutic scene: {e}")
             return None
 
-    async def generate_intervention_scene(
+    async def generate_intervention_scene(  # noqa: ARG002
         self,
         intervention_type: str,
         emotional_state: str,
@@ -486,9 +499,10 @@ class SceneGenerator:
         # Generate description
         description = setting["description"]
 
-        # Generate narrative content
+        # Generate narrative content (exclude 'setting' from kwargs to avoid duplicate arg)
+        content_kwargs = {k: v for k, v in kwargs.items() if k != "setting"}
         narrative_content = await self._generate_narrative_content(
-            pattern, setting, therapeutic_focus, emotional_tone, **kwargs
+            pattern, setting, therapeutic_focus, emotional_tone, **content_kwargs
         )
 
         # Generate learning objectives
@@ -542,34 +556,103 @@ class SceneGenerator:
         emotional_tone: str,
         **kwargs,
     ) -> str:
-        """Generate the main narrative content for the scene."""
-        # Start with pattern opening
-        content_parts = [pattern["opening"]]
+        """Generate the main narrative content for the scene.
 
-        # Add setting description
+        Uses the LLM when available; falls back to template assembly otherwise.
+        """
+        if self.llm is not None:
+            return await self._generate_narrative_content_llm(
+                setting, therapeutic_focus, emotional_tone, **kwargs
+            )
+        return await self._generate_narrative_content_template(
+            pattern, setting, therapeutic_focus, emotional_tone, **kwargs
+        )
+
+    async def _generate_narrative_content_llm(  # noqa: ARG002
+        self,
+        setting: dict[str, Any],
+        therapeutic_focus: list[str],
+        emotional_tone: str,
+        **kwargs,
+    ) -> str:
+        """Generate narrative content using the LLM."""
+        from langchain_core.messages import HumanMessage, SystemMessage  # noqa: PLC0415
+
+        focus_str = (
+            ", ".join(therapeutic_focus) if therapeutic_focus else "general wellbeing"
+        )
+        setting_name = setting.get("name", "peaceful space")
+        setting_desc = setting.get("description", "a calm and welcoming environment")
+
+        system_prompt = (
+            "You are a compassionate therapeutic narrative writer for a text adventure game "
+            "focused on mental health and healing. Your writing is warm, supportive, and "
+            "gently therapeutic — never clinical. Write in second person ('you')."
+        )
+        user_prompt = (
+            f"Write 2–3 paragraphs of immersive narrative for a scene set in: {setting_name}.\n"
+            f"Setting description: {setting_desc}\n"
+            f"Therapeutic focus: {focus_str}\n"
+            f"Emotional tone: {emotional_tone}\n\n"
+            "The text should draw the player into the space, subtly address the therapeutic "
+            "themes, and end with a gentle invitation to explore or reflect. No choices or "
+            "meta-commentary — just vivid, therapeutic narrative prose."
+        )
+
+        try:
+            assert self.llm is not None
+            response = await self.llm.ainvoke(
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=user_prompt),
+                ]
+            )
+            content = response.content
+            return content.strip() if isinstance(content, str) else str(content)
+        except Exception as e:
+            logger.warning(
+                "LLM scene generation failed, using template fallback: %s", e
+            )
+            # Fall back to template if LLM call fails
+            therapeutic_content = await self._generate_therapeutic_content(
+                therapeutic_focus, emotional_tone
+            )
+            tone_content = await self._generate_tone_content(emotional_tone)
+            parts = [setting_desc]
+            if therapeutic_content:
+                parts.append(therapeutic_content)
+            if tone_content:
+                parts.append(tone_content)
+            return " ".join(parts)
+
+    async def _generate_narrative_content_template(  # noqa: ARG002
+        self,
+        pattern: dict[str, str],
+        setting: dict[str, Any],
+        therapeutic_focus: list[str],
+        emotional_tone: str,
+        **kwargs,
+    ) -> str:
+        """Generate narrative content using template assembly (no LLM)."""
+        content_parts = [pattern["opening"]]
         content_parts.append(setting["description"] + ".")
 
-        # Add therapeutic elements based on focus
         therapeutic_content = await self._generate_therapeutic_content(
             therapeutic_focus, emotional_tone
         )
         if therapeutic_content:
             content_parts.append(therapeutic_content)
 
-        # Add pattern development
         content_parts.append(pattern["development"])
 
-        # Add emotional tone adjustments
         tone_content = await self._generate_tone_content(emotional_tone)
         if tone_content:
             content_parts.append(tone_content)
 
-        # Add therapeutic integration
         content_parts.append(pattern["therapeutic_integration"])
-
         return " ".join(content_parts)
 
-    async def _generate_therapeutic_content(
+    async def _generate_therapeutic_content(  # noqa: ARG002
         self, therapeutic_focus: list[str], emotional_tone: str
     ) -> str:
         """Generate therapeutic content based on focus areas."""
@@ -642,7 +725,7 @@ class SceneGenerator:
 
         return objectives[:3]  # Limit to 3 objectives
 
-    async def _generate_intervention_content(
+    async def _generate_intervention_content(  # noqa: ARG002
         self,
         intervention_type: str,
         emotional_state: str,

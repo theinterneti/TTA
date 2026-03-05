@@ -15,10 +15,19 @@ import logging
 from datetime import datetime
 from typing import Any
 
+from src.ai_components.llm_factory import get_llm
+
 from .choice_architecture.manager import ChoiceArchitectureManager
 from .consequence_system.system import ConsequenceSystem
 from .database.neo4j_manager import Neo4jGameplayManager
-from .models.core import Choice, ConsequenceSet, EmotionalState, Scene, SessionState
+from .models.core import (
+    Choice,
+    ConsequenceSet,
+    EmotionalState,
+    Scene,
+    SessionState,
+    TherapeuticContext,
+)
 from .models.interactions import GameplaySession, UserChoice
 from .narrative.engine import NarrativeEngine
 
@@ -32,25 +41,42 @@ class GameplayLoopController:
     and consequence generation.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        db_manager: Any | None = None,
+    ):
         self.config = config or {}
 
         # Initialize core components
-        db_config = config.get("database", {})
-        self.database_manager = Neo4jGameplayManager(
-            neo4j_uri=db_config.get("neo4j_uri", "bolt://localhost:7688"),
-            neo4j_user=db_config.get("neo4j_user", "neo4j"),
-            neo4j_password=db_config.get("neo4j_password", "password"),
-            redis_url=db_config.get("redis_url", "redis://localhost:6379"),
-        )
+        self.database_manager: Any  # Neo4jGameplayManager or DoltGameplayManager
+        if db_manager is not None:
+            self.database_manager = db_manager
+        else:
+            db_config = self.config.get("database", {})
+            self.database_manager = Neo4jGameplayManager(
+                neo4j_uri=db_config.get("neo4j_uri", "bolt://localhost:7688"),
+                neo4j_user=db_config.get("neo4j_user", "neo4j"),
+                neo4j_password=db_config.get("neo4j_password", "password"),
+                redis_url=db_config.get("redis_url", "redis://localhost:6379"),
+            )
+        # Build LLM — gracefully skip if no provider is configured
+        try:
+            _llm = get_llm()
+        except Exception as _exc:
+            logger.warning(
+                "No LLM configured; narrative engine will use templates: %s", _exc
+            )
+            _llm = None
+
         self.narrative_engine = NarrativeEngine(
-            self.database_manager, config.get("narrative", {})
+            self.database_manager, self.config.get("narrative", {}), llm=_llm
         )
         self.choice_architecture = ChoiceArchitectureManager(
-            config.get("choice_architecture", {})
+            self.config.get("choice_architecture", {}), llm=_llm
         )
         self.consequence_system = ConsequenceSystem(
-            config.get("consequence_system", {})
+            self.config.get("consequence_system", {}), llm=_llm
         )
 
         # Session management
@@ -83,7 +109,7 @@ class GameplayLoopController:
             return False
 
     # Session Lifecycle Management
-    async def start_session(
+    async def start_session(  # noqa: ARG002
         self, user_id: str, therapeutic_context: dict[str, Any] | None = None
     ) -> GameplaySession:
         """
@@ -102,8 +128,12 @@ class GameplayLoopController:
             # Create session state
             session_state = SessionState(
                 user_id=user_id,
-                therapeutic_context=therapeutic_context or {},
+                therapeutic_context=TherapeuticContext(),
                 emotional_state=EmotionalState.CALM,
+                character_id=None,
+                world_id=None,
+                current_scene=None,
+                current_scene_id=None,
             )
 
             # Generate opening scene
@@ -128,6 +158,7 @@ class GameplayLoopController:
                 user_id=user_id,
                 session_state=session_state,
                 current_scene=opening_scene,
+                current_scene_id=(opening_scene.scene_id if opening_scene else None),
                 available_choices=initial_choices,
                 session_start_time=datetime.utcnow(),
                 is_active=True,
@@ -164,7 +195,7 @@ class GameplayLoopController:
                 return session
 
             # Load session from database
-            session_state = await self.database_manager.load_session_state(session_id)
+            session_state = await self.database_manager.get_session(session_id)
             if not session_state:
                 logger.warning(f"Session {session_id} not found")
                 return None
@@ -195,6 +226,7 @@ class GameplayLoopController:
                 user_id=session_state.user_id,
                 session_state=session_state,
                 current_scene=current_scene,
+                current_scene_id=(current_scene.scene_id if current_scene else None),
                 available_choices=available_choices,
                 session_start_time=datetime.utcnow(),  # Resume time
                 is_active=True,
@@ -233,7 +265,7 @@ class GameplayLoopController:
             session.last_activity_time = datetime.utcnow()
 
             # Save session state to database
-            await self.database_manager.save_session_state(session.session_state)
+            await self.database_manager.update_session(session.session_state)
 
             # Remove from active sessions
             del self.active_sessions[session_id]
@@ -264,7 +296,7 @@ class GameplayLoopController:
                 session.session_end_time = datetime.utcnow()
 
                 # Save final session state
-                await self.database_manager.save_session_state(session.session_state)
+                await self.database_manager.update_session(session.session_state)
 
                 # Generate session summary
                 session_summary = await self._generate_session_summary(session)
@@ -302,10 +334,18 @@ class GameplayLoopController:
             start_time = datetime.utcnow()
             logger.info(f"Processing choice {choice_id} for session {session_id}")
 
-            # Get active session
+            # Get active session — auto-resume from DB if not in memory
             if session_id not in self.active_sessions:
-                logger.error(f"Session {session_id} not active")
-                return None, [], None
+                logger.info(
+                    f"Session {session_id} not in active_sessions; "
+                    "attempting auto-resume from DB"
+                )
+                resumed = await self.resume_session(session_id)
+                if not resumed:
+                    logger.error(
+                        f"Session {session_id} not found in DB; cannot process choice"
+                    )
+                    return None, [], None
 
             session = self.active_sessions[session_id]
             session_state = session.session_state
@@ -322,14 +362,21 @@ class GameplayLoopController:
                 return None, [], None
 
             # Create user choice object
+            session_state_for_choice: SessionState = session.session_state  # type: ignore[assignment]
             user_choice = UserChoice(
                 choice_id=choice_id,
+                session_id=session_id,
+                scene_id=(session_state_for_choice.current_scene_id or ""),
                 choice_text=selected_choice.choice_text,
                 choice_type=selected_choice.choice_type,
                 therapeutic_tags=selected_choice.therapeutic_tags,
                 therapeutic_value=selected_choice.therapeutic_value,
                 agency_level=selected_choice.agency_level,
-                timestamp=datetime.utcnow(),
+                emotional_state_before=session_state_for_choice.emotional_state,
+                emotional_state_after=None,
+                user_confidence=None,
+                difficulty_perceived=None,
+                choice_made_at=datetime.utcnow(),
             )
 
             # Generate consequences
@@ -376,7 +423,7 @@ class GameplayLoopController:
             session.last_activity_time = datetime.utcnow()
 
             # Save updated session state
-            await self.database_manager.save_session_state(session_state)
+            await self.database_manager.update_session(session_state)
 
             # Check response time
             processing_time = (datetime.utcnow() - start_time).total_seconds()
@@ -503,49 +550,130 @@ class GameplayLoopController:
             }
 
     async def get_session_status(self, session_id: str) -> dict[str, Any] | None:
-        """Get current status of a session."""
+        """Get current status of a session.
+
+        Checks active in-memory sessions first; falls back to the database for
+        paused/persisted sessions so callers get a valid status even after a
+        process restart.
+        """
         try:
-            if session_id not in self.active_sessions:
+            if session_id in self.active_sessions:
+                session = self.active_sessions[session_id]
+                session_state = session.session_state
+
+                status: dict[str, Any] = {
+                    "session_id": session_id,
+                    "user_id": session.user_id,
+                    "is_active": session.is_active,
+                    "current_scene_id": (
+                        session_state.current_scene.scene_id
+                        if session_state.current_scene
+                        else None
+                    ),
+                    "emotional_state": session_state.emotional_state.value,
+                    "total_choices": len(session_state.choice_history),
+                    "available_choices_count": len(session.available_choices),
+                    "available_choices": [
+                        {
+                            "choice_id": c.choice_id,
+                            "choice_text": c.choice_text,
+                            "description": c.description,
+                            "therapeutic_value": c.therapeutic_value,
+                        }
+                        for c in session.available_choices
+                    ],
+                    "therapeutic_engagement": 0.0,
+                    "last_activity": (
+                        session.last_activity_time.isoformat()
+                        if session.last_activity_time
+                        else None
+                    ),
+                }
+
+                if session_state.choice_history:
+                    therapeutic_values = [
+                        choice.get("therapeutic_value", 0)
+                        for choice in session_state.choice_history
+                    ]
+                    status["therapeutic_engagement"] = sum(therapeutic_values) / len(
+                        therapeutic_values
+                    )
+
+                return status
+
+            # Fall back to DB for paused / persisted sessions
+            session_state = await self.database_manager.get_session(session_id)
+            if session_state is None:
                 return None
 
-            session = self.active_sessions[session_id]
-            session_state = session.session_state
+            therapeutic_engagement = 0.0
+            if session_state.choice_history:
+                vals = [
+                    c.get("therapeutic_value", 0) for c in session_state.choice_history
+                ]
+                therapeutic_engagement = sum(vals) / len(vals)
 
-            status = {
+            return {
                 "session_id": session_id,
-                "user_id": session.user_id,
-                "is_active": session.is_active,
-                "current_scene_id": (
-                    session_state.current_scene.scene_id
-                    if session_state.current_scene
-                    else None
-                ),
+                "user_id": session_state.user_id,
+                "is_active": False,
+                "current_scene_id": session_state.current_scene_id,
                 "emotional_state": session_state.emotional_state.value,
                 "total_choices": len(session_state.choice_history),
-                "available_choices_count": len(session.available_choices),
-                "therapeutic_engagement": 0.0,
-                "last_activity": (
-                    session.last_activity_time.isoformat()
-                    if session.last_activity_time
-                    else None
-                ),
+                "available_choices_count": 0,
+                "available_choices": [],
+                "therapeutic_engagement": therapeutic_engagement,
+                "last_activity": None,
             }
-
-            # Calculate therapeutic engagement
-            if session_state.choice_history:
-                therapeutic_values = [
-                    choice.get("therapeutic_value", 0)
-                    for choice in session_state.choice_history
-                ]
-                status["therapeutic_engagement"] = sum(therapeutic_values) / len(
-                    therapeutic_values
-                )
-
-            return status
 
         except Exception as e:
             logger.error(f"Failed to get session status for {session_id}: {e}")
             return None
+
+    async def get_sessions_for_user(self, user_id: str) -> list[dict[str, Any]]:
+        """Return status dicts for all sessions belonging to user_id.
+
+        Merges in-memory active sessions with persisted sessions from the DB
+        (when the database manager supports get_sessions_for_user).
+        """
+        sessions: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+
+        # Active in-memory sessions
+        for session_id, session in self.active_sessions.items():
+            if session.session_state.user_id == user_id:
+                status = await self.get_session_status(session_id)
+                if status:
+                    sessions.append(status)
+                    seen_ids.add(session_id)
+
+        # Persisted sessions from DB (DoltGameplayManager supports this)
+        if hasattr(self.database_manager, "get_sessions_for_user"):
+            db_sessions = await self.database_manager.get_sessions_for_user(user_id)
+            for ss in db_sessions:
+                if ss.session_id not in seen_ids:
+                    therapeutic_engagement = 0.0
+                    if ss.choice_history:
+                        vals = [
+                            c.get("therapeutic_value", 0) for c in ss.choice_history
+                        ]
+                        therapeutic_engagement = sum(vals) / len(vals)
+                    sessions.append(
+                        {
+                            "session_id": ss.session_id,
+                            "user_id": ss.user_id,
+                            "is_active": False,
+                            "current_scene_id": ss.current_scene_id,
+                            "emotional_state": ss.emotional_state.value,
+                            "total_choices": len(ss.choice_history),
+                            "available_choices_count": 0,
+                            "available_choices": [],
+                            "therapeutic_engagement": therapeutic_engagement,
+                            "last_activity": None,
+                        }
+                    )
+
+        return sessions
 
     async def cleanup_inactive_sessions(self) -> int:
         """Clean up inactive sessions that have exceeded timeout."""

@@ -12,13 +12,13 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class RealtimeEnvironment(str, Enum):
+class RealtimeEnvironment(StrEnum):
     """Environment types for real-time configuration."""
 
     DEVELOPMENT = "development"

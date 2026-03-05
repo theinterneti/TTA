@@ -27,20 +27,6 @@ from ..orchestration.component import Component
 logger = logging.getLogger(__name__)
 
 
-# NOTE: Models moved to src/components/narrative_arc_orchestrator/models.py
-from .narrative_arc_orchestrator.models import (
-    EmergentEvent,
-    ImpactAssessment,
-    NarrativeEvent,
-    NarrativeResponse,
-    NarrativeScale,
-    NarrativeStatus,
-    PlayerChoice,
-    Resolution,
-    ScaleConflict,
-)
-
-
 class NarrativeScale(Enum):
     """Temporal scales for narrative management."""
 
@@ -58,8 +44,8 @@ class PlayerChoice:
     session_id: str
     choice_text: str
     choice_type: str = "dialogue"
-    metadata: dict[str, Any] = None
-    timestamp: datetime = None
+    metadata: dict[str, Any] = None  # type: ignore[assignment]
+    timestamp: datetime = None  # type: ignore[assignment]
 
     def __post_init__(self):
         if self.metadata is None:
@@ -74,10 +60,10 @@ class NarrativeResponse:
 
     content: str
     response_type: str = "narrative"
-    choices: list[dict[str, Any]] = None
-    metadata: dict[str, Any] = None
+    choices: list[dict[str, Any]] = None  # type: ignore[assignment]
+    metadata: dict[str, Any] = None  # type: ignore[assignment]
     session_id: str = ""
-    timestamp: datetime = None
+    timestamp: datetime = None  # type: ignore[assignment]
 
     def __post_init__(self):
         if self.choices is None:
@@ -98,7 +84,7 @@ class NarrativeStatus:
     character_arcs: dict[str, str]
     coherence_score: float
     therapeutic_alignment: float
-    last_updated: datetime = None
+    last_updated: datetime = None  # type: ignore[assignment]
 
     def __post_init__(self):
         if self.last_updated is None:
@@ -181,9 +167,9 @@ class EmergentEvent:
     event_type: str
     description: str
     scale: NarrativeScale
-    participants: list[str] = None
-    metadata: dict[str, Any] = None
-    timestamp: datetime = None
+    participants: list[str] = None  # type: ignore[assignment]
+    metadata: dict[str, Any] = None  # type: ignore[assignment]
+    timestamp: datetime = None  # type: ignore[assignment]
 
     def __post_init__(self):
         if self.participants is None:

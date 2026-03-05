@@ -18,7 +18,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import PlainTextResponse
 
-from .prometheus_metrics import CONTENT_TYPE_LATEST, get_metrics_collector
+from .prometheus_metrics import CONTENT_TYPE_LATEST, get_metrics_collector  # type: ignore[attr-defined]
 
 # Import mock monitoring with fallback
 try:
@@ -29,7 +29,7 @@ try:
 
     MOCK_MONITORING_AVAILABLE = True
 except ImportError:
-    MOCK_MONITORING_AVAILABLE = False
+    MOCK_MONITORING_AVAILABLE = False  # type: ignore[misc]
 
 logger = logging.getLogger(__name__)
 
@@ -141,42 +141,6 @@ def add_metrics_endpoint(app, path: str = "/metrics"):
             )
 
 
-class MockMetricsMiddleware(BaseHTTPMiddleware):
-    """Mock metrics middleware for environments without full monitoring infrastructure."""
-
-    def __init__(self, app, service_name: str = "tta"):
-        super().__init__(app)
-        self.service_name = service_name
-        logger.info(f"Using mock metrics middleware for service: {service_name}")
-
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        """Process request with minimal overhead."""
-        start_time = time.time()
-
-        try:
-            response = await call_next(request)
-            duration = time.time() - start_time
-
-            # Add timing header for debugging
-            response.headers["X-Process-Time"] = str(duration)
-
-            # Log basic metrics to console in debug mode
-            logger.debug(
-                f"Request: {request.method} {request.url.path} "
-                f"Status: {response.status_code} Duration: {duration:.3f}s"
-            )
-
-            return response
-
-        except Exception as e:
-            duration = time.time() - start_time
-            logger.debug(
-                f"Request failed: {request.method} {request.url.path} "
-                f"Duration: {duration:.3f}s Error: {e}"
-            )
-            raise
-
-
 def add_mock_metrics_endpoint(app, path: str = "/metrics"):
     """Add mock metrics endpoint for environments without Prometheus."""
 
@@ -223,7 +187,7 @@ def setup_monitoring_middleware(
     """
     # Use the new factory function for automatic environment detection
     use_mock = force_mock or (
-        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()
+        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()  # type: ignore[possibly-unbound]
     )
 
     if use_mock:
@@ -234,7 +198,7 @@ def setup_monitoring_middleware(
         try:
             if enable_prometheus:
                 # Try to use full Prometheus metrics
-                import prometheus_client
+                import prometheus_client  # noqa: F401
 
                 app.add_middleware(
                     PrometheusMetricsMiddleware, service_name=service_name
@@ -301,7 +265,7 @@ class MockMetricsMiddleware(BaseHTTPMiddleware):
         self.mock_env = None
 
         if MOCK_MONITORING_AVAILABLE:
-            self.mock_env = get_mock_monitoring_environment()
+            self.mock_env = get_mock_monitoring_environment()  # type: ignore[possibly-unbound]
             if not self.mock_env.is_running:
                 self.mock_env.start()
 
@@ -329,7 +293,7 @@ def create_metrics_middleware(app, service_name: str = "tta", force_mock: bool =
 
     # Check if we should use mock monitoring
     use_mock = force_mock or (
-        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()
+        MOCK_MONITORING_AVAILABLE and should_use_mock_monitoring()  # type: ignore[possibly-unbound]
     )
 
     if use_mock:
@@ -349,9 +313,9 @@ def get_monitoring_status() -> dict:
     }
 
     if MOCK_MONITORING_AVAILABLE:
-        if should_use_mock_monitoring():
+        if should_use_mock_monitoring():  # type: ignore[possibly-unbound]
             status["mock_mode"] = True
-            mock_env = get_mock_monitoring_environment()
+            mock_env = get_mock_monitoring_environment()  # type: ignore[possibly-unbound]
             status.update(mock_env.get_status())
         else:
             # Try to check real monitoring services

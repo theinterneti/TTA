@@ -123,6 +123,16 @@ repos:
         pass_filenames: true
         stages: [commit]
 
+  - repo: local
+    hooks:
+      - id: logseq-graph-sync
+        name: Logseq Graph Sync
+        entry: scripts/pre-commit-logseq.sh
+        language: script
+        types_or: [python, ts, javascript, markdown]
+        pass_filenames: true
+        verbose: true
+
 # Configuration for specific tools
 ci:
   autofix_commit_msg: |

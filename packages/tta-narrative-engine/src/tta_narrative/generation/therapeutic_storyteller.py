@@ -11,7 +11,7 @@ immersion or feeling clinical.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import DifficultyLevel, EmotionalState, Scene, TherapeuticContext
@@ -19,7 +19,7 @@ from ..models.core import DifficultyLevel, EmotionalState, Scene, TherapeuticCon
 logger = logging.getLogger(__name__)
 
 
-class TherapeuticApproach(str, Enum):
+class TherapeuticApproach(StrEnum):
     """Therapeutic approaches that can be integrated into storytelling."""
 
     CBT = "cognitive_behavioral_therapy"
@@ -31,7 +31,7 @@ class TherapeuticApproach(str, Enum):
     SOLUTION_FOCUSED = "solution_focused_therapy"
 
 
-class StorytellingTechnique(str, Enum):
+class StorytellingTechnique(StrEnum):
     """Storytelling techniques for therapeutic integration."""
 
     METAPHOR = "metaphor"

@@ -64,7 +64,7 @@ class TestCoreGameplayLoopIntegration:
         return controller
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_complete_gameplay_session_flow(self, gameplay_controller):
         """Test complete gameplay session from start to end."""
         controller = gameplay_controller
@@ -157,7 +157,7 @@ class TestCoreGameplayLoopIntegration:
         assert final_status is None  # Should be None as session is ended
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_therapeutic_progression_validation(self, gameplay_controller):
         """Test that therapeutic elements are properly integrated throughout gameplay."""
         controller = gameplay_controller
@@ -229,7 +229,7 @@ class TestCoreGameplayLoopIntegration:
         await controller.end_session(session.session_id)
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_emotional_state_adaptation(self, gameplay_controller):
         """Test that the system adapts to different emotional states."""
         controller = gameplay_controller
@@ -289,7 +289,7 @@ class TestCoreGameplayLoopIntegration:
             await controller.end_session(session.session_id)
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_session_lifecycle_management(self, gameplay_controller):
         """Test comprehensive session lifecycle management."""
         controller = gameplay_controller

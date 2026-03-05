@@ -225,10 +225,16 @@ class GameplayLoopIntegration:
                 except Exception as e:
                     logger.warning(f"Agent orchestration integration failed: {e}")
 
+            # Fetch updated session status so callers can see incremented total_choices
+            updated_session_status = await self.gameplay_component.get_session_status(
+                session_id
+            )
+
             return {
                 "success": True,
                 "session_id": session_id,
                 "choice_result": choice_result,
+                "session_status": updated_session_status,
                 "processed_at": datetime.utcnow().isoformat(),
             }
 
@@ -406,13 +412,17 @@ class GameplayLoopIntegration:
                     "code": "AUTH_ERROR",
                 }
 
-            # Get session metrics (this would need to be enhanced to filter by user)
-            session_metrics = await self.gameplay_component.get_session_metrics()
+            sessions = await self.gameplay_component.get_user_sessions_for_player(
+                user_id
+            )
 
             return {
                 "success": True,
                 "user_id": user_id,
-                "session_metrics": session_metrics,
+                "session_metrics": {
+                    "sessions": sessions,
+                    "total_count": len(sessions),
+                },
                 "retrieved_at": datetime.utcnow().isoformat(),
             }
 

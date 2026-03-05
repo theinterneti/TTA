@@ -7,19 +7,18 @@ This module provides endpoints for world discovery and management.
 This is a placeholder implementation - full implementation will be done in task 7.4.
 """
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
-
-from ..auth import TokenData, get_current_active_player
-
-router = APIRouter()
 from pydantic import BaseModel, Field
 
 from ...managers.world_management_module import WorldManagementModule
 from ...models.enums import DifficultyLevel
 from ...models.world import WorldParameters as WorldParametersDC
+from ..auth import TokenData, get_current_active_player
+
+router = APIRouter()
 
 # Dependency for world manager (simple instantiation for now)
 
@@ -35,7 +34,7 @@ def get_world_manager_dep() -> WorldManagementModule:
 # API Schemas (Pydantic) mapping from dataclasses
 
 
-class DifficultyLevelEnum(str, Enum):
+class DifficultyLevelEnum(StrEnum):
     BEGINNER = "BEGINNER"
     INTERMEDIATE = "INTERMEDIATE"
     ADVANCED = "ADVANCED"

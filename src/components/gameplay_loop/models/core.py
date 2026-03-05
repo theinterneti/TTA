@@ -12,14 +12,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
 
-class DifficultyLevel(str, Enum):
+class DifficultyLevel(StrEnum):
     """Adaptive difficulty levels for therapeutic content."""
 
     GENTLE = "gentle"
@@ -28,7 +28,7 @@ class DifficultyLevel(str, Enum):
     INTENSIVE = "intensive"
 
 
-class EmotionalState(str, Enum):
+class EmotionalState(StrEnum):
     """Current emotional state indicators."""
 
     CALM = "calm"
@@ -39,7 +39,7 @@ class EmotionalState(str, Enum):
     CRISIS = "crisis"
 
 
-class SceneType(str, Enum):
+class SceneType(StrEnum):
     """Types of narrative scenes."""
 
     INTRODUCTION = "introduction"
@@ -50,7 +50,7 @@ class SceneType(str, Enum):
     RESOLUTION = "resolution"
 
 
-class ChoiceType(str, Enum):
+class ChoiceType(StrEnum):
     """Types of player choices."""
 
     NARRATIVE = "narrative"
@@ -74,6 +74,7 @@ class TherapeuticContext:
     session_objectives: list[str] = field(default_factory=list)
     completed_objectives: list[str] = field(default_factory=list)
     therapeutic_insights: list[str] = field(default_factory=list)
+    progress_markers: list[Any] = field(default_factory=list)
 
 
 @dataclass
@@ -117,6 +118,10 @@ class Scene(BaseModel):
     learning_objectives: list[str] = Field(default_factory=list)
     emotional_tone: str = Field(default="neutral")
 
+    # Adaptive preferences (set by pacing/complexity systems)
+    interaction_frequency_preference: str | None = Field(default=None)
+    choice_complexity_preference: str | None = Field(default=None)
+
     # Scene state
     is_completed: bool = Field(default=False)
     completion_time: datetime | None = Field(default=None)
@@ -131,10 +136,10 @@ class Choice(BaseModel):
     """A player choice option within a scene."""
 
     choice_id: str = Field(default_factory=lambda: str(uuid4()))
-    scene_id: str = Field(..., description="Parent scene ID")
+    scene_id: str = Field(default="", description="Parent scene ID")
 
     # Choice content
-    text: str = Field(..., description="Choice text displayed to player")
+    choice_text: str = Field(..., description="Choice text displayed to player")
     description: str | None = Field(None, description="Additional choice description")
 
     # Choice metadata
@@ -152,9 +157,15 @@ class Choice(BaseModel):
     long_term_consequences: list[str] = Field(default_factory=list)
     therapeutic_outcomes: list[str] = Field(default_factory=list)
 
+    # Therapeutic tags and agency
+    therapeutic_tags: list[str] = Field(default_factory=list)
+    agency_level: float = Field(default=0.5, ge=0.0, le=1.0)
+    meaningfulness_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    emotional_context: list[str] = Field(default_factory=list)
+
     # Availability
     is_available: bool = Field(default=True)
-    availability_reason: str | None = Field(None)
+    availability_reason: str | None = Field(default=None)
 
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -165,7 +176,7 @@ class ConsequenceSet(BaseModel):
 
     consequence_id: str = Field(default_factory=lambda: str(uuid4()))
     choice_id: str = Field(..., description="Triggering choice ID")
-    session_id: str = Field(..., description="Session ID")
+    session_id: str = Field(default="", description="Session ID")
 
     # Consequence details
     immediate_effects: dict[str, Any] = Field(default_factory=dict)
@@ -179,8 +190,20 @@ class ConsequenceSet(BaseModel):
 
     # Therapeutic impact
     therapeutic_progress: dict[str, float] = Field(default_factory=dict)
-    emotional_impact: dict[EmotionalState, float] = Field(default_factory=dict)
-    learning_outcomes: list[str] = Field(default_factory=list)
+    emotional_impact: dict[str, Any] = Field(default_factory=dict)
+    learning_opportunities: list[str] = Field(default_factory=list)
+    therapeutic_insights: list[str] = Field(default_factory=list)
+    therapeutic_value_realized: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    # Outcome sets
+    immediate_outcomes: list[str] = Field(default_factory=list)
+    delayed_outcomes: list[str] = Field(default_factory=list)
+    narrative_consequences: list[str] = Field(default_factory=list)
+    causality_explanation: str = Field(default="")
+    progress_markers: list[Any] = Field(default_factory=list)
+    skill_development: list[str] = Field(default_factory=list)
+    character_development: dict[str, Any] = Field(default_factory=dict)
+    world_state_changes: dict[str, Any] = Field(default_factory=dict)
 
     # Execution state
     is_applied: bool = Field(default=False)
@@ -249,7 +272,7 @@ class SessionState(BaseModel):
         """Add a choice and its outcome to the session history."""
         choice_record = {
             "choice_id": choice.choice_id,
-            "choice_text": choice.text,
+            "choice_text": choice.choice_text,
             "choice_type": choice.choice_type,
             "therapeutic_value": choice.therapeutic_value,
             "timestamp": datetime.utcnow().isoformat(),

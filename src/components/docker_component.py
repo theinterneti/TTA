@@ -36,7 +36,7 @@ from src.common.process_utils import run as safe_run
 
 # Try to import codecarbon for carbon tracking
 try:
-    from codecarbon import track_emissions
+    from codecarbon import track_emissions  # type: ignore[import-not-found]
 
     _codecarbon_available = True
 except ImportError:

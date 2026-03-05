@@ -82,7 +82,7 @@ class RetryConfig:
         if self.jitter:
             # Add random jitter: ±20% of delay
             jitter_amount = delay * 0.2
-            delay += random.uniform(-jitter_amount, jitter_amount)
+            delay += random.uniform(-jitter_amount, jitter_amount)  # noqa: S311
             delay = max(0, delay)  # Ensure non-negative
 
         return delay
@@ -131,7 +131,7 @@ class RetryPolicy:
         Raises:
             Exception: If all retries fail
         """
-        last_error = None
+        last_error: Exception | None = None
 
         for attempt in range(self.config.max_retries + 1):
             try:
@@ -162,7 +162,7 @@ class RetryPolicy:
                     logger.error(f"All {self.config.max_retries + 1} attempts failed")
 
         # All retries failed
-        raise last_error
+        raise last_error or RuntimeError("All retries failed")
 
     def execute_with_retry_sync(
         self,
@@ -186,7 +186,7 @@ class RetryPolicy:
         Raises:
             Exception: If all retries fail
         """
-        last_error = None
+        last_error: Exception | None = None
 
         for attempt in range(self.config.max_retries + 1):
             try:
@@ -217,7 +217,7 @@ class RetryPolicy:
                     logger.error(f"All {self.config.max_retries + 1} attempts failed")
 
         # All retries failed
-        raise last_error
+        raise last_error or RuntimeError("All retries failed")
 
     def get_config(self) -> RetryConfig:
         """Get current retry configuration."""

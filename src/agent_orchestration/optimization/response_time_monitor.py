@@ -17,14 +17,14 @@ import time
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
 
-class ResponseTimeCategory(str, Enum):
+class ResponseTimeCategory(StrEnum):
     """Categories of response time measurements."""
 
     MESSAGE_PROCESSING = "message_processing"
@@ -143,7 +143,7 @@ class ResponseTimeCollector:
         )
 
         # Active timing contexts
-        self.active_timings: dict[str, float] = {}  # context_id -> start_time
+        self.active_timings: dict[str, Any] = {}  # context_id -> start_time
 
         # Statistics cache
         self.stats_cache: dict[str, ResponseTimeStats] = {}

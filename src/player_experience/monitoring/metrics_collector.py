@@ -15,11 +15,11 @@ from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class MetricType(str, Enum):
+class MetricType(StrEnum):
     """Types of metrics that can be collected."""
 
     COUNTER = "counter"
@@ -29,7 +29,7 @@ class MetricType(str, Enum):
     RATE = "rate"
 
 
-class MetricSeverity(str, Enum):
+class MetricSeverity(StrEnum):
     """Severity levels for metric alerts."""
 
     LOW = "low"
