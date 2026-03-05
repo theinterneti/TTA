@@ -1,0 +1,62 @@
+# TTA Player Experience API — Multi-stage build
+# Python 3.12, pip --no-deps, non-root user, minimal runtime image
+#
+# requirements.docker.txt: deduplicated from uv.lock (one version per package)
+# Excludes path-based editable deps (TTA.dev platform packages).
+
+# ── Builder stage ─────────────────────────────────────────────────────────────
+FROM python:3.12-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential curl git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install all pinned deps into a target dir.
+# --no-deps: skip resolution (versions already pinned)
+# --ignore-requires-python: some lock-file packages declare >=3.13 but work on 3.12
+COPY requirements.docker.txt ./
+RUN pip install --no-cache-dir --no-deps --ignore-requires-python \
+        --target /deps -r requirements.docker.txt
+
+# ── Runtime stage ─────────────────────────────────────────────────────────────
+FROM python:3.12-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app:/deps" \
+    TZ=UTC
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates tini \
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
+
+# Non-root user
+RUN groupadd -r -g 1001 tta && useradd -r -u 1001 -g tta -d /app tta
+
+WORKDIR /app
+
+# Installed packages
+COPY --from=builder --chown=tta:tta /deps /deps
+
+# Application source
+COPY --chown=tta:tta src/ ./src/
+
+# Writable dirs for SQLite fallback DB and logs
+RUN mkdir -p /app/.tta /app/logs && chown -R tta:tta /app
+
+USER tta
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8081/api/v1/health/liveness || exit 1
+
+EXPOSE 8081
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["python", "-m", "uvicorn", "src.player_experience.api.app:app", \
+     "--host", "0.0.0.0", "--port", "8081", "--log-level", "info"]

@@ -1,0 +1,72 @@
+# TTA Staging Stack
+#
+# Spins up the TTA Player Experience API and connects it to the running
+# tta-redis and tta-dolt containers via their existing Docker networks.
+#
+# Prerequisites:
+#   docker-compose up -d   (starts tta-redis)
+#   docker compose -f docker-compose.dolt.yml up -d   (starts tta-dolt)
+#
+# Usage:
+#   docker compose -f docker-compose.staging.yml up --build -d
+#   docker compose -f docker-compose.staging.yml logs -f tta-staging-api
+#   docker compose -f docker-compose.staging.yml down
+
+services:
+  tta-staging-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: runtime
+    image: tta-api:staging
+    container_name: tta-staging-api
+    restart: unless-stopped
+    env_file:
+      - .env.staging
+    environment:
+      # Ensure deps dir is on the path (env.staging sets PYTHONPATH=/app only)
+      PYTHONPATH: /app:/deps
+      # Override/add Dolt settings (tta-dolt is on tta-dev_default network)
+      DOLT_HOST: tta-dolt
+      DOLT_PORT: "3306"
+      DOLT_USER: root
+      DOLT_DATABASE: tta_solo
+      # Redis via tta-network (tta-redis container hostname)
+      REDIS_URL: redis://tta-redis:6379
+      # Disable Neo4j (no container running)
+      NEO4J_URI: bolt://localhost:7687
+      # Tell the app we're in staging
+      ENVIRONMENT: staging
+    ports:
+      - "8081:8081"
+    networks:
+      - tta-network       # reaches tta-redis
+      - tta-dev_default   # reaches tta-dolt
+    volumes:
+      # Persist SQLite fallback DB and logs across restarts
+      - tta-staging-data:/app/.tta
+      - tta-staging-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/v1/health/liveness"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    depends_on: []   # external containers managed separately
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  tta-staging-data:
+    name: tta-staging-data
+  tta-staging-logs:
+    name: tta-staging-logs
+
+networks:
+  tta-network:
+    external: true   # created by docker-compose.yml (tta-redis)
+  tta-dev_default:
+    external: true   # created by tta-dev docker-compose (tta-dolt)

@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from tta_dev_primitives.persistence import AbstractUnitOfWork
+from src.common.unit_of_work import AbstractUnitOfWork
 
 from .abstract_session_repository import AbstractSessionRepository
 
