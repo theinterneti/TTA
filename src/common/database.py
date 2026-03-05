@@ -117,7 +117,7 @@ def make_session_factory(
 @asynccontextmanager
 async def session_context(
     factory: async_sessionmaker[AsyncSession],
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """Async context manager that yields a session with an open transaction.
 
     The transaction is committed on successful exit and rolled back on any
@@ -142,7 +142,7 @@ async def session_context(
 @asynccontextmanager
 async def readonly_session_context(
     factory: async_sessionmaker[AsyncSession],
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """Async context manager that yields a read-only session in AUTOCOMMIT mode.
 
     AUTOCOMMIT skips the implicit ``BEGIN``/``COMMIT`` round-trips for every
@@ -227,7 +227,7 @@ def freeze_result[T](rows: Sequence[T]) -> tuple[T, ...]:
 @asynccontextmanager
 async def connection_context(
     engine: AsyncEngine,
-) -> AsyncGenerator[AsyncConnection, None]:
+) -> AsyncGenerator[AsyncConnection]:
     """Async context manager that yields a raw ``AsyncConnection``.
 
     Useful for DDL operations (``CREATE TABLE``, schema migrations) or raw
