@@ -218,12 +218,14 @@ class SessionState(BaseModel):
 
     session_id: str = Field(default_factory=lambda: str(uuid4()))
     user_id: str = Field(..., description="User identifier")
-    character_id: str | None = Field(None, description="Character identifier")
-    world_id: str | None = Field(None, description="World identifier")
+    character_id: str | None = Field(default=None, description="Character identifier")
+    world_id: str | None = Field(default=None, description="World identifier")
 
     # Current state
-    current_scene: Scene | None = Field(None, description="Current active scene")
-    current_scene_id: str | None = Field(None, description="Current scene ID")
+    current_scene: Scene | None = Field(
+        default=None, description="Current active scene"
+    )
+    current_scene_id: str | None = Field(default=None, description="Current scene ID")
 
     # Session context
     therapeutic_context: TherapeuticContext = Field(default_factory=TherapeuticContext)

@@ -268,9 +268,10 @@ class StateValidator:
         """Reschedule a payload to the appropriate queue, or DLQ on failure."""
         try:
             prio = _extract_priority(payload)
-            await self._redis.zadd(
-                self._sched_key(at, inst, prio), {payload: timestamp}
+            key: bytes | str = (
+                bytes(payload) if isinstance(payload, bytearray) else payload
             )
+            await self._redis.zadd(self._sched_key(at, inst, prio), {key: timestamp})
             await self._redis.rpush(self._queue_key(at, inst), payload)
         except Exception:
             logger.debug("Rescheduling to DLQ for %s:%s", at.value, inst, exc_info=True)

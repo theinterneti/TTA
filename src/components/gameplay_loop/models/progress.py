@@ -74,7 +74,7 @@ class ProgressMarker(BaseModel):
         default=ProgressType.INSIGHT_GAINED, description="Type of progress"
     )
     marker_type: ProgressType | None = Field(
-        None, description="Alias for progress_type"
+        default=None, description="Alias for progress_type"
     )
     title: str = Field(default="", description="Progress title")
     description: str = Field(default="", description="Progress description")
@@ -82,9 +82,11 @@ class ProgressMarker(BaseModel):
 
     # Context
     triggered_by_choice: str | None = Field(
-        None, description="Choice that triggered this progress"
+        default=None, description="Choice that triggered this progress"
     )
-    scene_context: str | None = Field(None, description="Scene where progress occurred")
+    scene_context: str | None = Field(
+        default=None, description="Scene where progress occurred"
+    )
 
     # Measurement
     progress_value: float = Field(

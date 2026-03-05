@@ -40,27 +40,6 @@ from .resolution_engine import build_simple_resolution
 
 logger = logging.getLogger(__name__)
 
-# Robust event loop policy for test environments
-try:
-    import asyncio
-
-    class _RobustEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
-        def get_event_loop(self):
-            try:
-                return super().get_event_loop()
-            except RuntimeError:
-                loop = self.new_event_loop()
-                self.set_event_loop(loop)
-                return loop
-
-    # Only set policy if not already robust
-    current_policy = asyncio.get_event_loop_policy()
-    if not isinstance(current_policy, _RobustEventLoopPolicy):
-        asyncio.set_event_loop_policy(_RobustEventLoopPolicy())
-except Exception as e:
-    # If setting a policy fails, log and continue; tests that use asyncio.run(...) will manage loops
-    logger.debug("Failed to set event loop policy: %s", e)
-
 
 class ScaleManager:
     def __init__(self, config: dict[str, Any]):

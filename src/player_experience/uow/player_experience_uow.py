@@ -38,7 +38,7 @@ class PlayerExperienceUnitOfWork(AbstractPlayerExperienceUnitOfWork):
 
     def __init__(self, redis_client=None, neo4j_driver=None) -> None:
         self.characters = CharacterRepository()
-        self.sessions = SessionRepository(redis_client, neo4j_driver)
+        self.sessions = SessionRepository(redis_client, neo4j_driver)  # type: ignore[assignment]  # SessionRepository API has diverged from AbstractSessionRepository
 
     def commit(self) -> None:
         pass  # extend for explicit Neo4j transaction commit
