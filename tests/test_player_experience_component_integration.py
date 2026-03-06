@@ -43,29 +43,29 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
     def test_component_initialization(self):
         """Test that the PlayerExperienceComponent initializes correctly."""
         # Check component properties
-        self.assertEqual(self.player_experience.name, "player_experience")
-        self.assertEqual(self.player_experience.status, ComponentStatus.STOPPED)
-        self.assertEqual(self.player_experience.api_port, 8080)
-        self.assertEqual(self.player_experience.web_port, 3000)
+        assert self.player_experience.name == "player_experience"
+        assert self.player_experience.status == ComponentStatus.STOPPED
+        assert self.player_experience.api_port == 8080
+        assert self.player_experience.web_port == 3000
 
         # Check dependencies
-        self.assertIn("redis", self.player_experience.dependencies)
-        self.assertIn("neo4j", self.player_experience.dependencies)
+        assert "redis" in self.player_experience.dependencies
+        assert "neo4j" in self.player_experience.dependencies
 
     def test_component_registration_in_orchestrator(self):
         """Test that the PlayerExperienceComponent is registered in the orchestrator."""
         # Check that the component is registered
-        self.assertIn("player_experience", self.orchestrator.components)
+        assert "player_experience" in self.orchestrator.components
 
         # Check that it's the correct type
         component = self.orchestrator.components["player_experience"]
-        self.assertIsInstance(component, PlayerExperienceComponent)
+        assert isinstance(component, PlayerExperienceComponent)
 
     def test_configuration_integration(self):
         """Test that the component correctly reads configuration from TTA config."""
         # Test default configuration values
-        self.assertEqual(self.player_experience.api_port, 8080)
-        self.assertEqual(self.player_experience.web_port, 3000)
+        assert self.player_experience.api_port == 8080
+        assert self.player_experience.web_port == 3000
 
         # Test configuration override
         new_config = TTAConfig()
@@ -73,8 +73,8 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
         new_config.set("player_experience.web.port", 4000)
 
         new_component = PlayerExperienceComponent(new_config)
-        self.assertEqual(new_component.api_port, 9090)
-        self.assertEqual(new_component.web_port, 4000)
+        assert new_component.api_port == 9090
+        assert new_component.web_port == 4000
 
     @patch("subprocess.run")
     @patch("requests.get")
@@ -91,8 +91,8 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
 
         # Test starting the component
         result = self.player_experience.start()
-        self.assertTrue(result)
-        self.assertEqual(self.player_experience.status, ComponentStatus.RUNNING)
+        assert result
+        assert self.player_experience.status == ComponentStatus.RUNNING
 
         # Verify Docker Compose was called
         mock_subprocess.assert_called()
@@ -120,45 +120,45 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
 
         # Test stopping the component
         result = self.player_experience.stop()
-        self.assertTrue(result)
-        self.assertEqual(self.player_experience.status, ComponentStatus.STOPPED)
+        assert result
+        assert self.player_experience.status == ComponentStatus.STOPPED
 
     def test_health_status_integration(self):
         """Test that the component provides comprehensive health status."""
         health_status = self.player_experience.get_health_status()
 
         # Check required health status fields
-        self.assertIn("api_running", health_status)
-        self.assertIn("api_port", health_status)
-        self.assertIn("web_port", health_status)
-        self.assertIn("component_status", health_status)
-        self.assertIn("dependencies_status", health_status)
-        self.assertIn("container_status", health_status)
-        self.assertIn("last_health_check", health_status)
+        assert "api_running" in health_status
+        assert "api_port" in health_status
+        assert "web_port" in health_status
+        assert "component_status" in health_status
+        assert "dependencies_status" in health_status
+        assert "container_status" in health_status
+        assert "last_health_check" in health_status
 
         # Check port values
-        self.assertEqual(health_status["api_port"], 8080)
-        self.assertEqual(health_status["web_port"], 3000)
+        assert health_status["api_port"] == 8080
+        assert health_status["web_port"] == 3000
 
     def test_monitoring_metrics_integration(self):
         """Test that the component provides monitoring metrics."""
         metrics = self.player_experience.get_monitoring_metrics()
 
         # Check required metrics fields
-        self.assertIn("component_name", metrics)
-        self.assertIn("uptime", metrics)
-        self.assertIn("status", metrics)
-        self.assertIn("health_status", metrics)
-        self.assertIn("configuration", metrics)
+        assert "component_name" in metrics
+        assert "uptime" in metrics
+        assert "status" in metrics
+        assert "health_status" in metrics
+        assert "configuration" in metrics
 
         # Check component name
-        self.assertEqual(metrics["component_name"], "player_experience")
+        assert metrics["component_name"] == "player_experience"
 
         # Check configuration section
         config = metrics["configuration"]
-        self.assertIn("api_port", config)
-        self.assertIn("web_port", config)
-        self.assertIn("dependencies", config)
+        assert "api_port" in config
+        assert "web_port" in config
+        assert "dependencies" in config
 
     @patch("subprocess.run")
     def test_docker_compose_integration(self, mock_subprocess):
@@ -171,15 +171,15 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
         # Test Docker Compose command execution
         result = self.player_experience._run_docker_compose(["up", "-d"])
 
-        self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, "Services started")
+        assert result.returncode == 0
+        assert result.stdout == "Services started"
 
         # Verify the command was called correctly
         mock_subprocess.assert_called_once()
         call_args = mock_subprocess.call_args[0][0]
-        self.assertIn("docker-compose", call_args)
-        self.assertIn("up", call_args)
-        self.assertIn("-d", call_args)
+        assert "docker-compose" in call_args
+        assert "up" in call_args
+        assert "-d" in call_args
 
     @patch("redis.Redis")
     def test_dependency_health_checking(self, mock_redis):
@@ -193,25 +193,25 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
         health = self.player_experience._check_dependencies_health()
 
         # Check that Redis health is checked
-        self.assertIn("redis", health)
-        self.assertTrue(health["redis"])
+        assert "redis" in health
+        assert health["redis"]
 
         # Check that Neo4j health is checked
-        self.assertIn("neo4j", health)
+        assert "neo4j" in health
 
     def test_orchestrator_component_lifecycle(self):
         """Test component lifecycle through orchestrator."""
         # Test that orchestrator can find the component
-        self.assertTrue(self.orchestrator.has_component("player_experience"))
+        assert self.orchestrator.has_component("player_experience")
 
         # Test getting component status
         status = self.orchestrator.get_component_status("player_experience")
-        self.assertEqual(status, ComponentStatus.STOPPED)
+        assert status == ComponentStatus.STOPPED
 
         # Test component dependencies are recognized
         component = self.orchestrator.components["player_experience"]
-        self.assertIn("redis", component.dependencies)
-        self.assertIn("neo4j", component.dependencies)
+        assert "redis" in component.dependencies
+        assert "neo4j" in component.dependencies
 
     def test_configuration_validation(self):
         """Test that the component validates required configuration."""
@@ -221,8 +221,8 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
 
         # Component should still initialize with defaults
         component = PlayerExperienceComponent(empty_config)
-        self.assertIsNotNone(component.api_port)
-        self.assertIsNotNone(component.web_port)
+        assert component.api_port is not None
+        assert component.web_port is not None
 
     @patch("subprocess.run")
     def test_container_status_checking(self, mock_subprocess):
@@ -242,9 +242,9 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
 
         # Check that container status is parsed correctly
         if "api_container" in container_status:
-            self.assertIn("name", container_status["api_container"])
-            self.assertIn("status", container_status["api_container"])
-            self.assertIn("image", container_status["api_container"])
+            assert "name" in container_status["api_container"]
+            assert "status" in container_status["api_container"]
+            assert "image" in container_status["api_container"]
 
     def test_error_handling_integration(self):
         """Test error handling in component integration."""
@@ -254,8 +254,8 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
 
         # Starting should fail gracefully
         result = invalid_component.start()
-        self.assertFalse(result)
-        self.assertEqual(invalid_component.status, ComponentStatus.STOPPED)
+        assert not result
+        assert invalid_component.status == ComponentStatus.STOPPED
 
     def test_component_decorators_integration(self):
         """Test that component methods use orchestration decorators correctly."""
@@ -263,11 +263,11 @@ class TestPlayerExperienceComponentIntegration(unittest.TestCase):
         start_method = self.player_experience._start_impl
 
         # Check that the method exists and is callable
-        self.assertTrue(callable(start_method))
+        assert callable(start_method)
 
         # Test that stop method has proper decorators
         stop_method = self.player_experience._stop_impl
-        self.assertTrue(callable(stop_method))
+        assert callable(stop_method)
 
 
 class TestPlayerExperienceOrchestrationWorkflow(unittest.TestCase):
@@ -282,12 +282,12 @@ class TestPlayerExperienceOrchestrationWorkflow(unittest.TestCase):
     def test_full_system_startup_workflow(self):
         """Test that player experience component integrates into full system startup."""
         # Check that player experience is included in component list
-        self.assertIn("player_experience", self.orchestrator.components)
+        assert "player_experience" in self.orchestrator.components
 
         # Check that dependencies are properly configured
         pe_component = self.orchestrator.components["player_experience"]
-        self.assertIn("redis", pe_component.dependencies)
-        self.assertIn("neo4j", pe_component.dependencies)
+        assert "redis" in pe_component.dependencies
+        assert "neo4j" in pe_component.dependencies
 
     @patch("src.components.player_experience_component.PlayerExperienceComponent.start")
     def test_orchestrator_start_component_integration(self, mock_start):
@@ -296,7 +296,7 @@ class TestPlayerExperienceOrchestrationWorkflow(unittest.TestCase):
 
         # Test starting through orchestrator
         result = self.orchestrator.start_component("player_experience")
-        self.assertTrue(result)
+        assert result
 
         # Verify the component's start method was called
         mock_start.assert_called_once()
@@ -308,7 +308,7 @@ class TestPlayerExperienceOrchestrationWorkflow(unittest.TestCase):
 
         # Test stopping through orchestrator
         result = self.orchestrator.stop_component("player_experience")
-        self.assertTrue(result)
+        assert result
 
         # Verify the component's stop method was called
         mock_stop.assert_called_once()
@@ -317,7 +317,7 @@ class TestPlayerExperienceOrchestrationWorkflow(unittest.TestCase):
         """Test that component status is properly reported through orchestrator."""
         # Get status through orchestrator
         status = self.orchestrator.get_component_status("player_experience")
-        self.assertIsInstance(status, ComponentStatus)
+        assert isinstance(status, ComponentStatus)
 
         # Test status display (should not raise exceptions)
         try:

@@ -10,6 +10,8 @@ crisis detection, and emergency resource provision functionality.
 import unittest
 from datetime import datetime
 
+import pytest
+
 from src.player_experience.managers.personalization_service_manager import (
     AdaptationResult,
     CrisisDetectionSystem,
@@ -42,9 +44,9 @@ class TestCrisisDetectionSystem(unittest.TestCase):
             self.crisis_detector.detect_crisis_indicators(text, context)
         )
 
-        self.assertTrue(crisis_detected)
-        self.assertIn(CrisisType.SUICIDAL_IDEATION, crisis_types)
-        self.assertGreater(confidence, 0.5)
+        assert crisis_detected
+        assert CrisisType.SUICIDAL_IDEATION in crisis_types
+        assert confidence > 0.5
 
     def test_crisis_detection_self_harm(self):
         """Test detection of self-harm indicators."""
@@ -55,9 +57,9 @@ class TestCrisisDetectionSystem(unittest.TestCase):
             self.crisis_detector.detect_crisis_indicators(text, context)
         )
 
-        self.assertTrue(crisis_detected)
-        self.assertIn(CrisisType.SELF_HARM, crisis_types)
-        self.assertGreater(confidence, 0.3)
+        assert crisis_detected
+        assert CrisisType.SELF_HARM in crisis_types
+        assert confidence > 0.3
 
     def test_crisis_detection_panic_attack(self):
         """Test detection of panic attack indicators."""
@@ -68,9 +70,9 @@ class TestCrisisDetectionSystem(unittest.TestCase):
             self.crisis_detector.detect_crisis_indicators(text, context)
         )
 
-        self.assertTrue(crisis_detected)
-        self.assertIn(CrisisType.PANIC_ATTACK, crisis_types)
-        self.assertGreater(confidence, 0.3)
+        assert crisis_detected
+        assert CrisisType.PANIC_ATTACK in crisis_types
+        assert confidence > 0.3
 
     def test_crisis_detection_no_crisis(self):
         """Test that normal text doesn't trigger crisis detection."""
@@ -81,9 +83,9 @@ class TestCrisisDetectionSystem(unittest.TestCase):
             self.crisis_detector.detect_crisis_indicators(text, context)
         )
 
-        self.assertFalse(crisis_detected)
-        self.assertEqual(len(crisis_types), 0)
-        self.assertLessEqual(confidence, 0.3)
+        assert not crisis_detected
+        assert len(crisis_types) == 0
+        assert confidence <= 0.3
 
     def test_crisis_detection_context_based(self):
         """Test crisis detection based on context indicators."""
@@ -97,9 +99,9 @@ class TestCrisisDetectionSystem(unittest.TestCase):
             self.crisis_detector.detect_crisis_indicators(text, context)
         )
 
-        self.assertTrue(crisis_detected)
-        self.assertIn(CrisisType.GENERAL_DISTRESS, crisis_types)
-        self.assertIn(CrisisType.SEVERE_DEPRESSION, crisis_types)
+        assert crisis_detected
+        assert CrisisType.GENERAL_DISTRESS in crisis_types
+        assert CrisisType.SEVERE_DEPRESSION in crisis_types
 
     def test_get_crisis_resources_suicidal(self):
         """Test getting crisis resources for suicidal ideation."""
@@ -107,15 +109,15 @@ class TestCrisisDetectionSystem(unittest.TestCase):
 
         resources = self.crisis_detector.get_crisis_resources(crisis_types)
 
-        self.assertGreater(len(resources), 0)
+        assert len(resources) > 0
 
         # Check that 988 Lifeline is included
         lifeline_found = any(r.resource_id == "988_lifeline" for r in resources)
-        self.assertTrue(lifeline_found)
+        assert lifeline_found
 
         # Check that resources are sorted by priority
         priorities = [r.priority for r in resources]
-        self.assertEqual(priorities, sorted(priorities))
+        assert priorities == sorted(priorities)
 
     def test_get_crisis_resources_emergency_only(self):
         """Test getting only emergency crisis resources."""
@@ -128,23 +130,23 @@ class TestCrisisDetectionSystem(unittest.TestCase):
             crisis_types, emergency_only=False
         )
 
-        self.assertLessEqual(len(emergency_resources), len(all_resources))
+        assert len(emergency_resources) <= len(all_resources)
 
         # All returned resources should be emergency resources
         for resource in emergency_resources:
-            self.assertTrue(resource.is_emergency)
+            assert resource.is_emergency
 
     def test_crisis_resources_initialization(self):
         """Test that crisis resources are properly initialized."""
         resources = self.crisis_detector.crisis_resources
 
-        self.assertGreater(len(resources), 0)
+        assert len(resources) > 0
 
         # Check that essential resources exist
         resource_ids = {r.resource_id for r in resources}
-        self.assertIn("988_lifeline", resource_ids)
-        self.assertIn("crisis_text_line", resource_ids)
-        self.assertIn("emergency_services", resource_ids)
+        assert "988_lifeline" in resource_ids
+        assert "crisis_text_line" in resource_ids
+        assert "emergency_services" in resource_ids
 
 
 class TestPlayerFeedback(unittest.TestCase):
@@ -160,11 +162,11 @@ class TestPlayerFeedback(unittest.TestCase):
             content={"rating": 4, "comments": "Very helpful session"},
         )
 
-        self.assertEqual(feedback.feedback_id, "test_feedback_1")
-        self.assertEqual(feedback.player_id, "test_player_123")
-        self.assertEqual(feedback.feedback_type, "rating")
-        self.assertFalse(feedback.processed)
-        self.assertIsInstance(feedback.timestamp, datetime)
+        assert feedback.feedback_id == "test_feedback_1"
+        assert feedback.player_id == "test_player_123"
+        assert feedback.feedback_type == "rating"
+        assert not feedback.processed
+        assert isinstance(feedback.timestamp, datetime)
 
     def test_feedback_auto_id_generation(self):
         """Test automatic ID generation for feedback."""
@@ -176,8 +178,8 @@ class TestPlayerFeedback(unittest.TestCase):
             content={"text": "This was helpful"},
         )
 
-        self.assertIsNotNone(feedback.feedback_id)
-        self.assertNotEqual(feedback.feedback_id, "")
+        assert feedback.feedback_id is not None
+        assert feedback.feedback_id != ""
 
 
 class TestAdaptationResult(unittest.TestCase):
@@ -193,16 +195,16 @@ class TestAdaptationResult(unittest.TestCase):
             reasoning="Player feedback indicated difficulty with current intensity",
         )
 
-        self.assertEqual(result.adaptation_id, "test_adaptation_1")
-        self.assertEqual(result.player_id, "test_player_123")
-        self.assertEqual(len(result.changes_made), 2)
-        self.assertEqual(result.confidence_score, 0.8)
-        self.assertFalse(result.requires_player_approval)
+        assert result.adaptation_id == "test_adaptation_1"
+        assert result.player_id == "test_player_123"
+        assert len(result.changes_made) == 2
+        assert result.confidence_score == 0.8
+        assert not result.requires_player_approval
 
     def test_adaptation_result_validation(self):
         """Test validation of adaptation result."""
         # Test invalid confidence score
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             AdaptationResult(
                 adaptation_id="test_adaptation_2",
                 player_id="test_player_123",
@@ -221,8 +223,8 @@ class TestAdaptationResult(unittest.TestCase):
             reasoning="Test reasoning",
         )
 
-        self.assertIsNotNone(result.adaptation_id)
-        self.assertNotEqual(result.adaptation_id, "")
+        assert result.adaptation_id is not None
+        assert result.adaptation_id != ""
 
 
 class TestPersonalizationServiceManager(unittest.TestCase):
@@ -247,11 +249,11 @@ class TestPersonalizationServiceManager(unittest.TestCase):
 
     def test_manager_initialization(self):
         """Test PersonalizationServiceManager initialization."""
-        self.assertIsNotNone(self.manager.personalization_engine)
-        self.assertIsNotNone(self.manager.settings_validator)
-        self.assertIsNotNone(self.manager.crisis_detector)
-        self.assertIsInstance(self.manager.adaptation_history, dict)
-        self.assertIsInstance(self.manager.feedback_history, dict)
+        assert self.manager.personalization_engine is not None
+        assert self.manager.settings_validator is not None
+        assert self.manager.crisis_detector is not None
+        assert isinstance(self.manager.adaptation_history, dict)
+        assert isinstance(self.manager.feedback_history, dict)
 
     def test_update_therapeutic_settings_valid(self):
         """Test updating valid therapeutic settings."""
@@ -259,8 +261,8 @@ class TestPersonalizationServiceManager(unittest.TestCase):
             self.test_player_id, self.test_settings
         )
 
-        self.assertTrue(success)
-        self.assertEqual(len(conflicts), 0)
+        assert success
+        assert len(conflicts) == 0
 
     def test_update_therapeutic_settings_with_conflicts(self):
         """Test updating therapeutic settings with conflicts."""
@@ -281,10 +283,8 @@ class TestPersonalizationServiceManager(unittest.TestCase):
         )
 
         # Should still succeed due to auto-resolution, but with conflicts reported
-        self.assertTrue(success)
-        self.assertGreaterEqual(
-            len(conflicts), 0
-        )  # May have remaining non-critical conflicts
+        assert success
+        assert len(conflicts) >= 0  # May have remaining non-critical conflicts
 
     def test_update_therapeutic_settings_critical_conflicts(self):
         """Test updating therapeutic settings with critical conflicts."""
@@ -301,15 +301,15 @@ class TestPersonalizationServiceManager(unittest.TestCase):
         )
 
         # Should succeed due to auto-resolution of critical conflicts
-        self.assertTrue(success)
+        assert success
 
     def test_get_adaptive_recommendations_no_history(self):
         """Test getting adaptive recommendations with no history."""
         recommendations = self.manager.get_adaptive_recommendations(self.test_player_id)
 
-        self.assertIsInstance(recommendations, list)
+        assert isinstance(recommendations, list)
         # Should return empty list or contextual recommendations
-        self.assertLessEqual(len(recommendations), 5)
+        assert len(recommendations) <= 5
 
     def test_get_adaptive_recommendations_with_context(self):
         """Test getting adaptive recommendations with context."""
@@ -322,14 +322,14 @@ class TestPersonalizationServiceManager(unittest.TestCase):
             self.test_player_id, context
         )
 
-        self.assertIsInstance(recommendations, list)
-        self.assertLessEqual(len(recommendations), 5)
+        assert isinstance(recommendations, list)
+        assert len(recommendations) <= 5
 
         # Should include stress management recommendation
         stress_recommendations = [
             r for r in recommendations if "stress" in r.description.lower()
         ]
-        self.assertGreater(len(stress_recommendations), 0)
+        assert len(stress_recommendations) > 0
 
     def test_process_rating_feedback(self):
         """Test processing rating feedback."""
@@ -343,12 +343,12 @@ class TestPersonalizationServiceManager(unittest.TestCase):
 
         result = self.manager.process_feedback(self.test_player_id, feedback)
 
-        self.assertIsInstance(result, AdaptationResult)
-        self.assertEqual(result.player_id, self.test_player_id)
-        self.assertGreater(len(result.changes_made), 0)
-        self.assertIn("reduce_intensity", result.changes_made)
-        self.assertGreater(result.confidence_score, 0.5)
-        self.assertTrue(feedback.processed)
+        assert isinstance(result, AdaptationResult)
+        assert result.player_id == self.test_player_id
+        assert len(result.changes_made) > 0
+        assert "reduce_intensity" in result.changes_made
+        assert result.confidence_score > 0.5
+        assert feedback.processed
 
     def test_process_text_feedback(self):
         """Test processing text feedback."""
@@ -362,10 +362,10 @@ class TestPersonalizationServiceManager(unittest.TestCase):
 
         result = self.manager.process_feedback(self.test_player_id, feedback)
 
-        self.assertIsInstance(result, AdaptationResult)
-        self.assertEqual(result.player_id, self.test_player_id)
-        self.assertIn("maintain_current_approach", result.changes_made)
-        self.assertGreater(result.confidence_score, 0.5)
+        assert isinstance(result, AdaptationResult)
+        assert result.player_id == self.test_player_id
+        assert "maintain_current_approach" in result.changes_made
+        assert result.confidence_score > 0.5
 
     def test_process_preference_feedback(self):
         """Test processing preference change feedback."""
@@ -384,10 +384,10 @@ class TestPersonalizationServiceManager(unittest.TestCase):
 
         result = self.manager.process_feedback(self.test_player_id, feedback)
 
-        self.assertIsInstance(result, AdaptationResult)
-        self.assertEqual(result.player_id, self.test_player_id)
-        self.assertTrue(result.requires_player_approval)
-        self.assertEqual(result.confidence_score, 0.9)
+        assert isinstance(result, AdaptationResult)
+        assert result.player_id == self.test_player_id
+        assert result.requires_player_approval
+        assert result.confidence_score == 0.9
 
     def test_process_crisis_feedback(self):
         """Test processing crisis indicator feedback."""
@@ -405,14 +405,12 @@ class TestPersonalizationServiceManager(unittest.TestCase):
 
         result = self.manager.process_feedback(self.test_player_id, feedback)
 
-        self.assertIsInstance(result, AdaptationResult)
-        self.assertEqual(result.player_id, self.test_player_id)
-        self.assertFalse(
-            result.requires_player_approval
-        )  # Crisis adaptations are automatic
-        self.assertEqual(result.confidence_score, 1.0)  # Maximum confidence for crisis
-        self.assertIn("enable_crisis_monitoring", result.changes_made)
-        self.assertIn("provide_support_resources", result.changes_made)
+        assert isinstance(result, AdaptationResult)
+        assert result.player_id == self.test_player_id
+        assert not result.requires_player_approval  # Crisis adaptations are automatic
+        assert result.confidence_score == 1.0  # Maximum confidence for crisis
+        assert "enable_crisis_monitoring" in result.changes_made
+        assert "provide_support_resources" in result.changes_made
 
     def test_get_crisis_support_resources(self):
         """Test getting crisis support resources."""
@@ -422,12 +420,12 @@ class TestPersonalizationServiceManager(unittest.TestCase):
             self.test_player_id, crisis_types
         )
 
-        self.assertIsInstance(resources, list)
-        self.assertGreater(len(resources), 0)
+        assert isinstance(resources, list)
+        assert len(resources) > 0
 
         # Check that resources are relevant to crisis types
         for resource in resources:
-            self.assertTrue(any(ct in resource.crisis_types for ct in crisis_types))
+            assert any(ct in resource.crisis_types for ct in crisis_types)
 
     def test_get_crisis_support_resources_emergency_only(self):
         """Test getting emergency-only crisis support resources."""
@@ -440,11 +438,11 @@ class TestPersonalizationServiceManager(unittest.TestCase):
             self.test_player_id, crisis_types, emergency_only=False
         )
 
-        self.assertLessEqual(len(emergency_resources), len(all_resources))
+        assert len(emergency_resources) <= len(all_resources)
 
         # All returned resources should be emergency resources
         for resource in emergency_resources:
-            self.assertTrue(resource.is_emergency)
+            assert resource.is_emergency
 
     def test_detect_crisis_situation(self):
         """Test crisis situation detection."""
@@ -455,16 +453,16 @@ class TestPersonalizationServiceManager(unittest.TestCase):
             self.manager.detect_crisis_situation(self.test_player_id, text, context)
         )
 
-        self.assertTrue(crisis_detected)
-        self.assertGreater(len(crisis_types), 0)
-        self.assertGreater(len(emergency_resources), 0)
+        assert crisis_detected
+        assert len(crisis_types) > 0
+        assert len(emergency_resources) > 0
 
         # Check that crisis feedback was created and processed
         player_feedback = self.manager.feedback_history.get(self.test_player_id, [])
         crisis_feedback = [
             f for f in player_feedback if f.feedback_type == "crisis_indicator"
         ]
-        self.assertGreater(len(crisis_feedback), 0)
+        assert len(crisis_feedback) > 0
 
     def test_detect_crisis_situation_no_crisis(self):
         """Test crisis detection with non-crisis text."""
@@ -475,9 +473,9 @@ class TestPersonalizationServiceManager(unittest.TestCase):
             self.manager.detect_crisis_situation(self.test_player_id, text, context)
         )
 
-        self.assertFalse(crisis_detected)
-        self.assertEqual(len(crisis_types), 0)
-        self.assertEqual(len(emergency_resources), 0)
+        assert not crisis_detected
+        assert len(crisis_types) == 0
+        assert len(emergency_resources) == 0
 
     def test_feedback_history_storage(self):
         """Test that feedback history is properly stored."""
@@ -501,11 +499,11 @@ class TestPersonalizationServiceManager(unittest.TestCase):
         self.manager.process_feedback(self.test_player_id, feedback2)
 
         player_feedback = self.manager.feedback_history.get(self.test_player_id, [])
-        self.assertEqual(len(player_feedback), 2)
+        assert len(player_feedback) == 2
 
         feedback_ids = {f.feedback_id for f in player_feedback}
-        self.assertIn("feedback_1", feedback_ids)
-        self.assertIn("feedback_2", feedback_ids)
+        assert "feedback_1" in feedback_ids
+        assert "feedback_2" in feedback_ids
 
     def test_adaptation_history_storage(self):
         """Test that adaptation history is properly stored."""
@@ -522,8 +520,8 @@ class TestPersonalizationServiceManager(unittest.TestCase):
         player_adaptations = self.manager.adaptation_history.get(
             self.test_player_id, []
         )
-        self.assertEqual(len(player_adaptations), 1)
-        self.assertEqual(player_adaptations[0].adaptation_id, result.adaptation_id)
+        assert len(player_adaptations) == 1
+        assert player_adaptations[0].adaptation_id == result.adaptation_id
 
     def test_recommendations_with_feedback_history(self):
         """Test recommendations generation with feedback history."""
@@ -540,13 +538,13 @@ class TestPersonalizationServiceManager(unittest.TestCase):
 
         recommendations = self.manager.get_adaptive_recommendations(self.test_player_id)
 
-        self.assertGreater(len(recommendations), 0)
+        assert len(recommendations) > 0
 
         # Should include recommendations for therapeutic adjustment
         adjustment_recommendations = [
             r for r in recommendations if "adjust" in r.title.lower()
         ]
-        self.assertGreater(len(adjustment_recommendations), 0)
+        assert len(adjustment_recommendations) > 0
 
 
 if __name__ == "__main__":

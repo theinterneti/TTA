@@ -50,7 +50,8 @@ async def test_tools_diagnostics_endpoint(redis_client):
     res = client.get("/tools")
     assert res.status_code == 200
     body = res.json()
-    assert "tools" in body and isinstance(body["tools"], list)
+    assert "tools" in body
+    assert isinstance(body["tools"], list)
     # allow either presence (if not pruned) or absence
     assert any(t["name"] == unique_name for t in body["tools"]) or body["tools"] == []
 

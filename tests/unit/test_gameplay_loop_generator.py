@@ -7,22 +7,43 @@ slot_index mechanism that prevents identical choices.
 
 from __future__ import annotations
 
+import sys
+
 import pytest
 
-from src.components.gameplay_loop.choice_architecture.generator import (
-    ChoiceGenerator,
-    ChoiceTemplate,
+# Skip on Python 3.14 due to langchain_openai segfault in gameplay components
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Gameplay components trigger langchain_openai segfault on Python 3.14",
 )
-from src.components.gameplay_loop.models.core import (
-    Choice,
-    ChoiceType,
-    DifficultyLevel,
-    EmotionalState,
-    Scene,
-    SceneType,
-    SessionState,
-    TherapeuticContext,
-)
+
+if sys.version_info < (3, 14):
+    from src.components.gameplay_loop.choice_architecture.generator import (
+        ChoiceGenerator,
+        ChoiceTemplate,
+    )
+    from src.components.gameplay_loop.models.core import (
+        Choice,
+        ChoiceType,
+        DifficultyLevel,
+        EmotionalState,
+        Scene,
+        SceneType,
+        SessionState,
+        TherapeuticContext,
+    )
+else:
+    # Dummy imports for Python 3.14+
+    ChoiceGenerator = None  # type: ignore[misc,assignment]
+    ChoiceTemplate = None  # type: ignore[misc,assignment]
+    Choice = None  # type: ignore[misc,assignment]
+    ChoiceType = None  # type: ignore[misc,assignment]
+    DifficultyLevel = None  # type: ignore[misc,assignment]
+    EmotionalState = None  # type: ignore[misc,assignment]
+    Scene = None  # type: ignore[misc,assignment]
+    SceneType = None  # type: ignore[misc,assignment]
+    SessionState = None  # type: ignore[misc,assignment]
+    TherapeuticContext = None  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Helpers

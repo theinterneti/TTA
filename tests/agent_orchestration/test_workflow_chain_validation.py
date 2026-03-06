@@ -253,11 +253,10 @@ class TestWorkflowChainValidation:
 
         # Validate data flow: IPA → NGA (direct)
         # IPA intent should influence NGA therapeutic approach
-        ipa_result.get("intent", "")
         therapeutic_elements = nga_result.get("therapeutic_elements", [])
 
         # Intent should be reflected in therapeutic approach
-        len(therapeutic_elements) > 0
+        assert len(therapeutic_elements) > 0
 
         # Validate session consistency
         assert result["session_id"] == session_id

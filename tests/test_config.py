@@ -13,6 +13,8 @@ from pathlib import Path
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import pytest
+
 from src.orchestration.config import TTAConfig
 
 
@@ -111,10 +113,8 @@ orchestration:
         Test that TTAConfig initializes with the default path.
         """
         # self.config is already initialized in setUp with dummy_default_config_path
-        self.assertEqual(self.config.config_path, self.dummy_default_config_path)
-        self.assertIn(
-            "agent_orchestration", self.config.get("orchestration.components")
-        )
+        assert self.config.config_path == self.dummy_default_config_path
+        assert "agent_orchestration" in self.config.get("orchestration.components")
 
     def test_init_custom_path(self):
         """
@@ -127,8 +127,8 @@ orchestration:
         # Clear singleton to allow fresh instantiation with custom path
         TTAConfig._instances.clear()
         new_config = TTAConfig(custom_path)
-        self.assertEqual(new_config.config_path, custom_path)
-        self.assertEqual(new_config.get("custom_key"), "custom_value")
+        assert new_config.config_path == custom_path
+        assert new_config.get("custom_key") == "custom_value"
 
     def test_load_config_non_existent_file(self):
         """
@@ -137,7 +137,7 @@ orchestration:
         """
         non_existent_path = self.test_config_dir / "non_existent.yaml"
         config = TTAConfig(non_existent_path)
-        self.assertIn("agent_orchestration", config.get("orchestration.components"))
+        assert "agent_orchestration" in config.get("orchestration.components")
 
     def test_load_config_invalid_format(self):
         """
@@ -149,7 +149,7 @@ orchestration:
             f.write("this is not yaml or json")
 
         config = TTAConfig(invalid_format_path)
-        self.assertIn("agent_orchestration", config.get("orchestration.components"))
+        assert "agent_orchestration" in config.get("orchestration.components")
 
     def test_load_config_exception_during_loading(self):
         """
@@ -163,7 +163,7 @@ orchestration:
         os.chmod(unreadable_path, 0o000)  # Make file unreadable
 
         config = TTAConfig(unreadable_path)
-        self.assertIn("agent_orchestration", config.get("orchestration.components"))
+        assert "agent_orchestration" in config.get("orchestration.components")
         os.chmod(unreadable_path, 0o644)  # Restore permissions for cleanup
 
     def test_get_default_config(self):
@@ -172,9 +172,9 @@ orchestration:
         """
         config = TTAConfig(self.dummy_default_config_path)
         default_config = config._get_default_config()
-        self.assertIn("tta.dev", default_config)
-        self.assertIn("agent_orchestration", default_config)
-        self.assertIn("orchestration", default_config)
+        assert "tta.dev" in default_config
+        assert "agent_orchestration" in default_config
+        assert "orchestration" in default_config
 
     def test_load_env_vars(self):
         """
@@ -191,9 +191,9 @@ orchestration:
         TTAConfig._instances.clear()
         config = TTAConfig(self.dummy_default_config_path)
         # new.section.key is set by TTA_NEW_SECTION_KEY
-        self.assertEqual(config.get("new.section.key"), "env_value")
+        assert config.get("new.section.key") == "env_value"
         # tta.dev compound key works via special ttadev→tta.dev mapping
-        self.assertEqual(config.get("tta.dev.components.neo4j.port"), 7689)
+        assert config.get("tta.dev.components.neo4j.port") == 7689
 
     def test_set_nested_config(self):
         """
@@ -201,24 +201,24 @@ orchestration:
         """
         config = TTAConfig(self.dummy_default_config_path)
         config._set_nested_config(["new_key"], "new_value")
-        self.assertEqual(config.get("new_key"), "new_value")
+        assert config.get("new_key") == "new_value"
 
         config._set_nested_config(["level1", "level2", "level3"], "deep_value")
-        self.assertEqual(config.get("level1.level2.level3"), "deep_value")
+        assert config.get("level1.level2.level3") == "deep_value"
 
         config._set_nested_config(["tta.dev", "enabled"], False)
-        self.assertFalse(config.get("tta.dev.enabled"))
+        assert not config.get("tta.dev.enabled")
 
     def test_get_method(self):
         """
         Test the get method for various scenarios.
         """
         config = TTAConfig(self.dummy_default_config_path)
-        self.assertTrue(config.get("agent_orchestration.enabled"))
-        self.assertEqual(config.get("agent_orchestration.port"), 8503)
-        self.assertEqual(config.get("non_existent_key"), None)
-        self.assertEqual(config.get("non_existent_key", "default_val"), "default_val")
-        self.assertIn("player_experience", config.get("orchestration.components"))
+        assert config.get("agent_orchestration.enabled")
+        assert config.get("agent_orchestration.port") == 8503
+        assert config.get("non_existent_key") is None
+        assert config.get("non_existent_key", "default_val") == "default_val"
+        assert "player_experience" in config.get("orchestration.components")
 
     def test_set_method(self):
         """
@@ -226,10 +226,10 @@ orchestration:
         """
         config = TTAConfig(self.dummy_default_config_path)
         config.set("new_setting", "test_value")
-        self.assertEqual(config.get("new_setting"), "test_value")
+        assert config.get("new_setting") == "test_value"
 
         config.set("agent_orchestration.port", 9000)
-        self.assertEqual(config.get("agent_orchestration.port"), 9000)
+        assert config.get("agent_orchestration.port") == 9000
 
     def test_save_method_yaml(self):
         """
@@ -238,10 +238,10 @@ orchestration:
         save_path = self.test_config_dir / "saved_config.yaml"
         config = TTAConfig(self.dummy_default_config_path)
         config.set("test_save_key", "test_save_value")
-        self.assertTrue(config.save(save_path))
+        assert config.save(save_path)
 
         loaded_config = TTAConfig(save_path)
-        self.assertEqual(loaded_config.get("test_save_key"), "test_save_value")
+        assert loaded_config.get("test_save_key") == "test_save_value"
 
     def test_save_method_json(self):
         """
@@ -250,12 +250,10 @@ orchestration:
         save_path = self.test_config_dir / "saved_config.json"
         config = TTAConfig(self.dummy_default_config_path)
         config.set("test_save_key_json", "test_save_value_json")
-        self.assertTrue(config.save(save_path))
+        assert config.save(save_path)
 
         loaded_config = TTAConfig(save_path)
-        self.assertEqual(
-            loaded_config.get("test_save_key_json"), "test_save_value_json"
-        )
+        assert loaded_config.get("test_save_key_json") == "test_save_value_json"
 
     def test_save_method_unsupported_format(self):
         """
@@ -263,7 +261,7 @@ orchestration:
         """
         save_path = self.test_config_dir / "unsupported.txt"
         config = TTAConfig(self.dummy_default_config_path)
-        self.assertFalse(config.save(save_path))
+        assert not config.save(save_path)
 
     def test_save_method_exception_during_saving(self):
         """
@@ -274,7 +272,7 @@ orchestration:
         os.chmod(self.test_config_dir, 0o555)  # Make directory read-only
 
         config = TTAConfig(self.dummy_default_config_path)
-        self.assertFalse(config.save(save_path))
+        assert not config.save(save_path)
         os.chmod(self.test_config_dir, 0o755)  # Restore permissions
 
     def test_validate_method_success(self):
@@ -282,7 +280,7 @@ orchestration:
         Test successful configuration validation against default schema.
         """
         config = TTAConfig(self.dummy_default_config_path)
-        self.assertTrue(config.validate())
+        assert config.validate()
 
     def test_validate_method_missing_required_key(self):
         """
@@ -291,9 +289,7 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         # Temporarily remove a required key to simulate failure
         original_value = config.config.pop("agent_orchestration")
-        with self.assertRaisesRegex(
-            ValueError, "Required key 'agent_orchestration' is missing"
-        ):
+        with pytest.raises(ValueError, match="Required key 'agent_orchestration' is missing"):
             config.validate()
         config.config["agent_orchestration"] = original_value  # Restore
 
@@ -304,9 +300,7 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         original_value = config.config["agent_orchestration"]["port"]
         config.config["agent_orchestration"]["port"] = "not_an_int"
-        with self.assertRaisesRegex(
-            ValueError, "Key 'agent_orchestration.port' must be an integer"
-        ):
+        with pytest.raises(ValueError, match="Key 'agent_orchestration.port' must be an integer"):
             config.validate()
         config.config["agent_orchestration"]["port"] = original_value  # Restore
 
@@ -317,10 +311,7 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         original_value = config.config["environment"]["log_level"]
         config.config["environment"]["log_level"] = "invalid_level"
-        with self.assertRaisesRegex(
-            ValueError,
-            r"Key 'environment.log_level' must be one of \['debug', 'info', 'warning', 'error', 'critical'\]",
-        ):
+        with pytest.raises(ValueError, match=r"Key 'environment.log_level' must be one of \['debug', 'info', 'warning', 'error', 'critical'\]"):
             config.validate()
         config.config["environment"]["log_level"] = original_value  # Restore
 
@@ -331,9 +322,7 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         original_value = config.config["docker"]["use_gpu"]
         config.config["docker"]["use_gpu"] = "not_a_bool"
-        with self.assertRaisesRegex(
-            ValueError, "Key 'docker.use_gpu' must be a boolean"
-        ):
+        with pytest.raises(ValueError, match="Key 'docker.use_gpu' must be a boolean"):
             config.validate()
         config.config["docker"]["use_gpu"] = original_value  # Restore
 

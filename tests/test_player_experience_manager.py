@@ -120,9 +120,9 @@ class TestPlayerExperienceManager(unittest.TestCase):
     def test_dashboard_aggregation(self):
         async def run():
             dashboard = await self.mgr.get_player_dashboard(self.player_id)
-            self.assertEqual(dashboard.player_id, self.player_id)
-            self.assertEqual(len(dashboard.recent_sessions), 3)
-            self.assertGreaterEqual(dashboard.therapeutic_momentum, 0.7)
+            assert dashboard.player_id == self.player_id
+            assert len(dashboard.recent_sessions) == 3
+            assert dashboard.therapeutic_momentum >= 0.7
 
         asyncio.run(run())
 
@@ -130,8 +130,8 @@ class TestPlayerExperienceManager(unittest.TestCase):
         async def run():
             recs = await self.mgr.get_recommendations(self.player_id)
             titles = [r.title for r in recs]
-            self.assertIn("Mindfulness practice", titles)
-            self.assertIn("Stress Management Focus", titles)
+            assert "Mindfulness practice" in titles
+            assert "Stress Management Focus" in titles
 
         asyncio.run(run())
 
@@ -145,8 +145,8 @@ class TestPlayerExperienceManager(unittest.TestCase):
                 content={"rating": 2},
             )
             result = await self.mgr.process_player_feedback(self.player_id, fb)
-            self.assertEqual(result["adaptation_id"], "a1")
-            self.assertIn("reduce_intensity", result["changes_made"])
+            assert result["adaptation_id"] == "a1"
+            assert "reduce_intensity" in result["changes_made"]
 
         asyncio.run(run())
 
@@ -172,13 +172,13 @@ class TestPlayerExperienceManager(unittest.TestCase):
             out = await self.mgr.detect_crisis_and_get_resources(
                 self.player_id, "I want to end it all."
             )
-            self.assertTrue(out["crisis_detected"])
-            self.assertIn("suicidal_ideation", out["crisis_types"])  # enum value
-            self.assertEqual(len(out["resources"]), 1)
+            assert out["crisis_detected"]
+            assert "suicidal_ideation" in out["crisis_types"]  # enum value
+            assert len(out["resources"]) == 1
             r = out["resources"][0]
-            self.assertEqual(r["resource_id"], "res1")
-            self.assertEqual(r["contact"], "988")
-            self.assertTrue(r["emergency"])
+            assert r["resource_id"] == "res1"
+            assert r["contact"] == "988"
+            assert r["emergency"]
 
         asyncio.run(run())
 

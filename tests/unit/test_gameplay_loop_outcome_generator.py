@@ -8,19 +8,26 @@ choice types, and fallback behaviour.
 from __future__ import annotations
 
 import re
+import sys
 
 import pytest
 
-from src.components.gameplay_loop.consequence_system.outcome_generator import (
-    OutcomeGenerator,
+# Skip on Python 3.14 due to langchain_openai segfault in gameplay components
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Gameplay components trigger langchain_openai segfault on Python 3.14",
 )
-from src.components.gameplay_loop.models.core import (
-    ChoiceType,
-    DifficultyLevel,
-    EmotionalState,
-    Scene,
-    SceneType,
-    SessionState,
+
+if sys.version_info < (3, 14):
+    from src.components.gameplay_loop.consequence_system.outcome_generator import (
+        OutcomeGenerator,
+    )
+    from src.components.gameplay_loop.models.core import (
+        ChoiceType,
+        EmotionalState,
+        Scene,
+        SceneType,
+        SessionState,
     TherapeuticContext,
 )
 from src.components.gameplay_loop.models.interactions import UserChoice

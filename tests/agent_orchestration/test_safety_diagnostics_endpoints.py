@@ -44,7 +44,8 @@ async def test_safety_snapshot_endpoint(redis_client):
     assert resp.status_code == 200
     data = resp.json()
     assert data.get("enabled") is True
-    assert "rules" in data and data["rules"].get("rules")
+    assert "rules" in data
+    assert data["rules"].get("rules")
     status = data.get("status") or {}
     assert status.get("source", "").startswith("redis:")
     assert status.get("redis_key") == "ao:safety:rules"

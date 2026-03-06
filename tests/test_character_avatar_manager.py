@@ -8,6 +8,8 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 
+import pytest
+
 from src.player_experience.database.character_repository import CharacterRepository
 from src.player_experience.managers.character_avatar_manager import (
     CharacterAvatarManager,
@@ -68,15 +70,15 @@ class TestCharacterAvatarManager(unittest.TestCase):
             self.player_id, self.test_character_data
         )
 
-        self.assertIsNotNone(character.character_id)
-        self.assertEqual(character.player_id, self.player_id)
-        self.assertEqual(character.name, "Alice Johnson")
-        self.assertEqual(character.appearance, self.test_appearance)
-        self.assertEqual(character.background, self.test_background)
-        self.assertEqual(character.therapeutic_profile, self.test_therapeutic_profile)
-        self.assertTrue(character.is_active)
-        self.assertIsInstance(character.created_at, datetime)
-        self.assertIsInstance(character.last_active, datetime)
+        assert character.character_id is not None
+        assert character.player_id == self.player_id
+        assert character.name == "Alice Johnson"
+        assert character.appearance == self.test_appearance
+        assert character.background == self.test_background
+        assert character.therapeutic_profile == self.test_therapeutic_profile
+        assert character.is_active
+        assert isinstance(character.created_at, datetime)
+        assert isinstance(character.last_active, datetime)
 
     def test_create_character_limit_exceeded(self):
         """Test character creation when limit is exceeded."""
@@ -93,22 +95,22 @@ class TestCharacterAvatarManager(unittest.TestCase):
             self.manager.create_character(self.player_id, character_data)
 
         # Try to create one more - should fail
-        with self.assertRaises(CharacterLimitExceededError):
+        with pytest.raises(CharacterLimitExceededError):
             self.manager.create_character(self.player_id, self.test_character_data)
 
     def test_create_character_invalid_data(self):
         """Test character creation with invalid data."""
         # Test empty name - should fail at CharacterBackground level
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterBackground(name="")
 
         # Test name too long - should fail at CharacterBackground level
         long_name = "A" * 60
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterBackground(name=long_name)
 
         # Test invalid characters in name - should fail at CharacterBackground level
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterBackground(name="Alice123")
 
         # Test mismatched names at manager level
@@ -119,11 +121,11 @@ class TestCharacterAvatarManager(unittest.TestCase):
             therapeutic_profile=self.test_therapeutic_profile,
         )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.manager.create_character(self.player_id, invalid_data)
 
         # Test invalid therapeutic readiness level - should fail at TherapeuticProfile level
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticProfile(readiness_level=1.5)  # Out of range
 
     def test_get_character(self):
@@ -135,19 +137,19 @@ class TestCharacterAvatarManager(unittest.TestCase):
 
         # Get character
         retrieved = self.manager.get_character(character.character_id)
-        self.assertIsNotNone(retrieved)
-        self.assertEqual(retrieved.character_id, character.character_id)
-        self.assertEqual(retrieved.name, character.name)
+        assert retrieved is not None
+        assert retrieved.character_id == character.character_id
+        assert retrieved.name == character.name
 
         # Test non-existent character
         non_existent = self.manager.get_character("non_existent_id")
-        self.assertIsNone(non_existent)
+        assert non_existent is None
 
     def test_get_player_characters(self):
         """Test getting all characters for a player."""
         # Initially no characters
         characters = self.manager.get_player_characters(self.player_id)
-        self.assertEqual(len(characters), 0)
+        assert len(characters) == 0
 
         # Create multiple characters
         char1 = self.manager.create_character(self.player_id, self.test_character_data)
@@ -162,11 +164,11 @@ class TestCharacterAvatarManager(unittest.TestCase):
 
         # Get all characters
         characters = self.manager.get_player_characters(self.player_id)
-        self.assertEqual(len(characters), 2)
+        assert len(characters) == 2
 
         character_ids = [char.character_id for char in characters]
-        self.assertIn(char1.character_id, character_ids)
-        self.assertIn(char2.character_id, character_ids)
+        assert char1.character_id in character_ids
+        assert char2.character_id in character_ids
 
     def test_update_character(self):
         """Test updating a character."""
@@ -194,12 +196,12 @@ class TestCharacterAvatarManager(unittest.TestCase):
         # Update character
         updated = self.manager.update_character(character.character_id, updates)
 
-        self.assertEqual(updated.appearance, new_appearance)
-        self.assertEqual(updated.background, new_background)
-        self.assertEqual(updated.background.backstory, "Updated backstory")
+        assert updated.appearance == new_appearance
+        assert updated.background == new_background
+        assert updated.background.backstory == "Updated backstory"
 
         # Test updating non-existent character
-        with self.assertRaises(CharacterNotFoundError):
+        with pytest.raises(CharacterNotFoundError):
             self.manager.update_character("non_existent_id", updates)
 
     def test_delete_character(self):
@@ -211,19 +213,19 @@ class TestCharacterAvatarManager(unittest.TestCase):
 
         # Delete character
         result = self.manager.delete_character(character.character_id)
-        self.assertTrue(result)
+        assert result
 
         # Character should no longer be retrievable
         retrieved = self.manager.get_character(character.character_id)
-        self.assertIsNone(retrieved)
+        assert retrieved is None
 
         # Should not appear in player's character list
         characters = self.manager.get_player_characters(self.player_id)
-        self.assertEqual(len(characters), 0)
+        assert len(characters) == 0
 
         # Test deleting non-existent character
         result = self.manager.delete_character("non_existent_id")
-        self.assertFalse(result)
+        assert not result
 
     def test_get_character_therapeutic_profile(self):
         """Test getting character therapeutic profile."""
@@ -234,13 +236,13 @@ class TestCharacterAvatarManager(unittest.TestCase):
 
         # Get therapeutic profile
         profile = self.manager.get_character_therapeutic_profile(character.character_id)
-        self.assertIsNotNone(profile)
-        self.assertEqual(profile.primary_concerns, ["work stress", "anxiety"])
-        self.assertEqual(profile.preferred_intensity, IntensityLevel.MEDIUM)
+        assert profile is not None
+        assert profile.primary_concerns == ["work stress", "anxiety"]
+        assert profile.preferred_intensity == IntensityLevel.MEDIUM
 
         # Test non-existent character
         profile = self.manager.get_character_therapeutic_profile("non_existent_id")
-        self.assertIsNone(profile)
+        assert profile is None
 
     def test_update_character_therapeutic_profile(self):
         """Test updating character therapeutic profile."""
@@ -261,23 +263,21 @@ class TestCharacterAvatarManager(unittest.TestCase):
         result = self.manager.update_character_therapeutic_profile(
             character.character_id, new_profile
         )
-        self.assertTrue(result)
+        assert result
 
         # Verify update
         updated_profile = self.manager.get_character_therapeutic_profile(
             character.character_id
         )
-        self.assertEqual(
-            updated_profile.primary_concerns, ["relationship issues", "self-esteem"]
-        )
-        self.assertEqual(updated_profile.preferred_intensity, IntensityLevel.HIGH)
-        self.assertEqual(updated_profile.readiness_level, 0.9)
+        assert updated_profile.primary_concerns == ["relationship issues", "self-esteem"]
+        assert updated_profile.preferred_intensity == IntensityLevel.HIGH
+        assert updated_profile.readiness_level == 0.9
 
         # Test updating non-existent character
         result = self.manager.update_character_therapeutic_profile(
             "non_existent_id", new_profile
         )
-        self.assertFalse(result)
+        assert not result
 
     def test_get_character_statistics(self):
         """Test getting character statistics."""
@@ -288,7 +288,7 @@ class TestCharacterAvatarManager(unittest.TestCase):
 
         # Get statistics
         stats = self.manager.get_character_statistics(character.character_id)
-        self.assertIsNotNone(stats)
+        assert stats is not None
 
         expected_keys = [
             "character_id",
@@ -304,21 +304,21 @@ class TestCharacterAvatarManager(unittest.TestCase):
         ]
 
         for key in expected_keys:
-            self.assertIn(key, stats)
+            assert key in stats
 
-        self.assertEqual(stats["character_id"], character.character_id)
-        self.assertEqual(stats["name"], character.name)
-        self.assertEqual(stats["total_session_time"], 0)
-        self.assertEqual(stats["session_count"], 0)
-        self.assertEqual(stats["active_worlds"], 0)
+        assert stats["character_id"] == character.character_id
+        assert stats["name"] == character.name
+        assert stats["total_session_time"] == 0
+        assert stats["session_count"] == 0
+        assert stats["active_worlds"] == 0
         # Therapeutic readiness may be adjusted by the integration service
-        self.assertGreaterEqual(stats["therapeutic_readiness"], 0.6)
-        self.assertLessEqual(stats["therapeutic_readiness"], 1.0)
-        self.assertTrue(stats["is_active"])
+        assert stats["therapeutic_readiness"] >= 0.6
+        assert stats["therapeutic_readiness"] <= 1.0
+        assert stats["is_active"]
 
         # Test non-existent character
         stats = self.manager.get_character_statistics("non_existent_id")
-        self.assertIsNone(stats)
+        assert stats is None
 
     def test_extract_personality_traits(self):
         """Test personality trait extraction from character data."""
@@ -348,17 +348,17 @@ class TestCharacterAvatarManager(unittest.TestCase):
         traits = self.manager._extract_personality_traits(character_data)
 
         # Check that traits are extracted correctly
-        self.assertIn("empathy", traits)
-        self.assertIn("patience", traits)
-        self.assertIn("conscientiousness", traits)
-        self.assertIn("extraversion", traits)
-        self.assertIn("neuroticism", traits)
-        self.assertIn("openness", traits)  # From high intensity preference
+        assert "empathy" in traits
+        assert "patience" in traits
+        assert "conscientiousness" in traits
+        assert "extraversion" in traits
+        assert "neuroticism" in traits
+        assert "openness" in traits  # From high intensity preference
 
         # Check that all values are in valid range
         for value in traits.values():
-            self.assertGreaterEqual(value, -1.0)
-            self.assertLessEqual(value, 1.0)
+            assert value >= -1.0
+            assert value <= 1.0
 
 
 class TestCharacterAvatarManagerIntegration(unittest.TestCase):
@@ -400,9 +400,7 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
         # Verify that the development system was called
         self.mock_cds.initialize_character.assert_called_once()
         call_args = self.mock_cds.initialize_character.call_args
-        self.assertEqual(
-            call_args[0][0], character.character_id
-        )  # First positional arg is character_id
+        assert call_args[0][0] == character.character_id  # First positional arg is character_id
 
     def test_create_character_calls_personalization_engine(self):
         """Test that character creation calls the personalization engine."""
@@ -413,9 +411,7 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
         # Verify that the personalization engine was called
         self.mock_pe.create_personalization_profile.assert_called_once()
         call_args = self.mock_pe.create_personalization_profile.call_args
-        self.assertEqual(
-            call_args[0][0], character.character_id
-        )  # First positional arg is character_id
+        assert call_args[0][0] == character.character_id  # First positional arg is character_id
 
     def test_update_character_calls_personalization_engine(self):
         """Test that character update calls the personalization engine."""
@@ -451,19 +447,19 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
         )
 
         # Should return list of recommendation dictionaries
-        self.assertIsInstance(recommendations, list)
+        assert isinstance(recommendations, list)
 
         # If there are recommendations, check structure
         if recommendations:
             for rec in recommendations:
-                self.assertIn("recommendation_id", rec)
-                self.assertIn("type", rec)
-                self.assertIn("title", rec)
-                self.assertIn("description", rec)
-                self.assertIn("rationale", rec)
-                self.assertIn("priority", rec)
-                self.assertIn("confidence_score", rec)
-                self.assertIn("created_at", rec)
+                assert "recommendation_id" in rec
+                assert "type" in rec
+                assert "title" in rec
+                assert "description" in rec
+                assert "rationale" in rec
+                assert "priority" in rec
+                assert "confidence_score" in rec
+                assert "created_at" in rec
 
     def test_adapt_therapeutic_content_for_character(self):
         """Test adapting therapeutic content for a character."""
@@ -479,23 +475,23 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
         )
 
         # Should return adaptation dictionary
-        self.assertIsNotNone(adaptation)
-        self.assertIn("adaptation_id", adaptation)
-        self.assertIn("original_content", adaptation)
-        self.assertIn("adapted_content", adaptation)
-        self.assertIn("adaptation_type", adaptation)
-        self.assertIn("reasoning", adaptation)
-        self.assertIn("effectiveness_score", adaptation)
-        self.assertIn("created_at", adaptation)
+        assert adaptation is not None
+        assert "adaptation_id" in adaptation
+        assert "original_content" in adaptation
+        assert "adapted_content" in adaptation
+        assert "adaptation_type" in adaptation
+        assert "reasoning" in adaptation
+        assert "effectiveness_score" in adaptation
+        assert "created_at" in adaptation
 
         # Should replace character name
-        self.assertIn("Test Character", adaptation["adapted_content"])
+        assert "Test Character" in adaptation["adapted_content"]
 
         # Test with non-existent character
         result = self.manager.adapt_therapeutic_content_for_character(
             "non_existent_id", content
         )
-        self.assertIsNone(result)
+        assert result is None
 
 
 if __name__ == "__main__":

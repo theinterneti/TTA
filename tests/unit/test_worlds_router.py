@@ -18,7 +18,6 @@ from fastapi.testclient import TestClient
 from src.player_experience.api.auth import TokenData, get_current_active_player
 from src.player_experience.api.routers.worlds import get_world_manager_dep, router
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

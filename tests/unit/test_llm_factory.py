@@ -3,12 +3,27 @@
 from __future__ import annotations
 
 import os
+import sys
 from unittest.mock import patch
 
 import pytest
-from langchain_openai import ChatOpenAI
 
-from src.ai_components.llm_factory import get_llm
+# Skip all tests in this module on Python 3.14 due to langchain_openai segfault
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="langchain_openai causes segfault on Python 3.14",
+)
+
+if sys.version_info < (3, 14):
+    from langchain_openai import ChatOpenAI
+
+    from src.ai_components.llm_factory import get_llm
+else:
+    # Dummy imports to avoid collection errors
+    ChatOpenAI = None  # type: ignore[misc,assignment]
+
+    def get_llm(*args, **kwargs):  # type: ignore[misc]
+        """Dummy function for Python 3.14+"""
 
 
 class TestGetLlm:

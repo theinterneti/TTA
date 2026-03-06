@@ -19,20 +19,36 @@ Redis is required.
 
 from __future__ import annotations
 
+import sys
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from src.components.gameplay_loop.models.core import (
-    Choice,
-    ChoiceType,
-    ConsequenceSet,
-    EmotionalState,
-    Scene,
-    SceneType,
-    SessionState,
+# Skip on Python 3.14 due to langchain_openai segfault in gameplay components
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Gameplay components trigger langchain_openai segfault on Python 3.14",
 )
 
+if sys.version_info < (3, 14):
+    from src.components.gameplay_loop.models.core import (
+        Choice,
+        ChoiceType,
+        ConsequenceSet,
+        EmotionalState,
+        Scene,
+        SceneType,
+        SessionState,
+    )
+else:
+    # Dummy imports for Python 3.14+
+    Choice = None  # type: ignore[misc,assignment]
+    ChoiceType = None  # type: ignore[misc,assignment]
+    ConsequenceSet = None  # type: ignore[misc,assignment]
+    EmotionalState = None  # type: ignore[misc,assignment]
+    Scene = None  # type: ignore[misc,assignment]
+    SceneType = None  # type: ignore[misc,assignment]
+    SessionState = None  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # FakeDb — in-memory stand-in for Neo4jGameplayManager / DoltGameplayManager
@@ -387,7 +403,8 @@ class TestFullLoopSmoke:
 
         # 2. Status (active)
         s1 = await ctrl.get_session_status(sid)
-        assert s1 is not None and s1["is_active"] is True
+        assert s1 is not None
+        assert s1["is_active"] is True
 
         # 3. Process choice
         next_scene, choices, csq = await ctrl.process_user_choice(sid, "choice-1")
@@ -396,14 +413,16 @@ class TestFullLoopSmoke:
 
         # 4. Status (choice recorded)
         s2 = await ctrl.get_session_status(sid)
-        assert s2 is not None and s2["total_choices"] == 1
+        assert s2 is not None
+        assert s2["total_choices"] == 1
 
         # 5. Pause
         assert await ctrl.pause_session(sid) is True
 
         # 6. Status (DB fallback)
         s3 = await ctrl.get_session_status(sid)
-        assert s3 is not None and s3["is_active"] is False
+        assert s3 is not None
+        assert s3["is_active"] is False
 
         # 7. Resume
         resumed = await ctrl.resume_session(sid)
@@ -411,7 +430,8 @@ class TestFullLoopSmoke:
 
         # 8. Status (active again)
         s4 = await ctrl.get_session_status(sid)
-        assert s4 is not None and s4["is_active"] is True
+        assert s4 is not None
+        assert s4["is_active"] is True
 
         # 9. End
         assert await ctrl.end_session(sid) is True
@@ -420,7 +440,8 @@ class TestFullLoopSmoke:
 
         # 10. Status (DB fallback after end)
         s5 = await ctrl.get_session_status(sid)
-        assert s5 is not None and s5["is_active"] is False
+        assert s5 is not None
+        assert s5["is_active"] is False
 
     async def test_therapeutic_engagement_tracked_through_loop(
         self, controller_with_fake_db

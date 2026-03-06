@@ -18,7 +18,8 @@ def test_tool_spec_semver_and_param_limits():
         safety_flags=[],
     )
     h = spec.signature_hash()
-    assert isinstance(h, str) and len(h) == 16
+    assert isinstance(h, str)
+    assert len(h) == 16
 
     # too many params should fail
     with pytest.raises(Exception):

@@ -39,7 +39,7 @@ class FakeUnitOfWork:
 
     # -- context manager -------------------------------------------------------
 
-    async def __aenter__(self) -> "FakeUnitOfWork":
+    async def __aenter__(self) -> FakeUnitOfWork:
         self._take_snapshot()
         self.committed = False
         self.rolled_back = False

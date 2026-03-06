@@ -37,7 +37,8 @@ async def test_agents_endpoint_and_auto_register(redis_client):
     res = client.get("/agents")
     assert res.status_code == 200
     body = res.json()
-    assert "local" in body and "redis_index" in body
+    assert "local" in body
+    assert "redis_index" in body
     # Derived metrics should be present (performance keys may be zero but exist)
     # Note: performance is attached when any Agent.process_with_timeout has run; it's ok if absent.
     # Ensure heartbeat age is present for redis_index entries

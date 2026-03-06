@@ -8,12 +8,9 @@ Tests cover:
 
 from __future__ import annotations
 
-from datetime import UTC, date, timedelta
-
-import pytest
+from datetime import date, timedelta
 
 from src.common.time_utils import consecutive_streak_ending_today, pick_reference_today
-
 
 # ---------------------------------------------------------------------------
 # consecutive_streak_ending_today

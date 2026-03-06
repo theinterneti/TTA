@@ -9,6 +9,8 @@ and migration functionality.
 
 import unittest
 
+import pytest
+
 from src.player_experience.models.enums import IntensityLevel, TherapeuticApproach
 from src.player_experience.models.therapeutic_settings import (
     EnhancedTherapeuticSettings,
@@ -33,11 +35,11 @@ class TestTherapeuticBoundary(unittest.TestCase):
             parameters={"topics": ["family", "trauma"]},
         )
 
-        self.assertEqual(boundary.boundary_id, "test_boundary_1")
-        self.assertEqual(boundary.boundary_type, "avoid_topic")
-        self.assertEqual(boundary.severity, "hard")
-        self.assertTrue(boundary.is_active)
-        self.assertIn("topics", boundary.parameters)
+        assert boundary.boundary_id == "test_boundary_1"
+        assert boundary.boundary_type == "avoid_topic"
+        assert boundary.severity == "hard"
+        assert boundary.is_active
+        assert "topics" in boundary.parameters
 
     def test_boundary_auto_id_generation(self):
         """Test automatic ID generation for boundaries."""
@@ -48,12 +50,12 @@ class TestTherapeuticBoundary(unittest.TestCase):
             severity="soft",
         )
 
-        self.assertIsNotNone(boundary.boundary_id)
-        self.assertNotEqual(boundary.boundary_id, "")
+        assert boundary.boundary_id is not None
+        assert boundary.boundary_id != ""
 
     def test_boundary_invalid_severity(self):
         """Test validation of boundary severity."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticBoundary(
                 boundary_id="test_boundary_2",
                 boundary_type="avoid_topic",
@@ -82,12 +84,12 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
         """Test creating enhanced therapeutic settings."""
         settings = self.basic_settings
 
-        self.assertEqual(settings.settings_id, "test_settings_1")
-        self.assertEqual(settings.player_id, self.test_player_id)
-        self.assertEqual(settings.intensity_level, IntensityLevel.MEDIUM)
-        self.assertIn(TherapeuticApproach.CBT, settings.preferred_approaches)
-        self.assertIn(TherapeuticApproach.MINDFULNESS, settings.preferred_approaches)
-        self.assertTrue(settings.is_active)
+        assert settings.settings_id == "test_settings_1"
+        assert settings.player_id == self.test_player_id
+        assert settings.intensity_level == IntensityLevel.MEDIUM
+        assert TherapeuticApproach.CBT in settings.preferred_approaches
+        assert TherapeuticApproach.MINDFULNESS in settings.preferred_approaches
+        assert settings.is_active
 
     def test_settings_auto_id_generation(self):
         """Test automatic ID generation for settings."""
@@ -95,13 +97,13 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
             settings_id="", player_id=self.test_player_id
         )
 
-        self.assertIsNotNone(settings.settings_id)
-        self.assertNotEqual(settings.settings_id, "")
+        assert settings.settings_id is not None
+        assert settings.settings_id != ""
 
     def test_settings_validation(self):
         """Test validation of therapeutic settings."""
         # Test invalid intensity level
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             EnhancedTherapeuticSettings(
                 settings_id="test_settings_2",
                 player_id=self.test_player_id,
@@ -109,7 +111,7 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
             )
 
         # Test invalid feedback sensitivity
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             EnhancedTherapeuticSettings(
                 settings_id="test_settings_3",
                 player_id=self.test_player_id,
@@ -117,7 +119,7 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
             )
 
         # Test invalid session duration
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             EnhancedTherapeuticSettings(
                 settings_id="test_settings_4",
                 player_id=self.test_player_id,
@@ -137,11 +139,11 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
 
         settings.add_boundary(boundary)
 
-        self.assertEqual(len(settings.boundaries), 1)
-        self.assertEqual(settings.boundaries[0].boundary_id, "boundary_1")
+        assert len(settings.boundaries) == 1
+        assert settings.boundaries[0].boundary_id == "boundary_1"
 
         # Test adding duplicate boundary
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             settings.add_boundary(boundary)
 
     def test_remove_boundary(self):
@@ -156,16 +158,16 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
         )
 
         settings.add_boundary(boundary)
-        self.assertEqual(len(settings.boundaries), 1)
+        assert len(settings.boundaries) == 1
 
         # Remove boundary
         removed = settings.remove_boundary("boundary_2")
-        self.assertTrue(removed)
-        self.assertEqual(len(settings.boundaries), 0)
+        assert removed
+        assert len(settings.boundaries) == 0
 
         # Try to remove non-existent boundary
         removed = settings.remove_boundary("non_existent")
-        self.assertFalse(removed)
+        assert not removed
 
     def test_update_intensity(self):
         """Test updating intensity level."""
@@ -179,8 +181,8 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
 
         settings.update_intensity(IntensityLevel.HIGH)
 
-        self.assertEqual(settings.intensity_level, IntensityLevel.HIGH)
-        self.assertGreater(settings.updated_at, original_updated_at)
+        assert settings.intensity_level == IntensityLevel.HIGH
+        assert settings.updated_at > original_updated_at
 
     def test_add_preferred_approach(self):
         """Test adding preferred therapeutic approaches."""
@@ -189,14 +191,12 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
 
         settings.add_preferred_approach(TherapeuticApproach.NARRATIVE_THERAPY)
 
-        self.assertEqual(len(settings.preferred_approaches), original_count + 1)
-        self.assertIn(
-            TherapeuticApproach.NARRATIVE_THERAPY, settings.preferred_approaches
-        )
+        assert len(settings.preferred_approaches) == original_count + 1
+        assert TherapeuticApproach.NARRATIVE_THERAPY in settings.preferred_approaches
 
         # Test adding duplicate approach (should not add)
         settings.add_preferred_approach(TherapeuticApproach.NARRATIVE_THERAPY)
-        self.assertEqual(len(settings.preferred_approaches), original_count + 1)
+        assert len(settings.preferred_approaches) == original_count + 1
 
     def test_remove_preferred_approach(self):
         """Test removing preferred therapeutic approaches."""
@@ -204,14 +204,14 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
 
         # Remove existing approach
         removed = settings.remove_preferred_approach(TherapeuticApproach.CBT)
-        self.assertTrue(removed)
-        self.assertNotIn(TherapeuticApproach.CBT, settings.preferred_approaches)
+        assert removed
+        assert TherapeuticApproach.CBT not in settings.preferred_approaches
 
         # Try to remove non-existent approach
         removed = settings.remove_preferred_approach(
             TherapeuticApproach.NARRATIVE_THERAPY
         )
-        self.assertFalse(removed)
+        assert not removed
 
     def test_get_all_approaches(self):
         """Test getting all therapeutic approaches."""
@@ -220,9 +220,9 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
 
         all_approaches = settings.get_all_approaches()
 
-        self.assertIn(TherapeuticApproach.CBT, all_approaches)
-        self.assertIn(TherapeuticApproach.MINDFULNESS, all_approaches)
-        self.assertIn(TherapeuticApproach.ACCEPTANCE_COMMITMENT, all_approaches)
+        assert TherapeuticApproach.CBT in all_approaches
+        assert TherapeuticApproach.MINDFULNESS in all_approaches
+        assert TherapeuticApproach.ACCEPTANCE_COMMITMENT in all_approaches
 
     def test_create_new_version(self):
         """Test creating new version of settings."""
@@ -233,14 +233,10 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
             change_summary="Updated intensity level", created_by=self.test_player_id
         )
 
-        self.assertEqual(new_settings.version.version_number, original_version + 1)
-        self.assertEqual(
-            new_settings.version.previous_version_id, settings.version.version_id
-        )
-        self.assertEqual(new_settings.version.created_by, self.test_player_id)
-        self.assertEqual(
-            new_settings.settings_id, settings.settings_id
-        )  # Same settings ID
+        assert new_settings.version.version_number == original_version + 1
+        assert new_settings.version.previous_version_id == settings.version.version_id
+        assert new_settings.version.created_by == self.test_player_id
+        assert new_settings.settings_id == settings.settings_id  # Same settings ID
 
     def test_get_active_boundaries(self):
         """Test getting active boundaries only."""
@@ -267,8 +263,8 @@ class TestEnhancedTherapeuticSettings(unittest.TestCase):
 
         active_boundaries = settings.get_active_boundaries()
 
-        self.assertEqual(len(active_boundaries), 1)
-        self.assertEqual(active_boundaries[0].boundary_id, "active_boundary")
+        assert len(active_boundaries) == 1
+        assert active_boundaries[0].boundary_id == "active_boundary"
 
 
 class TestTherapeuticPreferencesValidator(unittest.TestCase):
@@ -291,8 +287,8 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
 
         is_valid, conflicts = self.validator.validate_settings(settings)
 
-        self.assertTrue(is_valid)
-        self.assertEqual(len(conflicts), 0)
+        assert is_valid
+        assert len(conflicts) == 0
 
     def test_intensity_approach_mismatch(self):
         """Test detection of intensity-approach mismatches."""
@@ -307,8 +303,8 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
 
         is_valid, conflicts = self.validator.validate_settings(settings)
 
-        self.assertTrue(is_valid)  # Should be valid but with warnings
-        self.assertGreater(len(conflicts), 0)
+        assert is_valid  # Should be valid but with warnings
+        assert len(conflicts) > 0
 
         # Check for intensity-approach mismatch conflict
         mismatch_conflicts = [
@@ -316,7 +312,7 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
             for c in conflicts
             if c.conflict_type == SettingsConflictType.INTENSITY_APPROACH_MISMATCH
         ]
-        self.assertGreater(len(mismatch_conflicts), 0)
+        assert len(mismatch_conflicts) > 0
 
     def test_contradictory_preferences(self):
         """Test detection of contradictory preferences."""
@@ -329,7 +325,7 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
 
         is_valid, conflicts = self.validator.validate_settings(settings)
 
-        self.assertFalse(is_valid)  # Should be invalid due to error-level conflict
+        assert not is_valid  # Should be invalid due to error-level conflict
 
         # Check for contradictory preferences conflict
         contradictory_conflicts = [
@@ -337,11 +333,11 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
             for c in conflicts
             if c.conflict_type == SettingsConflictType.CONTRADICTORY_PREFERENCES
         ]
-        self.assertGreater(len(contradictory_conflicts), 0)
+        assert len(contradictory_conflicts) > 0
 
         conflict = contradictory_conflicts[0]
-        self.assertEqual(conflict.severity, "error")
-        self.assertTrue(conflict.auto_resolvable)
+        assert conflict.severity == "error"
+        assert conflict.auto_resolvable
 
     def test_unsafe_combinations(self):
         """Test detection of unsafe setting combinations."""
@@ -354,7 +350,7 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
 
         is_valid, conflicts = self.validator.validate_settings(settings)
 
-        self.assertFalse(is_valid)  # Should be invalid due to critical conflict
+        assert not is_valid  # Should be invalid due to critical conflict
 
         # Check for unsafe combination conflict
         unsafe_conflicts = [
@@ -362,11 +358,11 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
             for c in conflicts
             if c.conflict_type == SettingsConflictType.UNSAFE_COMBINATION
         ]
-        self.assertGreater(len(unsafe_conflicts), 0)
+        assert len(unsafe_conflicts) > 0
 
         conflict = unsafe_conflicts[0]
-        self.assertEqual(conflict.severity, "critical")
-        self.assertTrue(conflict.auto_resolvable)
+        assert conflict.severity == "critical"
+        assert conflict.auto_resolvable
 
     def test_resolve_conflict(self):
         """Test automatic conflict resolution."""
@@ -378,7 +374,7 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
         )
 
         is_valid, conflicts = self.validator.validate_settings(settings)
-        self.assertFalse(is_valid)
+        assert not is_valid
 
         # Find the unsafe combination conflict
         unsafe_conflict = next(
@@ -394,10 +390,8 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
         )
 
         # Check that the conflict is resolved
-        self.assertTrue(resolved_settings.crisis_monitoring_enabled)
-        self.assertGreater(
-            resolved_settings.version.version_number, settings.version.version_number
-        )
+        assert resolved_settings.crisis_monitoring_enabled
+        assert resolved_settings.version.version_number > settings.version.version_number
 
     def test_non_resolvable_conflict(self):
         """Test handling of non-resolvable conflicts."""
@@ -415,7 +409,7 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
             settings_id="test_settings", player_id=self.test_player_id
         )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.validator.resolve_conflict(settings, conflict, {})
 
 
@@ -452,25 +446,18 @@ class TestSettingsMigrationManager(unittest.TestCase):
         )
 
         # Check basic migration
-        self.assertEqual(migrated_settings.settings_id, "old_settings_1")
-        self.assertEqual(migrated_settings.player_id, self.test_player_id)
-        self.assertEqual(
-            migrated_settings.intensity_level, IntensityLevel.HIGH
-        )  # 0.7 -> HIGH
-        self.assertEqual(
-            migrated_settings.preferred_approaches,
-            [TherapeuticApproach.CBT, TherapeuticApproach.MINDFULNESS],
-        )
-        self.assertEqual(migrated_settings.intervention_frequency, "frequent")
-        self.assertEqual(migrated_settings.feedback_sensitivity, 0.8)
-        self.assertTrue(migrated_settings.crisis_monitoring_enabled)
-        self.assertFalse(migrated_settings.adaptive_difficulty)
-        self.assertEqual(migrated_settings.session_duration_preference, 45)
-        self.assertEqual(
-            migrated_settings.trigger_warnings, ["loud_noises", "conflict"]
-        )
-        self.assertEqual(migrated_settings.comfort_topics, ["nature", "music"])
-        self.assertEqual(migrated_settings.avoid_topics, ["violence"])
+        assert migrated_settings.settings_id == "old_settings_1"
+        assert migrated_settings.player_id == self.test_player_id
+        assert migrated_settings.intensity_level == IntensityLevel.HIGH  # 0.7 -> HIGH
+        assert migrated_settings.preferred_approaches == [TherapeuticApproach.CBT, TherapeuticApproach.MINDFULNESS]
+        assert migrated_settings.intervention_frequency == "frequent"
+        assert migrated_settings.feedback_sensitivity == 0.8
+        assert migrated_settings.crisis_monitoring_enabled
+        assert not migrated_settings.adaptive_difficulty
+        assert migrated_settings.session_duration_preference == 45
+        assert migrated_settings.trigger_warnings == ["loud_noises", "conflict"]
+        assert migrated_settings.comfort_topics == ["nature", "music"]
+        assert migrated_settings.avoid_topics == ["violence"]
 
     def test_migrate_float_intensity_conversion(self):
         """Test conversion of float intensity levels to enums."""
@@ -479,21 +466,21 @@ class TestSettingsMigrationManager(unittest.TestCase):
         migrated_low = self.migration_manager.migrate_settings(
             old_settings_low, target_version=1
         )
-        self.assertEqual(migrated_low.intensity_level, IntensityLevel.LOW)
+        assert migrated_low.intensity_level == IntensityLevel.LOW
 
         # Test medium intensity
         old_settings_medium = {"player_id": self.test_player_id, "intensity_level": 0.5}
         migrated_medium = self.migration_manager.migrate_settings(
             old_settings_medium, target_version=1
         )
-        self.assertEqual(migrated_medium.intensity_level, IntensityLevel.MEDIUM)
+        assert migrated_medium.intensity_level == IntensityLevel.MEDIUM
 
         # Test high intensity
         old_settings_high = {"player_id": self.test_player_id, "intensity_level": 0.9}
         migrated_high = self.migration_manager.migrate_settings(
             old_settings_high, target_version=1
         )
-        self.assertEqual(migrated_high.intensity_level, IntensityLevel.HIGH)
+        assert migrated_high.intensity_level == IntensityLevel.HIGH
 
     def test_migrate_invalid_approaches_filtering(self):
         """Test filtering of invalid therapeutic approaches during migration."""
@@ -511,17 +498,15 @@ class TestSettingsMigrationManager(unittest.TestCase):
         )
 
         # Should only contain valid approaches
-        self.assertEqual(len(migrated_settings.preferred_approaches), 2)
-        self.assertIn(TherapeuticApproach.CBT, migrated_settings.preferred_approaches)
-        self.assertIn(
-            TherapeuticApproach.MINDFULNESS, migrated_settings.preferred_approaches
-        )
+        assert len(migrated_settings.preferred_approaches) == 2
+        assert TherapeuticApproach.CBT in migrated_settings.preferred_approaches
+        assert TherapeuticApproach.MINDFULNESS in migrated_settings.preferred_approaches
 
     def test_migrate_unsupported_version(self):
         """Test handling of unsupported migration versions."""
         old_settings = {"player_id": self.test_player_id}
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.migration_manager.migrate_settings(old_settings, target_version=999)
 
 

@@ -86,10 +86,10 @@ class TestProgressTrackingService(unittest.TestCase):
     def test_compute_progress_summary(self):
         async def run():
             summary = await self.service.compute_progress_summary(self.player_id)
-            self.assertEqual(summary.player_id, self.player_id)
-            self.assertEqual(summary.engagement_metrics.total_sessions, 5)
-            self.assertGreaterEqual(summary.therapeutic_momentum, 0.4)
-            self.assertIn(summary.progress_trend, ["stable", "improving"])
+            assert summary.player_id == self.player_id
+            assert summary.engagement_metrics.total_sessions == 5
+            assert summary.therapeutic_momentum >= 0.4
+            assert summary.progress_trend in ["stable", "improving"]
 
         asyncio.run(run())
 
@@ -100,27 +100,27 @@ class TestProgressTrackingService(unittest.TestCase):
             )
             # Skill milestone should trigger
             titles = [m.title for m in milestones]
-            self.assertIn("Skill Builder Level 1", titles)
-            self.assertGreater(len(highlights), 0)
+            assert "Skill Builder Level 1" in titles
+            assert len(highlights) > 0
 
         asyncio.run(run())
 
     def test_generate_progress_insights(self):
         async def run():
             recs = await self.service.generate_progress_insights(self.player_id)
-            self.assertIsInstance(recs, list)
+            assert isinstance(recs, list)
             # Expect at least one recommendation based on momentum
-            self.assertGreater(len(recs), 0)
+            assert len(recs) > 0
 
         asyncio.run(run())
 
     def test_get_visualization_data(self):
         async def run():
             viz = await self.service.get_visualization_data(self.player_id, days=7)
-            self.assertEqual(len(viz.time_buckets), 7)
-            self.assertIn("sessions", viz.series)
-            self.assertIn("duration_minutes", viz.series)
-            self.assertEqual(len(viz.series["sessions"]), 7)
+            assert len(viz.time_buckets) == 7
+            assert "sessions" in viz.series
+            assert "duration_minutes" in viz.series
+            assert len(viz.series["sessions"]) == 7
 
         asyncio.run(run())
 
@@ -129,12 +129,12 @@ class TestProgressTrackingService(unittest.TestCase):
             report = await self.service.generate_therapeutic_effectiveness_report(
                 self.player_id
             )
-            self.assertEqual(report.player_id, self.player_id)
-            self.assertIsInstance(report.overall_effectiveness_score, float)
-            self.assertGreaterEqual(report.overall_effectiveness_score, 0.0)
-            self.assertLessEqual(report.overall_effectiveness_score, 1.0)
-            self.assertIsInstance(report.therapeutic_metrics, list)
-            self.assertGreater(len(report.therapeutic_metrics), 0)
+            assert report.player_id == self.player_id
+            assert isinstance(report.overall_effectiveness_score, float)
+            assert report.overall_effectiveness_score >= 0.0
+            assert report.overall_effectiveness_score <= 1.0
+            assert isinstance(report.therapeutic_metrics, list)
+            assert len(report.therapeutic_metrics) > 0
 
         asyncio.run(run())
 
@@ -149,10 +149,10 @@ class TestProgressTrackingService(unittest.TestCase):
             celebration = await self.service.celebrate_milestone_achievement(
                 self.player_id, milestone
             )
-            self.assertIn("milestone_id", celebration)
-            self.assertIn("celebration_message", celebration)
-            self.assertIn("therapeutic_value", celebration)
-            self.assertIsInstance(celebration["therapeutic_value"], float)
+            assert "milestone_id" in celebration
+            assert "celebration_message" in celebration
+            assert "therapeutic_value" in celebration
+            assert isinstance(celebration["therapeutic_value"], float)
 
         asyncio.run(run())
 
@@ -194,14 +194,14 @@ class TestProgressTrackingService(unittest.TestCase):
             summary = await self.service.compute_progress_summary(self.player_id)
 
             # Verify enhanced functionality
-            self.assertIsInstance(summary.strength_areas, list)
-            self.assertIsInstance(summary.challenge_areas, list)
-            self.assertIsInstance(summary.next_recommended_goals, list)
-            self.assertIsInstance(summary.suggested_therapeutic_adjustments, list)
+            assert isinstance(summary.strength_areas, list)
+            assert isinstance(summary.challenge_areas, list)
+            assert isinstance(summary.next_recommended_goals, list)
+            assert isinstance(summary.suggested_therapeutic_adjustments, list)
 
             # Verify therapeutic momentum calculation
-            self.assertGreater(summary.therapeutic_momentum, 0.5)
-            self.assertGreater(summary.readiness_for_advancement, 0.3)
+            assert summary.therapeutic_momentum > 0.5
+            assert summary.readiness_for_advancement > 0.3
 
         asyncio.run(run())
 
@@ -236,12 +236,12 @@ class TestProgressTrackingService(unittest.TestCase):
 
             # Should detect multiple milestones for 7+ day streak
             milestone_titles = [m.title for m in milestones]
-            self.assertTrue(any("7" in title for title in milestone_titles))
+            assert any("7" in title for title in milestone_titles)
 
             # Should have celebration highlights
-            self.assertGreater(len(highlights), 0)
+            assert len(highlights) > 0
             highlight_types = [h.highlight_type for h in highlights]
-            self.assertIn("milestone", highlight_types)
+            assert "milestone" in highlight_types
 
         asyncio.run(run())
 
@@ -272,16 +272,16 @@ class TestProgressTrackingService(unittest.TestCase):
             insights = await self.service.generate_progress_insights(self.player_id)
 
             # Should generate multiple relevant recommendations
-            self.assertGreater(len(insights), 0)
-            self.assertLessEqual(len(insights), 6)  # Should limit to top 6
+            assert len(insights) > 0
+            assert len(insights) <= 6  # Should limit to top 6
 
             # Recommendations should be sorted by priority
             priorities = [rec.priority for rec in insights]
-            self.assertEqual(priorities, sorted(priorities))
+            assert priorities == sorted(priorities)
 
             # Should include diverse recommendation types
             rec_types = [rec.recommendation_type for rec in insights]
-            self.assertGreater(len(set(rec_types)), 1)  # Multiple types
+            assert len(set(rec_types)) > 1  # Multiple types
 
         asyncio.run(run())
 
@@ -313,7 +313,7 @@ class TestProgressTrackingService(unittest.TestCase):
             summary = await self.service.compute_progress_summary(self.player_id)
 
             # Should detect elevated dropout risk
-            self.assertGreaterEqual(summary.engagement_metrics.dropout_risk_score, 0.5)
+            assert summary.engagement_metrics.dropout_risk_score >= 0.5
 
             # Should suggest therapeutic support (flexible approach or engagement support)
             insights = await self.service.generate_progress_insights(self.player_id)
@@ -329,10 +329,7 @@ class TestProgressTrackingService(unittest.TestCase):
                 or "approach" in title.lower()
                 for title in rec_titles
             )
-            self.assertTrue(
-                dropout_support_found,
-                f"Expected dropout support recommendations but got types: {rec_types}, titles: {rec_titles}",
-            )
+            assert dropout_support_found, f"Expected dropout support recommendations but got types: {rec_types}, titles: {rec_titles}"
 
         asyncio.run(run())
 
@@ -354,24 +351,24 @@ class TestProgressTrackingService(unittest.TestCase):
         breakthrough_value = self.service._assess_therapeutic_value(
             "Major breakthrough in understanding", session_summary
         )
-        self.assertGreater(breakthrough_value, 0.3)
+        assert breakthrough_value > 0.3
 
         # Test skill achievement
         skill_value = self.service._assess_therapeutic_value(
             "New coping skill acquired", session_summary
         )
-        self.assertGreater(skill_value, 0.2)
+        assert skill_value > 0.2
 
         # Test regular achievement
         regular_value = self.service._assess_therapeutic_value(
             "Completed session", session_summary
         )
-        self.assertGreater(regular_value, 0.1)
+        assert regular_value > 0.1
 
         # All values should be <= 1.0
-        self.assertLessEqual(breakthrough_value, 1.0)
-        self.assertLessEqual(skill_value, 1.0)
-        self.assertLessEqual(regular_value, 1.0)
+        assert breakthrough_value <= 1.0
+        assert skill_value <= 1.0
+        assert regular_value <= 1.0
 
     def test_streak_calculation_accuracy(self):
         # Test streak calculation with various scenarios
@@ -380,32 +377,32 @@ class TestProgressTrackingService(unittest.TestCase):
         # Test consecutive streak
         consecutive_dates = [now - timedelta(days=i) for i in range(5)]
         streak = self.service._calculate_current_streak(consecutive_dates)
-        self.assertEqual(streak, 5)
+        assert streak == 5
 
         # Test broken streak
         broken_dates = [now - timedelta(days=i) for i in [0, 1, 3, 4]]  # Missing day 2
         broken_streak = self.service._calculate_current_streak(broken_dates)
-        self.assertEqual(broken_streak, 2)  # Only counts from today
+        assert broken_streak == 2  # Only counts from today
 
         # Test no recent activity
         old_dates = [now - timedelta(days=i) for i in range(10, 15)]
         no_streak = self.service._calculate_current_streak(old_dates)
-        self.assertEqual(no_streak, 0)
+        assert no_streak == 0
 
     def test_visualization_data_accuracy(self):
         async def run():
             # Test visualization data generation
             viz_data = await self.service.get_visualization_data(self.player_id, days=7)
 
-            self.assertEqual(len(viz_data.time_buckets), 7)
-            self.assertIn("sessions", viz_data.series)
-            self.assertIn("duration_minutes", viz_data.series)
-            self.assertEqual(len(viz_data.series["sessions"]), 7)
-            self.assertEqual(len(viz_data.series["duration_minutes"]), 7)
+            assert len(viz_data.time_buckets) == 7
+            assert "sessions" in viz_data.series
+            assert "duration_minutes" in viz_data.series
+            assert len(viz_data.series["sessions"]) == 7
+            assert len(viz_data.series["duration_minutes"]) == 7
 
             # Verify metadata
-            self.assertIn("period_days", viz_data.meta)
-            self.assertEqual(viz_data.meta["period_days"], 7)
+            assert "period_days" in viz_data.meta
+            assert viz_data.meta["period_days"] == 7
 
         asyncio.run(run())
 

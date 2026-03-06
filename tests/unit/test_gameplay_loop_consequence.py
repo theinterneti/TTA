@@ -9,22 +9,30 @@ mocked so these tests remain pure unit tests with no external service dependenci
 
 from __future__ import annotations
 
+import sys
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from src.components.gameplay_loop.consequence_system.therapeutic_framer import (
-    TherapeuticFramer,
+# Skip on Python 3.14 due to langchain_openai segfault in gameplay components
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Gameplay components trigger langchain_openai segfault on Python 3.14",
 )
-from src.components.gameplay_loop.models.core import (
-    ChoiceType,
-    ConsequenceSet,
-    EmotionalState,
-    Scene,
-    SceneType,
-    SessionState,
-)
-from src.components.gameplay_loop.models.interactions import UserChoice
+
+if sys.version_info < (3, 14):
+    from src.components.gameplay_loop.consequence_system.therapeutic_framer import (
+        TherapeuticFramer,
+    )
+    from src.components.gameplay_loop.models.core import (
+        ChoiceType,
+        ConsequenceSet,
+        EmotionalState,
+        Scene,
+        SceneType,
+        SessionState,
+    )
+    from src.components.gameplay_loop.models.interactions import UserChoice
 
 # ---------------------------------------------------------------------------
 # Helpers

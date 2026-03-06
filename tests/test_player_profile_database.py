@@ -8,6 +8,8 @@ import unittest
 from datetime import datetime
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+
 from src.player_experience.database.player_profile_repository import (
     PlayerProfileRepository,
     PlayerProfileRepositoryError,
@@ -45,11 +47,11 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
             uri="bolt://localhost:7687", username="test_user", password="test_pass"
         )
 
-        self.assertEqual(manager.uri, "bolt://localhost:7687")
-        self.assertEqual(manager.username, "test_user")
-        self.assertEqual(manager.password, "test_pass")
-        self.assertEqual(manager.player_schema_version, "1.0.0")
-        self.assertIsNone(manager.driver)
+        assert manager.uri == "bolt://localhost:7687"
+        assert manager.username == "test_user"
+        assert manager.password == "test_pass"
+        assert manager.player_schema_version == "1.0.0"
+        assert manager.driver is None
 
     @patch("src.player_experience.database.player_profile_schema.GraphDatabase")
     def test_connect_success(self, mock_graph_db):
@@ -62,7 +64,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
         manager = PlayerProfileSchemaManager()
         manager.connect()
 
-        self.assertEqual(manager.driver, mock_driver)
+        assert manager.driver == mock_driver
         mock_graph_db.driver.assert_called_once_with(
             "bolt://localhost:7687", auth=("neo4j", "password")
         )
@@ -79,7 +81,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         manager = PlayerProfileSchemaManager()
 
-        with self.assertRaises(PlayerProfileSchemaError):
+        with pytest.raises(PlayerProfileSchemaError):
             manager.connect()
 
     def test_disconnect(self):
@@ -90,22 +92,22 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
         self.schema_manager.disconnect()
 
         mock_driver.close.assert_called_once()
-        self.assertIsNone(self.schema_manager.driver)
+        assert self.schema_manager.driver is None
 
     def test_is_connected_true(self):
         """Test connection check when connected."""
-        self.assertTrue(self.schema_manager.is_connected())
+        assert self.schema_manager.is_connected()
         self.mock_session.run.assert_called_with("RETURN 1")
 
     def test_is_connected_false_no_driver(self):
         """Test connection check when no driver."""
         self.schema_manager.driver = None
-        self.assertFalse(self.schema_manager.is_connected())
+        assert not self.schema_manager.is_connected()
 
     def test_is_connected_false_exception(self):
         """Test connection check when exception occurs."""
         self.mock_session.run.side_effect = Exception("Connection error")
-        self.assertFalse(self.schema_manager.is_connected())
+        assert not self.schema_manager.is_connected()
 
     def test_create_player_profile_constraints_success(self):
         """Test successful constraint creation."""
@@ -113,9 +115,9 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.create_player_profile_constraints()
 
-        self.assertTrue(result)
+        assert result
         # Verify that multiple constraint creation queries were called
-        self.assertGreater(self.mock_session.run.call_count, 5)
+        assert self.mock_session.run.call_count > 5
 
     def test_create_player_profile_constraints_already_exists(self):
         """Test constraint creation when constraints already exist."""
@@ -125,7 +127,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.create_player_profile_constraints()
 
-        self.assertTrue(result)
+        assert result
 
     def test_create_player_profile_constraints_failure(self):
         """Test constraint creation failure."""
@@ -135,7 +137,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.create_player_profile_constraints()
 
-        self.assertFalse(result)
+        assert not result
 
     def test_create_player_profile_indexes_success(self):
         """Test successful index creation."""
@@ -143,9 +145,9 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.create_player_profile_indexes()
 
-        self.assertTrue(result)
+        assert result
         # Verify that multiple index creation queries were called
-        self.assertGreater(self.mock_session.run.call_count, 10)
+        assert self.mock_session.run.call_count > 10
 
     def test_setup_player_profile_schema_success(self):
         """Test successful complete schema setup."""
@@ -153,9 +155,9 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.setup_player_profile_schema()
 
-        self.assertTrue(result)
+        assert result
         # Verify that schema version was recorded
-        self.assertGreater(self.mock_session.run.call_count, 15)
+        assert self.mock_session.run.call_count > 15
 
     def test_setup_player_profile_schema_constraint_failure(self):
         """Test schema setup failure during constraint creation."""
@@ -165,7 +167,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.setup_player_profile_schema()
 
-        self.assertFalse(result)
+        assert not result
 
     def test_get_player_schema_version_success(self):
         """Test getting schema version successfully."""
@@ -175,7 +177,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         version = self.schema_manager.get_player_schema_version()
 
-        self.assertEqual(version, "1.0.0")
+        assert version == "1.0.0"
 
     def test_get_player_schema_version_not_found(self):
         """Test getting schema version when not found."""
@@ -183,7 +185,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         version = self.schema_manager.get_player_schema_version()
 
-        self.assertIsNone(version)
+        assert version is None
 
     def test_validate_player_profile_schema_success(self):
         """Test successful schema validation."""
@@ -207,7 +209,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.validate_player_profile_schema()
 
-        self.assertTrue(result)
+        assert result
 
     def test_validate_player_profile_schema_missing_constraints(self):
         """Test schema validation with missing constraints."""
@@ -216,7 +218,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
 
         result = self.schema_manager.validate_player_profile_schema()
 
-        self.assertFalse(result)
+        assert not result
 
     def test_context_manager(self):
         """Test context manager functionality."""
@@ -257,10 +259,10 @@ class TestPlayerProfileRepository(unittest.TestCase):
             uri="bolt://localhost:7687", username="test_user", password="test_pass"
         )
 
-        self.assertEqual(repo.uri, "bolt://localhost:7687")
-        self.assertEqual(repo.username, "test_user")
-        self.assertEqual(repo.password, "test_pass")
-        self.assertIsNone(repo.driver)
+        assert repo.uri == "bolt://localhost:7687"
+        assert repo.username == "test_user"
+        assert repo.password == "test_pass"
+        assert repo.driver is None
 
     @patch("src.player_experience.database.player_profile_repository.GraphDatabase")
     def test_connect_success(self, mock_graph_db):
@@ -273,7 +275,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
         repo = PlayerProfileRepository()
         repo.connect()
 
-        self.assertEqual(repo.driver, mock_driver)
+        assert repo.driver == mock_driver
         mock_session.run.assert_called_once_with("RETURN 1")
 
     def test_serialize_therapeutic_preferences(self):
@@ -291,15 +293,12 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         serialized = self.repository._serialize_therapeutic_preferences(prefs)
 
-        self.assertEqual(serialized["intensity_level"], "high")
-        self.assertEqual(
-            serialized["preferred_approaches"],
-            ["cognitive_behavioral_therapy", "mindfulness"],
-        )
-        self.assertEqual(serialized["trigger_warnings"], ["violence"])
-        self.assertEqual(serialized["comfort_topics"], ["nature"])
-        self.assertEqual(serialized["session_duration_preference"], 45)
-        self.assertIn("preferences_id", serialized)
+        assert serialized["intensity_level"] == "high"
+        assert serialized["preferred_approaches"] == ["cognitive_behavioral_therapy", "mindfulness"]
+        assert serialized["trigger_warnings"] == ["violence"]
+        assert serialized["comfort_topics"] == ["nature"]
+        assert serialized["session_duration_preference"] == 45
+        assert "preferences_id" in serialized
 
     def test_serialize_privacy_settings(self):
         """Test privacy settings serialization."""
@@ -311,10 +310,10 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         serialized = self.repository._serialize_privacy_settings(privacy)
 
-        self.assertTrue(serialized["data_collection_consent"])
-        self.assertFalse(serialized["research_participation_consent"])
-        self.assertEqual(serialized["data_retention_period_days"], 180)
-        self.assertIn("settings_id", serialized)
+        assert serialized["data_collection_consent"]
+        assert not serialized["research_participation_consent"]
+        assert serialized["data_retention_period_days"] == 180
+        assert "settings_id" in serialized
 
     def test_serialize_progress_summary(self):
         """Test progress summary serialization."""
@@ -327,11 +326,11 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         serialized = self.repository._serialize_progress_summary(progress)
 
-        self.assertEqual(serialized["total_sessions"], 10)
-        self.assertEqual(serialized["total_time_minutes"], 300)
-        self.assertEqual(serialized["milestones_achieved"], 3)
-        self.assertEqual(serialized["current_streak_days"], 5)
-        self.assertIn("summary_id", serialized)
+        assert serialized["total_sessions"] == 10
+        assert serialized["total_time_minutes"] == 300
+        assert serialized["milestones_achieved"] == 3
+        assert serialized["current_streak_days"] == 5
+        assert "summary_id" in serialized
 
     def test_create_player_profile_success(self):
         """Test successful player profile creation."""
@@ -340,15 +339,15 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         result = self.repository.create_player_profile(self.test_profile)
 
-        self.assertTrue(result)
+        assert result
         self.mock_session.run.assert_called_once()
 
         # Verify the query was called with correct parameters
         call_args = self.mock_session.run.call_args
-        self.assertIn("player_id", call_args[1])
-        self.assertEqual(call_args[1]["player_id"], "test_player_123")
-        self.assertEqual(call_args[1]["username"], "testuser")
-        self.assertEqual(call_args[1]["email"], "test@example.com")
+        assert "player_id" in call_args[1]
+        assert call_args[1]["player_id"] == "test_player_123"
+        assert call_args[1]["username"] == "testuser"
+        assert call_args[1]["email"] == "test@example.com"
 
     def test_create_player_profile_already_exists(self):
         """Test player profile creation when profile already exists."""
@@ -356,7 +355,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         self.mock_session.run.side_effect = ClientError("already exists")
 
-        with self.assertRaises(PlayerProfileRepositoryError):
+        with pytest.raises(PlayerProfileRepositoryError):
             self.repository.create_player_profile(self.test_profile)
 
     def test_create_player_profile_failure(self):
@@ -365,7 +364,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         result = self.repository.create_player_profile(self.test_profile)
 
-        self.assertFalse(result)
+        assert not result
 
     def test_get_player_profile_success(self):
         """Test successful player profile retrieval."""
@@ -409,10 +408,10 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         profile = self.repository.get_player_profile("test_player_123")
 
-        self.assertIsNotNone(profile)
-        self.assertEqual(profile.player_id, "test_player_123")
-        self.assertEqual(profile.username, "testuser")
-        self.assertEqual(profile.email, "test@example.com")
+        assert profile is not None
+        assert profile.player_id == "test_player_123"
+        assert profile.username == "testuser"
+        assert profile.email == "test@example.com"
 
     def test_get_player_profile_not_found(self):
         """Test player profile retrieval when not found."""
@@ -420,7 +419,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         profile = self.repository.get_player_profile("nonexistent_player")
 
-        self.assertIsNone(profile)
+        assert profile is None
 
     def test_update_player_profile_success(self):
         """Test successful player profile update."""
@@ -429,7 +428,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         result = self.repository.update_player_profile(self.test_profile)
 
-        self.assertTrue(result)
+        assert result
         self.mock_session.run.assert_called_once()
 
     def test_update_player_profile_not_found(self):
@@ -438,7 +437,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         result = self.repository.update_player_profile(self.test_profile)
 
-        self.assertFalse(result)
+        assert not result
 
     def test_delete_player_profile_success(self):
         """Test successful player profile deletion."""
@@ -448,7 +447,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         result = self.repository.delete_player_profile("test_player_123")
 
-        self.assertTrue(result)
+        assert result
         self.mock_session.run.assert_called_once()
 
     def test_delete_player_profile_not_found(self):
@@ -459,7 +458,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         result = self.repository.delete_player_profile("nonexistent_player")
 
-        self.assertFalse(result)
+        assert not result
 
     def test_username_exists_true(self):
         """Test username existence check when username exists."""
@@ -469,7 +468,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         exists = self.repository.username_exists("testuser")
 
-        self.assertTrue(exists)
+        assert exists
 
     def test_username_exists_false(self):
         """Test username existence check when username doesn't exist."""
@@ -479,7 +478,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         exists = self.repository.username_exists("nonexistent_user")
 
-        self.assertFalse(exists)
+        assert not exists
 
     def test_email_exists_true(self):
         """Test email existence check when email exists."""
@@ -489,7 +488,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         exists = self.repository.email_exists("test@example.com")
 
-        self.assertTrue(exists)
+        assert exists
 
     def test_email_exists_false(self):
         """Test email existence check when email doesn't exist."""
@@ -499,7 +498,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
         exists = self.repository.email_exists("nonexistent@example.com")
 
-        self.assertFalse(exists)
+        assert not exists
 
     def test_list_active_players(self):
         """Test listing active players."""
@@ -514,9 +513,9 @@ class TestPlayerProfileRepository(unittest.TestCase):
 
             profiles = self.repository.list_active_players(limit=10)
 
-            self.assertEqual(len(profiles), 2)
-            self.assertEqual(profiles[0], mock_profile_1)
-            self.assertEqual(profiles[1], mock_profile_2)
+            assert len(profiles) == 2
+            assert profiles[0] == mock_profile_1
+            assert profiles[1] == mock_profile_2
 
     def test_context_manager(self):
         """Test context manager functionality."""
@@ -543,15 +542,15 @@ class TestPlayerProfileValidation(unittest.TestCase):
             created_at=datetime.now(),
         )
 
-        self.assertEqual(profile.player_id, "player_123")
-        self.assertEqual(profile.username, "testuser")
-        self.assertEqual(profile.email, "test@example.com")
-        self.assertTrue(profile.is_active)
-        self.assertEqual(len(profile.characters), 0)
+        assert profile.player_id == "player_123"
+        assert profile.username == "testuser"
+        assert profile.email == "test@example.com"
+        assert profile.is_active
+        assert len(profile.characters) == 0
 
     def test_player_profile_validation_empty_id(self):
         """Test player profile validation with empty ID."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="",
                 username="testuser",
@@ -561,7 +560,7 @@ class TestPlayerProfileValidation(unittest.TestCase):
 
     def test_player_profile_validation_short_username(self):
         """Test player profile validation with short username."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="player_123",
                 username="ab",  # Too short
@@ -571,7 +570,7 @@ class TestPlayerProfileValidation(unittest.TestCase):
 
     def test_player_profile_validation_invalid_email(self):
         """Test player profile validation with invalid email."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="player_123",
                 username="testuser",
@@ -593,7 +592,7 @@ class TestPlayerProfileValidation(unittest.TestCase):
             profile.add_character(f"char_{i}")
 
         # Try to add one more (should fail)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             profile.add_character("char_6")
 
     def test_player_profile_character_management(self):
@@ -607,16 +606,16 @@ class TestPlayerProfileValidation(unittest.TestCase):
 
         # Add character
         profile.add_character("char_1")
-        self.assertIn("char_1", profile.characters)
+        assert "char_1" in profile.characters
 
         # Set active session
         profile.set_active_session("char_1", "session_1")
-        self.assertEqual(profile.get_active_session("char_1"), "session_1")
+        assert profile.get_active_session("char_1") == "session_1"
 
         # Remove character
         profile.remove_character("char_1")
-        self.assertNotIn("char_1", profile.characters)
-        self.assertIsNone(profile.get_active_session("char_1"))
+        assert "char_1" not in profile.characters
+        assert profile.get_active_session("char_1") is None
 
     def test_therapeutic_preferences_validation(self):
         """Test therapeutic preferences validation."""
@@ -624,29 +623,29 @@ class TestPlayerProfileValidation(unittest.TestCase):
         prefs = TherapeuticPreferences(
             intensity_level=IntensityLevel.MEDIUM, session_duration_preference=45
         )
-        self.assertEqual(prefs.intensity_level, IntensityLevel.MEDIUM)
-        self.assertEqual(prefs.session_duration_preference, 45)
+        assert prefs.intensity_level == IntensityLevel.MEDIUM
+        assert prefs.session_duration_preference == 45
 
         # Invalid session duration (too short)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticPreferences(session_duration_preference=5)
 
         # Invalid session duration (too long)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticPreferences(session_duration_preference=150)
 
     def test_privacy_settings_validation(self):
         """Test privacy settings validation."""
         # Valid privacy settings
         privacy = PrivacySettings(data_retention_period_days=180)
-        self.assertEqual(privacy.data_retention_period_days, 180)
+        assert privacy.data_retention_period_days == 180
 
         # Invalid retention period (too short)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=20)
 
         # Invalid retention period (too long)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=3000)
 
 
@@ -665,7 +664,7 @@ class TestUtilityFunctions(unittest.TestCase):
 
         result = setup_player_profile_schema()
 
-        self.assertTrue(result)
+        assert result
         mock_manager.setup_player_profile_schema.assert_called_once()
 
     @patch(
@@ -677,7 +676,7 @@ class TestUtilityFunctions(unittest.TestCase):
 
         result = setup_player_profile_schema()
 
-        self.assertFalse(result)
+        assert not result
 
     @patch(
         "src.player_experience.database.player_profile_repository.PlayerProfileRepository"
@@ -689,7 +688,7 @@ class TestUtilityFunctions(unittest.TestCase):
 
         repo = create_player_profile_repository()
 
-        self.assertEqual(repo, mock_repo)
+        assert repo == mock_repo
         mock_repo.connect.assert_called_once()
 
 
