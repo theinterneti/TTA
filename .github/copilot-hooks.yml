@@ -1,0 +1,156 @@
+# Copilot CLI Hooks Configuration
+# Enforces local quality gates after code generation
+# See: https://docs.github.com/copilot/using-github-copilot/using-github-copilot-cli
+
+version: "1.0"
+
+# Hook execution configuration
+hooks:
+  # Post-generation hook - runs after Copilot modifies code
+  post-generation:
+    enabled: true
+    description: "Automated local quality gate enforcement"
+    
+    # Quality gate commands (executed in order)
+    commands:
+      - name: "ruff-check"
+        description: "Python linting with ruff"
+        command: "uv run ruff check src/ tests/"
+        timeout: 120
+        required: true
+        on_failure: "auto_fix"
+        
+      - name: "pyright-check"
+        description: "Python type checking with pyright"
+        command: "uv run pyright src/"
+        timeout: 90
+        required: true
+        on_failure: "report"
+        
+      - name: "pytest-check"
+        description: "Run viable test subset"
+        command: "uv run pytest tests/unit/test_message_service.py tests/unit/test_characters_router.py tests/unit/tools/ -q --tb=line"
+        timeout: 180
+        required: true
+        on_failure: "report"
+
+    # Automatic repair configuration
+    auto_repair:
+      enabled: true
+      max_iterations: 5
+      strategies:
+        - name: "ruff_auto_fix"
+          trigger: "ruff-check"
+          action: "uv run ruff check --fix src/ tests/"
+          description: "Apply automatic ruff fixes"
+          
+        - name: "ruff_unsafe_fix"
+          trigger: "ruff-check"
+          action: "uv run ruff check --fix --unsafe-fixes src/ tests/"
+          description: "Apply unsafe ruff fixes if safe fixes insufficient"
+          condition: "iteration > 1"
+          
+        - name: "analyze_and_fix"
+          trigger: "any"
+          action: "analyze_errors_and_fix"
+          description: "Parse error logs and apply targeted fixes"
+
+    # Success criteria
+    success_criteria:
+      all_checks_pass: true
+      no_new_warnings: false  # Allow warnings, fail only on errors
+      exit_code_zero: true
+
+# Persistent agent behavior instructions
+agent_instructions:
+  quality_gate_enforcement:
+    description: "Auto-repair loop until all quality gates pass"
+    rules:
+      - "ALWAYS run post-generation hooks after modifying code"
+      - "If ANY hook fails, automatically enter repair loop"
+      - "Parse error logs to identify root causes"
+      - "Apply targeted fixes (not blanket changes)"
+      - "Re-run failed checks after each fix attempt"
+      - "Continue repair loop until ALL checks pass or max_iterations reached"
+      - "Report detailed summary of repairs to user"
+      - "NEVER return control to user with failing quality gates (unless max_iterations exceeded)"
+      
+  repair_strategies:
+    ruff_failures:
+      - "Run 'ruff check --fix' first (safe auto-fixes)"
+      - "If still failing, run 'ruff check --fix --unsafe-fixes'"
+      - "If still failing, analyze specific error codes and apply manual fixes"
+      - "Common fixes: import sorting, unused imports, formatting"
+      
+    pyright_failures:
+      - "Analyze type errors for missing type hints"
+      - "Add appropriate type annotations"
+      - "Check for missing imports or incorrect type usage"
+      - "Use 'type: ignore' comments only as last resort with justification"
+      
+    pytest_failures:
+      - "Identify failing test from output"
+      - "Analyze test assertions and error messages"
+      - "Fix code logic or test expectations (preserve test intent)"
+      - "Re-run only affected tests first, then full suite"
+      
+  error_analysis:
+    parse_patterns:
+      - "Extract file paths, line numbers, and error codes"
+      - "Group related errors by file and type"
+      - "Prioritize critical errors over warnings"
+      - "Identify cascading failures (fix root cause first)"
+      
+  reporting:
+    on_success:
+      - "✅ All quality gates passed"
+      - "Summary: ruff (0 errors), pyright (0 errors), pytest (N passed)"
+      
+    on_failure:
+      - "❌ Quality gates failed after max iterations"
+      - "Report: Which checks failed, error counts, repair attempts made"
+      - "Provide: Next steps for manual intervention"
+
+# Environment configuration
+environment:
+  python_version: "3.14"
+  package_manager: "uv"
+  virtual_env: ".venv"
+  
+  # Quality gate thresholds
+  thresholds:
+    ruff_errors: 0
+    pyright_errors: 0
+    pytest_min_pass: 100  # Minimum tests that must pass
+
+# Exclusions (paths to skip during checks)
+exclusions:
+  paths:
+    - "tests/e2e/**"
+    - "tests/e2e-staging/**"
+    - "tests/comprehensive_battery/**"
+    - "tests/performance/**"
+    - "tests/post_deployment/**"
+  
+  pytest_patterns:
+    - "tests/unit/test_gameplay*.py"  # Skip on Python 3.14 (known segfault)
+    - "tests/unit/test_llm_factory.py"  # Skip on Python 3.14
+
+# Logging configuration
+logging:
+  level: "INFO"
+  output: ".github/hooks/logs/quality-gates.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  retain_days: 7
+
+# Notifications
+notifications:
+  on_failure:
+    enabled: true
+    channels:
+      - type: "terminal"
+        format: "emoji"  # Use ✓/✗ emojis for visual feedback
+      
+  on_success:
+    enabled: true
+    summary: true

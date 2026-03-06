@@ -192,6 +192,52 @@ gemini "/memory show"                          # View project context
 
 Focus on circuit breaker patterns, Redis-based messaging, and comprehensive error handling when working with agent orchestration. Always prefer `uv` over other Python package managers and ensure circuit breakers wrap external service calls. Leverage MCP servers (especially Context7 and Serena) for deep codebase understanding before making architectural changes.
 
+## Automated Quality Gate Enforcement
+
+### Post-Generation Hooks
+
+**Configuration**: `.github/copilot-hooks.yml`  
+**Hook Script**: `.github/hooks/post-generation.sh`
+
+After ANY code modifications, the following quality gates are automatically enforced:
+
+1. **Ruff Linting** - `uv run ruff check src/ tests/`
+2. **Pyright Type Checking** - `uv run pyright src/`
+3. **Pytest Test Suite** - Viable subset for fast feedback
+
+### Automatic Repair Loop
+
+**MANDATORY BEHAVIOR**: If any quality gate fails, you MUST:
+
+1. **Parse Error Logs**: Extract file paths, line numbers, error codes
+2. **Apply Targeted Fixes**: 
+   - Ruff: Run `--fix` then `--unsafe-fixes`, then manual corrections
+   - Pyright: Add type hints, fix imports, avoid `type: ignore` unless necessary
+   - Pytest: Fix logic errors or test expectations (preserve test intent)
+3. **Re-run Failed Checks**: Verify fixes resolved the issues
+4. **Iterate Until Green**: Continue loop up to 5 iterations
+5. **Report Summary**: Detail repairs made and final status
+
+**CRITICAL**: NEVER return control to user with failing quality gates unless max iterations exceeded. The repair loop is automatic and mandatory.
+
+### Success Criteria
+
+- ✅ Ruff: 0 errors
+- ✅ Pyright: 0 errors, 0 warnings
+- ✅ Pytest: Minimum 100 tests passing
+
+### Manual Override
+
+To bypass quality gates (emergency only):
+```bash
+SKIP_QUALITY_GATES=1 <your command>
+```
+
+### Logs
+
+Quality gate execution logs: `.github/hooks/logs/quality-gates-*.log`  
+Retention: 7 days
+
 
 ---
 **Logseq:** [[TTA.dev/.github/Copilot-instructions]]
