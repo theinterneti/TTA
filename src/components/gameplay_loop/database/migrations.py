@@ -9,7 +9,7 @@ gameplay loop system, including schema updates and data migrations.
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -314,7 +314,7 @@ class MigrationManager:
 
                     if await migration.up(self.neo4j_driver):
                         await self.mark_migration_applied(migration.version)
-                        migration.applied_at = datetime.utcnow()
+                        migration.applied_at = datetime.now(UTC)
                         logger.info(
                             f"Migration {migration.version} applied successfully"
                         )

@@ -8,7 +8,7 @@ operations for user authentication data, including CRUD operations and queries.
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from ..models.auth import UserRole
@@ -38,7 +38,7 @@ class User:
         self.email = email
         self.password_hash = password_hash
         self.role = role
-        self.created_at = created_at or datetime.utcnow()
+        self.created_at = created_at or datetime.now(UTC)
         self.is_active = True
         self.is_verified = True  # For simplicity, assume verified
 
@@ -128,7 +128,7 @@ class UserRepository:
                 player_id=user_id,
                 username=username,
                 email=email,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(UTC),
                 last_login=None,
                 is_active=True,
                 therapeutic_preferences=TherapeuticPreferences(),
@@ -314,7 +314,7 @@ class UserRepository:
         try:
             player_profile = self.player_repo.get_player_profile(user_id)
             if player_profile:
-                player_profile.last_login = datetime.utcnow()
+                player_profile.last_login = datetime.now(UTC)
                 self.player_repo.update_player_profile(player_profile)
                 return True
             return False

@@ -11,7 +11,7 @@ approaches and personalized therapeutic recommendations.
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -77,7 +77,7 @@ class TherapeuticRecommendation:
     estimated_duration: int  # minutes
     difficulty_level: str
     character_alignment: dict[str, float]
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -98,7 +98,7 @@ class TherapeuticScenario:
     character_involvement: dict[str, str]
     difficulty_level: str
     estimated_duration: int
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -114,7 +114,7 @@ class IntegrationSession:
     milestones_achieved: list[str]
     session_duration: int  # minutes
     effectiveness_score: float
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class TherapeuticIntegrationSystem:
@@ -193,7 +193,7 @@ class TherapeuticIntegrationSystem:
             List of personalized therapeutic recommendations
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Analyze user context
             user_context = self._analyze_user_context(
@@ -227,7 +227,7 @@ class TherapeuticIntegrationSystem:
             # Update metrics
             self.metrics["recommendations_generated"] += len(recommendations)
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Generated {len(recommendations)} recommendations for user {user_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -272,7 +272,7 @@ class TherapeuticIntegrationSystem:
             Generated therapeutic scenario
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get scenario template
             template = self._get_scenario_template(framework, scenario_type)
@@ -309,7 +309,7 @@ class TherapeuticIntegrationSystem:
             self.metrics["scenarios_created"] += 1
             self.metrics["frameworks_integrated"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Created {framework.value} scenario for user {user_id} "
                 f"in {processing_time.total_seconds():.3f}s"

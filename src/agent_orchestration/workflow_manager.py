@@ -15,7 +15,7 @@ import contextlib
 import logging
 import time
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 def _utc_now() -> str:
-    return datetime.utcnow().isoformat() + "Z"
+    return datetime.now(UTC).isoformat() + "Z"
 
 
 class WorkflowRunStatus(StrEnum):

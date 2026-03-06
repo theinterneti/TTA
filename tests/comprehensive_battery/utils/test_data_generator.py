@@ -13,7 +13,7 @@ Generates realistic test data for comprehensive testing including:
 import random
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -156,7 +156,7 @@ class TestDataGenerator:
             character_id=str(uuid.uuid4()),
             world_id=str(uuid.uuid4()),
             therapeutic_settings=therapeutic_settings,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
             is_active=True,
             metadata={
                 "test_scenario": scenario.scenario_id,

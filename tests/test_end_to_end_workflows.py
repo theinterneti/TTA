@@ -10,7 +10,7 @@ including performance tests for concurrent user scenarios.
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -53,7 +53,7 @@ def create_auth_token(
         "sub": player_id,
         "username": username,
         "email": email,
-        "exp": datetime.utcnow() + timedelta(hours=1),
+        "exp": datetime.now(UTC) + timedelta(hours=1),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -817,7 +817,7 @@ class TestErrorHandlingAndRecovery:
             "sub": "expired-user",
             "username": "expireduser",
             "email": "expired@example.com",
-            "exp": datetime.utcnow() - timedelta(hours=1),  # Expired
+            "exp": datetime.now(UTC) - timedelta(hours=1),  # Expired
         }
         expired_token = jwt.encode(expired_payload, SECRET_KEY, algorithm=ALGORITHM)
 

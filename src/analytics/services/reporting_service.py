@@ -10,7 +10,7 @@ therapeutic outcome tracking with customizable dashboards.
 import json
 import logging
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
@@ -463,7 +463,7 @@ class ReportGenerator:
             configuration=config,
             content=content,
             visualizations=visualizations,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(UTC),
         )
 
     async def generate_user_engagement_report(
@@ -527,7 +527,7 @@ class ReportGenerator:
             configuration=config,
             content=content,
             visualizations=visualizations,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(UTC),
         )
 
     async def generate_cohort_analysis_report(
@@ -588,7 +588,7 @@ class ReportGenerator:
             configuration=config,
             content=content,
             visualizations=visualizations,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(UTC),
         )
 
     async def generate_report(
@@ -674,7 +674,7 @@ async def generate_report(request: ReportRequest, background_tasks: BackgroundTa
             date_range_end=request.date_range_end,
             filters=request.filters,
             visualization_config=request.visualization_config,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
         )
 
         # Mock data for demonstration - in production, this would fetch from database
@@ -762,7 +762,7 @@ async def health_check():
         "status": "healthy",
         "service": "advanced-reporting",
         "reports_generated": len(report_generator.generated_reports),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 

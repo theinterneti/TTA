@@ -10,7 +10,7 @@ without requiring an actual Neo4j instance.
 import asyncio
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -103,7 +103,7 @@ class MockAsyncSession:
             result_data = {
                 "id": node_id,
                 "created": True,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
             # If creating a user, include user data
@@ -113,7 +113,7 @@ class MockAsyncSession:
                         "u": {
                             "name": all_params.get("name", "unknown_user"),
                             "created_at": all_params.get(
-                                "created_at", datetime.utcnow().isoformat()
+                                "created_at", datetime.now(UTC).isoformat()
                             ),
                             "id": node_id,
                         }
@@ -129,7 +129,7 @@ class MockAsyncSession:
                     [
                         {
                             "name": f"test_user_{i}",
-                            "created_at": datetime.utcnow().isoformat(),
+                            "created_at": datetime.now(UTC).isoformat(),
                             "user_id": str(uuid.uuid4()),
                             "active": True,
                         }
@@ -144,7 +144,7 @@ class MockAsyncSession:
                             "story_id": str(uuid.uuid4()),
                             "title": f"Test Story {i}",
                             "content": f"This is test story content {i}",
-                            "created_at": datetime.utcnow().isoformat(),
+                            "created_at": datetime.now(UTC).isoformat(),
                         }
                         for i in range(2)
                     ]
@@ -157,7 +157,7 @@ class MockAsyncSession:
                             "character_id": str(uuid.uuid4()),
                             "name": f"Test Character {i}",
                             "attributes": {"strength": 10, "intelligence": 8},
-                            "created_at": datetime.utcnow().isoformat(),
+                            "created_at": datetime.now(UTC).isoformat(),
                         }
                         for i in range(2)
                     ]
@@ -169,7 +169,7 @@ class MockAsyncSession:
                     {
                         "result": "success",
                         "count": 1,
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(UTC).isoformat(),
                     }
                 ]
             )
@@ -181,14 +181,14 @@ class MockAsyncSession:
                     {
                         "deleted": True,
                         "count": 1,
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(UTC).isoformat(),
                     }
                 ]
             )
 
         # Default response
         return MockResult(
-            [{"executed": True, "timestamp": datetime.utcnow().isoformat()}]
+            [{"executed": True, "timestamp": datetime.now(UTC).isoformat()}]
         )
 
     async def begin_transaction(self):

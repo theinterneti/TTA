@@ -72,7 +72,7 @@ except Exception as e:
     logger.warning(f"⚠️ UserRepository connection failed: {e}. Using Redis fallback.")
     # Create a simple Redis-based user repository as fallback
     try:
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         import redis
 
@@ -109,7 +109,7 @@ except Exception as e:
                     "email": email,
                     "password_hash": password_hash,
                     "role": role.value,
-                    "created_at": datetime.utcnow().isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
                     "is_active": "true",  # Convert boolean to string for Redis
                 }
 
@@ -119,7 +119,7 @@ except Exception as e:
                 self.redis_client.set(f"email:{email}", user_id)
 
                 return User(
-                    user_id, username, email, password_hash, role, datetime.utcnow()
+                    user_id, username, email, password_hash, role, datetime.now(UTC)
                 )
 
             def get_user_by_username(self, username: str):
@@ -148,7 +148,7 @@ except Exception as e:
 
             def update_last_login(self, user_id: str) -> bool:
                 result = self.redis_client.hset(
-                    f"user:{user_id}", "last_login", datetime.utcnow().isoformat()
+                    f"user:{user_id}", "last_login", datetime.now(UTC).isoformat()
                 )
                 return bool(result)
 

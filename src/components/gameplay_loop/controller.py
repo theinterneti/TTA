@@ -12,7 +12,7 @@ consequence system, and session lifecycle management.
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from src.ai_components.llm_factory import get_llm
@@ -160,7 +160,7 @@ class GameplayLoopController:
                 current_scene=opening_scene,
                 current_scene_id=(opening_scene.scene_id if opening_scene else None),
                 available_choices=initial_choices,
-                session_start_time=datetime.utcnow(),
+                session_start_time=datetime.now(UTC),
                 is_active=True,
             )
 
@@ -191,7 +191,7 @@ class GameplayLoopController:
             # Check if session is already active
             if session_id in self.active_sessions:
                 session = self.active_sessions[session_id]
-                session.last_activity_time = datetime.utcnow()
+                session.last_activity_time = datetime.now(UTC)
                 return session
 
             # Load session from database
@@ -228,7 +228,7 @@ class GameplayLoopController:
                 current_scene=current_scene,
                 current_scene_id=(current_scene.scene_id if current_scene else None),
                 available_choices=available_choices,
-                session_start_time=datetime.utcnow(),  # Resume time
+                session_start_time=datetime.now(UTC),  # Resume time
                 is_active=True,
                 session_recap=recap,
             )
@@ -262,7 +262,7 @@ class GameplayLoopController:
 
             session = self.active_sessions[session_id]
             session.is_active = False
-            session.last_activity_time = datetime.utcnow()
+            session.last_activity_time = datetime.now(UTC)
 
             # Save session state to database
             await self.database_manager.update_session(session.session_state)
@@ -293,7 +293,7 @@ class GameplayLoopController:
             if session_id in self.active_sessions:
                 session = self.active_sessions[session_id]
                 session.is_active = False
-                session.session_end_time = datetime.utcnow()
+                session.session_end_time = datetime.now(UTC)
 
                 # Save final session state
                 await self.database_manager.update_session(session.session_state)
@@ -331,7 +331,7 @@ class GameplayLoopController:
             Tuple of (next_scene, new_choices, consequences)
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
             logger.info(f"Processing choice {choice_id} for session {session_id}")
 
             # Get active session — auto-resume from DB if not in memory
@@ -376,7 +376,7 @@ class GameplayLoopController:
                 emotional_state_after=None,
                 user_confidence=None,
                 difficulty_perceived=None,
-                choice_made_at=datetime.utcnow(),
+                choice_made_at=datetime.now(UTC),
             )
 
             # Generate consequences
@@ -392,7 +392,7 @@ class GameplayLoopController:
                     "choice_type": selected_choice.choice_type.value,
                     "therapeutic_value": selected_choice.therapeutic_value,
                     "therapeutic_tags": selected_choice.therapeutic_tags,
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                 }
             )
 
@@ -420,13 +420,13 @@ class GameplayLoopController:
             # Update session
             session.current_scene = next_scene
             session.available_choices = new_choices
-            session.last_activity_time = datetime.utcnow()
+            session.last_activity_time = datetime.now(UTC)
 
             # Save updated session state
             await self.database_manager.update_session(session_state)
 
             # Check response time
-            processing_time = (datetime.utcnow() - start_time).total_seconds()
+            processing_time = (datetime.now(UTC) - start_time).total_seconds()
             if processing_time > self.response_time_target:
                 logger.warning(
                     f"Choice processing took {processing_time:.2f}s (target: {self.response_time_target}s)"
@@ -678,7 +678,7 @@ class GameplayLoopController:
     async def cleanup_inactive_sessions(self) -> int:
         """Clean up inactive sessions that have exceeded timeout."""
         try:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(UTC)
             sessions_to_remove = []
 
             for session_id, session in self.active_sessions.items():

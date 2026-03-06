@@ -7,7 +7,7 @@ dependencies are mocked to avoid requiring external services (Neo4j, Redis).
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -556,14 +556,14 @@ class TestCleanupInactiveSessions:
     async def test_expired_session_is_cleaned_up(self, mock_controller):
         session = await mock_controller.start_session("user-1")
         # Set last activity to well beyond timeout
-        session.last_activity_time = datetime.utcnow() - timedelta(hours=2)
+        session.last_activity_time = datetime.now(UTC) - timedelta(hours=2)
         result = await mock_controller.cleanup_inactive_sessions()
         assert result == 1
 
     async def test_multiple_expired_sessions_all_cleaned_up(self, mock_controller):
         for uid in ["u1", "u2", "u3"]:
             sess = await mock_controller.start_session(uid)
-            sess.last_activity_time = datetime.utcnow() - timedelta(hours=2)
+            sess.last_activity_time = datetime.now(UTC) - timedelta(hours=2)
         result = await mock_controller.cleanup_inactive_sessions()
         assert result == 3
         assert len(mock_controller.active_sessions) == 0
@@ -574,7 +574,7 @@ class TestCleanupInactiveSessions:
         # cleanup_inactive_sessions returns len(sessions_to_remove) regardless
         # of whether individual pause_session calls succeed or fail.
         session = await mock_controller.start_session("u1")
-        session.last_activity_time = datetime.utcnow() - timedelta(hours=2)
+        session.last_activity_time = datetime.now(UTC) - timedelta(hours=2)
         mock_controller.database_manager.update_session = AsyncMock(
             side_effect=RuntimeError("db")
         )
@@ -620,8 +620,8 @@ class TestGenerateSessionRecap:
 class TestGenerateSessionSummary:
     async def test_returns_dict_with_basic_fields(self, mock_controller):
         session = await mock_controller.start_session("user-1")
-        session.session_start_time = datetime.utcnow() - timedelta(minutes=15)
-        session.session_end_time = datetime.utcnow()
+        session.session_start_time = datetime.now(UTC) - timedelta(minutes=15)
+        session.session_end_time = datetime.now(UTC)
         summary = await mock_controller._generate_session_summary(session)
         assert "session_id" in summary
         assert "user_id" in summary
@@ -630,8 +630,8 @@ class TestGenerateSessionSummary:
 
     async def test_duration_calculated(self, mock_controller):
         session = await mock_controller.start_session("user-1")
-        session.session_start_time = datetime.utcnow() - timedelta(minutes=10)
-        session.session_end_time = datetime.utcnow()
+        session.session_start_time = datetime.now(UTC) - timedelta(minutes=10)
+        session.session_end_time = datetime.now(UTC)
         summary = await mock_controller._generate_session_summary(session)
         assert summary["duration_minutes"] > 0
 

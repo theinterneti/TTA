@@ -1,7 +1,7 @@
 # Logseq: [[TTA.dev/Tests/Test_player_experience_manager]]
 import asyncio
 import unittest
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from src.player_experience.database.character_repository import CharacterRepository
 from src.player_experience.database.session_repository import SessionRepository
@@ -89,7 +89,7 @@ class MockPersonalizationManager(PersonalizationServiceManager):
 
 class TestPlayerExperienceManager(unittest.TestCase):
     def setUp(self):
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         self.summaries = []
         for i in range(3):
             self.summaries.append(

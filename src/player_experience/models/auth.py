@@ -8,7 +8,7 @@ models for enhanced security.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -154,7 +154,7 @@ class MFASecret:
     method: MFAMethod
     secret: str  # Encrypted secret
     backup_codes: list[str] = field(default_factory=list)  # Encrypted backup codes
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     last_used: datetime | None = None
     is_verified: bool = False
 
@@ -217,7 +217,7 @@ class SecurityEvent(BaseModel):
     user_id: str | None = None
     ip_address: str | None = None
     user_agent: str | None = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     details: dict[str, Any] = Field(default_factory=dict)
     severity: str = "info"  # info, warning, error, critical
 

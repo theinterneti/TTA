@@ -189,7 +189,7 @@ class MFAService:
             MFAChallenge: The challenge object
         """
         challenge_id = str(uuid4())
-        expires_at = datetime.utcnow() + timedelta(minutes=5)  # 5-minute expiry
+        expires_at = datetime.now(UTC) + timedelta(minutes=5)  # 5-minute expiry
 
         challenge = MFAChallenge(
             challenge_id=challenge_id, method=method, expires_at=expires_at
@@ -213,7 +213,7 @@ class MFAService:
         if not challenge:
             raise MFAError("Invalid or expired challenge")
 
-        if datetime.utcnow() > challenge.expires_at:
+        if datetime.now(UTC) > challenge.expires_at:
             del self.active_challenges[verification.challenge_id]
             raise MFAError("Challenge has expired")
 
@@ -239,7 +239,7 @@ class MFAService:
 
     def cleanup_expired_challenges(self):
         """Remove expired challenges from memory."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         expired_challenges = [
             challenge_id
             for challenge_id, challenge in self.active_challenges.items()
@@ -464,7 +464,7 @@ class EnhancedAuthService:
             role=user.role,
             permissions=role_permissions.permissions,
             mfa_enabled=self.is_mfa_enabled(user.user_id),
-            last_login=datetime.utcnow(),
+            last_login=datetime.now(UTC),
         )
 
         self.log_security_event(
@@ -499,8 +499,8 @@ class EnhancedAuthService:
         session = SessionInfo(
             session_id=session_id,
             user_id=user.user_id,
-            created_at=datetime.utcnow(),
-            last_activity=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            last_activity=datetime.now(UTC),
             ip_address=ip_address,
             user_agent=user_agent,
             mfa_verified=not user.mfa_enabled,  # If MFA not enabled, consider it verified
@@ -603,7 +603,7 @@ class EnhancedAuthService:
                 raise AuthenticationError("Session is no longer active")
 
             # Update session activity
-            session.last_activity = datetime.utcnow()
+            session.last_activity = datetime.now(UTC)
 
             # Convert role and permissions back to enums
             role = UserRole(role_str)
@@ -744,7 +744,7 @@ class EnhancedAuthService:
         recent_attempts = [
             attempt
             for attempt in attempts
-            if datetime.utcnow() - attempt
+            if datetime.now(UTC) - attempt
             < timedelta(minutes=self.security_settings.lockout_duration_minutes)
         ]
 
@@ -755,10 +755,10 @@ class EnhancedAuthService:
         if username not in self.failed_login_attempts:
             self.failed_login_attempts[username] = []
 
-        self.failed_login_attempts[username].append(datetime.utcnow())
+        self.failed_login_attempts[username].append(datetime.now(UTC))
 
         # Clean up old attempts
-        cutoff = datetime.utcnow() - timedelta(
+        cutoff = datetime.now(UTC) - timedelta(
             minutes=self.security_settings.lockout_duration_minutes
         )
         self.failed_login_attempts[username] = [
@@ -785,7 +785,7 @@ class EnhancedAuthService:
 
     def cleanup_expired_sessions(self):
         """Remove expired sessions."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         timeout = timedelta(minutes=self.security_settings.session_timeout_minutes)
 
         expired_sessions = [

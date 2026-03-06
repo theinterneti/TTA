@@ -13,7 +13,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -45,7 +45,7 @@ CONVERSATION_INDEX_KEY_PREFIX = "tta:player:conversations:"
 class ConversationMessage(BaseModel):
     role: str = Field(..., description="Message role: user, assistant, or system")
     content: str = Field(..., description="Message content")
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -547,8 +547,8 @@ async def send_message(
                     "session_id": session_id,
                     "player_id": player_id,
                     "messages": [],
-                    "created_at": datetime.utcnow().isoformat(),
-                    "last_activity": datetime.utcnow().isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
+                    "last_activity": datetime.now(UTC).isoformat(),
                 }
 
         # Initialize session state if it doesn't exist
@@ -563,8 +563,8 @@ async def send_message(
                 "session_goals": [],
                 "therapeutic_focus": "general_support",
                 "interaction_count": 0,
-                "created_at": datetime.utcnow().isoformat(),
-                "last_updated": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
+                "last_updated": datetime.now(UTC).isoformat(),
                 # Enhanced tracking
                 "session_analytics": session_analytics.model_dump(),
                 "therapeutic_interventions_used": [],
@@ -585,7 +585,7 @@ async def send_message(
 
         # Update session state with user input analysis
         session_state["interaction_count"] += 1
-        session_state["last_updated"] = datetime.utcnow().isoformat()
+        session_state["last_updated"] = datetime.now(UTC).isoformat()
 
         # Analyze emotional themes
         user_lower = user_message.lower()
@@ -675,7 +675,7 @@ async def send_message(
                     breakthrough_indicators
                 )
                 milestone_data = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                     "type": "breakthrough",
                     "indicators": breakthrough_indicators,
                     "interaction_count": session_state["interaction_count"],
@@ -691,7 +691,7 @@ async def send_message(
 
         # Record emotional state history
         emotional_state_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "interaction_count": session_state["interaction_count"],
             "emotional_themes": session_state["emotional_themes"].copy(),
             "engagement_level": progress_analysis.get("engagement_level", 0.5),
@@ -718,7 +718,7 @@ async def send_message(
             metadata={**ai_metadata, "progress_analysis": progress_analysis},
         )
         conversation["messages"].append(ai_msg.model_dump())
-        conversation["last_activity"] = datetime.utcnow().isoformat()
+        conversation["last_activity"] = datetime.now(UTC).isoformat()
 
         # Persist conversation history to Redis
         assert player_id is not None  # Already checked above
@@ -840,7 +840,7 @@ async def clear_conversation(
             recovery_data = {
                 "session_id": session_id,
                 "player_id": player_id,
-                "cleared_at": datetime.utcnow().isoformat(),
+                "cleared_at": datetime.now(UTC).isoformat(),
                 "final_analytics": session_state.get("session_analytics", {}),
                 "total_interactions": session_state.get("interaction_count", 0),
                 "emotional_themes": session_state.get("emotional_themes", []),
@@ -1023,7 +1023,7 @@ async def set_session_goals(
 
         # Update session goals
         session_state["session_goals"] = goals
-        session_state["last_updated"] = datetime.utcnow().isoformat()
+        session_state["last_updated"] = datetime.now(UTC).isoformat()
 
         # Initialize goal progress tracking
         session_analytics = session_state.get("session_analytics", {})
@@ -1107,7 +1107,7 @@ async def get_player_session_analytics(
             "unique_emotional_themes": list(all_emotional_themes),
             "recent_sessions": analytics_list[:5],  # Last 5 sessions
             "active_session_summaries": active_sessions,
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
         }
 
     except Exception as e:
@@ -1149,7 +1149,7 @@ async def get_session_statistics(
         return {
             "memory_statistics": memory_stats,
             "redis_statistics": redis_stats,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     except Exception as e:
@@ -1168,7 +1168,7 @@ async def health_check() -> dict[str, Any]:
         "service": "conversation",
         "active_conversations": len(_CONVERSATIONS),
         "active_session_states": len(_SESSION_STATES),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "features": {
             "ai_progress_analysis": True,
             "session_analytics": True,

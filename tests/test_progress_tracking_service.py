@@ -1,7 +1,7 @@
 # Logseq: [[TTA.dev/Tests/Test_progress_tracking_service]]
 import asyncio
 import unittest
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from src.player_experience.managers.progress_tracking_service import (
     ProgressTrackingService,
@@ -39,7 +39,7 @@ class MockSessionRepository:
 
 class TestProgressTrackingService(unittest.TestCase):
     def setUp(self):
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         # Create 5 daily session summaries
         self.summaries = []
         for i in range(5):
@@ -183,7 +183,7 @@ class TestProgressTrackingService(unittest.TestCase):
                         marker_id=f"enhanced_pm{i}",
                         marker_type=marker_type,
                         description=f"Enhanced {marker_type.value}",
-                        achieved_at=datetime.utcnow() - timedelta(minutes=i),
+                        achieved_at=datetime.now(UTC) - timedelta(minutes=i),
                         therapeutic_value=0.3,
                     )
                 )
@@ -208,7 +208,7 @@ class TestProgressTrackingService(unittest.TestCase):
     def test_comprehensive_milestone_detection(self):
         async def run():
             # Create session summaries for streak detection
-            now = datetime.utcnow()
+            now = datetime.now(UTC)
             streak_summaries = []
             for i in range(10):  # 10 consecutive days
                 start = now - timedelta(days=i, hours=1)
@@ -249,7 +249,7 @@ class TestProgressTrackingService(unittest.TestCase):
         async def run():
             # Create a scenario with high therapeutic momentum
             high_momentum_summaries = []
-            now = datetime.utcnow()
+            now = datetime.now(UTC)
             for i in range(15):  # 15 sessions
                 start = now - timedelta(days=i, hours=1)
                 end = now - timedelta(days=i)
@@ -289,7 +289,7 @@ class TestProgressTrackingService(unittest.TestCase):
         async def run():
             # Create scenario with very high dropout risk (no recent sessions, very old activity)
             old_summaries = []
-            old_date = datetime.utcnow() - timedelta(days=15)  # Even older sessions
+            old_date = datetime.now(UTC) - timedelta(days=15)  # Even older sessions
             for i in range(2):  # Fewer sessions
                 start = old_date - timedelta(days=i, hours=1)
                 end = old_date - timedelta(days=i)
@@ -342,8 +342,8 @@ class TestProgressTrackingService(unittest.TestCase):
             session_id="test_session",
             character_name="Test Char",
             world_name="Test World",
-            start_time=datetime.utcnow(),
-            end_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
+            end_time=datetime.now(UTC),
             duration_minutes=30,
             status=SessionStatus.COMPLETED,
             progress_markers_count=1,

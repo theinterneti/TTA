@@ -14,7 +14,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -45,8 +45,8 @@ class OrchestrationState:
     player_id: str
     phase: OrchestrationPhase
     user_input: str
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Phase results
     ipa_result: dict[str, Any] | None = None
@@ -238,7 +238,7 @@ class UnifiedAgentOrchestrator:
 
             # Mark as complete
             state.phase = OrchestrationPhase.COMPLETE
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
             await self._save_state(state)
 
             logger.info(f"[{workflow_id}] Workflow completed successfully")
@@ -281,7 +281,7 @@ class UnifiedAgentOrchestrator:
             state.ipa_result = ipa_result
 
             state.phase = OrchestrationPhase.WORLD_BUILDING
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
 
             return state
 
@@ -320,7 +320,7 @@ class UnifiedAgentOrchestrator:
                 state.world_context.update(wba_result["world_state"])
 
             state.phase = OrchestrationPhase.NARRATIVE_GENERATION
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
 
             return state
 
@@ -354,7 +354,7 @@ class UnifiedAgentOrchestrator:
             )
             state.nga_result = nga_result
 
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
 
             return state
 

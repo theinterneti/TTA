@@ -12,7 +12,7 @@ import io
 import json
 import unittest
 import zipfile
-from datetime import datetime
+from datetime import UTC, datetime
 
 from src.player_experience.models.auth import AuthenticatedUser, Permission, UserRole
 from src.player_experience.services.privacy_service import (
@@ -98,7 +98,7 @@ class TestPrivacyCompliance(unittest.TestCase):
                 DataCategory.BEHAVIORAL_DATA,
             ],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
             consent_evidence="User clicked 'I agree' button",
         )
@@ -150,7 +150,7 @@ class TestPrivacyCompliance(unittest.TestCase):
             purpose=ProcessingPurpose.CONSENT,
             data_categories=[DataCategory.THERAPEUTIC_CONTENT],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
         )
         self.privacy_service.record_consent(consent)
@@ -316,7 +316,7 @@ class TestPrivacyCompliance(unittest.TestCase):
 
     def test_data_retention_compliance_monitoring(self):
         """Test data retention compliance monitoring."""
-        from datetime import timedelta
+        from datetime import UTC, timedelta
 
         from src.player_experience.services.privacy_service import DataProcessingRecord
 
@@ -329,7 +329,7 @@ class TestPrivacyCompliance(unittest.TestCase):
             legal_basis="User consent",
             data_source="test",
             retention_period=DataRetentionPeriod.SHORT_TERM,  # 30 days
-            created_at=datetime.utcnow() - timedelta(days=45),  # 45 days old
+            created_at=datetime.now(UTC) - timedelta(days=45),  # 45 days old
         )
 
         self.privacy_service.record_data_processing(old_record)
@@ -343,7 +343,7 @@ class TestPrivacyCompliance(unittest.TestCase):
             legal_basis="User consent",
             data_source="test",
             retention_period=DataRetentionPeriod.MEDIUM_TERM,  # 1 year
-            created_at=datetime.utcnow() - timedelta(days=30),  # 30 days old
+            created_at=datetime.now(UTC) - timedelta(days=30),  # 30 days old
         )
 
         self.privacy_service.record_data_processing(recent_record)
@@ -427,7 +427,7 @@ class TestPrivacyCompliance(unittest.TestCase):
             purpose=ProcessingPurpose.LEGITIMATE_INTERESTS,
             data_categories=[DataCategory.BEHAVIORAL_DATA],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
         )
         consent_id = self.privacy_service.record_consent(consent)

@@ -13,7 +13,7 @@ import json
 import logging
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -151,7 +151,7 @@ class RedisSessionManager:
             session_id: Unique session identifier
         """
         session_id = secrets.token_urlsafe(32)
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         session = SessionData(
             session_id=session_id,
@@ -199,12 +199,12 @@ class RedisSessionManager:
             session = SessionData.from_dict(session_dict)
 
             # Check expiry
-            if datetime.utcnow() > session.expires_at:
+            if datetime.now(UTC) > session.expires_at:
                 await self.delete_session(session_id)
                 return None
 
             # Update last accessed time
-            session.last_accessed = datetime.utcnow()
+            session.last_accessed = datetime.now(UTC)
             await self.redis.setex(
                 key, self.session_ttl, json.dumps(session.to_dict(), default=str)
             )
@@ -283,7 +283,7 @@ class RedisSessionManager:
             state: Unique state identifier
         """
         state = secrets.token_urlsafe(32)
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         oauth_state = OAuthState(
             state=state,
@@ -321,7 +321,7 @@ class RedisSessionManager:
             oauth_state = OAuthState.from_dict(state_dict)
 
             # Check expiry
-            if datetime.utcnow() > oauth_state.expires_at:
+            if datetime.now(UTC) > oauth_state.expires_at:
                 await self.delete_oauth_state(state)
                 return None
 

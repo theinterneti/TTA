@@ -11,7 +11,7 @@ therapeutic systems for comprehensive collaborative workflows.
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -80,8 +80,8 @@ class CollaborativeParticipant:
     current_emotional_state: dict[str, Any] = field(default_factory=dict)
 
     # Participation tracking
-    joined_at: datetime = field(default_factory=datetime.utcnow)
-    last_activity: datetime = field(default_factory=datetime.utcnow)
+    joined_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_activity: datetime = field(default_factory=lambda: datetime.now(UTC))
     contributions_count: int = 0
     support_given: int = 0
     support_received: int = 0
@@ -120,7 +120,7 @@ class SupportInteraction:
     effectiveness_score: float | None = None
 
     # Metadata
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     is_crisis_related: bool = False
 
 
@@ -151,7 +151,7 @@ class CollaborativeGoal:
     celebration_triggers: list[str] = field(default_factory=list)
 
     # Metadata
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     target_completion: datetime | None = None
     completed_at: datetime | None = None
 
@@ -197,8 +197,8 @@ class CollaborativeSession:
     crisis_interventions: int = 0
 
     # Metadata
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    last_activity: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_activity: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class TherapeuticCollaborativeSystem:
@@ -306,7 +306,7 @@ class TherapeuticCollaborativeSystem:
             CollaborativeSession representing the created session
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Check session limits
             if len(self.collaborative_sessions) >= self.max_concurrent_sessions:
@@ -361,12 +361,12 @@ class TherapeuticCollaborativeSystem:
 
             # Update session status
             session.status = SessionStatus.WAITING_FOR_PARTICIPANTS
-            session.last_activity = datetime.utcnow()
+            session.last_activity = datetime.now(UTC)
 
             # Update metrics
             self.metrics["sessions_created"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Created collaborative session {session.session_id} for host {host_user_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -406,7 +406,7 @@ class TherapeuticCollaborativeSystem:
             CollaborativeParticipant representing the joined participant
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get session
             session = self.collaborative_sessions.get(session_id)
@@ -463,7 +463,7 @@ class TherapeuticCollaborativeSystem:
 
             # Add participant to session
             session.participants[user_id] = participant
-            session.last_activity = datetime.utcnow()
+            session.last_activity = datetime.now(UTC)
 
             # Track user sessions
             if user_id not in self.user_sessions:
@@ -480,7 +480,7 @@ class TherapeuticCollaborativeSystem:
             # Update metrics
             self.metrics["participants_connected"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"User {user_id} joined collaborative session {session_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -525,7 +525,7 @@ class TherapeuticCollaborativeSystem:
             SupportInteraction representing the support provided
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get session and validate participants
             session = self.collaborative_sessions.get(session_id)
@@ -584,16 +584,16 @@ class TherapeuticCollaborativeSystem:
 
             supporter.support_given += 1
             supporter.contributions_count += 1
-            supporter.last_activity = datetime.utcnow()
+            supporter.last_activity = datetime.now(UTC)
 
             recipient.support_received += 1
-            recipient.last_activity = datetime.utcnow()
+            recipient.last_activity = datetime.now(UTC)
 
             # Store interaction
             self.support_interactions[interaction.interaction_id] = interaction
             session.support_interactions.append(interaction.interaction_id)
             session.total_therapeutic_value += interaction.therapeutic_value
-            session.last_activity = datetime.utcnow()
+            session.last_activity = datetime.now(UTC)
 
             # Update peer connections
             await self._strengthen_peer_connection(supporter_id, recipient_id)
@@ -603,7 +603,7 @@ class TherapeuticCollaborativeSystem:
             if is_crisis_related:
                 self.metrics["crisis_interventions"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Peer support provided in session {session_id} "
                 f"({support_type.value}) in {processing_time.total_seconds():.3f}s"
@@ -647,7 +647,7 @@ class TherapeuticCollaborativeSystem:
             CollaborativeGoal representing the shared goal
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get session
             session = self.collaborative_sessions.get(session_id)
@@ -707,9 +707,9 @@ class TherapeuticCollaborativeSystem:
             # Store goal
             self.collaborative_goals[goal.goal_id] = goal
             session.shared_goals.append(goal.goal_id)
-            session.last_activity = datetime.utcnow()
+            session.last_activity = datetime.now(UTC)
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Created collaborative goal {goal.goal_id} for session {session_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -840,7 +840,7 @@ class TherapeuticCollaborativeSystem:
         """Start an active collaborative session."""
         try:
             session.status = SessionStatus.ACTIVE
-            session.started_at = datetime.utcnow()
+            session.started_at = datetime.now(UTC)
             session.current_activity = "collaborative_introduction"
 
             # Initialize group therapeutic context

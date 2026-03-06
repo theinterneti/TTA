@@ -10,7 +10,7 @@ a clean interface for API endpoints.
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -276,7 +276,7 @@ class GameplayService:
             return {
                 "success": True,
                 "session_id": session_id,
-                "paused_at": datetime.utcnow().isoformat(),
+                "paused_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -340,7 +340,7 @@ class GameplayService:
                 "success": True,
                 "session_id": session_id,
                 "session_data": session_data,
-                "resumed_at": datetime.utcnow().isoformat(),
+                "resumed_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:

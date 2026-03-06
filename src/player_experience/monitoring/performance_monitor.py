@@ -16,7 +16,7 @@ from collections import defaultdict, deque
 from collections.abc import Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import psutil
@@ -254,7 +254,7 @@ class DatabaseQueryTracker:
                         "query_type": context.query_type,
                         "query_text": context.query_text,
                         "duration": duration,
-                        "timestamp": datetime.utcnow(),
+                        "timestamp": datetime.now(UTC),
                         "metadata": context.metadata,
                     }
                 )
@@ -629,7 +629,7 @@ class PerformanceMonitor:
     def get_performance_summary(self) -> dict[str, Any]:
         """Get comprehensive performance summary."""
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "performance": self.metrics_collector.get_performance_metrics().to_dict(),
             "database": self.metrics_collector.get_database_metrics().to_dict(),
             "cache": self.metrics_collector.get_cache_metrics().to_dict(),

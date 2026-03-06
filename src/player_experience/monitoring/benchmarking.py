@@ -15,7 +15,7 @@ import statistics
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -240,8 +240,8 @@ class HTTPLoadGenerator(LoadGenerator):
         """Generate HTTP load."""
         result = BenchmarkResult(
             config=config,
-            start_time=datetime.utcnow(),
-            end_time=datetime.utcnow(),  # Will be updated
+            start_time=datetime.now(UTC),
+            end_time=datetime.now(UTC),  # Will be updated
         )
 
         # Initialize system metrics collection
@@ -277,7 +277,7 @@ class HTTPLoadGenerator(LoadGenerator):
             with contextlib.suppress(asyncio.CancelledError):
                 await system_metrics_task
 
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
 
             # Calculate final metrics
             duration = (result.end_time - result.start_time).total_seconds()
@@ -448,7 +448,7 @@ class HTTPLoadGenerator(LoadGenerator):
                             {
                                 "url": url,
                                 "status": response.status,
-                                "timestamp": datetime.utcnow().isoformat(),
+                                "timestamp": datetime.now(UTC).isoformat(),
                                 "response_time": response_time,
                             }
                         )
@@ -463,7 +463,7 @@ class HTTPLoadGenerator(LoadGenerator):
                     {
                         "url": url,
                         "error": str(e),
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(UTC).isoformat(),
                         "response_time": response_time,
                     }
                 )
@@ -605,11 +605,11 @@ class BenchmarkSuite:
         if not self.results:
             return
 
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         report_path = self.output_dir / f"benchmark_summary_{timestamp}.json"
 
         summary = {
-            "execution_time": datetime.utcnow().isoformat(),
+            "execution_time": datetime.now(UTC).isoformat(),
             "total_benchmarks": len(self.results),
             "passed_benchmarks": 0,
             "failed_benchmarks": 0,

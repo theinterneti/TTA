@@ -14,7 +14,7 @@ Validates the complete data pipeline from story generation input to database sto
 import asyncio
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -73,7 +73,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -157,7 +157,7 @@ class DataPipelineValidator:
             logger.error(f"Story generation pipeline validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -171,7 +171,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -227,7 +227,7 @@ class DataPipelineValidator:
             logger.error(f"User interaction metrics validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -241,7 +241,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -297,7 +297,7 @@ class DataPipelineValidator:
             logger.error(f"Data transformation validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -311,7 +311,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -365,7 +365,7 @@ class DataPipelineValidator:
             logger.error(f"Cross-database consistency validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -379,7 +379,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -445,7 +445,7 @@ class DataPipelineValidator:
             logger.error(f"Data persistence validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -459,7 +459,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -495,7 +495,7 @@ class DataPipelineValidator:
             logger.error(f"Metrics aggregation validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -509,7 +509,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -563,7 +563,7 @@ class DataPipelineValidator:
             logger.error(f"Real-time data flow validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -577,7 +577,7 @@ class DataPipelineValidator:
             test_name=test_name,
             category=TestCategory.DATA_PIPELINE,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -611,7 +611,7 @@ class DataPipelineValidator:
             logger.error(f"Data cleanup validation failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -636,7 +636,7 @@ class DataPipelineValidator:
             "user_id": user.user_id,
             "scenario_id": scenario.scenario_id,
             "input_data": {"story_request": "Generate test story"},
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     async def _process_story_generation(
@@ -647,7 +647,7 @@ class DataPipelineValidator:
         return {
             "tracking_id": input_data["tracking_id"],
             "generated_story": "Test story content",
-            "processed_at": datetime.utcnow().isoformat(),
+            "processed_at": datetime.now(UTC).isoformat(),
         }
 
     async def _verify_neo4j_storage(
@@ -676,7 +676,7 @@ class DataPipelineValidator:
                 "interaction_id": str(uuid.uuid4()),
                 "user_id": str(uuid.uuid4()),
                 "interaction_type": "story_choice",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
             for _ in range(count)
         ]

@@ -7,7 +7,7 @@ Tests multi-stakeholder web interfaces, AI/ML integration, and Neo4j living worl
 
 import asyncio
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import aiohttp
@@ -451,7 +451,7 @@ class TestPhase2AIntegration:
 
     async def _create_test_session(self, patient_id: str) -> dict[str, Any]:
         """Helper method to create a test session"""
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
 
         session_data = {
             "patient_id": patient_id,
@@ -468,7 +468,7 @@ class TestPhase2AIntegration:
             ) as response,
         ):
             result = await response.json()
-            end_time = datetime.utcnow()
+            end_time = datetime.now(UTC)
 
             result["response_time"] = (end_time - start_time).total_seconds()
             return result

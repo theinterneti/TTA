@@ -8,7 +8,7 @@ Tests cover:
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import UTC, date, timedelta
 
 import pytest
 
@@ -71,9 +71,9 @@ class TestConsecutiveStreakEndingToday:
 
 class TestPickReferenceToday:
     def test_returns_utc_when_only_utc_in_candidates(self):
-        from datetime import datetime
+        from datetime import UTC, datetime
 
-        utc = datetime.utcnow().date()
+        utc = datetime.now(UTC).date()
         result = pick_reference_today([utc])
         assert result == utc
 
@@ -84,16 +84,16 @@ class TestPickReferenceToday:
         assert result == past1  # most recent
 
     def test_empty_candidates_returns_utc_today(self):
-        from datetime import datetime
+        from datetime import UTC, datetime
 
-        utc = datetime.utcnow().date()
+        utc = datetime.now(UTC).date()
         result = pick_reference_today([])
         assert result == utc
 
     def test_returns_max_when_both_local_and_utc_present(self):
-        from datetime import datetime
+        from datetime import UTC, datetime
 
-        utc = datetime.utcnow().date()
+        utc = datetime.now(UTC).date()
         local = datetime.now().date()
         # Both present → should return max(local, utc)
         result = pick_reference_today([utc, local])

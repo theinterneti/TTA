@@ -11,7 +11,7 @@ evidence-based safety protocols and real-time risk assessment.
 
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum, IntEnum
 from typing import Any
 from uuid import uuid4
@@ -173,7 +173,7 @@ class TherapeuticEmotionalSafetySystem:
             - indicators: List of detected crisis indicators
             - response_time: Float indicating assessment processing time
         """
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
 
         try:
             # Handle empty input
@@ -205,7 +205,7 @@ class TherapeuticEmotionalSafetySystem:
             self._update_user_risk_tracking(user_id, crisis_level, detected_indicators)
 
             # Calculate response time
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             response_time = processing_time.total_seconds()
 
             # Update metrics
@@ -246,7 +246,7 @@ class TherapeuticEmotionalSafetySystem:
             logger.error(f"Error in crisis risk assessment for user {user_id}: {e}")
 
             # Return safe fallback
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             return {
                 "crisis_detected": False,
                 "crisis_level": CrisisLevel.NONE.value,
@@ -364,7 +364,7 @@ class TherapeuticEmotionalSafetySystem:
             self.user_risk_levels[user_id] = []
 
         risk_entry = {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(UTC),
             "crisis_level": crisis_level,
             "indicators": indicators,
         }
@@ -372,7 +372,7 @@ class TherapeuticEmotionalSafetySystem:
         self.user_risk_levels[user_id].append(risk_entry)
 
         # Keep only recent entries (last 24 hours)
-        cutoff_time = datetime.utcnow() - timedelta(hours=24)
+        cutoff_time = datetime.now(UTC) - timedelta(hours=24)
         self.user_risk_levels[user_id] = [
             entry
             for entry in self.user_risk_levels[user_id]
@@ -394,7 +394,7 @@ class TherapeuticEmotionalSafetySystem:
             Dictionary containing protocol activation results
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             protocols_activated = []
             emergency_contacts_notified = False
@@ -430,7 +430,7 @@ class TherapeuticEmotionalSafetySystem:
                 # Update metrics
                 self.metrics["protocols_activated"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
 
             return {
                 "protocols_activated": len(protocols_activated) > 0,
@@ -508,7 +508,7 @@ class TherapeuticEmotionalSafetySystem:
             Dictionary containing escalation results
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # In production, this would integrate with professional networks
             # For now, we simulate the escalation process
@@ -522,7 +522,7 @@ class TherapeuticEmotionalSafetySystem:
                 f"Crisis level {crisis_level.value}"
             )
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
 
             return {
                 "professional_notified": escalation_successful,

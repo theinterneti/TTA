@@ -76,7 +76,7 @@ class TestPythonJoseFunctionality:
     def test_jwt_token_generation(self):
         """Test JWT token generation with python-jose 3.4.0."""
         try:
-            from datetime import datetime, timedelta
+            from datetime import UTC, datetime, timedelta
 
             from jose import jwt
 
@@ -84,7 +84,7 @@ class TestPythonJoseFunctionality:
             secret_key = "test-secret-key-for-validation"
             payload = {
                 "sub": "test-user",
-                "exp": datetime.utcnow() + timedelta(minutes=30),
+                "exp": datetime.now(UTC) + timedelta(minutes=30),
             }
 
             token = jwt.encode(payload, secret_key, algorithm="HS256")

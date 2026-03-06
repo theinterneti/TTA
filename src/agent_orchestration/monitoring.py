@@ -16,7 +16,7 @@ import time
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -161,7 +161,7 @@ class AgentMonitor:
             return HealthStatus(
                 component=f"{self.metrics.agent_type}:{self.metrics.agent_instance}",
                 status=status,
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(UTC),
                 response_time_ms=response_time,
                 error_count=self.metrics.failed_requests,
                 details={
@@ -177,7 +177,7 @@ class AgentMonitor:
             return HealthStatus(
                 component=f"{self.metrics.agent_type}:{self.metrics.agent_instance}",
                 status="unhealthy",
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(UTC),
                 response_time_ms=response_time,
                 error_count=self.metrics.failed_requests + 1,
                 details={"health_check_error": str(e)},
@@ -299,7 +299,7 @@ class SystemMonitor:
         system_health = HealthStatus(
             component="system",
             status=system_status,
-            last_check=datetime.utcnow(),
+            last_check=datetime.now(UTC),
             response_time_ms=0.0,
             error_count=self.metrics.failed_workflows,
             details={

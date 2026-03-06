@@ -11,7 +11,7 @@ characters, and therapeutic elements.
 import json
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import httpx
@@ -326,8 +326,8 @@ Generate rich, detailed content that would be suitable for a professional therap
             average_rating=0.0,
             average_session_count=0,
             therapeutic_effectiveness_score=0.0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         logger.info(f"Created world: {world.name} ({world.world_id})")

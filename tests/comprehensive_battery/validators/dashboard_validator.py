@@ -16,7 +16,7 @@ import asyncio
 import logging
 import time
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from ..common import TestCategory, TestResult, TestStatus
@@ -72,7 +72,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -132,7 +132,7 @@ class DashboardValidator:
             logger.error(f"Real-time data updates verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -146,7 +146,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -191,7 +191,7 @@ class DashboardValidator:
             logger.error(f"WebSocket connections verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -205,7 +205,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -261,7 +261,7 @@ class DashboardValidator:
             logger.error(f"Dashboard data accuracy verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -275,7 +275,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -330,7 +330,7 @@ class DashboardValidator:
             logger.error(f"Metrics display verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -344,7 +344,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -409,7 +409,7 @@ class DashboardValidator:
             logger.error(f"Chart data integrity verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -423,7 +423,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -471,7 +471,7 @@ class DashboardValidator:
             logger.error(f"Dashboard responsiveness verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -485,7 +485,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -542,7 +542,7 @@ class DashboardValidator:
             logger.error(f"Data refresh rates verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -556,7 +556,7 @@ class DashboardValidator:
             test_name=test_name,
             category=TestCategory.DASHBOARD,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -610,7 +610,7 @@ class DashboardValidator:
             logger.error(f"Filtered views verification failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -632,7 +632,7 @@ class DashboardValidator:
                 "update_id": str(uuid.uuid4()),
                 "data_type": "metrics",
                 "update_data": {"value": i * 10},
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
             for i in range(count)
         ]
@@ -682,7 +682,7 @@ class DashboardValidator:
                 "data_id": str(uuid.uuid4()),
                 "value": i * 100,
                 "category": f"category_{i % 3}",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
             for i in range(count)
         ]
@@ -713,7 +713,7 @@ class DashboardValidator:
                 "metric_id": str(uuid.uuid4()),
                 "type": metric_type,
                 "value": i * 10,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
             for i in range(count)
         ]
@@ -741,7 +741,7 @@ class DashboardValidator:
                 "x": i,
                 "y": i * 2 + (i % 5),
                 "category": f"series_{i % 3}",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
             for i in range(data_points)
         ]
