@@ -213,7 +213,7 @@ def check_schema_compatibility(response_version: str, expected_version: str) -> 
 
         return True
 
-    except (ValueError, IndexError):
+    except ValueError, IndexError:
         # Invalid version format
         return False
 

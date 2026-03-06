@@ -41,7 +41,7 @@ async def test_tools_diagnostics_endpoint(redis_client):
         name=unique_name,
         version="1.0.0",
         description="Query KG",
-        parameters=[ToolParameter(name="q", schema={"type": "string"})],
+        parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
         returns_schema={"type": "object"},
     )
     # register may be False if concurrently registered; still acceptable
@@ -70,7 +70,7 @@ async def test_concurrent_registry_and_coordinator(redis_client):
             name="kg.query",
             version="1.0.2",
             description="Query KG",
-            parameters=[ToolParameter(name="q", schema={"type": "string"})],
+            parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
             returns_schema={"type": "object"},
         )
 

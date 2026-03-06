@@ -5,7 +5,7 @@ from tta_ai.orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpe
 
 def test_tool_spec_semver_and_param_limits():
     params = [
-        ToolParameter(name=f"p{i}", required=True, schema={"type": "string"})
+        ToolParameter(name=f"p{i}", required=True, param_schema={"type": "string"})
         for i in range(3)
     ]
     spec = ToolSpec(
@@ -26,7 +26,7 @@ def test_tool_spec_semver_and_param_limits():
             name="x",
             version="1.0.0",
             description="d",
-            parameters=[ToolParameter(name=f"q{i}", schema={}) for i in range(20)],
+            parameters=[ToolParameter(name=f"q{i}", param_schema={}) for i in range(20)],
         )
 
 
@@ -38,7 +38,7 @@ def test_tool_policy_safety_flags():
         name="net.fetch",
         description="fetch network resource",
         version="1.0.0",
-        parameters=[ToolParameter(name="url", schema={"type": "string"})],
+        parameters=[ToolParameter(name="url", param_schema={"type": "string"})],
         safety_flags=["network"],
     )
     with pytest.raises(Exception):

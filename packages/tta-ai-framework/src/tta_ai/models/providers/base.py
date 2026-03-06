@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class BaseModelInstance(IModelInstance):
     """Base implementation for model instances."""
 
-    def __init__(self, model_id: str, provider: "BaseProvider"):
+    def __init__(self, model_id: str, provider: BaseProvider):
         self._model_id = model_id
         self._provider = provider
         self._status = ModelStatus.UNKNOWN
