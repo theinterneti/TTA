@@ -148,23 +148,23 @@ uv run pytest -q -m "not integration" tests/
 ## Implementation Checklist
 
 ### Phase 3.1: Custom Agents Setup (8-12 hours)
-- [ ] Create `.github/agents/` directory
-- [ ] Implement @test-agent.md
-- [ ] Implement @docs-agent.md
-- [ ] Implement @lint-agent.md
-- [ ] Create PR templates
+- [x] Create `.github/agents/` directory
+- [x] Implement @test-agent.md
+- [x] Implement @docs-agent.md
+- [x] Implement @lint-agent.md
+- [x] Create PR templates
 
 ### Phase 3.2: Agentic Workflows (12-16 hours)
-- [ ] Create workflow execution engine
-- [ ] Implement continuous-quality-hygiene.md
-- [ ] Implement continuous-documentation.md
-- [ ] Create GitHub Actions YAML triggers
+- [ ] Create workflow execution engine (deferred - user will use gh-aw CLI)
+- [x] Implement continuous-quality-hygiene.md
+- [x] Implement continuous-documentation.md
+- [ ] Create GitHub Actions YAML triggers (deferred - user will compile locally)
 
 ### Phase 3.3: Integration & Testing (8-12 hours)
 - [ ] End-to-end testing of all agents
-- [ ] Security validation (boundary enforcement)
-- [ ] Documentation updates
-- [ ] Monitoring setup (Grafana dashboard)
+- [x] Security validation (boundary enforcement) - scripts created
+- [x] Documentation updates - guides created
+- [ ] Monitoring setup (Grafana dashboard) - future task
 
 ### Phase 3.4: Production Rollout (4-6 hours)
 - [ ] Week 1: @lint-agent only
