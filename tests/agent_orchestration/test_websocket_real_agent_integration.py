@@ -283,7 +283,8 @@ class TestWebSocketRealAgentIntegration:
         for event in feedback_events:
             assert "progress" in event
             assert "message" in event
-            assert event["progress"] >= 0.0 and event["progress"] <= 1.0
+            assert event["progress"] >= 0.0
+            assert event["progress"] <= 1.0
 
     async def test_error_reporting_integration(
         self, websocket_manager, mock_websocket, event_publisher

@@ -99,19 +99,17 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
             )
 
             # Verify session was created
-            self.assertIsNotNone(result)
-            self.assertEqual(result.player_id, self.test_player_id)
+            assert result is not None
+            assert result.player_id == self.test_player_id
 
             # Verify narrative engine was initialized
-            self.assertIn(
-                result.session_id, self.mock_narrative_engine.initialized_sessions
-            )
+            assert result.session_id in self.mock_narrative_engine.initialized_sessions
             init_data = self.mock_narrative_engine.initialized_sessions[
                 result.session_id
             ]
-            self.assertEqual(init_data["character_id"], self.test_character_id)
-            self.assertEqual(init_data["world_id"], self.test_world_id)
-            self.assertEqual(init_data["therapeutic_settings"], self.test_settings)
+            assert init_data["character_id"] == self.test_character_id
+            assert init_data["world_id"] == self.test_world_id
+            assert init_data["therapeutic_settings"] == self.test_settings
 
         asyncio.run(run_test())
 
@@ -137,26 +135,26 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
 
             # Test pausing session
             pause_result = await self.manager.pause_session(self.test_player_id)
-            self.assertTrue(pause_result)
+            assert pause_result
 
             # Verify narrative state was preserved
-            self.assertIn("narrative_state", session.session_variables)
+            assert "narrative_state" in session.session_variables
             preserved_state = session.session_variables["narrative_state"]
-            self.assertEqual(preserved_state["narrative_position"], 5)
-            self.assertEqual(preserved_state["current_scene"], "test_scene")
+            assert preserved_state["narrative_position"] == 5
+            assert preserved_state["current_scene"] == "test_scene"
 
             # Update session status for resume test
             session.status = SessionStatus.PAUSED
 
             # Test resuming session
             resume_result = await self.manager.resume_session("test_session")
-            self.assertIsNotNone(resume_result)
-            self.assertEqual(resume_result.status, SessionStatus.ACTIVE)
+            assert resume_result is not None
+            assert resume_result.status == SessionStatus.ACTIVE
 
             # Verify narrative state was restored
-            self.assertIn("test_session", self.mock_narrative_engine.session_states)
+            assert "test_session" in self.mock_narrative_engine.session_states
             restored_state = self.mock_narrative_engine.session_states["test_session"]
-            self.assertEqual(restored_state["narrative_position"], 5)
+            assert restored_state["narrative_position"] == 5
 
         asyncio.run(run_test())
 
@@ -180,16 +178,16 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
 
             # Test ending session
             result = await self.manager.end_session(self.test_player_id)
-            self.assertTrue(result)
+            assert result
 
             # Verify session was finalized in narrative engine
-            self.assertIn("test_session", self.mock_narrative_engine.finalized_sessions)
+            assert "test_session" in self.mock_narrative_engine.finalized_sessions
 
             # Verify session was removed from active sessions
-            self.assertNotIn(self.test_player_id, self.manager._active_sessions)
+            assert self.test_player_id not in self.manager._active_sessions
 
             # Verify session status was updated
-            self.assertEqual(session.status, SessionStatus.COMPLETED)
+            assert session.status == SessionStatus.COMPLETED
 
         asyncio.run(run_test())
 
@@ -223,22 +221,18 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
                 self.test_player_id, new_settings
             )
 
-            self.assertTrue(result)
+            assert result
 
             # Verify settings were updated in session
-            self.assertEqual(session.therapeutic_settings.intensity_level, 0.8)
+            assert session.therapeutic_settings.intensity_level == 0.8
 
             # Verify settings were updated in narrative engine
-            self.assertIn(
-                "test_session", self.mock_narrative_engine.therapeutic_settings
-            )
+            assert "test_session" in self.mock_narrative_engine.therapeutic_settings
             engine_settings = self.mock_narrative_engine.therapeutic_settings[
                 "test_session"
             ]
-            self.assertEqual(engine_settings.intensity_level, 0.8)
-            self.assertEqual(
-                engine_settings.preferred_approaches[0], TherapeuticApproach.MINDFULNESS
-            )
+            assert engine_settings.intensity_level == 0.8
+            assert engine_settings.preferred_approaches[0] == TherapeuticApproach.MINDFULNESS
 
         asyncio.run(run_test())
 
@@ -268,25 +262,23 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
             )
 
             # Verify new session was created
-            self.assertIsNotNone(result)
-            self.assertEqual(result.character_id, "new_char_456")
-            self.assertEqual(result.world_id, "new_world_456")
+            assert result is not None
+            assert result.character_id == "new_char_456"
+            assert result.world_id == "new_world_456"
 
             # Verify current session was paused and state preserved
-            self.assertIn("narrative_state", current_session.session_variables)
+            assert "narrative_state" in current_session.session_variables
 
             # Verify new session was initialized in narrative engine
-            self.assertIn(
-                result.session_id, self.mock_narrative_engine.initialized_sessions
-            )
+            assert result.session_id in self.mock_narrative_engine.initialized_sessions
             init_data = self.mock_narrative_engine.initialized_sessions[
                 result.session_id
             ]
-            self.assertEqual(init_data["character_id"], "new_char_456")
-            self.assertEqual(init_data["world_id"], "new_world_456")
+            assert init_data["character_id"] == "new_char_456"
+            assert init_data["world_id"] == "new_world_456"
 
             # Verify therapeutic settings were preserved
-            self.assertEqual(result.therapeutic_settings.intensity_level, 0.6)
+            assert result.therapeutic_settings.intensity_level == 0.6
 
         asyncio.run(run_test())
 
@@ -320,13 +312,13 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
             result = await self.manager.get_session_continuity_data("test_session")
 
             # Verify continuity data includes narrative information
-            self.assertIn("session_variables", result)
-            self.assertIn("narrative_state", result["session_variables"])
+            assert "session_variables" in result
+            assert "narrative_state" in result["session_variables"]
 
             narrative_state = result["session_variables"]["narrative_state"]
-            self.assertEqual(narrative_state["narrative_position"], 10)
-            self.assertEqual(narrative_state["current_scene"], "important_scene")
-            self.assertIn("char1", narrative_state["character_states"])
+            assert narrative_state["narrative_position"] == 10
+            assert narrative_state["current_scene"] == "important_scene"
+            assert "char1" in narrative_state["character_states"]
 
         asyncio.run(run_test())
 

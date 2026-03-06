@@ -102,7 +102,8 @@ async def test_tools_execute_auth_authorized_and_allowed_tools(redis_client):
         headers={"X-AO-DIAG-KEY": "secret"},
         json={"tool_name": "other", "version": "1.0.0", "arguments": {}},
     )
-    assert bad.status_code == 200 and bad.json().get("ok") is False
+    assert bad.status_code == 200
+    assert bad.json().get("ok") is False
 
     # correct tool and key
     ok = client.post(
@@ -116,4 +117,5 @@ async def test_tools_execute_auth_authorized_and_allowed_tools(redis_client):
     )
     assert ok.status_code == 200
     js = ok.json()
-    assert js.get("ok") is True and js.get("result") == 7
+    assert js.get("ok") is True
+    assert js.get("result") == 7

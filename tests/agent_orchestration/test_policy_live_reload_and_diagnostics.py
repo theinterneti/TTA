@@ -37,7 +37,8 @@ async def test_policy_snapshot_and_redaction(redis_client):
     resp = client.get("/policy")
     assert resp.status_code == 200
     snap = resp.json()
-    assert "policy" in snap and "schema" in snap
+    assert "policy" in snap
+    assert "schema" in snap
     assert "max_schema_depth" in snap["schema"]
 
     # Redaction utility should redact sensitive-looking keys

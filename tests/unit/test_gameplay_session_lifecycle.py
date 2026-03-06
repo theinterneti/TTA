@@ -8,20 +8,34 @@ Covers:
 
 from __future__ import annotations
 
+import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from src.components.gameplay_loop.models.core import (
-    DifficultyLevel,
-    EmotionalState,
-    Scene,
-    SceneType,
-    SessionState,
+# Skip on Python 3.14 due to langchain_openai segfault in gameplay components
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Gameplay components trigger langchain_openai segfault on Python 3.14",
 )
 
+if sys.version_info < (3, 14):
+    from src.components.gameplay_loop.models.core import (
+        DifficultyLevel,
+        EmotionalState,
+        Scene,
+        SceneType,
+        SessionState,
+    )
+else:
+    # Dummy imports for Python 3.14+
+    DifficultyLevel = None  # type: ignore[misc,assignment]
+    EmotionalState = None  # type: ignore[misc,assignment]
+    Scene = None  # type: ignore[misc,assignment]
+    SceneType = None  # type: ignore[misc,assignment]
+    SessionState = None  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -35,7 +35,8 @@ async def test_registry_ttl_and_interval_config_and_deregister(redis_client):
     # (default export_state returns empty dict, so no 'state' key)
     val1 = await redis_client.get(key)
     data1 = json.loads(val1)
-    assert "status" in data1 and "last_heartbeat" in data1
+    assert "status" in data1
+    assert "last_heartbeat" in data1
     t1 = float(data1["last_heartbeat"]) if isinstance(data1, dict) else 0.0
 
     # Heartbeats

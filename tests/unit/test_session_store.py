@@ -9,13 +9,13 @@ import pytest
 from src.player_experience.services.session_store import SessionStore
 
 
-@pytest.fixture()
+@pytest.fixture
 def store(tmp_path):
     """Fresh in-memory SQLite store per test."""
     return SessionStore(db_path=tmp_path / "test_sessions.db")
 
 
-@pytest.fixture()
+@pytest.fixture
 def mem_store():
     """Pure in-memory fallback store (simulates unavailable SQLite)."""
     s = SessionStore.__new__(SessionStore)

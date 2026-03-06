@@ -15,12 +15,10 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from unittest.mock import patch
 
 import pytest
 
 from src.common.process_utils import ProcessError, RunResult, run
-
 
 # ---------------------------------------------------------------------------
 # RunResult

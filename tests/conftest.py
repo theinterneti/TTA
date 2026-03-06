@@ -45,7 +45,7 @@ def neo4j_available():
     return has_neo4j()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_neo4j_driver():
     """Provide a simple mock Neo4j driver/session for unit tests."""
     from unittest.mock import AsyncMock
@@ -70,7 +70,7 @@ def mock_neo4j_driver():
     return mock_driver
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_redis_client():
     """Provide a simple mock Redis client for unit tests."""
     from unittest.mock import AsyncMock
@@ -385,7 +385,7 @@ async def redis_client(redis_container):
         await client.aclose()
 
 
-@pytest.fixture()
+@pytest.fixture
 def redis_client_sync(redis_container):
     """Synchronous Redis client for simple integration tests.
     Returns redis.Redis so .get/.exists return concrete results, not coroutines.

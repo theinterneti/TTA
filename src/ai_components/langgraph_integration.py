@@ -15,7 +15,6 @@ from typing import Any, TypedDict
 
 import redis.asyncio as aioredis
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 
 from .llm_factory import get_llm
@@ -72,7 +71,7 @@ class TherapeuticWorkflowManager:
         self.redis_url = redis_url
         self.model_name = model_name
 
-        self.llm: ChatOpenAI = get_llm(
+        self.llm = get_llm(
             provider=provider,
             model=model_name,
             temperature=0.7,

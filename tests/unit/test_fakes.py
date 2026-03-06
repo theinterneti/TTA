@@ -4,14 +4,13 @@ import pytest
 
 from tests.fakes import FakeRepository, FakeUnitOfWork
 
-
 # ---------------------------------------------------------------------------
 # FakeRepository
 # ---------------------------------------------------------------------------
 
 
 class TestFakeRepository:
-    @pytest.fixture()
+    @pytest.fixture
     def repo(self):
         return FakeRepository()
 

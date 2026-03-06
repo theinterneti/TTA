@@ -14,11 +14,9 @@ from __future__ import annotations
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-
 from src.common.health_checks import (
-    HealthCheckResult,
     HealthChecker,
+    HealthCheckResult,
     HealthStatus,
     check_agent_orchestration_health,
     check_neo4j_health,
@@ -26,7 +24,6 @@ from src.common.health_checks import (
     check_redis_health,
     get_health_checker,
 )
-
 
 # ---------------------------------------------------------------------------
 # HealthCheckResult

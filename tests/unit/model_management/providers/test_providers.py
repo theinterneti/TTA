@@ -897,7 +897,8 @@ class TestOpenRouterProvider:
             m for m in provider._available_models if m.model_id == "paid-model"
         )
         assert free_model.cost_per_token == pytest.approx(0.0)
-        assert paid_model.cost_per_token is not None and paid_model.cost_per_token > 0
+        assert paid_model.cost_per_token is not None
+        assert paid_model.cost_per_token > 0
 
 
 # ---------------------------------------------------------------------------

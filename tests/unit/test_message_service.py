@@ -21,12 +21,12 @@ def clear_history():
     _SESSION_HISTORY.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def service():
     return MessageService()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_llm():
     llm = MagicMock()
     llm.ainvoke = AsyncMock(return_value=MagicMock(content="A peaceful garden awaits."))

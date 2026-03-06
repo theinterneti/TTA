@@ -25,11 +25,11 @@ class TestOrchestratorTopoSort(unittest.TestCase):
         """
         graph = {"a": ["b", "c"], "b": ["d"], "c": ["d"], "d": []}
         sorted_order = self.orchestrator._topological_sort(graph)
-        self.assertEqual(len(sorted_order), 4)
-        self.assertEqual(sorted_order[0], "d")
-        self.assertIn(sorted_order[1], ["b", "c"])
-        self.assertIn(sorted_order[2], ["b", "c"])
-        self.assertEqual(sorted_order[3], "a")
+        assert len(sorted_order) == 4
+        assert sorted_order[0] == "d"
+        assert sorted_order[1] in ["b", "c"]
+        assert sorted_order[2] in ["b", "c"]
+        assert sorted_order[3] == "a"
 
     def test_topological_sort_complex(self):
         """
@@ -44,13 +44,13 @@ class TestOrchestratorTopoSort(unittest.TestCase):
             "f": [],
         }
         sorted_order = self.orchestrator._topological_sort(graph)
-        self.assertEqual(len(sorted_order), 6)
-        self.assertEqual(sorted_order[0], "d")
-        self.assertEqual(sorted_order[1], "f")
-        self.assertIn(sorted_order[2], ["b", "c", "e"])
-        self.assertIn(sorted_order[3], ["b", "c", "e"])
-        self.assertIn(sorted_order[4], ["b", "c", "e"])
-        self.assertEqual(sorted_order[5], "a")
+        assert len(sorted_order) == 6
+        assert sorted_order[0] == "d"
+        assert sorted_order[1] == "f"
+        assert sorted_order[2] in ["b", "c", "e"]
+        assert sorted_order[3] in ["b", "c", "e"]
+        assert sorted_order[4] in ["b", "c", "e"]
+        assert sorted_order[5] == "a"
 
     def test_topological_sort_circular_dependency(self):
         """
@@ -59,7 +59,7 @@ class TestOrchestratorTopoSort(unittest.TestCase):
         graph = {"a": ["b"], "b": ["c"], "c": ["a"]}
         sorted_order = self.orchestrator._topological_sort(graph)
         # The exact output can vary, but it should not hang and should return a partial sort
-        self.assertIn(len(sorted_order), [0, 1, 2, 3])
+        assert len(sorted_order) in [0, 1, 2, 3]
 
     def test_topological_sort_empty_graph(self):
         """
@@ -67,7 +67,7 @@ class TestOrchestratorTopoSort(unittest.TestCase):
         """
         graph = {}
         sorted_order = self.orchestrator._topological_sort(graph)
-        self.assertEqual(sorted_order, [])
+        assert sorted_order == []
 
     def test_topological_sort_disconnected_components(self):
         """
@@ -75,13 +75,13 @@ class TestOrchestratorTopoSort(unittest.TestCase):
         """
         graph = {"a": ["b"], "b": [], "c": ["d"], "d": []}
         sorted_order = self.orchestrator._topological_sort(graph)
-        self.assertEqual(len(sorted_order), 4)
-        self.assertIn("b", sorted_order)
-        self.assertIn("d", sorted_order)
-        self.assertIn("a", sorted_order)
-        self.assertIn("c", sorted_order)
-        self.assertLess(sorted_order.index("b"), sorted_order.index("a"))
-        self.assertLess(sorted_order.index("d"), sorted_order.index("c"))
+        assert len(sorted_order) == 4
+        assert "b" in sorted_order
+        assert "d" in sorted_order
+        assert "a" in sorted_order
+        assert "c" in sorted_order
+        assert sorted_order.index("b") < sorted_order.index("a")
+        assert sorted_order.index("d") < sorted_order.index("c")
 
 
 if __name__ == "__main__":

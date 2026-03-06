@@ -166,7 +166,8 @@ class TestMFAService:
     def test_generate_totp_secret_returns_secret_and_qr(self):
         svc = self._svc()
         secret, qr_url = svc.generate_totp_secret("u1", "alice")
-        assert isinstance(secret, str) and len(secret) > 0
+        assert isinstance(secret, str)
+        assert len(secret) > 0
         assert qr_url.startswith("data:image/png;base64,")
 
     def test_verify_totp_code_with_valid_current_code(self):
@@ -349,7 +350,8 @@ class TestEnhancedAuthServiceSessionAndToken:
         user = _make_player_user()
         session_id = svc.create_session(user)
         token = svc.create_access_token(user, session_id)
-        assert isinstance(token, str) and len(token) > 0
+        assert isinstance(token, str)
+        assert len(token) > 0
 
     def test_create_access_token_uses_player_id_field(self):
         from jose import jwt as _jwt

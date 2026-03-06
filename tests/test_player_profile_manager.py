@@ -12,6 +12,8 @@ import uuid
 from datetime import datetime
 from unittest.mock import Mock, patch
 
+import pytest
+
 from src.player_experience.database.player_profile_repository import (
     PlayerProfileRepository,
     PlayerProfileRepositoryError,
@@ -93,10 +95,10 @@ class TestPlayerProfileManager(unittest.TestCase):
             )
 
         # Verify
-        self.assertIsInstance(profile, PlayerProfile)
-        self.assertEqual(profile.username, self.test_username)
-        self.assertEqual(profile.email, self.test_email)
-        self.assertEqual(profile.player_id, self.test_player_id)
+        assert isinstance(profile, PlayerProfile)
+        assert profile.username == self.test_username
+        assert profile.email == self.test_email
+        assert profile.player_id == self.test_player_id
 
         # Verify repository calls
         self.mock_repository.username_exists.assert_called_once_with(self.test_username)
@@ -109,12 +111,12 @@ class TestPlayerProfileManager(unittest.TestCase):
         self.mock_repository.username_exists.return_value = True
 
         # Execute and verify
-        with self.assertRaises(PlayerProfileManagerError) as context:
+        with pytest.raises(PlayerProfileManagerError) as context:
             self.manager.create_player_profile(
                 username=self.test_username, email=self.test_email
             )
 
-        self.assertIn("already exists", str(context.exception))
+        assert "already exists" in str(context.value)
 
     def test_create_player_profile_duplicate_email(self):
         """Test player profile creation with duplicate email."""
@@ -123,12 +125,12 @@ class TestPlayerProfileManager(unittest.TestCase):
         self.mock_repository.email_exists.return_value = True
 
         # Execute and verify
-        with self.assertRaises(PlayerProfileManagerError) as context:
+        with pytest.raises(PlayerProfileManagerError) as context:
             self.manager.create_player_profile(
                 username=self.test_username, email=self.test_email
             )
 
-        self.assertIn("already exists", str(context.exception))
+        assert "already exists" in str(context.value)
 
     def test_create_player_profile_invalid_username(self):
         """Test player profile creation with invalid username."""
@@ -136,7 +138,7 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         for invalid_username in invalid_usernames:
             with self.subTest(username=invalid_username):
-                with self.assertRaises(PlayerProfileManagerError):
+                with pytest.raises(PlayerProfileManagerError):
                     self.manager.create_player_profile(
                         username=invalid_username, email=self.test_email
                     )
@@ -147,7 +149,7 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         for invalid_email in invalid_emails:
             with self.subTest(email=invalid_email):
-                with self.assertRaises(PlayerProfileManagerError):
+                with pytest.raises(PlayerProfileManagerError):
                     self.manager.create_player_profile(
                         username=self.test_username, email=invalid_email
                     )
@@ -155,11 +157,11 @@ class TestPlayerProfileManager(unittest.TestCase):
     def test_create_player_profile_invalid_privacy_settings(self):
         """Test player profile creation with invalid privacy settings."""
         # Test invalid data retention period (too short)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=15)
 
         # Test invalid data retention period (too long)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=3000)
 
     def test_get_player_profile_success(self):
@@ -173,8 +175,8 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertIsInstance(profile, PlayerProfile)
-        self.assertEqual(profile.player_id, self.test_player_id)
+        assert isinstance(profile, PlayerProfile)
+        assert profile.player_id == self.test_player_id
         self.mock_repository.get_player_profile.assert_called_once_with(
             self.test_player_id
         )
@@ -188,7 +190,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         profile = self.manager.get_player_profile("nonexistent_id")
 
         # Verify
-        self.assertIsNone(profile)
+        assert profile is None
 
     def test_get_player_profile_privacy_filtering(self):
         """Test privacy filtering when accessed by different user."""
@@ -208,8 +210,8 @@ class TestPlayerProfileManager(unittest.TestCase):
         profile = self.manager.get_player_profile(self.test_player_id, other_user_id)
 
         # Verify privacy filtering applied
-        self.assertEqual(profile.email, "***@***.***")
-        self.assertEqual(profile.active_sessions, {})
+        assert profile.email == "***@***.***"
+        assert profile.active_sessions == {}
 
     def test_get_player_profile_data_access_restricted(self):
         """Test data access restriction when consent is not given."""
@@ -226,14 +228,14 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         # Execute and verify - access by different user should be restricted
         other_user_id = str(uuid.uuid4())
-        with self.assertRaises(DataAccessRestrictedError):
+        with pytest.raises(DataAccessRestrictedError):
             self.manager.get_player_profile(self.test_player_id, other_user_id)
 
         # But access by profile owner should work
         profile = self.manager.get_player_profile(
             self.test_player_id, self.test_player_id
         )
-        self.assertIsNotNone(profile)
+        assert profile is not None
 
     def test_update_player_profile_success(self):
         """Test successful player profile update."""
@@ -248,7 +250,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertTrue(result)
+        assert result
         self.mock_repository.update_player_profile.assert_called_once()
 
     def test_update_player_profile_not_found(self):
@@ -257,7 +259,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         self.mock_repository.get_player_profile.return_value = None
 
         # Execute and verify
-        with self.assertRaises(PlayerProfileManagerError):
+        with pytest.raises(PlayerProfileManagerError):
             self.manager.update_player_profile(
                 "nonexistent_id", {"username": "newusername"}, "nonexistent_id"
             )
@@ -269,7 +271,7 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         # Execute and verify
         other_user_id = str(uuid.uuid4())
-        with self.assertRaises(DataAccessRestrictedError):
+        with pytest.raises(DataAccessRestrictedError):
             self.manager.update_player_profile(
                 self.test_player_id, {"username": "newusername"}, other_user_id
             )
@@ -281,7 +283,7 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         # Execute and verify
         restricted_updates = {"player_id": "new_id", "created_at": datetime.now()}
-        with self.assertRaises(DataAccessRestrictedError):
+        with pytest.raises(DataAccessRestrictedError):
             self.manager.update_player_profile(
                 self.test_player_id, restricted_updates, self.test_player_id
             )
@@ -298,7 +300,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertTrue(result)
+        assert result
         self.mock_repository.delete_player_profile.assert_called_once_with(
             self.test_player_id
         )
@@ -312,7 +314,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         result = self.manager.delete_player_profile("nonexistent_id", "nonexistent_id")
 
         # Verify
-        self.assertFalse(result)
+        assert not result
 
     def test_delete_player_profile_unauthorized(self):
         """Test player profile deletion by unauthorized user."""
@@ -321,7 +323,7 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         # Execute and verify
         other_user_id = str(uuid.uuid4())
-        with self.assertRaises(DataAccessRestrictedError):
+        with pytest.raises(DataAccessRestrictedError):
             self.manager.delete_player_profile(self.test_player_id, other_user_id)
 
     def test_get_player_by_username(self):
@@ -336,8 +338,8 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertIsInstance(profile, PlayerProfile)
-        self.assertEqual(profile.username, self.test_username)
+        assert isinstance(profile, PlayerProfile)
+        assert profile.username == self.test_username
         self.mock_repository.get_player_by_username.assert_called_once_with(
             self.test_username
         )
@@ -352,8 +354,8 @@ class TestPlayerProfileManager(unittest.TestCase):
         profile = self.manager.get_player_by_email(self.test_email, self.test_player_id)
 
         # Verify
-        self.assertIsInstance(profile, PlayerProfile)
-        self.assertEqual(profile.email, self.test_email)
+        assert isinstance(profile, PlayerProfile)
+        assert profile.email == self.test_email
         self.mock_repository.get_player_by_email.assert_called_once_with(
             self.test_email
         )
@@ -375,7 +377,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertTrue(result)
+        assert result
         self.mock_repository.update_player_profile.assert_called_once()
 
     def test_update_privacy_settings(self):
@@ -394,13 +396,13 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertTrue(result)
+        assert result
         self.mock_repository.update_player_profile.assert_called_once()
 
     def test_update_privacy_settings_invalid(self):
         """Test privacy settings update with invalid settings."""
         # Execute and verify - the validation happens in the model constructor
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=15)
 
     def test_export_player_data_success(self):
@@ -414,19 +416,17 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertIsInstance(export_data, dict)
-        self.assertIn("player_profile", export_data)
-        self.assertIn("therapeutic_preferences", export_data)
-        self.assertIn("privacy_settings", export_data)
-        self.assertIn("progress_summary", export_data)
-        self.assertIn("export_metadata", export_data)
+        assert isinstance(export_data, dict)
+        assert "player_profile" in export_data
+        assert "therapeutic_preferences" in export_data
+        assert "privacy_settings" in export_data
+        assert "progress_summary" in export_data
+        assert "export_metadata" in export_data
 
         # Verify data content
-        self.assertEqual(
-            export_data["player_profile"]["player_id"], self.test_player_id
-        )
-        self.assertEqual(export_data["player_profile"]["username"], self.test_username)
-        self.assertEqual(export_data["player_profile"]["email"], self.test_email)
+        assert export_data["player_profile"]["player_id"] == self.test_player_id
+        assert export_data["player_profile"]["username"] == self.test_username
+        assert export_data["player_profile"]["email"] == self.test_email
 
     def test_export_player_data_unauthorized(self):
         """Test player data export by unauthorized user."""
@@ -443,7 +443,7 @@ class TestPlayerProfileManager(unittest.TestCase):
 
         # Execute and verify
         other_user_id = str(uuid.uuid4())
-        with self.assertRaises(PlayerProfileManagerError):
+        with pytest.raises(PlayerProfileManagerError):
             self.manager.export_player_data(self.test_player_id, other_user_id)
 
     def test_get_access_log_success(self):
@@ -458,15 +458,15 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Verify
-        self.assertEqual(len(access_log), 2)
-        self.assertEqual(access_log[0]["operation"], "CREATE")
-        self.assertEqual(access_log[1]["operation"], "READ")
+        assert len(access_log) == 2
+        assert access_log[0]["operation"] == "CREATE"
+        assert access_log[1]["operation"] == "READ"
 
     def test_get_access_log_unauthorized(self):
         """Test access log retrieval by unauthorized user."""
         # Execute and verify
         other_user_id = str(uuid.uuid4())
-        with self.assertRaises(DataAccessRestrictedError):
+        with pytest.raises(DataAccessRestrictedError):
             self.manager.get_access_log(self.test_player_id, other_user_id)
 
     def test_repository_error_handling(self):
@@ -477,7 +477,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         )
 
         # Execute and verify
-        with self.assertRaises(PlayerProfileManagerError):
+        with pytest.raises(PlayerProfileManagerError):
             self.manager.get_player_profile(self.test_player_id)
 
     def test_create_player_profile_manager_utility(self):
@@ -485,8 +485,8 @@ class TestPlayerProfileManager(unittest.TestCase):
         mock_repo = Mock(spec=PlayerProfileRepository)
         manager = create_player_profile_manager(mock_repo)
 
-        self.assertIsInstance(manager, PlayerProfileManager)
-        self.assertEqual(manager.repository, mock_repo)
+        assert isinstance(manager, PlayerProfileManager)
+        assert manager.repository == mock_repo
 
 
 class TestPlayerProfileManagerIntegration(unittest.TestCase):
@@ -522,8 +522,8 @@ class TestPlayerProfileManagerIntegration(unittest.TestCase):
                 username=self.test_username, email=self.test_email
             )
 
-        self.assertIsNotNone(profile)
-        self.assertEqual(profile.player_id, self.test_player_id)
+        assert profile is not None
+        assert profile.player_id == self.test_player_id
 
         # Setup for read
         self.mock_repository.get_player_profile.return_value = profile
@@ -532,20 +532,20 @@ class TestPlayerProfileManagerIntegration(unittest.TestCase):
         retrieved_profile = self.manager.get_player_profile(
             self.test_player_id, self.test_player_id
         )
-        self.assertEqual(retrieved_profile.username, self.test_username)
+        assert retrieved_profile.username == self.test_username
 
         # Update profile
         updates = {"username": "updateduser"}
         update_result = self.manager.update_player_profile(
             self.test_player_id, updates, self.test_player_id
         )
-        self.assertTrue(update_result)
+        assert update_result
 
         # Delete profile
         delete_result = self.manager.delete_player_profile(
             self.test_player_id, self.test_player_id
         )
-        self.assertTrue(delete_result)
+        assert delete_result
 
     def test_privacy_controls_enforcement(self):
         """Test that privacy controls are properly enforced."""
@@ -568,14 +568,14 @@ class TestPlayerProfileManagerIntegration(unittest.TestCase):
 
         # Test that external access is restricted
         other_user_id = str(uuid.uuid4())
-        with self.assertRaises(DataAccessRestrictedError):
+        with pytest.raises(DataAccessRestrictedError):
             self.manager.get_player_profile(self.test_player_id, other_user_id)
 
         # Test that owner access still works
         owner_profile = self.manager.get_player_profile(
             self.test_player_id, self.test_player_id
         )
-        self.assertIsNotNone(owner_profile)
+        assert owner_profile is not None
 
 
 if __name__ == "__main__":

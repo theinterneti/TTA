@@ -41,6 +41,7 @@ async def test_agent_router_resolves_and_events_endpoint(redis_client):
     # Check that /events returns something structured
     app = comp._create_diagnostics_app()
     data = await app.router.routes[-1].endpoint()  # /events endpoint
-    assert isinstance(data, dict) and "events" in data
+    assert isinstance(data, dict)
+    assert "events" in data
 
     await comp.stop()

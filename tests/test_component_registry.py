@@ -12,6 +12,8 @@ from unittest import mock
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import pytest
+
 from src.orchestration.component import Component
 from src.orchestration.component_registry import ComponentRegistry
 from src.orchestration.config import TTAConfig
@@ -99,22 +101,18 @@ from tests.test_component_registry import DummyComponent
         Test that component definitions are loaded correctly.
         """
         self.mock_config.get.assert_called_with("orchestration.components", {})
-        self.assertIn("valid_component", self.registry._registered_components)
-        self.assertNotIn("malformed_component_1", self.registry._registered_components)
-        self.assertNotIn("malformed_component_2", self.registry._registered_components)
-        self.assertIn("non_subclass_component", self.registry._registered_components)
-        self.assertIn(
-            "non_existent_class_component", self.registry._registered_components
-        )
-        self.assertIn("import_error_component", self.registry._registered_components)
+        assert "valid_component" in self.registry._registered_components
+        assert "malformed_component_1" not in self.registry._registered_components
+        assert "malformed_component_2" not in self.registry._registered_components
+        assert "non_subclass_component" in self.registry._registered_components
+        assert "non_existent_class_component" in self.registry._registered_components
+        assert "import_error_component" in self.registry._registered_components
 
         # Check details of a valid component
         valid_comp_info = self.registry._registered_components["valid_component"]
-        self.assertEqual(
-            valid_comp_info["path"], "tests.temp_components.dummy_component"
-        )
-        self.assertEqual(valid_comp_info["class_name"], "DummyComponent")
-        self.assertEqual(valid_comp_info["dependencies"], ["dep1"])
+        assert valid_comp_info["path"] == "tests.temp_components.dummy_component"
+        assert valid_comp_info["class_name"] == "DummyComponent"
+        assert valid_comp_info["dependencies"] == ["dep1"]
 
     def test_get_registered_component_names(self):
         """
@@ -135,37 +133,28 @@ from tests.test_component_registry import DummyComponent
         Test get_component_class when importlib.util.spec_from_file_location returns None.
         """
         mock_spec_from_file_location.return_value = None
-        with self.assertRaisesRegex(
-            ValueError, "Could not load component 'import_error_component'"
-        ):
+        with pytest.raises(ValueError, match="Could not load component 'import_error_component'"):
             self.registry.get_component_class("import_error_component")
 
     def test_get_component_class_not_registered(self):
         """
         Test get_component_class with a component that is not registered.
         """
-        with self.assertRaisesRegex(
-            ValueError, "Component 'non_existent_component' is not registered."
-        ):
+        with pytest.raises(ValueError, match="Component 'non_existent_component' is not registered."):
             self.registry.get_component_class("non_existent_component")
 
     def test_get_component_class_non_existent_class(self):
         """
         Test get_component_class when the class_name does not exist in the module.
         """
-        with self.assertRaisesRegex(
-            ValueError, "Could not load component 'non_existent_class_component'"
-        ):
+        with pytest.raises(ValueError, match="Could not load component 'non_existent_class_component'"):
             self.registry.get_component_class("non_existent_class_component")
 
     def test_get_component_class_non_subclass(self):
         """
         Test get_component_class when the loaded class is not a subclass of Component.
         """
-        with self.assertRaisesRegex(
-            TypeError,
-            "Class 'NonComponentClass' in 'tests.temp_components.non_component_class' is not a subclass of Component.",
-        ):
+        with pytest.raises(TypeError, match="Class 'NonComponentClass' in 'tests.temp_components.non_component_class' is not a subclass of Component."):
             self.registry.get_component_class("non_subclass_component")
 
     def test_get_component_class_success(self):
@@ -175,9 +164,9 @@ from tests.test_component_registry import DummyComponent
         component_class, dependencies = self.registry.get_component_class(
             "valid_component"
         )
-        self.assertEqual(component_class.__name__, "DummyComponent")
-        self.assertEqual(dependencies, ["dep1"])
-        self.assertTrue(issubclass(component_class, Component))
+        assert component_class.__name__ == "DummyComponent"
+        assert dependencies == ["dep1"]
+        assert issubclass(component_class, Component)
 
 
 if __name__ == "__main__":

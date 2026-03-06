@@ -28,6 +28,7 @@ def test_progress_viz_endpoint_returns_series() -> None:
     )
     assert resp.status_code == 200
     data = resp.json()
-    assert "time_buckets" in data and "series" in data
+    assert "time_buckets" in data
+    assert "series" in data
     assert isinstance(data["time_buckets"], list)
     assert isinstance(data["series"], dict)

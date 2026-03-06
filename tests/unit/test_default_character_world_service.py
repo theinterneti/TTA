@@ -21,7 +21,6 @@ from src.player_experience.services.default_character_world_service import (
     DefaultCharacterWorldService,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -98,7 +97,8 @@ class TestInitializeDefaultCharacterAndWorld:
         char_id, world_id, session_id = svc.initialize_default_character_and_world("p1")
         assert char_id == "char-456"
         assert world_id == DefaultCharacterWorldService.DEFAULT_WORLD_ID
-        assert session_id is not None and len(session_id) > 0
+        assert session_id is not None
+        assert len(session_id) > 0
 
     def test_unexpected_exception_returns_none_triple(self):
         svc = _make_service()

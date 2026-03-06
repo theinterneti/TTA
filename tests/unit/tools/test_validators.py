@@ -20,7 +20,7 @@ class TestToolNameValidator:
     """Tests for ToolNameValidator."""
 
     @pytest.mark.parametrize(
-        "name,expected_valid",
+        ("name", "expected_valid"),
         [
             ("get_player_profile", True),
             ("list_active_sessions", True),
@@ -104,7 +104,7 @@ class TestToolDescriptionValidator:
     """Tests for ToolDescriptionValidator."""
 
     @pytest.mark.parametrize(
-        "description,expected_score_range",
+        ("description", "expected_score_range"),
         [
             (
                 "Retrieves player profile data including preferences and progress.",
@@ -190,7 +190,7 @@ class TestToolDescriptionValidator:
         assert result.details["length"] == len(description)
 
     @pytest.mark.parametrize(
-        "first_word,expected_in_action_verbs",
+        ("first_word", "expected_in_action_verbs"),
         [
             ("retrieves", True),
             ("gets", True),

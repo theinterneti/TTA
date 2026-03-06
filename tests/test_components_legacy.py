@@ -25,6 +25,7 @@ from unittest.mock import MagicMock, mock_open, patch
 # Add the parent directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import pytest
 import requests
 
 from src.components import AppComponent, CarbonComponent, DockerComponent, LLMComponent
@@ -38,7 +39,7 @@ class TestComponents(unittest.TestCase):
     def test_config_validation(self):
         """Test configuration validation."""
         config = TTAConfig()
-        self.assertTrue(config.validate(), "Configuration validation failed")
+        assert config.validate(), "Configuration validation failed"
 
     def test_docker_component(self):
         """Test the Docker component."""
@@ -46,27 +47,17 @@ class TestComponents(unittest.TestCase):
         docker = DockerComponent(config)
 
         # Test initialization
-        self.assertEqual(docker.name, "docker", "Docker component name is incorrect")
-        self.assertEqual(
-            docker.status.value, "stopped", "Docker component status is incorrect"
-        )
+        assert docker.name == "docker", "Docker component name is incorrect"
+        assert docker.status.value == "stopped", "Docker component status is incorrect"
 
         # Test starting the component
         if os.environ.get("RUN_DOCKER_TESTS", "false").lower() == "true":
-            self.assertTrue(docker.start(), "Docker component failed to start")
-            self.assertEqual(
-                docker.status.value,
-                "running",
-                "Docker component status is incorrect after starting",
-            )
+            assert docker.start(), "Docker component failed to start"
+            assert docker.status.value == "running", "Docker component status is incorrect after starting"
 
             # Test stopping the component
-            self.assertTrue(docker.stop(), "Docker component failed to stop")
-            self.assertEqual(
-                docker.status.value,
-                "stopped",
-                "Docker component status is incorrect after stopping",
-            )
+            assert docker.stop(), "Docker component failed to stop"
+            assert docker.status.value == "stopped", "Docker component status is incorrect after stopping"
 
     # Batch 1: Start/Stop Operations (3 tests)
     def test_docker_start_success(self):
@@ -85,7 +76,7 @@ class TestComponents(unittest.TestCase):
             patch.object(docker, "ensure_consistency", return_value=True),
         ):
             result = docker.start()
-            self.assertTrue(result, "Docker component should start successfully")
+            assert result, "Docker component should start successfully"
 
     def test_docker_start_docker_not_installed(self):
         """Test Docker component start fails when Docker not installed."""
@@ -99,10 +90,7 @@ class TestComponents(unittest.TestCase):
             side_effect=RuntimeError("Docker not installed"),
         ):
             result = docker.start()
-            self.assertFalse(
-                result,
-                "Docker component should fail to start when Docker not installed",
-            )
+            assert not result, "Docker component should fail to start when Docker not installed"
 
     def test_docker_stop_success(self):
         """Test Docker component stop (always succeeds as it's a no-op)."""
@@ -113,7 +101,7 @@ class TestComponents(unittest.TestCase):
         docker.status = ComponentStatus.RUNNING
 
         result = docker.stop()
-        self.assertTrue(result, "Docker component should stop successfully")
+        assert result, "Docker component should stop successfully"
 
     # Batch 2: Docker Installation Check (2 tests)
     def test_check_docker_installed_success(self):
@@ -128,7 +116,7 @@ class TestComponents(unittest.TestCase):
 
         with patch("src.common.process_utils.run", return_value=mock_result):
             result = docker._check_docker_installed()
-            self.assertTrue(result, "Docker should be detected as installed")
+            assert result, "Docker should be detected as installed"
 
     def test_check_docker_installed_failure(self):
         """Test Docker installation check exception handling."""
@@ -143,7 +131,7 @@ class TestComponents(unittest.TestCase):
         # Patch at the module level where it's imported
         with (
             patch("src.components.docker_component.safe_run", return_value=mock_result),
-            self.assertRaises(RuntimeError),
+            pytest.raises(RuntimeError),
         ):
             docker._check_docker_installed()
 
@@ -164,7 +152,7 @@ class TestComponents(unittest.TestCase):
             patch.object(docker, "_ensure_consistent_services"),
         ):
             result = docker.ensure_consistency()
-            self.assertTrue(result, "Consistency should be ensured successfully")
+            assert result, "Consistency should be ensured successfully"
 
     def test_ensure_consistency_dev_missing(self):
         """Test ensure_consistency fails when tta.dev repository not found."""
@@ -174,7 +162,7 @@ class TestComponents(unittest.TestCase):
         # Mock Path.exists to return False for tta.dev
         with patch.object(Path, "exists", return_value=False):
             result = docker.ensure_consistency()
-            self.assertFalse(result, "Consistency should fail when tta.dev missing")
+            assert not result, "Consistency should fail when tta.dev missing"
 
     def test_ensure_consistency_prototype_missing(self):
         """Test ensure_consistency fails when tta.prototype repository not found."""
@@ -195,9 +183,7 @@ class TestComponents(unittest.TestCase):
             patch.object(docker, "_ensure_consistent_services"),
         ):
             result = docker.ensure_consistency()
-            self.assertFalse(
-                result, "Consistency should fail when tta.prototype missing"
-            )
+            assert not result, "Consistency should fail when tta.prototype missing"
 
     def test_carbon_component(self):
         """Test the Carbon component."""
@@ -205,10 +191,8 @@ class TestComponents(unittest.TestCase):
         carbon = CarbonComponent(config)
 
         # Test initialization
-        self.assertEqual(carbon.name, "carbon", "Carbon component name is incorrect")
-        self.assertEqual(
-            carbon.status.value, "stopped", "Carbon component status is incorrect"
-        )
+        assert carbon.name == "carbon", "Carbon component name is incorrect"
+        assert carbon.status.value == "stopped", "Carbon component status is incorrect"
 
         # Test starting the component
         try:
@@ -219,38 +203,24 @@ class TestComponents(unittest.TestCase):
             has_codecarbon = False
 
         if has_codecarbon:
-            self.assertTrue(carbon.start(), "Carbon component failed to start")
-            self.assertEqual(
-                carbon.status.value,
-                "running",
-                "Carbon component status is incorrect after starting",
-            )
+            assert carbon.start(), "Carbon component failed to start"
+            assert carbon.status.value == "running", "Carbon component status is incorrect after starting"
 
             # Test tracking a function
             def test_function():
                 return "test"
 
             result = carbon.track_function(test_function)
-            self.assertEqual(
-                result, "test", "Carbon component failed to track function"
-            )
+            assert result == "test", "Carbon component failed to track function"
 
             # Test getting emissions report
             report = carbon.get_emissions_report()
-            self.assertIn(
-                "project_name", report, "Emissions report is missing project_name"
-            )
-            self.assertIn(
-                "total_emissions", report, "Emissions report is missing total_emissions"
-            )
+            assert "project_name" in report, "Emissions report is missing project_name"
+            assert "total_emissions" in report, "Emissions report is missing total_emissions"
 
             # Test stopping the component
-            self.assertTrue(carbon.stop(), "Carbon component failed to stop")
-            self.assertEqual(
-                carbon.status.value,
-                "stopped",
-                "Carbon component status is incorrect after stopping",
-            )
+            assert carbon.stop(), "Carbon component failed to stop"
+            assert carbon.status.value == "stopped", "Carbon component status is incorrect after stopping"
 
     def test_carbon_decorator(self):
         """Test the Carbon component decorator functionality."""
@@ -259,7 +229,7 @@ class TestComponents(unittest.TestCase):
 
         # Test getting the carbon decorator
         decorator = carbon.get_carbon_decorator()
-        self.assertIsNotNone(decorator, "Carbon decorator should not be None")
+        assert decorator is not None, "Carbon decorator should not be None"
 
         # Test that the decorator can be applied to a function
         @decorator
@@ -267,7 +237,7 @@ class TestComponents(unittest.TestCase):
             return "decorated"
 
         result = test_function()
-        self.assertEqual(result, "decorated", "Decorated function should work")
+        assert result == "decorated", "Decorated function should work"
 
     def test_carbon_without_codecarbon(self):
         """Test Carbon component behavior when codecarbon is not available."""
@@ -278,7 +248,7 @@ class TestComponents(unittest.TestCase):
         # This test will pass regardless of whether codecarbon is installed
         # because the component handles both cases
         report = carbon.get_emissions_report()
-        self.assertIsNotNone(report, "Emissions report should not be None")
+        assert report is not None, "Emissions report should not be None"
 
     def test_carbon_stop_without_codecarbon(self):
         """Test Carbon component stop when codecarbon is not available."""
@@ -289,9 +259,7 @@ class TestComponents(unittest.TestCase):
         with patch("src.components.carbon_component.codecarbon_available", False):
             carbon.start()
             result = carbon.stop()
-            self.assertTrue(
-                result, "Carbon component should stop successfully without codecarbon"
-            )
+            assert result, "Carbon component should stop successfully without codecarbon"
 
     def test_carbon_stop_with_emissions_data(self):
         """Test Carbon component stop with emissions data."""
@@ -314,7 +282,7 @@ class TestComponents(unittest.TestCase):
             # Mock the _save_emissions_data method
             with patch.object(carbon, "_save_emissions_data") as mock_save:
                 result = carbon.stop()
-                self.assertTrue(result, "Carbon component should stop successfully")
+                assert result, "Carbon component should stop successfully"
                 mock_save.assert_called_once()
 
     def test_carbon_get_emissions_report_with_data(self):
@@ -330,11 +298,11 @@ class TestComponents(unittest.TestCase):
 
         with patch("src.components.carbon_component.codecarbon_available", True):
             report = carbon.get_emissions_report()
-            self.assertIn("project_name", report)
-            self.assertIn("total_emissions", report)
-            self.assertIn("functions", report)
-            self.assertEqual(report["total_emissions"], 0.8)
-            self.assertEqual(report["unit"], "kg CO2eq")
+            assert "project_name" in report
+            assert "total_emissions" in report
+            assert "functions" in report
+            assert report["total_emissions"] == 0.8
+            assert report["unit"] == "kg CO2eq"
 
     def test_carbon_save_emissions_data(self):
         """Test saving emissions data to file."""
@@ -362,12 +330,12 @@ class TestComponents(unittest.TestCase):
 
             # Check that a file was created
             files = list(Path(temp_dir).glob("emissions_*.json"))
-            self.assertEqual(len(files), 1, "Should create one emissions file")
+            assert len(files) == 1, "Should create one emissions file"
 
             # Verify file content
             content = json.loads(files[0].read_text())
-            self.assertIn("project_name", content)
-            self.assertIn("total_emissions", content)
+            assert "project_name" in content
+            assert "total_emissions" in content
         finally:
             # Clean up
             shutil.rmtree(temp_dir)
@@ -390,7 +358,7 @@ class TestComponents(unittest.TestCase):
 
         with patch("src.components.carbon_component.codecarbon_available", False):
             decorator = carbon.get_carbon_decorator()
-            self.assertIsNotNone(decorator, "Should return a no-op decorator")
+            assert decorator is not None, "Should return a no-op decorator"
 
             # Test that the decorator works as a no-op
             @decorator
@@ -398,9 +366,7 @@ class TestComponents(unittest.TestCase):
                 return "test"
 
             result = test_func()
-            self.assertEqual(
-                result, "test", "Decorator should not affect function result"
-            )
+            assert result == "test", "Decorator should not affect function result"
 
     def test_carbon_get_decorator_with_codecarbon(self):
         """Test getting carbon decorator when codecarbon is available."""
@@ -418,7 +384,7 @@ class TestComponents(unittest.TestCase):
             ),
         ):
             decorator = carbon.get_carbon_decorator(project_name="test_project")
-            self.assertIsNotNone(decorator, "Should return a decorator")
+            assert decorator is not None, "Should return a decorator"
 
             # The decorator should be a callable that wraps functions
             # Test that it returns a function
@@ -427,9 +393,7 @@ class TestComponents(unittest.TestCase):
                 return "test"
 
             # The decorated function should still be callable
-            self.assertTrue(
-                callable(test_func), "Decorated function should be callable"
-            )
+            assert callable(test_func), "Decorated function should be callable"
 
     # Batch 4: Template Copying (2 tests)
     def test_copy_template_files_docker_compose(self):
@@ -442,7 +406,7 @@ class TestComponents(unittest.TestCase):
         try:
             docker._copy_template_files("tta.dev")
             # If we get here, the method executed successfully
-            self.assertTrue(True, "Method executed successfully")
+            assert True, "Method executed successfully"
         except Exception as e:
             self.fail(f"Method raised unexpected exception: {e}")
 
@@ -464,10 +428,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._copy_template_files("tta.dev")
             # Verify mkdir and copy were called
-            self.assertTrue(
-                mock_mkdir.called or mock_copy.called,
-                "Directory creation or copy should occur",
-            )
+            assert mock_mkdir.called or mock_copy.called, "Directory creation or copy should occur"
 
     # Batch 5: Container Name Standardization (2 tests)
     def test_standardize_container_names_success(self):
@@ -485,7 +446,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._standardize_container_names("tta.dev")
             # Verify file was opened for reading and writing
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     def test_standardize_container_names_no_file(self):
         """Test standardizing container names when docker-compose.yml doesn't exist."""
@@ -520,7 +481,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_extensions("tta.dev")
             # Should complete without warnings
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     def test_ensure_consistent_extensions_missing(self):
         """Test ensuring extensions when some are missing."""
@@ -537,7 +498,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_extensions("tta.dev")
             # Should log warnings about missing extensions
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     # Batch 7: Environment Variable Consistency (3 tests)
     def test_ensure_consistent_env_vars_create_new(self):
@@ -553,7 +514,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_env_vars("tta.dev")
             # Verify file was created
-            self.assertTrue(mock_file.called, "File should be created")
+            assert mock_file.called, "File should be created"
 
     def test_ensure_consistent_env_vars_add_missing(self):
         """Test adding missing environment variables."""
@@ -570,7 +531,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_env_vars("tta.dev")
             # Should add missing variables
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     def test_ensure_consistent_env_vars_all_present(self):
         """Test when all environment variables are present."""
@@ -593,7 +554,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_env_vars("tta.dev")
             # Should complete without adding variables
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     # Batch 8: Service Consistency (2 tests)
     def test_ensure_consistent_services_all_present(self):
@@ -617,7 +578,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_services("tta.dev")
             # Should complete without warnings
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     def test_ensure_consistent_services_missing(self):
         """Test ensuring services when some are missing."""
@@ -634,7 +595,7 @@ class TestComponents(unittest.TestCase):
         ):
             docker._ensure_consistent_services("tta.dev")
             # Should log warnings about missing services
-            self.assertTrue(mock_file.called, "File should be opened")
+            assert mock_file.called, "File should be opened"
 
     # Batch 9: Helper Methods (3 tests)
     def test_get_env_var_default_known_vars(self):
@@ -643,15 +604,11 @@ class TestComponents(unittest.TestCase):
         docker = DockerComponent(config)
 
         # Test known variables
-        self.assertEqual(docker._get_env_var_default("NEO4J_PASSWORD"), "password")
-        self.assertEqual(docker._get_env_var_default("NEO4J_URI"), "bolt://neo4j:7687")
-        self.assertEqual(docker._get_env_var_default("NEO4J_USERNAME"), "neo4j")
-        self.assertEqual(
-            docker._get_env_var_default("MODEL_CACHE_DIR"), "/app/.model_cache"
-        )
-        self.assertEqual(
-            docker._get_env_var_default("CODECARBON_OUTPUT_DIR"), "/app/logs/codecarbon"
-        )
+        assert docker._get_env_var_default("NEO4J_PASSWORD") == "password"
+        assert docker._get_env_var_default("NEO4J_URI") == "bolt://neo4j:7687"
+        assert docker._get_env_var_default("NEO4J_USERNAME") == "neo4j"
+        assert docker._get_env_var_default("MODEL_CACHE_DIR") == "/app/.model_cache"
+        assert docker._get_env_var_default("CODECARBON_OUTPUT_DIR") == "/app/logs/codecarbon"
 
     def test_get_env_var_default_unknown_var(self):
         """Test getting default value for unknown environment variable."""
@@ -659,7 +616,7 @@ class TestComponents(unittest.TestCase):
         docker = DockerComponent(config)
 
         # Test unknown variable
-        self.assertEqual(docker._get_env_var_default("UNKNOWN_VAR"), "default_value")
+        assert docker._get_env_var_default("UNKNOWN_VAR") == "default_value"
 
     def test_create_env_example_with_template(self):
         """Test creating .env.example from template."""
@@ -676,12 +633,12 @@ class TestComponents(unittest.TestCase):
                 docker._create_env_example("tta.dev", env_example_path)
 
             # Verify file was created
-            self.assertTrue(env_example_path.exists(), ".env.example should be created")
+            assert env_example_path.exists(), ".env.example should be created"
 
             # Verify content
             content = env_example_path.read_text()
-            self.assertIn("NEO4J_PASSWORD", content)
-            self.assertIn("NEO4J_URI", content)
+            assert "NEO4J_PASSWORD" in content
+            assert "NEO4J_URI" in content
 
     def test_add_missing_env_vars_integration(self):
         """Test adding missing environment variables (integration test)."""
@@ -701,10 +658,10 @@ class TestComponents(unittest.TestCase):
 
             # Verify missing variables were added
             content = env_example_path.read_text()
-            self.assertIn("NEO4J_URI", content)
-            self.assertIn("NEO4J_USERNAME", content)
-            self.assertIn("MODEL_CACHE_DIR", content)
-            self.assertIn("CODECARBON_OUTPUT_DIR", content)
+            assert "NEO4J_URI" in content
+            assert "NEO4J_USERNAME" in content
+            assert "MODEL_CACHE_DIR" in content
+            assert "CODECARBON_OUTPUT_DIR" in content
 
     def test_standardize_container_names_integration(self):
         """Test standardizing container names (integration test)."""
@@ -732,8 +689,8 @@ class TestComponents(unittest.TestCase):
 
             # Verify container names were standardized
             content = docker_compose_path.read_text()
-            self.assertIn("tta-dev-app", content)
-            self.assertIn("tta-dev-neo4j", content)
+            assert "tta-dev-app" in content
+            assert "tta-dev-neo4j" in content
 
     def test_ensure_consistency_integration(self):
         """Test ensure_consistency method (integration test)."""
@@ -768,11 +725,11 @@ class TestComponents(unittest.TestCase):
                 result = docker.ensure_consistency()
 
             # Verify success
-            self.assertTrue(result, "ensure_consistency should succeed")
+            assert result, "ensure_consistency should succeed"
 
             # Verify .env.example files were created
-            self.assertTrue((tta_dev_path / ".env.example").exists())
-            self.assertTrue((tta_prototype_path / ".env.example").exists())
+            assert (tta_dev_path / ".env.example").exists()
+            assert (tta_prototype_path / ".env.example").exists()
 
     def test_copy_template_files_integration(self):
         """Test _copy_template_files method (integration test)."""
@@ -803,7 +760,7 @@ class TestComponents(unittest.TestCase):
                 docker._copy_template_files("tta.dev")
 
             # Verify docker-compose.yml was copied
-            self.assertTrue((repo_path / "docker-compose.yml").exists())
+            assert (repo_path / "docker-compose.yml").exists()
 
     def test_ensure_consistent_extensions_integration(self):
         """Test _ensure_consistent_extensions method (integration test)."""
@@ -833,7 +790,7 @@ class TestComponents(unittest.TestCase):
                 docker._ensure_consistent_extensions("tta.dev")
 
             # Verify method executed without error
-            self.assertTrue((devcontainer_path / "devcontainer.json").exists())
+            assert (devcontainer_path / "devcontainer.json").exists()
 
     def test_ensure_consistent_services_integration(self):
         """Test _ensure_consistent_services method (integration test)."""
@@ -859,7 +816,7 @@ class TestComponents(unittest.TestCase):
                 docker._ensure_consistent_services("tta.dev")
 
             # Verify method executed without error
-            self.assertTrue((repo_path / "docker-compose.yml").exists())
+            assert (repo_path / "docker-compose.yml").exists()
 
     # ========== App Component Tests ==========
 
@@ -868,10 +825,10 @@ class TestComponents(unittest.TestCase):
         config = TTAConfig()
         app = AppComponent(config)
 
-        self.assertEqual(app.name, "tta.prototype_app")
-        self.assertEqual(app.port, 8501)
-        self.assertIsNotNone(app.root_dir)
-        self.assertIsNotNone(app.repo_dir)
+        assert app.name == "tta.prototype_app"
+        assert app.port == 8501
+        assert app.root_dir is not None
+        assert app.repo_dir is not None
 
     def test_app_stop_not_running(self):
         """Test App component stop when not running."""
@@ -880,9 +837,7 @@ class TestComponents(unittest.TestCase):
 
         with patch.object(app, "_is_app_running", return_value=False):
             result = app.stop()
-            self.assertTrue(
-                result, "App component should stop successfully when not running"
-            )
+            assert result, "App component should stop successfully when not running"
 
     def test_app_stop_success(self):
         """Test App component successful stop."""
@@ -902,7 +857,7 @@ class TestComponents(unittest.TestCase):
             mock_docker.return_value = mock_result
 
             result = app.stop()
-            self.assertTrue(result, "App component should stop successfully")
+            assert result, "App component should stop successfully"
             mock_docker.assert_called_once_with(["stop", "app"])
 
     def test_app_stop_timeout(self):
@@ -923,7 +878,7 @@ class TestComponents(unittest.TestCase):
             mock_docker.return_value = mock_result
 
             result = app.stop()
-            self.assertFalse(result, "App component should fail to stop due to timeout")
+            assert not result, "App component should fail to stop due to timeout"
 
     def test_app_stop_error(self):
         """Test App component stop error handling."""
@@ -942,9 +897,7 @@ class TestComponents(unittest.TestCase):
             ),
         ):
             result = app.stop()
-            self.assertFalse(
-                result, "App component should fail to stop due to exception"
-            )
+            assert not result, "App component should fail to stop due to exception"
 
     def test_app_start_already_running(self):
         """Test App component start when already running."""
@@ -957,9 +910,7 @@ class TestComponents(unittest.TestCase):
             patch.object(app, "_is_app_running", return_value=True),
         ):
             result = app._start_impl()
-            self.assertTrue(
-                result, "App component should return True when already running"
-            )
+            assert result, "App component should return True when already running"
 
     def test_app_start_success(self):
         """Test App component successful start."""
@@ -977,7 +928,7 @@ class TestComponents(unittest.TestCase):
             mock_docker.return_value = mock_result
 
             result = app._start_impl()
-            self.assertTrue(result, "App component should start successfully")
+            assert result, "App component should start successfully"
             mock_docker.assert_called_once_with(["up", "-d", "app"])
 
     def test_app_start_timeout(self):
@@ -996,9 +947,7 @@ class TestComponents(unittest.TestCase):
             mock_docker.return_value = mock_result
 
             result = app._start_impl()
-            self.assertFalse(
-                result, "App component should fail to start due to timeout"
-            )
+            assert not result, "App component should fail to start due to timeout"
 
     def test_app_start_docker_error(self):
         """Test App component Docker Compose failure."""
@@ -1018,9 +967,7 @@ class TestComponents(unittest.TestCase):
             mock_docker.return_value = mock_result
 
             result = app._start_impl()
-            self.assertFalse(
-                result, "App component should fail to start due to Docker error"
-            )
+            assert not result, "App component should fail to start due to Docker error"
 
     def test_app_start_exception(self):
         """Test App component start exception handling."""
@@ -1036,9 +983,7 @@ class TestComponents(unittest.TestCase):
             ),
         ):
             result = app._start_impl()
-            self.assertFalse(
-                result, "App component should fail to start due to exception"
-            )
+            assert not result, "App component should fail to start due to exception"
 
     # ========================================================================
     # LLM Component Tests
@@ -1050,11 +995,11 @@ class TestComponents(unittest.TestCase):
         llm = LLMComponent(config, repository="tta.dev")
 
         # Verify initialization
-        self.assertEqual(llm.repository, "tta.dev")
-        self.assertEqual(llm.model, "qwen2.5-7b-instruct")
-        self.assertEqual(llm.api_base, "http://localhost:1234/v1")
-        self.assertEqual(llm.use_gpu, False)
-        self.assertEqual(llm.name, "tta.dev_llm")
+        assert llm.repository == "tta.dev"
+        assert llm.model == "qwen2.5-7b-instruct"
+        assert llm.api_base == "http://localhost:1234/v1"
+        assert not llm.use_gpu
+        assert llm.name == "tta.dev_llm"
 
     def test_llm_stop_not_running(self):
         """Test LLM component stop when not running."""
@@ -1066,9 +1011,7 @@ class TestComponents(unittest.TestCase):
             # Set status to RUNNING (required for base Component.stop() to call _stop_impl)
             llm.status = ComponentStatus.RUNNING
             result = llm.stop()
-            self.assertTrue(
-                result, "LLM component should stop successfully when not running"
-            )
+            assert result, "LLM component should stop successfully when not running"
 
     def test_llm_stop_success(self):
         """Test LLM component successful stop."""
@@ -1087,7 +1030,7 @@ class TestComponents(unittest.TestCase):
             # Set status to RUNNING
             llm.status = ComponentStatus.RUNNING
             result = llm.stop()
-            self.assertTrue(result, "LLM component should stop successfully")
+            assert result, "LLM component should stop successfully"
 
     def test_llm_stop_timeout(self):
         """Test LLM component stop timeout."""
@@ -1106,7 +1049,7 @@ class TestComponents(unittest.TestCase):
             # Set status to RUNNING
             llm.status = ComponentStatus.RUNNING
             result = llm.stop()
-            self.assertFalse(result, "LLM component should timeout during stop")
+            assert not result, "LLM component should timeout during stop"
 
     def test_llm_stop_error(self):
         """Test LLM component stop error handling."""
@@ -1127,9 +1070,7 @@ class TestComponents(unittest.TestCase):
             # Set status to RUNNING
             llm.status = ComponentStatus.RUNNING
             result = llm.stop()
-            self.assertFalse(
-                result, "LLM component should fail to stop due to Docker error"
-            )
+            assert not result, "LLM component should fail to stop due to Docker error"
 
     def test_llm_start_already_running(self):
         """Test LLM component start when already running."""
@@ -1142,9 +1083,7 @@ class TestComponents(unittest.TestCase):
         # Mock _is_llm_running to return True
         with patch.object(llm, "_is_llm_running", return_value=True):
             result = llm.start()
-            self.assertTrue(
-                result, "LLM component should return True when already running"
-            )
+            assert result, "LLM component should return True when already running"
 
     def test_llm_start_success(self):
         """Test LLM component successful start."""
@@ -1164,7 +1103,7 @@ class TestComponents(unittest.TestCase):
             patch.object(llm, "_run_docker_compose", return_value=mock_result),
         ):
             result = llm.start()
-            self.assertTrue(result, "LLM component should start successfully")
+            assert result, "LLM component should start successfully"
 
     def test_llm_start_timeout(self):
         """Test LLM component start timeout."""
@@ -1184,7 +1123,7 @@ class TestComponents(unittest.TestCase):
             patch.object(llm, "_run_docker_compose", return_value=mock_result),
         ):
             result = llm.start()
-            self.assertFalse(result, "LLM component should timeout during start")
+            assert not result, "LLM component should timeout during start"
 
     def test_llm_start_docker_error(self):
         """Test LLM component start Docker Compose error."""
@@ -1206,9 +1145,7 @@ class TestComponents(unittest.TestCase):
             patch.object(llm, "_run_docker_compose", return_value=mock_result),
         ):
             result = llm.start()
-            self.assertFalse(
-                result, "LLM component should fail to start due to Docker error"
-            )
+            assert not result, "LLM component should fail to start due to Docker error"
 
     def test_llm_start_exception(self):
         """Test LLM component start exception handling."""
@@ -1221,9 +1158,7 @@ class TestComponents(unittest.TestCase):
         # Mock _is_llm_running to raise exception
         with patch.object(llm, "_is_llm_running", side_effect=Exception("Test error")):
             result = llm.start()
-            self.assertFalse(
-                result, "LLM component should fail to start due to exception"
-            )
+            assert not result, "LLM component should fail to start due to exception"
 
     def test_llm_start_with_gpu(self):
         """Test LLM component start with GPU profile."""
@@ -1246,13 +1181,13 @@ class TestComponents(unittest.TestCase):
             ) as mock_docker,
         ):
             result = llm.start()
-            self.assertTrue(result, "LLM component should start successfully with GPU")
+            assert result, "LLM component should start successfully with GPU"
 
             # Verify GPU profile was added to command
             call_args = mock_docker.call_args
             command = call_args[0][0]  # First positional argument
-            self.assertIn("--profile", command, "GPU profile flag should be in command")
-            self.assertIn("with-gpu", command, "GPU profile value should be in command")
+            assert "--profile" in command, "GPU profile flag should be in command"
+            assert "with-gpu" in command, "GPU profile value should be in command"
 
     def test_llm_is_running_check_success(self):
         """Test LLM health check returns True when HTTP 200."""
@@ -1265,7 +1200,7 @@ class TestComponents(unittest.TestCase):
         # Mock requests.get to return HTTP 200
         with patch("requests.get", return_value=mock_response):
             result = llm._is_llm_running()
-            self.assertTrue(result, "LLM should be considered running when HTTP 200")
+            assert result, "LLM should be considered running when HTTP 200"
 
     def test_llm_is_running_check_failure(self):
         """Test LLM health check returns False on exception."""
@@ -1277,9 +1212,7 @@ class TestComponents(unittest.TestCase):
             "requests.get", side_effect=requests.RequestException("Connection error")
         ):
             result = llm._is_llm_running()
-            self.assertFalse(
-                result, "LLM should be considered not running on connection error"
-            )
+            assert not result, "LLM should be considered not running on connection error"
 
 
 if __name__ == "__main__":

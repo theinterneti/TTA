@@ -10,52 +10,60 @@ Tests all Pydantic models and dataclasses in:
 
 from __future__ import annotations
 
+import sys
 import time
 
 import pytest
 from pydantic import ValidationError
 
-from src.components.gameplay_loop.models.core import (
-    Choice,
-    ChoiceType,
-    ConsequenceSet,
-    DifficultyLevel,
-    EmotionalState,
-    GameplayMetrics,
-    Scene,
-    SceneType,
-    SessionState,
-    TherapeuticContext,
+# Skip on Python 3.14 due to langchain_openai segfault in gameplay components
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Gameplay components trigger langchain_openai segfault on Python 3.14",
 )
-from src.components.gameplay_loop.models.interactions import (
-    AgencyAssessment,
-    ChoiceOutcome,
-    EventType,
-    GameplaySession,
-    InterventionType,
-    NarrativeEvent,
-    OutcomeType,
-    TherapeuticIntervention,
-    UserChoice,
-)
-from src.components.gameplay_loop.models.progress import (
-    CharacterAttribute,
-    CharacterState,
-    ProgressMarker,
-    ProgressType,
-    SkillCategory,
-    SkillDevelopment,
-    TherapeuticProgress,
-)
-from src.components.gameplay_loop.models.validation import (
-    ContentValidation,
-    SafetyCheck,
-    SafetyLevel,
-    TherapeuticValidation,
-    ValidationResult,
-    ValidationStatus,
-    ValidationType,
-)
+
+if sys.version_info < (3, 14):
+    from src.components.gameplay_loop.models.core import (
+        Choice,
+        ChoiceType,
+        ConsequenceSet,
+        DifficultyLevel,
+        EmotionalState,
+        GameplayMetrics,
+        Scene,
+        SceneType,
+        SessionState,
+        TherapeuticContext,
+    )
+    from src.components.gameplay_loop.models.interactions import (
+        AgencyAssessment,
+        ChoiceOutcome,
+        EventType,
+        GameplaySession,
+        InterventionType,
+        NarrativeEvent,
+        OutcomeType,
+        TherapeuticIntervention,
+        UserChoice,
+    )
+    from src.components.gameplay_loop.models.progress import (
+        CharacterAttribute,
+        CharacterState,
+        ProgressMarker,
+        ProgressType,
+        SkillCategory,
+        SkillDevelopment,
+        TherapeuticProgress,
+    )
+    from src.components.gameplay_loop.models.validation import (
+        ContentValidation,
+        SafetyCheck,
+        SafetyLevel,
+        TherapeuticValidation,
+        ValidationResult,
+        ValidationStatus,
+        ValidationType,
+    )
 
 # ---------------------------------------------------------------------------
 # Enum tests

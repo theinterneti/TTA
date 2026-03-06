@@ -139,10 +139,12 @@ async def test_agent_registry_discovery_and_healthloop():
     reg.register(a2)
     # Discover
     ds = reg.discover(AgentType.IPA)
-    assert len(ds) == 1 and ds[0].name.startswith("ipa:")
+    assert len(ds) == 1
+    assert ds[0].name.startswith("ipa:")
     # Health check
     snap = await reg.run_health_checks_once()
-    assert a1.name in snap and "status" in snap[a1.name]
+    assert a1.name in snap
+    assert "status" in snap[a1.name]
     # Start periodic and stop
     reg.start_periodic_health_checks(interval_s=0.05)
     await asyncio.sleep(0.12)
