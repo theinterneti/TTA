@@ -7,7 +7,7 @@ This module tests the enhanced authentication features including
 multi-factor authentication, role-based access control, and security features.
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi import FastAPI
@@ -192,7 +192,7 @@ class TestMFAService:
 
         assert challenge.method == method
         assert challenge.attempts_remaining == 3
-        assert challenge.expires_at > datetime.utcnow()
+        assert challenge.expires_at > datetime.now(UTC)
 
         # Challenge should be stored
         assert challenge.challenge_id in auth_service.mfa_service.active_challenges
@@ -207,7 +207,7 @@ class TestMFAService:
         challenge_id = challenge.challenge_id
 
         # Manually expire the challenge
-        challenge.expires_at = datetime.utcnow() - timedelta(minutes=1)
+        challenge.expires_at = datetime.now(UTC) - timedelta(minutes=1)
 
         # Cleanup should remove expired challenge
         auth_service.mfa_service.cleanup_expired_challenges()
@@ -353,7 +353,7 @@ class TestEnhancedAuthService:
 
         # Manually expire the session
         session = auth_service.active_sessions[session_id]
-        session.last_activity = datetime.utcnow() - timedelta(hours=10)
+        session.last_activity = datetime.now(UTC) - timedelta(hours=10)
 
         # Cleanup should remove expired session
         auth_service.cleanup_expired_sessions()

@@ -15,7 +15,7 @@ import asyncio
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -87,7 +87,7 @@ class HealthChecker:
                 component=name,
                 status=HealthStatus.UNKNOWN,
                 message=f"No health check registered for {name}",
-                checked_at=datetime.utcnow(),
+                checked_at=datetime.now(UTC),
             )
 
         start_time = asyncio.get_running_loop().time()
@@ -95,7 +95,7 @@ class HealthChecker:
             result = await self._checks[name]()
             end_time = asyncio.get_running_loop().time()
             result.response_time_ms = (end_time - start_time) * 1000
-            result.checked_at = datetime.utcnow()
+            result.checked_at = datetime.now(UTC)
             return result
         except Exception as e:
             end_time = asyncio.get_running_loop().time()
@@ -104,7 +104,7 @@ class HealthChecker:
                 component=name,
                 status=HealthStatus.UNHEALTHY,
                 message=f"Health check error: {str(e)}",
-                checked_at=datetime.utcnow(),
+                checked_at=datetime.now(UTC),
                 response_time_ms=(end_time - start_time) * 1000,
             )
 

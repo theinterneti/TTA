@@ -10,7 +10,7 @@ within the therapeutic text adventure gameplay system.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
@@ -77,7 +77,7 @@ class UserChoice(BaseModel):
     )
 
     # Timing
-    choice_made_at: datetime = Field(default_factory=datetime.utcnow)
+    choice_made_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     response_time: float = Field(
         default=0.0, description="Time taken to make choice in seconds"
     )
@@ -135,7 +135,7 @@ class ChoiceOutcome(BaseModel):
     safety_concerns: list[str] = Field(default_factory=list)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class NarrativeEvent(BaseModel):
@@ -166,7 +166,7 @@ class NarrativeEvent(BaseModel):
     blocked_content: list[str] = Field(default_factory=list)
 
     # Metadata
-    occurred_at: datetime = Field(default_factory=datetime.utcnow)
+    occurred_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class TherapeuticIntervention(BaseModel):
@@ -208,7 +208,7 @@ class TherapeuticIntervention(BaseModel):
     follow_up_scheduled: datetime | None = Field(None)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = Field(None)
 
 
@@ -233,7 +233,7 @@ class AgencyAssessment(BaseModel):
     )
 
     # Metadata
-    assessed_at: datetime = Field(default_factory=datetime.utcnow)
+    assessed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class GameplaySession(BaseModel):
@@ -256,8 +256,8 @@ class GameplaySession(BaseModel):
     session_recap: str | None = Field(default=None)
 
     # Session metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_activity_time: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    last_activity_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
     is_active: bool = Field(default=True)
 
     # Therapeutic context

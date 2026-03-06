@@ -14,7 +14,7 @@ This script demonstrates the comprehensive test battery's ability to:
 import asyncio
 import logging
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Add the project root to the path
@@ -72,7 +72,7 @@ async def demonstrate_mock_functionality():
             result = await session.run(
                 "CREATE (u:User {name: $name, created_at: $created_at}) RETURN u",
                 name="demo_user",
-                created_at=datetime.utcnow().isoformat(),
+                created_at=datetime.now(UTC).isoformat(),
             )
             await result.single()
 
@@ -95,7 +95,7 @@ async def demonstrate_mock_functionality():
         # Use mapping parameter for hset
         user_data = {
             "username": "test_user",
-            "last_active": datetime.utcnow().isoformat(),
+            "last_active": datetime.now(UTC).isoformat(),
             "session_count": "5",
         }
         await test_battery.redis_client.hset("demo:user:456", mapping=user_data)

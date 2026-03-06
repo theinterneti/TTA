@@ -15,7 +15,7 @@ Generates comprehensive reports from test execution results including:
 import csv
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -49,7 +49,7 @@ class TestReportGenerator:
         """Generate comprehensive test report."""
         try:
             # Generate timestamp for report files
-            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
 
             # Create report data structure
             report_data = await self._create_report_data(
@@ -118,7 +118,7 @@ class TestReportGenerator:
 
         return {
             "report_metadata": {
-                "generated_at": datetime.utcnow().isoformat(),
+                "generated_at": datetime.now(UTC).isoformat(),
                 "test_execution_start": start_time.isoformat(),
                 "test_execution_end": end_time.isoformat(),
                 "total_duration_seconds": total_duration,

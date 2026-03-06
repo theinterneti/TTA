@@ -197,13 +197,13 @@ class TestMFAService:
             svc.verify_mfa_challenge(verification, secret="dummy")
 
     def test_verify_mfa_challenge_expired_raises(self):
-        from datetime import datetime, timedelta
+        from datetime import UTC, datetime, timedelta
 
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         # Manually expire the challenge
         svc.active_challenges[challenge.challenge_id].expires_at = (
-            datetime.utcnow() - timedelta(minutes=1)
+            datetime.now(UTC) - timedelta(minutes=1)
         )
         verification = MFAVerification(
             challenge_id=challenge.challenge_id, code="123456", method=MFAMethod.TOTP
@@ -224,12 +224,12 @@ class TestMFAService:
             svc.verify_mfa_challenge(verification, secret="dummy")
 
     def test_cleanup_expired_challenges_removes_expired(self):
-        from datetime import datetime, timedelta
+        from datetime import UTC, datetime, timedelta
 
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         svc.active_challenges[challenge.challenge_id].expires_at = (
-            datetime.utcnow() - timedelta(minutes=1)
+            datetime.now(UTC) - timedelta(minutes=1)
         )
 
         svc.cleanup_expired_challenges()
@@ -404,13 +404,13 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert not svc.active_sessions[s2].is_active
 
     def test_cleanup_expired_sessions(self):
-        from datetime import datetime, timedelta
+        from datetime import UTC, datetime, timedelta
 
         svc = _make_service()
         user = _make_player_user()
         session_id = svc.create_session(user)
         # Backdating last_activity to exceed the 8-hour timeout
-        svc.active_sessions[session_id].last_activity = datetime.utcnow() - timedelta(
+        svc.active_sessions[session_id].last_activity = datetime.now(UTC) - timedelta(
             minutes=500
         )
         svc.cleanup_expired_sessions()

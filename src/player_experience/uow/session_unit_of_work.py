@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import abc
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from src.common.unit_of_work import AbstractUnitOfWork
@@ -32,7 +32,7 @@ class InMemorySessionRepository(AbstractSessionRepository):
         world_id: str,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).isoformat()
         record: dict[str, Any] = {
             "session_id": session_id,
             "player_id": player_id,
@@ -70,7 +70,7 @@ class InMemorySessionRepository(AbstractSessionRepository):
                 "player_id": player_id,
                 "role": role,
                 "content": content,
-                "created_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
                 **kwargs,
             }
         )
@@ -102,7 +102,7 @@ class InMemorySessionRepository(AbstractSessionRepository):
         new_record = {
             **source,
             "session_id": new_id,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
         if player_id is not None:
             new_record["player_id"] = player_id

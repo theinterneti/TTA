@@ -9,7 +9,7 @@ session start to completion.
 """
 
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 import pytest_asyncio
@@ -96,7 +96,7 @@ class TestCoreGameplayLoopIntegration:
             selected_choice = session.available_choices[0]
 
             # Process the choice
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
             (
                 next_scene,
                 new_choices,
@@ -104,7 +104,7 @@ class TestCoreGameplayLoopIntegration:
             ) = await controller.process_user_choice(
                 session.session_id, selected_choice.choice_id
             )
-            processing_time = (datetime.utcnow() - start_time).total_seconds()
+            processing_time = (datetime.now(UTC) - start_time).total_seconds()
 
             # Validate response time requirement (<2 seconds)
             assert processing_time < 2.0, (
@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
         if session.available_choices:
             choice = session.available_choices[0]
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             (
                 next_scene,
@@ -359,7 +359,7 @@ if __name__ == "__main__":
                 session.session_id, choice.choice_id
             )
 
-            (datetime.utcnow() - start_time).total_seconds()
+            (datetime.now(UTC) - start_time).total_seconds()
 
         await controller.end_session(session.session_id)
 

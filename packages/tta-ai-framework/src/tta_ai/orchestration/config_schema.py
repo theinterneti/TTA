@@ -149,9 +149,7 @@ class AgentsConfig(BaseModel):
         """Validate heartbeat interval against TTL."""
         if self.heartbeat_interval is not None:
             if self.heartbeat_interval <= 0 or self.heartbeat_interval >= self.heartbeat_ttl:
-                raise ValueError(
-                    "Heartbeat interval must be positive and less than heartbeat_ttl"
-                )
+                raise ValueError("Heartbeat interval must be positive and less than heartbeat_ttl")
         return self
 
     def get_effective_heartbeat_interval(self) -> float:

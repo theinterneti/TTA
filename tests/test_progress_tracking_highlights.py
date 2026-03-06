@@ -1,6 +1,6 @@
 # Logseq: [[TTA.dev/Tests/Test_progress_tracking_highlights]]
 import asyncio
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from src.player_experience.managers.progress_tracking_service import (
     ProgressTrackingService,
@@ -28,7 +28,7 @@ class MockSessionRepository:
 
 
 def test_highlights_created_for_session_milestone():
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     # 10 completed sessions to trigger session milestone
     summaries = []
     for i in range(10):
@@ -61,7 +61,7 @@ def test_highlights_created_for_session_milestone():
 
 
 def test_highlights_created_for_streak_milestone():
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     # 8 consecutive daily sessions triggers 7-day streak highlight
     summaries = []
     for i in range(8):

@@ -16,7 +16,7 @@ async def test_tool_coordinator_create_or_get(redis_client):
             name="kg.query",
             version="1.0.1",
             description="Query KG",
-            parameters=[ToolParameter(name="q", schema={"type": "string"})],
+            parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
             returns_schema={"type": "object"},
             safety_flags=[],
         )

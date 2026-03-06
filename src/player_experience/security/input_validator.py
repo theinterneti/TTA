@@ -12,7 +12,7 @@ import re
 import urllib.parse
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from re import Pattern
@@ -106,7 +106,7 @@ class ValidationResult:
                 "rule": rule_name,
                 "message": message,
                 "severity": severity.value,
-                "timestamp": str(datetime.utcnow()),
+                "timestamp": str(datetime.now(UTC)),
             }
         )
 

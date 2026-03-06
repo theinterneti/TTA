@@ -12,7 +12,7 @@ Responsibilities:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from ..database.character_repository import CharacterRepository
@@ -84,7 +84,7 @@ class PlayerExperienceManager:
         total_today = sum(
             s.duration_minutes
             for s in recent_sessions
-            if s.start_time.date() == datetime.utcnow().date()
+            if s.start_time.date() == datetime.now(UTC).date()
         )
 
         # Progress summary/highlights
@@ -111,7 +111,7 @@ class PlayerExperienceManager:
         dashboard.most_effective_approach = (
             None  # placeholder until analytics available
         )
-        dashboard.next_recommended_session = datetime.utcnow() + timedelta(hours=12)
+        dashboard.next_recommended_session = datetime.now(UTC) + timedelta(hours=12)
         return dashboard
 
     async def get_recommendations(

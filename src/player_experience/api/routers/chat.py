@@ -12,7 +12,7 @@ import contextlib
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
@@ -145,7 +145,7 @@ def _outgoing_message(
         "role": role,
         "session_id": session_id,
         "content": content,
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(UTC).isoformat() + "Z",
         "metadata": metadata or {},
     }
 
@@ -229,7 +229,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
             raw = await websocket.receive_text()
 
             # Sliding window rate limit per connection
-            now_ts = datetime.utcnow().timestamp()
+            now_ts = datetime.now(UTC).timestamp()
             while window and (now_ts - window[0]) > window_seconds:
                 window.popleft()
             window.append(now_ts)
@@ -361,7 +361,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                             user_input=text,
                             session_id=session_id or "default",
                             world_id=metadata.get("world_id"),
-                            workflow_id=f"chat_{player_id}_{int(datetime.utcnow().timestamp() * 1000)}",
+                            workflow_id=f"chat_{player_id}_{int(datetime.now(UTC).timestamp() * 1000)}",
                         )
 
                         # Progressive feedback: Generating response
@@ -647,7 +647,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         marker_id=f"pm_{uuid.uuid4().hex[:10]}",
                         marker_type=ProgressMarkerType.SKILL_ACQUIRED,
                         description=f"Completed guided exercise: {base}",
-                        achieved_at=datetime.utcnow(),
+                        achieved_at=datetime.now(UTC),
                         therapeutic_value=0.2,
                     )
                     await sim.add_progress_marker(player_id, marker)

@@ -9,7 +9,7 @@ import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, TypedDict
 
@@ -369,7 +369,7 @@ class TherapeuticWorkflowManager:
                 ),
                 "ai_response": state["messages"][-1].content,
                 "emotional_impact": state["emotional_state"],
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
             state["decision_points"].append(narrative_update)
@@ -402,7 +402,7 @@ class TherapeuticWorkflowManager:
         # Log crisis intervention
         intervention = {
             "type": "crisis_intervention",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "patient_id": state["patient_id"],
             "session_id": state["session_id"],
             "trigger": state["emotional_state"],

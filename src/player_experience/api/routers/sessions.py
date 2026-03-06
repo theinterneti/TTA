@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -93,7 +93,7 @@ async def create_session(
         )
 
     session_id = str(uuid.uuid4())
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(UTC).isoformat()
     player_id = getattr(current_player, "player_id", None)
     _SESSIONS[session_id] = {
         "session_id": session_id,
@@ -158,7 +158,7 @@ async def update_session(
         )
     if request.therapeutic_settings is not None:
         s["therapeutic_settings"] = request.therapeutic_settings.model_dump()
-    s["updated_at"] = datetime.utcnow().isoformat()
+    s["updated_at"] = datetime.now(UTC).isoformat()
     return {
         k: v
         for k, v in s.items()

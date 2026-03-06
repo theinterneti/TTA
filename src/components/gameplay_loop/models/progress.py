@@ -10,7 +10,7 @@ and skill acquisition within the therapeutic text adventure system.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from uuid import uuid4
 
@@ -99,7 +99,7 @@ class ProgressMarker(BaseModel):
     skills_involved: list[SkillCategory] = Field(default_factory=list)
 
     # Metadata
-    achieved_at: datetime = Field(default_factory=datetime.utcnow)
+    achieved_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class SkillDevelopment(BaseModel):
@@ -141,7 +141,7 @@ class SkillDevelopment(BaseModel):
     related_skills: list[str] = Field(default_factory=list)
 
     # Metadata
-    first_practiced: datetime = Field(default_factory=datetime.utcnow)
+    first_practiced: datetime = Field(default_factory=lambda: datetime.now(UTC))
     last_practiced: datetime | None = Field(None)
     mastery_achieved: datetime | None = Field(None)
 
@@ -157,16 +157,16 @@ class SkillDevelopment(BaseModel):
 
         # Apply retention decay if not practiced recently
         if self.last_practiced:
-            days_since_practice = (datetime.utcnow() - self.last_practiced).days
+            days_since_practice = (datetime.now(UTC) - self.last_practiced).days
             if days_since_practice > 7:
                 decay = (1 - self.retention_rate) * (days_since_practice / 30)
                 self.current_level = max(0.0, self.current_level - decay)
 
-        self.last_practiced = datetime.utcnow()
+        self.last_practiced = datetime.now(UTC)
 
         # Check for mastery
         if self.current_level >= self.target_level and not self.mastery_achieved:
-            self.mastery_achieved = datetime.utcnow()
+            self.mastery_achieved = datetime.now(UTC)
 
 
 class CharacterState(BaseModel):
@@ -204,15 +204,15 @@ class CharacterState(BaseModel):
     resources: dict[str, int] = Field(default_factory=dict)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     def modify_attribute(self, attribute: CharacterAttribute, change: float) -> None:
         """Modify a character attribute."""
         current_value = self.attributes.get(attribute, 0.5)
         new_value = max(0.0, min(1.0, current_value + change))
         self.attributes[attribute] = new_value
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def add_experience(self, amount: int) -> bool:
         """Add experience and check for level up."""
@@ -223,7 +223,7 @@ class CharacterState(BaseModel):
 
         if new_level > self.level:
             self.level = new_level
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(UTC)
             return True  # Level up occurred
 
         return False
@@ -259,5 +259,5 @@ class TherapeuticProgress(BaseModel):
     average_session_length: float = Field(default=0.0)
 
     # Metadata
-    started_at: datetime = Field(default_factory=datetime.utcnow)
-    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(UTC))

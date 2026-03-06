@@ -8,7 +8,7 @@ Manages dynamic narrative environments and character relationships
 import json
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -205,7 +205,7 @@ class LivingWorldsManager:
                     type="character",
                     properties=dict(character_node),
                     relationships=[],
-                    last_updated=datetime.utcnow(),
+                    last_updated=datetime.now(UTC),
                 )
 
             raise Exception("Failed to create character")
@@ -264,7 +264,7 @@ class LivingWorldsManager:
                     type="narrative_thread",
                     properties=dict(thread_node),
                     relationships=[],
-                    last_updated=datetime.utcnow(),
+                    last_updated=datetime.now(UTC),
                 )
 
             raise Exception("Failed to create narrative thread")
@@ -317,7 +317,7 @@ class LivingWorldsManager:
                     relationship_type=relationship_type,
                     strength=strength,
                     properties=properties,
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.now(UTC),
                 )
 
             raise Exception("Failed to create relationship")
@@ -420,7 +420,7 @@ class LivingWorldsManager:
                         json.dumps(
                             {
                                 "progress": progress,
-                                "last_updated": datetime.utcnow().isoformat(),
+                                "last_updated": datetime.now(UTC).isoformat(),
                                 "emotional_impact": emotional_impact,
                             }
                         ),

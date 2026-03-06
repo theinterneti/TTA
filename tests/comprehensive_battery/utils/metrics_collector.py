@@ -17,7 +17,7 @@ import logging
 import statistics
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import psutil
@@ -76,7 +76,7 @@ class TestMetricsCollector:
         if self.is_collecting:
             return
 
-        self.collection_start_time = datetime.utcnow()
+        self.collection_start_time = datetime.now(UTC)
         self.is_collecting = True
 
         # Start background monitoring
@@ -92,7 +92,7 @@ class TestMetricsCollector:
             return
 
         self.is_collecting = False
-        self.collection_end_time = datetime.utcnow()
+        self.collection_end_time = datetime.now(UTC)
 
         # Stop monitoring task
         if self.monitoring_task:
@@ -115,7 +115,7 @@ class TestMetricsCollector:
             name=name,
             value=value,
             unit=unit,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             category=category,
             metadata=metadata or {},
         )
@@ -171,7 +171,7 @@ class TestMetricsCollector:
                 pass
 
             snapshot = SystemSnapshot(
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(UTC),
                 cpu_percent=cpu_percent,
                 memory_percent=memory_percent,
                 disk_usage_percent=disk_usage_percent,
@@ -186,7 +186,7 @@ class TestMetricsCollector:
         except Exception as e:
             logger.error(f"Failed to capture system snapshot: {e}")
             return SystemSnapshot(
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(UTC),
                 cpu_percent=0.0,
                 memory_percent=0.0,
                 disk_usage_percent=0.0,

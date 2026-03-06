@@ -10,7 +10,7 @@ within the therapeutic text adventure system.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
@@ -89,7 +89,7 @@ class ValidationResult(BaseModel):
     therapeutic_context: dict[str, Any] = Field(default_factory=dict)
 
     # Metadata
-    validated_at: datetime = Field(default_factory=datetime.utcnow)
+    validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     validator_version: str = Field(default="1.0.0")
 
 
@@ -134,7 +134,7 @@ class SafetyCheck(BaseModel):
     user_history: dict[str, Any] = Field(default_factory=dict)
 
     # Metadata
-    checked_at: datetime = Field(default_factory=datetime.utcnow)
+    checked_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     expires_at: datetime | None = Field(
         default=None, description="When this check expires"
     )
@@ -192,7 +192,7 @@ class TherapeuticValidation(BaseModel):
     session_context: dict[str, Any] = Field(default_factory=dict)
 
     # Metadata
-    validated_at: datetime = Field(default_factory=datetime.utcnow)
+    validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ContentValidation(BaseModel):
@@ -231,5 +231,5 @@ class ContentValidation(BaseModel):
     modification_suggestions: list[str] = Field(default_factory=list)
 
     # Metadata
-    validated_at: datetime = Field(default_factory=datetime.utcnow)
+    validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     validation_version: str = Field(default="1.0.0")

@@ -7,7 +7,7 @@ which satisfy the contracts in :mod:`abstract_repository` using plain dicts.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from ..models.character import Character
@@ -53,7 +53,7 @@ class FakeSessionRepository(AbstractSessionRepository):
         world_id: str,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).isoformat()
         record: dict[str, Any] = {
             "session_id": session_id,
             "player_id": player_id,
@@ -91,7 +91,7 @@ class FakeSessionRepository(AbstractSessionRepository):
                 "player_id": player_id,
                 "role": role,
                 "content": content,
-                "created_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
                 **kwargs,
             }
         )
@@ -123,7 +123,7 @@ class FakeSessionRepository(AbstractSessionRepository):
         new_record = {
             **source,
             "session_id": new_id,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
         if player_id is not None:
             new_record["player_id"] = player_id

@@ -151,12 +151,12 @@ def add_mock_metrics_endpoint(app, path: str = "/metrics"):
     async def mock_metrics():
         """Mock metrics endpoint that returns basic information."""
         import json
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         mock_data = {
             "service": "tta",
             "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "message": "Mock metrics endpoint - Prometheus not available",
             "basic_metrics": {
                 "uptime_seconds": time.time(),

@@ -8,7 +8,7 @@ TTA systems including authentication, safety validation, and agent orchestration
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from ..agent_orchestration.service import AgentOrchestrationService
@@ -117,7 +117,7 @@ class GameplayLoopIntegration:
                 "session_id": session_id,
                 "user_id": user_id,
                 "session_status": session_status,
-                "created_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -235,7 +235,7 @@ class GameplayLoopIntegration:
                 "session_id": session_id,
                 "choice_result": choice_result,
                 "session_status": updated_session_status,
-                "processed_at": datetime.utcnow().isoformat(),
+                "processed_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -301,7 +301,7 @@ class GameplayLoopIntegration:
             return {
                 "success": True,
                 "session_status": session_status,
-                "retrieved_at": datetime.utcnow().isoformat(),
+                "retrieved_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -376,7 +376,7 @@ class GameplayLoopIntegration:
             return {
                 "success": True,
                 "session_id": session_id,
-                "ended_at": datetime.utcnow().isoformat(),
+                "ended_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -423,7 +423,7 @@ class GameplayLoopIntegration:
                     "sessions": sessions,
                     "total_count": len(sessions),
                 },
-                "retrieved_at": datetime.utcnow().isoformat(),
+                "retrieved_at": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:

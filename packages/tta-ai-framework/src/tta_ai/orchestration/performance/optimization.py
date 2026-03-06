@@ -417,7 +417,7 @@ class IntelligentAgentCoordinator:
 
         try:
             return statistics.stdev(response_times) / statistics.mean(response_times)
-        except (statistics.StatisticsError, ZeroDivisionError):
+        except statistics.StatisticsError, ZeroDivisionError:
             return 0.0
 
     async def _reserve_agents(self, decision: SchedulingDecision) -> None:

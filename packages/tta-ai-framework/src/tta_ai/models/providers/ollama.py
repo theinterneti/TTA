@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class OllamaModelInstance(BaseModelInstance):
     """Ollama model instance implementation."""
 
-    def __init__(self, model_id: str, provider: "OllamaProvider", client: httpx.AsyncClient):
+    def __init__(self, model_id: str, provider: OllamaProvider, client: httpx.AsyncClient):
         super().__init__(model_id, provider)
         self._client = client
         self._status = ModelStatus.READY
@@ -114,7 +114,7 @@ class OllamaModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using Ollama API."""
         try:
             # Prepare request payload

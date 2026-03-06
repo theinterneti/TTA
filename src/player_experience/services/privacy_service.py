@@ -13,7 +13,7 @@ import json
 import secrets
 import zipfile
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -65,7 +65,7 @@ class DataProcessingRecord:
     data_source: str
     recipients: list[str] = field(default_factory=list)
     retention_period: DataRetentionPeriod = DataRetentionPeriod.MEDIUM_TERM
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     consent_given: bool = False
     consent_date: datetime | None = None
     is_sensitive: bool = False
@@ -138,7 +138,7 @@ class PrivacySettings(BaseModel):
     third_party_sharing: bool = False
     data_retention_preference: DataRetentionPeriod = DataRetentionPeriod.MEDIUM_TERM
     notification_preferences: dict[str, bool] = Field(default_factory=dict)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class EncryptionService:
@@ -161,7 +161,7 @@ class EncryptionService:
         self.encryption_keys[key_id] = key
         self.key_metadata[key_id] = {
             "purpose": purpose,
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(UTC),
             "algorithm": "Fernet",
             "key_size": 256,
         }
@@ -186,7 +186,7 @@ class EncryptionService:
             encrypted_content=encrypted_content,
             encryption_method="Fernet",
             key_id=key_id,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             data_category=data_category,
             is_sensitive=data_category
             in [DataCategory.THERAPEUTIC_CONTENT, DataCategory.PERSONAL_IDENTIFIABLE],
@@ -213,7 +213,7 @@ class EncryptionService:
         # In production, you would re-encrypt all data with the new key
         # For now, just mark the old key as deprecated
         self.key_metadata[old_key_id]["deprecated"] = True
-        self.key_metadata[old_key_id]["deprecated_at"] = datetime.utcnow()
+        self.key_metadata[old_key_id]["deprecated_at"] = datetime.now(UTC)
 
         return True
 
@@ -359,14 +359,14 @@ class DataPrivacyService:
         for consent in self.consent_records[user_id]:
             if consent.consent_id == consent_id and consent.is_active:
                 consent.is_active = False
-                consent.withdrawal_date = datetime.utcnow()
+                consent.withdrawal_date = datetime.now(UTC)
                 return True
 
         return False
 
     def update_privacy_settings(self, settings: PrivacySettings) -> bool:
         """Update user privacy settings."""
-        settings.updated_at = datetime.utcnow()
+        settings.updated_at = datetime.now(UTC)
         self.privacy_settings[settings.user_id] = settings
         return True
 
@@ -419,7 +419,7 @@ class DataPrivacyService:
         export_data = {
             "export_metadata": {
                 "user_id": request.user_id,
-                "export_date": datetime.utcnow().isoformat(),
+                "export_date": datetime.now(UTC).isoformat(),
                 "format": request.export_format,
                 "categories_included": [
                     cat.value for cat in request.include_categories
@@ -468,7 +468,7 @@ class DataPrivacyService:
             )
             zip_file.writestr(
                 "export_info.txt",
-                f"GDPR Data Export for User {request.user_id}\nGenerated: {datetime.utcnow()}",
+                f"GDPR Data Export for User {request.user_id}\nGenerated: {datetime.now(UTC)}",
             )
 
         zip_buffer.seek(0)
@@ -478,7 +478,7 @@ class DataPrivacyService:
         """Delete user data (GDPR Article 17 - Right to erasure)."""
         deletion_summary = {
             "user_id": request.user_id,
-            "deletion_date": datetime.utcnow().isoformat(),
+            "deletion_date": datetime.now(UTC).isoformat(),
             "reason": request.deletion_reason,
             "categories_deleted": [],
             "items_deleted": 0,
@@ -511,7 +511,7 @@ class DataPrivacyService:
             "user_id": request.user_id,
             "deletion_request": request.model_dump(),
             "deletion_summary": deletion_summary,
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(UTC),
         }
         self.deletion_log.append(deletion_log_entry)
 
@@ -524,7 +524,7 @@ class DataPrivacyService:
         anonymization_summary = {
             "original_user_id": user_id,
             "anonymous_id": anonymous_id,
-            "anonymization_date": datetime.utcnow().isoformat(),
+            "anonymization_date": datetime.now(UTC).isoformat(),
             "items_anonymized": 0,
         }
 
@@ -543,7 +543,7 @@ class DataPrivacyService:
     def check_data_retention_compliance(self) -> list[dict[str, Any]]:
         """Check data retention compliance and identify data for deletion."""
         compliance_issues = []
-        current_time = datetime.utcnow()
+        current_time = datetime.now(UTC)
 
         for record in self.processing_records:
             retention_period = record.retention_period

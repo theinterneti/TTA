@@ -25,7 +25,7 @@ class ToolParameter(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
     description: str | None = Field(default=None, max_length=1024)  # Increased from 512
     required: bool = True
-    schema: dict[str, Any] = Field(  # type: ignore[override]
+    param_schema: dict[str, Any] = Field(
         default_factory=dict, description="JSON schema for the parameter"
     )
 
@@ -208,7 +208,7 @@ class ToolPolicy(BaseModel):
             return d
 
         for p in spec.parameters:
-            if depth(p.schema) > self.max_schema_depth:
+            if depth(p.param_schema) > self.max_schema_depth:
                 raise ValueError("parameter schema too deep")
         if depth(spec.returns_schema) > self.max_schema_depth:
             raise ValueError("returns schema too deep")

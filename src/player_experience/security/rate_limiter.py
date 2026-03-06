@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
@@ -149,14 +149,14 @@ class TokenBucketRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.burst_capacity,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(hours=1),
+                reset_time=datetime.now(UTC) + timedelta(hours=1),
                 retry_after=3600,
                 limit_type="blacklisted",
             )
@@ -186,7 +186,7 @@ class TokenBucketRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=True,
                     remaining=int(bucket["tokens"]),
-                    reset_time=datetime.utcnow()
+                    reset_time=datetime.now(UTC)
                     + timedelta(seconds=60 / self.config.requests_per_minute),
                 )
             # Calculate retry after
@@ -197,7 +197,7 @@ class TokenBucketRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(seconds=retry_after),
+                reset_time=datetime.now(UTC) + timedelta(seconds=retry_after),
                 retry_after=retry_after,
                 limit_type="rate_limit",
             )
@@ -225,14 +225,14 @@ class SlidingWindowRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(hours=1),
+                reset_time=datetime.now(UTC) + timedelta(hours=1),
                 retry_after=3600,
                 limit_type="blacklisted",
             )
@@ -257,7 +257,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(seconds=60),
+                    reset_time=datetime.now(UTC) + timedelta(seconds=60),
                     retry_after=60,
                     limit_type="per_minute",
                 )
@@ -266,7 +266,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(hours=1),
+                    reset_time=datetime.now(UTC) + timedelta(hours=1),
                     retry_after=3600,
                     limit_type="per_hour",
                 )
@@ -275,7 +275,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(days=1),
+                    reset_time=datetime.now(UTC) + timedelta(days=1),
                     retry_after=86400,
                     limit_type="per_day",
                 )
@@ -286,7 +286,7 @@ class SlidingWindowRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute - minute_requests - 1,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
     def reset_limit(self, identifier: str):
@@ -311,14 +311,14 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(hours=1),
+                reset_time=datetime.now(UTC) + timedelta(hours=1),
                 retry_after=3600,
                 limit_type="blacklisted",
             )
@@ -350,7 +350,7 @@ class RedisRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(minutes=1),
+                    reset_time=datetime.now(UTC) + timedelta(minutes=1),
                     retry_after=60,
                     limit_type="per_minute",
                 )
@@ -358,7 +358,7 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute - current_requests - 1,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         except redis.RedisError as e:
@@ -367,7 +367,7 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
     def reset_limit(self, identifier: str):

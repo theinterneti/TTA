@@ -11,7 +11,7 @@ import contextlib
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -637,7 +637,7 @@ class PlayerProfileRepository:
                     return None
 
                 created_at_val = player_data.get("created_at")
-                created_at_dt = _to_dt_profile(created_at_val) or datetime.utcnow()
+                created_at_dt = _to_dt_profile(created_at_val) or datetime.now(UTC)
                 last_login_val = player_data.get("last_login")
                 last_login_dt = (
                     _to_dt_profile(last_login_val) if last_login_val else None

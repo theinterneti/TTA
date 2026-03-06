@@ -7,7 +7,7 @@ Provides therapeutic gaming and patient-focused functionality
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
@@ -162,7 +162,7 @@ async def start_therapeutic_session(
         response = TherapeuticSessionResponse(
             id=session_id,
             patient_id=patient_id,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
             status="active",
             therapeutic_framework=session_data.therapeutic_framework,
             progress_metrics={
@@ -240,7 +240,7 @@ async def update_session_progress(
 
         response_data = {
             "session_id": session_id,
-            "updated_at": datetime.utcnow(),
+            "updated_at": datetime.now(UTC),
             "safety_assessment": safety_assessment,
             "difficulty_level": difficulty_adjustment.get("new_level", 3),
             "interventions_triggered": safety_assessment.get("interventions", []),
@@ -275,7 +275,7 @@ async def trigger_intervention(
         return {
             "intervention_id": str(uuid4()),
             "type": intervention.intervention_type,
-            "triggered_at": datetime.utcnow(),
+            "triggered_at": datetime.now(UTC),
             "content": intervention_response,
             "estimated_duration": intervention_response.get("duration", 5),
         }
@@ -389,6 +389,6 @@ async def health_check():
     """Health check for patient interface API"""
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(UTC),
         "service": "patient-interface-api",
     }

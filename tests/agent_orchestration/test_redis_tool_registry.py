@@ -16,7 +16,7 @@ async def test_register_get_list_and_cleanup(redis_client):
         name="kg.query",
         version="1.0.0",
         description="Query KG",
-        parameters=[ToolParameter(name="q", schema={"type": "string"})],
+        parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
         returns_schema={"type": "object"},
     )
     created = await reg.register_tool(spec)

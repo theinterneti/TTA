@@ -13,7 +13,7 @@ import logging
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -172,7 +172,7 @@ class ProtocolTranslator:
                 "source": result.get("source", "ipa"),
             },
             "metadata": result.get("metadata", {}),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     def _translate_from_wba_format(self, result: dict[str, Any]) -> dict[str, Any]:
@@ -187,7 +187,7 @@ class ProtocolTranslator:
                 "source": result.get("source", "wba"),
             },
             "metadata": result.get("metadata", {}),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     def _translate_from_nga_format(self, result: dict[str, Any]) -> dict[str, Any]:
@@ -202,7 +202,7 @@ class ProtocolTranslator:
                 "source": result.get("source", "nga"),
             },
             "metadata": result.get("metadata", {}),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
 

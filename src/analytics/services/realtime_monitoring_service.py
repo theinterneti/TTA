@@ -13,7 +13,7 @@ import logging
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
@@ -211,7 +211,7 @@ class TherapeuticInterventionTrigger:
                         "intervention_type": rule["intervention"],
                         "message": rule["message"],
                         "user_data": user_data,
-                        "triggered_at": datetime.utcnow().isoformat(),
+                        "triggered_at": datetime.now(UTC).isoformat(),
                     }
                     triggered_interventions.append(intervention)
             except Exception as e:
@@ -257,7 +257,7 @@ class AlertManager:
             message=message,
             data=data,
             user_cohort=user_cohort,
-            triggered_at=datetime.utcnow(),
+            triggered_at=datetime.now(UTC),
         )
 
         # Store alert
@@ -286,7 +286,7 @@ class AlertManager:
 
         alert = self.active_alerts[alert_id]
         alert.is_resolved = True
-        alert.resolved_at = datetime.utcnow()
+        alert.resolved_at = datetime.now(UTC)
         alert.resolved_by = resolved_by
 
         # Update in Redis
@@ -400,7 +400,7 @@ class RealTimeMonitoringService:
             metric_unit="",
             threshold_warning=warning_threshold,
             threshold_critical=critical_threshold,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
         )
 
         self.performance_metrics[metric_name] = metric
@@ -625,7 +625,7 @@ async def get_current_metrics():
             ),
         }
 
-    return {"metrics": metrics, "timestamp": datetime.utcnow().isoformat()}
+    return {"metrics": metrics, "timestamp": datetime.now(UTC).isoformat()}
 
 
 @app.get("/health")
@@ -639,7 +639,7 @@ async def health_check():
         "websocket_subscribers": len(
             monitoring_service.alert_manager.alert_subscribers
         ),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 

@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum, StrEnum
 from typing import Any
 
@@ -86,8 +86,8 @@ class GameplayLoopContext:
     safety_level: str = "standard"  # "standard", "elevated", "crisis"
 
     # Session state
-    session_start_time: datetime = field(default_factory=datetime.utcnow)
-    last_activity_time: datetime = field(default_factory=datetime.utcnow)
+    session_start_time: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_activity_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     total_session_time: float = 0.0
 
     # Gameplay state
@@ -217,7 +217,7 @@ class GameplayLoopComponent(Component, ABC):  # type: ignore[misc]
         context = self._active_contexts.get(session_id)
         if context:
             # Update last activity time
-            context.last_activity_time = datetime.utcnow()
+            context.last_activity_time = datetime.now(UTC)
         return context
 
     async def update_session_context(
@@ -233,7 +233,7 @@ class GameplayLoopComponent(Component, ABC):  # type: ignore[misc]
             if hasattr(context, key):
                 setattr(context, key, value)
 
-        context.last_activity_time = datetime.utcnow()
+        context.last_activity_time = datetime.now(UTC)
 
         # Notify component of context update
         await self._on_session_context_updated(context)
@@ -280,7 +280,7 @@ class GameplayLoopComponent(Component, ABC):  # type: ignore[misc]
     def _update_performance_metrics(self, context: GameplayLoopContext) -> None:
         """Update performance metrics for a completed session."""
         session_duration = (
-            datetime.utcnow() - context.session_start_time
+            datetime.now(UTC) - context.session_start_time
         ).total_seconds()
 
         if "sessions" not in self._performance_metrics:

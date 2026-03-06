@@ -11,7 +11,7 @@ gameplay loop system, including session state, scenes, choices, and consequences
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
@@ -128,8 +128,8 @@ class Scene(BaseModel):
     player_choices_made: list[str] = Field(default_factory=list)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class Choice(BaseModel):
@@ -168,7 +168,7 @@ class Choice(BaseModel):
     availability_reason: str | None = Field(default=None)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ConsequenceSet(BaseModel):
@@ -210,7 +210,7 @@ class ConsequenceSet(BaseModel):
     application_time: datetime | None = Field(default=None)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class SessionState(BaseModel):
@@ -238,8 +238,8 @@ class SessionState(BaseModel):
     consequence_stack: list[ConsequenceSet] = Field(default_factory=list)
 
     # Session timing
-    session_start_time: datetime = Field(default_factory=datetime.utcnow)
-    last_activity_time: datetime = Field(default_factory=datetime.utcnow)
+    session_start_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    last_activity_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
     total_session_time: float = Field(default=0.0)
 
     # Performance metrics
@@ -256,12 +256,12 @@ class SessionState(BaseModel):
     safety_alerts: list[str] = Field(default_factory=list)
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     def update_activity(self) -> None:
         """Update last activity time and session duration."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         if not self.is_paused:
             time_delta = (now - self.last_activity_time).total_seconds()
             self.total_session_time += time_delta
@@ -277,7 +277,7 @@ class SessionState(BaseModel):
             "choice_text": choice.choice_text,
             "choice_type": choice.choice_type,
             "therapeutic_value": choice.therapeutic_value,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "outcome": outcome,
         }
         self.choice_history.append(choice_record)

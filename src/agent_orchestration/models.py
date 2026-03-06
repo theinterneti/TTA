@@ -11,7 +11,7 @@ specifics; richer models can be added in follow-up tasks.
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum, StrEnum
 from typing import Any
 
@@ -189,7 +189,7 @@ class AgentCapabilitySet(BaseModel):
     # Capability set metadata
     version: str = Field(default="1.0.0", description="Version of the capability set")
     last_updated: datetime = Field(
-        default_factory=datetime.utcnow, description="Last update timestamp"
+        default_factory=lambda: datetime.now(UTC), description="Last update timestamp"
     )
 
     # Discovery and routing metadata
@@ -331,7 +331,7 @@ class CapabilityDiscoveryResponse(BaseModel):
 
     # Discovery metadata
     discovery_timestamp: datetime = Field(
-        default_factory=datetime.utcnow, description="Discovery timestamp"
+        default_factory=lambda: datetime.now(UTC), description="Discovery timestamp"
     )
     cache_hit: bool = Field(
         default=False, description="Whether results came from cache"

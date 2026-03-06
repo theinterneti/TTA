@@ -13,7 +13,7 @@ import contextlib
 import json
 import time
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -168,7 +168,7 @@ class ProductionReadinessValidator:
         """Run comprehensive production readiness assessment."""
         logger.info("Starting comprehensive production readiness assessment")
 
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
         self.checks = []
 
         # Run all check categories
@@ -185,7 +185,7 @@ class ProductionReadinessValidator:
         # Save report
         await self._save_report(report)
 
-        execution_time = (datetime.utcnow() - start_time).total_seconds()
+        execution_time = (datetime.now(UTC) - start_time).total_seconds()
         logger.info(
             f"Production readiness assessment completed in {execution_time:.2f}s"
         )
@@ -1213,7 +1213,7 @@ class ProductionReadinessValidator:
         unique_recommendations = list(set(all_recommendations))
 
         return ReadinessReport(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             overall_level=overall_level,
             overall_score=overall_score,
             checks=self.checks,

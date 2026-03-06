@@ -16,7 +16,7 @@ import sys
 import threading
 import traceback
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -127,7 +127,7 @@ class StructuredFormatter(jsonlogger.JsonFormatter):  # type: ignore[name-define
 
         # Ensure timestamp is in ISO format
         if "timestamp" not in log_record:
-            log_record["timestamp"] = datetime.utcnow().isoformat() + "Z"
+            log_record["timestamp"] = datetime.now(UTC).isoformat() + "Z"
 
         # Add severity mapping for external systems
         level_mapping = {"DEBUG": 0, "INFO": 1, "WARNING": 2, "ERROR": 3, "CRITICAL": 4}

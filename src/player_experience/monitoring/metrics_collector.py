@@ -14,7 +14,7 @@ import threading
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
@@ -308,7 +308,7 @@ class MetricsCollector:
     ):
         """Record a metric point with metadata."""
         point = MetricPoint(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             value=value,
             tags=tags or {},
             metadata={"type": metric_type.value},
@@ -337,7 +337,7 @@ class MetricsCollector:
             points = list(self.metrics[name])
 
             if duration:
-                cutoff_time = datetime.utcnow() - duration
+                cutoff_time = datetime.now(UTC) - duration
                 points = [p for p in points if p.timestamp >= cutoff_time]
 
             return points
@@ -460,7 +460,7 @@ class MetricsCollector:
         """Export all metrics in specified format."""
         with self.lock:
             metrics_data = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
                 "performance": self.get_performance_metrics().to_dict(),
                 "database": self.get_database_metrics().to_dict(),
                 "cache": self.get_cache_metrics().to_dict(),

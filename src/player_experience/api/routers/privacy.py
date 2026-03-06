@@ -150,7 +150,7 @@ async def record_consent(
     Returns:
         Dict: Consent ID and success message
     """
-    from datetime import datetime
+    from datetime import UTC, datetime
 
     consent = ConsentRecord(
         user_id=user.user_id,
@@ -158,7 +158,7 @@ async def record_consent(
         purpose=consent_request.purpose,
         data_categories=consent_request.data_categories,
         consent_given=consent_request.consent_given,
-        consent_date=datetime.utcnow(),
+        consent_date=datetime.now(UTC),
         consent_method=consent_request.consent_method,
         consent_evidence=consent_request.consent_evidence,
     )

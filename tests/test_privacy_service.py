@@ -11,7 +11,7 @@ import io
 import json
 import unittest
 import zipfile
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from src.player_experience.services.privacy_service import (
     AnonymizationService,
@@ -87,7 +87,7 @@ class TestEncryptionService(unittest.TestCase):
             encrypted_content=b"fake_encrypted_data",
             encryption_method="Fernet",
             key_id="nonexistent_key",
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             data_category=DataCategory.THERAPEUTIC_CONTENT,
         )
 
@@ -247,7 +247,7 @@ class TestDataPrivacyService(unittest.TestCase):
             purpose=ProcessingPurpose.CONSENT,
             data_categories=[DataCategory.THERAPEUTIC_CONTENT],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
         )
 
@@ -271,7 +271,7 @@ class TestDataPrivacyService(unittest.TestCase):
             purpose=ProcessingPurpose.CONSENT,
             data_categories=[DataCategory.THERAPEUTIC_CONTENT],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
         )
 
@@ -366,7 +366,7 @@ class TestDataPrivacyService(unittest.TestCase):
             purpose=ProcessingPurpose.CONSENT,
             data_categories=[DataCategory.THERAPEUTIC_CONTENT],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
         )
         self.privacy_service.record_consent(consent)
@@ -482,7 +482,7 @@ class TestDataPrivacyService(unittest.TestCase):
             legal_basis="User consent",
             data_source="test",
             retention_period=DataRetentionPeriod.SHORT_TERM,
-            created_at=datetime.utcnow() - timedelta(days=45),  # Older than 30 days
+            created_at=datetime.now(UTC) - timedelta(days=45),  # Older than 30 days
         )
 
         self.privacy_service.record_data_processing(old_record)
@@ -509,7 +509,7 @@ class TestDataPrivacyService(unittest.TestCase):
             legal_basis="User consent",
             data_source="test",
             retention_period=DataRetentionPeriod.MEDIUM_TERM,
-            created_at=datetime.utcnow() - timedelta(days=30),  # Within 1 year limit
+            created_at=datetime.now(UTC) - timedelta(days=30),  # Within 1 year limit
         )
 
         self.privacy_service.record_data_processing(recent_record)
@@ -540,7 +540,7 @@ class TestPrivacyServiceIntegration(unittest.TestCase):
                 DataCategory.BEHAVIORAL_DATA,
             ],
             consent_given=True,
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             consent_method="explicit",
         )
 
