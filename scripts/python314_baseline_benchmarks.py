@@ -15,7 +15,6 @@ import argparse
 import asyncio
 import gc
 import json
-import os
 import statistics
 import sys
 import time
@@ -109,6 +108,7 @@ def benchmark_import_times() -> list[BenchmarkResult]:
                         f"import {module_name}; "
                         "print(time.perf_counter()-s)",
                     ],
+                    check=False,
                     capture_output=True,
                     text=True,
                     timeout=30,
