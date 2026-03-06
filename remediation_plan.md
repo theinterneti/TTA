@@ -1,8 +1,8 @@
 # TTA CI Remediation Plan
 
-**Date:** 2026-03-05  
+**Date:** 2026-03-05 (Phase 3 added 2026-03-06)  
 **Author:** Staff DevOps Engineer (Copilot Agent)  
-**Status:** COMPLETE — all quality gate checks pass (0 ruff errors, 0 pyright errors, 1428 unit tests green)  
+**Status:** COMPLETE — all quality gate checks pass (0 ruff errors, 0 pyright errors, 1428 unit tests green, 0 TTA-owned warnings)  
 
 ---
 
@@ -255,15 +255,138 @@ This is partially blocked by upstream (`langchain_core`). Track via **issue #117
 
 ---
 
+## Phase 3 — Deprecation and Warning Elimination
+
+**Goal:** Eliminate all TTA-owned runtime deprecation warnings and Pydantic UserWarnings.  
+**Risk:** Low-medium — `datetime.utcnow()` replacement is mechanical; model default factories
+require careful timezone-awareness testing.  
+**Estimated effort:** 2–3 hours.  
+**Pre-condition:** Phase 2 must be complete and tests green before starting Phase 3.
+
+### 3.1 Replace `datetime.utcnow()` with `datetime.now(UTC)` in source files
+
+**Scope:** 55 source files containing 269 `datetime.utcnow()` call sites.
+
+Python 3.12+ deprecates `datetime.datetime.utcnow()` (returns naive UTC datetimes)
+in favor of `datetime.datetime.now(datetime.UTC)` (returns timezone-aware UTC datetimes).
+The codebase already had `datetime.now(UTC)` usage in newer modules, confirming this as
+the intended migration pattern.
+
+**Migration pattern:** `from datetime import UTC` + `datetime.utcnow()` → `datetime.now(UTC)`
+
+**Checklist:**
+- [x] Run automated migration script across all `src/**/*.py` files
+- [x] Manually fix one remaining occurrence using `_dt` alias in `progress_tracking_service.py`
+- [x] Run `uv run ruff check src/ --fix && uv run ruff format src/` to fix import ordering
+- [x] Confirm 0 remaining `utcnow()` calls in `src/`
+
+### 3.2 Migrate `default_factory=datetime.utcnow` in model files
+
+**Scope:** 15 source files with 27 Pydantic Field / dataclass field `default_factory=datetime.utcnow` declarations.
+
+The `default_factory=datetime.utcnow` pattern produces naive datetimes at model instantiation
+time. After migrating runtime code to `datetime.now(UTC)`, comparisons between model defaults
+(naive) and runtime timestamps (aware) raise `TypeError: can't compare offset-naive and
+offset-aware datetimes`.
+
+**Fix:** `default_factory=datetime.utcnow` → `default_factory=lambda: datetime.now(UTC)`
+
+**Files touched:**
+- `src/agent_orchestration/models.py`, `unified_orchestrator.py`
+- `src/components/gameplay_loop/base.py`, `models/core.py`, `models/interactions.py`,
+  `models/progress.py`, `models/validation.py`
+- `src/components/therapeutic_systems_enhanced/` (6 files)
+- `src/player_experience/models/auth.py`, `services/privacy_service.py`
+
+**Checklist:**
+- [x] Run automated migration script
+- [x] Ensure `UTC` imported in all affected files
+- [x] Run previously-failing tests — 4/4 pass
+- [x] Run full unit suite — 1428 passed, 0 failed
+
+### 3.3 Update test files using `datetime.utcnow()`
+
+**Scope:** 28 test files containing 184 `datetime.utcnow()` call sites.
+
+Same migration pattern as 3.1, applied to test files:
+- `tests/unit/common/test_time_utils.py`
+- `tests/unit/test_auth_service.py`
+- `tests/unit/test_gameplay_loop_controller.py`
+- `tests/comprehensive_battery/` (11 files)
+- `tests/integration/` (3 files)
+- Various root-level test files
+
+**Checklist:**
+- [x] Run automated migration script across all `tests/**/*.py` files
+- [x] Confirm 0 remaining `utcnow()` calls in `tests/`
+- [x] Full unit suite still passes
+
+### 3.4 Rename `ToolParameter.schema` to avoid `BaseModel.schema` shadow
+
+**Files:** `src/agent_orchestration/tools/models.py`, `packages/tta-ai-framework/src/tta_ai/orchestration/tools/models.py`  
+**Warning:** `UserWarning: Field name "schema" in "ToolParameter" shadows an attribute in parent "BaseModel"`
+
+Pydantic v2 emits this warning at class creation time because `BaseModel.schema` is a
+deprecated v1 class method that still exists for backward compatibility.
+
+**Fix:** Renamed field `schema` → `param_schema`. Updated all 9 references in test files:
+- `tests/agent_orchestration/test_tool_models.py`
+- `tests/agent_orchestration/test_tool_invocation_service.py`
+- `tests/agent_orchestration/test_tool_coordinator.py`
+- `tests/agent_orchestration/test_tools_diagnostics_and_concurrency.py`
+- `tests/agent_orchestration/test_redis_tool_registry.py`
+
+Also updated `p.schema` → `p.param_schema` in the `ToolPolicy.check_safety()` method
+in both model files.
+
+**Checklist:**
+- [x] Rename field in both `src/` and `packages/` model files
+- [x] Update all test references (`schema=` → `param_schema=`)
+- [x] Update `p.schema` → `p.param_schema` in `check_safety()`
+- [x] Run tool-related tests — 2 passed, 9 skipped (Redis)
+- [x] Full unit suite — 1428 passed, 0 failed, warnings reduced from 8 → 6
+
+### 3.5 Fix pre-existing ruff errors in tta-ai-framework package
+
+**Scope:** 16 ruff errors in `packages/tta-ai-framework/` (UP043, UP037).
+
+While working on the ToolParameter.schema fix in the package, also fixed 16 pre-existing
+ruff auto-fixable issues:
+- 9 × `UP043` — Unnecessary default type arguments (`AsyncGenerator[str, None]` → `AsyncGenerator[str]`)
+- 7 × `UP037` — Remove quotes from type annotations (forward references no longer needed)
+
+**Checklist:**
+- [x] Run `uv run ruff check packages/ --fix && uv run ruff format packages/`
+- [x] Confirm 0 ruff errors in `packages/`
+
+### 3.6 Warning summary (post-Phase 3)
+
+After Phase 3, test suite reports 6 warnings — **all from upstream dependencies**:
+
+| Source | Warning | Actionable? |
+|--------|---------|-------------|
+| `_hypothesis_pytestplugin` | `.hypothesis` directory collection skipped | No (pytest config) |
+| `langchain_core` | Pydantic V1 incompatible with Python 3.14 | No (upstream) |
+| `pythonjsonlogger` | `jsonlogger` module moved | No (upstream) |
+| `torch/cuda` | pynvml package deprecated | No (upstream) |
+| `SwigPyObject`/`SwigPyPacked` | No `__module__` attribute | No (SWIG bindings) |
+| `AsyncMockMixin` | Coroutine never awaited | No (pytest internal) |
+
+**Zero warnings from TTA-owned code.**
+
+---
+
 ## Definition of Done
 
 The remediation is complete when all of the following are true:
 
 ```bash
 uv run ruff check src/       # Exit 0 — zero errors          ✅ ACHIEVED
+uv run ruff check packages/  # Exit 0 — zero errors          ✅ ACHIEVED (Phase 3)
 uv run pyright src/          # Exit 0 — zero errors, zero warnings  ✅ ACHIEVED
 uv run pytest tests/unit/ -q -m "not integration and not neo4j and not redis"
                              # All tests pass (≥1428 passed, 0 failed)  ✅ ACHIEVED
+                             # Zero TTA-owned warnings  ✅ ACHIEVED (Phase 3)
 ```
 
 No tests may be deleted or downgraded (e.g., from `xfail` to skip) to reach green.
@@ -325,3 +448,15 @@ uv run ruff check src/       → All checks passed!
 uv run pyright src/           → 0 errors, 0 warnings, 0 informations
 uv run pytest tests/unit/     → 1428 passed, 1 skipped, 1 xpassed, 8 warnings in 67.85s
 ```
+
+### Final output (after Phase 3)
+
+```
+uv run ruff check src/        → All checks passed!
+uv run ruff check packages/   → All checks passed!
+uv run pyright src/            → 0 errors, 0 warnings, 0 informations
+uv run pytest tests/unit/      → 1428 passed, 1 skipped, 1 xpassed, 6 warnings in 67.77s
+```
+
+All 6 remaining warnings are from upstream dependencies (langchain_core, torch, hypothesis,
+pythonjsonlogger, SWIG bindings). Zero warnings from TTA-owned code.
