@@ -20,8 +20,6 @@ from __future__ import annotations
 import logging
 import os
 
-from langchain_openai import ChatOpenAI
-
 logger = logging.getLogger(__name__)
 
 # Provider base URLs
@@ -38,7 +36,7 @@ def get_llm(
     model: str | None = None,
     temperature: float = 0.7,
     max_tokens: int = 1000,
-) -> ChatOpenAI:
+):
     """Return a configured LLM client using only free or local providers.
 
     Args:
@@ -53,6 +51,7 @@ def get_llm(
     Raises:
         ValueError: If OpenRouter is selected but ``OPENROUTER_API_KEY`` is unset.
     """
+
     effective_provider = (
         provider
         or os.environ.get("TTA_LLM_PROVIDER", "").lower()
@@ -72,7 +71,9 @@ def _auto_detect_provider() -> str:
 
 def _make_ollama_llm(
     model: str | None, temperature: float, max_tokens: int
-) -> ChatOpenAI:
+):
+    from langchain_openai import ChatOpenAI
+
     model_name = model or os.environ.get("OLLAMA_MODEL", _DEFAULT_OLLAMA_MODEL)
     raw_url = os.environ.get("OLLAMA_BASE_URL", _OLLAMA_BASE_URL)
     # Ensure the URL ends with /v1 (OpenAI-compatible path)
@@ -91,7 +92,9 @@ def _make_ollama_llm(
 
 def _make_openrouter_llm(
     model: str | None, temperature: float, max_tokens: int
-) -> ChatOpenAI:
+):
+    from langchain_openai import ChatOpenAI
+
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
         raise ValueError(

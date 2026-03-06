@@ -15,8 +15,6 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from src.ai_components.llm_factory import get_llm
-
 from .choice_architecture.manager import ChoiceArchitectureManager
 from .consequence_system.system import ConsequenceSystem
 from .database.neo4j_manager import Neo4jGameplayManager
@@ -62,6 +60,8 @@ class GameplayLoopController:
             )
         # Build LLM — gracefully skip if no provider is configured
         try:
+            from src.ai_components.llm_factory import get_llm
+
             _llm = get_llm()
         except Exception as _exc:
             logger.warning(
