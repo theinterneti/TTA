@@ -214,7 +214,7 @@ pydantic-settings==2.13.1
 pydocstyle==6.3.0
 pyflakes==3.4.0
 pygments==2.19.2
-pyjwt==2.11.0
+pyjwt==2.12.0
 pylint==4.0.5
 pylint-celery==0.3
 pylint-django==2.7.0
