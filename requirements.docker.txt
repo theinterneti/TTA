@@ -13,7 +13,7 @@ astroid==4.0.4
 asttokens==3.0.1
 async-timeout==5.0.1
 attrs==25.4.0
-authlib==1.6.8
+authlib==1.6.9
 babel==2.18.0
 backoff==1.11.1
 backrefs==6.2
