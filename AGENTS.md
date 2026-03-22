@@ -64,3 +64,23 @@ root-cause, resolved TODO), invoke the `create-atomic-note` skill:
    frontmatter schema defined in `.claude/skills/create-atomic-note/SKILL.md`.
 2. Keep the note to a single topic — split complex work into multiple notes.
 3. The repo owner will ingest these files into `TTA-notes` manually.
+
+## L0 / TTA.dev Interaction Rule
+
+`TTA.dev` owns the emerging **developer-agent L0 control plane**.
+
+TTA does **not** own that layer. In this repo, L0-related work should focus on
+**integrating with TTA.dev**, not recreating a second developer control plane
+inside `src/agent_orchestration/`.
+
+### What TTA agents should do next for L0
+
+1. keep runtime/player-session orchestration separate from developer-agent orchestration
+2. define how TTA build/test/release work should be represented as TTA.dev L0 tasks and runs
+3. add adapters or scripts that let TTA.dev-managed agents safely operate on this repo
+4. surface enough project/workflow metadata that TTA.dev can coordinate work without touching therapeutic runtime state
+
+### Anti-goal
+
+Do not treat IPA/WBA/NGA runtime coordination as the same problem as Claude/Copilot
+developer coordination. Those are different control planes.

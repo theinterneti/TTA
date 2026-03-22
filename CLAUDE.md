@@ -93,3 +93,21 @@ tests/                  # pytest suite (unit/, integration/, e2e/)
 | Augment | `.augment/instructions.md` |
 | Cline | `.cline/instructions.md` |
 | Gemini | `GEMINI.md` |
+
+## L0 Integration Directive
+
+`TTA.dev` is now building the L0 developer control plane for coding agents.
+
+When a task in this repo mentions L0, agent management, developer orchestration,
+task leases, approvals, or build-plane coordination:
+
+- assume the control-plane source of truth belongs in `TTA.dev`
+- do not build a second developer-agent queue/lease system in TTA
+- focus on the TTA side of the boundary: adapters, metadata, integration points,
+  and safe separation from runtime player-session orchestration
+
+### TTA-side priorities for L0
+
+1. document or implement how TTA work items map onto TTA.dev L0 tasks/runs
+2. expose TTA build/test/deploy workflows in a form L0 agents can claim safely
+3. keep runtime orchestration (`IPA/WBA/NGA`, Redis, Neo4j, sessions) separate from developer-agent coordination

@@ -129,6 +129,19 @@ Project root contains `GEMINI.md` with:
 - Common commands and patterns
 - Auto-loaded by Gemini CLI sub-agent
 
+## L0 / TTA.dev Boundary
+
+`TTA.dev` owns the emerging L0 developer control plane for coding agents.
+
+Inside `TTA`, do not implement a second developer-agent queue, lease, or approval
+system unless the repository owner explicitly asks for a local exception.
+
+When asked to work on L0 from this repo, prioritize:
+
+1. integration points with `TTA.dev`
+2. repo metadata and scripts that TTA.dev-managed agents can consume
+3. clear separation between developer-agent coordination and runtime therapeutic/player-session coordination
+
 ## MCP Server Integration
 
 ### Available MCP Servers
