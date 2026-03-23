@@ -106,6 +106,14 @@ async def risky_operation():
 - **tta-workflow-primitives**: Production workflow composition with observability
 - **Retry Decorators**: `@with_retry()` and `@with_retry_async()`
 
+### Agent Memory (Hindsight)
+
+TTA uses Hindsight for cross-session agent memory.
+
+- **Recall** at session start: query `adam-global` (cross-project patterns), then derived `project-*`/`workspace-*` bank (TTA-specific context)
+- **Retain** after significant tasks: cross-project patterns → `adam-global`; TTA-specific → derived `project-*`/`workspace-*` bank
+- MCP server: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hindsight-local-mcp`
+
 ### Chat Modes (`.augment/chatmodes/`)
 Activate role-specific behavior patterns:
 - **Architect** (`architect.chatmode.md`) - Design decisions, system architecture
@@ -204,7 +212,3 @@ gemini "/memory show"                          # View project context
 ```
 
 Focus on circuit breaker patterns, Redis-based messaging, and comprehensive error handling when working with agent orchestration. Always prefer `uv` over other Python package managers and ensure circuit breakers wrap external service calls. Leverage MCP servers (especially Context7 and Serena) for deep codebase understanding before making architectural changes.
-
-
----
-**Logseq:** [[TTA.dev/.github/Copilot-instructions]]
