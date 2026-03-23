@@ -1,9 +1,9 @@
-# Skill: create-atomic-note
+# Skill: retain-to-hindsight
 
 ## Purpose
 
-Save a single-topic documentation artifact to `docs/kb-exports/` for later
-ingestion into the TTA-notes Knowledge Base.
+Store a single-topic knowledge artifact to the TTA Hindsight memory bank
+for persistent cross-session agent recall.
 
 ## When to invoke
 
@@ -15,62 +15,65 @@ After completing any task that produces durable knowledge:
 - Resolved TODO with explanation of how/why
 - Design rationale for a non-obvious implementation choice
 
-## File naming convention
+## How to invoke
 
-```
-docs/kb-exports/YYYY-MM-DD_<kebab-case-topic>.md
-```
+Call `mcp__hindsight__retain` with:
 
-Example: `docs/kb-exports/2026-03-04_unit-of-work-pattern.md`
+| Field | Value |
+|-------|-------|
+| `bank` | `adam-global` for cross-project patterns; derived `project-*`/`workspace-*` bank for TTA-specific |
+| `category` | `architectural-decisions` \| `successful-patterns` \| `implementation-failures` |
+| `title` | Short kebab-case topic (e.g. `circuit-breaker-redis-persistence`) |
+| `content` | Structured markdown (see Body Format below) |
+| `tags` | Array of relevant tags — always include `tta-game` + component tag |
+| `severity` | `critical` \| `high` \| `medium` \| `low` |
 
-## Required YAML frontmatter
-
-Every atomic note MUST begin with this block (all fields required):
-
-```yaml
----
-type: <architecture|decision|bug-fix|todo-resolved|api-doc|narrative-design>
-priority: <high|medium|low>
-tags: [tta-game, <domain-tag>, <component-tag>]
-date: YYYY-MM-DD
-source_files:
-  - src/path/to/relevant/file.py
-related_notes: []
----
-```
-
-### Field guidance
-
-| Field | Allowed values | Notes |
-|-------|----------------|-------|
-| `type` | `architecture`, `decision`, `bug-fix`, `todo-resolved`, `api-doc`, `narrative-design` | Pick exactly one |
-| `priority` | `high`, `medium`, `low` | High = referenced often or blocks other work |
-| `tags` | array of strings | Always include `tta-game`; add component tags e.g. `player-experience`, `llm-factory`, `dolt`, `redis`, `narrative-engine`, `unit-of-work`, `mcp` |
-| `date` | ISO-8601 (`YYYY-MM-DD`) | Today's date |
-| `source_files` | repo-relative paths | Files most relevant to this note |
-| `related_notes` | filenames in `docs/kb-exports/` | Other atomic notes this connects to (empty list if none) |
+**Which bank?**
+- Use `adam-global` when the insight is reusable beyond TTA (general Python patterns, workflow lessons, tooling preferences)
+- Use the derived `project-*`/`workspace-*` bank when the insight is TTA-specific (TTA architecture, crisis detection design, specific module quirks)
 
 ## Body format
-
-After frontmatter: plain Markdown, **max ~300 lines**.
-
-Use this structure:
 
 ```markdown
 ## Context
 <1–3 sentences: why this topic matters, what prompted it>
 
 ## Decision / Finding
-<the actual content — the architectural decision, bug root-cause, API description, etc.>
+<the actual content — decision, root-cause, API description, etc.>
 
 ## Consequences / Next Steps
-<what changed as a result, what to watch for, any open follow-up questions>
+<what changed as a result, what to watch for, any open follow-up>
 ```
+
+## Category guidance
+
+| Category | Use when |
+|----------|----------|
+| `architectural-decisions` | Design choices, technology selection, structural changes |
+| `successful-patterns` | Approaches that worked well and should be reused |
+| `implementation-failures` | Failed approaches, anti-patterns, debugging lessons |
 
 ## Anti-patterns — DO NOT
 
-- Write more than one distinct topic per file — split into multiple notes instead
-- Omit or partially fill the YAML frontmatter
-- Use Logseq wiki-links (`[[...]]`) — this staging area is not a Logseq graph
-- Paste raw code blocks longer than ~40 lines — reference the source file path instead
-- Edit an existing atomic note — always create a new one
+- Retain more than one distinct topic in a single call — split into multiple retains
+- Retain trivial observations (e.g. "ran tests, they passed")
+- Paste raw code blocks longer than ~20 lines — reference the source file path instead
+- Retain implementation details that are obvious from reading the code
+
+## Recall
+
+To retrieve prior knowledge before starting a task:
+
+```bash
+# 1. Cross-project patterns and preferences
+mcp__hindsight__recall   # query "adam-global"
+# 2. TTA-specific context
+mcp__hindsight__recall   # query current derived "project-*" or "workspace-*" bank
+# 3. Synthesize into reasoned guidance
+mcp__hindsight__reflect
+```
+
+## MCP server
+
+Hindsight must be running locally: `uvx --from hindsight-api hindsight-local-mcp`
+URL: `http://localhost:8888/mcp/`
