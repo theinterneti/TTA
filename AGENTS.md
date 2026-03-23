@@ -21,20 +21,17 @@ layer curates which paths are safe and effective.
 | Cline | AI coding assistant | `.cline/instructions.md` |
 | Gemini | Secondary review | `GEMINI.md` |
 
-## Knowledge Base Access (MANDATORY)
+## Memory Access (MANDATORY)
 
-Before executing any non-trivial task, query the `tta-notes-kb` MCP server:
+Before any non-trivial task, recall context from Hindsight:
+1. `mcp__hindsight__recall` — query `adam-global` for durable directives and cross-project patterns
+2. `mcp__hindsight__recall` — query the current derived `project-*` or `workspace-*` bank for TTA-specific context
 
-1. Use `search_kb` to find relevant architectural decisions, prior work, and
-   design rationale for the area you are about to change.
-2. Use `get_high_priority_todos` to check for open work items related to your task.
+After completing a significant task (architecture decision, bug root-cause, resolved TODO):
+- Cross-project patterns → retain to `adam-global`
+- TTA-specific decisions, commands, failures → retain to current derived `project-*`/`workspace-*` bank
 
-The `tta-notes-kb` server runs from `/home/thein/repos/TTA-notes/mcp_server.py`
-and is configured in `.mcp.json` (Claude Code) and
-`.vscode/notebooklm-mcp-config.json` (VS Code).
-
-Do NOT rely solely on code inspection or this file for project context — the KB
-is the canonical source of architectural truth.
+Hindsight MCP: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hindsight-local-mcp`
 
 ## Non-Negotiable Standards
 
@@ -54,16 +51,6 @@ uv run ruff format src/
 uv run pyright src/
 uv run pytest -q -m "not integration and not neo4j and not redis" tests/
 ```
-
-## Documenting Your Work (MANDATORY)
-
-After completing any significant task (new feature, architecture decision, bug
-root-cause, resolved TODO), invoke the `create-atomic-note` skill:
-
-1. Create a new file in `docs/kb-exports/` following the naming convention and
-   frontmatter schema defined in `.claude/skills/create-atomic-note/SKILL.md`.
-2. Keep the note to a single topic — split complex work into multiple notes.
-3. The repo owner will ingest these files into `TTA-notes` manually.
 
 ## L0 / TTA.dev Interaction Rule
 
