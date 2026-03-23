@@ -21,10 +21,10 @@ Date: **2025-11-16**
 | --- | --- | --- |
 | **TTA product** | `src/`, `tests/`, `deployment/`, `docker/`, `docs/` (player + therapy), `monitoring/`, `living_worlds/`, `player_experience/`, `api_gateway/`, `components/`, `scripts/` (platform ops) | Live therapeutic experience, must stay online; dependencies reference these paths directly. |
 | **Shared foundation** | `packages/tta-ai-framework/`, `packages/tta-narrative-engine/`, `narrative-engine/`, `tta/` (prod) | Libraries consumed by both TTA product code and future builders. |
-| **TTA.dev & agentic primitives** | `.augment/` (chatmodes, workflows, kb, logseq mirror), `.serena/` + `serena/` (ACE runtime), `.tta/` (persona orchestration), `.cline/`, `.clinerules/`, `.kiro/` (retired spec backlog), `.mcp.hypertool.json`, `packages/ai-dev-toolkit/`, `packages/universal-agent-context/`, `ai-components/` (empty placeholder), `observability` exports, keploy/e2b helpers in `scripts/` | Must be isolated into `tta-dev/` (or exported) so AI assistants stop tripping over product code. |
+| **TTA.dev & agentic primitives** | `.augment/` (chatmodes, workflows, kb), `.serena/` + `serena/` (ACE runtime), `.tta/` (persona orchestration), `.cline/`, `.clinerules/`, `.kiro/` (retired spec backlog), `.mcp.hypertool.json`, `packages/ai-dev-toolkit/`, `packages/universal-agent-context/`, `ai-components/` (empty placeholder), `observability` exports, keploy/e2b helpers in `scripts/` | Must be isolated into `tta-dev/` (or exported) so AI assistants stop tripping over product code. |
 | **Deprecated / parking lot** | `src/agent_orchestration/openhands_integration/` (plus related tests/docs/scripts), `docs/development/openhands-*`, `.kiro/` specs, `GEMINI.md` workflows earmarked for pause | Keep history but move under `legacy/` buckets. |
 
-> ✅ Inventory covers initial agentic primitives: hypertool config, Serena runtime, ACE personas (`.tta/personas/*.md`), cline CLI hooks, logseq knowledge base (`.augment/logseq`), plus upcoming e2b hooks (currently absent but reserved under `packages/ai-dev-toolkit`).
+> ✅ Inventory covers initial agentic primitives: hypertool config, Serena runtime, ACE personas (`.tta/personas/*.md`), cline CLI hooks, plus upcoming e2b hooks (currently absent but reserved under `packages/ai-dev-toolkit`).
 
 ## 3. Clean Target Layout (within repo before final export)
 
@@ -37,7 +37,6 @@ platform/
       serena/
       personas/
       cline/
-      logseq/
       skills/        # slot for Anthropic/e2b assets
     packages/
       ai-dev-toolkit/
@@ -95,7 +94,6 @@ Key ideas:
 - **CI references**: GitHub workflows might reference `.augment/` or `.cline/` — create temp symlinks or update paths before merging.
 - **Package imports**: `pyproject.toml` currently excludes `ai-dev-toolkit`; moving it must not reintroduce it to product install.
 - **VS Code tasks**: existing tasks rely on root-level `.cline` hooks; plan to update `package.json`-style scripts concurrently.
-- **Knowledge base**: `.augment/logseq` replicates the Logseq KB; relocating it must not break the symlinks described in `AGENTS.md`.
 
 ## 7. Next Steps (2025-11-17)
 
@@ -106,6 +104,3 @@ Key ideas:
 
 Once Phase 1 is complete, we can begin copying `platform/dev` into the external `TTA.dev` repository or expose it as a git submodule. For now, this roadmap keeps the effort scoped and visible to every collaborating agent.
 
-
----
-**Logseq:** [[TTA.dev/Docs/Development/Reorg/Tta-separation-roadmap]]

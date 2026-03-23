@@ -15,7 +15,6 @@ security:
     - sequential-thinking
     - gitmcp
     - serena
-    - mcp-logseq
 tools:
   allowed:
     - editFiles
@@ -401,21 +400,3 @@ read_memory_Serena: "caching strategy decisions"
 **Status**: Active - Backend Implementer chat mode
 
 
----
-**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Chatmodes/Backend-implementer.chatmode]]
-
----
-**Logseq:** [[TTA.dev/.uv_cache/Git-v0/Checkouts/Dfe140d6c1db7dcd/05447d7/Packages/Universal-agent-context/.augment/Chatmodes/Backend-implementer.chatmode]]
-
----
-**Logseq:** [[TTA.dev/.github/Chatmodes/Backend-implementer.chatmode]]
-
----
-**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Backend-implementer.chatmode]]
-
----
-**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Workflows/Chatmodes/Backend-implementer.chatmode]]
-
-
----
-**Logseq:** [[TTA.dev/Platform/Agent-context/.augment/Chatmodes/Backend-implementer.chatmode]]

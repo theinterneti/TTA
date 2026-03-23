@@ -15,7 +15,6 @@ security:
     - sequential-thinking
     - gitmcp
     - serena
-    - mcp-logseq
 tools:
   allowed:
     - fetch
@@ -334,21 +333,3 @@ read_memory_Serena: "authentication architecture decisions"
 **Status**: Active - Safety Architect chat mode
 
 
----
-**Logseq:** [[TTA.dev/Packages/Universal-agent-context/.augment/Chatmodes/Safety-architect.chatmode]]
-
----
-**Logseq:** [[TTA.dev/.uv_cache/Git-v0/Checkouts/Dfe140d6c1db7dcd/05447d7/Packages/Universal-agent-context/.augment/Chatmodes/Safety-architect.chatmode]]
-
----
-**Logseq:** [[TTA.dev/.github/Chatmodes/Safety-architect.chatmode]]
-
----
-**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Augment/Core/Chatmodes/Safety-architect.chatmode]]
-
----
-**Logseq:** [[TTA.dev/Platform_tta_dev/Components/Hypertool/Workflows/Chatmodes/Safety-architect.chatmode]]
-
-
----
-**Logseq:** [[TTA.dev/Platform/Agent-context/.augment/Chatmodes/Safety-architect.chatmode]]

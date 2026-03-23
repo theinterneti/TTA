@@ -21,7 +21,7 @@ This report audits all existing specifications, architecture documents, and agen
 | **TTA.dev Boundary** | `ARCHITECTURE.md` defines a clear two-layer separation but no spec enforces it | High |
 | **TTA.dev Boundary** | Circuit breaker is implemented in TTA (`src/agent_orchestration/circuit_breaker.py`) but spec does not reference TTA.dev primitive extraction | Medium |
 | **Consistency** | Agent instruction files (4 files) reference IPA/WBA/NGA but point to no canonical spec | High |
-| **Consistency** | `AGENTS.md` and `GEMINI.md` are stale redirect stubs pointing to a Logseq KB not in this repo | Medium |
+| **Consistency** | `AGENTS.md` and `GEMINI.md` are stale redirect stubs pointing to an external knowledge base not in this repo | Medium |
 | **Organization** | `specs/` has only 4 files; 2 are examples/templates, none cover core game agents | Critical |
 | **Organization** | Therapeutic documentation is scattered across `docs/design/`, `docs/clinical/`, `src/` docstrings | High |
 
@@ -205,8 +205,8 @@ There is no single document that a developer can read to understand the complete
 | `.github/copilot-instructions.md` | Active | ✅ Named | `WorkflowPrimitive`, `tta-workflow-primitives` | ❌ None |
 | `.augment/instructions.md` | Active | ✅ With workflow diagram | `WorkflowPrimitive`, circuit breaker, retry | ❌ None |
 | `.cline/instructions.md` | Active | ✅ "multi-agent pipeline" | `WorkflowPrimitive`, `tta-dev-primitives` | ❌ None |
-| `AGENTS.md` | **Stale redirect** | ❌ | ❌ | Redirects to external Logseq KB |
-| `GEMINI.md` | **Stale redirect** | ❌ | ❌ | Redirects to external Logseq KB |
+| `AGENTS.md` | **Stale redirect** | ❌ | ❌ | Redirects to external KB (now replaced) |
+| `GEMINI.md` | **Stale redirect** | ❌ | ❌ | Redirects to external KB (now replaced) |
 
 **Key Issue:** All four active instruction files mention the agents and TTA.dev primitives but none reference a canonical specification document. If an agent generates code for the IPA, it has no formal contract to validate against.
 
@@ -276,9 +276,9 @@ Canonical specification: `specs/therapeutic-safety/`
 
 ---
 
-## 4. Gap Analysis & Logseq TODO Blocks
+## 4. Gap Analysis & TODO Blocks
 
-The following gaps were identified. Each is formatted as a Logseq-compliant `#dev-todo` block with required `type::`, `priority::`, and `package::` properties.
+The following gaps were identified. Each is formatted as a `#dev-todo` block with required `type::`, `priority::`, and `package::` properties.
 
 ### GAP-01: Missing IPA Specification
 
@@ -407,7 +407,7 @@ The following gaps were identified. Each is formatted as a Logseq-compliant `#de
   type:: documentation
   priority:: medium
   package:: tta-ai-framework
-  description:: Both `AGENTS.md` and `GEMINI.md` redirect to an external Logseq KB at `~/repos/TTA-notes/logseq/pages/TTA/` which is not in this repository. Either inline the relevant content or replace with a clear note that the canonical source is in the separate TTA-notes repo, and add a summary of key agent roles for developer orientation.
+  description:: Both `AGENTS.md` and `GEMINI.md` previously redirected to an external knowledge base not in this repository. These have been updated with inline content. Verify agent roles and orientation summaries are current.
 ```
 
 ### GAP-14: Agent Instructions Missing Canonical Spec Pointer
@@ -488,9 +488,9 @@ The following gaps were identified. Each is formatted as a Logseq-compliant `#de
 
 ### Root-Level Documents
 - `ARCHITECTURE.md` — Two-layer toolkit architecture (well-maintained)
-- `AGENTS.md` — Stale redirect to Logseq KB
+- `AGENTS.md` — Previously a stale redirect stub (now updated)
 - `CLAUDE.md` — Primary agent instructions (active)
-- `GEMINI.md` — Stale redirect to Logseq KB
+- `GEMINI.md` — Previously a stale redirect stub (now updated)
 - `CONTRIBUTING.md` — Contributor guidelines (active)
 - `SECURITY.md` — Security policy
 
@@ -544,6 +544,3 @@ For the future `specs/therapeutic-safety/safety-interop.md`, the following mappi
 | `UNSAFE` | `CrisisLevel.HIGH` | Halt content, grounding, provide exit |
 | `CRISIS` | `CrisisLevel.CRITICAL` | Immediate intervention, emergency resources |
 
----
-
-**Logseq:** [[TTA/Reports/TTA Spec Audit Report]]

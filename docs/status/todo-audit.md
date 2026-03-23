@@ -30,7 +30,6 @@ A fully-featured TODO and issue tracking document with:
 - ✅ Component promotion tracking
 - ✅ Effort estimates for planning
 - ✅ Dependency mapping
-- ✅ Logseq query blocks for dynamic views
 
 ### 2. Automation Script
 
@@ -41,28 +40,15 @@ Python script with capabilities:
 - ✅ Scan codebase for TODO patterns
 - ✅ Identify orphaned TODOs (closed issue refs)
 - ✅ Generate status reports
-- ✅ Export to Logseq format
 - ✅ Categorize and prioritize automatically
 
-### 3. Logseq Integration
-
-**Location**: `.augment/logseq/config.edn`
-
-Configured Logseq graph with:
-- ✅ Custom TODO workflow (TODO → DOING → DONE)
-- ✅ Query blocks for MVP blockers, in-progress items
-- ✅ Color-coded priority markers
-- ✅ Linked references between issues and code
-- ✅ Property-based metadata
-
-### 4. Documentation
+### 3. Documentation
 
 **Location**: `.augment/README-TODO-AUDIT.md`
 
 Complete guide covering:
 - ✅ Quick start instructions
 - ✅ Usage patterns for different roles
-- ✅ Logseq tips and custom queries
 - ✅ Best practices for writing TODOs
 - ✅ Automation and CI/CD integration
 - ✅ Troubleshooting guide
@@ -162,16 +148,10 @@ TODOs referencing closed or non-existent GitHub issues:
    - Core for MVP authentication flow
    - Security critical (HIPAA compliance)
 
-3. **Integrate Logseq Workflow**
-   - Set up Logseq graph in `.augment/`
-   - Train team on query blocks
-   - Establish weekly audit cadence
-
 ### Long Term (Ongoing)
 
 1. **Maintain Audit System**
    - Weekly: Run `python3 scripts/todo-audit.py report`
-   - Sprint Planning: Export to Logseq for visualization
    - Pre-Release: Verify zero critical TODOs
 
 2. **Improve TODO Quality**
@@ -182,7 +162,7 @@ TODOs referencing closed or non-existent GitHub issues:
 3. **Automate Tracking**
    - Add pre-commit hooks for orphan detection
    - CI/CD integration for reports
-   - Weekly cron job for Logseq exports
+   - Weekly cron job for audit reports
 
 ---
 
@@ -215,8 +195,8 @@ python3 scripts/todo-audit.py scan
 ### For Project Managers
 
 **Sprint Planning**:
-1. Open `.augment/TODO-AUDIT.md` in Logseq
-2. Use query blocks to filter:
+1. Open `.augment/TODO-AUDIT.md` for current audit state
+2. Filter by priority:
    - MVP blockers
    - High priority items
    - Quick wins (1-2 day effort)
@@ -229,9 +209,6 @@ python3 scripts/todo-audit.py report > reports/audit-$(date +%Y-%m-%d).txt
 
 # Sync with GitHub
 python3 scripts/todo-audit.py sync
-
-# Export to Logseq
-python3 scripts/todo-audit.py export
 ```
 
 ### For QA Engineers
@@ -277,14 +254,12 @@ python3 scripts/todo-audit.py report
 ### Documentation
 - **Main Audit**: [.augment/TODO-AUDIT.md](.augment/TODO-AUDIT.md)
 - **Usage Guide**: [.augment/README-TODO-AUDIT.md](.augment/README-TODO-AUDIT.md)
-- **Logseq Config**: [.augment/logseq/config.edn](.augment/logseq/config.edn)
 
 ### Scripts
 - **Audit Tool**: [scripts/todo-audit.py](scripts/todo-audit.py)
 
 ### External
 - **GitHub Issues**: https://github.com/theinterneti/TTA/issues
-- **Logseq**: https://logseq.com/
 - **GitHub CLI**: https://cli.github.com/
 
 ---
@@ -292,15 +267,11 @@ python3 scripts/todo-audit.py report
 ## 🎉 Next Steps
 
 1. **Review Main Audit**: Open `.augment/TODO-AUDIT.md`
-2. **Set Up Logseq** (Optional but Recommended):
-   - Download: https://logseq.com/
-   - Add graph: `.augment/` directory
-   - Try query blocks
-3. **Run First Audit**:
+2. **Run First Audit**:
    ```bash
    python3 scripts/todo-audit.py report
    ```
-4. **Integrate Into Workflow**:
+3. **Integrate Into Workflow**:
    - Weekly sprint planning
    - Pre-commit checks
    - Release validation
@@ -324,6 +295,3 @@ python3 scripts/todo-audit.py report
 **Last Audit**: 2025-11-01 21:38:11
 **Next Scheduled**: 2025-11-08 (Weekly)
 
-
----
-**Logseq:** [[TTA.dev/Docs/Status/Todo-audit]]
