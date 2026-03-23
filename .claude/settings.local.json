@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/adam/repos/**)",
+      "Read(//home/thein/repos/**)",
+      "Read(//home/**)",
+      "Bash(find /home/adam/Repos/TTA.dev -name *.json -path *mcp*)",
+      "Bash(git:*)",
+      "Bash(uv run:*)",
+      "Bash(wait)",
+      "Bash(od -c .hindsight/banks/session/.gitkeep)",
+      "Bash(python3:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "hindsight",
+    "codegraphcontext",
+    "sequential-thinking",
+    "github"
+  ]
+}
