@@ -69,9 +69,7 @@ def _auto_detect_provider() -> str:
     return "ollama"
 
 
-def _make_ollama_llm(
-    model: str | None, temperature: float, max_tokens: int
-):
+def _make_ollama_llm(model: str | None, temperature: float, max_tokens: int):
     from langchain_openai import ChatOpenAI
 
     model_name = model or os.environ.get("OLLAMA_MODEL", _DEFAULT_OLLAMA_MODEL)
@@ -90,9 +88,7 @@ def _make_ollama_llm(
     )
 
 
-def _make_openrouter_llm(
-    model: str | None, temperature: float, max_tokens: int
-):
+def _make_openrouter_llm(model: str | None, temperature: float, max_tokens: int):
     from langchain_openai import ChatOpenAI
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
