@@ -241,4 +241,3 @@ norecursedirs = archive .git __pycache__ .venv node_modules
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Status/Current-sprint]]

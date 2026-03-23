@@ -364,4 +364,3 @@ After adding your model:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Adding-models-to-registry]]

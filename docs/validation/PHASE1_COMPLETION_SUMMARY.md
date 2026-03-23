@@ -273,4 +273,3 @@ cat docs/validation/PHASE1_VALIDATION_REPORT.md
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Phase1_completion_summary]]

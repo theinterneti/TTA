@@ -228,4 +228,3 @@ Once installation is complete:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Getting-started/Installation]]

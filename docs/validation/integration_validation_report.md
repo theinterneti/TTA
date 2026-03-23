@@ -215,4 +215,3 @@ The TTA Core Gameplay Loop integration is **SUCCESSFUL** and ready for developme
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Integration_validation_report]]

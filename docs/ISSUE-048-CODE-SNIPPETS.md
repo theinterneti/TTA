@@ -228,4 +228,3 @@ For issues during implementation:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issue-048-code-snippets]]

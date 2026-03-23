@@ -128,4 +128,3 @@ All GitLeaks findings were example values in documentation. The repository does 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Security/Gitleaks-remediation-2025-10-01]]

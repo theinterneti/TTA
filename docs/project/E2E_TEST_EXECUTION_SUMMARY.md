@@ -328,4 +328,3 @@ For questions or issues with the E2E test suite:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/E2e_test_execution_summary]]

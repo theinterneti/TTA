@@ -325,4 +325,3 @@ ls -la test-results-staging/
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Readme_e2e_validation]]

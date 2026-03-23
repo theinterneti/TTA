@@ -387,4 +387,3 @@ The TTA MVP E2E test suite is comprehensive and ready for execution. The tests c
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/E2e_testing_report]]

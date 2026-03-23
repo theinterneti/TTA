@@ -389,4 +389,3 @@ The TTA Player Experience application is now ready to provide therapeutic value 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Task_completion_summary]]

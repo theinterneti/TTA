@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/References/GitHub Setup]]
 > - **Path:** `.augment/kb/References/GitHub Setup.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/References/GitHub Setup.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Github/Readme]]

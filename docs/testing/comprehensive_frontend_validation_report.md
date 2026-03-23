@@ -243,4 +243,3 @@ The integration successfully demonstrates how therapeutic text adventures can be
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Comprehensive_frontend_validation_report]]

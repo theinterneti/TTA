@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Extended_evaluation/Simulated_user_profiles]]
 Simulated User Profiles for Extended Session Testing
 
 Provides sophisticated user behavior modeling for realistic testing of

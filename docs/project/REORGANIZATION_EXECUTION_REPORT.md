@@ -375,4 +375,3 @@ The TTA project reorganization has been successfully completed, transforming a c
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Reorganization_execution_report]]

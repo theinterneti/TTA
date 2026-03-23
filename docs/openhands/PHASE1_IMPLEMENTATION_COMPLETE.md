@@ -316,4 +316,3 @@ The OpenHands async enhancement has been successfully implemented with:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Phase1_implementation_complete]]

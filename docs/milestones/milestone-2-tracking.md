@@ -151,4 +151,3 @@ implemented, tested, and validated.
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Milestones/Milestone-2-tracking]]

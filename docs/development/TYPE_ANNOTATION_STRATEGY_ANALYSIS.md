@@ -585,4 +585,3 @@ src.player_experience.services.gameplay_service  # ← CIRCULAR!
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Type_annotation_strategy_analysis]]

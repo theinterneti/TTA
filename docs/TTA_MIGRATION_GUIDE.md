@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/TTA Migration Guide: tta-agent-coordination Package]]
 > - **Path:** `.augment/kb/Workflows/TTA Migration Guide: tta-agent-coordination Package.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/TTA Migration Guide: tta-agent-coordination Package.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tta_migration_guide]]

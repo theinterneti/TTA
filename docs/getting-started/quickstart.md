@@ -295,4 +295,3 @@ Now that you have TTA running:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Getting-started/Quickstart]]

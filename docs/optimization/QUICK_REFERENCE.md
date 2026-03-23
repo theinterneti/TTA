@@ -236,4 +236,3 @@ In workflow file:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Optimization/Quick_reference]]

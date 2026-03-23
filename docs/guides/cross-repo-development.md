@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/Cross-Repository Workflow Guide]]
 > - **Path:** `.augment/kb/Workflows/Cross-Repository Workflow Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Cross-Repository Workflow Guide.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Guides/Cross-repo-development]]

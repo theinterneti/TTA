@@ -416,4 +416,3 @@ When implementing concrete tools, follow this checklist:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tools/Phase3_tool_audit]]

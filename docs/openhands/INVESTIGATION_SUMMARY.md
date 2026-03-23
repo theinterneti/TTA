@@ -145,4 +145,3 @@ The OpenHands integration investigation is **COMPLETE**. The recommended approac
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Investigation_summary]]

@@ -264,4 +264,3 @@ This document provides a high-level summary of the GitHub Project Board automati
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Project_automation_summary]]

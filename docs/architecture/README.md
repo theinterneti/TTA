@@ -78,4 +78,3 @@ src/player_experience
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Architecture/Readme]]

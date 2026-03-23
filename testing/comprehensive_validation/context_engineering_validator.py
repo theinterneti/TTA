@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Comprehensive_validation/Context_engineering_validator]]
 AI Agent Context Engineering Validation System for TTA
 
 This module provides comprehensive validation of context prompt engineering

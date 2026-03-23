@@ -228,4 +228,3 @@ The TTA MVP has been successfully completed with all Phase 1 and Phase 2 feature
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Mvp_completion_summary]]

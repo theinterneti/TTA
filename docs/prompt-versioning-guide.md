@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/Prompt Versioning & Management Guide]]
 > - **Path:** `.augment/kb/Workflows/Prompt Versioning & Management Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Prompt Versioning & Management Guide.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Prompt-versioning-guide]]

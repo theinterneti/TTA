@@ -294,4 +294,3 @@ The Narrative Coherence Validation component has successfully completed the stag
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Staging_promotion_complete]]

@@ -168,4 +168,3 @@ The fix ensures that:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issues/High-002-landing-page-redirect-completed]]

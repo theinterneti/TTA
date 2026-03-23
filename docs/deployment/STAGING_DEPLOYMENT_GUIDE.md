@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/TTA Staging Environment - Deployment Guide]]
 > - **Path:** `.augment/kb/Workflows/TTA Staging Environment - Deployment Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/TTA Staging Environment - Deployment Guide.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Deployment/Staging_deployment_guide]]

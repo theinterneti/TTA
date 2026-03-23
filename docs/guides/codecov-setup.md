@@ -180,4 +180,3 @@ uv sync --all-extras
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Guides/Codecov-setup]]

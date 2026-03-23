@@ -110,4 +110,3 @@ bash scripts/tta-dev.sh logs neo4j  # Just Neo4j
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Dev-environment]]

@@ -179,4 +179,3 @@ If you encounter issues with the Carbon Component, check the following:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Docker/Carbon]]

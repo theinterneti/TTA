@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/Next Steps: Testing Enhanced GitHub Workflows]]
 > - **Path:** `.augment/kb/Workflows/Next Steps: Testing Enhanced GitHub Workflows.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Next Steps: Testing Enhanced GitHub Workflows.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Next-steps]]

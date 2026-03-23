@@ -338,4 +338,3 @@ uvx pytest tests/contracts/ -v
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Model_management_test_plan]]

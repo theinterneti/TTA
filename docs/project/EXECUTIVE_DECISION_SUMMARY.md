@@ -349,4 +349,3 @@ Start Week 1 immediately.
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Executive_decision_summary]]

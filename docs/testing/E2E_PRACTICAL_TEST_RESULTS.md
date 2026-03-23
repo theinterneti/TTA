@@ -364,4 +364,3 @@ The TTA MVP platform has a solid foundation with working authentication and well
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/E2e_practical_test_results]]

@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/References/TTA Development Documentation]]
 > - **Path:** `.augment/kb/References/TTA Development Documentation.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/References/TTA Development Documentation.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Readme]]

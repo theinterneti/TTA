@@ -267,4 +267,3 @@ rm -rf obsolete/
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Reorganization_summary]]

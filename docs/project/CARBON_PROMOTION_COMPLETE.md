@@ -378,4 +378,3 @@ This achievement:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Carbon_promotion_complete]]

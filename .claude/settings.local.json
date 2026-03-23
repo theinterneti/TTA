@@ -9,7 +9,10 @@
       "Bash(uv run:*)",
       "Bash(wait)",
       "Bash(od -c .hindsight/banks/session/.gitkeep)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(uv sync:*)",
+      "Bash(grep -r \"logseq\\\\|Logseq\" --include=*.md --include=*.py --include=*.sh --include=*.json --include=*.yaml --exclude-dir=.git docs/ testing/)",
+      "Bash(grep -r \"logseq\\\\|Logseq\" --include=*.md --include=*.py --include=*.sh --exclude-dir=.git docs/ testing/)"
     ]
   },
   "enabledMcpjsonServers": [

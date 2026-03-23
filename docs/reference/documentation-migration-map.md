@@ -212,11 +212,6 @@ grep -r "search term" .augment/kb/
 find .augment/kb -name "*partial_name*"
 ```
 
-**Strategy 3: Logseq search**
-1. Open Logseq → TTA graph
-2. Press `Ctrl+K` (or `Cmd+K`)
-3. Type document name or content
-
 ### Handling Broken Links
 
 **If you find a broken link:**
@@ -330,4 +325,3 @@ See [Architecture](.augment/kb/TTA___Architecture___Application Architecture.md)
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Reference/Documentation-migration-map]]

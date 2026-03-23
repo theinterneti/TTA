@@ -398,4 +398,3 @@ SKIP=run-tests-on-changed-files git commit -m "message"
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Testing_infrastructure_validation]]

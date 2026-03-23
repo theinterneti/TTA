@@ -257,4 +257,3 @@ Successfully implemented auto-trigger system, workflow extraction, and agent fil
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Optimization/Optimization_report]]

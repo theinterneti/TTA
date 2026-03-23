@@ -324,4 +324,3 @@ The `MUTATION_TESTING_GUIDE.md` should be updated with:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Mutation_testing_resolution]]

@@ -341,4 +341,3 @@ gh pr merge 99 --squash --delete-branch
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Quick_start]]

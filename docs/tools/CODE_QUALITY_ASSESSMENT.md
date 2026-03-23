@@ -390,4 +390,3 @@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tools/Code_quality_assessment]]

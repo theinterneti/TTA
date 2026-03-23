@@ -958,4 +958,3 @@ pact = Consumer('Frontend').has_pact_with(
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Advanced_testing_methodology]]

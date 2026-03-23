@@ -187,4 +187,3 @@ The previous hierarchical structure with TTA.prototype/.env and TTA.dev/.env has
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Env_structure]]

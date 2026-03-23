@@ -276,4 +276,3 @@ For issues or questions:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Github_integration]]

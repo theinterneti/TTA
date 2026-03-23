@@ -195,4 +195,3 @@ If you also use Claude Desktop, you can add NotebookLM there too:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Mcp-servers]]

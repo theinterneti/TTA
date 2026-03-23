@@ -382,4 +382,3 @@ All implemented fixes and improvements are working as expected. The application 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Final_validation_report]]

@@ -214,4 +214,3 @@ This document outlines a comprehensive testing strategy for TTA's single-player 
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Single_player_comprehensive_test_plan]]

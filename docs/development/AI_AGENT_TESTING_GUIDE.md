@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/AI Agent Testing Guide]]
 > - **Path:** `.augment/kb/Workflows/AI Agent Testing Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/AI Agent Testing Guide.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Ai_agent_testing_guide]]

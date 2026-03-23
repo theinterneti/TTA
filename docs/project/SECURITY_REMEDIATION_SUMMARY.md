@@ -194,4 +194,3 @@ Each commit will require user confirmation before execution.
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Security_remediation_summary]]

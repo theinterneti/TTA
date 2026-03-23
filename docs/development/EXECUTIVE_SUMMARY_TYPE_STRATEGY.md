@@ -390,4 +390,3 @@ src.player_experience.services.gameplay_service  # ← CIRCULAR!
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Executive_summary_type_strategy]]

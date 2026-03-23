@@ -511,4 +511,3 @@ class NGAAdapter:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Decisions/Openhands-critical-analysis]]

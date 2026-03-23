@@ -263,4 +263,3 @@ Identification of differences between documented requirements and actual system 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Master-glossary]]

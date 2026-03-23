@@ -174,4 +174,3 @@ Resolve CRITICAL-001 to unblock remaining tests and enable full E2E validation.
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/E2e-validation-status-update]]

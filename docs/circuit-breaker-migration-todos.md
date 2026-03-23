@@ -2,7 +2,6 @@
 
 **Status:** In progress
 **Created:** 2026-03-04
-**Logseq:** [[TTA.dev/Docs/Circuit_breaker_migration_todos]]
 
 ---
 
@@ -309,4 +308,3 @@ Next steps for this follow-up:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Circuit-breaker-migration-todos]]

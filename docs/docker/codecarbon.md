@@ -209,4 +209,3 @@ For more information about CodeCarbon, see the [official documentation](https://
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Docker/Codecarbon]]

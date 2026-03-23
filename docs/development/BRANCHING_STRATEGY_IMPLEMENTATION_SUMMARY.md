@@ -275,4 +275,3 @@ The three-tier branching strategy is fully implemented and ready for use. All ph
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Branching_strategy_implementation_summary]]

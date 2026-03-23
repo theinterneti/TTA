@@ -237,4 +237,3 @@ The TTA Docker environment is fully prepared for MCP server integration. All dat
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Integration/Mcp_verification_report]]

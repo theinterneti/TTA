@@ -520,4 +520,3 @@ The TTA Player Experience application has successfully completed comprehensive v
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Production_readiness_assessment]]

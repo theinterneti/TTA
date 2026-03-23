@@ -389,4 +389,3 @@ The coverage discrepancy (59.11% vs reported 70.3%) should be investigated durin
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Narrative_arc_orchestrator_promotion_final_summary]]

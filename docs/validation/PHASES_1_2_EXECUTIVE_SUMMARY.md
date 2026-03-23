@@ -280,4 +280,3 @@ We've successfully:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Phases_1_2_executive_summary]]

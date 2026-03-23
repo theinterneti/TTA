@@ -339,4 +339,3 @@ For questions or issues, refer to the [pre-commit documentation](https://pre-com
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Pre_commit_hooks]]

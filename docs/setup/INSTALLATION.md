@@ -198,4 +198,3 @@ After installation, you can:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Installation]]

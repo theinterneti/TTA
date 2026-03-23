@@ -292,4 +292,3 @@ The TTA staging environment authentication issues have been successfully resolve
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Staging_validation_final_report]]

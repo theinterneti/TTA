@@ -120,4 +120,3 @@ Moving on to HIGH-002 (Landing page redirect) to maintain progress on other crit
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issues/Critical-001-session-persistence-investigation]]

@@ -302,4 +302,3 @@ The integration provides several extension points for future development:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Integration/Gameplay_loop_integration]]

@@ -256,4 +256,3 @@ This traceability matrix maps user journey requirements to specific system compo
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Traceability-matrix]]

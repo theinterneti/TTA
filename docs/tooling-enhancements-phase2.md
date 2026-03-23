@@ -531,4 +531,3 @@ Phase 2 enhancements successfully implemented:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tooling-enhancements-phase2]]

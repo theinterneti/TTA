@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Load_tests/Locustfile]]
 TTA Home Lab Load Testing Configuration
 Comprehensive load testing for multi-user scenarios and performance validation
 """

@@ -122,4 +122,3 @@ This allows for repository-specific overrides while maintaining common infrastru
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Environment_variables]]

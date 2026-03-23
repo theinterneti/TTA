@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/GitHub Actions Workflow Review: Component Status Reporting]]
 > - **Path:** `.augment/kb/Workflows/GitHub Actions Workflow Review: Component Status Reporting.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/GitHub Actions Workflow Review: Component Status Reporting.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Github_workflow_review_and_recommendations]]

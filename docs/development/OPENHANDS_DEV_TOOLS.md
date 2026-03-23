@@ -40,4 +40,3 @@ These tools support the OpenHands integration workflow:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Openhands_dev_tools]]

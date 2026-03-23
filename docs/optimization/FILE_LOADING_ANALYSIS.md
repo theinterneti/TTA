@@ -197,4 +197,3 @@ The 74,207 character count suggests the system is loading:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Optimization/File_loading_analysis]]

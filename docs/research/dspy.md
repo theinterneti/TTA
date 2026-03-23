@@ -197,4 +197,3 @@ By embracing its programming-centric philosophy and leveraging its optimization 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Research/Dspy]]

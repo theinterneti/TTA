@@ -232,4 +232,3 @@ temperature = model_config["recommended_config"]["temperature"]
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Ai-framework/Models/Model-testing]]

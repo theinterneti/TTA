@@ -315,4 +315,3 @@ Based on current architecture analysis:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tools/Phase3_recommendation]]

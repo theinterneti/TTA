@@ -303,4 +303,3 @@ This gap analysis compares the documented user journey requirements with the dem
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Gap-analysis]]

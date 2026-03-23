@@ -432,4 +432,3 @@ This optimization successfully eliminated redundant tooling while maintaining (a
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tooling-optimization-summary]]

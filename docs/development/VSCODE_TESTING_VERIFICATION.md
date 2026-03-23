@@ -286,4 +286,3 @@ After completing all verification steps, confirm:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Vscode_testing_verification]]

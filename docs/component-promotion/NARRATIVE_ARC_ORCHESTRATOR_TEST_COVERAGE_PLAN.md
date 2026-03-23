@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Components/Narrative Arc Orchestrator - Test Coverage Improvement Plan]]
 > - **Path:** `.augment/kb/Components/Narrative Arc Orchestrator - Test Coverage Improvement Plan.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Narrative Arc Orchestrator - Test Coverage Improvement Plan.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Component-promotion/Narrative_arc_orchestrator_test_coverage_plan]]

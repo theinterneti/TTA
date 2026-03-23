@@ -160,4 +160,3 @@ The TTA staging environment is **partially ready for production**. Responsive de
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Staging-readiness-assessment]]

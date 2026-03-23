@@ -556,4 +556,3 @@ print(result["stdout"])
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Tool-configuration-research]]

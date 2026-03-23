@@ -543,4 +543,3 @@ def my_callback(callback_context: CallbackContext):
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Google-adk-reference]]

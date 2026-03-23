@@ -132,4 +132,3 @@ These tools will benefit every developer working on TTA and establish profession
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Pr-consolidation/Pr9_closure_message]]

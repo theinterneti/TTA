@@ -150,4 +150,3 @@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Mutation_testing_quick_reference]]

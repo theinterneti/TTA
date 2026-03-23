@@ -88,4 +88,3 @@ Ready to proceed to Task 13.2 (Database Integration Validation).
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Task_13_1_dependency_resolution_summary]]

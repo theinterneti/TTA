@@ -207,4 +207,3 @@ The TTA Comprehensive Simulation Testing Framework is now:
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Simulation/Implementation_complete]]

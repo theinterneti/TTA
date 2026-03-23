@@ -356,4 +356,3 @@ With Priority 1 complete, the following Priority 2 tasks are ready for implement
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Priority_1_implementation_summary]]

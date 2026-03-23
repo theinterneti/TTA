@@ -346,4 +346,3 @@ Everything is set up and ready to use. Start with Phase 1 and work your way thro
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Guides/Advanced-testing]]

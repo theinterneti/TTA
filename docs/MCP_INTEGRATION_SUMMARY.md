@@ -317,4 +317,3 @@ tools:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Mcp_integration_summary]]

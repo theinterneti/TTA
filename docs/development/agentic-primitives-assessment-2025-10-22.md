@@ -253,4 +253,3 @@ TTA has **excellent infrastructure primitives** but is **missing AI-agent guidan
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-assessment-2025-10-22]]

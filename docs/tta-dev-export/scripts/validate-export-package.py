@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 
-# Logseq: [[TTA.dev/Docs/Tta-dev-export/Scripts/Validate-export-package]]
 Validation script for Universal Agent Context System export package.
 
 This script validates:

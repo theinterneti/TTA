@@ -330,4 +330,3 @@ Ask AI agent:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Next_steps_summary]]

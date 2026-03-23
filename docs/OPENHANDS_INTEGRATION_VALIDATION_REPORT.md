@@ -186,4 +186,3 @@ All validation tests have passed successfully. The OpenHands Docker integration 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands_integration_validation_report]]

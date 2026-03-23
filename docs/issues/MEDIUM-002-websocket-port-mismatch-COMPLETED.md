@@ -162,4 +162,3 @@ The WebSocket service now correctly connects to the API endpoint on port 8081, n
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issues/Medium-002-websocket-port-mismatch-completed]]

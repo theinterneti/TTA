@@ -137,4 +137,3 @@ The TTA project filesystem and Docker configurations have been successfully opti
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Operations/Filesystem_optimization_report]]

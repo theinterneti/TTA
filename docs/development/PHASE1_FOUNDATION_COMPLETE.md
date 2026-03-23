@@ -164,4 +164,3 @@ docs/development/
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Phase1_foundation_complete]]

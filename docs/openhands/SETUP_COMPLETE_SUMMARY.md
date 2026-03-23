@@ -308,4 +308,3 @@ You can now:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Setup_complete_summary]]

@@ -175,4 +175,3 @@ The logout functionality is fully implemented and tested. All components work to
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Logout_implementation_summary]]

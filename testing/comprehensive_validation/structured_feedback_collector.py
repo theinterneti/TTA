@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Comprehensive_validation/Structured_feedback_collector]]
 Structured User Feedback Collection System for TTA
 
 This module provides comprehensive collection and analysis of structured

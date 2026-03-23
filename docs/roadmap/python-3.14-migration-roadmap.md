@@ -160,4 +160,3 @@ This roadmap outlines the comprehensive plan for migrating TTA to Python 3.14 an
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Roadmap/Python-3.14-migration-roadmap]]

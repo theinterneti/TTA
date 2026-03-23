@@ -597,4 +597,3 @@ For more information, see:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Github_project_automation]]

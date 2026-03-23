@@ -305,4 +305,3 @@ Should we enhance our development infrastructure before starting the 16-week hyb
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Pre_rebuild_decision_summary]]

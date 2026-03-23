@@ -302,4 +302,3 @@ The Carbon component has met all maturity criteria and is hereby promoted from D
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Carbon_staging_promotion]]

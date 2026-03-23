@@ -332,4 +332,3 @@ When creating GitHub issues:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Memory_system_packaging_roadmap]]

@@ -267,4 +267,3 @@ See `validation_results.json` for complete test data including:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Phase1_validation_report]]

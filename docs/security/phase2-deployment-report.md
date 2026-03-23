@@ -317,4 +317,3 @@ The TTA project is now ready for production deployment of Phase 2 security updat
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Security/Phase2-deployment-report]]

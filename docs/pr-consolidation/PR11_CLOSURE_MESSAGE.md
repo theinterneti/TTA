@@ -98,4 +98,3 @@ These frameworks will guide therapeutic content creation and ensure clinical val
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Pr-consolidation/Pr11_closure_message]]

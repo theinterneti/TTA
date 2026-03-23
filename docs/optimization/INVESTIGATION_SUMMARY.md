@@ -251,4 +251,3 @@ docs/optimization/
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Optimization/Investigation_summary]]

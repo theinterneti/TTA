@@ -112,4 +112,3 @@ When contributing to packages, ensure:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Packages/Overview]]

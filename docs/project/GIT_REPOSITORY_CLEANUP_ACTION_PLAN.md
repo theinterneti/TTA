@@ -577,4 +577,3 @@ git push origin main --force-with-lease
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Git_repository_cleanup_action_plan]]

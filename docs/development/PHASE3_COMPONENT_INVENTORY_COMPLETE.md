@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Components/Archived: Phase 3: Component Inventory - Completion Report]]
 > - **Path:** `.augment/kb/Components/Archived: Phase 3: Component Inventory - Completion Report.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Archived: Phase 3: Component Inventory - Completion Report.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Phase3_component_inventory_complete]]

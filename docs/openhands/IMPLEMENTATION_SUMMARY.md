@@ -291,4 +291,3 @@ Copilot can suggest creating OpenHands tasks:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Implementation_summary]]

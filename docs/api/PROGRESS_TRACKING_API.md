@@ -267,4 +267,3 @@ For issues or questions about the Progress Tracking API, please contact support@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Api/Progress_tracking_api]]

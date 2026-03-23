@@ -381,4 +381,3 @@ category: global
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-current-session]]

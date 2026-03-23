@@ -227,4 +227,3 @@ By carefully considering these strategies, recommendations, and final points, de
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Research/Agent memory]]

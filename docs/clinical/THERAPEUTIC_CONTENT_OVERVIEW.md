@@ -44,4 +44,3 @@ For more detailed content documentation specific to each component:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Clinical/Therapeutic_content_overview]]

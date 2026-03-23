@@ -72,4 +72,3 @@ None
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tta-dev-setup/.github/Pull_request_template]]

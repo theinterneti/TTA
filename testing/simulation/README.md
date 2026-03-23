@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Testing/TTA Comprehensive Simulation Testing Framework]]
 > - **Path:** `.augment/kb/Testing/TTA Comprehensive Simulation Testing Framework.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Testing/TTA Comprehensive Simulation Testing Framework.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Simulation/Readme]]

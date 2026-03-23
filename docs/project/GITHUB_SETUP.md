@@ -71,4 +71,3 @@ git push
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Github_setup]]

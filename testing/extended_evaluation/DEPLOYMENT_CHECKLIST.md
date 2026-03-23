@@ -244,4 +244,3 @@ python -c "import yaml; yaml.safe_load(open('testing/configs/production_extended
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Extended_evaluation/Deployment_checklist]]

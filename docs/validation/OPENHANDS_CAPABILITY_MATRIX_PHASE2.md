@@ -273,4 +273,3 @@ We've successfully expanded model coverage and identified a robust rotation stra
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Openhands_capability_matrix_phase2]]
