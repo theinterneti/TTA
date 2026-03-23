@@ -7,6 +7,18 @@ Claude Code is the **primary/main agent** for this repository.
 **Therapeutic Text Adventure (TTA)** — AI-powered narrative game for mental health support.
 Multi-agent pipeline: `User Input → IPA → WBA → NGA → SSE Stream → Player`.
 
+## Session Protocol
+
+**Every session begins with memory recall:**
+1. `mcp__hindsight__recall` — query `adam-global` for durable directives and cross-project patterns
+2. `mcp__hindsight__recall` — query the current derived `project-*` or `workspace-*` bank for TTA-specific context
+
+**Every significant task ends with a retain (choose the right bank):**
+- Cross-project patterns, reusable workflow insights → `adam-global`
+- TTA-specific decisions, commands, failure lessons → current derived `project-*`/`workspace-*` bank
+
+MCP server: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hindsight-local-mcp`
+
 ## Non-Negotiable Standards
 
 | Constraint | Rule |
@@ -76,13 +88,14 @@ tests/                  # pytest suite (unit/, integration/, e2e/)
 - **Agents**: IPA (Input Processing), WBA (World Building), NGA (Narrative Generation).
 - **Safety**: Dual safety systems — Crisis Detection (4-level) + Emotional Safety (5-level).
 
-## Known Issues (Fix via `remediation_plan.md`)
+## Known Issues
 
-1. **Ruff**: 16 lint errors (15 auto-fixable): UP043 unnecessary type args, PT028, I001.
-2. **Pyright**: 5 type errors in `state_validator.py`, `character_development_system.py`,
-   `error_recovery_manager.py`, `player_experience_uow.py`.
-3. **Pydantic v2**: Some validators still use v1 `@validator` style — tracked in issue #117.
-4. **Deprecations**: `asyncio.DefaultEventLoopPolicy` usage slated for removal in Python 3.16.
+Quality gate is currently clean — see `remediation_plan.md` for historical issues (all resolved as of 2026-03-06).
+
+Remaining upstream warnings (not actionable by TTA):
+- `langchain_core` Pydantic v1 compatibility (upstream)
+- `torch/cuda` pynvml deprecation (upstream)
+- `asyncio.DefaultEventLoopPolicy` in `packages/tta-narrative-engine/` (separate package, out of TTA src/ scope)
 
 ## Agent Roster
 
