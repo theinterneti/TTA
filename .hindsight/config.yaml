@@ -1,0 +1,52 @@
+# TTA Hindsight Memory Configuration
+# Docs: https://github.com/hindsight-ai/hindsight-api
+# Reference: /home/adam/Repos/TTA.dev/.hindsight/config.yaml
+#
+# NOTE:
+# This file describes the older repo-local, file-based Hindsight layout.
+# The live runtime used in active sessions is API-backed and follows a
+# different bank model:
+#   - global durable bank:     adam-global
+#   - repo/workspace context:  derived project-* or workspace-* bank
+# Keep that distinction in mind when reading or extending this config.
+
+version: "1.0"
+
+# Memory banks (file-based reference layout)
+banks:
+  - name: tta
+    path: banks/tta
+    persistent: true
+    description: "TTA architectural decisions, patterns, and learnings (file-based reference)"
+    categories:
+      - implementation-failures
+      - successful-patterns
+      - architectural-decisions
+
+  - name: session
+    path: banks/session
+    persistent: false
+    description: "Current session work-in-progress"
+
+# Semantic indexing (from TTA.dev reference config)
+indexing:
+  enabled: true
+  embedding_model: "text-embedding-3-small"
+  chunk_size: 1000
+  chunk_overlap: 200
+  watch_enabled: false
+  watch_interval_seconds: 300
+
+# Retrieval settings
+retrieval:
+  max_results: 10
+  similarity_threshold: 0.7
+  include_metadata: true
+  recency_weight: 0.2
+
+# Agent integration
+agents:
+  auto_load_on_start: true
+  share_session_memories: true
+  sync_interval_minutes: 5
+  sub_agent_memory_scope: workflow
