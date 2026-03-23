@@ -310,4 +310,3 @@ DevOps Actions:
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Devops-engineer.chatmode]]

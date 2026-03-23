@@ -326,4 +326,3 @@ class PlayerAction(BaseModel):
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Api-gateway-engineer.chatmode]]

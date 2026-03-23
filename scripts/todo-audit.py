@@ -3,7 +3,6 @@
 TTA TODO & GitHub Issue Audit Script
 
 This script provides intelligent management of TODOs and GitHub issues:
-- Syncs GitHub issues to Logseq format
 - Scans codebase for TODO comments
 - Generates status reports
 - Identifies stale/orphaned TODOs
@@ -71,7 +70,6 @@ class TODOAuditor:
     def __init__(self, repo_root: Path):
         self.repo_root = repo_root
         self.audit_file = repo_root / ".augment" / "TODO-AUDIT.md"
-        self.logseq_dir = repo_root / ".augment" / "logseq"
 
         # TODO patterns to match
         self.todo_patterns = [
@@ -248,102 +246,6 @@ class TODOAuditor:
             stats=stats,
         )
 
-    def export_to_logseq(self, report: AuditReport):
-        """Export audit report to Logseq format."""
-        self.logseq_dir.mkdir(parents=True, exist_ok=True)
-
-        # Create pages directory
-        pages_dir = self.logseq_dir / "pages"
-        pages_dir.mkdir(exist_ok=True)
-
-        # Generate issue pages
-        for issue in report.github_issues:
-            if issue.state == "OPEN":
-                self._create_issue_page(pages_dir, issue, report.code_todos)
-
-        # Generate TODO summary page
-        self._create_todo_summary_page(pages_dir, report)
-
-    def _create_issue_page(
-        self, pages_dir: Path, issue: GitHubIssue, todos: list[CodeTODO]
-    ):
-        """Create a Logseq page for a GitHub issue."""
-        page_name = f"Issue-{issue.number}"
-        page_file = pages_dir / f"{page_name}.md"
-
-        # Find related TODOs
-        related_todos = [t for t in todos if t.github_issue == issue.number]
-
-        content = f"""---
-title: Issue #{issue.number}: {issue.title}
-tags: {", ".join(f"#{label}" for label in issue.labels)}
-github-issue: {issue.number}
-state: {issue.state}
-url: {issue.url}
----
-
-# Issue #{issue.number}: {issue.title}
-
-## Details
-- **State**: {issue.state}
-- **Labels**: {", ".join(issue.labels)}
-- **URL**: {issue.url}
-
-## Description
-{issue.body or "No description provided"}
-
-## Related Code TODOs
-"""
-
-        if related_todos:
-            for todo in related_todos:
-                content += (
-                    f"- TODO [[{todo.file_path}:{todo.line_number}]]: {todo.content}\n"
-                )
-        else:
-            content += "*No related TODOs found in codebase*\n"
-
-        with open(page_file, "w") as f:
-            f.write(content)
-
-    def _create_todo_summary_page(self, pages_dir: Path, report: AuditReport):
-        """Create a summary page of all TODOs."""
-        page_file = pages_dir / "TODO-Summary.md"
-
-        content = f"""---
-title: TODO Summary
-updated: {report.timestamp.isoformat()}
----
-
-# TODO Summary
-
-Generated: {report.timestamp.strftime("%Y-%m-%d %H:%M:%S")}
-
-## Statistics
-- **Total GitHub Issues**: {report.stats["total_github_issues"]}
-- **Open GitHub Issues**: {report.stats["open_github_issues"]}
-- **Code TODOs**: {report.stats["total_code_todos"]}
-- **Orphaned TODOs**: {report.stats["orphaned_todos"]}
-
-## TODOs by Priority
-"""
-        for priority, count in sorted(report.stats["todos_by_priority"].items()):
-            content += f"- **{priority.title()}**: {count}\n"
-
-        content += "\n## TODOs by Category\n"
-        for category, count in sorted(report.stats["todos_by_category"].items()):
-            content += f"- **{category.title()}**: {count}\n"
-
-        # Add orphaned TODOs section
-        if report.orphaned_todos:
-            content += "\n## ⚠️ Orphaned TODOs\n"
-            content += "*TODOs referencing closed or non-existent issues*\n\n"
-            for todo in report.orphaned_todos:
-                content += f"- [[{todo.file_path}:{todo.line_number}]]: {todo.content} (refs #[[Issue-{todo.github_issue}]])\n"
-
-        with open(page_file, "w") as f:
-            f.write(content)
-
     def _is_text_file(self, path: Path) -> bool:
         """Check if file is likely a text file."""
         text_extensions = {
@@ -433,12 +335,12 @@ def main():
     parser = argparse.ArgumentParser(description="TTA TODO & GitHub Issue Audit Tool")
     parser.add_argument(
         "command",
-        choices=["sync", "scan", "report", "orphans", "export"],
+        choices=["sync", "scan", "report", "orphans"],
         help="Command to execute",
     )
     parser.add_argument(
         "--format",
-        choices=["text", "json", "logseq"],
+        choices=["text", "json"],
         default="text",
         help="Output format",
     )
@@ -472,11 +374,6 @@ def main():
             report.stats["issues_by_label"].items(), key=lambda x: x[1], reverse=True
         )[:5]:
             pass
-
-    elif args.command == "export":
-        report = auditor.generate_report()
-        auditor.export_to_logseq(report)
-
 
 if __name__ == "__main__":
     main()

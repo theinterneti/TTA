@@ -316,4 +316,3 @@ def validate_coherence(
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Narrative-engine-developer.chatmode]]

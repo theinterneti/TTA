@@ -265,4 +265,3 @@ When using this mode, verify:
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Therapeutic-safety-auditor.chatmode]]

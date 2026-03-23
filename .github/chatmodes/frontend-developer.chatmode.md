@@ -337,4 +337,3 @@ Developer Actions:
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Frontend-developer.chatmode]]
