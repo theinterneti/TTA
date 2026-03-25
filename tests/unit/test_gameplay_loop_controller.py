@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -32,14 +33,15 @@ if sys.version_info < (3, 14):
     from src.components.gameplay_loop.models.interactions import GameplaySession
 else:
     # Dummy imports for Python 3.14+
-    Choice = None  # type: ignore[misc,assignment]
-    ChoiceType = None  # type: ignore[misc,assignment]
-    ConsequenceSet = None  # type: ignore[misc,assignment]
-    EmotionalState = None  # type: ignore[misc,assignment]
-    Scene = None  # type: ignore[misc,assignment]
-    SceneType = None  # type: ignore[misc,assignment]
-    SessionState = None  # type: ignore[misc,assignment]
-    GameplaySession = None  # type: ignore[misc,assignment]
+    _dummy = object()
+    Choice = SimpleNamespace  # type: ignore[misc,assignment]
+    ChoiceType = SimpleNamespace(NARRATIVE=_dummy)  # type: ignore[misc,assignment]
+    ConsequenceSet = SimpleNamespace  # type: ignore[misc,assignment]
+    EmotionalState = SimpleNamespace(CALM=_dummy)  # type: ignore[misc,assignment]
+    Scene = SimpleNamespace  # type: ignore[misc,assignment]
+    SceneType = SimpleNamespace(INTRODUCTION=_dummy)  # type: ignore[misc,assignment]
+    SessionState = SimpleNamespace  # type: ignore[misc,assignment]
+    GameplaySession = SimpleNamespace  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Factory helpers

@@ -10,7 +10,6 @@ a clean interface for API endpoints.
 
 import asyncio
 import logging
-from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -48,6 +47,9 @@ class GameplayService:
             if not gameplay_component:
                 logger.error("GameplayLoopComponent not found in orchestrator")
                 return
+            narrative_orchestrator = orchestrator.components.get(
+                "narrative_arc_orchestrator"
+            )
 
             # Start the component if controller not yet initialized
             # Run in executor to avoid event loop conflict (component.start() uses run_until_complete)
@@ -83,6 +85,7 @@ class GameplayService:
                 gameplay_component=gameplay_component,  # type: ignore[arg-type]
                 agent_orchestration=agent_orchestration,
                 safety_service=safety_service,
+                narrative_orchestrator=narrative_orchestrator,  # type: ignore[arg-type]
             )
 
             self._initialized = True
@@ -236,52 +239,9 @@ class GameplayService:
         if not self._integration:
             return {"error": "Gameplay service not available", "code": "SERVICE_ERROR"}
 
-        try:
-            # Authenticate user first
-            from ..api.auth import AuthenticationError, verify_token
-
-            try:
-                token_data = verify_token(auth_token)
-                user_id = token_data.player_id or token_data.username
-
-                if not user_id:
-                    return {"error": "Invalid user information", "code": "AUTH_ERROR"}
-
-            except AuthenticationError as e:
-                return {
-                    "error": f"Authentication failed: {str(e)}",
-                    "code": "AUTH_ERROR",
-                }
-
-            # Verify session ownership
-            session_status = (
-                await self._integration.gameplay_component.get_session_status(
-                    session_id
-                )
-            )
-            if not session_status:
-                return {"error": "Session not found", "code": "SESSION_NOT_FOUND"}
-
-            if session_status.get("user_id") != user_id:
-                return {"error": "Session access denied", "code": "ACCESS_DENIED"}
-
-            # Pause the session
-            success = await self._integration.gameplay_component.pause_session(
-                session_id
-            )
-
-            if not success:
-                return {"error": "Failed to pause session", "code": "SESSION_ERROR"}
-
-            return {
-                "success": True,
-                "session_id": session_id,
-                "paused_at": datetime.now(UTC).isoformat(),
-            }
-
-        except Exception as e:
-            logger.error(f"Failed to pause session: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+        return await self._integration.pause_session_with_auth(
+            session_id=session_id, auth_token=auth_token
+        )
 
     async def resume_session(self, session_id: str, auth_token: str) -> dict[str, Any]:
         """
@@ -299,50 +259,6 @@ class GameplayService:
         if not self._integration:
             return {"error": "Gameplay service not available", "code": "SERVICE_ERROR"}
 
-        try:
-            # Authenticate user first
-            from ..api.auth import AuthenticationError, verify_token
-
-            try:
-                token_data = verify_token(auth_token)
-                user_id = token_data.player_id or token_data.username
-
-                if not user_id:
-                    return {"error": "Invalid user information", "code": "AUTH_ERROR"}
-
-            except AuthenticationError as e:
-                return {
-                    "error": f"Authentication failed: {str(e)}",
-                    "code": "AUTH_ERROR",
-                }
-
-            # Verify session ownership before resuming
-            session_status = (
-                await self._integration.gameplay_component.get_session_status(
-                    session_id
-                )
-            )
-            if not session_status:
-                return {"error": "Session not found", "code": "SESSION_NOT_FOUND"}
-
-            if session_status.get("user_id") != user_id:
-                return {"error": "Session access denied", "code": "ACCESS_DENIED"}
-
-            # Resume the session
-            session_data = await self._integration.gameplay_component.resume_session(
-                session_id
-            )
-
-            if not session_data:
-                return {"error": "Failed to resume session", "code": "SESSION_ERROR"}
-
-            return {
-                "success": True,
-                "session_id": session_id,
-                "session_data": session_data,
-                "resumed_at": datetime.now(UTC).isoformat(),
-            }
-
-        except Exception as e:
-            logger.error(f"Failed to resume session: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+        return await self._integration.resume_session_with_auth(
+            session_id=session_id, auth_token=auth_token
+        )

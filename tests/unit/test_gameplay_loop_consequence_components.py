@@ -8,6 +8,7 @@ No external services are required; all three components are template-based.
 from __future__ import annotations
 
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -37,7 +38,21 @@ if sys.version_info < (3, 14):
         TherapeuticContext,
     )
     from src.components.gameplay_loop.models.interactions import UserChoice
-from src.components.gameplay_loop.models.progress import ProgressType
+    from src.components.gameplay_loop.models.progress import ProgressType
+else:
+    _dummy = object()
+    CausalityExplainer = SimpleNamespace  # type: ignore[misc,assignment]
+    ProgressTracker = SimpleNamespace  # type: ignore[misc,assignment]
+    TherapeuticFramer = SimpleNamespace  # type: ignore[misc,assignment]
+    ChoiceType = SimpleNamespace(THERAPEUTIC=_dummy)  # type: ignore[misc,assignment]
+    ConsequenceSet = SimpleNamespace  # type: ignore[misc,assignment]
+    EmotionalState = SimpleNamespace(CALM=_dummy)  # type: ignore[misc,assignment]
+    Scene = SimpleNamespace  # type: ignore[misc,assignment]
+    SceneType = SimpleNamespace(THERAPEUTIC=_dummy)  # type: ignore[misc,assignment]
+    SessionState = SimpleNamespace  # type: ignore[misc,assignment]
+    TherapeuticContext = SimpleNamespace  # type: ignore[misc,assignment]
+    UserChoice = SimpleNamespace  # type: ignore[misc,assignment]
+    ProgressType = SimpleNamespace  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -349,9 +364,7 @@ class TestExplainCausality:
         result = await explainer.explain_causality(
             uc, _make_outcomes(), _make_scene(), _make_session(EmotionalState.CALM)
         )
-        assert not result.lower().startswith(
-            "gently"
-        )
+        assert not result.lower().startswith("gently")
         assert not result.lower().startswith("naturally")
 
     async def test_anxious_state_prefixes_naturally(self, explainer):

@@ -1,12 +1,14 @@
 # TTA.dev Integration Specifications
 
+**Last Updated:** 2026-03-23
+
 Boundary contracts defining how TTA components use TTA.dev primitives.
 
 | Spec | Topic | Status |
 |---|---|---|
-| `primitive-mapping.md` | Primitive dependency map per component | ❌ Not started |
-| `circuit-breaker-usage.md` | Circuit breaker delegation contract | ❌ Not started |
-| `observability-boundary.md` | TTA vs TTA.dev observability split | ❌ Not started |
+| `primitive-mapping.md` | Primitive dependency map per component | ✅ Drafted |
+| `circuit-breaker-usage.md` | Circuit breaker delegation contract | ✅ Drafted |
+| `observability-boundary.md` | TTA vs TTA.dev observability split | ✅ Drafted |
 
 ## Boundary Rule
 

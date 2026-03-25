@@ -1,13 +1,15 @@
 # Agent Specifications
 
+**Last Updated:** 2026-03-23
+
 Behavioral contracts for TTA's core agents.
 
 | Spec | Agent | Status |
 |---|---|---|
-| `ipa-input-processing-agent.md` | Input Processing Agent (IPA) | ❌ Not started |
-| `wba-world-building-agent.md` | World Building Agent (WBA) | ❌ Not started |
-| `nga-narrative-generator-agent.md` | Narrative Generator Agent (NGA) | ❌ Not started |
-| `agent-orchestration-protocol.md` | IPA → WBA → NGA coordination | ❌ Not started |
+| `ipa-input-processing-agent.md` | Input Processing Agent (IPA) | ✅ Drafted |
+| `wba-world-building-agent.md` | World Building Agent (WBA) | ✅ Drafted |
+| `nga-narrative-generator-agent.md` | Narrative Generator Agent (NGA) | ✅ Drafted |
+| `agent-orchestration-protocol.md` | IPA → WBA → NGA coordination | ✅ Drafted |
 
 ## Code References
 

@@ -71,19 +71,27 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         # Should have original concerns plus extracted ones
         assert "work stress" in enhanced_profile.primary_concerns
         assert "anxiety" in enhanced_profile.primary_concerns  # From anxious trait
-        assert "perfectionism" in enhanced_profile.primary_concerns  # From perfectionist trait
+        assert (
+            "perfectionism" in enhanced_profile.primary_concerns
+        )  # From perfectionist trait
 
         # Should have comfort zones from values and traits
         assert "nature" in enhanced_profile.comfort_zones
         assert "learning" in enhanced_profile.comfort_zones
-        assert "learning and growth" in enhanced_profile.comfort_zones  # From education value
+        assert (
+            "learning and growth" in enhanced_profile.comfort_zones
+        )  # From education value
 
         # Should have challenge areas
         assert "perfectionism" in enhanced_profile.challenge_areas
-        assert "stress management" in enhanced_profile.challenge_areas  # From anxious trait
+        assert (
+            "stress management" in enhanced_profile.challenge_areas
+        )  # From anxious trait
 
         # Should have coping strategies
-        assert "social support" in enhanced_profile.coping_strategies  # From empathetic trait
+        assert (
+            "social support" in enhanced_profile.coping_strategies
+        )  # From empathetic trait
         assert "planning" in enhanced_profile.coping_strategies  # From organized trait
 
         # Should have generated therapeutic goals
@@ -102,10 +110,19 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
 
         assert context.character_id == self.test_character.character_id
         assert context.character_name == self.test_character.name
-        assert context.personality_traits == self.test_character.background.personality_traits
+        assert (
+            context.personality_traits
+            == self.test_character.background.personality_traits
+        )
         assert context.core_values == self.test_character.background.core_values
-        assert context.preferred_intensity == self.test_character.therapeutic_profile.preferred_intensity
-        assert context.readiness_level == self.test_character.therapeutic_profile.readiness_level
+        assert (
+            context.preferred_intensity
+            == self.test_character.therapeutic_profile.preferred_intensity
+        )
+        assert (
+            context.readiness_level
+            == self.test_character.therapeutic_profile.readiness_level
+        )
 
         # Should extract life experiences
         assert len(context.life_experiences) > 0
@@ -313,7 +330,9 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         assert "planning" in insights["coping_strategies"]
 
         # Should extract comfort zones from core values
-        assert "learning and growth" in insights["comfort_zones"]  # From education value
+        assert (
+            "learning and growth" in insights["comfort_zones"]
+        )  # From education value
 
     def test_generate_therapeutic_goals(self):
         """Test generating therapeutic goals from character data."""

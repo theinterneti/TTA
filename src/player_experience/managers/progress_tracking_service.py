@@ -469,6 +469,14 @@ class ProgressTrackingService:
             generated_at=now,
         )
 
+    async def compute_therapeutic_effectiveness(
+        self, player_id: str, character_id: str | None = None
+    ) -> TherapeuticEffectivenessReport:
+        """Compatibility wrapper for callers using the older method name."""
+        return await self.generate_therapeutic_effectiveness_report(
+            player_id, character_id=character_id
+        )
+
     async def celebrate_milestone_achievement(
         self, player_id: str, milestone: Milestone
     ) -> dict[str, Any]:

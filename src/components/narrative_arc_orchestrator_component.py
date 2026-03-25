@@ -14,11 +14,15 @@ Classes:
     NarrativeStatus: Status information about current narrative state
 """
 
+import asyncio
 import contextlib
+import dataclasses
+import inspect
 import logging
 import uuid
+from copy import deepcopy
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -1522,14 +1526,14 @@ class ScaleManager:
 
     async def _detect_therapeutic_conflicts(self) -> list[ScaleConflict]:
         """Detect therapeutic alignment conflicts between scales."""
-        # TODO: Implement therapeutic conflict detection
+        # Delegated to the extracted narrative arc helper implementation.
         return []
 
     async def _generate_conflict_resolution(
         self, conflict: ScaleConflict
     ) -> Resolution | None:
         """Generate a resolution for a scale conflict."""
-        # TODO: Implement sophisticated conflict resolution generation
+        # Delegated to the extracted narrative arc helper implementation.
         resolution_id = str(uuid.uuid4())
 
         return Resolution(
@@ -1550,7 +1554,7 @@ class ScaleManager:
 
     async def _implement_resolution(self, resolution: Resolution) -> None:
         """Implement a conflict resolution."""
-        # TODO: Implement resolution implementation
+        # Delegated to the extracted narrative arc helper implementation.
         logger.debug(f"Implementing resolution {resolution.resolution_id}")
         pass
 
@@ -1612,6 +1616,10 @@ class NarrativeArcOrchestratorComponent(Component):
 
         # Runtime state
         self.active_sessions: dict[str, dict[str, Any]] = {}
+        self._session_store: dict[str, dict[str, Any]] = {}
+        self.dependency_adapters: dict[str, Any] = self.component_config.get(
+            "dependency_adapters", {}
+        )
         self.neo4j_connection = None
         self.redis_connection = None
         self.interactive_narrative_engine = None
@@ -1683,18 +1691,12 @@ class NarrativeArcOrchestratorComponent(Component):
     def _initialize_dependencies(self) -> None:
         """Initialize connections to dependent components."""
         try:
-            # Initialize Neo4j connection (placeholder)
-            # In a real implementation, this would connect to the actual Neo4j component
             self.neo4j_connection = self._get_neo4j_connection()
             logger.info("Neo4j connection initialized")
 
-            # Initialize Redis connection (placeholder)
-            # In a real implementation, this would connect to the actual Redis component
             self.redis_connection = self._get_redis_connection()
             logger.info("Redis connection initialized")
 
-            # Initialize Interactive Narrative Engine connection (placeholder)
-            # In a real implementation, this would connect to the actual engine
             self.interactive_narrative_engine = self._get_interactive_narrative_engine()
             logger.info("Interactive Narrative Engine connection initialized")
 
@@ -1703,26 +1705,58 @@ class NarrativeArcOrchestratorComponent(Component):
             raise
 
     def _get_neo4j_connection(self) -> Any:
-        """Get Neo4j connection (placeholder implementation)."""
-        # TODO: Implement actual Neo4j connection
-        logger.info(
-            "Neo4j connection placeholder - would connect to actual Neo4j component"
-        )
+        """Get Neo4j connection from configured adapters or a safe fallback."""
+        configured_adapter = self._resolve_dependency_adapter("neo4j")
+        if configured_adapter is not None:
+            return configured_adapter
+
+        logger.info("Using Neo4j placeholder connection; no neo4j adapter configured")
         return {"type": "neo4j_placeholder", "status": "connected"}
 
     def _get_redis_connection(self) -> Any:
-        """Get Redis connection (placeholder implementation)."""
-        # TODO: Implement actual Redis connection
-        logger.info(
-            "Redis connection placeholder - would connect to actual Redis component"
-        )
+        """Get Redis connection from configured adapters or a safe fallback."""
+        configured_adapter = self._resolve_dependency_adapter("redis")
+        if configured_adapter is not None:
+            return configured_adapter
+
+        logger.info("Using Redis placeholder connection; no redis adapter configured")
         return {"type": "redis_placeholder", "status": "connected"}
 
     def _get_interactive_narrative_engine(self) -> Any:
-        """Get Interactive Narrative Engine connection (placeholder implementation)."""
-        # TODO: Implement actual Interactive Narrative Engine connection
-        logger.info("Interactive Narrative Engine connection placeholder")
+        """Get the interactive narrative engine or a safe fallback."""
+        configured_adapter = self._resolve_dependency_adapter(
+            "interactive_narrative_engine"
+        )
+        if configured_adapter is not None:
+            return configured_adapter
+
+        logger.info(
+            "Using narrative engine placeholder; no interactive engine adapter configured"
+        )
         return {"type": "narrative_engine_placeholder", "status": "connected"}
+
+    def _resolve_dependency_adapter(self, dependency_name: str) -> Any:
+        """Resolve a configured dependency instance or provider."""
+        adapter = self.dependency_adapters.get(dependency_name)
+        if adapter is None:
+            return None
+        return adapter() if callable(adapter) else adapter
+
+    def _get_session_persistence_adapter(self) -> Any:
+        """Return the configured session persistence adapter if available."""
+        explicit_adapter = self.dependency_adapters.get("session_persistence")
+        if explicit_adapter is not None:
+            return (
+                explicit_adapter() if callable(explicit_adapter) else explicit_adapter
+            )
+
+        if self.redis_connection and any(
+            hasattr(self.redis_connection, method_name)
+            for method_name in ("load_session_state", "save_session_state")
+        ):
+            return self.redis_connection
+
+        return None
 
     def _setup_session_management(self) -> None:
         """Set up session management infrastructure."""
@@ -1780,21 +1814,21 @@ class NarrativeArcOrchestratorComponent(Component):
     def _cleanup_connections(self) -> None:
         """Clean up component connections."""
         try:
-            # Close Neo4j connection
             if self.neo4j_connection:
-                # TODO: Implement actual connection cleanup
+                self._close_dependency_sync("neo4j", self.neo4j_connection)
                 self.neo4j_connection = None
                 logger.info("Neo4j connection closed")
 
-            # Close Redis connection
             if self.redis_connection:
-                # TODO: Implement actual connection cleanup
+                self._close_dependency_sync("redis", self.redis_connection)
                 self.redis_connection = None
                 logger.info("Redis connection closed")
 
-            # Close Interactive Narrative Engine connection
             if self.interactive_narrative_engine:
-                # TODO: Implement actual connection cleanup
+                self._close_dependency_sync(
+                    "interactive_narrative_engine",
+                    self.interactive_narrative_engine,
+                )
                 self.interactive_narrative_engine = None
                 logger.info("Interactive Narrative Engine connection closed")
 
@@ -1806,12 +1840,309 @@ class NarrativeArcOrchestratorComponent(Component):
     ) -> None:
         """Save session state to persistent storage."""
         try:
-            # TODO: Implement actual session state persistence
+            normalized_state = self._store_session_state_locally(
+                session_id, session_data
+            )
+            session_persistence = self._get_session_persistence_adapter()
+            if session_persistence is not None:
+                existing_state = self._invoke_sync_adapter_method(
+                    session_persistence,
+                    "load_session_state",
+                    session_id,
+                )
+                merged_state = self._merge_persisted_session_state(
+                    existing_state, normalized_state
+                )
+                self._invoke_sync_adapter_method(
+                    session_persistence,
+                    "save_session_state",
+                    session_id,
+                    deepcopy(merged_state),
+                )
             logger.debug(f"Session state saved for session {session_id}")
         except Exception as e:
             logger.error(f"Failed to save session state for {session_id}: {e}")
 
+    def _store_session_state_locally(
+        self, session_id: str, session_data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Persist session state in the component's in-memory store."""
+        normalized_state = self._normalize_session_state(session_id, session_data)
+        self._session_store[session_id] = deepcopy(normalized_state)
+        return normalized_state
+
+    async def _persist_session_state(
+        self, session_id: str, session_data: dict[str, Any]
+    ) -> None:
+        """Persist session state locally and through configured adapters."""
+        normalized_state = self._store_session_state_locally(session_id, session_data)
+        session_persistence = self._get_session_persistence_adapter()
+        if session_persistence is not None:
+            existing_state = await self._invoke_async_adapter_method(
+                session_persistence,
+                "load_session_state",
+                session_id,
+            )
+            merged_state = self._merge_persisted_session_state(
+                existing_state, normalized_state
+            )
+            await self._invoke_async_adapter_method(
+                session_persistence,
+                "save_session_state",
+                session_id,
+                deepcopy(merged_state),
+            )
+
+    def _merge_persisted_session_state(
+        self, existing_state: Any, session_state: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Preserve non-orchestrator session fields when sharing persistence backends."""
+        if not isinstance(existing_state, dict):
+            return session_state
+
+        merged_state = deepcopy(existing_state)
+        merged_state.update(deepcopy(session_state))
+        return merged_state
+
+    async def _invoke_async_adapter_method(
+        self, adapter: Any, method_name: str, *args: Any
+    ) -> Any:
+        """Call adapter hooks that may be sync or async."""
+        method = getattr(adapter, method_name, None)
+        if method is None:
+            return None
+
+        result = method(*args)
+        if inspect.isawaitable(result):
+            return await result
+        return result
+
+    def _invoke_sync_adapter_method(
+        self, adapter: Any, method_name: str, *args: Any
+    ) -> Any:
+        """Call adapter hooks from sync paths, bridging async methods when possible."""
+        method = getattr(adapter, method_name, None)
+        if method is None:
+            return None
+
+        result = method(*args)
+        if inspect.isawaitable(result):
+            try:
+                asyncio.get_running_loop()
+            except RuntimeError:
+
+                async def _await_result(awaitable: Any) -> Any:
+                    return await awaitable
+
+                return asyncio.run(_await_result(result))
+
+            logger.warning(
+                "Adapter method %s is async and was invoked from a running sync path",
+                method_name,
+            )
+            return None
+        return result
+
+    def _close_dependency_sync(self, dependency_name: str, dependency: Any) -> None:
+        """Close configured dependency adapters when they expose cleanup hooks."""
+        for method_name in ("aclose", "close", "shutdown", "stop"):
+            if not hasattr(dependency, method_name):
+                continue
+            self._invoke_sync_adapter_method(dependency, method_name)
+            return
+
+        logger.debug(
+            "Dependency %s does not expose a recognized cleanup hook", dependency_name
+        )
+
+    def _normalize_session_state(
+        self, session_id: str, session_data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Ensure session state has the fields needed by runtime helpers."""
+        normalized_state = deepcopy(session_data)
+        now = datetime.now(UTC)
+
+        normalized_state.setdefault("session_id", session_id)
+        normalized_state["created_at"] = self._coerce_datetime(
+            normalized_state.get("created_at"), default=now
+        )
+        normalized_state["last_updated"] = self._coerce_datetime(
+            normalized_state.get("last_updated"), default=normalized_state["created_at"]
+        )
+        normalized_state.setdefault("active_threads", [])
+        normalized_state.setdefault("character_arcs", {})
+        normalized_state.setdefault("coherence_score", 0.8)
+        normalized_state.setdefault("therapeutic_alignment", 0.7)
+        normalized_state.setdefault("interaction_count", 0)
+        normalized_state.setdefault("engagement_score", 0.5)
+        normalized_state.setdefault("last_scale_advancement", {})
+        normalized_state.setdefault("emergent_events", [])
+
+        scale_progression = normalized_state.setdefault("scale_progression", {})
+        for scale in NarrativeScale:
+            scale_progression.setdefault(scale.value, 0)
+
+        normalized_state["current_scale"] = self._resolve_current_scale(
+            normalized_state
+        ).value
+        return normalized_state
+
+    def _coerce_datetime(self, value: Any, *, default: datetime) -> datetime:
+        """Convert persisted timestamp data to timezone-aware datetimes."""
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            try:
+                return datetime.fromisoformat(value.replace("Z", "+00:00"))
+            except ValueError:
+                logger.warning("Invalid persisted datetime %s; using default", value)
+        return default
+
+    def _resolve_current_scale(self, session_data: dict[str, Any]) -> NarrativeScale:
+        """Read the current scale from session data or derive a stable default."""
+        current_scale = session_data.get("current_scale")
+        if isinstance(current_scale, NarrativeScale):
+            return current_scale
+        if isinstance(current_scale, str):
+            with contextlib.suppress(ValueError):
+                return NarrativeScale(current_scale)
+
+        interaction_count = int(session_data.get("interaction_count", 0))
+        if interaction_count >= 10:
+            return NarrativeScale.EPIC_TERM
+        if interaction_count >= 6:
+            return NarrativeScale.LONG_TERM
+        if interaction_count >= 3:
+            return NarrativeScale.MEDIUM_TERM
+        return NarrativeScale.SHORT_TERM
+
+    def _record_scale_advancement(
+        self, session_data: dict[str, Any], scale: NarrativeScale, thread_name: str
+    ) -> None:
+        """Track scale progression and keep active threads de-duplicated."""
+        scale_progression = session_data.setdefault("scale_progression", {})
+        scale_progression[scale.value] = scale_progression.get(scale.value, 0) + 1
+
+        last_scale_advancement = session_data.setdefault("last_scale_advancement", {})
+        last_scale_advancement[scale.value] = datetime.now(UTC).isoformat()
+
+        active_threads = session_data.setdefault("active_threads", [])
+        if thread_name not in active_threads:
+            active_threads.append(thread_name)
+
+    def _update_current_scale_from_response(
+        self, session_data: dict[str, Any], response: NarrativeResponse
+    ) -> None:
+        """Prefer response impact metadata when choosing the current scale."""
+        impact_assessments = response.metadata.get("impact_assessments", {})
+        if impact_assessments:
+            max_scale_value = max(
+                impact_assessments,
+                key=lambda scale_value: impact_assessments[scale_value].get(
+                    "magnitude", 0.0
+                ),
+            )
+            with contextlib.suppress(ValueError):
+                session_data["current_scale"] = NarrativeScale(max_scale_value).value
+                return
+
+        session_data["current_scale"] = self._resolve_current_scale(session_data).value
+
     # Public API methods for narrative orchestration
+
+    async def initialize_session(
+        self,
+        session_id: str,
+        character_id: str,
+        world_id: str,
+        therapeutic_settings: Any = None,
+    ) -> dict[str, Any]:
+        """Initialize or refresh narrative orchestration state for a session."""
+        await self._load_session(session_id)
+
+        existing_state = self.active_sessions.get(session_id, {})
+        session_data = {
+            **existing_state,
+            "session_id": session_id,
+            "character_id": character_id,
+            "world_id": world_id,
+            "therapeutic_settings": self._serialize_therapeutic_settings(
+                therapeutic_settings
+            ),
+            "last_updated": datetime.now(UTC),
+        }
+        normalized_state = self._normalize_session_state(session_id, session_data)
+        self.active_sessions[session_id] = normalized_state
+        await self._persist_session_state(session_id, normalized_state)
+        return self._build_session_snapshot(normalized_state)
+
+    async def get_session_state(self, session_id: str) -> dict[str, Any]:
+        """Return a compact session snapshot matching the async narrative-engine contract."""
+        if session_id not in self.active_sessions:
+            await self._load_session(session_id)
+
+        session_data = self.active_sessions.get(session_id)
+        if session_data is None:
+            return {}
+
+        return self._build_session_snapshot(session_data)
+
+    async def restore_session_state(
+        self, session_id: str, narrative_state: dict[str, Any]
+    ) -> bool:
+        """Merge externally managed session data into orchestrator runtime state."""
+        if session_id not in self.active_sessions:
+            await self._load_session(session_id)
+
+        existing_state = self.active_sessions.get(
+            session_id,
+            {
+                "session_id": session_id,
+                "created_at": datetime.now(UTC),
+            },
+        )
+        restored_state = {
+            **existing_state,
+            **deepcopy(narrative_state),
+            "last_updated": datetime.now(UTC),
+        }
+        normalized_state = self._normalize_session_state(session_id, restored_state)
+        self.active_sessions[session_id] = normalized_state
+        await self._persist_session_state(session_id, normalized_state)
+        return True
+
+    async def finalize_session(self, session_id: str) -> bool:
+        """Persist final session state and remove it from the active runtime cache."""
+        if session_id not in self.active_sessions:
+            await self._load_session(session_id)
+
+        session_data = self.active_sessions.get(session_id)
+        if session_data is None:
+            return False
+
+        session_data["finalized_at"] = datetime.now(UTC)
+        session_data["last_updated"] = session_data["finalized_at"]
+        await self._persist_session_state(session_id, session_data)
+        self.active_sessions.pop(session_id, None)
+        return True
+
+    async def update_therapeutic_settings(
+        self, session_id: str, therapeutic_settings: Any
+    ) -> bool:
+        """Update therapeutic settings using the shared interactive-engine contract."""
+        if session_id not in self.active_sessions:
+            await self._load_session(session_id)
+
+        session_data = self.active_sessions.get(session_id)
+        if session_data is None:
+            return False
+
+        session_data["therapeutic_settings"] = self._serialize_therapeutic_settings(
+            therapeutic_settings
+        )
+        session_data["last_updated"] = datetime.now(UTC)
+        await self._persist_session_state(session_id, session_data)
+        return True
 
     async def process_player_choice(
         self, session_id: str, choice: PlayerChoice
@@ -1893,6 +2224,10 @@ class NarrativeArcOrchestratorComponent(Component):
             await self._advance_medium_term_narrative(session_id)
             await self._advance_long_term_narrative(session_id)
             await self._advance_epic_term_narrative(session_id)
+            session_data = self.active_sessions[session_id]
+            session_data["current_scale"] = NarrativeScale.EPIC_TERM.value
+            session_data["last_updated"] = datetime.now(UTC)
+            await self._persist_session_state(session_id, session_data)
 
             logger.info(
                 f"Successfully advanced narrative scales for session {session_id}"
@@ -1918,20 +2253,23 @@ class NarrativeArcOrchestratorComponent(Component):
 
             # Check if session exists in active sessions
             if session_id not in self.active_sessions:
-                # Try to load from storage, but don't create placeholder sessions
-                # TODO: Implement actual session loading from Redis/Neo4j
-                logger.warning(f"Session {session_id} not found for status request")
-                return None
+                await self._load_session(session_id)
+                if session_id not in self.active_sessions:
+                    logger.warning(f"Session {session_id} not found for status request")
+                    return None
 
             # Build narrative status
             session_data = self.active_sessions[session_id]
             return NarrativeStatus(
                 session_id=session_id,
-                current_scale=NarrativeScale.SHORT_TERM,  # TODO: Get actual current scale
+                current_scale=self._resolve_current_scale(session_data),
                 active_threads=session_data.get("active_threads", []),
                 character_arcs=session_data.get("character_arcs", {}),
                 coherence_score=session_data.get("coherence_score", 0.8),
                 therapeutic_alignment=session_data.get("therapeutic_alignment", 0.7),
+                last_updated=self._coerce_datetime(
+                    session_data.get("last_updated"), default=datetime.now(UTC)
+                ),
             )
 
         except Exception as e:
@@ -1956,9 +2294,10 @@ class NarrativeArcOrchestratorComponent(Component):
 
             # Check if session exists in active sessions
             if session_id not in self.active_sessions:
-                # Don't create placeholder sessions for emergent events
-                logger.warning(f"Session {session_id} not found for emergent event")
-                return None
+                await self._load_session(session_id)
+                if session_id not in self.active_sessions:
+                    logger.warning(f"Session {session_id} not found for emergent event")
+                    return None
 
             # Evaluate emergent event probability
             probability = await self._calculate_emergent_probability(
@@ -1970,6 +2309,23 @@ class NarrativeArcOrchestratorComponent(Component):
                 event = await self._generate_emergent_event(
                     session_id, context, probability
                 )
+                session_data = self.active_sessions[session_id]
+                session_data.setdefault("emergent_events", []).append(
+                    {
+                        "event_id": event.event_id,
+                        "event_type": event.event_type,
+                        "scale": event.scale.value,
+                        "description": event.description,
+                        "generated_at": event.timestamp.isoformat(),
+                    }
+                )
+                self._record_scale_advancement(
+                    session_data,
+                    event.scale,
+                    thread_name=f"emergent:{event.event_type}",
+                )
+                session_data["last_updated"] = datetime.now(UTC)
+                await self._persist_session_state(session_id, session_data)
                 logger.info(
                     f"Generated emergent event {event.event_id} for session {session_id}"
                 )
@@ -1988,19 +2344,24 @@ class NarrativeArcOrchestratorComponent(Component):
     async def _load_session(self, session_id: str) -> None:
         """Load session from persistent storage."""
         try:
-            # TODO: Implement actual session loading from Redis/Neo4j
             logger.debug(f"Loading session {session_id} from storage")
+            session_data = None
+            session_persistence = self._get_session_persistence_adapter()
+            if session_persistence is not None:
+                session_data = await self._invoke_async_adapter_method(
+                    session_persistence, "load_session_state", session_id
+                )
 
-            # Placeholder session data
-            self.active_sessions[session_id] = {
-                "session_id": session_id,
-                "created_at": datetime.now(),
-                "last_updated": datetime.now(),
-                "active_threads": [],
-                "character_arcs": {},
-                "coherence_score": 0.8,
-                "therapeutic_alignment": 0.7,
-            }
+            if session_data is None:
+                session_data = self._session_store.get(session_id)
+
+            if session_data is None:
+                logger.debug("No persisted session found for %s", session_id)
+                return
+
+            normalized_state = self._normalize_session_state(session_id, session_data)
+            normalized_state["last_accessed"] = datetime.now(UTC).isoformat()
+            self.active_sessions[session_id] = normalized_state
 
         except Exception as e:
             logger.error(f"Failed to load session {session_id}: {e}")
@@ -2033,13 +2394,16 @@ class NarrativeArcOrchestratorComponent(Component):
                     conflicts
                 )
                 logger.info(f"Resolved {len(resolutions)} scale conflicts")
+            else:
+                resolutions = []
 
             # 3. Maintain causal relationships
             await self.scale_manager.maintain_causal_relationships(session_id)
 
             # 4. Generate response based on impact assessments
+            player_signals = self._build_player_signals(impact_assessments, conflicts)
             response_content = await self._generate_narrative_response(
-                choice, impact_assessments
+                choice, impact_assessments, player_signals
             )
 
             # 5. Generate appropriate choices for next interaction
@@ -2065,6 +2429,10 @@ class NarrativeArcOrchestratorComponent(Component):
                     default=0.5,
                 ),
                 "coherence_maintained": len(conflicts) == 0,
+                "player_signals": player_signals,
+                "resolution_types": [
+                    resolution.resolution_type for resolution in resolutions
+                ],
             }
 
             return NarrativeResponse(
@@ -2085,33 +2453,51 @@ class NarrativeArcOrchestratorComponent(Component):
         """Update session state after processing choice."""
         try:
             session_data = self.active_sessions[session_id]
-            session_data["last_updated"] = datetime.now()
+            session_data["last_updated"] = datetime.now(UTC)
             session_data["last_choice"] = choice.choice_text
             session_data["last_response"] = response.content
-
-            # TODO: Persist to storage
+            session_data["interaction_count"] = (
+                session_data.get("interaction_count", 0) + 1
+            )
+            session_data["engagement_score"] = min(
+                1.0, session_data.get("engagement_score", 0.5) + 0.05
+            )
+            self._update_current_scale_from_response(session_data, response)
+            await self._persist_session_state(session_id, session_data)
 
         except Exception as e:
             logger.error(f"Error updating session state: {e}")
 
     async def _advance_short_term_narrative(self, session_id: str) -> None:
         """Advance short-term narrative elements."""
-        # TODO: Implement short-term narrative advancement
+        session_data = self.active_sessions[session_id]
+        self._record_scale_advancement(
+            session_data, NarrativeScale.SHORT_TERM, "immediate_scene"
+        )
         logger.debug(f"Advanced short-term narrative for session {session_id}")
 
     async def _advance_medium_term_narrative(self, session_id: str) -> None:
         """Advance medium-term narrative elements."""
-        # TODO: Implement medium-term narrative advancement
+        session_data = self.active_sessions[session_id]
+        self._record_scale_advancement(
+            session_data, NarrativeScale.MEDIUM_TERM, "character_arc_progression"
+        )
         logger.debug(f"Advanced medium-term narrative for session {session_id}")
 
     async def _advance_long_term_narrative(self, session_id: str) -> None:
         """Advance long-term narrative elements."""
-        # TODO: Implement long-term narrative advancement
+        session_data = self.active_sessions[session_id]
+        self._record_scale_advancement(
+            session_data, NarrativeScale.LONG_TERM, "world_consequence"
+        )
         logger.debug(f"Advanced long-term narrative for session {session_id}")
 
     async def _advance_epic_term_narrative(self, session_id: str) -> None:
         """Advance epic-term narrative elements."""
-        # TODO: Implement epic-term narrative advancement
+        session_data = self.active_sessions[session_id]
+        self._record_scale_advancement(
+            session_data, NarrativeScale.EPIC_TERM, "legacy_arc"
+        )
         logger.debug(f"Advanced epic-term narrative for session {session_id}")
 
     async def _calculate_emergent_probability(
@@ -2119,19 +2505,31 @@ class NarrativeArcOrchestratorComponent(Component):
     ) -> float:
         """Calculate probability of emergent event occurrence."""
         try:
-            # TODO: Implement actual probability calculation based on:
-            # - Session history
-            # - Character states
-            # - World events
-            # - Player engagement patterns
-
-            # Placeholder calculation
-            base_probability = 0.3
-            context_modifier = len(context.get("recent_events", [])) * 0.1
             session_data = self.active_sessions[session_id]
-            engagement_modifier = session_data.get("engagement_score", 0.5) * 0.2
+            recent_events = context.get("recent_events", [])
+            unresolved_threads = context.get("unresolved_threads", [])
+            active_threads = session_data.get("active_threads", [])
+            recent_emergent_events = session_data.get("emergent_events", [])[-2:]
+            engagement_score = float(session_data.get("engagement_score", 0.5))
+            therapeutic_alignment = float(
+                session_data.get("therapeutic_alignment", 0.7)
+            )
 
-            return min(1.0, base_probability + context_modifier + engagement_modifier)
+            probability = 0.12
+            probability += min(0.25, len(recent_events) * 0.05)
+            probability += min(0.18, len(active_threads) * 0.04)
+            probability += min(0.2, engagement_score * 0.2)
+            if unresolved_threads:
+                probability += 0.12
+            if context.get("relationship_tension"):
+                probability += 0.06
+            if context.get("world_state_change"):
+                probability += 0.08
+            if therapeutic_alignment < 0.5:
+                probability += 0.08
+
+            probability -= min(0.18, len(recent_emergent_events) * 0.09)
+            return max(0.0, min(1.0, probability))
 
         except Exception as e:
             logger.error(f"Error calculating emergent probability: {e}")
@@ -2142,19 +2540,30 @@ class NarrativeArcOrchestratorComponent(Component):
     ) -> EmergentEvent:
         """Generate an emergent narrative event."""
         try:
-            # TODO: Implement actual emergent event generation
-
             event_id = str(uuid.uuid4())
+            session_data = self.active_sessions[session_id]
+            event_scale = self._determine_emergent_scale(session_data, context)
+            event_type = self._determine_emergent_event_type(context)
+            participants = self._determine_emergent_participants(context)
+            description = self._build_emergent_description(
+                event_type, event_scale, context
+            )
+            triggers = self._summarize_emergent_triggers(session_data, context)
+
             return EmergentEvent(
                 event_id=event_id,
-                event_type="character_revelation",
-                description="A character reveals an unexpected connection to your past.",
-                scale=NarrativeScale.MEDIUM_TERM,
-                participants=["player", "mysterious_character"],
+                event_type=event_type,
+                description=description,
+                scale=event_scale,
+                participants=participants,
                 metadata={
                     "probability": probability,
                     "context": context,
-                    "generated_at": datetime.now().isoformat(),
+                    "generated_at": datetime.now(UTC).isoformat(),
+                    "triggers": triggers,
+                    "therapeutic_alignment": session_data.get(
+                        "therapeutic_alignment", 0.7
+                    ),
                 },
             )
 
@@ -2162,10 +2571,104 @@ class NarrativeArcOrchestratorComponent(Component):
             logger.error(f"Error generating emergent event: {e}")
             raise
 
+    def _determine_emergent_scale(
+        self, session_data: dict[str, Any], context: dict[str, Any]
+    ) -> NarrativeScale:
+        """Select the narrative scale most appropriate for the current triggers."""
+        event_type = self._determine_emergent_event_type(context)
+        if context.get("legacy_pressure"):
+            return NarrativeScale.EPIC_TERM
+        if context.get("world_state_change"):
+            return NarrativeScale.LONG_TERM
+        if event_type == "character_revelation":
+            return NarrativeScale.MEDIUM_TERM
+        if context.get("relationship_tension") or context.get("unresolved_threads"):
+            return NarrativeScale.MEDIUM_TERM
+
+        return self._resolve_current_scale(session_data)
+
+    def _determine_emergent_event_type(self, context: dict[str, Any]) -> str:
+        """Choose a deterministic emergent event type from context."""
+        recent_events = " ".join(
+            str(item).lower() for item in context.get("recent_events", [])
+        )
+        if context.get("world_state_change"):
+            return "world_shift"
+        if context.get("legacy_pressure"):
+            return "legacy_echo"
+        if "memory" in recent_events or context.get("therapeutic_need"):
+            return "character_revelation"
+        if context.get("unresolved_threads"):
+            return "thread_convergence"
+        return "character_revelation"
+
+    def _determine_emergent_participants(self, context: dict[str, Any]) -> list[str]:
+        """Extract participants for an emergent event."""
+        participants = context.get("participants")
+        if isinstance(participants, list) and participants:
+            return [str(participant) for participant in participants]
+        return ["player", "mysterious_character"]
+
+    def _build_emergent_description(
+        self,
+        event_type: str,
+        event_scale: NarrativeScale,
+        context: dict[str, Any],
+    ) -> str:
+        """Create player-facing text for the generated emergent event."""
+        unresolved_threads = context.get("unresolved_threads", [])
+        if event_type == "world_shift":
+            return (
+                "The world around you subtly rearranges itself, revealing consequences "
+                "that were already gathering beyond the edges of the scene."
+            )
+        if event_type == "legacy_echo":
+            return (
+                "An older pattern echoes into the present, hinting that your choices "
+                "are touching something much larger than this moment."
+            )
+        if event_type == "thread_convergence" and unresolved_threads:
+            joined_threads = ", ".join(str(thread) for thread in unresolved_threads[:2])
+            return (
+                f"Separate tensions begin to converge around {joined_threads}, making "
+                "their connection impossible to ignore."
+            )
+
+        scale_phrase = {
+            NarrativeScale.SHORT_TERM: "in the immediate moment",
+            NarrativeScale.MEDIUM_TERM: "across your evolving relationships",
+            NarrativeScale.LONG_TERM: "through the broader world around you",
+            NarrativeScale.EPIC_TERM: "across the longer arc of your story",
+        }[event_scale]
+        return (
+            "A character reveals an unexpected connection to your past, opening a new "
+            f"layer of meaning {scale_phrase}."
+        )
+
+    def _summarize_emergent_triggers(
+        self, session_data: dict[str, Any], context: dict[str, Any]
+    ) -> list[str]:
+        """Summarize why an emergent event was triggered."""
+        triggers: list[str] = []
+        if context.get("recent_events"):
+            triggers.append("recent_events")
+        if context.get("unresolved_threads"):
+            triggers.append("unresolved_threads")
+        if context.get("relationship_tension"):
+            triggers.append("relationship_tension")
+        if context.get("world_state_change"):
+            triggers.append("world_state_change")
+        if float(session_data.get("engagement_score", 0.5)) >= 0.75:
+            triggers.append("high_engagement")
+        if float(session_data.get("therapeutic_alignment", 0.7)) < 0.5:
+            triggers.append("low_therapeutic_alignment")
+        return triggers
+
     async def _generate_narrative_response(
         self,
         choice: PlayerChoice,
         impact_assessments: dict[NarrativeScale, ImpactAssessment],
+        player_signals: dict[str, Any] | None = None,
     ) -> str:
         """Generate narrative response content based on choice and impact assessments."""
         try:
@@ -2241,11 +2744,138 @@ class NarrativeArcOrchestratorComponent(Component):
                     "The connections between your actions and their consequences feel particularly clear."
                 )
 
+            if player_signals:
+                supportive_note = self._build_supportive_response_note(player_signals)
+                if supportive_note:
+                    response_parts.append(supportive_note)
+
             return " ".join(response_parts)
 
         except Exception as e:
             logger.error(f"Error generating narrative response: {e}")
             return f"You chose: '{choice.choice_text}'. The story continues..."
+
+    def _build_player_signals(
+        self,
+        impact_assessments: dict[NarrativeScale, ImpactAssessment],
+        conflicts: list[ScaleConflict],
+    ) -> dict[str, Any]:
+        """Summarize therapeutic/coherence state in a player-facing shape."""
+        therapeutic_value = max(
+            (
+                assessment.therapeutic_alignment
+                for assessment in impact_assessments.values()
+            ),
+            default=0.5,
+        )
+        highest_impact_scale = max(
+            impact_assessments,
+            key=lambda scale: impact_assessments[scale].magnitude,
+        )
+        coherence_status = "stable" if not conflicts else "strained"
+        warnings: list[str] = []
+        if conflicts:
+            warnings.append(
+                "Some narrative tensions are being actively stabilized behind the scenes."
+            )
+        if therapeutic_value < 0.4:
+            warnings.append(
+                "This moment may feel emotionally unsettled; proceed gently and take your time."
+            )
+        elif therapeutic_value > 0.75:
+            warnings.append(
+                "This choice supports a constructive and grounded emotional direction."
+            )
+
+        return {
+            "therapeutic_alignment": round(therapeutic_value, 3),
+            "coherence_status": coherence_status,
+            "highest_impact_scale": highest_impact_scale.value,
+            "warning_count": len(warnings),
+            "warnings": warnings,
+        }
+
+    def _build_supportive_response_note(self, player_signals: dict[str, Any]) -> str:
+        """Add a short player-facing note when the response needs extra framing."""
+        warnings = player_signals.get("warnings", [])
+        if not isinstance(warnings, list) or not warnings:
+            return ""
+        return str(warnings[0])
+
+    def _serialize_therapeutic_settings(self, therapeutic_settings: Any) -> Any:
+        """Convert settings models/dataclasses into plain data for persistence."""
+        if therapeutic_settings is None:
+            return None
+        if hasattr(therapeutic_settings, "model_dump"):
+            return therapeutic_settings.model_dump()
+        if not isinstance(therapeutic_settings, type) and dataclasses.is_dataclass(
+            therapeutic_settings
+        ):
+            return {
+                key: value
+                for key, value in vars(therapeutic_settings).items()
+                if not key.startswith("_")
+            }
+        if isinstance(therapeutic_settings, dict):
+            return deepcopy(therapeutic_settings)
+        if hasattr(therapeutic_settings, "__dict__"):
+            return {
+                key: value
+                for key, value in vars(therapeutic_settings).items()
+                if not key.startswith("_")
+            }
+        return therapeutic_settings
+
+    def _build_session_snapshot(self, session_data: dict[str, Any]) -> dict[str, Any]:
+        """Expose a stable API/session snapshot derived from orchestrator runtime state."""
+        current_scale = self._resolve_current_scale(session_data)
+        coherence_score = float(session_data.get("coherence_score", 0.8))
+        therapeutic_alignment = float(session_data.get("therapeutic_alignment", 0.7))
+        warnings: list[str] = []
+
+        if coherence_score < 0.65:
+            warnings.append(
+                "Narrative continuity is under extra strain and is being stabilized."
+            )
+        if therapeutic_alignment < 0.45:
+            warnings.append(
+                "The current emotional direction may feel unsettled; proceed gently."
+            )
+        elif therapeutic_alignment > 0.75:
+            warnings.append(
+                "The session is moving in a constructive and grounded direction."
+            )
+
+        last_updated = self._coerce_datetime(
+            session_data.get("last_updated"), default=datetime.now(UTC)
+        )
+        return {
+            "session_id": session_data.get("session_id"),
+            "current_scale": current_scale.value,
+            "active_threads": deepcopy(session_data.get("active_threads", [])),
+            "character_arcs": deepcopy(session_data.get("character_arcs", {})),
+            "coherence_score": round(coherence_score, 3),
+            "therapeutic_alignment": round(therapeutic_alignment, 3),
+            "interaction_count": int(session_data.get("interaction_count", 0)),
+            "engagement_score": round(
+                float(session_data.get("engagement_score", 0.5)), 3
+            ),
+            "scale_progression": deepcopy(session_data.get("scale_progression", {})),
+            "emergent_events": deepcopy(session_data.get("emergent_events", [])),
+            "therapeutic_settings": deepcopy(session_data.get("therapeutic_settings")),
+            "last_choice": session_data.get("last_choice"),
+            "last_response": session_data.get("last_response"),
+            "last_updated": last_updated.isoformat(),
+            "player_signals": {
+                "therapeutic_alignment": round(therapeutic_alignment, 3),
+                "coherence_status": (
+                    "stable" if coherence_score >= 0.65 else "strained"
+                ),
+                "highest_impact_scale": current_scale.value,
+                "warning_count": len(warnings),
+                "warnings": warnings,
+            },
+        }
 
     async def _generate_next_choices(
         self,

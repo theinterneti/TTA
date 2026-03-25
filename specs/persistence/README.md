@@ -1,12 +1,14 @@
 # Persistence Specifications
 
+**Last Updated:** 2026-03-23
+
 Data layer contracts for TTA's storage systems.
 
 | Spec | System | Status |
 |---|---|---|
-| `redis-session-cache.md` | Redis session cache + messaging | ❌ Not started |
-| `neo4j-story-graph.md` | Neo4j story graph persistence | ❌ Not started |
-| `data-retention-policy.md` | HIPAA-compliant data retention | ❌ Not started |
+| `redis-session-cache.md` | Redis session cache + messaging | ✅ Drafted |
+| `neo4j-story-graph.md` | Neo4j story graph persistence | ✅ Drafted |
+| `data-retention-policy.md` | HIPAA-compliant data retention | ✅ Drafted |
 
 ## Code References
 

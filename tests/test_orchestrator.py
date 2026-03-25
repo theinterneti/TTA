@@ -113,14 +113,21 @@ class TestOrchestrator(unittest.TestCase):
         """
         assert "mock_component_1" in self.orchestrator.components
         assert "mock_component_2" in self.orchestrator.components
-        assert self.orchestrator.components["mock_component_1"].name == "mock_component_1"
-        assert self.orchestrator.components["mock_component_2"].name == "mock_component_2"
+        assert (
+            self.orchestrator.components["mock_component_1"].name == "mock_component_1"
+        )
+        assert (
+            self.orchestrator.components["mock_component_2"].name == "mock_component_2"
+        )
 
     def test_component_dependencies(self):
         """
         Test that component dependencies are correct.
         """
-        assert "mock_component_2" in self.orchestrator.components["mock_component_1"].dependencies
+        assert (
+            "mock_component_2"
+            in self.orchestrator.components["mock_component_1"].dependencies
+        )
         assert len(self.orchestrator.components["mock_component_2"].dependencies) == 0
 
     def test_start_component_success_no_dependencies(self):
@@ -166,7 +173,10 @@ class TestOrchestrator(unittest.TestCase):
 
         assert not self.orchestrator.start_component(component_name)
         assert dependency.status == ComponentStatus.ERROR
-        assert self.orchestrator.components[component_name].status == ComponentStatus.STOPPED
+        assert (
+            self.orchestrator.components[component_name].status
+            == ComponentStatus.STOPPED
+        )
 
     def test_start_component_already_running(self):
         """
@@ -232,7 +242,10 @@ class TestOrchestrator(unittest.TestCase):
 
         assert not self.orchestrator.stop_component(component_name)
         assert dependent.status == ComponentStatus.ERROR
-        assert self.orchestrator.components[component_name].status == ComponentStatus.RUNNING
+        assert (
+            self.orchestrator.components[component_name].status
+            == ComponentStatus.RUNNING
+        )
 
     def test_stop_component_already_stopped(self):
         """

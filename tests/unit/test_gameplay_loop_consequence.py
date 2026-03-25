@@ -10,6 +10,7 @@ mocked so these tests remain pure unit tests with no external service dependenci
 from __future__ import annotations
 
 import sys
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -33,6 +34,16 @@ if sys.version_info < (3, 14):
         SessionState,
     )
     from src.components.gameplay_loop.models.interactions import UserChoice
+else:
+    _dummy = object()
+    TherapeuticFramer = SimpleNamespace  # type: ignore[misc,assignment]
+    ChoiceType = SimpleNamespace(THERAPEUTIC=_dummy)  # type: ignore[misc,assignment]
+    ConsequenceSet = SimpleNamespace  # type: ignore[misc,assignment]
+    EmotionalState = SimpleNamespace(CALM=_dummy)  # type: ignore[misc,assignment]
+    Scene = SimpleNamespace  # type: ignore[misc,assignment]
+    SceneType = SimpleNamespace(THERAPEUTIC=_dummy)  # type: ignore[misc,assignment]
+    SessionState = SimpleNamespace  # type: ignore[misc,assignment]
+    UserChoice = SimpleNamespace  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Helpers

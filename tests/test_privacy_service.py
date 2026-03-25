@@ -112,7 +112,10 @@ class TestEncryptionService(unittest.TestCase):
         assert success
         assert new_key_id in self.encryption_service.encryption_keys
         assert self.encryption_service.key_metadata[old_key_id]["deprecated"]
-        assert self.encryption_service.key_metadata[old_key_id]["deprecated_at"] is not None
+        assert (
+            self.encryption_service.key_metadata[old_key_id]["deprecated_at"]
+            is not None
+        )
 
     def test_key_rotation_nonexistent_key(self):
         """Test key rotation with nonexistent key."""
@@ -311,7 +314,9 @@ class TestDataPrivacyService(unittest.TestCase):
         assert stored_settings.user_id == self.test_user_id
         assert stored_settings.data_minimization
         assert not stored_settings.research_consent
-        assert stored_settings.data_retention_preference == DataRetentionPeriod.SHORT_TERM
+        assert (
+            stored_settings.data_retention_preference == DataRetentionPeriod.SHORT_TERM
+        )
 
     def test_encrypt_therapeutic_content(self):
         """Test encrypting therapeutic content."""
@@ -433,7 +438,10 @@ class TestDataPrivacyService(unittest.TestCase):
 
         assert deletion_summary is not None
         assert deletion_summary["user_id"] == self.test_user_id
-        assert DataCategory.THERAPEUTIC_CONTENT.value in deletion_summary["categories_deleted"]
+        assert (
+            DataCategory.THERAPEUTIC_CONTENT.value
+            in deletion_summary["categories_deleted"]
+        )
         assert deletion_summary["items_deleted"] > 0
 
         # Verify data is deleted

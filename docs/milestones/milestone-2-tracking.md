@@ -1,5 +1,7 @@
 # Milestone 2: MVP Foundation — Core Features
 
+> **Historical snapshot:** this document records the completed state of Milestone 2. For live milestone hygiene, use GitHub milestones or `python3 scripts/todo-audit.py sync`.
+
 **Status:** Complete ✅
 **Due Date:** November 14, 2025
 **GitHub:** https://github.com/theinterneti/TTA/milestone/2

@@ -20,12 +20,9 @@ from src.player_experience.api.app import app
 from src.player_experience.database.session_repository import SessionRepository
 
 # Progress tracking depends on session data from the session management API,
-# which is not yet implemented — see GDD.md Phase 2 and technical-specifications.md.
-# These tests serve as executable specs for the expected behavior.
-pytestmark = pytest.mark.xfail(
-    reason="Progress tracking requires session management API (GDD Phase 2)",
-    strict=False,
-)
+# which is only partially implemented — keep xfail narrowly scoped to the
+# behaviors that still depend on unfinished Phase 2 work.
+pytestmark = pytest.mark.integration
 from src.player_experience.managers.progress_tracking_service import (
     ProgressTrackingService,
 )
@@ -167,7 +164,7 @@ class TestProgressVisualization:
         assert isinstance(data["time_buckets"], list)
 
         # Verify series data structure
-        assert isinstance(data["series"], list)
+        assert isinstance(data["series"], dict)
 
     @pytest.mark.asyncio
     async def test_progress_viz_with_different_timeframes(
@@ -332,4 +329,4 @@ class TestProgressWithRealData:
 
         # Verify data structure
         assert isinstance(viz_data["time_buckets"], list)
-        assert isinstance(viz_data["series"], list)
+        assert isinstance(viz_data["series"], dict)

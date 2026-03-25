@@ -329,7 +329,9 @@ class TestProgressTrackingService(unittest.TestCase):
                 or "approach" in title.lower()
                 for title in rec_titles
             )
-            assert dropout_support_found, f"Expected dropout support recommendations but got types: {rec_types}, titles: {rec_titles}"
+            assert dropout_support_found, (
+                f"Expected dropout support recommendations but got types: {rec_types}, titles: {rec_titles}"
+            )
 
         asyncio.run(run())
 

@@ -18,6 +18,9 @@ from typing import Any
 from ..database.character_repository import CharacterRepository
 from ..database.session_repository import SessionRepository
 from ..models.session import PlayerDashboard, Recommendation
+from ..services.narrative_session_enrichment import enrich_session_payloads
+from ..services.session_store import SessionStore
+from .character_avatar_manager import CharacterAvatarManager
 from .personalization_service_manager import (
     PersonalizationServiceManager,
     PlayerFeedback,
@@ -114,6 +117,110 @@ class PlayerExperienceManager:
         dashboard.next_recommended_session = datetime.now(UTC) + timedelta(hours=12)
         return dashboard
 
+    async def get_dashboard_api_payload(
+        self,
+        player_id: str,
+        *,
+        session_store: SessionStore | None = None,
+        character_manager: CharacterAvatarManager | None = None,
+        recent_limit: int = 10,
+    ) -> dict[str, Any]:
+        """Build the API-facing dashboard payload from shared manager logic."""
+        try:
+            characters = (
+                character_manager.get_player_characters(player_id)
+                if character_manager is not None
+                else []
+            )
+            active_character_ids = [character.character_id for character in characters]
+        except Exception:
+            active_character_ids = []
+
+        try:
+            recent_sessions = (
+                session_store.list_sessions(player_id)[:recent_limit]
+                if session_store is not None
+                else []
+            )
+        except Exception:
+            recent_sessions = []
+
+        try:
+            enriched_sessions, narrative_summary = await enrich_session_payloads(
+                recent_sessions
+            )
+        except Exception:
+            enriched_sessions = recent_sessions
+            narrative_summary = {"stable_sessions": 0, "strained_sessions": 0}
+
+        try:
+            recommendations = [
+                self._serialize_recommendation(recommendation)
+                for recommendation in await self.get_recommendations(player_id)
+            ]
+        except Exception:
+            recommendations = []
+
+        return {
+            "player_id": player_id,
+            "active_characters": active_character_ids,
+            "recent_sessions": enriched_sessions,
+            "session_metrics": {
+                "total_count": len(enriched_sessions),
+                "narrative_summary": narrative_summary,
+            },
+            "recommendations": recommendations,
+        }
+
+    async def get_session_list_api_payload(
+        self,
+        player_id: str,
+        *,
+        session_store: SessionStore | None = None,
+        include_narrative: bool = False,
+    ) -> dict[str, Any]:
+        """Build the API-facing session-list payload from shared manager logic."""
+        try:
+            sessions = (
+                session_store.list_sessions(player_id)
+                if session_store is not None
+                else []
+            )
+        except Exception:
+            sessions = []
+
+        if not include_narrative:
+            return {"sessions": sessions, "count": len(sessions)}
+
+        try:
+            enriched_sessions, narrative_summary = await enrich_session_payloads(
+                sessions
+            )
+        except Exception:
+            enriched_sessions = sessions
+            narrative_summary = {"stable_sessions": 0, "strained_sessions": 0}
+
+        return {
+            "sessions": enriched_sessions,
+            "count": len(enriched_sessions),
+            "narrative_summary": narrative_summary,
+        }
+
+    async def get_progress_api_payload(self, player_id: str) -> dict[str, Any]:
+        """Build the API-facing progress payload from shared manager logic."""
+        summary = await self.progress_service.compute_progress_summary(player_id)
+        return {
+            "player_id": player_id,
+            "total_sessions": summary.engagement_metrics.total_sessions,
+            "total_time_minutes": summary.engagement_metrics.total_time_minutes,
+            "milestones_achieved": len(summary.milestones_achieved),
+            "current_streak_days": summary.engagement_metrics.current_streak_days,
+            "therapeutic_momentum": summary.therapeutic_momentum,
+            "progress_trend": summary.progress_trend,
+            "engagement_trend": summary.engagement_trend,
+            "last_updated": summary.last_updated.isoformat(),
+        }
+
     async def get_recommendations(
         self, player_id: str, context: dict[str, Any] | None = None
     ) -> list[Recommendation]:
@@ -139,6 +246,29 @@ class PlayerExperienceManager:
         # Sort by priority (ascending)
         unique.sort(key=lambda r: r.priority)
         return unique[:8]
+
+    def _serialize_recommendation(
+        self, recommendation: Recommendation
+    ) -> dict[str, Any]:
+        """Convert a Recommendation dataclass into a JSON-safe API payload."""
+        expires_at = (
+            recommendation.expires_at.isoformat()
+            if recommendation.expires_at is not None
+            else None
+        )
+        created_at = recommendation.created_at.isoformat()
+        return {
+            "recommendation_id": recommendation.recommendation_id,
+            "title": recommendation.title,
+            "description": recommendation.description,
+            "recommendation_type": recommendation.recommendation_type,
+            "priority": recommendation.priority,
+            "target_entity_id": recommendation.target_entity_id,
+            "reasoning": recommendation.reasoning,
+            "created_at": created_at,
+            "expires_at": expires_at,
+            "is_dismissed": recommendation.is_dismissed,
+        }
 
     async def process_player_feedback(
         self, player_id: str, feedback: PlayerFeedback

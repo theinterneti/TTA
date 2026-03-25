@@ -269,7 +269,10 @@ class TestCharacterAvatarManager(unittest.TestCase):
         updated_profile = self.manager.get_character_therapeutic_profile(
             character.character_id
         )
-        assert updated_profile.primary_concerns == ["relationship issues", "self-esteem"]
+        assert updated_profile.primary_concerns == [
+            "relationship issues",
+            "self-esteem",
+        ]
         assert updated_profile.preferred_intensity == IntensityLevel.HIGH
         assert updated_profile.readiness_level == 0.9
 
@@ -400,7 +403,9 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
         # Verify that the development system was called
         self.mock_cds.initialize_character.assert_called_once()
         call_args = self.mock_cds.initialize_character.call_args
-        assert call_args[0][0] == character.character_id  # First positional arg is character_id
+        assert (
+            call_args[0][0] == character.character_id
+        )  # First positional arg is character_id
 
     def test_create_character_calls_personalization_engine(self):
         """Test that character creation calls the personalization engine."""
@@ -411,7 +416,9 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
         # Verify that the personalization engine was called
         self.mock_pe.create_personalization_profile.assert_called_once()
         call_args = self.mock_pe.create_personalization_profile.call_args
-        assert call_args[0][0] == character.character_id  # First positional arg is character_id
+        assert (
+            call_args[0][0] == character.character_id
+        )  # First positional arg is character_id
 
     def test_update_character_calls_personalization_engine(self):
         """Test that character update calls the personalization engine."""

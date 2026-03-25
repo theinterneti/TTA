@@ -294,7 +294,10 @@ class TestPlayerProfileRepository(unittest.TestCase):
         serialized = self.repository._serialize_therapeutic_preferences(prefs)
 
         assert serialized["intensity_level"] == "high"
-        assert serialized["preferred_approaches"] == ["cognitive_behavioral_therapy", "mindfulness"]
+        assert serialized["preferred_approaches"] == [
+            "cognitive_behavioral_therapy",
+            "mindfulness",
+        ]
         assert serialized["trigger_warnings"] == ["violence"]
         assert serialized["comfort_topics"] == ["nature"]
         assert serialized["session_duration_preference"] == 45

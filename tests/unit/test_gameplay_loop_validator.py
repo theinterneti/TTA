@@ -8,6 +8,7 @@ mocked dependencies — no external services required.
 from __future__ import annotations
 
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -31,6 +32,17 @@ if sys.version_info < (3, 14):
         SessionState,
     )
     from src.components.gameplay_loop.models.interactions import UserChoice
+else:
+    _dummy = object()
+    ChoiceValidator = SimpleNamespace  # type: ignore[misc,assignment]
+    Choice = SimpleNamespace  # type: ignore[misc,assignment]
+    ChoiceType = SimpleNamespace(THERAPEUTIC=_dummy)  # type: ignore[misc,assignment]
+    DifficultyLevel = SimpleNamespace(STANDARD=_dummy)  # type: ignore[misc,assignment]
+    EmotionalState = SimpleNamespace(CALM=_dummy)  # type: ignore[misc,assignment]
+    Scene = SimpleNamespace  # type: ignore[misc,assignment]
+    SceneType = SimpleNamespace(EXPLORATION=_dummy)  # type: ignore[misc,assignment]
+    SessionState = SimpleNamespace  # type: ignore[misc,assignment]
+    UserChoice = SimpleNamespace  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Helpers

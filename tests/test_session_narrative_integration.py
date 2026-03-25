@@ -232,7 +232,10 @@ class TestSessionNarrativeIntegration(unittest.TestCase):
                 "test_session"
             ]
             assert engine_settings.intensity_level == 0.8
-            assert engine_settings.preferred_approaches[0] == TherapeuticApproach.MINDFULNESS
+            assert (
+                engine_settings.preferred_approaches[0]
+                == TherapeuticApproach.MINDFULNESS
+            )
 
         asyncio.run(run_test())
 

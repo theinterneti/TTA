@@ -36,7 +36,7 @@ from .models import (
     Resolution,
     ScaleConflict,
 )
-from .resolution_engine import build_simple_resolution
+from .resolution_engine import apply_resolution, build_simple_resolution
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +121,7 @@ class ScaleManager:
             conflicts.extend(await self._detect_character_conflicts())
             conflicts.extend(await self._detect_thematic_conflicts())
             conflicts.extend(await self._detect_therapeutic_conflicts())
+            self.active_conflicts = conflicts
             return conflicts
         except Exception as e:
             logger.error(f"Error detecting scale conflicts: {e}")
@@ -290,7 +291,31 @@ class ScaleManager:
 
     async def _implement_resolution(self, resolution: Resolution) -> None:
         logger.debug(f"Implementing resolution {resolution.resolution_id}")
-        # Placeholder
+        applied_resolution = apply_resolution(resolution)
+        affected_event_values = applied_resolution.get("affected_events", [])
+        affected_events = (
+            set(affected_event_values)
+            if isinstance(affected_event_values, list)
+            else set()
+        )
+        recommended_action = str(applied_resolution.get("recommended_action", "adjust"))
+
+        for event in self.get_active_events():
+            if event.event_id not in affected_events:
+                continue
+            event.metadata.setdefault("resolution_ids", []).append(
+                resolution.resolution_id
+            )
+            event.metadata["therapeutic_mitigation"] = recommended_action
+            event.metadata.setdefault("resolved_conflict_ids", []).append(
+                resolution.conflict_id
+            )
+
+        self.active_conflicts = [
+            conflict
+            for conflict in self.active_conflicts
+            if conflict.conflict_id != resolution.conflict_id
+        ]
 
 
 __all__ = ["ScaleManager"]
