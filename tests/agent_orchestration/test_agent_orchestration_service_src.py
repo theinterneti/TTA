@@ -270,7 +270,8 @@ def test_get_workflow_name_world_building():
 def test_get_workflow_name_narrative_generation():
     svc = _service()
     assert (
-        svc._get_workflow_name(WorkflowType.NARRATIVE_GENERATION) == "narrative_generation"
+        svc._get_workflow_name(WorkflowType.NARRATIVE_GENERATION)
+        == "narrative_generation"
     )
 
 
@@ -385,7 +386,9 @@ async def test_process_user_input_increments_request_count():
     )
     svc._initialized = True
 
-    with patch.object(svc, "_execute_workflow_with_context", return_value=mock_response):
+    with patch.object(
+        svc, "_execute_workflow_with_context", return_value=mock_response
+    ):
         await svc.process_user_input("go north", _session())
 
     assert svc._request_count == 1

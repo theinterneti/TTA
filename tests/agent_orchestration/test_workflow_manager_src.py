@@ -217,7 +217,9 @@ async def test_execute_workflow_async_unknown_workflow():
 async def test_execute_workflow_async_entrypoint_mismatch():
     wm = WorkflowManager()
     wm.register_workflow("basic", _simple_definition())
-    resp, run_id, err = await wm.execute_workflow_async("basic", _request(AgentType.WBA))
+    resp, run_id, err = await wm.execute_workflow_async(
+        "basic", _request(AgentType.WBA)
+    )
     assert resp is None
     assert err is not None
 

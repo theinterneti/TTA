@@ -97,7 +97,10 @@ def test_validation_severity_values():
 
 def test_consistency_issue_type_values():
     assert ConsistencyIssueType.LORE_VIOLATION.value == "lore_violation"
-    assert ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT.value == "therapeutic_misalignment"
+    assert (
+        ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT.value
+        == "therapeutic_misalignment"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -268,10 +271,7 @@ async def test_coherence_validator_with_lore_constraint_violation():
         characters=["Wizard"],
     )
     result = await validator.validate_narrative_consistency(content)
-    assert any(
-        i.issue_type.value == "lore_violation"
-        for i in result.detected_issues
-    )
+    assert any(i.issue_type.value == "lore_violation" for i in result.detected_issues)
 
 
 @pytest.mark.asyncio
@@ -296,8 +296,7 @@ async def test_coherence_validator_with_lore_positive_constraint():
     )
     result = await validator.validate_narrative_consistency(content)
     assert not any(
-        i.issue_type.value == "lore_violation"
-        for i in result.detected_issues
+        i.issue_type.value == "lore_violation" for i in result.detected_issues
     )
 
 

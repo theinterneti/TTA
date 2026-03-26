@@ -37,7 +37,9 @@ def _monitor(redis=None) -> WorkflowMonitor:
 
 
 def _run_record(run_id: str = "r1", status: str = "running") -> RunRecord:
-    return RunRecord(run_id=run_id, workflow="wf", status=status, started_at=time.time())
+    return RunRecord(
+        run_id=run_id, workflow="wf", status=status, started_at=time.time()
+    )
 
 
 # ---------------------------------------------------------------------------
