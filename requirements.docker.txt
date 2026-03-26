@@ -13,7 +13,7 @@ astroid==4.0.4
 asttokens==3.0.1
 async-timeout==5.0.1
 attrs==25.4.0
-authlib==1.6.8
+authlib==1.6.9
 babel==2.18.0
 backoff==1.11.1
 backrefs==6.2
@@ -152,7 +152,7 @@ murmurhash==1.0.15
 mutmut==3.4.0
 neo4j==6.1.0
 networkx==3.6.1
-nltk==3.9.2
+nltk==3.9.4
 nodeenv==1.10.0
 notebooklm-mcp==2.0.11
 numpy==2.4.2
