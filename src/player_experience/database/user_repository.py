@@ -321,3 +321,29 @@ class UserRepository:
         except Exception as e:
             logger.error(f"Error updating last login for user {user_id}: {e}")
             return False
+
+    def update_password(self, username: str, password_hash: str) -> bool:
+        """
+        Update a user's password hash.
+
+        Args:
+            username: Username whose password should be updated
+            password_hash: Newly hashed password
+
+        Returns:
+            bool: True if successful
+        """
+        if not self._connected:
+            return False
+
+        try:
+            player_profile = self.player_repo.get_player_by_username(username)
+            if not player_profile:
+                return False
+
+            player_profile.privacy_settings.password_hash = password_hash  # type: ignore[attr-defined]
+            self.player_repo.update_player_profile(player_profile)
+            return True
+        except Exception as e:
+            logger.error(f"Error updating password for user {username}: {e}")
+            return False

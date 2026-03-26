@@ -296,7 +296,10 @@ class TestCompatibilityChecker(unittest.TestCase):
 
         # Check that recommendations are sorted by compatibility score
         for i in range(len(recommendations) - 1):
-            assert recommendations[i][1].overall_score >= recommendations[i + 1][1].overall_score
+            assert (
+                recommendations[i][1].overall_score
+                >= recommendations[i + 1][1].overall_score
+            )
 
         # Each recommendation should be a tuple of (WorldDetails, CompatibilityReport)
         for world, report in recommendations:
@@ -341,7 +344,10 @@ class TestCompatibilityChecker(unittest.TestCase):
 
         # Should recommend easier worlds or mention prerequisites
         recommendation_text = " ".join(report.recommendations).lower()
-        assert any(keyword in recommendation_text for keyword in ["prerequisite", "easier", "beginner", "readiness"])
+        assert any(
+            keyword in recommendation_text
+            for keyword in ["prerequisite", "easier", "beginner", "readiness"]
+        )
 
         # Test with trigger world (should generate safety warnings)
         trigger_report = (
@@ -353,7 +359,10 @@ class TestCompatibilityChecker(unittest.TestCase):
         assert len(trigger_report.warnings) > 0
 
         warning_text = " ".join(trigger_report.warnings).lower()
-        assert any(keyword in warning_text for keyword in ["trigger", "content", "support", "difficult"])
+        assert any(
+            keyword in warning_text
+            for keyword in ["trigger", "content", "support", "difficult"]
+        )
 
     def test_edge_cases(self):
         """Test edge cases and boundary conditions."""

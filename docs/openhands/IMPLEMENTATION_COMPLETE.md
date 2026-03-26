@@ -245,4 +245,3 @@ The Docker-based OpenHands integration is **production-ready** and provides:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Implementation_complete]]

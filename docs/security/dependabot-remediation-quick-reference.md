@@ -292,4 +292,3 @@ For questions or issues during remediation:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Security/Dependabot-remediation-quick-reference]]

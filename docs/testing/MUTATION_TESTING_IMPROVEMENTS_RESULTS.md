@@ -271,4 +271,3 @@ The mutation testing improvement initiative successfully demonstrated the value 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Mutation_testing_improvements_results]]

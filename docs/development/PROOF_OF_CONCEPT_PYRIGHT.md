@@ -409,4 +409,3 @@ $ uv run mypy src/player_experience/api/auth.py --no-error-summary 2>&1 | head -
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Proof_of_concept_pyright]]

@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Comprehensive_validation/End_to_end_journey_validator]]
 End-to-End User Journey Validation for TTA System
 
 This module provides comprehensive validation of complete user journeys

@@ -299,4 +299,3 @@ If cross-file consistency becomes a burden:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Yamale_validation_implementation]]

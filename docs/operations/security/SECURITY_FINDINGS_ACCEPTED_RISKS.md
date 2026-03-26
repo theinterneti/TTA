@@ -116,4 +116,3 @@ All other findings have been remediated.
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Operations/Security/Security_findings_accepted_risks]]

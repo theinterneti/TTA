@@ -388,4 +388,3 @@ This roadmap provides a systematic approach to closing identified gaps in the TT
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Implementation-roadmap]]

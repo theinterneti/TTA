@@ -631,4 +631,3 @@ This comprehensive user journey matrix provides the foundation for thorough test
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/User-journey-matrix]]

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,10 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 # Default free models
 _DEFAULT_OLLAMA_MODEL = "llama3.2"
 _DEFAULT_OPENROUTER_MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+
+# Keep the client import lazy for runtime compatibility, but expose a patchable
+# module attribute so unit tests can replace it without importing the provider.
+ChatOpenAI: Any | None = None
 
 
 def get_llm(
@@ -69,11 +74,16 @@ def _auto_detect_provider() -> str:
     return "ollama"
 
 
-def _make_ollama_llm(
-    model: str | None, temperature: float, max_tokens: int
-):
-    from langchain_openai import ChatOpenAI
+def _get_chat_openai():
+    global ChatOpenAI
+    if ChatOpenAI is None:
+        from langchain_openai import ChatOpenAI as langchain_chat_openai
 
+        ChatOpenAI = langchain_chat_openai
+    return ChatOpenAI
+
+
+def _make_ollama_llm(model: str | None, temperature: float, max_tokens: int):
     model_name = model or os.environ.get("OLLAMA_MODEL", _DEFAULT_OLLAMA_MODEL)
     raw_url = os.environ.get("OLLAMA_BASE_URL", _OLLAMA_BASE_URL)
     # Ensure the URL ends with /v1 (OpenAI-compatible path)
@@ -81,7 +91,7 @@ def _make_ollama_llm(
     if not base_url.endswith("/v1"):
         base_url = f"{base_url}/v1"
     logger.info("LLM: Ollama %s @ %s", model_name, base_url)
-    return ChatOpenAI(
+    return _get_chat_openai()(
         api_key="ollama",  # Ollama ignores the key; placeholder required by client
         base_url=base_url,
         model=model_name,
@@ -90,11 +100,7 @@ def _make_ollama_llm(
     )
 
 
-def _make_openrouter_llm(
-    model: str | None, temperature: float, max_tokens: int
-):
-    from langchain_openai import ChatOpenAI
-
+def _make_openrouter_llm(model: str | None, temperature: float, max_tokens: int):
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
         raise ValueError(
@@ -108,7 +114,7 @@ def _make_openrouter_llm(
         or os.environ.get("OPENROUTER_MODEL", _DEFAULT_OPENROUTER_MODEL)
     )
     logger.info("LLM: OpenRouter %s", model_name)
-    return ChatOpenAI(
+    return _get_chat_openai()(
         api_key=api_key,
         base_url=_OPENROUTER_BASE_URL,
         model=model_name,

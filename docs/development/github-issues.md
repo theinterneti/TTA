@@ -726,4 +726,3 @@ Epic: Repository Reorganization [#1]
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Github-issues]]

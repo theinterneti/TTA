@@ -213,4 +213,3 @@ Successfully expanded production-ready models from 7 to 27+ with:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Phase2_expansion_capability_matrix_final]]

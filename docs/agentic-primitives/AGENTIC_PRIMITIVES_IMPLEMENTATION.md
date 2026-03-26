@@ -387,4 +387,3 @@ Both primitive packages are **complete, tested, and ready for adoption**. The co
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Agentic-primitives/Agentic_primitives_implementation]]

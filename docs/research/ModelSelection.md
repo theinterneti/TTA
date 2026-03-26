@@ -199,4 +199,3 @@ By implementing these strategies, particularly combining 4-bit NF4 quantization 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Research/Modelselection]]

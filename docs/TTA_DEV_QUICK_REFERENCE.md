@@ -470,4 +470,3 @@ If "no" to any → **Keep it in TTA repo until proven**
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tta_dev_quick_reference]]

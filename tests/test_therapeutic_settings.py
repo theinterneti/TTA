@@ -391,7 +391,9 @@ class TestTherapeuticPreferencesValidator(unittest.TestCase):
 
         # Check that the conflict is resolved
         assert resolved_settings.crisis_monitoring_enabled
-        assert resolved_settings.version.version_number > settings.version.version_number
+        assert (
+            resolved_settings.version.version_number > settings.version.version_number
+        )
 
     def test_non_resolvable_conflict(self):
         """Test handling of non-resolvable conflicts."""
@@ -449,7 +451,10 @@ class TestSettingsMigrationManager(unittest.TestCase):
         assert migrated_settings.settings_id == "old_settings_1"
         assert migrated_settings.player_id == self.test_player_id
         assert migrated_settings.intensity_level == IntensityLevel.HIGH  # 0.7 -> HIGH
-        assert migrated_settings.preferred_approaches == [TherapeuticApproach.CBT, TherapeuticApproach.MINDFULNESS]
+        assert migrated_settings.preferred_approaches == [
+            TherapeuticApproach.CBT,
+            TherapeuticApproach.MINDFULNESS,
+        ]
         assert migrated_settings.intervention_frequency == "frequent"
         assert migrated_settings.feedback_sensitivity == 0.8
         assert migrated_settings.crisis_monitoring_enabled

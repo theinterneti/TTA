@@ -165,7 +165,9 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
 
             # Verify session variables contain narrative state
             assert "narrative_state" in session.session_variables
-            assert session.session_variables["narrative_state"]["narrative_position"] == 10
+            assert (
+                session.session_variables["narrative_state"]["narrative_position"] == 10
+            )
 
         asyncio.run(run_test())
 
@@ -293,7 +295,10 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             # Verify settings were updated
             assert result
             assert session.therapeutic_settings.intensity_level == 0.8
-            assert session.therapeutic_settings.preferred_approaches[0] == TherapeuticApproach.MINDFULNESS
+            assert (
+                session.therapeutic_settings.preferred_approaches[0]
+                == TherapeuticApproach.MINDFULNESS
+            )
             assert session.therapeutic_settings.intervention_frequency == "frequent"
 
             # Verify narrative engine was updated

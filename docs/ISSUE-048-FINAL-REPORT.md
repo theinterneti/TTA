@@ -197,4 +197,3 @@ The remaining failing test (logout functionality) has been tracked as Issue #51 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issue-048-final-report]]

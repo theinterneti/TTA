@@ -64,4 +64,3 @@ The TTA project consists of three repositories:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Github/Setup]]

@@ -206,4 +206,3 @@ The Docker-based OpenHands integration is **production-ready** and provides:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Mission_complete_summary]]

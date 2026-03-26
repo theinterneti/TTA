@@ -343,4 +343,3 @@ validation_rules:
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Therapeutic-content-creator.chatmode]]

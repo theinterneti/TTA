@@ -221,4 +221,3 @@ python3 testing/run_extended_evaluation.py --mode status
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Extended_evaluation/Quick_start]]

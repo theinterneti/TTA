@@ -220,4 +220,3 @@ For Codecov issues:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Codecov_setup]]

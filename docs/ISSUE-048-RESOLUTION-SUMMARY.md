@@ -98,4 +98,3 @@ Expected output: 9 passed, 1 failed, 1 skipped
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issue-048-resolution-summary]]

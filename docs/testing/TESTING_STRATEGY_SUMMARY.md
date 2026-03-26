@@ -357,4 +357,3 @@ The TTA storytelling system has a **mature testing infrastructure** with 971 tes
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Testing_strategy_summary]]

@@ -345,4 +345,3 @@ git push
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Branching_strategy]]

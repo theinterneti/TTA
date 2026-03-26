@@ -358,4 +358,3 @@ All implemented frontend fixes and improvements are working as expected. The app
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Validation_test_results]]

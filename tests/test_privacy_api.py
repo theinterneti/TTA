@@ -79,7 +79,10 @@ class TestPrivacyCompliance(unittest.TestCase):
         assert retrieved_settings.user_id == self.test_user_id
         assert retrieved_settings.data_minimization
         assert not retrieved_settings.research_consent
-        assert retrieved_settings.data_retention_preference == DataRetentionPeriod.MEDIUM_TERM
+        assert (
+            retrieved_settings.data_retention_preference
+            == DataRetentionPeriod.MEDIUM_TERM
+        )
         assert not retrieved_settings.marketing_consent
         assert retrieved_settings.analytics_consent
 
@@ -227,7 +230,10 @@ class TestPrivacyCompliance(unittest.TestCase):
         assert deletion_summary is not None
         assert deletion_summary["user_id"] == self.test_user_id
         assert deletion_summary["reason"] == "User requested account deletion"
-        assert DataCategory.THERAPEUTIC_CONTENT.value in deletion_summary["categories_deleted"]
+        assert (
+            DataCategory.THERAPEUTIC_CONTENT.value
+            in deletion_summary["categories_deleted"]
+        )
         assert deletion_summary["items_deleted"] > 0
 
         # Verify data is actually deleted
@@ -266,7 +272,10 @@ class TestPrivacyCompliance(unittest.TestCase):
         second_anonymization = self.privacy_service.anonymize_user_data(
             self.test_user_id
         )
-        assert anonymization_summary["anonymous_id"] == second_anonymization["anonymous_id"]
+        assert (
+            anonymization_summary["anonymous_id"]
+            == second_anonymization["anonymous_id"]
+        )
 
     def test_data_processing_records_management(self):
         """Test data processing records management."""

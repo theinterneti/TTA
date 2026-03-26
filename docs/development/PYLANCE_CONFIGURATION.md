@@ -300,4 +300,3 @@ class AgentType(str, Enum):
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Pylance_configuration]]

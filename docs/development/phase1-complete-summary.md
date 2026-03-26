@@ -400,4 +400,3 @@ Phase 1 successfully delivered all three Quick Wins, demonstrating the value of 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Phase1-complete-summary]]

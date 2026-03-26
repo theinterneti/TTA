@@ -244,4 +244,3 @@ This framework ensures that the TTA platform maintains the highest standards of 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Clinical/Clinical_consultation_framework]]

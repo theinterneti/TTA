@@ -167,4 +167,3 @@ The TTA Storytelling Platform recovery project represents a **world-class achiev
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Phase_1a_integration_complete]]

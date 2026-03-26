@@ -48,6 +48,7 @@ from ..auth import (
     RefreshTokenRequest,
     Token,
     _get_token_cache,
+    create_refresh_token,
     security,
 )
 
@@ -149,6 +150,15 @@ except Exception as e:
             def update_last_login(self, user_id: str) -> bool:
                 result = self.redis_client.hset(
                     f"user:{user_id}", "last_login", datetime.now(UTC).isoformat()
+                )
+                return bool(result)
+
+            def update_password(self, username: str, password_hash: str) -> bool:
+                user_id = self.redis_client.get(f"username:{username}")
+                if not user_id:
+                    return False
+                result = self.redis_client.hset(
+                    f"user:{user_id}", "password_hash", password_hash
                 )
                 return bool(result)
 
@@ -549,7 +559,14 @@ async def login(
 
         return LoginResponse(
             access_token=access_token,
-            refresh_token="",  # TODO: Implement refresh token
+            refresh_token=create_refresh_token(
+                {
+                    "sub": user.user_id,
+                    "player_id": user.user_id,
+                    "username": user.username,
+                    "email": user.email,
+                }
+            ),
             token_type="bearer",
             expires_in=auth_service.access_token_expire_minutes * 60,
             mfa_required=False,
@@ -656,7 +673,9 @@ async def setup_mfa(
         HTTPException: If MFA setup fails
     """
     try:
-        setup_info = auth_service.setup_mfa(user.user_id, method)
+        setup_info = auth_service.setup_mfa(
+            user.user_id, method, username=user.username
+        )
 
         return MFASetupResponse(
             method=method.value,
@@ -1042,7 +1061,35 @@ async def change_password(
             detail={"message": "Password does not meet requirements", "errors": errors},
         )
 
-    # TODO: Verify current password and update to new password in database
+    if auth_service.user_repository is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Password changes require a configured user repository",
+        )
+
+    stored_user = auth_service.user_repository.get_user_by_username(user.username)
+    if stored_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Authenticated user could not be found",
+        )
+
+    if not auth_service.security_service.verify_password(
+        current_password, stored_user.password_hash
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect",
+        )
+
+    updated = auth_service.user_repository.update_password(
+        user.username, auth_service.security_service.hash_password(new_password)
+    )
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password",
+        )
 
     # Log security event
     from models.auth import SecurityEvent

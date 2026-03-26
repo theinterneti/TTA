@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Components/Component Coverage Investigation - Executive Summary]]
 > - **Path:** `.augment/kb/Components/Component Coverage Investigation - Executive Summary.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Component Coverage Investigation - Executive Summary.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Component-promotion/Coverage_investigation_summary]]

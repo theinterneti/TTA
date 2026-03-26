@@ -131,4 +131,3 @@ The remaining 8 failing tests are related to frontend functionality and session 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Critical-001-resolution-summary]]

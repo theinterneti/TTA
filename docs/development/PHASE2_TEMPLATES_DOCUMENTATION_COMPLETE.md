@@ -296,4 +296,3 @@ nano src/components/neo4j/MATURITY.md
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Phase2_templates_documentation_complete]]

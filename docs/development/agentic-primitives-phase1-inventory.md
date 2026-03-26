@@ -536,4 +536,3 @@ primitives-v2.0.0                  # Major version (Phase 2 integration)
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-phase1-inventory]]

@@ -185,4 +185,3 @@ The staging environment is now 88.6% ready for production deployment, with all b
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issues/Critical-001-session-persistence-completed]]

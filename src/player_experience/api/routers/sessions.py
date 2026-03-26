@@ -9,12 +9,15 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
+from ...managers.character_avatar_manager import CharacterAvatarManager
+from ...managers.player_experience_manager import PlayerExperienceManager
 from ...managers.world_management_module import WorldManagementModule
 from ...services.session_store import SessionStore
 from ..auth import TokenData, get_current_active_player
+from .characters import get_character_manager_dep
 
 router = APIRouter()
 
@@ -48,8 +51,18 @@ def get_session_store() -> SessionStore:
     return _session_store  # type: ignore[return-value]
 
 
+def get_player_experience_manager_dep() -> PlayerExperienceManager:
+    """Resolve the player experience manager used for session aggregation."""
+    from ...database.session_repository import SessionRepository
+
+    return PlayerExperienceManager(session_repository=SessionRepository())
+
+
 # Global world manager instance
 _world_manager: WorldManagementModule | None = None
+_WORLD_ID_ALIASES = {
+    "test_world_001": "world_mindfulness_garden",
+}
 
 
 async def get_world_manager() -> WorldManagementModule:
@@ -58,6 +71,27 @@ async def get_world_manager() -> WorldManagementModule:
     if _world_manager is None:
         _world_manager = WorldManagementModule()
     return _world_manager
+
+
+def _resolve_world_id(world_id: str) -> str:
+    return _WORLD_ID_ALIASES.get(world_id, world_id)
+
+
+def _serialize_session(session: dict[str, Any]) -> dict[str, Any]:
+    return {
+        k: v
+        for k, v in session.items()
+        if k
+        in {
+            "session_id",
+            "character_id",
+            "world_id",
+            "status",
+            "created_at",
+            "last_interaction",
+            "updated_at",
+        }
+    }
 
 
 class TherapeuticSettings(BaseModel):
@@ -83,9 +117,24 @@ async def create_session(
     current_player: TokenData = Depends(get_current_active_player),
     world_manager: WorldManagementModule = Depends(get_world_manager),
     store: SessionStore = Depends(get_session_store),
+    character_manager: CharacterAvatarManager = Depends(get_character_manager_dep),
 ) -> dict[str, Any]:
+    character = character_manager.get_character(request.character_id)
+    if character is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Character {request.character_id} not found",
+        )
+
+    if character.player_id != current_player.player_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied",
+        )
+
     # Validate world exists
-    world = world_manager.get_world_details(request.world_id)
+    resolved_world_id = _resolve_world_id(request.world_id)
+    world = world_manager.get_world_details(resolved_world_id)
     if world is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -102,6 +151,7 @@ async def create_session(
         "therapeutic_settings": request.therapeutic_settings.model_dump(),
         "status": "active",
         "created_at": now,
+        "last_interaction": now,
         "updated_at": now,
         "owner": player_id,
     }
@@ -110,6 +160,8 @@ async def create_session(
         player_id=player_id or "",
         character_id=request.character_id,
         world_id=request.world_id,
+        character_name=character.name,
+        world_name=world.name,
     )
     return {
         "session_id": session_id,
@@ -117,6 +169,7 @@ async def create_session(
         "world_id": request.world_id,
         "status": "active",
         "created_at": now,
+        "last_interaction": now,
     }
 
 
@@ -130,19 +183,7 @@ async def get_session(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
         )
-    return {
-        k: v
-        for k, v in s.items()
-        if k
-        in {
-            "session_id",
-            "character_id",
-            "world_id",
-            "status",
-            "created_at",
-            "updated_at",
-        }
-    }
+    return _serialize_session(s)
 
 
 @router.put("/{session_id}")
@@ -158,20 +199,10 @@ async def update_session(
         )
     if request.therapeutic_settings is not None:
         s["therapeutic_settings"] = request.therapeutic_settings.model_dump()
-    s["updated_at"] = datetime.now(UTC).isoformat()
-    return {
-        k: v
-        for k, v in s.items()
-        if k
-        in {
-            "session_id",
-            "character_id",
-            "world_id",
-            "status",
-            "created_at",
-            "updated_at",
-        }
-    }
+    now = datetime.now(UTC).isoformat()
+    s["last_interaction"] = now
+    s["updated_at"] = now
+    return _serialize_session(s)
 
 
 @router.get("/{session_id}/progress")
@@ -203,11 +234,19 @@ async def get_session_progress(
 async def list_sessions(
     current_player: TokenData = Depends(get_current_active_player),
     store: SessionStore = Depends(get_session_store),
+    manager: PlayerExperienceManager = Depends(get_player_experience_manager_dep),
+    include_narrative: bool = Query(
+        False,
+        description="Include narrative orchestration snapshots for listed sessions.",
+    ),
 ) -> dict[str, Any]:
     """List all sessions for the authenticated player, newest first."""
     player_id = getattr(current_player, "player_id", "") or ""
-    sessions = store.list_sessions(player_id)
-    return {"sessions": sessions, "count": len(sessions)}
+    return await manager.get_session_list_api_payload(
+        player_id,
+        session_store=store,
+        include_narrative=include_narrative,
+    )
 
 
 @router.get("/{session_id}/messages")

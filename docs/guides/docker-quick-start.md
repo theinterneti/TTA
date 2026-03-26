@@ -106,4 +106,3 @@ After starting services:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Guides/Docker-quick-start]]

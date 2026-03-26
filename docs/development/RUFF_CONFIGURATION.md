@@ -278,4 +278,3 @@ For questions or issues:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Ruff_configuration]]

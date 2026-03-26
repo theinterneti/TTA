@@ -227,4 +227,3 @@ The combination of property-based tests and concrete value tests proved highly e
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Performance_monitor_mutation_results]]

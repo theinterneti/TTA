@@ -362,4 +362,3 @@ The Cosmic Ray mutation testing execution was an **OUTSTANDING SUCCESS**, achiev
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Cosmic_ray_final_results]]

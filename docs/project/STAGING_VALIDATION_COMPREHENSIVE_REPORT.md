@@ -341,4 +341,3 @@ The TTA staging environment is **operational and suitable for development and te
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Staging_validation_comprehensive_report]]

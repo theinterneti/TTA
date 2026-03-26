@@ -7,7 +7,7 @@ Tests cover:
 - get_player: not found → 404, access restricted → 403, success → 200
 - update_player: wrong player_id → 403, update failed → 400
 - delete_player: wrong player_id → 403, not found → 404, success → 204
-- get_player_progress: static dict → 200
+- get_player_progress: manager-backed dict → 200
 - get_player_dashboard: dict → 200
 - export_player_data: wrong player_id → 403
 """
@@ -15,13 +15,19 @@ Tests cover:
 from __future__ import annotations
 
 from datetime import datetime
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.auth import TokenData, get_current_active_player
-from src.player_experience.api.routers.players import get_player_manager_dep, router
+from src.player_experience.api.routers.characters import get_character_manager_dep
+from src.player_experience.api.routers.players import (
+    get_player_experience_manager_dep,
+    get_player_manager_dep,
+    router,
+)
+from src.player_experience.api.routers.sessions import get_session_store
 from src.player_experience.managers.player_profile_manager import (
     DataAccessRestrictedError,
     PlayerProfileManagerError,
@@ -45,13 +51,30 @@ def _make_player(player_id: str = "player-1") -> PlayerProfile:
 def _build_app(
     manager_mock: MagicMock,
     player_id: str = "player-1",
+    experience_manager_mock: MagicMock | None = None,
 ) -> TestClient:
+    session_store_override = MagicMock()
+    character_manager_override = MagicMock()
+
+    def _get_session_store_override() -> MagicMock:
+        return session_store_override
+
+    def _get_character_manager_override() -> MagicMock:
+        return character_manager_override
+
     app = FastAPI()
     app.include_router(router)
     app.dependency_overrides[get_current_active_player] = lambda: TokenData(
         player_id=player_id, username="testuser"
     )
     app.dependency_overrides[get_player_manager_dep] = lambda: manager_mock
+    app.dependency_overrides[get_player_experience_manager_dep] = lambda: (
+        experience_manager_mock or _mock_experience_manager()
+    )
+    app.dependency_overrides[get_session_store] = _get_session_store_override
+    app.dependency_overrides[get_character_manager_dep] = (
+        _get_character_manager_override
+    )
     return TestClient(app, raise_server_exceptions=False)
 
 
@@ -62,6 +85,49 @@ def _mock_manager() -> MagicMock:
     m.update_player_profile.return_value = False
     m.delete_player_profile.return_value = False
     m.export_player_data.return_value = {}
+    return m
+
+
+def _mock_experience_manager() -> MagicMock:
+    m = MagicMock()
+    m.get_progress_api_payload = AsyncMock(
+        return_value={
+            "player_id": "player-1",
+            "total_sessions": 2,
+            "total_time_minutes": 45,
+            "milestones_achieved": 1,
+            "current_streak_days": 3,
+            "therapeutic_momentum": 0.7,
+            "progress_trend": "stable",
+            "engagement_trend": "stable",
+            "last_updated": "2026-03-24T06:00:00+00:00",
+        }
+    )
+    m.get_dashboard_api_payload = AsyncMock(
+        return_value={
+            "player_id": "player-1",
+            "active_characters": [],
+            "recent_sessions": [],
+            "session_metrics": {
+                "total_count": 0,
+                "narrative_summary": {"stable_sessions": 0, "strained_sessions": 0},
+            },
+            "recommendations": [
+                {
+                    "recommendation_id": "rec-1",
+                    "title": "Stress Management Focus",
+                    "description": "Focus on stress management.",
+                    "recommendation_type": "therapeutic_focus",
+                    "priority": 2,
+                    "target_entity_id": None,
+                    "reasoning": "",
+                    "created_at": "2026-03-24T05:00:00+00:00",
+                    "expires_at": None,
+                    "is_dismissed": False,
+                }
+            ],
+        }
+    )
     return m
 
 
@@ -247,19 +313,26 @@ class TestDeletePlayer:
 
 class TestGetPlayerProgress:
     def test_returns_200_with_expected_fields(self):
-        client = _build_app(_mock_manager())
+        client = _build_app(
+            _mock_manager(), experience_manager_mock=_mock_experience_manager()
+        )
         resp = client.get("/player-1/progress")
         assert resp.status_code == 200
         data = resp.json()
         assert data["player_id"] == "player-1"
         assert "total_sessions" in data
         assert "total_time_minutes" in data
+        assert data["current_streak_days"] == 3
+        assert data["therapeutic_momentum"] == 0.7
 
-    def test_player_id_echoed_in_response(self):
-        client = _build_app(_mock_manager())
+    def test_rejects_progress_access_for_other_player(self):
+        client = _build_app(
+            _mock_manager(),
+            player_id="player-1",
+            experience_manager_mock=_mock_experience_manager(),
+        )
         resp = client.get("/some-player/progress")
-        assert resp.status_code == 200
-        assert resp.json()["player_id"] == "some-player"
+        assert resp.status_code == 403
 
 
 # ---------------------------------------------------------------------------
@@ -269,13 +342,76 @@ class TestGetPlayerProgress:
 
 class TestGetPlayerDashboard:
     def test_returns_200_with_player_id(self):
-        client = _build_app(_mock_manager())
+        client = _build_app(
+            _mock_manager(), experience_manager_mock=_mock_experience_manager()
+        )
         resp = client.get("/player-1/dashboard")
         assert resp.status_code == 200
         data = resp.json()
         assert data["player_id"] == "player-1"
         assert "active_characters" in data
         assert "recommendations" in data
+
+    def test_includes_recent_sessions_and_narrative_summary(self):
+        experience_manager = _mock_experience_manager()
+        experience_manager.get_dashboard_api_payload = AsyncMock(
+            return_value={
+                "player_id": "player-1",
+                "active_characters": [],
+                "recent_sessions": [
+                    {
+                        "session_id": "session-1",
+                        "narrative_orchestration": {
+                            "player_signals": {"coherence_status": "stable"}
+                        },
+                    }
+                ],
+                "session_metrics": {
+                    "total_count": 1,
+                    "narrative_summary": {"stable_sessions": 1, "strained_sessions": 0},
+                },
+                "recommendations": [
+                    {
+                        "recommendation_id": "rec-1",
+                        "title": "Stress Management Focus",
+                        "description": "Focus on stress management.",
+                        "recommendation_type": "therapeutic_focus",
+                        "priority": 2,
+                        "target_entity_id": None,
+                        "reasoning": "",
+                        "created_at": "2026-03-24T05:00:00+00:00",
+                        "expires_at": None,
+                        "is_dismissed": False,
+                    }
+                ],
+            }
+        )
+        client = _build_app(
+            _mock_manager(),
+            experience_manager_mock=experience_manager,
+        )
+        resp = client.get("/player-1/dashboard")
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["session_metrics"]["total_count"] == 1
+        assert data["session_metrics"]["narrative_summary"]["stable_sessions"] == 1
+        assert data["recommendations"][0]["recommendation_type"] == "therapeutic_focus"
+        assert (
+            data["recent_sessions"][0]["narrative_orchestration"]["player_signals"][
+                "coherence_status"
+            ]
+            == "stable"
+        )
+
+    def test_rejects_dashboard_access_for_other_player(self):
+        client = _build_app(
+            _mock_manager(),
+            player_id="player-1",
+            experience_manager_mock=_mock_experience_manager(),
+        )
+        resp = client.get("/other-player/dashboard")
+        assert resp.status_code == 403
 
 
 # ---------------------------------------------------------------------------

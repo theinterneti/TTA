@@ -470,4 +470,3 @@ The TTA database layer is well-architected with good caching strategies already 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Database_performance_optimization]]

@@ -204,4 +204,3 @@ The TTA Enhanced Extended Session Quality Evaluation Framework has been **compre
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Results/Phase_2_integration_validation_report]]

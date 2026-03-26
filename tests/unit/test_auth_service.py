@@ -203,9 +203,9 @@ class TestMFAService:
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         # Manually expire the challenge
-        svc.active_challenges[challenge.challenge_id].expires_at = (
-            datetime.now(UTC) - timedelta(minutes=1)
-        )
+        svc.active_challenges[challenge.challenge_id].expires_at = datetime.now(
+            UTC
+        ) - timedelta(minutes=1)
         verification = MFAVerification(
             challenge_id=challenge.challenge_id, code="123456", method=MFAMethod.TOTP
         )
@@ -229,9 +229,9 @@ class TestMFAService:
 
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
-        svc.active_challenges[challenge.challenge_id].expires_at = (
-            datetime.now(UTC) - timedelta(minutes=1)
-        )
+        svc.active_challenges[challenge.challenge_id].expires_at = datetime.now(
+            UTC
+        ) - timedelta(minutes=1)
 
         svc.cleanup_expired_challenges()
         assert challenge.challenge_id not in svc.active_challenges
@@ -241,6 +241,26 @@ class TestMFAService:
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         svc.cleanup_expired_challenges()
         assert challenge.challenge_id in svc.active_challenges
+
+    def test_verify_backup_code_succeeds_and_consumes_code(self):
+        svc = self._svc()
+        challenge = svc.create_mfa_challenge("u1", MFAMethod.BACKUP_CODES)
+        backup_codes = ["ABC12345", "DEF67890"]
+        verification = MFAVerification(
+            challenge_id=challenge.challenge_id,
+            code="ABC12345",
+            method=MFAMethod.BACKUP_CODES,
+        )
+
+        assert (
+            svc.verify_mfa_challenge(
+                verification,
+                secret="unused",
+                backup_codes=backup_codes,
+            )
+            is True
+        )
+        assert backup_codes == ["DEF67890"]
 
 
 # ===========================================================================
@@ -417,6 +437,16 @@ class TestEnhancedAuthServiceSessionAndToken:
         )
         svc.cleanup_expired_sessions()
         assert session_id not in svc.active_sessions
+
+
+class TestEnhancedAuthServiceMFASetup:
+    def test_setup_mfa_uses_passed_username_and_stores_backup_codes(self):
+        svc = _make_service()
+
+        setup_info = svc.setup_mfa("u1", MFAMethod.TOTP, username="alice")
+
+        assert setup_info["backup_codes"]
+        assert svc.mfa_secrets["u1"][0].backup_codes == setup_info["backup_codes"]
 
 
 class TestEnhancedAuthServicePermissions:

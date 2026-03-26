@@ -5,4 +5,3 @@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Includes/Abbreviations]]

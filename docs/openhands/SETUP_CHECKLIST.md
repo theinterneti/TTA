@@ -187,4 +187,3 @@ After successful setup:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Setup_checklist]]

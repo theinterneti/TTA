@@ -286,4 +286,3 @@ response = await model.generate(prompt)
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Decisions/Adr-001-openhands-integration-postponement]]

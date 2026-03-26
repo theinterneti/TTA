@@ -112,4 +112,3 @@ The framework provides the data-driven evidence needed to validate TTA's market 
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Simulation/Production_deployment_success]]

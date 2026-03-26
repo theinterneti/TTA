@@ -451,4 +451,3 @@ Questions? See the correction summary issue: #[CORRECTION_ISSUE_NUMBER]
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Correction_action_plan]]

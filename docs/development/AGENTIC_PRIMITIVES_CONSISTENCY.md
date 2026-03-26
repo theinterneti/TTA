@@ -418,4 +418,3 @@ Generate documentation files (AGENTS.md, CLAUDE.md) from source configuration fi
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Agentic_primitives_consistency]]

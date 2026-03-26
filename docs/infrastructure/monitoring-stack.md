@@ -295,4 +295,3 @@ docker exec tta-promtail cat /etc/promtail/config.yml
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Infrastructure/Monitoring-stack]]

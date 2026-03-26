@@ -188,4 +188,3 @@ CRITICAL-001 has been successfully resolved. The backend is production-ready and
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Next-steps-after-critical-001]]

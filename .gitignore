@@ -470,3 +470,4 @@ backups/
 # Legacy agentic component runtime/state directories
 platform/dev/agentic/*/runtime/
 platform/dev/agentic/*/state/
+.worktrees/

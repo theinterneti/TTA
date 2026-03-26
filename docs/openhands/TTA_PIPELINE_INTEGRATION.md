@@ -383,4 +383,3 @@ logger = logging.getLogger("openhands_integration")
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Tta_pipeline_integration]]

@@ -241,4 +241,3 @@ The TTA system's narrative coherence capabilities have been **comprehensively va
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Narrative_coherence_validation_summary]]

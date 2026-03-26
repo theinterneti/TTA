@@ -178,4 +178,3 @@ The TTA Enhanced Extended Session Quality Evaluation Framework now provides user
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Results/Comprehensive_validation_report]]

@@ -178,4 +178,3 @@ For questions about generated tests or test generation process:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Generated_tests_summary]]

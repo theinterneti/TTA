@@ -184,4 +184,3 @@ sudo apt upgrade google-chrome-stable
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Guides/Notebooklm-copilot]]

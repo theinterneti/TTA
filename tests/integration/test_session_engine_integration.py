@@ -16,13 +16,9 @@ from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import app
 
-# Session management (POST /sessions, GET /sessions/:id, etc.) is not yet
-# implemented — see GDD.md Phase 2 and docs/design/technical-specifications.md.
-# These tests serve as executable specs for the expected behavior.
-pytestmark = pytest.mark.xfail(
-    reason="Session management API not yet implemented (GDD Phase 2)",
-    strict=False,
-)
+# Session management is partially implemented. Keep xfail only on the specific
+# behaviors that are still pending from Phase 2 instead of the whole module.
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture

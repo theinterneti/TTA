@@ -113,4 +113,3 @@ fn = creg.resolve_callable(spec)  # spec.name="math.add", spec.version="1.0.0"
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Orchestration/Agent_orchestration_tools]]

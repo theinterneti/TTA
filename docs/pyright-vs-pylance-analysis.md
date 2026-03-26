@@ -354,4 +354,3 @@ All documentation correctly reflects the dual usage of Pylance (IDE) and Pyright
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Pyright-vs-pylance-analysis]]

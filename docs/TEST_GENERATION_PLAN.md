@@ -172,4 +172,3 @@ For each module, OpenHands will:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Test_generation_plan]]

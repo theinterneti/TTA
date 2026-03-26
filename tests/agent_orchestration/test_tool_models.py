@@ -27,7 +27,9 @@ def test_tool_spec_semver_and_param_limits():
             name="x",
             version="1.0.0",
             description="d",
-            parameters=[ToolParameter(name=f"q{i}", param_schema={}) for i in range(20)],
+            parameters=[
+                ToolParameter(name=f"q{i}", param_schema={}) for i in range(20)
+            ],
         )
 
 

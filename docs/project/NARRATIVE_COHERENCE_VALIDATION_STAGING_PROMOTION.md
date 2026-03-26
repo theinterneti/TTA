@@ -397,4 +397,3 @@ The Narrative Coherence Validation component is ready for staging promotion:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Narrative_coherence_validation_staging_promotion]]

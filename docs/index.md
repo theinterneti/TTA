@@ -102,4 +102,3 @@ Each component of the TTA project has its own detailed documentation:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Index]]

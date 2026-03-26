@@ -370,4 +370,3 @@ Phase 1 security remediation is **complete and ready for review**. All critical 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Security/Phase1-completion-summary]]

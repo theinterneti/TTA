@@ -378,4 +378,3 @@ NODE_ENV=staging
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Validation_report_2025-01-11]]

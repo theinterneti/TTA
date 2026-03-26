@@ -252,4 +252,3 @@ Related to: Three-tier branching strategy implementation
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Documentation_update_summary]]

@@ -373,4 +373,3 @@ The CI/CD integration for mutation testing is **complete and operational**. All 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Cicd_integration_summary]]

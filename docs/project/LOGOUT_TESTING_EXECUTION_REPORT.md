@@ -170,4 +170,3 @@ The logout functionality has been partially implemented with proper backend supp
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Logout_testing_execution_report]]

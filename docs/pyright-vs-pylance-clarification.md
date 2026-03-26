@@ -385,4 +385,3 @@ Only use `settings.json` for Pylance-specific IDE features:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Pyright-vs-pylance-clarification]]

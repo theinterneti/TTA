@@ -294,4 +294,3 @@ Everything is set up and ready to use. Start with the Getting Started guide and 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Implementation_complete_final_summary]]

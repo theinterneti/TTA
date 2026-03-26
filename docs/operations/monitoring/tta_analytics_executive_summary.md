@@ -163,4 +163,3 @@ With full implementation, the TTA analytics system will provide:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Operations/Monitoring/Tta_analytics_executive_summary]]

@@ -346,4 +346,3 @@ The staging environment is **production-ready from an infrastructure perspective
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Staging_validation_updated_report]]

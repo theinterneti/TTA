@@ -311,4 +311,3 @@ Manual mutation testing successfully identified critical gaps in the ModelSelect
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Manual_mutation_testing_results]]

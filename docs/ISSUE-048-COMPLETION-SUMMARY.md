@@ -173,4 +173,3 @@ The remaining failing test (logout functionality) has been tracked as a separate
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issue-048-completion-summary]]

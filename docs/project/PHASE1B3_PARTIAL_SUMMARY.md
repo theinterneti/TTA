@@ -253,4 +253,3 @@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Phase1b3_partial_summary]]

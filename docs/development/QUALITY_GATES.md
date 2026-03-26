@@ -261,4 +261,3 @@ Quality gates should evolve with the project:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Quality_gates]]

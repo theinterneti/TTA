@@ -185,4 +185,3 @@ The reorganization of the TTA project files, folders, and documentation has crea
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Project_organization]]

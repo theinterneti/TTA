@@ -234,4 +234,3 @@ For issues specific to:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Mcp_setup_readme]]

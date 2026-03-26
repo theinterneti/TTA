@@ -445,4 +445,3 @@ echo 'export REDIS_URL="redis://localhost:6379"' >> ~/.bashrc
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Gemini-cli-extensions-evaluation]]

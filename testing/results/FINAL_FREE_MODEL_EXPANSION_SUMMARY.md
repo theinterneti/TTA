@@ -240,4 +240,3 @@ The TTA Enhanced Extended Session Quality Evaluation Framework has been **succes
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Results/Final_free_model_expansion_summary]]

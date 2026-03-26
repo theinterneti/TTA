@@ -258,4 +258,3 @@ The 90% failure rate in Phase 2 Expansion testing was NOT due to testing methodo
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Validation/Investigation_findings_and_recommendations]]

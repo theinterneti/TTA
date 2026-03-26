@@ -66,4 +66,3 @@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Model-compatibility-results]]

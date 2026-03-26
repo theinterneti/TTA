@@ -282,4 +282,3 @@ python benchmark_improvements.py
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Primitives-comparison]]

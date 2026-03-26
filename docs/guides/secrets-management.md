@@ -368,4 +368,3 @@ secrets:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Guides/Secrets-management]]

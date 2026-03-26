@@ -313,4 +313,3 @@ See `tests/e2e-staging/ADVANCED_TESTING_INFRASTRUCTURE.md` for:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Advanced_testing_verification_report]]

@@ -223,4 +223,3 @@ Response: 200 OK (Valid JWT token returned)
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Staging_promotion_decision]]

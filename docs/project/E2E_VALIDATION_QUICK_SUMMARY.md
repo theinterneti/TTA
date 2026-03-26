@@ -262,4 +262,3 @@ npx playwright show-report playwright-staging-report
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/E2e_validation_quick_summary]]

@@ -340,4 +340,3 @@ The testing infrastructure is ready for immediate use and will help ensure the T
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/E2e_testing_implementation_summary]]

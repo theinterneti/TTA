@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Extended_evaluation/Analysis_reporting]]
 Analysis and Reporting System for Extended Session Quality Evaluation
 
 Provides comprehensive analysis, pattern recognition, and reporting

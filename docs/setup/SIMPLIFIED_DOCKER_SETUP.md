@@ -214,4 +214,3 @@ docker-compose -f docker-compose.simple.yml logs redis
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Simplified_docker_setup]]

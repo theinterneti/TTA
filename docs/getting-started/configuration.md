@@ -622,4 +622,3 @@ docker-compose exec redis redis-cli ping
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Getting-started/Configuration]]

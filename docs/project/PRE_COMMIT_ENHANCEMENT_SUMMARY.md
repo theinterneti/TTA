@@ -388,4 +388,3 @@ The configuration is production-ready and aligned with our WSL2 solo developer w
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Pre_commit_enhancement_summary]]

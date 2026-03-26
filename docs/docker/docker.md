@@ -132,4 +132,3 @@ If you encounter issues with the Docker Component, check the following:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Docker/Docker]]

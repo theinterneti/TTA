@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Architecture/TTA Agent Coordination Package Design]]
 > - **Path:** `.augment/kb/Architecture/TTA Agent Coordination Package Design.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/TTA Agent Coordination Package Design.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tta_agent_coordination_package_design]]

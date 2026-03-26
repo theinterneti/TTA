@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Components/Coverage Improvement Test Plan]]
 > - **Path:** `.augment/kb/Components/Coverage Improvement Test Plan.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Coverage Improvement Test Plan.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Component-promotion/Coverage_improvement_test_plan]]

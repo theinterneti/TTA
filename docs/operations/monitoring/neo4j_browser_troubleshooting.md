@@ -305,4 +305,3 @@ The Neo4j browser should now work reliably with the provided safe Cypher example
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Operations/Monitoring/Neo4j_browser_troubleshooting]]

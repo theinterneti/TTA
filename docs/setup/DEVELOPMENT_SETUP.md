@@ -182,4 +182,3 @@ docker-compose -f tta.dev/docker-compose.yml -f docker-compose.hotreload.yml up 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Development_setup]]

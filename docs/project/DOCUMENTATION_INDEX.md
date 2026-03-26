@@ -198,4 +198,3 @@ When creating or updating documentation:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Documentation_index]]

@@ -122,4 +122,3 @@ Documentation/
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Directory_structure]]

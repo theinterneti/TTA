@@ -41,7 +41,10 @@ class TestWorldManagementModule(unittest.TestCase):
         )
 
         assert manager_with_deps.world_state_manager == mock_world_state_manager
-        assert manager_with_deps.therapeutic_environment_generator == mock_therapeutic_generator
+        assert (
+            manager_with_deps.therapeutic_environment_generator
+            == mock_therapeutic_generator
+        )
 
     def test_get_available_worlds_without_character(self):
         """Test getting available worlds without character filtering."""

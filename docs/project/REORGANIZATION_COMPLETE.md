@@ -392,4 +392,3 @@ The TTA project reorganization has been **successfully completed**, achieving a 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Reorganization_complete]]

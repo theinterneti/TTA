@@ -77,7 +77,10 @@ class TestSessionRepository(unittest.TestCase):
         assert deserialized.session_id == self.test_session.session_id
         assert deserialized.player_id == self.test_session.player_id
         assert deserialized.status == self.test_session.status
-        assert deserialized.therapeutic_settings.intensity_level == self.test_session.therapeutic_settings.intensity_level
+        assert (
+            deserialized.therapeutic_settings.intensity_level
+            == self.test_session.therapeutic_settings.intensity_level
+        )
 
     async def _async_create_session(self):
         """Test creating a session in the repository."""
@@ -459,7 +462,10 @@ class TestSessionIntegrationManager(unittest.TestCase):
 
         assert result
         assert active_session.therapeutic_settings.intensity_level == 0.8
-        assert active_session.therapeutic_settings.preferred_approaches[0] == TherapeuticApproach.MINDFULNESS
+        assert (
+            active_session.therapeutic_settings.preferred_approaches[0]
+            == TherapeuticApproach.MINDFULNESS
+        )
         self.mock_narrative_engine.update_therapeutic_settings.assert_called_once()
 
     def test_get_session_continuity_data(self):

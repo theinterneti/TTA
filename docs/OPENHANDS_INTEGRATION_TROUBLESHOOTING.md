@@ -241,4 +241,3 @@ For issues not covered here:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands_integration_troubleshooting]]

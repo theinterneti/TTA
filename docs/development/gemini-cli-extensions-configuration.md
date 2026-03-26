@@ -368,4 +368,3 @@ Consider:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Gemini-cli-extensions-configuration]]

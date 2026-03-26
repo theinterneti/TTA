@@ -355,4 +355,3 @@ See separate template files:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Agentic-primitives-implementation-plan]]

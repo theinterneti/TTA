@@ -196,4 +196,3 @@ The logout functionality is **fully implemented, tested, and working correctly**
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Logout_test_execution_report]]

@@ -579,4 +579,3 @@ Extensions provide additional context via GEMINI.md files automatically loaded b
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Gemini-cli-integration-summary]]

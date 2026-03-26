@@ -154,4 +154,3 @@ All four missing test phases have been executed and analyzed. Results show:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Issues/Medium-001-test-coverage-analysis]]

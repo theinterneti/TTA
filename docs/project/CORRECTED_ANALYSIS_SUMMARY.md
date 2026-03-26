@@ -323,4 +323,3 @@ cat component-maturity-analysis.json | jq
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Corrected_analysis_summary]]

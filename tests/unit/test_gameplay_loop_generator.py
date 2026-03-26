@@ -8,6 +8,7 @@ slot_index mechanism that prevents identical choices.
 from __future__ import annotations
 
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -34,16 +35,17 @@ if sys.version_info < (3, 14):
     )
 else:
     # Dummy imports for Python 3.14+
-    ChoiceGenerator = None  # type: ignore[misc,assignment]
-    ChoiceTemplate = None  # type: ignore[misc,assignment]
-    Choice = None  # type: ignore[misc,assignment]
-    ChoiceType = None  # type: ignore[misc,assignment]
-    DifficultyLevel = None  # type: ignore[misc,assignment]
-    EmotionalState = None  # type: ignore[misc,assignment]
-    Scene = None  # type: ignore[misc,assignment]
-    SceneType = None  # type: ignore[misc,assignment]
-    SessionState = None  # type: ignore[misc,assignment]
-    TherapeuticContext = None  # type: ignore[misc,assignment]
+    _dummy = object()
+    ChoiceGenerator = SimpleNamespace  # type: ignore[misc,assignment]
+    ChoiceTemplate = SimpleNamespace  # type: ignore[misc,assignment]
+    Choice = SimpleNamespace  # type: ignore[misc,assignment]
+    ChoiceType = SimpleNamespace(THERAPEUTIC=_dummy)  # type: ignore[misc,assignment]
+    DifficultyLevel = SimpleNamespace(STANDARD=_dummy)  # type: ignore[misc,assignment]
+    EmotionalState = SimpleNamespace(CALM=_dummy)  # type: ignore[misc,assignment]
+    Scene = SimpleNamespace  # type: ignore[misc,assignment]
+    SceneType = SimpleNamespace(EXPLORATION=_dummy)  # type: ignore[misc,assignment]
+    SessionState = SimpleNamespace  # type: ignore[misc,assignment]
+    TherapeuticContext = SimpleNamespace  # type: ignore[misc,assignment]
 
 # ---------------------------------------------------------------------------
 # Helpers

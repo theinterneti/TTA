@@ -224,4 +224,3 @@ All investigation documents are located in `docs/openhands/`:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Investigation_complete]]

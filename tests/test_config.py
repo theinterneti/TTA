@@ -289,7 +289,9 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         # Temporarily remove a required key to simulate failure
         original_value = config.config.pop("agent_orchestration")
-        with pytest.raises(ValueError, match="Required key 'agent_orchestration' is missing"):
+        with pytest.raises(
+            ValueError, match="Required key 'agent_orchestration' is missing"
+        ):
             config.validate()
         config.config["agent_orchestration"] = original_value  # Restore
 
@@ -300,7 +302,9 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         original_value = config.config["agent_orchestration"]["port"]
         config.config["agent_orchestration"]["port"] = "not_an_int"
-        with pytest.raises(ValueError, match="Key 'agent_orchestration.port' must be an integer"):
+        with pytest.raises(
+            ValueError, match="Key 'agent_orchestration.port' must be an integer"
+        ):
             config.validate()
         config.config["agent_orchestration"]["port"] = original_value  # Restore
 
@@ -311,7 +315,10 @@ orchestration:
         config = TTAConfig(self.dummy_default_config_path)
         original_value = config.config["environment"]["log_level"]
         config.config["environment"]["log_level"] = "invalid_level"
-        with pytest.raises(ValueError, match=r"Key 'environment.log_level' must be one of \['debug', 'info', 'warning', 'error', 'critical'\]"):
+        with pytest.raises(
+            ValueError,
+            match=r"Key 'environment.log_level' must be one of \['debug', 'info', 'warning', 'error', 'critical'\]",
+        ):
             config.validate()
         config.config["environment"]["log_level"] = original_value  # Restore
 

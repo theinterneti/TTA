@@ -508,4 +508,3 @@ git branch --show-current
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Git_commit_strategy]]

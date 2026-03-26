@@ -20,6 +20,7 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from ....components import NarrativeArcOrchestratorComponent
 from ...services.enhanced_session_persistence import EnhancedSessionPersistence
 from ..auth import TokenData, get_current_active_player
 
@@ -35,6 +36,7 @@ _SESSION_STATES: dict[str, dict[str, Any]] = {}
 
 # Enhanced session persistence service (initialized later with Redis client)
 _SESSION_PERSISTENCE: EnhancedSessionPersistence | None = None
+_narrative_orchestrator: NarrativeArcOrchestratorComponent | None = None
 
 # Redis key prefixes for conversation storage
 CONVERSATION_KEY_PREFIX = "tta:conversation:"
@@ -71,6 +73,109 @@ class ConversationHistory(BaseModel):
     total_messages: int
     created_at: str
     last_activity: str
+
+
+def _get_narrative_orchestrator() -> NarrativeArcOrchestratorComponent:
+    """Lazily construct the narrative orchestrator for session-state enrichment."""
+    global _narrative_orchestrator  # noqa: PLW0603
+    if _narrative_orchestrator is None:
+        _narrative_orchestrator = NarrativeArcOrchestratorComponent(
+            {
+                "tta.prototype.components.narrative_arc_orchestrator": {
+                    "dependency_adapters": {
+                        "session_persistence": lambda: _SESSION_PERSISTENCE
+                    }
+                }
+            }
+        )
+    return _narrative_orchestrator
+
+
+def _build_narrative_therapeutic_settings(
+    session_state: dict[str, Any],
+    context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Project conversation state into the shared narrative-engine settings shape."""
+    context = context or {}
+    merged_settings: dict[str, Any] = {}
+    context_settings = context.get("therapeutic_settings")
+    if isinstance(context_settings, dict):
+        merged_settings.update(context_settings)
+
+    merged_settings.setdefault(
+        "therapeutic_focus", session_state.get("therapeutic_focus", "general_support")
+    )
+    merged_settings["session_goals"] = list(session_state.get("session_goals", []))
+    merged_settings["emotional_themes"] = list(
+        session_state.get("emotional_themes", [])
+    )
+    return merged_settings
+
+
+def _build_narrative_session_payload(
+    session_state: dict[str, Any],
+    progress_analysis: dict[str, Any],
+) -> dict[str, Any]:
+    """Translate conversation/session analytics into orchestrator runtime state."""
+    active_threads = [
+        f"theme:{theme}" for theme in session_state.get("emotional_themes", [])
+    ]
+    active_threads.extend(
+        f"goal:{goal}" for goal in session_state.get("session_goals", []) if goal
+    )
+    deduped_threads = list(dict.fromkeys(active_threads))
+
+    coherence_score = float(progress_analysis.get("session_quality_score", 0.7))
+    therapeutic_alignment = float(
+        progress_analysis.get(
+            "emotional_progress_score",
+            progress_analysis.get("session_quality_score", 0.7),
+        )
+    )
+
+    return {
+        "session_id": session_state["session_id"],
+        "player_id": session_state["player_id"],
+        "created_at": session_state["created_at"],
+        "last_updated": session_state["last_updated"],
+        "interaction_count": session_state.get("interaction_count", 0),
+        "engagement_score": float(progress_analysis.get("engagement_level", 0.5)),
+        "coherence_score": coherence_score,
+        "therapeutic_alignment": therapeutic_alignment,
+        "active_threads": deduped_threads,
+        "therapeutic_settings": _build_narrative_therapeutic_settings(session_state),
+    }
+
+
+async def _sync_narrative_orchestration(
+    session_state: dict[str, Any],
+    context: dict[str, Any],
+    progress_analysis: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Keep the narrative orchestrator aligned with the therapeutic session state."""
+    try:
+        orchestrator = _get_narrative_orchestrator()
+        session_id = str(session_state["session_id"])
+        await orchestrator.initialize_session(
+            session_id=session_id,
+            character_id=str(context.get("character_id", "therapeutic-companion")),
+            world_id=str(context.get("world_id", "therapeutic-space")),
+            therapeutic_settings=_build_narrative_therapeutic_settings(
+                session_state, context
+            ),
+        )
+        await orchestrator.restore_session_state(
+            session_id,
+            _build_narrative_session_payload(session_state, progress_analysis),
+        )
+        return await orchestrator.get_session_state(session_id)
+    except Exception as exc:
+        logger.error(
+            "Failed to synchronize narrative orchestration for session %s: %s",
+            session_state.get("session_id"),
+            exc,
+        )
+        return None
 
 
 async def _persist_conversation_to_redis(
@@ -706,6 +811,14 @@ async def send_message(
                 "emotional_state_history"
             ][-20:]
 
+        narrative_orchestration = await _sync_narrative_orchestration(
+            session_state,
+            request.context,
+            progress_analysis,
+        )
+        if narrative_orchestration:
+            session_state["narrative_orchestration"] = narrative_orchestration
+
         # Persist enhanced session state to Redis
         if _SESSION_PERSISTENCE:
             await _SESSION_PERSISTENCE.save_session_state(session_id, session_state)
@@ -739,7 +852,11 @@ async def send_message(
             session_id=session_id,
             response=ai_response,
             timestamp=ai_msg.timestamp,
-            metadata={**ai_metadata, "progress_analysis": progress_analysis},
+            metadata={
+                **ai_metadata,
+                "progress_analysis": progress_analysis,
+                "narrative_orchestration": narrative_orchestration or {},
+            },
         )
 
     except HTTPException:
@@ -945,6 +1062,11 @@ async def get_session_state(
                 else 0.5
             ),
         }
+        narrative_orchestration = await _get_narrative_orchestrator().get_session_state(
+            session_id
+        )
+        if narrative_orchestration:
+            enhanced_state["narrative_orchestration"] = narrative_orchestration
 
         return enhanced_state
 
@@ -1036,6 +1158,13 @@ async def set_session_goals(
                 session_analytics["therapeutic_goals_progress"][goal] = 0.0
 
         session_state["session_analytics"] = session_analytics
+        if await _get_narrative_orchestrator().update_therapeutic_settings(
+            session_id,
+            _build_narrative_therapeutic_settings(session_state),
+        ):
+            session_state[
+                "narrative_orchestration"
+            ] = await _get_narrative_orchestrator().get_session_state(session_id)
 
         logger.info(f"Set {len(goals)} therapeutic goals for session {session_id}")
 

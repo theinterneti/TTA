@@ -210,4 +210,3 @@ Task 14.2 has been successfully completed with a comprehensive, GDPR-compliant d
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Task_14_2_data_privacy_protection_summary]]

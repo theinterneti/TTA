@@ -345,4 +345,3 @@ The system demonstrates:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Narrative_coherence_validation_report]]

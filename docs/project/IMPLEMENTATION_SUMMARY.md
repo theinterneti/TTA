@@ -371,4 +371,3 @@ uv run python scripts/analyze-component-maturity.py
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Implementation_summary]]

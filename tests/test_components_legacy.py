@@ -53,11 +53,15 @@ class TestComponents(unittest.TestCase):
         # Test starting the component
         if os.environ.get("RUN_DOCKER_TESTS", "false").lower() == "true":
             assert docker.start(), "Docker component failed to start"
-            assert docker.status.value == "running", "Docker component status is incorrect after starting"
+            assert docker.status.value == "running", (
+                "Docker component status is incorrect after starting"
+            )
 
             # Test stopping the component
             assert docker.stop(), "Docker component failed to stop"
-            assert docker.status.value == "stopped", "Docker component status is incorrect after stopping"
+            assert docker.status.value == "stopped", (
+                "Docker component status is incorrect after stopping"
+            )
 
     # Batch 1: Start/Stop Operations (3 tests)
     def test_docker_start_success(self):
@@ -90,7 +94,9 @@ class TestComponents(unittest.TestCase):
             side_effect=RuntimeError("Docker not installed"),
         ):
             result = docker.start()
-            assert not result, "Docker component should fail to start when Docker not installed"
+            assert not result, (
+                "Docker component should fail to start when Docker not installed"
+            )
 
     def test_docker_stop_success(self):
         """Test Docker component stop (always succeeds as it's a no-op)."""
@@ -204,7 +210,9 @@ class TestComponents(unittest.TestCase):
 
         if has_codecarbon:
             assert carbon.start(), "Carbon component failed to start"
-            assert carbon.status.value == "running", "Carbon component status is incorrect after starting"
+            assert carbon.status.value == "running", (
+                "Carbon component status is incorrect after starting"
+            )
 
             # Test tracking a function
             def test_function():
@@ -216,11 +224,15 @@ class TestComponents(unittest.TestCase):
             # Test getting emissions report
             report = carbon.get_emissions_report()
             assert "project_name" in report, "Emissions report is missing project_name"
-            assert "total_emissions" in report, "Emissions report is missing total_emissions"
+            assert "total_emissions" in report, (
+                "Emissions report is missing total_emissions"
+            )
 
             # Test stopping the component
             assert carbon.stop(), "Carbon component failed to stop"
-            assert carbon.status.value == "stopped", "Carbon component status is incorrect after stopping"
+            assert carbon.status.value == "stopped", (
+                "Carbon component status is incorrect after stopping"
+            )
 
     def test_carbon_decorator(self):
         """Test the Carbon component decorator functionality."""
@@ -259,7 +271,9 @@ class TestComponents(unittest.TestCase):
         with patch("src.components.carbon_component.codecarbon_available", False):
             carbon.start()
             result = carbon.stop()
-            assert result, "Carbon component should stop successfully without codecarbon"
+            assert result, (
+                "Carbon component should stop successfully without codecarbon"
+            )
 
     def test_carbon_stop_with_emissions_data(self):
         """Test Carbon component stop with emissions data."""
@@ -428,7 +442,9 @@ class TestComponents(unittest.TestCase):
         ):
             docker._copy_template_files("tta.dev")
             # Verify mkdir and copy were called
-            assert mock_mkdir.called or mock_copy.called, "Directory creation or copy should occur"
+            assert mock_mkdir.called or mock_copy.called, (
+                "Directory creation or copy should occur"
+            )
 
     # Batch 5: Container Name Standardization (2 tests)
     def test_standardize_container_names_success(self):
@@ -608,7 +624,10 @@ class TestComponents(unittest.TestCase):
         assert docker._get_env_var_default("NEO4J_URI") == "bolt://neo4j:7687"
         assert docker._get_env_var_default("NEO4J_USERNAME") == "neo4j"
         assert docker._get_env_var_default("MODEL_CACHE_DIR") == "/app/.model_cache"
-        assert docker._get_env_var_default("CODECARBON_OUTPUT_DIR") == "/app/logs/codecarbon"
+        assert (
+            docker._get_env_var_default("CODECARBON_OUTPUT_DIR")
+            == "/app/logs/codecarbon"
+        )
 
     def test_get_env_var_default_unknown_var(self):
         """Test getting default value for unknown environment variable."""
@@ -872,6 +891,7 @@ class TestComponents(unittest.TestCase):
         with (
             patch.object(app, "_is_app_running", return_value=True),
             patch.object(app, "_run_docker_compose") as mock_docker,
+            patch("src.components.app_component.time.sleep", return_value=None),
         ):
             # Mock successful docker-compose stop command
             mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
@@ -941,6 +961,7 @@ class TestComponents(unittest.TestCase):
             patch.object(app.config, "get", return_value=8501),
             patch.object(app, "_is_app_running", return_value=False),
             patch.object(app, "_run_docker_compose") as mock_docker,
+            patch("src.components.app_component.time.sleep", return_value=None),
         ):
             # Mock successful docker-compose up command
             mock_result = type("obj", (object,), {"returncode": 0, "stderr": ""})()
@@ -1045,6 +1066,7 @@ class TestComponents(unittest.TestCase):
         with (
             patch.object(llm, "_is_llm_running", return_value=True),
             patch.object(llm, "_run_docker_compose", return_value=mock_result),
+            patch("src.components.llm_component.time.sleep", return_value=None),
         ):
             # Set status to RUNNING
             llm.status = ComponentStatus.RUNNING
@@ -1121,6 +1143,7 @@ class TestComponents(unittest.TestCase):
         with (
             patch.object(llm, "_is_llm_running", return_value=False),
             patch.object(llm, "_run_docker_compose", return_value=mock_result),
+            patch("src.components.llm_component.time.sleep", return_value=None),
         ):
             result = llm.start()
             assert not result, "LLM component should timeout during start"
@@ -1212,7 +1235,9 @@ class TestComponents(unittest.TestCase):
             "requests.get", side_effect=requests.RequestException("Connection error")
         ):
             result = llm._is_llm_running()
-            assert not result, "LLM should be considered not running on connection error"
+            assert not result, (
+                "LLM should be considered not running on connection error"
+            )
 
 
 if __name__ == "__main__":

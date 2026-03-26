@@ -412,7 +412,9 @@ class TestPerformanceBenchmarks:
                 while time.time() - start_time < duration:
                     # Maintain concurrent workflow count
                     while len(active_tasks) < concurrent_count:
-                        task = asyncio.create_task(benchmark_workflow(workflow_id, metrics))
+                        task = asyncio.create_task(
+                            benchmark_workflow(workflow_id, metrics)
+                        )
                         active_tasks.add(task)
                         workflow_id += 1
 

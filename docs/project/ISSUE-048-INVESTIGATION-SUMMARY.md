@@ -169,4 +169,3 @@ Reason: Session data lost during navigation
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Issue-048-investigation-summary]]

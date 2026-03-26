@@ -323,4 +323,3 @@ uv run python scripts/test_model_compatibility.py --model openrouter/new-model-n
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Free-model-registry]]

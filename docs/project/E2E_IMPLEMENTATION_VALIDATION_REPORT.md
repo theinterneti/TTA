@@ -330,4 +330,3 @@ The E2E testing framework is **fully functional and ready for immediate use**. A
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/E2e_implementation_validation_report]]

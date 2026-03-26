@@ -193,4 +193,3 @@ For more information about Docker and devcontainer setup, see the [Docker Setup 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Orchestration/Orchestration]]

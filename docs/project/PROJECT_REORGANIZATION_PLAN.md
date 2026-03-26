@@ -591,4 +591,3 @@ This document provides a detailed categorization and reorganization plan for 100
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Project_reorganization_plan]]

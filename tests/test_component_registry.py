@@ -133,28 +133,37 @@ from tests.test_component_registry import DummyComponent
         Test get_component_class when importlib.util.spec_from_file_location returns None.
         """
         mock_spec_from_file_location.return_value = None
-        with pytest.raises(ValueError, match="Could not load component 'import_error_component'"):
+        with pytest.raises(
+            ValueError, match="Could not load component 'import_error_component'"
+        ):
             self.registry.get_component_class("import_error_component")
 
     def test_get_component_class_not_registered(self):
         """
         Test get_component_class with a component that is not registered.
         """
-        with pytest.raises(ValueError, match="Component 'non_existent_component' is not registered."):
+        with pytest.raises(
+            ValueError, match="Component 'non_existent_component' is not registered."
+        ):
             self.registry.get_component_class("non_existent_component")
 
     def test_get_component_class_non_existent_class(self):
         """
         Test get_component_class when the class_name does not exist in the module.
         """
-        with pytest.raises(ValueError, match="Could not load component 'non_existent_class_component'"):
+        with pytest.raises(
+            ValueError, match="Could not load component 'non_existent_class_component'"
+        ):
             self.registry.get_component_class("non_existent_class_component")
 
     def test_get_component_class_non_subclass(self):
         """
         Test get_component_class when the loaded class is not a subclass of Component.
         """
-        with pytest.raises(TypeError, match="Class 'NonComponentClass' in 'tests.temp_components.non_component_class' is not a subclass of Component."):
+        with pytest.raises(
+            TypeError,
+            match="Class 'NonComponentClass' in 'tests.temp_components.non_component_class' is not a subclass of Component.",
+        ):
             self.registry.get_component_class("non_subclass_component")
 
     def test_get_component_class_success(self):

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/adam/repos/**)",
+      "Read(//home/thein/repos/**)",
+      "Read(//home/**)",
+      "Bash(find /home/adam/Repos/TTA.dev -name *.json -path *mcp*)",
+      "Bash(git:*)",
+      "Bash(uv run:*)",
+      "Bash(wait)",
+      "Bash(od -c .hindsight/banks/session/.gitkeep)",
+      "Bash(python3:*)",
+      "Bash(uv sync:*)",
+      "Bash(grep -r \"logseq\\\\|Logseq\" --include=*.md --include=*.py --include=*.sh --include=*.json --include=*.yaml --exclude-dir=.git docs/ testing/)",
+      "Bash(grep -r \"logseq\\\\|Logseq\" --include=*.md --include=*.py --include=*.sh --exclude-dir=.git docs/ testing/)",
+      "Skill(commit-commands:commit-push-pr)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "hindsight",
+    "codegraphcontext",
+    "sequential-thinking",
+    "github"
+  ]
+}

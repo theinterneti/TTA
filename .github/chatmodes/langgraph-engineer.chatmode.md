@@ -304,4 +304,3 @@ Engineer Actions:
 
 
 ---
-**Logseq:** [[TTA.dev/.github/Chatmodes/Langgraph-engineer.chatmode]]

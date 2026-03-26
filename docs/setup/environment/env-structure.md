@@ -70,4 +70,3 @@ COMPOSE_PROJECT_NAME=tta-prototype
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Setup/Environment/Env-structure]]

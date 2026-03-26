@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Extended_evaluation/Extended_session_framework]]
 Extended Session Testing Framework for TTA Quality Evaluation
 
 Provides comprehensive testing infrastructure for evaluating TTA storytelling

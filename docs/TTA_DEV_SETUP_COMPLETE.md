@@ -422,4 +422,3 @@ You've got this! The setup is professional, the process is clear, and the tools 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Tta_dev_setup_complete]]

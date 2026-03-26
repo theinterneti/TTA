@@ -77,4 +77,3 @@ Focus areas:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Phase1a_complete]]

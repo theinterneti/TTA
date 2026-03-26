@@ -488,4 +488,3 @@ Generate the implementation:"""
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Decisions/Openhands-strategic-recommendations]]

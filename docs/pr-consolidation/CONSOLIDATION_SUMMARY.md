@@ -203,4 +203,3 @@ Conducted comprehensive cost-benefit analysis for each unique component across 4
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Pr-consolidation/Consolidation_summary]]

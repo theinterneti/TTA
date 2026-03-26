@@ -689,4 +689,3 @@ The TTA application has a solid security foundation. The recommended enhancement
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Operations/Security/Security_hardening_report]]

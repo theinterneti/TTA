@@ -490,4 +490,3 @@ This approach aligns with your existing architecture, respects your circuit brea
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Sub-agent-orchestration-analysis]]

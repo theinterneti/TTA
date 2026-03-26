@@ -1,6 +1,5 @@
 """
 
-# Logseq: [[TTA.dev/Testing/Comprehensive_validation/Multi_agent_collaboration_validator]]
 Multi-Agent Collaboration Assessment Framework for TTA
 
 This module provides comprehensive validation of multi-agent collaboration,

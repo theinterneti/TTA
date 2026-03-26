@@ -330,4 +330,3 @@ This document summarizes all deliverables for the TTA Component Maturity Tracker
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Github_project_automation_deliverables]]

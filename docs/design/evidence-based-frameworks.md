@@ -234,4 +234,3 @@ This framework provides the clinical foundation for implementing evidence-based 
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Clinical/Evidence_based_frameworks]]

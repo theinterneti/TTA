@@ -317,4 +317,3 @@ The testing demonstrates that [conclusion about game-first presentation and ther
 
 
 ---
-**Logseq:** [[TTA.dev/Testing/Model_comparison_matrix_template]]

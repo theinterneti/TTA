@@ -413,4 +413,3 @@ tool = FunctionTool(func=async_neo4j_query)
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Adk-documentation-validation]]

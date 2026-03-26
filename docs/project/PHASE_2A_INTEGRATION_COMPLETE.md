@@ -258,4 +258,3 @@ Phase 2A represents a **major milestone** in the TTA Storytelling Platform devel
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Phase_2a_integration_complete]]

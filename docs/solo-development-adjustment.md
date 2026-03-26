@@ -194,4 +194,3 @@ The revised scope maintains the core vision while making the implementation real
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Solo-development-adjustment]]

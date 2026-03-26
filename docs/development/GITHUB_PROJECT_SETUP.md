@@ -236,4 +236,3 @@ After creating the project:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Github_project_setup]]

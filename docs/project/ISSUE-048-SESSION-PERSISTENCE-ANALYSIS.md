@@ -148,4 +148,3 @@ Backend session check fails ❌ → User redirected to login ❌
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Issue-048-session-persistence-analysis]]

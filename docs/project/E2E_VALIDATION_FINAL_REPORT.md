@@ -451,4 +451,3 @@ The TTA staging environment validation has revealed **critical authentication is
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/E2e_validation_final_report]]

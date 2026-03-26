@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/Devcontainer Troubleshooting Guide]]
 > - **Path:** `.augment/kb/Workflows/Devcontainer Troubleshooting Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Devcontainer Troubleshooting Guide.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Docker/Devcontainer_troubleshooting_guide]]

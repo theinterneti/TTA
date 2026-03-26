@@ -219,4 +219,3 @@ The implementation maintains the principle of appropriate complexity - providing
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Operations/Operational_excellence_report]]

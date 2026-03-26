@@ -303,4 +303,3 @@ This comprehensive simulation framework provides everything needed to validate T
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Simulation-framework-overview]]

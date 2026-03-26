@@ -25,4 +25,3 @@
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Testing/Frontend_integration_test_report]]

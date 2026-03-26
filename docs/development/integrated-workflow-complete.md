@@ -6,11 +6,9 @@
 > - **New location:** [[TTA/Workflows/Integrated Development Workflow - COMPLETE]]
 > - **Path:** `.augment/kb/Workflows/Integrated Development Workflow - COMPLETE.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Integrated Development Workflow - COMPLETE.md`
 
 **Migration date:** 2025-11-01
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Development/Integrated-workflow-complete]]

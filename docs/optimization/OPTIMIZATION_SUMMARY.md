@@ -227,4 +227,3 @@ Loaded based on file patterns in YAML frontmatter:
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Optimization/Optimization_summary]]

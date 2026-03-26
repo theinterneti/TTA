@@ -238,4 +238,3 @@ results = await collect_openhands_results(task_ids)
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Openhands/Async_investigation_summary]]

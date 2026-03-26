@@ -440,4 +440,3 @@ All implemented frontend fixes and improvements are working as expected. The app
 
 
 ---
-**Logseq:** [[TTA.dev/Docs/Project/Comprehensive_validation_summary]]
