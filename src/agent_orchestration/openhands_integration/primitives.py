@@ -14,7 +14,7 @@ Primitives:
 
 Example:
     ```python
-    from tta_dev_primitives.core.base import WorkflowContext
+    from ttadev.primitives.core.base import WorkflowContext
     from .primitives import (
         ModelSelectionPrimitive,
         TaskExecutionPrimitive,
@@ -43,7 +43,11 @@ import time
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
-from tta_dev_primitives.core.base import WorkflowContext, WorkflowPrimitive
+
+try:
+    from ttadev.primitives.core.base import WorkflowContext, WorkflowPrimitive
+except ImportError:
+    from tta_dev_primitives.core.base import WorkflowContext, WorkflowPrimitive  # type: ignore[no-redef]
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector

@@ -14,7 +14,11 @@ Tests:
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from tta_dev_primitives.core.base import WorkflowContext
+
+try:
+    from ttadev.primitives.core.base import WorkflowContext
+except ImportError:
+    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[no-redef]
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector
