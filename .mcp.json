@@ -4,7 +4,7 @@
       "url": "http://localhost:8888/mcp/"
     },
     "codegraphcontext": {
-      "command": "/home/adam/.local/bin/cgc",
+      "command": "cgc",
       "args": ["mcp", "start"]
     },
     "sequential-thinking": {

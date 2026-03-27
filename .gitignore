@@ -422,6 +422,9 @@ gha-creds-*.json
 .augment/rules/integrated-workflow.md
 .augment/rules/use-serena-tools.md
 
+# Claude Code local settings (contains machine-specific paths and permissions)
+.claude/settings.local.json
+
 # Serena AI configuration
 .serena/
 
