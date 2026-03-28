@@ -21,6 +21,7 @@ from sqlalchemy import Column, Integer, String, select, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from src.common.database import (
+    DOLT_DEFAULT_URL,
     Base,
     check_database_health,
     connection_context,
@@ -28,6 +29,8 @@ from src.common.database import (
     freeze_result,
     gather_queries,
     init_db,
+    make_dolt_engine,
+    make_dolt_session_factory,
     make_engine,
     make_session_factory,
     readonly_session_context,
@@ -398,3 +401,126 @@ class TestCheckDatabaseHealth:
         # SQLite in-memory URL has no credentials; verify the key is present
         assert result["url"] is not None
         await engine.dispose()
+
+
+# ---------------------------------------------------------------------------
+# make_dolt_engine (#280)
+# ---------------------------------------------------------------------------
+
+
+class TestMakeDoltEngine:
+    def test_default_url_constant(self) -> None:
+        assert DOLT_DEFAULT_URL.startswith("mysql+aiomysql://")
+
+    def test_explicit_url_accepted(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            engine = make_dolt_engine(
+                "mysql+aiomysql://root:pw@localhost:3306/tta"
+            )
+        assert engine is not None
+        mock_cae.assert_called_once()
+        call_url = mock_cae.call_args[0][0]
+        assert "mysql+aiomysql" in call_url
+
+    def test_env_var_used_when_url_not_given(self, monkeypatch) -> None:
+        from unittest.mock import MagicMock, patch
+
+        monkeypatch.setenv(
+            "DOLT_DATABASE_URL", "mysql+aiomysql://root:pw@dolt:3306/tta"
+        )
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            make_dolt_engine()
+        call_url = mock_cae.call_args[0][0]
+        assert "dolt:3306" in call_url
+
+    def test_default_url_used_when_no_env_no_arg(self, monkeypatch) -> None:
+        from unittest.mock import MagicMock, patch
+
+        monkeypatch.delenv("DOLT_DATABASE_URL", raising=False)
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            make_dolt_engine()
+        call_url = mock_cae.call_args[0][0]
+        assert call_url == DOLT_DEFAULT_URL
+
+    def test_pool_size_and_max_overflow_forwarded(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            make_dolt_engine(
+                "mysql+aiomysql://root@localhost:3306/tta",
+                pool_size=7,
+                max_overflow=15,
+            )
+        kwargs = mock_cae.call_args[1]
+        assert kwargs["pool_size"] == 7
+        assert kwargs["max_overflow"] == 15
+
+    def test_default_pool_size_5_max_overflow_10(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            make_dolt_engine("mysql+aiomysql://root@localhost:3306/tta")
+        kwargs = mock_cae.call_args[1]
+        assert kwargs["pool_size"] == 5
+        assert kwargs["max_overflow"] == 10
+
+    def test_wrong_scheme_raises_value_error(self) -> None:
+        with pytest.raises(ValueError, match="mysql\\+aiomysql"):
+            make_dolt_engine("postgresql+asyncpg://user:pass@localhost/db")
+
+    def test_sqlite_scheme_raises_value_error(self) -> None:
+        with pytest.raises(ValueError, match="mysql\\+aiomysql"):
+            make_dolt_engine("sqlite+aiosqlite:///:memory:")
+
+    def test_echo_forwarded(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            make_dolt_engine("mysql+aiomysql://root@localhost:3306/tta", echo=True)
+        kwargs = mock_cae.call_args[1]
+        assert kwargs["echo"] is True
+
+    def test_pool_pre_ping_true_by_default(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        with patch("src.common.database.create_async_engine") as mock_cae:
+            mock_cae.return_value = MagicMock(spec=AsyncEngine)
+            make_dolt_engine("mysql+aiomysql://root@localhost:3306/tta")
+        kwargs = mock_cae.call_args[1]
+        assert kwargs["pool_pre_ping"] is True
+
+
+# ---------------------------------------------------------------------------
+# make_dolt_session_factory (#280)
+# ---------------------------------------------------------------------------
+
+
+class TestMakeDoltSessionFactory:
+    def test_returns_async_sessionmaker(self) -> None:
+        from unittest.mock import MagicMock, patch
+        from sqlalchemy.ext.asyncio import async_sessionmaker
+
+        mock_engine = MagicMock(spec=AsyncEngine)
+        with patch("src.common.database.async_sessionmaker") as mock_sm:
+            mock_sm.return_value = MagicMock(spec=async_sessionmaker)
+            factory = make_dolt_session_factory(mock_engine)
+        assert factory is not None
+        mock_sm.assert_called_once_with(mock_engine, expire_on_commit=False)
+
+    def test_expire_on_commit_forwarded(self) -> None:
+        from unittest.mock import MagicMock, patch
+        from sqlalchemy.ext.asyncio import async_sessionmaker
+
+        mock_engine = MagicMock(spec=AsyncEngine)
+        with patch("src.common.database.async_sessionmaker") as mock_sm:
+            mock_sm.return_value = MagicMock(spec=async_sessionmaker)
+            make_dolt_session_factory(mock_engine, expire_on_commit=True)
+        mock_sm.assert_called_once_with(mock_engine, expire_on_commit=True)
