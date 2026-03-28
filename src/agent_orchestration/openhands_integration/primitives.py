@@ -45,7 +45,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 try:
-    from ttadev.primitives.core.base import WorkflowContext, WorkflowPrimitive
+    from ttadev.primitives.core.base import WorkflowContext, WorkflowPrimitive  # type: ignore[import]
 except ImportError:
     from tta_dev_primitives.core.base import (  # type: ignore[no-redef]
         WorkflowContext,
@@ -93,7 +93,7 @@ class OpenHandsTaskOutput(BaseModel):
 
 
 class ModelSelectionPrimitive(
-    WorkflowPrimitive[OpenHandsTaskInput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskInput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for selecting optimal model for task.
@@ -203,7 +203,7 @@ class ModelSelectionPrimitive(
 
 
 class TaskExecutionPrimitive(
-    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for executing task via OpenHands adapter.
@@ -312,7 +312,7 @@ class TaskExecutionPrimitive(
 
 
 class ResultValidationPrimitive(
-    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for validating task results.
@@ -424,7 +424,7 @@ class ResultValidationPrimitive(
 
 
 class MetricsRecordingPrimitive(
-    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for recording execution metrics.

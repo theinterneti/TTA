@@ -17,14 +17,14 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from ttadev.primitives.core.base import (  # type: ignore[assignment]
+    from ttadev.primitives.core.base import (  # type: ignore[import, assignment]
         WorkflowContext,
         WorkflowPrimitive,
     )
 except ImportError:
     try:
-        from tta_dev_primitives.core.base import (  # type: ignore[assignment]
-            WorkflowContext,
+        from tta_dev_primitives.core.base import (  # type: ignore[import]
+            WorkflowContext,  # pyright: ignore[reportAssignmentType]
             WorkflowPrimitive,
         )
     except ImportError:

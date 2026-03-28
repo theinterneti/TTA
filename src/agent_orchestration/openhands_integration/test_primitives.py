@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 try:
-    from ttadev.primitives.core.base import WorkflowContext
+    from ttadev.primitives.core.base import WorkflowContext  # type: ignore[import]
 except ImportError:
     from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[no-redef]
 
