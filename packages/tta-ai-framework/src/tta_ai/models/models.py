@@ -207,6 +207,9 @@ class ModelSelectionCriteria:
     # Preferences
     prefer_local_models: bool = False
     prefer_free_models: bool = True
+
+    # Timeout for the full model selection call (seconds)
+    selection_timeout_seconds: float = 30.0
     require_streaming: bool = False
 
 
