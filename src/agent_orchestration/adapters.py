@@ -471,21 +471,34 @@ class NGAAdapter:
     """Adapter for communicating with the real Narrative Generator Agent."""
 
     def __init__(
-        self, fallback_to_mock: bool = True, retry_config: RetryConfig | None = None
+        self,
+        fallback_to_mock: bool = True,
+        retry_config: RetryConfig | None = None,
+        world_context_builder: Any | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self._available = generate_narrative_response is not None
+        self._builder = world_context_builder
 
     async def generate_narrative(
-        self, prompt: str, context: dict[str, Any] | None = None
+        self,
+        prompt: str,
+        context: dict[str, Any] | None = None,
+        session_id: str | None = None,
+        location_id: str | None = None,
+        player_id: str | None = None,
+        player_character: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """
-        Generate narrative content using the real NGA implementation.
+        """Generate narrative content using the real NGA implementation.
 
         Args:
-            prompt: Narrative generation prompt
-            context: Optional context for narrative generation
+            prompt:           Narrative generation prompt.
+            context:          Optional context for narrative generation.
+            session_id:       Optional session ID for world context assembly.
+            location_id:      Optional current location (enables world context).
+            player_id:        Optional player ID (passed to builder).
+            player_character: Optional character dict (tier-6 context).
 
         Returns:
             Dict containing generated narrative and metadata
@@ -493,21 +506,49 @@ class NGAAdapter:
         Raises:
             AgentCommunicationError: If communication with NGA fails
         """
+        # Enrich prompt with world context when builder is available
+        world_context_text: str = ""
+        world_context_meta: dict[str, Any] = {}
+        if self._builder is not None and session_id and location_id:
+            try:
+                assembled = await self._builder.build(
+                    session_id=session_id,
+                    location_id=location_id,
+                    player_id=player_id or "",
+                    player_character=player_character,
+                )
+                world_context_text = assembled.text
+                world_context_meta = {
+                    "total_tokens": assembled.total_tokens,
+                    "neo4j_available": assembled.neo4j_available,
+                    "truncated_tiers": assembled.truncated_tiers,
+                }
+                logger.debug(
+                    "NGA world context assembled: session=%s tokens=%d",
+                    session_id,
+                    assembled.total_tokens,
+                )
+            except Exception as exc:
+                logger.warning("NGA: world context build failed: %s", exc)
+
         if not self._available:
             if self.fallback_to_mock:
                 logger.warning(
                     "Real NGA not available, using fallback mock implementation"
                 )
-                return self._mock_generate_narrative(prompt, context)
+                return self._mock_generate_narrative(prompt, context, world_context_meta)
             raise AgentCommunicationError("Real NGA implementation not available")
 
         try:
-            # Prepare input for NGA
-            nga_input = {
+            # Prepare input for NGA — inject assembled world context when available
+            nga_input: dict[str, Any] = {
                 "prompt": prompt,
                 "context": context or {},
                 "player_input": prompt,  # NGA expects player_input field
             }
+            if world_context_text:
+                nga_input["world_context"] = world_context_text
+                nga_input["world_context_meta"] = world_context_meta
 
             # Run NGA processing in thread pool with retry logic
             async def _process_with_executor():
@@ -538,21 +579,27 @@ class NGAAdapter:
             logger.error(f"Error communicating with real NGA: {e}")
             if self.fallback_to_mock:
                 logger.warning("Falling back to mock implementation")
-                return self._mock_generate_narrative(prompt, context)
+                return self._mock_generate_narrative(prompt, context, world_context_meta)
             raise AgentCommunicationError(f"NGA communication failed: {e}") from e
 
     def _mock_generate_narrative(
-        self, prompt: str, context: dict[str, Any] | None = None
+        self,
+        prompt: str,
+        context: dict[str, Any] | None = None,
+        world_context_meta: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Fallback mock implementation for NGA processing."""
         story = f"Generated story for: {prompt[:64]}..."
 
-        return {
+        result: dict[str, Any] = {
             "story": story,
             "raw": story,
             "context_used": bool(context),
             "source": "mock_fallback",
         }
+        if world_context_meta:
+            result["world_context_meta"] = world_context_meta
+        return result
 
 
 class AgentAdapterFactory:
@@ -564,16 +611,20 @@ class AgentAdapterFactory:
         tools: dict[str, Any] | None = None,
         fallback_to_mock: bool = True,
         retry_config: RetryConfig | None = None,
+        world_context_builder: Any | None = None,
     ):
         self.neo4j_manager = neo4j_manager
         self.tools = tools or {}
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
+        self.world_context_builder = world_context_builder
 
     def create_ipa_adapter(self) -> IPAAdapter:
         """Create an IPA adapter instance."""
         return IPAAdapter(
-            fallback_to_mock=self.fallback_to_mock, retry_config=self.retry_config
+            fallback_to_mock=self.fallback_to_mock,
+            retry_config=self.retry_config,
+            world_context_builder=self.world_context_builder,
         )
 
     def create_wba_adapter(self) -> WBAAdapter:
@@ -583,10 +634,13 @@ class AgentAdapterFactory:
             tools=self.tools,
             fallback_to_mock=self.fallback_to_mock,
             retry_config=self.retry_config,
+            world_context_builder=self.world_context_builder,
         )
 
     def create_nga_adapter(self) -> NGAAdapter:
         """Create an NGA adapter instance."""
         return NGAAdapter(
-            fallback_to_mock=self.fallback_to_mock, retry_config=self.retry_config
+            fallback_to_mock=self.fallback_to_mock,
+            retry_config=self.retry_config,
+            world_context_builder=self.world_context_builder,
         )
