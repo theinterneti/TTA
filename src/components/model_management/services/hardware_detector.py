@@ -271,7 +271,7 @@ class HardwareDetector(IHardwareDetector):
 
         try:
             # Try NVIDIA GPUs first
-            import pynvml  # noqa: PLC0415
+            import pynvml  # type: ignore[import-untyped]  # noqa: PLC0415
 
             pynvml.nvmlInit()
             device_count = pynvml.nvmlDeviceGetCount()

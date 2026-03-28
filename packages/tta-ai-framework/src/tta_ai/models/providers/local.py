@@ -16,8 +16,18 @@ from datetime import datetime
 from typing import Any
 
 import psutil
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+
+try:
+    import torch  # type: ignore[import-untyped]
+    from transformers import (  # type: ignore[import-untyped]
+        AutoModelForCausalLM,
+        AutoTokenizer,
+        pipeline,
+    )
+
+    _HAS_TORCH = True
+except ImportError:
+    _HAS_TORCH = False
 
 from ..interfaces import (
     GenerationRequest,

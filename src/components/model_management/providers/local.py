@@ -16,10 +16,27 @@ from pathlib import Path
 from typing import Any
 
 import psutil
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-from ..interfaces import (
+# Optional GPU dependencies — available with: uv sync --group gpu
+_has_torch = False
+torch: Any = None
+AutoModelForCausalLM: Any = None
+AutoTokenizer: Any = None
+pipeline: Any = None
+
+try:
+    import torch  # type: ignore[import-untyped]  # noqa: F811
+    from transformers import (  # type: ignore[import-untyped]
+        AutoModelForCausalLM,  # noqa: F811
+        AutoTokenizer,  # noqa: F811
+        pipeline,  # noqa: F811
+    )
+
+    _has_torch = True
+except ImportError:
+    pass
+
+from ..interfaces import (  # noqa: E402
     GenerationRequest,
     GenerationResponse,
     IModelInstance,
@@ -27,7 +44,7 @@ from ..interfaces import (
     ModelStatus,
     ProviderType,
 )
-from .base import BaseModelInstance, BaseProvider
+from .base import BaseModelInstance, BaseProvider  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
