@@ -8,6 +8,7 @@ See: docs/design/genesis-session.md
 """
 
 from .agent import AgentResponse, GenesisAgent
+from .first_scene_synthesis import FirstScene, FirstSceneSynthesisService
 from .narrator_voice import NARRATOR_VOICES, NarratorVoiceProfile, get_system_prompt
 from .session_state import (
     ACT_TRANSITIONS,
