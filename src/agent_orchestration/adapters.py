@@ -467,6 +467,59 @@ class WBAAdapter:
         }
 
 
+def _transform_nga_result(
+    prompt: str, context: dict[str, Any] | None, raw: dict[str, Any]
+) -> dict[str, Any]:
+    """Convert raw NGA result to orchestration format."""
+    story_text = raw.get(
+        "response",
+        raw.get("story", f"Generated story for: {prompt[:64]}..."),
+    )
+    return {
+        "story": story_text,
+        "raw": story_text,
+        "context_used": bool(context),
+        "source": "real_nga",
+        "raw_result": raw,
+    }
+
+
+class _NGACall(WorkflowPrimitive):
+    """WorkflowPrimitive that executes the real NGA generate_narrative_response function."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        nga_input: dict[str, Any] = input_data["nga_input"]
+        prompt: str = input_data["prompt"]
+        ctx_data: dict[str, Any] | None = input_data["context"]
+        real_fn = input_data["real_fn"]
+        loop = asyncio.get_running_loop()
+        raw: dict[str, Any] = await loop.run_in_executor(None, real_fn, nga_input)
+        return _transform_nga_result(prompt, ctx_data, raw)
+
+
+class _NGAFallback(WorkflowPrimitive):
+    """WorkflowPrimitive that returns the mock NGA response."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        prompt: str = input_data["prompt"]
+        ctx_data: dict[str, Any] | None = input_data["context"]
+        world_context_meta: dict[str, Any] = input_data.get("world_context_meta", {})
+        story = f"Generated story for: {prompt[:64]}..."
+        result: dict[str, Any] = {
+            "story": story,
+            "raw": story,
+            "context_used": bool(ctx_data),
+            "source": "mock_fallback",
+        }
+        if world_context_meta:
+            result["world_context_meta"] = world_context_meta
+        return result
+
+
 class NGAAdapter:
     """Adapter for communicating with the real Narrative Generator Agent."""
 
@@ -531,55 +584,52 @@ class NGAAdapter:
             except Exception as exc:
                 logger.warning("NGA: world context build failed: %s", exc)
 
+        ctx = WorkflowContext(workflow_id=session_id or f"nga-{id(self)}")
+        nga_input: dict[str, Any] = {
+            "prompt": prompt,
+            "context": context or {},
+            "player_input": prompt,  # NGA expects player_input field
+        }
+        if world_context_text:
+            nga_input["world_context"] = world_context_text
+            nga_input["world_context_meta"] = world_context_meta
+
+        input_data: dict[str, Any] = {
+            "nga_input": nga_input,
+            "prompt": prompt,
+            "context": context,
+            "real_fn": generate_narrative_response,
+            "world_context_meta": world_context_meta,
+        }
+
+        strategy = RetryStrategy(
+            max_retries=self.retry_config.max_retries,
+            backoff_base=self.retry_config.base_delay,
+            max_backoff=self.retry_config.max_delay,
+            jitter=self.retry_config.jitter,
+        )
+
         if not self._available:
             if self.fallback_to_mock:
                 logger.warning(
                     "Real NGA not available, using fallback mock implementation"
                 )
-                return self._mock_generate_narrative(prompt, context, world_context_meta)
+                return self._mock_generate_narrative(
+                    prompt, context, world_context_meta
+                )
             raise AgentCommunicationError("Real NGA implementation not available")
 
+        call: WorkflowPrimitive = _NGACall()
+        retry_call = RetryPrimitive(call, strategy=strategy)
+        primitive: WorkflowPrimitive
+        if self.fallback_to_mock:
+            primitive = FallbackPrimitive(retry_call, _NGAFallback())
+        else:
+            primitive = retry_call
+
         try:
-            # Prepare input for NGA — inject assembled world context when available
-            nga_input: dict[str, Any] = {
-                "prompt": prompt,
-                "context": context or {},
-                "player_input": prompt,  # NGA expects player_input field
-            }
-            if world_context_text:
-                nga_input["world_context"] = world_context_text
-                nga_input["world_context_meta"] = world_context_meta
-
-            # Run NGA processing in thread pool with retry logic
-            async def _process_with_executor():
-                loop = asyncio.get_running_loop()
-                return await loop.run_in_executor(
-                    None,
-                    generate_narrative_response,  # type: ignore[arg-type]
-                    nga_input,  # type: ignore[misc]
-                )
-
-            result = await retry_with_backoff(_process_with_executor, self.retry_config)
-
-            # Transform result to orchestration system format
-            story_text = result.get(
-                "response",
-                result.get("story", f"Generated story for: {prompt[:64]}..."),
-            )
-
-            return {
-                "story": story_text,
-                "raw": story_text,
-                "context_used": bool(context),
-                "source": "real_nga",
-                "raw_result": result,
-            }
-
+            return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
         except Exception as e:
-            logger.error(f"Error communicating with real NGA: {e}")
-            if self.fallback_to_mock:
-                logger.warning("Falling back to mock implementation")
-                return self._mock_generate_narrative(prompt, context, world_context_meta)
             raise AgentCommunicationError(f"NGA communication failed: {e}") from e
 
     def _mock_generate_narrative(
