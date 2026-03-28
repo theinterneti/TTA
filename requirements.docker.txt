@@ -115,7 +115,7 @@ jsonschema-path==0.4.1
 jsonschema-specifications==2025.9.1
 keyring==25.7.0
 kiwisolver==1.4.9
-langchain-core==1.2.14
+langchain-core==1.2.22
 langchain-openai==1.1.10
 langgraph==1.0.9
 langgraph-checkpoint==4.0.0
