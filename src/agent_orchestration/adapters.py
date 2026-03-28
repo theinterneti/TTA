@@ -246,6 +246,58 @@ class IPAAdapter:
         }
 
 
+def _transform_wba_result(
+    world_id: str, updates: dict[str, Any] | None, raw: dict[str, Any]
+) -> dict[str, Any]:
+    """Convert raw WBA result to orchestration format."""
+    return {
+        "world_id": world_id,
+        "world_state": raw.get("world_state", {}),
+        "updated": updates is not None,
+        "cached": False,
+        "source": "real_wba",
+        "raw_result": raw,
+    }
+
+
+class _WBACall(WorkflowPrimitive):
+    """WorkflowPrimitive that executes the real WBA process function."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        wba_instance = input_data["wba_instance"]
+        wba_input: dict[str, Any] = input_data["wba_input"]
+        world_id: str = input_data["world_id"]
+        updates: dict[str, Any] | None = input_data["updates"]
+
+        loop = asyncio.get_running_loop()
+        raw: dict[str, Any] = await loop.run_in_executor(
+            None, wba_instance.process, wba_input  # type: ignore[misc]
+        )
+        return _transform_wba_result(world_id, updates, raw)
+
+
+class _WBAFallback(WorkflowPrimitive):
+    """WorkflowPrimitive that returns the mock WBA response."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        world_id: str = input_data["world_id"]
+        updates: dict[str, Any] | None = input_data["updates"]
+        world_state: dict[str, Any] = {"id": world_id, "regions": [], "entities": []}
+        if updates:
+            world_state.update(updates)
+        return {
+            "world_id": world_id,
+            "world_state": world_state,
+            "updated": updates is not None,
+            "cached": False,
+            "source": "mock_fallback",
+        }
+
+
 class WBAAdapter:
     """Adapter for communicating with the real World Builder Agent."""
 
@@ -271,21 +323,44 @@ class WBAAdapter:
                 self._available = False
 
     async def process_world_request(
-        self, world_id: str, updates: dict[str, Any] | None = None
+        self,
+        world_id: str,
+        updates: dict[str, Any] | None = None,
+        session_id: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Process world building request using the real WBA implementation.
+        """Process world building request using the real WBA implementation.
 
         Args:
             world_id: ID of the world to process
             updates: Optional updates to apply to the world
+            session_id: Optional session ID for WorkflowContext observability
 
         Returns:
             Dict containing world state and processing results
 
         Raises:
-            AgentCommunicationError: If communication with WBA fails
+            AgentCommunicationError: If communication with WBA fails and
+                fallback_to_mock is False
         """
+        ctx = WorkflowContext(workflow_id=session_id or f"wba-{id(self)}")
+        input_data: dict[str, Any] = {
+            "wba_instance": self._wba_instance,
+            "wba_input": {
+                "world_id": world_id,
+                "action": "update" if updates else "fetch",
+                "updates": updates or {},
+            },
+            "world_id": world_id,
+            "updates": updates,
+        }
+
+        strategy = RetryStrategy(
+            max_retries=self.retry_config.max_retries,
+            backoff_base=self.retry_config.base_delay,
+            max_backoff=self.retry_config.max_delay,
+            jitter=self.retry_config.jitter,
+        )
+
         if not self._available or not self._wba_instance:
             if self.fallback_to_mock:
                 logger.warning(
@@ -294,40 +369,17 @@ class WBAAdapter:
                 return self._mock_process_world(world_id, updates)
             raise AgentCommunicationError("Real WBA implementation not available")
 
+        call: WorkflowPrimitive = _WBACall()
+        retry_call = RetryPrimitive(call, strategy=strategy)
+        primitive: WorkflowPrimitive
+        if self.fallback_to_mock:
+            primitive = FallbackPrimitive(retry_call, _WBAFallback())
+        else:
+            primitive = retry_call
+
         try:
-            # Prepare input for WBA
-            wba_input = {
-                "world_id": world_id,
-                "action": "update" if updates else "fetch",
-                "updates": updates or {},
-            }
-
-            # Run WBA processing in thread pool with retry logic
-            async def _process_with_executor():
-                loop = asyncio.get_running_loop()
-                return await loop.run_in_executor(
-                    None,
-                    self._wba_instance.process,  # type: ignore[union-attr]
-                    wba_input,
-                )
-
-            result = await retry_with_backoff(_process_with_executor, self.retry_config)
-
-            # Transform result to orchestration system format
-            return {
-                "world_id": world_id,
-                "world_state": result.get("world_state", {}),
-                "updated": updates is not None,
-                "cached": False,
-                "source": "real_wba",
-                "raw_result": result,
-            }
-
+            return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
         except Exception as e:
-            logger.error(f"Error communicating with real WBA: {e}")
-            if self.fallback_to_mock:
-                logger.warning("Falling back to mock implementation")
-                return self._mock_process_world(world_id, updates)
             raise AgentCommunicationError(f"WBA communication failed: {e}") from e
 
     def _mock_process_world(
