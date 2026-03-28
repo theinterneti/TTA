@@ -22,6 +22,7 @@ from tta_dev_primitives import (
     WorkflowContext,
     WorkflowPrimitive,
 )
+from tta_dev_primitives.observability import ObservablePrimitive
 
 # Add tta.prod to Python path for importing real agents
 tta_prod_path = Path(__file__).parent.parent.parent / "tta.prod" / "src"
@@ -214,6 +215,7 @@ class IPAAdapter:
             primitive = FallbackPrimitive(retry_call, _IPAFallback())
         else:
             primitive = retry_call
+        primitive = ObservablePrimitive(primitive, "ipa_processing")
 
         try:
             return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
@@ -393,6 +395,7 @@ class WBAAdapter:
             primitive = FallbackPrimitive(retry_call, _WBAFallback())
         else:
             primitive = retry_call
+        primitive = ObservablePrimitive(primitive, "wba_processing")
 
         try:
             return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
@@ -575,6 +578,7 @@ class NGAAdapter:
             primitive = FallbackPrimitive(retry_call, _NGAFallback())
         else:
             primitive = retry_call
+        primitive = ObservablePrimitive(primitive, "nga_processing")
 
         try:
             return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
