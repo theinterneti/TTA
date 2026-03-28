@@ -13,13 +13,46 @@ Provides:
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import random
 from typing import Any
 
-from ..adapters import AgentCommunicationError, RetryConfig, retry_with_backoff
+from ..adapters import AgentCommunicationError, RetryConfig
 from .client import OpenHandsClient
 
 logger = logging.getLogger(__name__)
+
+
+async def _retry_with_backoff(
+    func: Any, retry_config: RetryConfig, *args: Any, **kwargs: Any
+) -> Any:
+    """Execute a function with exponential backoff retry logic (local to openhands)."""
+    last_exception: BaseException | None = None
+
+    for attempt in range(retry_config.max_retries + 1):
+        try:
+            if asyncio.iscoroutinefunction(func):
+                return await func(*args, **kwargs)
+            return func(*args, **kwargs)
+        except Exception as e:
+            last_exception = e
+            if attempt == retry_config.max_retries:
+                break
+            delay = min(
+                retry_config.base_delay * (retry_config.exponential_base**attempt),
+                retry_config.max_delay,
+            )
+            if retry_config.jitter:
+                delay *= 0.5 + random.random() * 0.5
+            logger.warning(
+                "Attempt %d failed: %s. Retrying in %.2fs...", attempt + 1, e, delay
+            )
+            await asyncio.sleep(delay)
+
+    raise AgentCommunicationError(
+        f"All {retry_config.max_retries + 1} attempts failed. Last error: {last_exception}"
+    )
 
 
 class OpenHandsAdapter:
@@ -86,7 +119,7 @@ class OpenHandsAdapter:
 
         try:
             # Execute with retry
-            result = await retry_with_backoff(
+            result = await _retry_with_backoff(
                 self.client.execute_task,
                 self.retry_config,
                 task_description=task_description,

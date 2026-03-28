@@ -12,7 +12,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -56,7 +55,14 @@ class AgentCommunicationError(Exception):
 
 
 class RetryConfig:
-    """Configuration for retry logic."""
+    """Configuration for retry logic.
+
+    .. deprecated::
+        This class now serves as a bridge to TTA.dev ``RetryStrategy``/``RetryPrimitive``
+        (see ``IPAAdapter``, ``WBAAdapter``, ``NGAAdapter`` for the migration pattern).
+        New code should configure ``RetryStrategy`` directly.  ``RetryConfig`` will be
+        removed once all callers are fully migrated.
+    """
 
     def __init__(
         self,
@@ -71,63 +77,6 @@ class RetryConfig:
         self.max_delay = max_delay
         self.exponential_base = exponential_base
         self.jitter = jitter
-
-
-async def retry_with_backoff(
-    func: Callable[..., Any], retry_config: RetryConfig, *args: Any, **kwargs: Any
-) -> Any:
-    """
-    Execute a function with exponential backoff retry logic.
-
-    Args:
-        func: Function to execute
-        retry_config: Retry configuration
-        *args: Function arguments
-        **kwargs: Function keyword arguments
-
-    Returns:
-        Function result
-
-    Raises:
-        AgentCommunicationError: If all retries are exhausted
-    """
-    import random
-
-    last_exception = None
-
-    for attempt in range(retry_config.max_retries + 1):
-        try:
-            if asyncio.iscoroutinefunction(func):
-                return await func(*args, **kwargs)
-            return func(*args, **kwargs)
-
-        except Exception as e:
-            last_exception = e
-
-            if attempt == retry_config.max_retries:
-                # Final attempt failed
-                break
-
-            # Calculate delay with exponential backoff
-            delay = min(
-                retry_config.base_delay * (retry_config.exponential_base**attempt),
-                retry_config.max_delay,
-            )
-
-            # Add jitter to prevent thundering herd
-            if retry_config.jitter:
-                delay *= 0.5 + random.random() * 0.5
-
-            logger.warning(
-                f"Attempt {attempt + 1} failed: {e}. Retrying in {delay:.2f}s..."
-            )
-
-            await asyncio.sleep(delay)
-
-    # All retries exhausted
-    raise AgentCommunicationError(
-        f"All {retry_config.max_retries + 1} attempts failed. Last error: {last_exception}"
-    )
 
 
 def _transform_ipa_result(text: str, intent_result: Any) -> dict[str, Any]:
