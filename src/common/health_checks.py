@@ -268,6 +268,71 @@ async def check_agent_orchestration_health(
         )
 
 
+async def check_dolt_health(database_url: str | None = None) -> HealthCheckResult:
+    """Check Dolt SQL server connection health.
+
+    Attempts a lightweight connection using aiomysql. Degrades gracefully
+    when Dolt is not configured or the aiomysql driver is not installed.
+
+    Args:
+        database_url: mysql+aiomysql:// connection string (falls back to
+                      DOLT_DATABASE_URL env var).
+
+    Returns:
+        HealthCheckResult
+    """
+    import os
+
+    url = database_url or os.getenv("DOLT_DATABASE_URL")
+    if not url:
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.DEGRADED,
+            message="Dolt not configured (DOLT_DATABASE_URL not set)",
+        )
+
+    try:
+        # Parse host/port/password from the URL for a raw ping
+        # mysql+aiomysql://root:<pw>@<host>:<port>/<db>
+        from urllib.parse import urlparse
+
+        import aiomysql  # type: ignore[import-not-found]
+
+        parsed = urlparse(url.replace("mysql+aiomysql://", "mysql://"))
+        conn = await aiomysql.connect(
+            host=parsed.hostname or "localhost",
+            port=parsed.port or 3306,
+            user=parsed.username or "root",
+            password=parsed.password or "",
+            db=parsed.path.lstrip("/") or "tta",
+            connect_timeout=5,
+        )
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT @@version, dolt_version()")
+            row = await cur.fetchone()
+            mysql_version = row[0] if row else "unknown"
+            dolt_version = row[1] if row else "unknown"
+        conn.close()
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.HEALTHY,
+            message="Dolt SQL server connection healthy",
+            details={"mysql_version": mysql_version, "dolt_version": dolt_version},
+        )
+    except ImportError:
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.DEGRADED,
+            message="aiomysql not installed; Dolt health check skipped",
+        )
+    except Exception as e:
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.UNHEALTHY,
+            message=f"Dolt connection failed: {str(e)}",
+        )
+
+
 async def check_openrouter_health(api_key: str | None = None) -> HealthCheckResult:
     """
     Check OpenRouter API connectivity.
