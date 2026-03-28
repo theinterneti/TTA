@@ -13,6 +13,8 @@ Quickstart::
     ctx: WorldContext | None = await engine.build_context("loc-001", depth=3)
 """
 
+from src.components.world_context.builder import AssembledContext, WorldContextBuilder
+from src.components.world_context.compressor import HistoryCompressor
 from src.components.world_context.models import (
     ConnectedLocation,
     LocationFact,
@@ -26,6 +28,9 @@ from src.components.world_context.traversal import Neo4jTraversalEngine
 
 __all__ = [
     "Neo4jTraversalEngine",
+    "WorldContextBuilder",
+    "AssembledContext",
+    "HistoryCompressor",
     "WorldContext",
     "LocationFact",
     "NPCState",

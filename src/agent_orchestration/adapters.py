@@ -183,30 +183,65 @@ class IPAAdapter:
     """Adapter for communicating with the real Input Processor Agent."""
 
     def __init__(
-        self, fallback_to_mock: bool = True, retry_config: RetryConfig | None = None
+        self,
+        fallback_to_mock: bool = True,
+        retry_config: RetryConfig | None = None,
+        world_context_builder: Any | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self._available = process_input is not None and IntentSchema is not None
+        self._builder = world_context_builder
 
     async def process_input(
-        self, text: str, session_id: str | None = None
+        self,
+        text: str,
+        session_id: str | None = None,
+        location_id: str | None = None,
+        player_id: str | None = None,
+        player_character: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Process player input using the real IPA implementation.
 
         Args:
-            text: Player input text to process
-            session_id: Optional session ID for WorkflowContext observability
+            text:             Player input text to process.
+            session_id:       Optional session ID for WorkflowContext observability.
+            location_id:      Optional current location (enables world context).
+            player_id:        Optional player ID (passed to builder + spans).
+            player_character: Optional character dict (tier-6 context).
 
         Returns:
-            Dict containing processed intent and routing information
+            Dict containing processed intent and routing information.
 
         Raises:
             AgentCommunicationError: If communication with IPA fails and
-                fallback_to_mock is False
+                fallback_to_mock is False.
         """
         ctx = WorkflowContext(workflow_id=session_id or f"ipa-{id(self)}")
         input_data: dict[str, Any] = {"text": text, "real_fn": process_input}
+
+        # Enrich with world context when builder is available
+        if self._builder is not None and session_id and location_id:
+            try:
+                assembled = await self._builder.build(
+                    session_id=session_id,
+                    location_id=location_id,
+                    player_id=player_id or "",
+                    player_character=player_character,
+                )
+                input_data["world_context"] = assembled.text
+                input_data["world_context_meta"] = {
+                    "total_tokens": assembled.total_tokens,
+                    "neo4j_available": assembled.neo4j_available,
+                    "truncated_tiers": assembled.truncated_tiers,
+                }
+                logger.debug(
+                    "IPA world context assembled: session=%s tokens=%d",
+                    session_id,
+                    assembled.total_tokens,
+                )
+            except Exception as exc:
+                logger.warning("IPA: world context build failed: %s", exc)
 
         strategy = RetryStrategy(
             max_retries=self.retry_config.max_retries,
@@ -309,6 +344,7 @@ class WBAAdapter:
         tools: dict[str, Any] | None = None,
         fallback_to_mock: bool = True,
         retry_config: RetryConfig | None = None,
+        world_context_builder: Any | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
@@ -316,6 +352,7 @@ class WBAAdapter:
         self.tools = tools or {}
         self._available = WorldBuildingAgent is not None
         self._wba_instance = None
+        self._builder = world_context_builder
 
         if self._available and neo4j_manager:
             try:
@@ -329,13 +366,19 @@ class WBAAdapter:
         world_id: str,
         updates: dict[str, Any] | None = None,
         session_id: str | None = None,
+        location_id: str | None = None,
+        player_id: str | None = None,
+        player_character: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Process world building request using the real WBA implementation.
 
         Args:
-            world_id: ID of the world to process
-            updates: Optional updates to apply to the world
-            session_id: Optional session ID for WorkflowContext observability
+            world_id:         ID of the world to process.
+            updates:          Optional updates to apply to the world.
+            session_id:       Optional session ID for WorkflowContext observability.
+            location_id:      Optional current location (enables world context).
+            player_id:        Optional player ID (passed to builder).
+            player_character: Optional character dict (tier-6 context).
 
         Returns:
             Dict containing world state and processing results
@@ -355,6 +398,29 @@ class WBAAdapter:
             "world_id": world_id,
             "updates": updates,
         }
+
+        # Enrich with world context when builder is available
+        if self._builder is not None and session_id and location_id:
+            try:
+                assembled = await self._builder.build(
+                    session_id=session_id,
+                    location_id=location_id,
+                    player_id=player_id or "",
+                    player_character=player_character,
+                )
+                input_data["world_context"] = assembled.text
+                input_data["world_context_meta"] = {
+                    "total_tokens": assembled.total_tokens,
+                    "neo4j_available": assembled.neo4j_available,
+                    "truncated_tiers": assembled.truncated_tiers,
+                }
+                logger.debug(
+                    "WBA world context assembled: session=%s tokens=%d",
+                    session_id,
+                    assembled.total_tokens,
+                )
+            except Exception as exc:
+                logger.warning("WBA: world context build failed: %s", exc)
 
         strategy = RetryStrategy(
             max_retries=self.retry_config.max_retries,

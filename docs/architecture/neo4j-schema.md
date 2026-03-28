@@ -214,6 +214,127 @@ no overlapping constraint names.
 
 ---
 
+## Example Cypher: Create Nodes
+
+### Location
+```cypher
+CREATE (:Location {
+  id: 'loc-forest-clearing',
+  name: 'Forest Clearing',
+  description: 'A quiet glade dappled with afternoon light.',
+  zone_id: 'zone-ancient-forest',
+  location_type: 'outdoor',
+  is_accessible: true,
+  created_at: datetime(),
+  updated_at: datetime()
+})
+```
+
+### NPC
+```cypher
+MATCH (loc:Location {id: 'loc-forest-clearing'})
+CREATE (npc:NPC {
+  id: 'npc-aria',
+  name: 'Aria',
+  role: 'ally',
+  faction_id: 'faction-wardens',
+  current_location_id: 'loc-forest-clearing',
+  disposition: 'friendly',
+  is_active: true,
+  created_at: datetime(),
+  updated_at: datetime()
+})
+CREATE (npc)-[:LIVES_IN {is_primary: true}]->(loc)
+CREATE (npc)-[:CURRENTLY_AT]->(loc)
+```
+
+### WorldRule
+```cypher
+MATCH (loc:Location {id: 'loc-forest-clearing'})
+CREATE (rule:WorldRule {
+  id: 'rule-no-open-flame',
+  name: 'No Open Flame',
+  description: 'Open flames are forbidden; the ancient trees are sacred.',
+  scope: 'location',
+  scope_id: 'loc-forest-clearing',
+  category: 'social',
+  priority: 5,
+  is_active: true,
+  created_at: datetime()
+})
+CREATE (rule)-[:APPLIES_TO_LOCATION]->(loc)
+```
+
+### WorldEvent
+```cypher
+MATCH (loc:Location {id: 'loc-forest-clearing'})
+CREATE (evt:WorldEvent {
+  id: 'evt-storm-approaching',
+  name: 'Storm Approaching',
+  description: 'Dark clouds roll in from the north; thunder rumbles.',
+  event_type: 'environmental',
+  location_id: 'loc-forest-clearing',
+  started_at: datetime(),
+  expires_at: datetime() + duration({hours: 2}),
+  is_active: true,
+  severity: 'minor'
+})
+CREATE (loc)-[:HAD_EVENT]->(evt)
+```
+
+### PlayerCharacter
+```cypher
+MATCH (loc:Location {id: 'loc-forest-clearing'})
+CREATE (pc:PlayerCharacter {
+  id: 'pc-evren-001',
+  player_id: 'player-001',
+  name: 'Evren',
+  current_location_id: 'loc-forest-clearing',
+  health_state: 'healthy',
+  emotional_state: 'curious',
+  created_at: datetime(),
+  updated_at: datetime()
+})
+CREATE (pc)-[:CURRENTLY_AT {since: datetime()}]->(loc)
+```
+
+### Faction
+```cypher
+CREATE (:Faction {
+  id: 'faction-wardens',
+  name: 'Forest Wardens',
+  description: 'Ancient guardians sworn to protect the woodland.',
+  alignment: 'lawful',
+  is_active: true,
+  created_at: datetime()
+})
+```
+
+### Zone
+```cypher
+CREATE (zone:Zone {
+  id: 'zone-ancient-forest',
+  name: 'Ancient Forest',
+  description: 'A primordial woodland older than recorded memory.',
+  zone_type: 'wilderness',
+  danger_level: 4,
+  is_active: true,
+  created_at: datetime()
+})
+```
+
+### Connect locations and zone
+```cypher
+MATCH (a:Location {id: 'loc-forest-clearing'})
+MATCH (b:Location {id: 'loc-dark-cave'})
+MATCH (zone:Zone {id: 'zone-ancient-forest'})
+CREATE (a)-[:CONNECTED_TO {direction: 'north', travel_time: 5}]->(b)
+CREATE (a)-[:IN_ZONE]->(zone)
+CREATE (b)-[:IN_ZONE]->(zone)
+```
+
+---
+
 ## Cypher Constraint & Index Reference
 
 All constraints and indexes are managed by `src/common/neo4j_schema.py`.
