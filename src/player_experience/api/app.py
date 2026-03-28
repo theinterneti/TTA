@@ -61,6 +61,7 @@ try:
         chat,
         conversation,
         gameplay,
+        genesis,
         health,
         openrouter_auth,
         players,
@@ -77,6 +78,7 @@ except ImportError:
         chat,
         conversation,
         gameplay,
+        genesis,
         health,
         openrouter_auth,
         players,
@@ -246,6 +248,7 @@ def create_app() -> FastAPI:
             )
 
     app.include_router(gameplay.router, prefix="/api/v1/gameplay", tags=["gameplay"])
+    app.include_router(genesis.router, prefix="/api/v1/genesis", tags=["genesis"])
     # Metrics (gated by settings.debug) - now includes /metrics-prom endpoint
     app.include_router(metrics_router.router, tags=["metrics"])
     app.include_router(progress.router, prefix="/api/v1", tags=["progress"])

@@ -105,8 +105,17 @@ def _location_from_record(props: dict[str, Any]) -> LocationFact:
         extra={
             k: v
             for k, v in props.items()
-            if k not in {"id", "name", "description", "region", "atmosphere",
-                         "is_accessible", "created_at", "updated_at"}
+            if k
+            not in {
+                "id",
+                "name",
+                "description",
+                "region",
+                "atmosphere",
+                "is_accessible",
+                "created_at",
+                "updated_at",
+            }
         },
     )
 
@@ -122,9 +131,17 @@ def _npc_from_record(props: dict[str, Any]) -> NPCState:
         extra={
             k: v
             for k, v in props.items()
-            if k not in {"id", "name", "role", "emotional_state",
-                         "disposition_toward_player", "is_active",
-                         "created_at", "updated_at"}
+            if k
+            not in {
+                "id",
+                "name",
+                "role",
+                "emotional_state",
+                "disposition_toward_player",
+                "is_active",
+                "created_at",
+                "updated_at",
+            }
         },
     )
 
@@ -139,8 +156,18 @@ def _event_from_record(props: dict[str, Any]) -> WorldEventSummary:
         extra={
             k: v
             for k, v in props.items()
-            if k not in {"id", "name", "description", "event_type", "is_active",
-                         "created_at", "updated_at", "started_at", "ends_at"}
+            if k
+            not in {
+                "id",
+                "name",
+                "description",
+                "event_type",
+                "is_active",
+                "created_at",
+                "updated_at",
+                "started_at",
+                "ends_at",
+            }
         },
     )
 
@@ -156,8 +183,18 @@ def _rule_from_record(props: dict[str, Any]) -> WorldRuleSummary:
         extra={
             k: v
             for k, v in props.items()
-            if k not in {"id", "name", "rule_text", "rule_type", "scope",
-                         "priority", "is_active", "created_at", "updated_at"}
+            if k
+            not in {
+                "id",
+                "name",
+                "rule_text",
+                "rule_type",
+                "scope",
+                "priority",
+                "is_active",
+                "created_at",
+                "updated_at",
+            }
         },
     )
 
@@ -171,8 +208,15 @@ def _zone_from_record(props: dict[str, Any]) -> ZoneSummary:
         extra={
             k: v
             for k, v in props.items()
-            if k not in {"id", "name", "description", "zone_type",
-                         "created_at", "updated_at"}
+            if k
+            not in {
+                "id",
+                "name",
+                "description",
+                "zone_type",
+                "created_at",
+                "updated_at",
+            }
         },
     )
 
@@ -203,9 +247,7 @@ class Neo4jTraversalEngine:
                 return None
             return _location_from_record(dict(record["loc"]))
 
-    async def _fetch_location_rules(
-        self, location_id: str
-    ) -> list[WorldRuleSummary]:
+    async def _fetch_location_rules(self, location_id: str) -> list[WorldRuleSummary]:
         async with self._driver.session() as session:
             result = await session.run(  # type: ignore[arg-type]
                 QUERY_LOCATION_RULES, location_id=location_id
@@ -219,9 +261,7 @@ class Neo4jTraversalEngine:
             )
             return [_npc_from_record(dict(r["npc"])) async for r in result]
 
-    async def _fetch_active_events(
-        self, location_id: str
-    ) -> list[WorldEventSummary]:
+    async def _fetch_active_events(self, location_id: str) -> list[WorldEventSummary]:
         async with self._driver.session() as session:
             result = await session.run(  # type: ignore[arg-type]
                 QUERY_ACTIVE_EVENTS, location_id=location_id
@@ -315,15 +355,11 @@ class Neo4jTraversalEngine:
                 self._fetch_zone_and_faction_rules(location_id),
             ]
 
-        results = await asyncio.gather(
-            *tier1_coros, *tier2_coros, *tier3_coros
-        )
+        results = await asyncio.gather(*tier1_coros, *tier2_coros, *tier3_coros)
 
         location_fact: LocationFact | None = results[0]
         if location_fact is None:
-            logger.warning(
-                "WorldContextBuilder: location %s not found", location_id
-            )
+            logger.warning("WorldContextBuilder: location %s not found", location_id)
             return None
 
         location_rules: list[WorldRuleSummary] = results[1]

@@ -22,7 +22,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from src.components.gameplay_loop.models.world_seed import GuideCharacter
 
 
 class Act(StrEnum):
@@ -104,6 +107,9 @@ class GenesisSessionState:
 
     # Whether the guide character has been introduced
     guide_introduced: bool = False
+
+    # The derived guide character (stored so it doesn't need re-generation each request)
+    guide_character: GuideCharacter | None = None
 
     # Flag: player asked to be surprised (agent makes seed choices)
     surprise_me: bool = False

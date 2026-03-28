@@ -273,7 +273,9 @@ class _WBACall(WorkflowPrimitive):
 
         loop = asyncio.get_running_loop()
         raw: dict[str, Any] = await loop.run_in_executor(
-            None, wba_instance.process, wba_input  # type: ignore[misc]
+            None,
+            wba_instance.process,
+            wba_input,  # type: ignore[misc]
         )
         return _transform_wba_result(world_id, updates, raw)
 

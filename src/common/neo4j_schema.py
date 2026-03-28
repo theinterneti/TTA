@@ -104,8 +104,7 @@ class WorldGraphSchema:
             f"CREATE INDEX location_type_idx IF NOT EXISTS "
             f"FOR (n:{n.LOCATION}) ON (n.location_type)",
             # NPC
-            f"CREATE INDEX npc_name_idx IF NOT EXISTS "
-            f"FOR (n:{n.NPC}) ON (n.name)",
+            f"CREATE INDEX npc_name_idx IF NOT EXISTS FOR (n:{n.NPC}) ON (n.name)",
             f"CREATE INDEX npc_faction_idx IF NOT EXISTS "
             f"FOR (n:{n.NPC}) ON (n.faction_id)",
             f"CREATE INDEX npc_location_idx IF NOT EXISTS "
@@ -143,8 +142,7 @@ class WorldGraphSchema:
             f"CREATE INDEX faction_active_idx IF NOT EXISTS "
             f"FOR (n:{n.FACTION}) ON (n.is_active)",
             # Zone
-            f"CREATE INDEX zone_name_idx IF NOT EXISTS "
-            f"FOR (n:{n.ZONE}) ON (n.name)",
+            f"CREATE INDEX zone_name_idx IF NOT EXISTS FOR (n:{n.ZONE}) ON (n.name)",
             f"CREATE INDEX zone_type_idx IF NOT EXISTS "
             f"FOR (n:{n.ZONE}) ON (n.zone_type)",
         ]
@@ -185,7 +183,5 @@ class WorldGraphSchema:
         if success:
             logger.info("WorldGraphSchema initialized successfully")
         else:
-            logger.warning(
-                "WorldGraphSchema initialized with some skipped statements"
-            )
+            logger.warning("WorldGraphSchema initialized with some skipped statements")
         return success

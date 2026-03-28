@@ -7,6 +7,7 @@ as a setup wizard and ends with the player already inside their world.
 See: docs/design/genesis-session.md
 """
 
+from .agent import AgentResponse, GenesisAgent
 from .narrator_voice import NARRATOR_VOICES, NarratorVoiceProfile, get_system_prompt
 from .session_state import (
     ACT_TRANSITIONS,
@@ -15,12 +16,16 @@ from .session_state import (
     GenesisSessionState,
     Turn,
 )
+from .session_store import GenesisSessionStore
 
 __all__ = [
     "Act",
     "ACT_TRANSITIONS",
     "ACT_TURN_TARGETS",
+    "AgentResponse",
+    "GenesisAgent",
     "GenesisSessionState",
+    "GenesisSessionStore",
     "Turn",
     "NARRATOR_VOICES",
     "NarratorVoiceProfile",
