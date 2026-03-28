@@ -16,6 +16,14 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from tta_dev_primitives import (
+    FallbackPrimitive,
+    RetryPrimitive,
+    RetryStrategy,
+    WorkflowContext,
+    WorkflowPrimitive,
+)
+
 # Add tta.prod to Python path for importing real agents
 tta_prod_path = Path(__file__).parent.parent.parent / "tta.prod" / "src"
 if str(tta_prod_path) not in sys.path:
@@ -122,6 +130,55 @@ async def retry_with_backoff(
     )
 
 
+def _transform_ipa_result(text: str, intent_result: Any) -> dict[str, Any]:
+    """Convert raw IPA intent result to orchestration format."""
+    if hasattr(intent_result, "model_dump"):
+        intent_dict: dict[str, Any] = intent_result.model_dump()
+    else:
+        intent_dict = {"intent": str(intent_result), "confidence": 0.8}
+    return {
+        "normalized_text": text,
+        "routing": {
+            "intent": intent_dict.get("intent", "unknown"),
+            "confidence": intent_dict.get("confidence", 0.8),
+            "entities": intent_dict.get("entities", {}),
+            "direction": intent_dict.get("direction"),
+            "object": intent_dict.get("object"),
+            "npc": intent_dict.get("npc"),
+        },
+        "raw_intent": intent_dict,
+        "source": "real_ipa",
+    }
+
+
+class _IPACall(WorkflowPrimitive):
+    """WorkflowPrimitive that executes the real IPA process_input function."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        text: str = input_data["text"]
+        real_fn = input_data["real_fn"]
+        loop = asyncio.get_running_loop()
+        intent_result = await loop.run_in_executor(None, real_fn, text)
+        return _transform_ipa_result(text, intent_result)
+
+
+class _IPAFallback(WorkflowPrimitive):
+    """WorkflowPrimitive that returns the mock IPA response."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        text: str = input_data["text"]
+        return {
+            "normalized_text": text,
+            "routing": {"intent": "unknown", "confidence": 0.5},
+            "raw_intent": {"intent": "unknown"},
+            "source": "mock_fallback",
+        }
+
+
 class IPAAdapter:
     """Adapter for communicating with the real Input Processor Agent."""
 
@@ -132,19 +189,32 @@ class IPAAdapter:
         self.retry_config = retry_config or RetryConfig()
         self._available = process_input is not None and IntentSchema is not None
 
-    async def process_input(self, text: str) -> dict[str, Any]:
-        """
-        Process player input using the real IPA implementation.
+    async def process_input(
+        self, text: str, session_id: str | None = None
+    ) -> dict[str, Any]:
+        """Process player input using the real IPA implementation.
 
         Args:
             text: Player input text to process
+            session_id: Optional session ID for WorkflowContext observability
 
         Returns:
             Dict containing processed intent and routing information
 
         Raises:
-            AgentCommunicationError: If communication with IPA fails
+            AgentCommunicationError: If communication with IPA fails and
+                fallback_to_mock is False
         """
+        ctx = WorkflowContext(workflow_id=session_id or f"ipa-{id(self)}")
+        input_data: dict[str, Any] = {"text": text, "real_fn": process_input}
+
+        strategy = RetryStrategy(
+            max_retries=self.retry_config.max_retries,
+            backoff_base=self.retry_config.base_delay,
+            max_backoff=self.retry_config.max_delay,
+            jitter=self.retry_config.jitter,
+        )
+
         if not self._available:
             if self.fallback_to_mock:
                 logger.warning(
@@ -153,42 +223,17 @@ class IPAAdapter:
                 return self._mock_process_input(text)
             raise AgentCommunicationError("Real IPA implementation not available")
 
+        call: WorkflowPrimitive = _IPACall()
+        retry_call = RetryPrimitive(call, strategy=strategy)
+        primitive: WorkflowPrimitive
+        if self.fallback_to_mock:
+            primitive = FallbackPrimitive(retry_call, _IPAFallback())
+        else:
+            primitive = retry_call
+
         try:
-            # Run the synchronous IPA function in a thread pool with retry logic
-            async def _process_with_executor():
-                loop = asyncio.get_running_loop()
-                return await loop.run_in_executor(None, process_input, text)  # type: ignore[misc]
-
-            intent_result = await retry_with_backoff(
-                _process_with_executor, self.retry_config
-            )
-
-            # Convert IntentSchema to dict format expected by orchestration system
-            if hasattr(intent_result, "model_dump"):
-                intent_dict = intent_result.model_dump()
-            else:
-                intent_dict = {"intent": str(intent_result), "confidence": 0.8}
-
-            # Transform to orchestration system format
-            return {
-                "normalized_text": text,
-                "routing": {
-                    "intent": intent_dict.get("intent", "unknown"),
-                    "confidence": intent_dict.get("confidence", 0.8),
-                    "entities": intent_dict.get("entities", {}),
-                    "direction": intent_dict.get("direction"),
-                    "object": intent_dict.get("object"),
-                    "npc": intent_dict.get("npc"),
-                },
-                "raw_intent": intent_dict,
-                "source": "real_ipa",
-            }
-
+            return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
         except Exception as e:
-            logger.error(f"Error communicating with real IPA: {e}")
-            if self.fallback_to_mock:
-                logger.warning("Falling back to mock implementation")
-                return self._mock_process_input(text)
             raise AgentCommunicationError(f"IPA communication failed: {e}") from e
 
     def _mock_process_input(self, text: str) -> dict[str, Any]:
