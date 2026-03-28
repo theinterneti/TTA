@@ -45,7 +45,10 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 try:
-    from ttadev.primitives.core.base import WorkflowContext, WorkflowPrimitive  # type: ignore[import]
+    from ttadev.primitives.core.base import (  # type: ignore[import]
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 except ImportError:
     from tta_dev_primitives.core.base import (  # type: ignore[no-redef]
         WorkflowContext,
