@@ -123,11 +123,9 @@ class ResourceExhaustionDetector:
         self,
         thresholds: ResourceThresholds | None = None,
         check_interval_seconds: float = 5.0,
-        circuit_breaker_registry: Any = None,
     ) -> None:
         self.thresholds = thresholds or ResourceThresholds()
         self.check_interval_seconds = check_interval_seconds
-        self._circuit_breaker_registry = circuit_breaker_registry
 
         # Validation
         validation_errors = self.thresholds.validate()
@@ -377,10 +375,6 @@ class ResourceExhaustionDetector:
             except Exception as e:
                 logger.warning(f"Exhaustion callback failed: {e}")
 
-        # Trigger circuit breakers if registry is available
-        if self._circuit_breaker_registry:
-            await self._trigger_circuit_breakers_for_exhaustion(event)
-
     async def _handle_resource_warning(self, event: ResourceExhaustionEvent) -> None:
         """Handle resource warning events."""
         # Trigger warning callbacks
@@ -389,25 +383,6 @@ class ResourceExhaustionDetector:
                 await callback(event)
             except Exception as e:
                 logger.warning(f"Warning callback failed: {e}")
-
-    async def _trigger_circuit_breakers_for_exhaustion(
-        self, event: ResourceExhaustionEvent
-    ) -> None:
-        """Trigger circuit breakers when sustained exhaustion is detected."""
-        try:
-            # Get all workflow circuit breakers
-            all_metrics = await self._circuit_breaker_registry.get_all_metrics()
-
-            for cb_name in all_metrics:
-                if cb_name.startswith("workflow:"):
-                    circuit_breaker = await self._circuit_breaker_registry.get(cb_name)
-                    if circuit_breaker:
-                        await circuit_breaker._transition_to_open()
-                        logger.warning(
-                            f"Opened circuit breaker {cb_name} due to sustained {event.resource_type} exhaustion"
-                        )
-        except Exception as e:
-            logger.error(f"Failed to trigger circuit breakers for exhaustion: {e}")
 
     # ---- Callback management ----
     def register_exhaustion_callback(

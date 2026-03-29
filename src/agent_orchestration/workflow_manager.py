@@ -20,9 +20,14 @@ from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError
+from ttadev.primitives.core.base import WorkflowContext, WorkflowPrimitive
+from ttadev.primitives.recovery.circuit_breaker_primitive import (
+    CircuitBreakerConfig,
+    CircuitBreakerError,
+    CircuitBreakerPrimitive,
+    CircuitState,
+)
 
-from .circuit_breaker import CircuitBreakerOpenError
-from .circuit_breaker_registry import CircuitBreakerRegistry
 from .langgraph_integration import LangGraphExecutor, LangGraphWorkflowBuilder
 from .models import OrchestrationRequest
 from .performance import get_step_aggregator
@@ -34,6 +39,13 @@ from .workflow import (
 from .workflow import OrchestrationResponse as WorkflowOrchestrationResponse
 
 logger = logging.getLogger(__name__)
+
+
+class _WorkflowExecutorPrimitive(WorkflowPrimitive[Any, Any]):
+    """Thin adapter that lets CircuitBreakerPrimitive wrap an async callable."""
+
+    async def execute(self, input_data: Any, context: WorkflowContext) -> Any:
+        return await input_data()
 
 
 def _utc_now() -> str:
@@ -76,16 +88,15 @@ class WorkflowManager:
     """Registers and executes workflows with basic validation and state tracking."""
 
     def __init__(
-        self, circuit_breaker_registry: CircuitBreakerRegistry | None = None
+        self, cb_config: CircuitBreakerConfig | None = None
     ) -> None:
         self._workflows: dict[str, WorkflowDefinition] = {}
         self._runs: dict[str, WorkflowRunState] = {}
         self._lg_builder = LangGraphWorkflowBuilder()
         self._lg_executor = LangGraphExecutor()
-        # Performance aggregator
         self._aggregator = get_step_aggregator()
-        # Circuit breaker registry for graceful degradation
-        self._circuit_breaker_registry = circuit_breaker_registry
+        self._cb_config = cb_config or CircuitBreakerConfig()
+        self._circuit_breakers: dict[str, CircuitBreakerPrimitive] = {}
 
     # ---- Registration ----
     def register_workflow(
@@ -360,31 +371,27 @@ class WorkflowManager:
         """
         Execute a registered workflow asynchronously with circuit breaker support.
 
-        This is the async version that includes circuit breaker integration
-        for graceful degradation and error handling.
-
         Returns: (response, run_id, error)
         """
         definition = self._workflows.get(name)
         if not definition:
             return None, None, f"Workflow '{name}' is not registered"
 
-        # Check circuit breaker state before execution
-        if self._circuit_breaker_registry:
-            try:
-                circuit_breaker = await self._circuit_breaker_registry.get_or_create(
-                    f"workflow:{name}"
-                )
-                if not await circuit_breaker.is_call_permitted():
-                    logger.warning(
-                        f"Circuit breaker open for workflow {name}, attempting degraded execution"
-                    )
-                    return self._execute_degraded_workflow(
-                        name, request, context, metadata
-                    )
-            except Exception as e:
-                logger.warning(f"Circuit breaker check failed for workflow {name}: {e}")
-                # Continue with normal execution if circuit breaker check fails
+        # Get or create per-workflow circuit breaker
+        cb = self._circuit_breakers.get(name)
+        if cb is None:
+            cb = CircuitBreakerPrimitive(
+                primitive=_WorkflowExecutorPrimitive(),
+                config=self._cb_config,
+            )
+            self._circuit_breakers[name] = cb
+
+        # Bail out fast if circuit is open
+        if cb.state == CircuitState.OPEN:
+            logger.warning(
+                f"Circuit breaker open for workflow {name}, attempting degraded execution"
+            )
+            return self._execute_degraded_workflow(name, request, context, metadata)
 
         ok, err = self._validate_request_against_workflow(request, definition)
         if not ok:
@@ -405,78 +412,58 @@ class WorkflowManager:
         self._runs[run_id] = run_state
 
         try:
-            # Execute workflow through circuit breaker if available
-            if self._circuit_breaker_registry:
-                circuit_breaker = await self._circuit_breaker_registry.get_or_create(
-                    f"workflow:{name}"
-                )
-                try:
-                    response = await circuit_breaker.call(
-                        lambda: self._execute_workflow_steps(definition, run_state)
-                    )
-                    if response:
-                        return response, run_id, None
-                except CircuitBreakerOpenError:
-                    logger.warning(
-                        f"Circuit breaker opened during workflow {name} execution"
-                    )
-                    return self._execute_degraded_workflow(
-                        name, request, context, metadata
-                    )
-                except Exception as e:
-                    logger.error(f"Workflow {name} execution failed: {e}")
-                    run_state.status = WorkflowRunStatus.FAILED
-                    run_state.ended_at = _utc_now()
-                    return None, run_id, str(e)
-            else:
-                # Fallback to direct execution without circuit breaker
-                response = await self._execute_workflow_steps(definition, run_state)
-                if response:
-                    return response, run_id, None
-
+            wf_context = WorkflowContext(
+                workflow_id=run_id,
+                session_id=run_id,
+            )
+            response = await cb.execute(
+                lambda: self._execute_workflow_steps(definition, run_state),
+                wf_context,
+            )
+            if response:
+                return response, run_id, None
+        except CircuitBreakerError:
+            logger.warning(f"Circuit breaker opened during workflow {name} execution")
+            return self._execute_degraded_workflow(name, request, context, metadata)
         except Exception as e:
+            logger.error(f"Workflow {name} execution failed: {e}")
             run_state.status = WorkflowRunStatus.FAILED
             run_state.ended_at = _utc_now()
             return None, run_id, str(e)
 
-        # Should not reach here, but fallback
         return None, run_id, "Workflow execution completed without response"
 
     # ---- Circuit breaker management ----
-    async def get_circuit_breaker_status(
-        self, workflow_name: str
-    ) -> dict[str, Any] | None:
+    def get_circuit_breaker_status(self, workflow_name: str) -> dict[str, Any] | None:
         """Get circuit breaker status for a workflow."""
-        if not self._circuit_breaker_registry:
+        cb = self._circuit_breakers.get(workflow_name)
+        if cb is None:
             return None
+        return {
+            "state": cb.state,
+            "failure_count": cb.failure_count,
+            "success_count": cb.success_count,
+        }
 
-        circuit_breaker = await self._circuit_breaker_registry.get(
-            f"workflow:{workflow_name}"
-        )
-        if circuit_breaker:
-            return await circuit_breaker.get_metrics()
-        return None
-
-    async def reset_circuit_breaker(self, workflow_name: str) -> bool:
+    def reset_circuit_breaker(self, workflow_name: str) -> bool:
         """Reset circuit breaker for a workflow."""
-        if not self._circuit_breaker_registry:
+        cb = self._circuit_breakers.get(workflow_name)
+        if cb is None:
             return False
+        cb.reset()
+        logger.info(f"Reset circuit breaker for workflow {workflow_name}")
+        return True
 
-        circuit_breaker = await self._circuit_breaker_registry.get(
-            f"workflow:{workflow_name}"
-        )
-        if circuit_breaker:
-            await circuit_breaker.reset()
-            logger.info(f"Reset circuit breaker for workflow {workflow_name}")
-            return True
-        return False
-
-    async def get_all_circuit_breaker_status(self) -> dict[str, Any]:
+    def get_all_circuit_breaker_status(self) -> dict[str, Any]:
         """Get status of all workflow circuit breakers."""
-        if not self._circuit_breaker_registry:
-            return {}
-
-        return await self._circuit_breaker_registry.get_all_metrics()
+        return {
+            name: {
+                "state": cb.state,
+                "failure_count": cb.failure_count,
+                "success_count": cb.success_count,
+            }
+            for name, cb in self._circuit_breakers.items()
+        }
 
     def _validate_workflow_definition(
         self, definition: WorkflowDefinition

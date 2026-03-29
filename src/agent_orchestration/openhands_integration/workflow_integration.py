@@ -33,8 +33,8 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from src.agent_orchestration.circuit_breaker import (
-    CircuitBreakerOpenError,
+from ttadev.primitives.recovery.circuit_breaker_primitive import (
+    CircuitBreakerError as CircuitBreakerOpenError,
 )
 
 from .config import OpenHandsIntegrationConfig

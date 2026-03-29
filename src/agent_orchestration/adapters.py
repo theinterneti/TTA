@@ -23,6 +23,10 @@ from tta_dev_primitives import (
     WorkflowPrimitive,
 )
 from tta_dev_primitives.observability import ObservablePrimitive
+from ttadev.primitives.recovery.circuit_breaker_primitive import (
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 # Add tta.prod to Python path for importing real agents
 tta_prod_path = Path(__file__).parent.parent.parent / "tta.prod" / "src"
@@ -137,11 +141,13 @@ class IPAAdapter:
         fallback_to_mock: bool = True,
         retry_config: RetryConfig | None = None,
         world_context_builder: Any | None = None,
+        cb_config: CircuitBreakerConfig | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self._available = process_input is not None and IntentSchema is not None
         self._builder = world_context_builder
+        self._cb_config = cb_config or CircuitBreakerConfig()
 
     async def process_input(
         self,
@@ -210,11 +216,12 @@ class IPAAdapter:
 
         call: WorkflowPrimitive = _IPACall()
         retry_call = RetryPrimitive(call, strategy=strategy)
+        circuit_call = CircuitBreakerPrimitive(retry_call, config=self._cb_config)  # type: ignore[arg-type]
         primitive: WorkflowPrimitive
         if self.fallback_to_mock:
-            primitive = FallbackPrimitive(retry_call, _IPAFallback())
+            primitive = FallbackPrimitive(circuit_call, _IPAFallback())  # type: ignore[arg-type]
         else:
-            primitive = retry_call
+            primitive = circuit_call  # type: ignore[assignment]
         primitive = ObservablePrimitive(primitive, "ipa_processing")
 
         try:
@@ -296,6 +303,7 @@ class WBAAdapter:
         fallback_to_mock: bool = True,
         retry_config: RetryConfig | None = None,
         world_context_builder: Any | None = None,
+        cb_config: CircuitBreakerConfig | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
@@ -304,6 +312,7 @@ class WBAAdapter:
         self._available = WorldBuildingAgent is not None
         self._wba_instance = None
         self._builder = world_context_builder
+        self._cb_config = cb_config or CircuitBreakerConfig()
 
         if self._available and neo4j_manager:
             try:
@@ -390,11 +399,12 @@ class WBAAdapter:
 
         call: WorkflowPrimitive = _WBACall()
         retry_call = RetryPrimitive(call, strategy=strategy)
+        circuit_call = CircuitBreakerPrimitive(retry_call, config=self._cb_config)  # type: ignore[arg-type]
         primitive: WorkflowPrimitive
         if self.fallback_to_mock:
-            primitive = FallbackPrimitive(retry_call, _WBAFallback())
+            primitive = FallbackPrimitive(circuit_call, _WBAFallback())  # type: ignore[arg-type]
         else:
-            primitive = retry_call
+            primitive = circuit_call  # type: ignore[assignment]
         primitive = ObservablePrimitive(primitive, "wba_processing")
 
         try:
@@ -480,11 +490,13 @@ class NGAAdapter:
         fallback_to_mock: bool = True,
         retry_config: RetryConfig | None = None,
         world_context_builder: Any | None = None,
+        cb_config: CircuitBreakerConfig | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self._available = generate_narrative_response is not None
         self._builder = world_context_builder
+        self._cb_config = cb_config or CircuitBreakerConfig()
 
     async def generate_narrative(
         self,
@@ -573,11 +585,12 @@ class NGAAdapter:
 
         call: WorkflowPrimitive = _NGACall()
         retry_call = RetryPrimitive(call, strategy=strategy)
+        circuit_call = CircuitBreakerPrimitive(retry_call, config=self._cb_config)  # type: ignore[arg-type]
         primitive: WorkflowPrimitive
         if self.fallback_to_mock:
-            primitive = FallbackPrimitive(retry_call, _NGAFallback())
+            primitive = FallbackPrimitive(circuit_call, _NGAFallback())  # type: ignore[arg-type]
         else:
-            primitive = retry_call
+            primitive = circuit_call  # type: ignore[assignment]
         primitive = ObservablePrimitive(primitive, "nga_processing")
 
         try:
