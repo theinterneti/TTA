@@ -8,7 +8,6 @@ import pytest
 
 from src.agent_orchestration.adapters import IPAAdapter, NGAAdapter, WBAAdapter
 
-
 # ---------------------------------------------------------------------------
 # IPA observability (#310)
 # ---------------------------------------------------------------------------
@@ -40,7 +39,8 @@ class TestIPAObservabilitySpan:
             captured.append(self_inner)
             return await original_execute(self_inner, input_data, ctx)  # type: ignore[arg-type]
 
-        mock_fn = lambda text: type("R", (), {"intent": "explore", "confidence": 0.9})()
+        def mock_fn(text: str) -> object:
+            return type("R", (), {"intent": "explore", "confidence": 0.9})()
 
         with patch.object(ObservablePrimitive, "execute", spy_execute):
             # Patch the real_fn used by _IPACall so it doesn't call None
@@ -65,7 +65,8 @@ class TestIPAObservabilitySpan:
             names.append(name)
             original_init(self_inner, primitive, name)  # type: ignore[arg-type]
 
-        mock_fn = lambda text: type("R", (), {"intent": "explore", "confidence": 0.9})()
+        def mock_fn(text: str) -> object:
+            return type("R", (), {"intent": "explore", "confidence": 0.9})()
 
         import src.agent_orchestration.adapters as _m
         with patch.object(ObservablePrimitive, "__init__", spy_init), \
@@ -96,6 +97,7 @@ class TestWBAObservabilitySpan:
     async def test_wba_observable_on_real_path(self) -> None:
         """ObservablePrimitive.execute is called when the real WBA is available."""
         from unittest.mock import MagicMock
+
         from tta_dev_primitives.observability import ObservablePrimitive
 
         adapter = WBAAdapter(fallback_to_mock=True)
@@ -121,6 +123,7 @@ class TestWBAObservabilitySpan:
     async def test_wba_span_name_on_real_path(self) -> None:
         """WBA span is named 'wba_processing'."""
         from unittest.mock import MagicMock
+
         from tta_dev_primitives.observability import ObservablePrimitive
 
         adapter = WBAAdapter(fallback_to_mock=True)
@@ -162,6 +165,7 @@ class TestNGAObservabilitySpan:
     async def test_nga_observable_on_real_path(self) -> None:
         """ObservablePrimitive.execute is called when the real NGA is available."""
         from unittest.mock import MagicMock
+
         from tta_dev_primitives.observability import ObservablePrimitive
 
         adapter = NGAAdapter(fallback_to_mock=True)
@@ -187,6 +191,7 @@ class TestNGAObservabilitySpan:
     async def test_nga_span_name_on_real_path(self) -> None:
         """NGA span is named 'nga_processing'."""
         from unittest.mock import MagicMock
+
         from tta_dev_primitives.observability import ObservablePrimitive
 
         adapter = NGAAdapter(fallback_to_mock=True)
@@ -233,7 +238,9 @@ class TestPipelineSequentialPrimitive:
         """Pipeline is a SequentialPrimitive with 3 steps and the expected name."""
         from tta_dev_primitives import SequentialPrimitive
 
-        from src.agent_orchestration.unified_orchestrator import UnifiedAgentOrchestrator
+        from src.agent_orchestration.unified_orchestrator import (
+            UnifiedAgentOrchestrator,
+        )
 
         # Arrange
         orchestrator = UnifiedAgentOrchestrator()
@@ -257,7 +264,9 @@ class TestPipelineSequentialPrimitive:
 
         from tta_dev_primitives import WorkflowContext
 
-        from src.agent_orchestration.unified_orchestrator import UnifiedAgentOrchestrator
+        from src.agent_orchestration.unified_orchestrator import (
+            UnifiedAgentOrchestrator,
+        )
 
         # Arrange
         orchestrator = UnifiedAgentOrchestrator()
@@ -299,11 +308,13 @@ class TestPipelineSequentialPrimitive:
     @pytest.mark.asyncio
     async def test_ipa_result_flows_into_wba_step(self) -> None:
         """WBA adapter is called with intent and entities extracted from IPA result."""
-        from unittest.mock import AsyncMock, call
+        from unittest.mock import AsyncMock
 
         from tta_dev_primitives import WorkflowContext
 
-        from src.agent_orchestration.unified_orchestrator import UnifiedAgentOrchestrator
+        from src.agent_orchestration.unified_orchestrator import (
+            UnifiedAgentOrchestrator,
+        )
 
         # Arrange
         orchestrator = UnifiedAgentOrchestrator()
@@ -337,9 +348,6 @@ class TestPipelineSequentialPrimitive:
 
         # Assert — WBA was called with the intent and entities from IPA
         wba_mock.assert_awaited_once()
-        _, kwargs = wba_mock.call_args
-        updates = kwargs.get("updates") or wba_mock.call_args[0][1] if len(wba_mock.call_args[0]) > 1 else kwargs.get("updates", {})
-        # Retrieve from keyword args
         called_kwargs = wba_mock.call_args.kwargs
         assert called_kwargs["updates"]["intent"] == "talk"
         assert called_kwargs["updates"]["entities"] == {"npc": "merchant"}
@@ -355,7 +363,9 @@ class TestPipelineSequentialPrimitive:
 
         from tta_dev_primitives import WorkflowContext
 
-        from src.agent_orchestration.unified_orchestrator import UnifiedAgentOrchestrator
+        from src.agent_orchestration.unified_orchestrator import (
+            UnifiedAgentOrchestrator,
+        )
 
         # Arrange
         orchestrator = UnifiedAgentOrchestrator()
@@ -364,8 +374,6 @@ class TestPipelineSequentialPrimitive:
         nga_return = {"story": "You rest at the inn."}
 
         captured_nga_context: list[dict] = []
-
-        original_generate = orchestrator.nga_adapter.generate_narrative
 
         async def spy_generate(prompt: str, context: dict | None = None, session_id: str = "") -> dict:
             if context:
@@ -410,7 +418,9 @@ class TestPipelineSequentialPrimitive:
         from unittest.mock import AsyncMock, MagicMock
 
         from src.agent_orchestration.therapeutic_safety import SafetyLevel
-        from src.agent_orchestration.unified_orchestrator import UnifiedAgentOrchestrator
+        from src.agent_orchestration.unified_orchestrator import (
+            UnifiedAgentOrchestrator,
+        )
 
         # Arrange
         orchestrator = UnifiedAgentOrchestrator()

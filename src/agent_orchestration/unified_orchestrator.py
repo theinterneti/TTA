@@ -310,7 +310,9 @@ class UnifiedAgentOrchestrator:
                 "session_id": data["session_id"],
             }
             wba_result = await self.wba_adapter.process_world_request(
-                world_id=world_id, updates=updates
+                world_id=world_id,
+                updates=updates,
+                session_id=data["session_id"],
             )
             world_context = dict(data["world_context"])
             if wba_result.get("world_state"):
@@ -346,15 +348,18 @@ class UnifiedAgentOrchestrator:
             nga_result = await self.nga_adapter.generate_narrative(
                 prompt=prompt, context=nga_context, session_id=data["session_id"]
             )
-            world_context_meta = nga_result.get("world_context_meta", {})
-            tokens = world_context_meta.get("total_tokens", 0)
-            if tokens:
-                ctx.metadata["nga.context_window_tokens"] = tokens
-                logger.debug(
-                    "nga.context_window_tokens=%d workflow_id=%s",
-                    tokens,
-                    data["session_id"],
-                )
+            world_context_meta = nga_result.get("world_context_meta") or {}
+            tokens = world_context_meta.get("total_tokens")
+            if not tokens:
+                # Fallback: approximate from prompt length when NGAAdapter
+                # doesn't propagate world_context_meta (real path).
+                tokens = max(len(prompt) // 4, 1)
+            ctx.state["nga.context_window_tokens"] = tokens
+            logger.debug(
+                "nga.context_window_tokens=%d session_id=%s",
+                tokens,
+                data["session_id"],
+            )
             return {**data, "nga_result": nga_result}
 
         pipeline = SequentialPrimitive(
