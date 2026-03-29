@@ -57,6 +57,8 @@ dependencies = [
     "urllib3>=2.6.3",  # security: decompression bomb, unbounded redirect chain fixes
     # Authentication
     "python-jose[cryptography]>=3.4.0",  # security: algorithm confusion with OpenSSH ECDSA keys
+    "cryptography>=46.0.6",  # security: incomplete DNS name constraint enforcement
+    "ecdsa>=0.19.2",  # security: transitive via python-jose
     "passlib[bcrypt]>=1.7.4",
     "python-multipart>=0.0.22",  # security: arbitrary file write, ReDoS, DoS fixes
     "pydantic-settings>=2.5.0",
@@ -69,7 +71,7 @@ dependencies = [
     # Agent Integration
     "openhands-sdk>=0.1.0",
     # LangChain and LangGraph
-    "langchain-core>=1.0.0",
+    "langchain-core>=1.2.22",  # security: path traversal in legacy load_prompt
     "langgraph>=1.0.0",
     # Utilities
     "python-dotenv>=1.0.0",
