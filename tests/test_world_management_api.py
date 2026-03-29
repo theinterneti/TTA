@@ -6,7 +6,7 @@ Integration tests for World Management API endpoints (7.4).
 
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 
 from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import ALGORITHM, SECRET_KEY

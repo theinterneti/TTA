@@ -108,6 +108,7 @@ workflow_sync_report.json
 # -------------------------------------------------
 logs/
 *.log
+.observability/traces.jsonl
 *.tmp
 *.temp
 .tmp/

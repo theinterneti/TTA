@@ -374,7 +374,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert len(token) > 0
 
     def test_create_access_token_uses_player_id_field(self):
-        from jose import jwt as _jwt
+        import jwt as _jwt
 
         svc = _make_service()
         user = _make_player_user("u42")
@@ -384,7 +384,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert payload["player_id"] == "player-99"
 
     def test_create_access_token_defaults_player_id_to_user_id(self):
-        from jose import jwt as _jwt
+        import jwt as _jwt
 
         svc = _make_service()
         user = _make_player_user("u42")

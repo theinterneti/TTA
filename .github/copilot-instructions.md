@@ -212,3 +212,21 @@ gemini "/memory show"                          # View project context
 ```
 
 Focus on circuit breaker patterns, Redis-based messaging, and comprehensive error handling when working with agent orchestration. Always prefer `uv` over other Python package managers and ensure circuit breakers wrap external service calls. Leverage MCP servers (especially Context7 and Serena) for deep codebase understanding before making architectural changes.
+
+## Hindsight Memory
+
+Hindsight MCP server is available at `http://localhost:8888/mcp/`. Use it deliberately.
+
+**Session start** — before any non-trivial task:
+1. Recall from `adam-global` (cross-project directives and user preferences)
+2. Recall from `tta` (TTA-specific architecture, decisions, known issues)
+
+**During work** — after completing significant tasks:
+- Retain cross-project patterns → `adam-global`
+- Retain TTA-specific decisions, failures, and patterns → `tta`
+
+**Rules:**
+- Use `document_id` for evolving notes (same ID = upsert, prevents duplicates)
+- Include a `context` label when retaining
+- Never retain secrets, tokens, or credentials
+- If Hindsight is unavailable, say so and continue without pretending recall happened

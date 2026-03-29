@@ -229,41 +229,44 @@ async def test_execute_workflow_async_entrypoint_mismatch():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
-async def test_get_circuit_breaker_status_no_registry():
+def test_get_circuit_breaker_status_no_registry():
     wm = WorkflowManager()
-    assert await wm.get_circuit_breaker_status("any") is None
+    assert wm.get_circuit_breaker_status("any") is None
 
 
-@pytest.mark.asyncio
-async def test_reset_circuit_breaker_no_registry():
+def test_reset_circuit_breaker_no_registry():
     wm = WorkflowManager()
-    assert await wm.reset_circuit_breaker("any") is False
+    assert wm.reset_circuit_breaker("any") is False
 
 
-@pytest.mark.asyncio
-async def test_get_all_circuit_breaker_status_no_registry():
+def test_get_all_circuit_breaker_status_no_registry():
     wm = WorkflowManager()
-    assert await wm.get_all_circuit_breaker_status() == {}
+    assert wm.get_all_circuit_breaker_status() == {}
 
 
 # ---------------------------------------------------------------------------
-# execute_workflow_async – with mocked circuit breaker registry
+# execute_workflow_async – with open circuit breaker
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
 async def test_execute_workflow_async_with_open_circuit_breaker():
-    """When circuit breaker reports open, degraded execution is returned."""
-    from src.agent_orchestration.circuit_breaker_registry import CircuitBreakerRegistry
+    """When circuit breaker is open, degraded execution is returned."""
+    from ttadev.primitives.recovery.circuit_breaker_primitive import (
+        CircuitBreakerPrimitive,
+        CircuitState,
+    )
 
-    mock_registry = AsyncMock(spec=CircuitBreakerRegistry)
-    mock_cb = AsyncMock()
-    mock_cb.is_call_permitted = AsyncMock(return_value=False)
-    mock_registry.get_or_create = AsyncMock(return_value=mock_cb)
+    from src.agent_orchestration.workflow_manager import _WorkflowExecutorPrimitive
 
-    wm = WorkflowManager(circuit_breaker_registry=mock_registry)
+    wm = WorkflowManager()
     wm.register_workflow("basic", _simple_definition())
+
+    # Force the CB for "basic" into OPEN state
+    cb = CircuitBreakerPrimitive(primitive=_WorkflowExecutorPrimitive())
+    cb._state = CircuitState.OPEN
+    wm._circuit_breakers["basic"] = cb
+
     resp, run_id, err = await wm.execute_workflow_async("basic", _request())
     assert err is None
     assert resp is not None

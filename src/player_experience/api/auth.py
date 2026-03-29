@@ -13,9 +13,10 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import bcrypt as _bcrypt
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jwt.exceptions import PyJWTError as JWTError
 from pydantic import BaseModel
 
 from ..database.redis_cache import (
