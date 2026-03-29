@@ -352,8 +352,9 @@ PYRIGHT_BASELINE_*.txt
 /quick-validation.spec.ts
 /tsconfig.json
 
-# Test mock node_modules (contains invalid JSON configs)
+# Test/simulation node_modules (tracked by mistake, now untracked)
 /tests/e2e/mocks/node_modules/
+/testing/simulation/node_modules/
 
 # -------------------------------------------------
 # 18) Staging and environment-specific directories
