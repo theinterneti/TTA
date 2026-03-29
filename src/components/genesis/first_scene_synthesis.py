@@ -322,7 +322,9 @@ class FirstSceneSynthesisService:
                 atm=loc_data.get("atmosphere", ""),
                 session_id=session_id,
             )
-            logger.debug("Created Location node %s: %s", location_id, loc_data.get("name"))
+            logger.debug(
+                "Created Location node %s: %s", location_id, loc_data.get("name")
+            )
 
             # ── NPCs ──────────────────────────────────────────────────
             for npc_data in synthesis.get("npcs", []):
