@@ -18,7 +18,7 @@ from typing import Any
 
 try:
     from ttadev.primitives.core.base import (  # type: ignore[import, assignment]
-        WorkflowContext,
+        WorkflowContext,  # pyright: ignore[reportAssignmentType]
         WorkflowPrimitive,
     )
 except ImportError:

@@ -27,6 +27,7 @@ dependencies = [
     "tta-narrative-engine",
     # TTA.dev platform packages
     "tta-dev-primitives>=1.3.0",
+    "ttadev>=0.1.0",
     "tta-observability-integration>=1.0.0",
     "universal-agent-context>=1.0.0",
     "tta-dev-integrations>=0.1.0",
@@ -299,6 +300,7 @@ members = [
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
 tta-dev-primitives = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/primitives/v1.3.0/tta_dev_primitives-1.3.0-py3-none-any.whl" }
+ttadev = { path = "../TTA.dev", editable = true }
 tta-observability-integration = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/observability/v1.0.0/tta_observability_integration-1.0.0-py3-none-any.whl" }
 universal-agent-context = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/agent-context/v1.0.0/universal_agent_context-1.0.0-py3-none-any.whl" }
 tta-dev-integrations = { url = "https://github.com/theinterneti/TTA.dev/releases/download/packages/integrations/v0.1.0/tta_dev_integrations-0.1.0-py3-none-any.whl" }
