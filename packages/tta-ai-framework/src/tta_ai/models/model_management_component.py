@@ -9,10 +9,22 @@ within the TTA platform, coordinating multiple providers and services.
 
 import logging
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from src.orchestration.component import Component
 from src.orchestration.decorators import log_entry_exit, timing_decorator
+
+# Guarded import — TTA.dev UniversalLLMPrimitive (optional dependency)
+try:
+    from ttadev.primitives import LLMProvider, LLMRequest, UniversalLLMPrimitive
+    from ttadev.primitives.core import WorkflowContext
+
+    _UNIVERSAL_LLM_AVAILABLE = True
+except ImportError:
+    _UNIVERSAL_LLM_AVAILABLE = False
+    if TYPE_CHECKING:
+        from ttadev.primitives import LLMProvider, LLMRequest, UniversalLLMPrimitive
+        from ttadev.primitives.core import WorkflowContext
 
 from .interfaces import (
     GenerationRequest,
@@ -61,6 +73,11 @@ class ModelManagementComponent(Component):
         # Providers
         self.providers: dict[str, IModelProvider] = {}
         self.active_models: dict[str, IModelInstance] = {}
+
+        # TTA.dev UniversalLLMPrimitive (preferred path when ttadev is available)
+        self._universal_llm: "UniversalLLMPrimitive | None" = None
+        if _UNIVERSAL_LLM_AVAILABLE:
+            self._universal_llm = self._build_universal_llm()
 
         # State
         self.initialized = False
@@ -397,6 +414,91 @@ class ModelManagementComponent(Component):
             logger.warning(f"Failed to load model configuration, using defaults: {e}")
             return ModelManagementConfig()
 
+    def _build_universal_llm(self) -> "UniversalLLMPrimitive | None":
+        """Build a UniversalLLMPrimitive mapped from the active provider config.
+
+        Provider mapping:
+          openrouter  → LLMProvider.OPENAI, base_url https://openrouter.ai/api/v1
+          ollama      → LLMProvider.OLLAMA
+          lmstudio    → LLMProvider.OPENAI, base_url http://localhost:1234/v1
+          anthropic   → LLMProvider.ANTHROPIC
+          default     → LLMProvider.OPENAI (bare OpenAI)
+        """
+        if not _UNIVERSAL_LLM_AVAILABLE:
+            return None
+        try:
+            provider_configs = self.model_config.providers
+            default = self.model_config.default_provider or "openrouter"
+
+            cfg = provider_configs.get(default)
+            provider_kwargs: dict[str, Any] = {}
+
+            if default == "openrouter":
+                provider_kwargs["provider"] = LLMProvider.OPENAI
+                provider_kwargs["base_url"] = "https://openrouter.ai/api/v1"
+                if cfg and cfg.api_key:
+                    provider_kwargs["api_key"] = cfg.api_key
+            elif default == "ollama":
+                provider_kwargs["provider"] = LLMProvider.OLLAMA
+                if cfg and cfg.api_base:
+                    provider_kwargs["base_url"] = cfg.api_base
+            elif default == "lmstudio":
+                provider_kwargs["provider"] = LLMProvider.OPENAI
+                provider_kwargs["base_url"] = (cfg.api_base if cfg and cfg.api_base else "http://localhost:1234/v1")
+            elif default == "anthropic":
+                provider_kwargs["provider"] = LLMProvider.ANTHROPIC
+                if cfg and cfg.api_key:
+                    provider_kwargs["api_key"] = cfg.api_key
+            else:
+                provider_kwargs["provider"] = LLMProvider.OPENAI
+                if cfg and cfg.api_key:
+                    provider_kwargs["api_key"] = cfg.api_key
+
+            return UniversalLLMPrimitive(**provider_kwargs)
+        except Exception as e:
+            logger.warning(f"Could not build UniversalLLMPrimitive, will use legacy providers: {e}")
+            return None
+
+    async def _generate_via_universal_llm(
+        self, prompt: str, **kwargs
+    ) -> "GenerationResponse | None":
+        """Delegate generation to ttadev UniversalLLMPrimitive and bridge the response."""
+        if self._universal_llm is None:
+            return None
+        try:
+            default = self.model_config.default_provider or "openrouter"
+            provider_configs = self.model_config.providers
+            cfg = provider_configs.get(default)
+
+            # Resolve the model name: prefer an explicitly configured model, then a safe default.
+            model_name: str = kwargs.get("model") or (
+                cfg.models[0].model_id if cfg and getattr(cfg, "models", None) else None
+            ) or "openai/gpt-4.1-mini"
+
+            messages = [{"role": "user", "content": prompt}]
+            system = kwargs.get("system_prompt")
+
+            request = LLMRequest(
+                model=model_name,
+                messages=messages,
+                temperature=kwargs.get("temperature", 0.7),
+                max_tokens=kwargs.get("max_tokens", 2048),
+                system=system,
+            )
+
+            ctx = WorkflowContext(workflow_id="model_management_generate")
+            llm_response = await self._universal_llm.execute(request, ctx)
+
+            return GenerationResponse(
+                text=llm_response.content or "",
+                model_id=llm_response.model or model_name,
+                usage=llm_response.usage,
+                metadata={"provider": default, "finish_reason": "stop"},
+            )
+        except Exception as e:
+            logger.warning(f"UniversalLLMPrimitive generation failed, falling back to legacy: {e}")
+            return None
+
     async def _initialize_providers(self):
         """Initialize all configured providers."""
         provider_configs = self.model_config.providers
@@ -465,8 +567,22 @@ class ModelManagementComponent(Component):
     async def generate_text(
         self, prompt: str, task_type: TaskType = TaskType.GENERAL_CHAT, **kwargs
     ) -> GenerationResponse | None:
-        """High-level text generation method."""
+        """High-level text generation method.
+
+        When ttadev is installed, delegates to UniversalLLMPrimitive for a
+        reliable, observable generation path.  Falls back to the legacy
+        provider/selector pipeline when ttadev is unavailable or the
+        primitive raises.
+        """
         try:
+            # --- preferred path: ttadev UniversalLLMPrimitive ---
+            if self._universal_llm is not None:
+                response = await self._generate_via_universal_llm(prompt, **kwargs)
+                if response is not None:
+                    return response
+                # fall through to legacy path on failure
+
+            # --- legacy path: provider + selector ---
             # Create requirements based on task type
             requirements = ModelRequirements(
                 task_type=task_type,

@@ -1,0 +1,199 @@
+"""Unit tests for the UniversalLLMPrimitive integration in ModelManagementComponent.
+
+Tests verify:
+- guarded import availability flag
+- _build_universal_llm() mapping logic
+- _generate_via_universal_llm() response bridging
+- generate_text() fast-path routing
+"""
+
+from __future__ import annotations
+
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _make_component(config_dict: dict | None = None):
+    """Return a minimal ModelManagementComponent without real providers."""
+    from tta_ai.models.model_management_component import ModelManagementComponent
+
+    cfg = MagicMock()
+    cfg.get = lambda key, default=None: (config_dict or {}).get(key, default)
+    comp = ModelManagementComponent.__new__(ModelManagementComponent)
+    comp.config = cfg
+    # We build model_config manually to avoid side-effects
+    comp.model_config = comp._load_model_config()
+    return comp
+
+
+# ---------------------------------------------------------------------------
+# Guarded import
+# ---------------------------------------------------------------------------
+
+
+class TestGuardedImport:
+    def test_flag_type_is_bool(self):
+        import tta_ai.models.model_management_component as m
+
+        assert isinstance(m._UNIVERSAL_LLM_AVAILABLE, bool)
+
+
+# ---------------------------------------------------------------------------
+# _build_universal_llm
+# ---------------------------------------------------------------------------
+
+
+class TestBuildUniversalLlm:
+    def test_returns_none_when_not_available(self):
+        with patch(
+            "tta_ai.models.model_management_component._UNIVERSAL_LLM_AVAILABLE",
+            False,
+        ):
+            comp = _make_component()
+            assert comp._build_universal_llm() is None
+
+    def test_returns_primitive_when_available(self):
+        """When ttadev is installed, _build_universal_llm returns a UniversalLLMPrimitive."""
+        try:
+            from ttadev.primitives import UniversalLLMPrimitive
+        except ImportError:
+            pytest.skip("ttadev not installed in this environment")
+
+        comp = _make_component()
+        result = comp._build_universal_llm()
+        assert isinstance(result, UniversalLLMPrimitive)
+
+    def test_returns_none_on_build_error(self):
+        """Returns None and logs a warning when construction raises."""
+        try:
+            from ttadev.primitives import UniversalLLMPrimitive  # noqa: F401
+        except ImportError:
+            pytest.skip("ttadev not installed in this environment")
+
+        comp = _make_component()
+        with patch(
+            "tta_ai.models.model_management_component.UniversalLLMPrimitive",
+            side_effect=RuntimeError("bad config"),
+        ):
+            result = comp._build_universal_llm()
+        assert result is None
+
+
+# ---------------------------------------------------------------------------
+# _generate_via_universal_llm
+# ---------------------------------------------------------------------------
+
+
+class TestGenerateViaUniversalLlm:
+    @pytest.mark.asyncio
+    async def test_returns_none_when_primitive_is_none(self):
+        comp = _make_component()
+        comp._universal_llm = None
+        result = await comp._generate_via_universal_llm("hello")
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_bridges_response_fields(self):
+        try:
+            from ttadev.primitives import UniversalLLMPrimitive  # noqa: F401
+        except ImportError:
+            pytest.skip("ttadev not installed in this environment")
+
+        from tta_ai.models.interfaces import GenerationResponse
+
+        fake_response = MagicMock()
+        fake_response.content = "hello world"
+        fake_response.model = "openai/gpt-4.1-mini"
+        fake_response.usage = {"total_tokens": 12}
+
+        mock_primitive = MagicMock()
+        mock_primitive.execute = AsyncMock(return_value=fake_response)
+
+        comp = _make_component()
+        comp._universal_llm = mock_primitive
+
+        result = await comp._generate_via_universal_llm("test prompt", temperature=0.5)
+
+        assert isinstance(result, GenerationResponse)
+        assert result.text == "hello world"
+        assert result.model_id == "openai/gpt-4.1-mini"
+        assert result.usage == {"total_tokens": 12}
+        assert result.metadata is not None
+        assert result.metadata.get("provider") == "openrouter"
+
+    @pytest.mark.asyncio
+    async def test_returns_none_on_exception(self):
+        try:
+            from ttadev.primitives import UniversalLLMPrimitive  # noqa: F401
+        except ImportError:
+            pytest.skip("ttadev not installed in this environment")
+
+        mock_primitive = MagicMock()
+        mock_primitive.execute = AsyncMock(side_effect=RuntimeError("network error"))
+
+        comp = _make_component()
+        comp._universal_llm = mock_primitive
+
+        result = await comp._generate_via_universal_llm("test prompt")
+        assert result is None
+
+
+# ---------------------------------------------------------------------------
+# generate_text fast-path routing
+# ---------------------------------------------------------------------------
+
+
+class TestGenerateTextRouting:
+    @pytest.mark.asyncio
+    async def test_uses_universal_llm_when_available(self):
+        try:
+            from ttadev.primitives import UniversalLLMPrimitive  # noqa: F401
+        except ImportError:
+            pytest.skip("ttadev not installed in this environment")
+
+        from tta_ai.models.interfaces import GenerationResponse, TaskType
+
+        expected = GenerationResponse(
+            text="generated", model_id="openai/gpt-4.1-mini"
+        )
+
+        comp = _make_component()
+        comp._universal_llm = MagicMock()
+        comp._generate_via_universal_llm = AsyncMock(return_value=expected)
+
+        result = await comp.generate_text("prompt", TaskType.GENERAL_CHAT)
+        assert result is expected
+        comp._generate_via_universal_llm.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_falls_back_to_legacy_when_universal_returns_none(self):
+        """When UniversalLLM returns None, generate_text falls through to legacy path."""
+        comp = _make_component()
+        comp._universal_llm = MagicMock()
+        comp._generate_via_universal_llm = AsyncMock(return_value=None)
+        # Legacy path: select_model returns None → generate_text returns None
+        comp.select_model = AsyncMock(return_value=None)
+
+        from tta_ai.models.interfaces import TaskType
+
+        result = await comp.generate_text("prompt", TaskType.GENERAL_CHAT)
+        assert result is None
+        comp.select_model.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_uses_legacy_when_no_universal_llm(self):
+        comp = _make_component()
+        comp._universal_llm = None
+        comp.select_model = AsyncMock(return_value=None)
+
+        from tta_ai.models.interfaces import TaskType
+
+        result = await comp.generate_text("prompt", TaskType.GENERAL_CHAT)
+        assert result is None
+        comp.select_model.assert_awaited_once()
