@@ -17,9 +17,10 @@ from typing import Any
 from uuid import uuid4
 
 import bcrypt
+import jwt
 import pyotp
 import qrcode
-from jose import JWTError, jwt
+from jwt.exceptions import PyJWTError as JWTError
 
 from ..models.auth import (
     DEFAULT_ROLE_PERMISSIONS,

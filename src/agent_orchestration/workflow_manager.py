@@ -87,9 +87,7 @@ class WorkflowRunState(BaseModel):
 class WorkflowManager:
     """Registers and executes workflows with basic validation and state tracking."""
 
-    def __init__(
-        self, cb_config: CircuitBreakerConfig | None = None
-    ) -> None:
+    def __init__(self, cb_config: CircuitBreakerConfig | None = None) -> None:
         self._workflows: dict[str, WorkflowDefinition] = {}
         self._runs: dict[str, WorkflowRunState] = {}
         self._lg_builder = LangGraphWorkflowBuilder()

@@ -13,7 +13,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 
 from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import (
