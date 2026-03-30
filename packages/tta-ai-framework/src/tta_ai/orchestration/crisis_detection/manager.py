@@ -13,6 +13,16 @@ from ..safety_validation.models import ValidationResult
 from .enums import CrisisLevel, CrisisType, EscalationStatus, InterventionType
 from .models import CrisisAssessment, CrisisIntervention, InterventionAction
 
+try:
+    from ttadev.control_plane.service import ControlPlaneService
+    from ttadev.control_plane.models import GateType
+
+    _CONTROL_PLANE_AVAILABLE = True
+except ImportError:
+    ControlPlaneService = None  # type: ignore[assignment,misc]
+    GateType = None  # type: ignore[assignment]
+    _CONTROL_PLANE_AVAILABLE = False
+
 
 class CrisisInterventionManager:
     """Central coordinator for crisis situations detected by the TherapeuticValidator.
@@ -38,6 +48,11 @@ class CrisisInterventionManager:
 
         # Initialize logging
         self.logger = logging.getLogger(__name__ + ".CrisisInterventionManager")
+
+        # L0 control plane integration (optional — works without ttadev installed)
+        self._control_plane: ControlPlaneService | None = (
+            ControlPlaneService() if _CONTROL_PLANE_AVAILABLE else None
+        )
 
     def assess_crisis(
         self, validation_result: ValidationResult, session_context: dict[str, Any]
@@ -360,6 +375,8 @@ class CrisisInterventionManager:
         # In a real implementation, this would contact emergency services
         # For now, we'll log and record the action
 
+        task_id = self._create_control_plane_gate(intervention, "approval")
+
         action = InterventionAction(
             action_type=InterventionType.EMERGENCY_SERVICES,
             description="Emergency services notification triggered",
@@ -371,6 +388,7 @@ class CrisisInterventionManager:
                 "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
                 "user_id": intervention.user_id,
                 "session_id": intervention.session_id,
+                **({"control_plane_task_id": task_id} if task_id else {}),
             },
         )
 
@@ -390,6 +408,8 @@ class CrisisInterventionManager:
         # In a real implementation, this would notify human therapists/supervisors
         # For now, we'll log and record the action
 
+        task_id = self._create_control_plane_gate(intervention, "review")
+
         action = InterventionAction(
             action_type=InterventionType.HUMAN_OVERSIGHT,
             description="Human oversight notification sent",
@@ -401,6 +421,7 @@ class CrisisInterventionManager:
                 "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
                 "risk_factors": intervention.crisis_assessment.risk_factors,
                 "protective_factors": intervention.crisis_assessment.protective_factors,
+                **({"control_plane_task_id": task_id} if task_id else {}),
             },
         )
 
@@ -411,6 +432,43 @@ class CrisisInterventionManager:
             f"HUMAN OVERSIGHT ESCALATION: Intervention {intervention.intervention_id} "
             f"for user {intervention.user_id} - Crisis level: {intervention.crisis_assessment.crisis_level.value}"
         )
+
+    def _create_control_plane_gate(
+        self, intervention: CrisisIntervention, gate_type: str
+    ) -> str | None:
+        """Create an L0 control-plane gate task for human review/approval.
+
+        Args:
+            intervention: The crisis intervention requiring oversight.
+            gate_type: "approval" for CRITICAL crises, "review" for HIGH/MODERATE.
+
+        Returns:
+            The task_id string if the gate was created, None if unavailable.
+        """
+        if self._control_plane is None or GateType is None:
+            return None
+        try:
+            gate_enum = GateType.APPROVAL if gate_type == "approval" else GateType.REVIEW
+            task = self._control_plane.create_task(
+                title=f"Crisis {gate_type.capitalize()}: {intervention.intervention_id}",
+                description=(
+                    f"Crisis intervention requires human {gate_type}. "
+                    f"User: {intervention.user_id}, "
+                    f"Session: {intervention.session_id}, "
+                    f"Level: {intervention.crisis_assessment.crisis_level.value}"
+                ),
+                gates=[
+                    {
+                        "gate_type": gate_enum.value,
+                        "id": f"crisis-{gate_type}-{intervention.intervention_id}",
+                        "title": f"Human {gate_type.capitalize()} Required",
+                    }
+                ],
+            )
+            return task.task_id
+        except Exception:
+            self.logger.exception("Failed to create control-plane gate for intervention %s", intervention.intervention_id)
+            return None
 
     def _generate_crisis_response(self, assessment: CrisisAssessment) -> str:
         """Generate appropriate crisis response message."""

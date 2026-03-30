@@ -579,3 +579,75 @@ class TestAgentOrchestrationServiceIntegration:
 
 if __name__ == "__main__":
     pytest.main([__file__])
+
+
+class TestControlPlaneGateIntegration:
+    """Test TTA.dev L0 control-plane gate creation on crisis escalation."""
+
+    def _make_intervention(self, crisis_level, crisis_type, intervention_id="test-iv"):
+        from tta_ai.orchestration.crisis_detection.models import (
+            CrisisAssessment,
+            CrisisIntervention,
+        )
+
+        assessment = CrisisAssessment(
+            crisis_level=crisis_level,
+            crisis_types=[crisis_type],
+            confidence=0.90,
+            risk_factors=["test_factor"],
+            protective_factors=[],
+            immediate_risk=crisis_level == CrisisLevel.CRITICAL,
+            intervention_recommended=InterventionType.EMERGENCY_SERVICES,
+            escalation_required=True,
+            assessment_timestamp=0.0,
+            context={},
+        )
+        return CrisisIntervention(
+            intervention_id=intervention_id,
+            session_id="sess-test",
+            user_id="user-test",
+            crisis_assessment=assessment,
+        )
+
+    def test_critical_crisis_calls_approval_gate(self):
+        """_escalate_to_emergency_services calls _create_control_plane_gate with 'approval'."""
+        manager = CrisisInterventionManager()
+        manager._create_control_plane_gate = Mock(return_value="mock-task-id-123")  # type: ignore[method-assign]
+
+        intervention = self._make_intervention(CrisisLevel.CRITICAL, CrisisType.SUICIDAL_IDEATION)
+        manager._escalate_to_emergency_services(intervention)
+
+        manager._create_control_plane_gate.assert_called_once_with(intervention, "approval")
+        assert (
+            intervention.actions_taken[-1].metadata.get("control_plane_task_id")
+            == "mock-task-id-123"
+        )
+        assert intervention.emergency_contacted
+
+    def test_high_crisis_calls_review_gate(self):
+        """_escalate_to_human_oversight calls _create_control_plane_gate with 'review'."""
+        manager = CrisisInterventionManager()
+        manager._create_control_plane_gate = Mock(return_value="mock-task-id-456")  # type: ignore[method-assign]
+
+        intervention = self._make_intervention(CrisisLevel.HIGH, CrisisType.SELF_HARM, "test-iv-2")
+        manager._escalate_to_human_oversight(intervention)
+
+        manager._create_control_plane_gate.assert_called_once_with(intervention, "review")
+        assert (
+            intervention.actions_taken[-1].metadata.get("control_plane_task_id")
+            == "mock-task-id-456"
+        )
+        assert intervention.human_notified
+
+    def test_no_control_plane_escalates_gracefully(self):
+        """When _create_control_plane_gate returns None, escalation still succeeds."""
+        manager = CrisisInterventionManager()
+        manager._control_plane = None
+
+        intervention = self._make_intervention(
+            CrisisLevel.CRITICAL, CrisisType.SUICIDAL_IDEATION, "test-iv-3"
+        )
+        manager._escalate_to_emergency_services(intervention)
+
+        assert intervention.emergency_contacted
+        assert "control_plane_task_id" not in intervention.actions_taken[-1].metadata

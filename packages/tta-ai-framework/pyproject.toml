@@ -35,6 +35,9 @@ dev = [
     "ruff>=0.13.0",
     "pyright>=1.1.350",
 ]
+tta-control-plane = [
+    "ttadev>=0.1.0",
+]
 
 [build-system]
 requires = ["hatchling"]
