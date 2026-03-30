@@ -437,10 +437,15 @@ class ModelManagementComponent(Component):
             default = self.model_config.default_provider or "openrouter"
 
             cfg = provider_configs.get(default)
-            # Only build if the selected provider is explicitly configured
+            # Only build if the selected provider is configured and enabled
             if not cfg:
                 logger.debug(
                     "UniversalLLMPrimitive skipped: provider '%s' not configured", default
+                )
+                return None
+            if not cfg.enabled:
+                logger.debug(
+                    "UniversalLLMPrimitive skipped: provider '%s' is disabled", default
                 )
                 return None
             provider_kwargs: dict[str, Any] = {}
@@ -482,25 +487,20 @@ class ModelManagementComponent(Component):
 
             # Resolve the model name:
             # 1) explicit `model` kwarg
-            # 2) task_type match from ModelManagementConfig.models
+            # 2) task_type match from ModelManagementConfig.models (dict[str, ModelConfiguration])
             # 3) first configured model
             # 4) safe hardcoded default
             task_type = kwargs.get("task_type")
             configured_model_id: str | None = None
-            models = getattr(self.model_config, "models", None) or []
-            if models:
+            model_configs = getattr(self.model_config, "models", None) or {}
+            if model_configs:
                 if task_type is not None:
-                    for m in models:
-                        m_task_types = getattr(m, "task_types", None)
-                        m_task_type = getattr(m, "task_type", None)
-                        if (m_task_types and task_type in m_task_types) or (
-                            m_task_type is not None and m_task_type == task_type
-                        ):
-                            configured_model_id = getattr(m, "model_id", None)
-                            if configured_model_id:
-                                break
+                    for m in model_configs.values():
+                        if task_type in getattr(m, "supported_tasks", []):
+                            configured_model_id = m.model_id
+                            break
                 if configured_model_id is None:
-                    configured_model_id = getattr(models[0], "model_id", None)
+                    configured_model_id = next(iter(model_configs.values())).model_id
 
             model_name: str = kwargs.get("model") or configured_model_id or "openai/gpt-4.1-mini"
 

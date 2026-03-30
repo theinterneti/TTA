@@ -87,6 +87,19 @@ class TestBuildUniversalLlm:
             result = comp._build_universal_llm()
         assert result is None
 
+    def test_returns_none_when_provider_disabled(self):
+        """Returns None when the provider config exists but is disabled."""
+        comp = _make_component()
+        disabled_cfg = MagicMock()
+        disabled_cfg.enabled = False
+        comp.model_config.providers = {"openrouter": disabled_cfg}
+        with patch(
+            "tta_ai.models.model_management_component._UNIVERSAL_LLM_AVAILABLE",
+            True,
+        ):
+            result = comp._build_universal_llm()
+        assert result is None
+
     def test_returns_none_on_build_error(self):
         """Returns None and logs a warning when construction raises."""
         comp = _make_component()
@@ -150,6 +163,62 @@ class TestGenerateViaUniversalLlm:
 
         result = await comp._generate_via_universal_llm("test prompt")
         assert result is None
+
+    @pytest.mark.asyncio
+    async def test_resolves_model_id_by_task_type(self):
+        """Picks the model whose supported_tasks includes the requested task_type."""
+        from tta_ai.models.interfaces import GenerationResponse
+
+        fake_response = MagicMock()
+        fake_response.content = "ok"
+        fake_response.model = "openai/story-model"
+        fake_response.usage = {}
+
+        story_model = MagicMock()
+        story_model.model_id = "openai/story-model"
+        story_model.supported_tasks = ["story_generation"]
+
+        chat_model = MagicMock()
+        chat_model.model_id = "openai/chat-model"
+        chat_model.supported_tasks = ["general_chat"]
+
+        comp = _make_component()
+        comp.model_config.models = {"story": story_model, "chat": chat_model}
+        comp._universal_llm = MagicMock()
+        comp._universal_llm.execute = AsyncMock(return_value=fake_response)
+
+        result = await comp._generate_via_universal_llm(
+            "tell a story", task_type="story_generation"
+        )
+
+        assert isinstance(result, GenerationResponse)
+        assert result.model_id == "openai/story-model"
+
+    @pytest.mark.asyncio
+    async def test_falls_back_to_first_model_when_no_task_match(self):
+        """Falls back to first model in config dict when no task_type match."""
+        from tta_ai.models.interfaces import GenerationResponse
+
+        fake_response = MagicMock()
+        fake_response.content = "ok"
+        fake_response.model = "openai/first-model"
+        fake_response.usage = {}
+
+        first_model = MagicMock()
+        first_model.model_id = "openai/first-model"
+        first_model.supported_tasks = ["summarization"]
+
+        comp = _make_component()
+        comp.model_config.models = {"first": first_model}
+        comp._universal_llm = MagicMock()
+        comp._universal_llm.execute = AsyncMock(return_value=fake_response)
+
+        result = await comp._generate_via_universal_llm(
+            "chat message", task_type="general_chat"  # no match → fall back to first
+        )
+
+        assert isinstance(result, GenerationResponse)
+        assert result.model_id == "openai/first-model"
 
 
 # ---------------------------------------------------------------------------
