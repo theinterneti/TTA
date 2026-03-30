@@ -70,7 +70,9 @@ class TestNGAAdapterConstruction:
 class TestNGAAdapterMockPath:
     @pytest.mark.asyncio
     async def test_unavailable_returns_mock_story(self) -> None:
-        adapter = NGAAdapter(fallback_to_mock=True)
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(side_effect=RuntimeError("nga down"))
+        adapter = NGAAdapter(fallback_to_mock=True, nga_agent=mock_agent)
         result = await adapter.generate_narrative("hello world")
         assert result["source"] == "mock_fallback"
         assert "story" in result
@@ -79,15 +81,23 @@ class TestNGAAdapterMockPath:
     async def test_unavailable_no_fallback_raises(self) -> None:
         from src.agent_orchestration.adapters import AgentCommunicationError
 
-        adapter = NGAAdapter(fallback_to_mock=False)
-        with pytest.raises(AgentCommunicationError, match="not available"):
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(side_effect=RuntimeError("nga down"))
+        adapter = NGAAdapter(fallback_to_mock=False, nga_agent=mock_agent)
+        with pytest.raises(AgentCommunicationError, match="NGA communication failed"):
             await adapter.generate_narrative("hello")
 
     @pytest.mark.asyncio
     async def test_world_context_meta_included_in_mock_result(self) -> None:
         """When builder returns context, meta should survive even in mock fallback."""
         builder = _make_mock_builder(total_tokens=500, neo4j_available=False)
-        adapter = NGAAdapter(fallback_to_mock=True, world_context_builder=builder)
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(side_effect=RuntimeError("nga down"))
+        adapter = NGAAdapter(
+            fallback_to_mock=True,
+            world_context_builder=builder,
+            nga_agent=mock_agent,
+        )
         result = await adapter.generate_narrative(
             "tell me a story",
             session_id="sess-1",
@@ -102,7 +112,9 @@ class TestNGAAdapterMockPath:
 
     @pytest.mark.asyncio
     async def test_no_builder_mock_result_has_no_meta(self) -> None:
-        adapter = NGAAdapter(fallback_to_mock=True)
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(side_effect=RuntimeError("nga down"))
+        adapter = NGAAdapter(fallback_to_mock=True, nga_agent=mock_agent)
         result = await adapter.generate_narrative("story prompt")
         assert "world_context_meta" not in result
 
@@ -148,7 +160,9 @@ class TestNGAAdapterBuilderInvocation:
     @pytest.mark.asyncio
     async def test_no_builder_skips_assembly(self) -> None:
         """No builder → no error, result is still returned."""
-        adapter = NGAAdapter(fallback_to_mock=True)
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(side_effect=RuntimeError("nga down"))
+        adapter = NGAAdapter(fallback_to_mock=True, nga_agent=mock_agent)
         result = await adapter.generate_narrative(
             "story",
             session_id="sess-1",
@@ -161,7 +175,13 @@ class TestNGAAdapterBuilderInvocation:
         """Builder failure degrades gracefully; NGA still runs (mock path here)."""
         builder = MagicMock()
         builder.build = AsyncMock(side_effect=RuntimeError("neo4j down"))
-        adapter = NGAAdapter(fallback_to_mock=True, world_context_builder=builder)
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(side_effect=RuntimeError("nga down"))
+        adapter = NGAAdapter(
+            fallback_to_mock=True,
+            world_context_builder=builder,
+            nga_agent=mock_agent,
+        )
         result = await adapter.generate_narrative(
             "story",
             session_id="sess-1",
