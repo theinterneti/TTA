@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Dashboard]]
 Real-time system health and performance dashboards.
 
 This module provides real-time dashboard capabilities for monitoring system
@@ -12,7 +14,7 @@ import contextlib
 import logging
 import time
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..monitoring import SystemMonitor, get_system_monitor
@@ -29,7 +31,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class DashboardType(str, Enum):
+class DashboardType(StrEnum):
     """Types of real-time dashboards."""
 
     SYSTEM_HEALTH = "system_health"

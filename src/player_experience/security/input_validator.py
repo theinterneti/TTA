@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Security/Input_validator]]
 Comprehensive input validation and sanitization system.
 
 This module provides robust input validation, sanitization, and security
@@ -10,8 +12,9 @@ import re
 import urllib.parse
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
+from pathlib import Path
 from re import Pattern
 from typing import Any
 
@@ -22,7 +25,7 @@ from ..monitoring.logging_config import LogCategory, LogContext, get_logger
 logger = get_logger(__name__)
 
 
-class ValidationSeverity(str, Enum):
+class ValidationSeverity(StrEnum):
     """Severity levels for validation violations."""
 
     LOW = "low"
@@ -31,7 +34,7 @@ class ValidationSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class InputType(str, Enum):
+class InputType(StrEnum):
     """Types of input data."""
 
     TEXT = "text"
@@ -103,7 +106,7 @@ class ValidationResult:
                 "rule": rule_name,
                 "message": message,
                 "severity": severity.value,
-                "timestamp": str(datetime.utcnow()),
+                "timestamp": str(datetime.now(UTC)),
             }
         )
 
@@ -615,9 +618,7 @@ class InputValidator:
         """Check if file extension is allowed."""
         allowed_extensions = [".txt", ".pdf", ".doc", ".docx", ".jpg", ".png", ".gif"]
 
-        import os
-
-        _, ext = os.path.splitext(filename.lower())
+        ext = Path(filename.lower()).suffix
         return ext in allowed_extensions
 
     # Sanitization methods

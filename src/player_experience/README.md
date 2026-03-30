@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/Player Experience Interface.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Readme]]

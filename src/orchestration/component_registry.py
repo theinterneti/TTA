@@ -1,5 +1,7 @@
 """Component Registry for TTA Orchestrator."""
 
+# Logseq: [[TTA.dev/Orchestration/Component_registry]]
+
 import importlib.util
 import logging
 import sys

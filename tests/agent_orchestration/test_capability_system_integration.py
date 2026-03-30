@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_capability_system_integration]]
 Comprehensive Redis integration tests for the capability system.
 
 This module provides comprehensive Redis-marked integration tests with proper

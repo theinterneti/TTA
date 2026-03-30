@@ -1,11 +1,11 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Metrics]]
 Enhanced metrics router with Prometheus integration for TTA Player Experience API.
 Provides both legacy metrics and new Prometheus metrics endpoints.
 """
 
 from __future__ import annotations
-
-import contextlib
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from starlette.responses import PlainTextResponse
@@ -17,8 +17,8 @@ try:
     from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
         CONTENT_TYPE_LATEST,
     )
-    from ...monitoring.prometheus_metrics import (
-        get_metrics_collector as get_prometheus_collector,  # type: ignore[import-not-found]
+    from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
+        get_metrics_collector as get_prometheus_collector,
     )
 
     prometheus_available = True
@@ -32,12 +32,17 @@ router = APIRouter()
 
 def _metrics_allowed() -> None:
     # Only allow when debug/testing is enabled; import settings at runtime to honor test overrides
-    with contextlib.suppress(Exception):
-        from ..config import get_settings
+    try:
+        from ..config import (
+            settings as current_settings,  # type: ignore[attr-defined]  # noqa: PLC0415
+        )
 
-        current_settings = get_settings()
         if not getattr(current_settings, "debug", False):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    except HTTPException:
+        raise
+    except Exception:  # noqa: S110  # nosec B110
+        pass  # If config can't be loaded, allow access
 
 
 @router.get("/metrics", dependencies=[Depends(_metrics_allowed)])
@@ -66,9 +71,9 @@ async def get_prometheus_metrics():
         )
 
     try:
-        collector = get_prometheus_collector("player-experience")
+        collector = get_prometheus_collector("player-experience")  # type: ignore[possibly-unbound]
         metrics_data = collector.get_metrics()
-        return PlainTextResponse(content=metrics_data, media_type=CONTENT_TYPE_LATEST)
+        return PlainTextResponse(content=metrics_data, media_type=CONTENT_TYPE_LATEST)  # type: ignore[possibly-unbound]
     except Exception as e:
         return PlainTextResponse(
             content=f"# Error generating Prometheus metrics: {e}\n",

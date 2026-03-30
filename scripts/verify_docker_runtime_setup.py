@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Verify_docker_runtime_setup]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

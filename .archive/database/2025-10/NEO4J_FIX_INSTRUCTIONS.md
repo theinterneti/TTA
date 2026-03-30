@@ -95,3 +95,7 @@ The Neo4j bolt authentication has been problematic with the environment variable
 ---
 
 **Current Status**: Neo4j is running with `NEO4J_AUTH=none`. Follow the steps above to set the password properly.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Database/2025-10/Neo4j_fix_instructions]]

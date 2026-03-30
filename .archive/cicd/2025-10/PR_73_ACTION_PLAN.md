@@ -184,3 +184,7 @@ Once PR #73 merges:
 ---
 
 **Ready to go?** Start with fixing the MockPrimitive issues - they're identical in both files! 🎉
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Cicd/2025-10/Pr_73_action_plan]]

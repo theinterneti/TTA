@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Hooks/Useaccessibility]]
 import { useEffect, useState, useCallback } from 'react';
 
 interface AccessibilityPreferences {

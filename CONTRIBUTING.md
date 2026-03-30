@@ -1,82 +1,128 @@
 # Contributing to TTA
 
-> ⚠️ **This document has moved to the TTA Knowledge Base!**
+## Quick Start
 
-**New location:** `.augment/kb/TTA___Workflows___Docs Development Contributing.md`
+```bash
+# Clone and install
+git clone https://github.com/theinterneti/TTA.git
+cd TTA
+uv sync --all-extras
 
-## 📚 Working with the Knowledge Base
-
-When contributing to TTA, follow these KB conventions:
-
-### Documentation Location
-- **Core docs:** `.augment/kb/TTA___Category___PageName.md`
-- **Format:** Flat structure, triple-underscore naming
-- **Accessible via:** `~/repos/TTA-notes/logseq/pages/TTA/` (Logseq)
-
-### Creating New Documentation
-
-1. **Choose category:** Architecture, Components, Workflows, References, Status, Testing, Research
-2. **Name format:** `TTA___Category___Your Page Name.md`
-3. **Add frontmatter:**
-```yaml
----
-title: Your Page Title
-tags: #TTA #Category
-status: Active
-repo: theinterneti/TTA
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
----
+# Verify setup
+uv run pytest tests/unit/ -q          # Should pass 1382 tests
+uv run ruff check src/ --fix          # Lint
+uv run ruff format src/               # Format
 ```
-4. **Use wiki-links:** `[[TTA___Category___Other Page]]` for cross-references
-5. **Add to KB:** Files in `.augment/kb/` automatically visible in Logseq
 
-### Updating Existing Docs
+## Development Workflow
 
-- **Stubs in repo root:** Update KB file, not the stub
-- **Original locations:** Use stub redirects for backward compatibility
-- **KB files:** Edit directly in `.augment/kb/`
-- **Update dates:** Change `updated:` field in frontmatter
+1. **Branch** from `main` using conventional naming: `feat/`, `fix/`, `refactor/`
+2. **Make changes** following the standards below
+3. **Run quality gate** before committing:
 
-### Code Documentation Conventions
+```bash
+uv run ruff check src/ --fix
+uv run ruff format src/
+uv run pyright src/
+uv run pytest tests/unit/ -q
+```
 
-When referencing KB docs from code:
+4. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/):
+   - `feat:` new feature
+   - `fix:` bug fix
+   - `refactor:` code restructuring
+   - `test:` test additions/changes
+   - `chore:` maintenance tasks
+   - `docs:` documentation updates
+
+5. **Open a PR** against `main`
+
+## Code Standards
+
+### Python
+
+- **Version:** 3.12+ required
+- **Package manager:** `uv` only (never `pip install`)
+- **Type hints:** `str | None` (not `Optional[str]`)
+- **Line length:** 88 characters (Ruff)
+- **Async:** prefer `async def` for I/O-bound operations
+- **Logging:** use `logging.getLogger(__name__)` in every module
+
+### Error Handling
 
 ```python
-# Reference KB doc in docstrings
-"""
-Agent orchestration implementation.
+# Wrap external calls with circuit breaker
+from src.agent_orchestration.circuit_breaker import CircuitBreaker
 
-Architecture: See [[TTA___Architecture___Agent Orchestration]]
-Status: See [[TTA___Status___Implementation Dashboard]]
-"""
+circuit_breaker = CircuitBreaker(name="my_service", failure_threshold=5)
+result = await circuit_breaker.call(external_function)
 ```
 
-### Finding Documentation
+### Testing
 
-**In Logseq:**
-- Open `~/repos/TTA-notes`
-- Search: `Ctrl+K` (or `Cmd+K`)
-- Browse: Click TTA namespace
-- Tags: Search `#TTA #Category`
+- **Unit tests** in `tests/unit/` — fast, no external services
+- **Integration tests** in `tests/integration/` — require Redis/Neo4j
+- **Markers:** `@pytest.mark.redis`, `@pytest.mark.neo4j`, `@pytest.mark.integration`
 
-**In Terminal:**
 ```bash
-# Search KB files
-cd .augment/kb
-grep -r "search term" .
+# Unit tests only (CI default)
+uv run pytest tests/unit/ -q
 
-# List by category
-ls -1 TTA___Architecture___*.md
-ls -1 TTA___Components___*.md
+# Integration tests (requires services)
+uv run pytest -m "integration" tests/
+
+# Coverage report
+uv run pytest --cov=src --cov-report=term-missing tests/unit/
 ```
 
-### Related Documents
+## Project Structure
 
-- **[[TTA___References___Agents Document]]** - Universal agent context
-- **[[TTA___Status___Project Timeline]]** - Development history
-- **[[TTA___Status___Implementation Dashboard]]** - Component status
+```
+src/
+  agent_orchestration/     # Multi-agent pipeline (IPA → WBA → NGA)
+  ai_components/           # LLM integration
+  api_gateway/             # FastAPI routes
+  components/              # Gameplay loop, narrative, safety
+  player_experience/       # Player-facing features
+  common/                  # Shared utilities
 
-**See AGENTS.md for complete KB structure and navigation guide.**
+packages/
+  tta-ai-framework/        # AI orchestration package
+  tta-narrative-engine/    # Narrative engine package
 
-**Migration date:** 2025-11-01
+tests/
+  unit/                    # Fast unit tests (1382 tests)
+  integration/             # Service integration tests
+  e2e/                     # End-to-end browser tests
+```
+
+## Services
+
+Start local services for integration testing:
+
+```bash
+bash docker/scripts/tta-docker.sh dev up -d
+```
+
+This starts Redis (6379), Neo4j (7474/7687), and Grafana.
+
+## Documentation
+
+- **Architecture:** `docs/architecture/`
+- **Milestones:** `docs/milestones/`
+- **Development guides:** `docs/development/`
+- **Agentic primitives:** `docs/agentic-primitives/`
+
+## Key Patterns
+
+| Pattern | Where Used | Purpose |
+|---------|-----------|---------|
+| Circuit breaker | `agent_orchestration/` | Graceful degradation |
+| Retry with backoff | `agent_orchestration/`, `openhands_integration/` | Transient failure recovery |
+| Fallback handler | `model_management/` | Model fallback strategies |
+| Cache primitive | `observability_integration/` | Redis caching with metrics |
+| Error recovery | `gameplay_loop/narrative/` | Session checkpointing |
+
+---
+
+**Logseq:** [[TTA.dev/Contributing]]

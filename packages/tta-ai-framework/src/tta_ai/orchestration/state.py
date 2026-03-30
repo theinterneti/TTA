@@ -1,16 +1,18 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/State]]
 Agent state and context models for Orchestration (Task 2.1).
 """
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class AgentRuntimeStatus(str, Enum):
+class AgentRuntimeStatus(StrEnum):
     IDLE = "idle"
     BUSY = "busy"
     ERROR = "error"

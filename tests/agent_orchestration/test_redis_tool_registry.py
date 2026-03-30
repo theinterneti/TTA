@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_redis_tool_registry]]
 import asyncio
 
 import pytest
@@ -15,7 +16,7 @@ async def test_register_get_list_and_cleanup(redis_client):
         name="kg.query",
         version="1.0.0",
         description="Query KG",
-        parameters=[ToolParameter(name="q", schema={"type": "string"})],
+        parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
         returns_schema={"type": "object"},
     )
     created = await reg.register_tool(spec)
@@ -26,7 +27,8 @@ async def test_register_get_list_and_cleanup(redis_client):
     assert created2 is False
 
     got = await reg.get_tool("kg.query", "1.0.0")
-    assert got is not None and got.name == spec.name
+    assert got is not None
+    assert got.name == spec.name
 
     lst = await reg.list_tools()
     assert any(t.name == "kg.query" for t in lst)

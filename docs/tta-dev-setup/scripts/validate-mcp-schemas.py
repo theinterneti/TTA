@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+
 MCP Schema Validator
 
 Validates that MCP tool definitions match actual implementation.

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate-phase1-updates]]
 Phase 1 Security Update Validation Script
 
 Validates that all Phase 1 dependency updates are correctly applied

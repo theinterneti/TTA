@@ -348,3 +348,7 @@ curl http://localhost:<port>/health
 
 **Last Updated By**: theinterneti
 **Last Review Date**: 2025-10-07
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Orchestration/Maturity]]

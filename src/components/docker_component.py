@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Docker_component]]
 Docker Component.
 
 This module provides a component for managing Docker configurations across repositories.
@@ -34,7 +36,7 @@ from src.common.process_utils import run as safe_run
 
 # Try to import codecarbon for carbon tracking
 try:
-    from codecarbon import track_emissions
+    from codecarbon import track_emissions  # type: ignore[import-not-found]
 
     _codecarbon_available = True
 except ImportError:
@@ -104,9 +106,7 @@ class DockerComponent(Component):
             self._check_docker_installed()
 
             # Ensure Docker consistency across repositories
-            self.ensure_consistency()
-
-            return True
+            return self.ensure_consistency()
         except Exception as e:
             logger.error(f"Error starting Docker component: {e}")
             return False

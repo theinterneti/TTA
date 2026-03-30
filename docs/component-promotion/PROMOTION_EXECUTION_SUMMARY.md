@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/Component Promotion Execution Summary]]
 > - **Path:** `.augment/kb/Components/Component Promotion Execution Summary.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Component Promotion Execution Summary.md`
 
 **Migration date:** 2025-11-01
+
+
+---

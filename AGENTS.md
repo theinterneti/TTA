@@ -1,37 +1,73 @@
-# AGENTS.md - Universal Agent Context
+# AGENTS.md — Universal Agent Context
 
-> ⚠️ **This document has moved to the TTA Knowledge Base!**
->
-> **New location:** `TTA___References___Agents Document.md`
->
-> **Access via:**
-> - **Logseq:** Open TTA-notes → Navigate to `TTA` namespace → Search for "Agents"
-> - **Direct path:** `.augment/kb/TTA___References___Agents Document.md`
-> - **Symlink:** `~/repos/TTA-notes/logseq/pages/TTA/TTA___References___Agents Document.md`
+This file is the shared entry point for all AI agents operating in the TTA
+repository. Read this before acting.
 
-## 📚 TTA Knowledge Base
+## What This Repo Is
 
-The TTA documentation has been consolidated into a centralized Logseq knowledge base:
+**Therapeutic Text Adventure (TTA)** — An AI-powered narrative game for mental
+health support. Players make choices that branch the story; a therapist/editorial
+layer curates which paths are safe and effective.
 
-### KB Structure
-- **Location:** `~/repos/TTA-notes/logseq/pages/TTA/`
-- **Files:** 306 documents (flat Logseq structure)
-- **Format:** Triple-underscore naming (`TTA___Category___Page.md`)
+**TTA.dev** (`/home/thein/repos/TTA.dev`) provides reusable platform primitives.
 
-### Key Documents
-- **[[TTA___References___Agents Document]]** - Universal agent context (this doc)
-- **[[TTA___References___Claude Document]]** - Claude-specific context
-- **[[TTA___References___Overview Document]]** - Project README
-- **[[TTA___Status___Project Timeline]]** - Phase 1-7 development history
-- **[[TTA___Status___Implementation Dashboard]]** - Current component status
-- **[[TTA___Architecture___Docs Architecture Agent Orchestration]]** - System design
+## Agent Roster
 
-### Navigation Tips
-1. Open Logseq and load `~/repos/TTA-notes`
-2. Use `Ctrl+K` (or `Cmd+K` on Mac) to search pages
-3. Click wiki-links to navigate: `[[TTA___Category___Page]]`
-4. Use bidirectional links to explore connections
-5. Tag search: Use `#TTA` to see all TTA-related pages
+| Agent | Role | Config |
+|---|---|---|
+| **Claude Code** | Main agent — primary decision maker | `CLAUDE.md` |
+| GitHub Copilot | IDE suggestions | `.github/copilot-instructions.md` |
+| Augment | Code intelligence | `.augment/instructions.md` |
+| Cline | AI coding assistant | `.cline/instructions.md` |
+| Gemini | Secondary review | `GEMINI.md` |
 
-**Migration date:** 2025-11-01
-**KB Coverage:** 507 documents consolidated into 306 files
+## Memory Access (MANDATORY)
+
+Before any non-trivial task, recall context from Hindsight:
+1. `mcp__hindsight__recall` — query `adam-global` for durable directives and cross-project patterns
+2. `mcp__hindsight__recall` — query the current derived `project-*` or `workspace-*` bank for TTA-specific context
+
+After completing a significant task (architecture decision, bug root-cause, resolved TODO):
+- Cross-project patterns → retain to `adam-global`
+- TTA-specific decisions, commands, failures → retain to current derived `project-*`/`workspace-*` bank
+
+Hindsight MCP: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hindsight-local-mcp`
+
+## Non-Negotiable Standards
+
+- **Python**: 3.12+ only
+- **Package manager**: `uv` — never `pip install`
+- **Type hints**: `str | None` not `Optional[str]`
+- **Line length**: 88 chars (Ruff)
+- **Type checking**: Pyright `standard` mode
+- **Commits**: Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`)
+- **Tests**: pytest `asyncio_mode = "auto"`; integration tests use `@pytest.mark.integration`
+
+## Quality Gate (run before committing)
+
+```bash
+uv run ruff check src/ --fix
+uv run ruff format src/
+uv run pyright src/
+uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+```
+
+## L0 / TTA.dev Interaction Rule
+
+`TTA.dev` owns the emerging **developer-agent L0 control plane**.
+
+TTA does **not** own that layer. In this repo, L0-related work should focus on
+**integrating with TTA.dev**, not recreating a second developer control plane
+inside `src/agent_orchestration/`.
+
+### What TTA agents should do next for L0
+
+1. keep runtime/player-session orchestration separate from developer-agent orchestration
+2. define how TTA build/test/release work should be represented as TTA.dev L0 tasks and runs
+3. add adapters or scripts that let TTA.dev-managed agents safely operate on this repo
+4. surface enough project/workflow metadata that TTA.dev can coordinate work without touching therapeutic runtime state
+
+### Anti-goal
+
+Do not treat IPA/WBA/NGA runtime coordination as the same problem as Claude/Copilot
+developer coordination. Those are different control planes.

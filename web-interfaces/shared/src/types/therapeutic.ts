@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Web-interfaces/Shared/Src/Types/Therapeutic]]
 // Core therapeutic types for the TTA platform
 export interface TherapeuticSession {
   id: string;

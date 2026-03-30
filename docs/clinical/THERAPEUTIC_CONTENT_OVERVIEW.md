@@ -41,3 +41,6 @@ For more detailed content documentation specific to each component:
 
 - [Content Examples](examples/content-examples.md): Examples of therapeutic content
 - [UX Examples](examples/ux-examples.md): Examples of user experience implementation
+
+
+---

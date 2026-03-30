@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/Benchmarking]]
 Performance benchmarking and load testing utilities.
 
 This module provides comprehensive benchmarking tools for performance
@@ -13,8 +15,8 @@ import statistics
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -27,7 +29,7 @@ from .metrics_collector import get_metrics_collector
 logger = get_logger(__name__)
 
 
-class BenchmarkType(str, Enum):
+class BenchmarkType(StrEnum):
     """Types of benchmarks."""
 
     LOAD_TEST = "load_test"
@@ -38,7 +40,7 @@ class BenchmarkType(str, Enum):
     BASELINE_TEST = "baseline_test"
 
 
-class LoadPattern(str, Enum):
+class LoadPattern(StrEnum):
     """Load patterns for testing."""
 
     CONSTANT = "constant"
@@ -238,8 +240,8 @@ class HTTPLoadGenerator(LoadGenerator):
         """Generate HTTP load."""
         result = BenchmarkResult(
             config=config,
-            start_time=datetime.utcnow(),
-            end_time=datetime.utcnow(),  # Will be updated
+            start_time=datetime.now(UTC),
+            end_time=datetime.now(UTC),  # Will be updated
         )
 
         # Initialize system metrics collection
@@ -275,7 +277,7 @@ class HTTPLoadGenerator(LoadGenerator):
             with contextlib.suppress(asyncio.CancelledError):
                 await system_metrics_task
 
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
 
             # Calculate final metrics
             duration = (result.end_time - result.start_time).total_seconds()
@@ -446,7 +448,7 @@ class HTTPLoadGenerator(LoadGenerator):
                             {
                                 "url": url,
                                 "status": response.status,
-                                "timestamp": datetime.utcnow().isoformat(),
+                                "timestamp": datetime.now(UTC).isoformat(),
                                 "response_time": response_time,
                             }
                         )
@@ -461,7 +463,7 @@ class HTTPLoadGenerator(LoadGenerator):
                     {
                         "url": url,
                         "error": str(e),
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(UTC).isoformat(),
                         "response_time": response_time,
                     }
                 )
@@ -583,14 +585,14 @@ class BenchmarkSuite:
         filename = f"{result.config.name}_{timestamp}.json"
         filepath = self.output_dir / filename
 
-        with open(filepath, "w") as f:
+        with filepath.open("w") as f:
             json.dump(result.to_dict(), f, indent=2, default=str)
 
         # Also save as CSV for easy analysis
         csv_filename = f"{result.config.name}_{timestamp}_response_times.csv"
         csv_filepath = self.output_dir / csv_filename
 
-        with open(csv_filepath, "w", newline="") as f:
+        with csv_filepath.open("w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["timestamp", "response_time"])
 
@@ -603,11 +605,11 @@ class BenchmarkSuite:
         if not self.results:
             return
 
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         report_path = self.output_dir / f"benchmark_summary_{timestamp}.json"
 
         summary = {
-            "execution_time": datetime.utcnow().isoformat(),
+            "execution_time": datetime.now(UTC).isoformat(),
             "total_benchmarks": len(self.results),
             "passed_benchmarks": 0,
             "failed_benchmarks": 0,
@@ -638,7 +640,7 @@ class BenchmarkSuite:
                 }
             )
 
-        with open(report_path, "w") as f:
+        with report_path.open("w") as f:
             json.dump(summary, f, indent=2, default=str)
 
         logger.info(f"Benchmark summary saved to {report_path}")

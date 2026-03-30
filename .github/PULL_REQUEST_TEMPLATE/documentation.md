@@ -253,3 +253,7 @@ Related to #<!-- issue number -->
 ---
 
 *Thank you for improving TTA documentation! 📚✨*
+
+
+---
+**Logseq:** [[TTA.dev/.github/Pull_request_template/Documentation]]

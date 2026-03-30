@@ -1,9 +1,11 @@
 """Therapeutic scoring enumerations."""
 
-from enum import Enum
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Therapeutic_scoring/Enums]]
+
+from enum import StrEnum
 
 
-class TherapeuticContext(str, Enum):
+class TherapeuticContext(StrEnum):
     """Therapeutic contexts for content validation."""
 
     GENERAL_THERAPY = "general_therapy"

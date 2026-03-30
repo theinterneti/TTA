@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Test_orchestrator]]
 import subprocess
 import sys
 import unittest
@@ -92,10 +93,10 @@ class TestOrchestrator(unittest.TestCase):
         """
         # Check that the orchestrator has initialized the component registry
         self.mock_component_registry.get_registered_component_names.assert_called_once()
-        self.assertEqual(len(self.orchestrator.components), 3)
-        self.assertIn("mock_component_1", self.orchestrator.components)
-        self.assertIn("mock_component_2", self.orchestrator.components)
-        self.assertIn("mock_component_3", self.orchestrator.components)
+        assert len(self.orchestrator.components) == 3
+        assert "mock_component_1" in self.orchestrator.components
+        assert "mock_component_2" in self.orchestrator.components
+        assert "mock_component_3" in self.orchestrator.components
 
     def test_config_initialization(self):
         """
@@ -103,33 +104,31 @@ class TestOrchestrator(unittest.TestCase):
         """
         # Check that the configuration has the orchestration.components section
         orchestration_components = self.config.get("orchestration.components")
-        self.assertIsNotNone(orchestration_components)
-        self.assertIn("player_experience", orchestration_components)
+        assert orchestration_components is not None
+        assert "player_experience" in orchestration_components
 
     def test_component_registration(self):
         """
         Test that components are registered correctly.
         """
-        self.assertIn("mock_component_1", self.orchestrator.components)
-        self.assertIn("mock_component_2", self.orchestrator.components)
-        self.assertEqual(
-            self.orchestrator.components["mock_component_1"].name, "mock_component_1"
+        assert "mock_component_1" in self.orchestrator.components
+        assert "mock_component_2" in self.orchestrator.components
+        assert (
+            self.orchestrator.components["mock_component_1"].name == "mock_component_1"
         )
-        self.assertEqual(
-            self.orchestrator.components["mock_component_2"].name, "mock_component_2"
+        assert (
+            self.orchestrator.components["mock_component_2"].name == "mock_component_2"
         )
 
     def test_component_dependencies(self):
         """
         Test that component dependencies are correct.
         """
-        self.assertIn(
-            "mock_component_2",
-            self.orchestrator.components["mock_component_1"].dependencies,
+        assert (
+            "mock_component_2"
+            in self.orchestrator.components["mock_component_1"].dependencies
         )
-        self.assertEqual(
-            len(self.orchestrator.components["mock_component_2"].dependencies), 0
-        )
+        assert len(self.orchestrator.components["mock_component_2"].dependencies) == 0
 
     def test_start_component_success_no_dependencies(self):
         """
@@ -137,8 +136,8 @@ class TestOrchestrator(unittest.TestCase):
         """
         component_name = "mock_component_2"
         component = self.orchestrator.components[component_name]
-        self.assertTrue(self.orchestrator.start_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.RUNNING)
+        assert self.orchestrator.start_component(component_name)
+        assert component.status == ComponentStatus.RUNNING
 
     def test_start_component_success_with_dependencies(self):
         """
@@ -148,9 +147,9 @@ class TestOrchestrator(unittest.TestCase):
         component = self.orchestrator.components[component_name]
         dependency = self.orchestrator.components["mock_component_2"]
 
-        self.assertTrue(self.orchestrator.start_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.RUNNING)
-        self.assertEqual(dependency.status, ComponentStatus.RUNNING)
+        assert self.orchestrator.start_component(component_name)
+        assert component.status == ComponentStatus.RUNNING
+        assert dependency.status == ComponentStatus.RUNNING
 
     def test_start_component_failure(self):
         """
@@ -160,8 +159,8 @@ class TestOrchestrator(unittest.TestCase):
         component = self.orchestrator.components[component_name]
         component.start_success = False
 
-        self.assertFalse(self.orchestrator.start_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.ERROR)
+        assert not self.orchestrator.start_component(component_name)
+        assert component.status == ComponentStatus.ERROR
 
     def test_start_component_dependency_failure(self):
         """
@@ -172,10 +171,11 @@ class TestOrchestrator(unittest.TestCase):
         dependency = self.orchestrator.components[dependency_name]
         dependency.start_success = False
 
-        self.assertFalse(self.orchestrator.start_component(component_name))
-        self.assertEqual(dependency.status, ComponentStatus.ERROR)
-        self.assertEqual(
-            self.orchestrator.components[component_name].status, ComponentStatus.STOPPED
+        assert not self.orchestrator.start_component(component_name)
+        assert dependency.status == ComponentStatus.ERROR
+        assert (
+            self.orchestrator.components[component_name].status
+            == ComponentStatus.STOPPED
         )
 
     def test_start_component_already_running(self):
@@ -186,8 +186,8 @@ class TestOrchestrator(unittest.TestCase):
         component = self.orchestrator.components[component_name]
         component.status = ComponentStatus.RUNNING
 
-        self.assertTrue(self.orchestrator.start_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.RUNNING)
+        assert self.orchestrator.start_component(component_name)
+        assert component.status == ComponentStatus.RUNNING
 
     def test_stop_component_success_no_dependents(self):
         """
@@ -197,8 +197,8 @@ class TestOrchestrator(unittest.TestCase):
         component = self.orchestrator.components[component_name]
         component.status = ComponentStatus.RUNNING
 
-        self.assertTrue(self.orchestrator.stop_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.STOPPED)
+        assert self.orchestrator.stop_component(component_name)
+        assert component.status == ComponentStatus.STOPPED
 
     def test_stop_component_success_with_dependents(self):
         """
@@ -211,9 +211,9 @@ class TestOrchestrator(unittest.TestCase):
         # Start both components first
         self.orchestrator.start_component("mock_component_1")
 
-        self.assertTrue(self.orchestrator.stop_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.STOPPED)
-        self.assertEqual(dependent.status, ComponentStatus.STOPPED)
+        assert self.orchestrator.stop_component(component_name)
+        assert component.status == ComponentStatus.STOPPED
+        assert dependent.status == ComponentStatus.STOPPED
 
     def test_stop_component_failure(self):
         """
@@ -224,8 +224,8 @@ class TestOrchestrator(unittest.TestCase):
         component.status = ComponentStatus.RUNNING
         component.stop_success = False
 
-        self.assertFalse(self.orchestrator.stop_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.ERROR)
+        assert not self.orchestrator.stop_component(component_name)
+        assert component.status == ComponentStatus.ERROR
 
     def test_stop_component_dependent_failure(self):
         """
@@ -240,10 +240,11 @@ class TestOrchestrator(unittest.TestCase):
 
         dependent.stop_success = False
 
-        self.assertFalse(self.orchestrator.stop_component(component_name))
-        self.assertEqual(dependent.status, ComponentStatus.ERROR)
-        self.assertEqual(
-            self.orchestrator.components[component_name].status, ComponentStatus.RUNNING
+        assert not self.orchestrator.stop_component(component_name)
+        assert dependent.status == ComponentStatus.ERROR
+        assert (
+            self.orchestrator.components[component_name].status
+            == ComponentStatus.RUNNING
         )
 
     def test_stop_component_already_stopped(self):
@@ -254,8 +255,8 @@ class TestOrchestrator(unittest.TestCase):
         component = self.orchestrator.components[component_name]
         component.status = ComponentStatus.STOPPED
 
-        self.assertTrue(self.orchestrator.stop_component(component_name))
-        self.assertEqual(component.status, ComponentStatus.STOPPED)
+        assert self.orchestrator.stop_component(component_name)
+        assert component.status == ComponentStatus.STOPPED
 
     def test_stop_all(self):
         """
@@ -270,7 +271,7 @@ class TestOrchestrator(unittest.TestCase):
 
         # Check that all components are stopped
         for component in self.orchestrator.components.values():
-            self.assertEqual(component.status, ComponentStatus.STOPPED)
+            assert component.status == ComponentStatus.STOPPED
 
     @mock.patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_command_success(self, mock_safe_run):
@@ -289,7 +290,7 @@ class TestOrchestrator(unittest.TestCase):
         mock_safe_run.assert_called_once_with(
             ["docker", "ps"], text=True, timeout=120, capture_output=True, check=False
         )
-        self.assertEqual(result.returncode, 0)
+        assert result.returncode == 0
 
     @mock.patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_command_failure(self, mock_safe_run):
@@ -303,7 +304,7 @@ class TestOrchestrator(unittest.TestCase):
             stderr="Cannot connect to the Docker daemon.",
         )
 
-        with self.assertRaises(subprocess.SubprocessError):
+        with pytest.raises(subprocess.SubprocessError):
             self.orchestrator.run_docker_command(["ps"])
 
         calls = [
@@ -331,8 +332,8 @@ class TestOrchestrator(unittest.TestCase):
 
         results = self.orchestrator.run_docker_compose_command(["up", "-d"])
 
-        self.assertIn("tta.dev", results)
-        self.assertEqual(results["tta.dev"].returncode, 0)
+        assert "tta.dev" in results
+        assert results["tta.dev"].returncode == 0
 
     @mock.patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_compose_command_failure(self, mock_safe_run):
@@ -346,7 +347,7 @@ class TestOrchestrator(unittest.TestCase):
             stderr="ERROR: Some services are not healthy",
         )
 
-        with self.assertRaises(subprocess.SubprocessError):
+        with pytest.raises(subprocess.SubprocessError):
             self.orchestrator.run_docker_compose_command(["up", "-d"])
 
     @mock.patch("src.orchestration.orchestrator.safe_run")
@@ -365,9 +366,9 @@ class TestOrchestrator(unittest.TestCase):
             ["up", "-d"], repository="tta.dev"
         )
 
-        self.assertIn("tta.dev", results)
-        self.assertEqual(results["tta.dev"].returncode, 0)
-        self.assertNotIn("tta.prototype", results)
+        assert "tta.dev" in results
+        assert results["tta.dev"].returncode == 0
+        assert "tta.prototype" not in results
 
 
 if __name__ == "__main__":

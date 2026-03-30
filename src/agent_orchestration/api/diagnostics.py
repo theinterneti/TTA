@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Api/Diagnostics]]
 Enhanced diagnostics API endpoint for agent capability information.
 
 This module provides comprehensive diagnostics endpoints that aggregate

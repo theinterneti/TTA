@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Web-interfaces/Shared/Src/Themes/Therapeutictheme]]
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 import { PaletteMode } from '@mui/material';
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Auth]]
 Authentication and authorization models for the Player Experience system.
 
 This module defines user roles, permissions, and multi-factor authentication
@@ -6,14 +8,14 @@ models for enhanced security.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     """User roles for role-based access control."""
 
     PLAYER = "player"
@@ -23,7 +25,7 @@ class UserRole(str, Enum):
     MODERATOR = "moderator"
 
 
-class Permission(str, Enum):
+class Permission(StrEnum):
     """System permissions for fine-grained access control."""
 
     # Player permissions
@@ -58,7 +60,7 @@ class Permission(str, Enum):
     TEMPORARY_USER_ACTIONS = "temporary_user_actions"
 
 
-class MFAMethod(str, Enum):
+class MFAMethod(StrEnum):
     """Multi-factor authentication methods."""
 
     TOTP = "totp"  # Time-based One-Time Password (Google Authenticator, etc.)
@@ -152,7 +154,7 @@ class MFASecret:
     method: MFAMethod
     secret: str  # Encrypted secret
     backup_codes: list[str] = field(default_factory=list)  # Encrypted backup codes
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     last_used: datetime | None = None
     is_verified: bool = False
 
@@ -215,7 +217,7 @@ class SecurityEvent(BaseModel):
     user_id: str | None = None
     ip_address: str | None = None
     user_agent: str | None = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     details: dict[str, Any] = Field(default_factory=dict)
     severity: str = "info"  # info, warning, error, critical
 

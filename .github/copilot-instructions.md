@@ -106,6 +106,14 @@ async def risky_operation():
 - **tta-workflow-primitives**: Production workflow composition with observability
 - **Retry Decorators**: `@with_retry()` and `@with_retry_async()`
 
+### Agent Memory (Hindsight)
+
+TTA uses Hindsight for cross-session agent memory.
+
+- **Recall** at session start: query `adam-global` (cross-project patterns), then derived `project-*`/`workspace-*` bank (TTA-specific context)
+- **Retain** after significant tasks: cross-project patterns → `adam-global`; TTA-specific → derived `project-*`/`workspace-*` bank
+- MCP server: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hindsight-local-mcp`
+
 ### Chat Modes (`.augment/chatmodes/`)
 Activate role-specific behavior patterns:
 - **Architect** (`architect.chatmode.md`) - Design decisions, system architecture
@@ -128,6 +136,19 @@ Project root contains `GEMINI.md` with:
 - Current refactoring tasks and challenges
 - Common commands and patterns
 - Auto-loaded by Gemini CLI sub-agent
+
+## L0 / TTA.dev Boundary
+
+`TTA.dev` owns the emerging L0 developer control plane for coding agents.
+
+Inside `TTA`, do not implement a second developer-agent queue, lease, or approval
+system unless the repository owner explicitly asks for a local exception.
+
+When asked to work on L0 from this repo, prioritize:
+
+1. integration points with `TTA.dev`
+2. repo metadata and scripts that TTA.dev-managed agents can consume
+3. clear separation between developer-agent coordination and runtime therapeutic/player-session coordination
 
 ## MCP Server Integration
 
@@ -191,3 +212,21 @@ gemini "/memory show"                          # View project context
 ```
 
 Focus on circuit breaker patterns, Redis-based messaging, and comprehensive error handling when working with agent orchestration. Always prefer `uv` over other Python package managers and ensure circuit breakers wrap external service calls. Leverage MCP servers (especially Context7 and Serena) for deep codebase understanding before making architectural changes.
+
+## Hindsight Memory
+
+Hindsight MCP server is available at `http://localhost:8888/mcp/`. Use it deliberately.
+
+**Session start** — before any non-trivial task:
+1. Recall from `adam-global` (cross-project directives and user preferences)
+2. Recall from `tta` (TTA-specific architecture, decisions, known issues)
+
+**During work** — after completing significant tasks:
+- Retain cross-project patterns → `adam-global`
+- Retain TTA-specific decisions, failures, and patterns → `tta`
+
+**Rules:**
+- Use `document_id` for evolving notes (same ID = upsert, prevents duplicates)
+- Include a `context` label when retaining
+- Never retain secrets, tokens, or credentials
+- If Hindsight is unavailable, say so and continue without pretending recall happened

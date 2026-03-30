@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/OpenHands Integration - TTA Workflow Integration Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Agent_orchestration/Openhands_integration/Integration_guide]]

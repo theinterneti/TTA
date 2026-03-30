@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_workflow_safety_integration]]
 import pytest
 from tta_ai.orchestration.models import AgentType, OrchestrationRequest
 from tta_ai.orchestration.workflow import AgentStep, WorkflowDefinition, WorkflowType
@@ -14,7 +15,8 @@ async def test_workflow_manager_aggregates_safety_findings(monkeypatch):
         agent_sequence=[AgentStep(agent=AgentType.IPA), AgentStep(agent=AgentType.NGA)],
     )
     ok, err = wm.register_workflow("t", wf)
-    assert ok and not err
+    assert ok
+    assert not err
 
     # Monkeypatch internal _execute_step to attach therapeutic_validation
     def fake_exec(step, run_state):
@@ -41,7 +43,8 @@ async def test_workflow_manager_aggregates_safety_findings(monkeypatch):
 
     req = OrchestrationRequest(entrypoint=AgentType.IPA, input={})
     resp, run_id, error = wm.execute_workflow("t", req)
-    assert error is None and resp is not None
+    assert error is None
+    assert resp is not None
     agg = resp.therapeutic_validation
     assert agg is not None
     assert agg.get("level") == "blocked"

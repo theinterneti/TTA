@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/Agentic Primitives & Context Engineering Analysis for TTA]]
 > - **Path:** `.augment/kb/Architecture/Agentic Primitives & Context Engineering Analysis for TTA.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/Agentic Primitives & Context Engineering Analysis for TTA.md`
 
 **Migration date:** 2025-11-01
+
+
+---

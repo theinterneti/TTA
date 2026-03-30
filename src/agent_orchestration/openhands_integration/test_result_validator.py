@@ -4,6 +4,8 @@ This module provides functions to validate generated tests through syntax checki
 coverage verification, test execution, and convention compliance.
 """
 
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Test_result_validator]]
+
 import asyncio
 import subprocess
 from pathlib import Path
@@ -162,7 +164,7 @@ async def _check_syntax(test_file: Path, workspace_path: Path) -> bool:
 
     try:
         # Try to compile the file
-        with open(full_path) as f:
+        with full_path.open() as f:
             compile(f.read(), str(full_path), "exec")
         return True
     except SyntaxError:

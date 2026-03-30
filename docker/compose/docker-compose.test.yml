@@ -57,6 +57,28 @@ services:
       - tta-test-network
     security_opt:
       - no-new-privileges:true
+  dolt:
+    image: dolthub/dolt-sql-server:latest
+    container_name: ${CONTAINER_PREFIX:-tta-test}-dolt
+    ports:
+      - 4306:3306
+    environment:
+      - DOLT_ROOT_PASSWORD=${DOLT_PASSWORD:-tta_dolt_test_password}
+    volumes:
+      - dolt_test_data:/var/lib/dolt
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h localhost -u root -p${DOLT_PASSWORD:-tta_dolt_test_password} --silent || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - tta-test-network
+    security_opt:
+      - no-new-privileges:true
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: tta-redis-commander-test
@@ -77,7 +99,9 @@ volumes:
     name: tta_neo4j_test_data
   neo4j_test_logs:
     name: tta_neo4j_test_logs
-  redis_test_data:
+  dolt_test_data:
+    name: tta_dolt_test_data
+
     name: tta_redis_test_data
 networks:
   tta-test-network:

@@ -332,3 +332,7 @@ The Keploy framework extraction is complete and production-ready. The framework 
 **Created**: October 2025
 **Author**: GitHub Copilot
 **Related**: TTA.dev/packages/keploy-framework, TTA/docs/development/testing.md
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Keploy_framework_extraction_summary]]

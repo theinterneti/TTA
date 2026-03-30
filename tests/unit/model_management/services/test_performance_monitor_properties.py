@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Services/Test_performance_monitor_properties]]
 Property-Based Tests for PerformanceMonitor Service.
 
 This module contains property-based tests using Hypothesis to validate
@@ -10,6 +12,8 @@ from datetime import datetime
 import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
+
+pytest.importorskip("tta_ai")
 from tta_ai.models.models import TaskType
 from tta_ai.models.services import PerformanceMonitor
 

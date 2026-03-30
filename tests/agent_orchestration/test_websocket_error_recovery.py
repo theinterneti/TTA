@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_websocket_error_recovery]]
 WebSocket connection recovery and error handling tests.
 
 This module tests WebSocket connection recovery, error handling scenarios,

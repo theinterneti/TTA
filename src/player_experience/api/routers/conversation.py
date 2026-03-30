@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Conversation]]
 Conversation router: HTTP-based therapeutic conversation endpoints.
 
 Provides simple REST API for therapeutic conversations with OpenRouter AI integration.
@@ -11,13 +13,14 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from ....components import NarrativeArcOrchestratorComponent
 from ...services.enhanced_session_persistence import EnhancedSessionPersistence
 from ..auth import TokenData, get_current_active_player
 
@@ -33,6 +36,7 @@ _SESSION_STATES: dict[str, dict[str, Any]] = {}
 
 # Enhanced session persistence service (initialized later with Redis client)
 _SESSION_PERSISTENCE: EnhancedSessionPersistence | None = None
+_narrative_orchestrator: NarrativeArcOrchestratorComponent | None = None
 
 # Redis key prefixes for conversation storage
 CONVERSATION_KEY_PREFIX = "tta:conversation:"
@@ -43,7 +47,7 @@ CONVERSATION_INDEX_KEY_PREFIX = "tta:player:conversations:"
 class ConversationMessage(BaseModel):
     role: str = Field(..., description="Message role: user, assistant, or system")
     content: str = Field(..., description="Message content")
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -69,6 +73,109 @@ class ConversationHistory(BaseModel):
     total_messages: int
     created_at: str
     last_activity: str
+
+
+def _get_narrative_orchestrator() -> NarrativeArcOrchestratorComponent:
+    """Lazily construct the narrative orchestrator for session-state enrichment."""
+    global _narrative_orchestrator  # noqa: PLW0603
+    if _narrative_orchestrator is None:
+        _narrative_orchestrator = NarrativeArcOrchestratorComponent(
+            {
+                "tta.prototype.components.narrative_arc_orchestrator": {
+                    "dependency_adapters": {
+                        "session_persistence": lambda: _SESSION_PERSISTENCE
+                    }
+                }
+            }
+        )
+    return _narrative_orchestrator
+
+
+def _build_narrative_therapeutic_settings(
+    session_state: dict[str, Any],
+    context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Project conversation state into the shared narrative-engine settings shape."""
+    context = context or {}
+    merged_settings: dict[str, Any] = {}
+    context_settings = context.get("therapeutic_settings")
+    if isinstance(context_settings, dict):
+        merged_settings.update(context_settings)
+
+    merged_settings.setdefault(
+        "therapeutic_focus", session_state.get("therapeutic_focus", "general_support")
+    )
+    merged_settings["session_goals"] = list(session_state.get("session_goals", []))
+    merged_settings["emotional_themes"] = list(
+        session_state.get("emotional_themes", [])
+    )
+    return merged_settings
+
+
+def _build_narrative_session_payload(
+    session_state: dict[str, Any],
+    progress_analysis: dict[str, Any],
+) -> dict[str, Any]:
+    """Translate conversation/session analytics into orchestrator runtime state."""
+    active_threads = [
+        f"theme:{theme}" for theme in session_state.get("emotional_themes", [])
+    ]
+    active_threads.extend(
+        f"goal:{goal}" for goal in session_state.get("session_goals", []) if goal
+    )
+    deduped_threads = list(dict.fromkeys(active_threads))
+
+    coherence_score = float(progress_analysis.get("session_quality_score", 0.7))
+    therapeutic_alignment = float(
+        progress_analysis.get(
+            "emotional_progress_score",
+            progress_analysis.get("session_quality_score", 0.7),
+        )
+    )
+
+    return {
+        "session_id": session_state["session_id"],
+        "player_id": session_state["player_id"],
+        "created_at": session_state["created_at"],
+        "last_updated": session_state["last_updated"],
+        "interaction_count": session_state.get("interaction_count", 0),
+        "engagement_score": float(progress_analysis.get("engagement_level", 0.5)),
+        "coherence_score": coherence_score,
+        "therapeutic_alignment": therapeutic_alignment,
+        "active_threads": deduped_threads,
+        "therapeutic_settings": _build_narrative_therapeutic_settings(session_state),
+    }
+
+
+async def _sync_narrative_orchestration(
+    session_state: dict[str, Any],
+    context: dict[str, Any],
+    progress_analysis: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Keep the narrative orchestrator aligned with the therapeutic session state."""
+    try:
+        orchestrator = _get_narrative_orchestrator()
+        session_id = str(session_state["session_id"])
+        await orchestrator.initialize_session(
+            session_id=session_id,
+            character_id=str(context.get("character_id", "therapeutic-companion")),
+            world_id=str(context.get("world_id", "therapeutic-space")),
+            therapeutic_settings=_build_narrative_therapeutic_settings(
+                session_state, context
+            ),
+        )
+        await orchestrator.restore_session_state(
+            session_id,
+            _build_narrative_session_payload(session_state, progress_analysis),
+        )
+        return await orchestrator.get_session_state(session_id)
+    except Exception as exc:
+        logger.error(
+            "Failed to synchronize narrative orchestration for session %s: %s",
+            session_state.get("session_id"),
+            exc,
+        )
+        return None
 
 
 async def _persist_conversation_to_redis(
@@ -435,7 +542,7 @@ Focus on evidence-based therapeutic assessment. Be objective and supportive."""
                                 analysis_data = json.loads(json_match.group())
                                 analysis_data["analysis_available"] = True
                                 return analysis_data
-                        except json.JSONDecodeError:
+                        except json.JSONDecodeError:  # type: ignore[possibly-unbound]
                             pass
 
         except Exception as e:
@@ -545,8 +652,8 @@ async def send_message(
                     "session_id": session_id,
                     "player_id": player_id,
                     "messages": [],
-                    "created_at": datetime.utcnow().isoformat(),
-                    "last_activity": datetime.utcnow().isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
+                    "last_activity": datetime.now(UTC).isoformat(),
                 }
 
         # Initialize session state if it doesn't exist
@@ -561,8 +668,8 @@ async def send_message(
                 "session_goals": [],
                 "therapeutic_focus": "general_support",
                 "interaction_count": 0,
-                "created_at": datetime.utcnow().isoformat(),
-                "last_updated": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(UTC).isoformat(),
+                "last_updated": datetime.now(UTC).isoformat(),
                 # Enhanced tracking
                 "session_analytics": session_analytics.model_dump(),
                 "therapeutic_interventions_used": [],
@@ -583,7 +690,7 @@ async def send_message(
 
         # Update session state with user input analysis
         session_state["interaction_count"] += 1
-        session_state["last_updated"] = datetime.utcnow().isoformat()
+        session_state["last_updated"] = datetime.now(UTC).isoformat()
 
         # Analyze emotional themes
         user_lower = user_message.lower()
@@ -673,7 +780,7 @@ async def send_message(
                     breakthrough_indicators
                 )
                 milestone_data = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                     "type": "breakthrough",
                     "indicators": breakthrough_indicators,
                     "interaction_count": session_state["interaction_count"],
@@ -689,7 +796,7 @@ async def send_message(
 
         # Record emotional state history
         emotional_state_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "interaction_count": session_state["interaction_count"],
             "emotional_themes": session_state["emotional_themes"].copy(),
             "engagement_level": progress_analysis.get("engagement_level", 0.5),
@@ -704,6 +811,14 @@ async def send_message(
                 "emotional_state_history"
             ][-20:]
 
+        narrative_orchestration = await _sync_narrative_orchestration(
+            session_state,
+            request.context,
+            progress_analysis,
+        )
+        if narrative_orchestration:
+            session_state["narrative_orchestration"] = narrative_orchestration
+
         # Persist enhanced session state to Redis
         if _SESSION_PERSISTENCE:
             await _SESSION_PERSISTENCE.save_session_state(session_id, session_state)
@@ -716,7 +831,7 @@ async def send_message(
             metadata={**ai_metadata, "progress_analysis": progress_analysis},
         )
         conversation["messages"].append(ai_msg.model_dump())
-        conversation["last_activity"] = datetime.utcnow().isoformat()
+        conversation["last_activity"] = datetime.now(UTC).isoformat()
 
         # Persist conversation history to Redis
         assert player_id is not None  # Already checked above
@@ -737,7 +852,11 @@ async def send_message(
             session_id=session_id,
             response=ai_response,
             timestamp=ai_msg.timestamp,
-            metadata={**ai_metadata, "progress_analysis": progress_analysis},
+            metadata={
+                **ai_metadata,
+                "progress_analysis": progress_analysis,
+                "narrative_orchestration": narrative_orchestration or {},
+            },
         )
 
     except HTTPException:
@@ -838,7 +957,7 @@ async def clear_conversation(
             recovery_data = {
                 "session_id": session_id,
                 "player_id": player_id,
-                "cleared_at": datetime.utcnow().isoformat(),
+                "cleared_at": datetime.now(UTC).isoformat(),
                 "final_analytics": session_state.get("session_analytics", {}),
                 "total_interactions": session_state.get("interaction_count", 0),
                 "emotional_themes": session_state.get("emotional_themes", []),
@@ -943,6 +1062,11 @@ async def get_session_state(
                 else 0.5
             ),
         }
+        narrative_orchestration = await _get_narrative_orchestrator().get_session_state(
+            session_id
+        )
+        if narrative_orchestration:
+            enhanced_state["narrative_orchestration"] = narrative_orchestration
 
         return enhanced_state
 
@@ -1021,7 +1145,7 @@ async def set_session_goals(
 
         # Update session goals
         session_state["session_goals"] = goals
-        session_state["last_updated"] = datetime.utcnow().isoformat()
+        session_state["last_updated"] = datetime.now(UTC).isoformat()
 
         # Initialize goal progress tracking
         session_analytics = session_state.get("session_analytics", {})
@@ -1034,6 +1158,13 @@ async def set_session_goals(
                 session_analytics["therapeutic_goals_progress"][goal] = 0.0
 
         session_state["session_analytics"] = session_analytics
+        if await _get_narrative_orchestrator().update_therapeutic_settings(
+            session_id,
+            _build_narrative_therapeutic_settings(session_state),
+        ):
+            session_state[
+                "narrative_orchestration"
+            ] = await _get_narrative_orchestrator().get_session_state(session_id)
 
         logger.info(f"Set {len(goals)} therapeutic goals for session {session_id}")
 
@@ -1105,7 +1236,7 @@ async def get_player_session_analytics(
             "unique_emotional_themes": list(all_emotional_themes),
             "recent_sessions": analytics_list[:5],  # Last 5 sessions
             "active_session_summaries": active_sessions,
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
         }
 
     except Exception as e:
@@ -1147,7 +1278,7 @@ async def get_session_statistics(
         return {
             "memory_statistics": memory_stats,
             "redis_statistics": redis_stats,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     except Exception as e:
@@ -1166,7 +1297,7 @@ async def health_check() -> dict[str, Any]:
         "service": "conversation",
         "active_conversations": len(_CONVERSATIONS),
         "active_session_states": len(_SESSION_STATES),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "features": {
             "ai_progress_analysis": True,
             "session_analytics": True,

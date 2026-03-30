@@ -10,3 +10,10 @@
 > Otherwise, see: `.augment/kb/Components/Player Experience Component Maturity Status.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA/Components/Player_experience/Maturity]]
+
+---
+**Logseq:** [[TTA.dev/Components/Player_experience/Maturity]]

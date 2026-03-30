@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate_integration_architecture]]
 TTA Core Gameplay Loop Integration Architecture Validation
 
 This script validates the integration architecture without requiring

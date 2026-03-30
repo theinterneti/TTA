@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Tools/Test_registry_idempotency]]
 import asyncio
 
 import pytest

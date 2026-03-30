@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_component_loader]]
 Tests for Component Loader abstraction.
 
 This module tests the component loader protocol and implementations

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Custom_api]]
 Custom API Provider Implementation.
 
 This module provides support for custom API providers like OpenAI, Anthropic,
@@ -98,9 +100,7 @@ class CustomAPIModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using custom API."""
         try:
             # Prepare request based on API type
@@ -196,7 +196,7 @@ class CustomAPIModelInstance(BaseModelInstance):
             + usage.get("output_tokens", 0),
         }
 
-    async def _stream_openai_response(self, response) -> AsyncGenerator[str, None]:
+    async def _stream_openai_response(self, response) -> AsyncGenerator[str]:
         """Stream OpenAI response."""
         async for line in response.aiter_lines():
             if line.startswith("data: "):
@@ -216,7 +216,7 @@ class CustomAPIModelInstance(BaseModelInstance):
                 except json.JSONDecodeError:
                     continue
 
-    async def _stream_anthropic_response(self, response) -> AsyncGenerator[str, None]:
+    async def _stream_anthropic_response(self, response) -> AsyncGenerator[str]:
         """Stream Anthropic response."""
         async for line in response.aiter_lines():
             if line.startswith("data: "):
@@ -380,7 +380,7 @@ class CustomAPIProvider(BaseProvider):
             return self._get_predefined_models(provider_name, config)
 
     def _get_predefined_models(
-        self, provider_name: str, config: dict[str, Any]
+        self, _provider_name: str, config: dict[str, Any]
     ) -> list[ModelInfo]:
         """Get predefined models for providers that don't support model listing."""
         api_type = config.get("api_type", "openai")
@@ -447,7 +447,9 @@ class CustomAPIProvider(BaseProvider):
         ]
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
+        self,
+        model_id: str,
+        config: dict[str, Any],  # noqa: ARG002
     ) -> CustomAPIModelInstance:
         """Load a custom API model instance."""
         # Find which provider has this model
@@ -491,7 +493,7 @@ class CustomAPIProvider(BaseProvider):
         return healthy_count >= (total_count / 2) if total_count > 0 else False
 
     async def _test_provider_connection(
-        self, provider_name: str, config: dict[str, Any]
+        self, provider_name: str, _config: dict[str, Any]
     ):
         """Test connection to a provider."""
         client = self._clients.get(provider_name)
@@ -511,14 +513,14 @@ class CustomAPIProvider(BaseProvider):
             raise RuntimeError(f"Provider {provider_name} connection timeout") from None
 
     def _get_model_pricing(
-        self, provider_name: str, model_id: str
+        self, _provider_name: str, _model_id: str
     ) -> tuple[float | None, bool]:
         """Get pricing information for a model."""
         # This would typically be configured or fetched from the provider
         # For now, return reasonable defaults
         return 0.000001, False  # $1 per million tokens, not free
 
-    def _get_model_capabilities(self, provider_name: str, model_id: str) -> list[str]:
+    def _get_model_capabilities(self, _provider_name: str, model_id: str) -> list[str]:
         """Get capabilities for a model."""
         capabilities = ["text_generation", "chat"]
 
@@ -532,7 +534,7 @@ class CustomAPIProvider(BaseProvider):
         return capabilities
 
     def _get_model_context_length(
-        self, provider_name: str, model_id: str
+        self, _provider_name: str, model_id: str
     ) -> int | None:
         """Get context length for a model."""
         # Common context lengths
@@ -543,7 +545,7 @@ class CustomAPIProvider(BaseProvider):
         return 4096  # Default
 
     def _get_therapeutic_safety_score(
-        self, provider_name: str, model_id: str
+        self, _provider_name: str, model_id: str
     ) -> float | None:
         """Get therapeutic safety score for a model."""
         if "claude" in model_id.lower():

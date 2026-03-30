@@ -1,4 +1,5 @@
 """
+
 Multi-Agent Collaboration Assessment Framework for TTA
 
 This module provides comprehensive validation of multi-agent collaboration,

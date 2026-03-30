@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Utils/Errorhandling]]
 /**
  * Error Handling Utilities
  *

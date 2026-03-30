@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/UV Configuration Guide for TTA Project]]
 > - **Path:** `.augment/kb/Workflows/UV Configuration Guide for TTA Project.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/UV Configuration Guide for TTA Project.md`
 
 **Migration date:** 2025-11-01
+
+
+---

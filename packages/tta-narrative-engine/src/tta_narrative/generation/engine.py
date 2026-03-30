@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/Engine]]
 Narrative Engine for Therapeutic Text Adventure
 
 This module implements the core narrative engine that orchestrates scene generation,

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_workflow_manager]]
 from tta_ai.orchestration import (
     AgentStep,
     AgentType,
@@ -22,7 +23,8 @@ def _simple_definition():
 def test_register_and_list_workflows():
     wm = WorkflowManager()
     ok, err = wm.register_workflow("basic", _simple_definition())
-    assert ok is True and err is None
+    assert ok is True
+    assert err is None
     assert "basic" in wm.list_workflows()
     assert wm.get_workflow("basic") is not None
 
@@ -55,7 +57,8 @@ def test_execute_workflow_entrypoint_mismatch():
     # Entrypoint does not match first step
     req = OrchestrationRequest(entrypoint=AgentType.WBA)
     response, run_id, err = wm.execute_workflow("basic", req)
-    assert response is None and run_id is None
+    assert response is None
+    assert run_id is None
     assert isinstance(err, str)
 
 
@@ -64,7 +67,8 @@ def test_run_state_tracking():
     wm.register_workflow("basic", _simple_definition())
     req = OrchestrationRequest(entrypoint=AgentType.IPA)
     response, run_id, err = wm.execute_workflow("basic", req)
-    assert err is None and run_id is not None
+    assert err is None
+    assert run_id is not None
     run_state = wm.get_run_state(run_id)
     assert run_state is not None
     assert run_state.status.value == "completed"
@@ -76,7 +80,8 @@ def test_update_run_metadata():
     wm.register_workflow("basic", _simple_definition())
     req = OrchestrationRequest(entrypoint=AgentType.IPA)
     response, run_id, err = wm.execute_workflow("basic", req)
-    assert err is None and run_id is not None
+    assert err is None
+    assert run_id is not None
     assert wm.update_run_metadata(run_id, {"key": "value"}) is True
     run_state = wm.get_run_state(run_id)
     assert run_state.metadata.get("key") == "value"

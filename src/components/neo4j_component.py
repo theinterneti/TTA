@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Neo4j_component]]
 Neo4j Component.
 
 This module provides a component for managing Neo4j.

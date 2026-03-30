@@ -124,3 +124,7 @@ cd .storybook && npm install && npm run storybook-dev
 ---
 
 **This is a temporary bridge solution until Storybook officially supports Vite 7.**
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Frontend/Vite_version_strategy]]

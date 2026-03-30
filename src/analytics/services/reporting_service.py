@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Analytics/Services/Reporting_service]]
 Advanced Reporting Service for TTA Analytics
 
 This service provides automated report generation, trend analysis, and
@@ -8,24 +10,24 @@ therapeutic outcome tracking with customizable dashboards.
 import json
 import logging
 from dataclasses import asdict, dataclass
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+import plotly.express as px  # type: ignore[import-not-found]
+import plotly.graph_objects as go  # type: ignore[import-not-found]
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from jinja2 import Template
-from plotly.utils import PlotlyJSONEncoder
+from plotly.utils import PlotlyJSONEncoder  # type: ignore[import-not-found]
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
 
-class ReportType(str, Enum):
+class ReportType(StrEnum):
     """Types of reports that can be generated."""
 
     THERAPEUTIC_OUTCOMES = "therapeutic_outcomes"
@@ -36,7 +38,7 @@ class ReportType(str, Enum):
     CUSTOM_DASHBOARD = "custom_dashboard"
 
 
-class ReportFormat(str, Enum):
+class ReportFormat(StrEnum):
     """Output formats for reports."""
 
     JSON = "json"
@@ -152,12 +154,14 @@ class TrendAnalyzer:
 
         # Calculate trend direction
         engagement_scores = df_grouped[("engagement_score", "mean")].values
+        slope = 0.0
         if len(engagement_scores) < 2:
             trend_direction = "insufficient_data"
         else:
             # Simple linear trend calculation
             x = np.arange(len(engagement_scores))
-            slope = np.polyfit(x, engagement_scores, 1)[0]
+            scores_arr = np.asarray(engagement_scores, dtype=float)
+            slope = float(np.polyfit(x, scores_arr, 1)[0])
 
             if slope > 0.01:
                 trend_direction = "increasing"
@@ -168,8 +172,10 @@ class TrendAnalyzer:
 
         return {
             "trend": trend_direction,
-            "slope": float(slope) if len(engagement_scores) >= 2 else 0.0,
-            "avg_engagement": float(np.mean(engagement_scores)),
+            "slope": slope,
+            "avg_engagement": float(
+                np.mean(np.asarray(engagement_scores, dtype=float))
+            ),
             "data_points": len(engagement_scores),
             "analysis": f"Engagement trend is {trend_direction} over {time_period} periods",
             "time_series_data": df_grouped.to_dict("records"),
@@ -206,12 +212,13 @@ class TrendAnalyzer:
 
         success_rates = weekly_outcomes[("success", "mean")].values
 
-        if len(success_rates) < 2:
+        rates_arr = np.asarray(success_rates, dtype=float)
+        if len(rates_arr) < 2:
             trend_direction = "insufficient_data"
             slope = 0.0
         else:
-            x = np.arange(len(success_rates))
-            slope = np.polyfit(x, success_rates, 1)[0]
+            x = np.arange(len(rates_arr))
+            slope = float(np.polyfit(x, rates_arr, 1)[0])
 
             if slope > 0.05:
                 trend_direction = "improving"
@@ -222,8 +229,8 @@ class TrendAnalyzer:
 
         return {
             "trend": trend_direction,
-            "slope": float(slope),
-            "avg_success_rate": float(np.mean(success_rates)),
+            "slope": slope,
+            "avg_success_rate": float(np.mean(rates_arr)),
             "total_outcomes": len(outcome_data),
             "analysis": f"Therapeutic outcomes are {trend_direction}",
             "weekly_data": weekly_outcomes.to_dict("records"),
@@ -456,7 +463,7 @@ class ReportGenerator:
             configuration=config,
             content=content,
             visualizations=visualizations,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(UTC),
         )
 
     async def generate_user_engagement_report(
@@ -520,7 +527,7 @@ class ReportGenerator:
             configuration=config,
             content=content,
             visualizations=visualizations,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(UTC),
         )
 
     async def generate_cohort_analysis_report(
@@ -581,7 +588,7 @@ class ReportGenerator:
             configuration=config,
             content=content,
             visualizations=visualizations,
-            generated_at=datetime.utcnow(),
+            generated_at=datetime.now(UTC),
         )
 
     async def generate_report(
@@ -667,7 +674,7 @@ async def generate_report(request: ReportRequest, background_tasks: BackgroundTa
             date_range_end=request.date_range_end,
             filters=request.filters,
             visualization_config=request.visualization_config,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
         )
 
         # Mock data for demonstration - in production, this would fetch from database
@@ -755,7 +762,7 @@ async def health_check():
         "status": "healthy",
         "service": "advanced-reporting",
         "reports_generated": len(report_generator.generated_reports),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 

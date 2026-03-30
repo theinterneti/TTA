@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/TTA Component Maturity Assessment Report (CORRECTED)]]
 > - **Path:** `.augment/kb/Components/TTA Component Maturity Assessment Report (CORRECTED).md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/TTA Component Maturity Assessment Report (CORRECTED).md`
 
 **Migration date:** 2025-11-01
+
+
+---

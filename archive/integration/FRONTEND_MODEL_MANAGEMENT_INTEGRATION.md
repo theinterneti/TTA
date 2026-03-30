@@ -291,3 +291,7 @@ The frontend integration provides a comprehensive, user-friendly interface for t
 - **Configure settings** through an intuitive interface
 
 The integration follows TTA's design patterns, maintains performance standards, and provides valuable analytics for future optimization. The modular architecture makes it easy to extend with additional providers and features as the platform grows.
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Integration/Frontend_model_management_integration]]

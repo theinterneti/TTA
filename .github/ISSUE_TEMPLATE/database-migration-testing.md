@@ -279,3 +279,7 @@ docker-compose -f docker-compose.migration-test.yml down
 **Priority**: Low-Medium (for future upgrades)
 **Complexity**: Medium-High
 **Estimated Effort**: 1-2 weeks (initial setup)
+
+
+---
+**Logseq:** [[TTA.dev/.github/Issue_template/Database-migration-testing]]

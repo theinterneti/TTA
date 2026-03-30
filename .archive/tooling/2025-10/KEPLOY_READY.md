@@ -179,3 +179,7 @@ lsof -ti:8000 | xargs kill
 **🎉 You're all set! Your API is running and Keploy is ready to use.**
 
 **Try it now**: `./demo-api.sh` to see your API in action!
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Tooling/2025-10/Keploy_ready]]

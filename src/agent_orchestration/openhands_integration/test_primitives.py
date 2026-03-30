@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Test_primitives]]
 Unit tests for OpenHands workflow primitives.
 
 Tests:
@@ -12,7 +14,11 @@ Tests:
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from tta_dev_primitives.core.base import WorkflowContext
+
+try:
+    from ttadev.primitives.core.base import WorkflowContext  # type: ignore[import]
+except ImportError:
+    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[no-redef]
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector

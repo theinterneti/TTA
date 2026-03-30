@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/Model Management Component.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Readme]]

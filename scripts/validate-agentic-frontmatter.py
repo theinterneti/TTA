@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# Logseq: [[TTA.dev/Scripts/Validate-agentic-frontmatter]]
 # ruff: noqa: ALL
 """Validate YAML frontmatter in agentic primitive files.
 

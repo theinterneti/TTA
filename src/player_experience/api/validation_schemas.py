@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Validation_schemas]]
 Enhanced validation schemas for API requests.
 
 This module provides comprehensive Pydantic models with detailed validation,
@@ -135,7 +137,7 @@ class PersonalityTraitsValidator:
 
         validated_traits = []
         for trait in traits:
-            trait = trait.strip()
+            trait = trait.strip()  # noqa: PLW2901
             if len(trait) < 2:
                 raise ValidationError(
                     "Each trait must be at least 2 characters", "personality_traits"

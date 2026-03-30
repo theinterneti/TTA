@@ -172,3 +172,7 @@ ls -la packages/tta-observability-integration/src/
 ---
 
 **Ready to export?** Run: `./scripts/export-observability-package.sh`
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Observability/2025-10/Observability_export_quick_start]]

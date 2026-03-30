@@ -355,3 +355,7 @@ Use this checklist to systematically verify your staging environment is ready fo
 - [ ] Re-run validation after fixes
 - [ ] Document any workarounds
 - [ ] Prepare for production deployment
+
+
+---
+**Logseq:** [[TTA.dev/Tests/E2e-staging/Verification_checklist]]

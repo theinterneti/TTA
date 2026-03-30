@@ -244,3 +244,7 @@ uv sync --all-extras
 - Low risk: Changes are configuration-only
 - Should be completed before any package extraction work
 
+
+
+---
+**Logseq:** [[TTA.dev/.github/Issue_template/Packaging-fixes]]

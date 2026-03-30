@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Config/Real_agent_config]]
 Configuration for real agent communication.
 
 This module provides configuration settings for enabling and managing

@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/Verify-auth-fix]]
 /**
  * Standalone Authentication Verification Script
  *

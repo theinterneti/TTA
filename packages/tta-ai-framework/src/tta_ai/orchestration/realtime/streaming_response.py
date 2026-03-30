@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Streaming_response]]
 Streaming response system for long-running agent orchestration workflows.
 
 This module provides streaming capabilities for workflows that need to provide
@@ -181,7 +183,7 @@ class StreamingWorkflowResponse:
 
         logger.info(f"Completed streaming for workflow: {self.workflow_id}")
 
-    async def generate_stream(self) -> AsyncGenerator[str, None]:
+    async def generate_stream(self) -> AsyncGenerator[str]:
         """Generate the streaming response."""
         try:
             await self.start_streaming()

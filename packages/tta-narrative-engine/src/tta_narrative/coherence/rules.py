@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Coherence/Rules]]
 Rules and constraint constants used by narrative coherence validators.
 Lifted from narrative_coherence_engine; currently placeholders synced with existing logic.
 """

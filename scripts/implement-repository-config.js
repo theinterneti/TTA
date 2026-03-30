@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Scripts/Implement-repository-config]]
 #!/usr/bin/env node
 
 /**

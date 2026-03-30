@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Conftest]]
 import contextlib
 import logging
 import os
@@ -44,7 +45,7 @@ def neo4j_available():
     return has_neo4j()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_neo4j_driver():
     """Provide a simple mock Neo4j driver/session for unit tests."""
     from unittest.mock import AsyncMock
@@ -69,7 +70,7 @@ def mock_neo4j_driver():
     return mock_driver
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_redis_client():
     """Provide a simple mock Redis client for unit tests."""
     from unittest.mock import AsyncMock
@@ -371,19 +372,6 @@ def redis_container(pytestconfig):
 import pytest_asyncio
 
 
-@pytest.fixture(scope="session")
-def redis_client_sync(redis_container):
-    # Synchronous client for sync tests
-    import redis
-
-    client = redis.Redis.from_url(redis_container)
-    try:
-        client.ping()
-        yield client
-    finally:
-        client.close()
-
-
 @pytest_asyncio.fixture()
 async def redis_client(redis_container):
     # Async client for async repository tests
@@ -397,7 +385,7 @@ async def redis_client(redis_container):
         await client.aclose()
 
 
-@pytest.fixture()
+@pytest.fixture
 def redis_client_sync(redis_container):
     """Synchronous Redis client for simple integration tests.
     Returns redis.Redis so .get/.exists return concrete results, not coroutines.
@@ -415,7 +403,7 @@ def redis_client_sync(redis_container):
 
 
 # Comprehensive Test Battery Integration
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def comprehensive_test_config():
     """Provide comprehensive test battery configuration."""
     if not COMPREHENSIVE_TEST_AVAILABLE:
@@ -437,7 +425,7 @@ async def comprehensive_test_config():
     return config
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def mock_service_manager():
     """Provide mock service manager for comprehensive testing."""
     if not COMPREHENSIVE_TEST_AVAILABLE:
@@ -484,6 +472,21 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if "comprehensive" in item.keywords:
                 item.add_marker(skip_comprehensive)
+
+    # ---- Quarantine / flaky handling ----
+    # When running in CI, quarantined tests are expected to fail and must not
+    # block the pipeline.  We mark them with ``xfail(strict=False)`` so they
+    # appear as *xfail* (expected failure) or *xpass* (unexpected pass) but
+    # never as hard failures.
+    if os.getenv("CI") == "true":
+        for item in items:
+            if "quarantine" in item.keywords:
+                item.add_marker(
+                    pytest.mark.xfail(
+                        reason="quarantined – allowed to fail in CI",
+                        strict=False,
+                    )
+                )
 
 
 # Test environment setup

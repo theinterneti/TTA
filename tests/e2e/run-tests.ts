@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Run-tests]]
 #!/usr/bin/env ts-node
 
 /**

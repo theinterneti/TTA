@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/Database Design]]
 > - **Path:** `.augment/kb/Architecture/Database Design.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/Database Design.md`
 
 **Migration date:** 2025-11-01
+
+
+---

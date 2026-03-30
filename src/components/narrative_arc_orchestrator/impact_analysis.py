@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA/Components/Narrative_arc_orchestrator/Impact_analysis]]
 Impact analysis helpers extracted to a dedicated module.
 These functions are used by ScaleManager; they are designed to be pure where possible.
 """

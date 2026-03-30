@@ -193,3 +193,7 @@ services:
 **Priority**: High (for production release)
 **Complexity**: High
 **Estimated Effort**: 2-3 weeks
+
+
+---
+**Logseq:** [[TTA.dev/.github/Issue_template/Production-database-infrastructure]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Performance/Benchmarks/Test_service_performance]]
 Performance benchmarks for Model Management services.
 
 Tests service initialization times, method execution times, and throughput.

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Validate_manual_testing_guide]]
 Manual Testing Guide Validation Script
 
 This script validates that all the steps in the manual testing guide

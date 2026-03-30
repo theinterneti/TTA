@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/__init__]]
 Agent Orchestration core package.
 
 This package provides the foundational data models and interfaces used by the
@@ -6,21 +8,6 @@ Agent Orchestration Component to coordinate specialized AI agents.
 """
 
 from .agents import Agent, AgentRegistry
-from .circuit_breaker import (
-    CircuitBreaker,
-    CircuitBreakerConfig,
-    CircuitBreakerOpenError,
-    CircuitBreakerState,
-)
-from .circuit_breaker_config import (
-    CircuitBreakerConfigManager,
-    WorkflowErrorHandlingConfigSchema,
-)
-from .circuit_breaker_metrics import (
-    CircuitBreakerLogger,
-    CircuitBreakerMetricsCollector,
-)
-from .circuit_breaker_registry import CircuitBreakerRegistry
 from .interfaces import AgentProxy, MessageCoordinator
 from .messaging import (
     FailureType,
@@ -156,16 +143,7 @@ __all__ = [
     "ResourceManager",
     "ResourceRequirements",
     "ResourceAllocation",
-    # circuit breaker
-    "CircuitBreaker",
-    "CircuitBreakerConfig",
-    "CircuitBreakerState",
-    "CircuitBreakerOpenError",
-    "CircuitBreakerRegistry",
-    "CircuitBreakerMetricsCollector",
-    "CircuitBreakerLogger",
-    "CircuitBreakerConfigManager",
-    "WorkflowErrorHandlingConfigSchema",
+    # circuit breaker (now from ttadev)
     "ResourceExhaustionDetector",
     "ResourceThresholds",
     "ResourceExhaustionEvent",

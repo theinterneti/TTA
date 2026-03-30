@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Comprehensive_test_battery]]
 Comprehensive Test Battery Orchestrator
 
 Main orchestrator for executing comprehensive tests across all categories:
@@ -11,7 +13,7 @@ Main orchestrator for executing comprehensive tests across all categories:
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import yaml
@@ -220,7 +222,7 @@ class ComprehensiveTestBattery:
         if not self.is_initialized:
             raise RuntimeError("Test battery not initialized. Call initialize() first.")
 
-        self.start_time = datetime.utcnow()
+        self.start_time = datetime.now(UTC)
         logger.info("Starting comprehensive test battery execution...")
 
         try:
@@ -240,14 +242,14 @@ class ComprehensiveTestBattery:
             if self.config.run_dashboard_verification:
                 await self._execute_dashboard_verification()
 
-            self.end_time = datetime.utcnow()
+            self.end_time = datetime.now(UTC)
 
             # Generate comprehensive report
             return await self._generate_final_report()
 
         except Exception as e:
             logger.error(f"Test battery execution failed: {e}")
-            self.end_time = datetime.utcnow()
+            self.end_time = datetime.now(UTC)
             raise
 
     async def run_standard_tests(self) -> list[TestResult]:
@@ -261,8 +263,8 @@ class ComprehensiveTestBattery:
                     test_name="standard_suite_initialization",
                     category=TestCategory.STANDARD,
                     status=TestStatus.FAILED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message="Standard test suite not initialized",
                 )
@@ -277,8 +279,8 @@ class ComprehensiveTestBattery:
                     test_name="standard_suite_execution",
                     category=TestCategory.STANDARD,
                     status=TestStatus.FAILED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message=str(e),
                 )
@@ -295,8 +297,8 @@ class ComprehensiveTestBattery:
                     test_name="adversarial_suite_initialization",
                     category=TestCategory.ADVERSARIAL,
                     status=TestStatus.FAILED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message="Adversarial test suite not initialized",
                 )
@@ -311,8 +313,8 @@ class ComprehensiveTestBattery:
                     test_name="adversarial_suite_execution",
                     category=TestCategory.ADVERSARIAL,
                     status=TestStatus.FAILED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message=str(e),
                 )
@@ -329,8 +331,8 @@ class ComprehensiveTestBattery:
                     test_name="load_stress_suite_initialization",
                     category=TestCategory.LOAD_STRESS,
                     status=TestStatus.FAILED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message="Load/stress test suite not initialized",
                 )
@@ -345,8 +347,8 @@ class ComprehensiveTestBattery:
                     test_name="load_stress_suite_execution",
                     category=TestCategory.LOAD_STRESS,
                     status=TestStatus.FAILED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message=str(e),
                 )
@@ -375,8 +377,8 @@ class ComprehensiveTestBattery:
                     test_name="data_pipeline_validation_error",
                     category=TestCategory.DATA_PIPELINE,
                     status=TestStatus.COMPLETED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message=str(e),
                 )
@@ -401,8 +403,8 @@ class ComprehensiveTestBattery:
                     test_name="dashboard_verification_error",
                     category=TestCategory.DASHBOARD,
                     status=TestStatus.COMPLETED,
-                    start_time=datetime.utcnow(),
-                    end_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
+                    end_time=datetime.now(UTC),
                     passed=False,
                     error_message=str(e),
                 )

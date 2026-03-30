@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_session_management]]
 Unit tests for session management functionality.
 
 Tests session creation, lifecycle management, context switching,
@@ -58,11 +60,11 @@ class TestSessionRepository(unittest.TestCase):
         """Test serializing session context for storage."""
         serialized = self.repository._serialize_session_context(self.test_session)
 
-        self.assertEqual(serialized["session_id"], "test_session_123")
-        self.assertEqual(serialized["player_id"], "player_123")
-        self.assertEqual(serialized["status"], SessionStatus.ACTIVE.value)
-        self.assertIsInstance(serialized["created_at"], str)
-        self.assertIsInstance(serialized["last_interaction"], str)
+        assert serialized["session_id"] == "test_session_123"
+        assert serialized["player_id"] == "player_123"
+        assert serialized["status"] == SessionStatus.ACTIVE.value
+        assert isinstance(serialized["created_at"], str)
+        assert isinstance(serialized["last_interaction"], str)
 
     def test_deserialize_session_context(self):
         """Test deserializing session context from storage."""
@@ -72,12 +74,12 @@ class TestSessionRepository(unittest.TestCase):
         # Then deserialize
         deserialized = self.repository._deserialize_session_context(serialized)
 
-        self.assertEqual(deserialized.session_id, self.test_session.session_id)
-        self.assertEqual(deserialized.player_id, self.test_session.player_id)
-        self.assertEqual(deserialized.status, self.test_session.status)
-        self.assertEqual(
-            deserialized.therapeutic_settings.intensity_level,
-            self.test_session.therapeutic_settings.intensity_level,
+        assert deserialized.session_id == self.test_session.session_id
+        assert deserialized.player_id == self.test_session.player_id
+        assert deserialized.status == self.test_session.status
+        assert (
+            deserialized.therapeutic_settings.intensity_level
+            == self.test_session.therapeutic_settings.intensity_level
         )
 
     async def _async_create_session(self):
@@ -97,7 +99,7 @@ class TestSessionRepository(unittest.TestCase):
         # Test session creation
         result = await self.repository.create_session(self.test_session)
 
-        self.assertTrue(result)
+        assert result
         self.mock_redis.setex.assert_called_once()
         mock_neo4j_session.run.assert_called_once()
 
@@ -112,9 +114,9 @@ class TestSessionRepository(unittest.TestCase):
         # Test session retrieval
         result = await self.repository.get_session("test_session_123")
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result.session_id, "test_session_123")
-        self.assertEqual(result.player_id, "player_123")
+        assert result is not None
+        assert result.session_id == "test_session_123"
+        assert result.player_id == "player_123"
 
     async def _async_pause_session(self):
         """Test pausing an active session."""
@@ -148,7 +150,7 @@ class TestSessionRepository(unittest.TestCase):
         # Test pausing session
         result = await self.repository.pause_session("test_session_123")
 
-        self.assertTrue(result)
+        assert result
 
     async def _async_end_session(self):
         """Test ending an active session."""
@@ -181,7 +183,7 @@ class TestSessionRepository(unittest.TestCase):
         # Test ending session
         result = await self.repository.end_session("test_session_123")
 
-        self.assertTrue(result)
+        assert result
 
 
 class TestSessionIntegrationManager(unittest.TestCase):
@@ -220,11 +222,11 @@ class TestSessionIntegrationManager(unittest.TestCase):
             self.test_settings,
         )
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result.player_id, self.test_player_id)
-        self.assertEqual(result.character_id, self.test_character_id)
-        self.assertEqual(result.world_id, self.test_world_id)
-        self.assertEqual(result.status, SessionStatus.ACTIVE)
+        assert result is not None
+        assert result.player_id == self.test_player_id
+        assert result.character_id == self.test_character_id
+        assert result.world_id == self.test_world_id
+        assert result.status == SessionStatus.ACTIVE
 
         # Verify repository and narrative engine were called
         self.mock_repository.create_session.assert_called_once()
@@ -242,9 +244,9 @@ class TestSessionIntegrationManager(unittest.TestCase):
             self.test_player_id, "new_char_456", "new_world_456"
         )
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result.character_id, "new_char_456")
-        self.assertEqual(result.world_id, "new_world_456")
+        assert result is not None
+        assert result.character_id == "new_char_456"
+        assert result.world_id == "new_world_456"
 
     async def _async_switch_character_world_context_existing_session(self):
         """Test switching to existing paused session."""
@@ -271,9 +273,9 @@ class TestSessionIntegrationManager(unittest.TestCase):
             self.test_player_id, "new_char_456", "new_world_456"
         )
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result.session_id, "existing_session")
-        self.assertEqual(result.status, SessionStatus.ACTIVE)
+        assert result is not None
+        assert result.session_id == "existing_session"
+        assert result.status == SessionStatus.ACTIVE
 
     async def _async_pause_session(self):
         """Test pausing an active session."""
@@ -298,8 +300,8 @@ class TestSessionIntegrationManager(unittest.TestCase):
         # Test pausing session
         result = await self.manager.pause_session(self.test_player_id)
 
-        self.assertTrue(result)
-        self.assertEqual(active_session.status, SessionStatus.PAUSED)
+        assert result
+        assert active_session.status == SessionStatus.PAUSED
         self.mock_repository.pause_session.assert_called_once()
         self.mock_narrative_engine.get_session_state.assert_called_once()
 
@@ -326,9 +328,9 @@ class TestSessionIntegrationManager(unittest.TestCase):
         # Test resuming session
         result = await self.manager.resume_session("paused_session")
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result.status, SessionStatus.ACTIVE)
-        self.assertEqual(result.session_id, "paused_session")
+        assert result is not None
+        assert result.status == SessionStatus.ACTIVE
+        assert result.session_id == "paused_session"
         self.mock_repository.resume_session.assert_called_once()
         self.mock_narrative_engine.restore_session_state.assert_called_once()
 
@@ -353,9 +355,9 @@ class TestSessionIntegrationManager(unittest.TestCase):
         # Test ending session
         result = await self.manager.end_session(self.test_player_id)
 
-        self.assertTrue(result)
-        self.assertEqual(active_session.status, SessionStatus.COMPLETED)
-        self.assertNotIn(self.test_player_id, self.manager._active_sessions)
+        assert result
+        assert active_session.status == SessionStatus.COMPLETED
+        assert self.test_player_id not in self.manager._active_sessions
         self.mock_repository.end_session.assert_called_once()
         self.mock_narrative_engine.finalize_session.assert_called_once()
 
@@ -389,15 +391,11 @@ class TestSessionIntegrationManager(unittest.TestCase):
             self.test_player_id, interaction_data
         )
 
-        self.assertTrue(result)
-        self.assertEqual(active_session.interaction_count, 1)
-        self.assertIn(
-            "mindfulness_exercise", active_session.therapeutic_interventions_used
-        )
-        self.assertEqual(active_session.current_scene_id, "scene_2")
-        self.assertEqual(
-            active_session.session_variables["current_exercise"], "breathing"
-        )
+        assert result
+        assert active_session.interaction_count == 1
+        assert "mindfulness_exercise" in active_session.therapeutic_interventions_used
+        assert active_session.current_scene_id == "scene_2"
+        assert active_session.session_variables["current_exercise"] == "breathing"
 
     async def _async_add_progress_marker(self):
         """Test adding progress marker to session."""
@@ -428,9 +426,9 @@ class TestSessionIntegrationManager(unittest.TestCase):
         # Test adding progress marker
         result = await self.manager.add_progress_marker(self.test_player_id, marker)
 
-        self.assertTrue(result)
-        self.assertEqual(len(active_session.progress_markers), 1)
-        self.assertEqual(active_session.progress_markers[0].marker_id, "marker_1")
+        assert result
+        assert len(active_session.progress_markers) == 1
+        assert active_session.progress_markers[0].marker_id == "marker_1"
 
     async def _async_update_therapeutic_settings(self):
         """Test updating therapeutic settings for active session."""
@@ -462,11 +460,11 @@ class TestSessionIntegrationManager(unittest.TestCase):
             self.test_player_id, new_settings
         )
 
-        self.assertTrue(result)
-        self.assertEqual(active_session.therapeutic_settings.intensity_level, 0.8)
-        self.assertEqual(
-            active_session.therapeutic_settings.preferred_approaches[0],
-            TherapeuticApproach.MINDFULNESS,
+        assert result
+        assert active_session.therapeutic_settings.intensity_level == 0.8
+        assert (
+            active_session.therapeutic_settings.preferred_approaches[0]
+            == TherapeuticApproach.MINDFULNESS
         )
         self.mock_narrative_engine.update_therapeutic_settings.assert_called_once()
 
@@ -494,11 +492,11 @@ class TestSessionIntegrationManager(unittest.TestCase):
         async def run_test():
             result = await self.manager.get_session_continuity_data("test_session")
 
-            self.assertIn("therapeutic_settings", result)
-            self.assertIn("session_variables", result)
-            self.assertIn("therapeutic_interventions_used", result)
-            self.assertEqual(result["interaction_count"], 5)
-            self.assertEqual(result["total_duration_minutes"], 30)
+            assert "therapeutic_settings" in result
+            assert "session_variables" in result
+            assert "therapeutic_interventions_used" in result
+            assert result["interaction_count"] == 5
+            assert result["total_duration_minutes"] == 30
 
         asyncio.run(run_test())
 
@@ -572,14 +570,14 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         session = await self.manager.create_session(
             "player_123", "char_123", "world_123"
         )
-        self.assertIsNotNone(session)
-        self.assertEqual(session.status, SessionStatus.ACTIVE)
+        assert session is not None
+        assert session.status == SessionStatus.ACTIVE
 
         # 2. Update with interaction
         interaction_result = await self.manager.update_session_interaction(
             "player_123", {"therapeutic_intervention": "test_intervention"}
         )
-        self.assertTrue(interaction_result)
+        assert interaction_result
 
         # 3. Add progress marker
         marker = ProgressMarker(
@@ -589,19 +587,19 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
             achieved_at=datetime.now(),
         )
         marker_result = await self.manager.add_progress_marker("player_123", marker)
-        self.assertTrue(marker_result)
+        assert marker_result
 
         # 4. Pause session
         pause_result = await self.manager.pause_session("player_123")
-        self.assertTrue(pause_result)
+        assert pause_result
 
         # 5. Resume session
         resume_result = await self.manager.resume_session(session.session_id)
-        self.assertIsNotNone(resume_result)
+        assert resume_result is not None
 
         # 6. End session
         end_result = await self.manager.end_session("player_123")
-        self.assertTrue(end_result)
+        assert end_result
 
         # Verify all narrative engine methods were called
         self.mock_narrative_engine.initialize_session.assert_called_once()

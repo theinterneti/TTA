@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Prompts/__init__]]
 AI Components Prompts Package.
 
 This package provides centralized prompt management with versioning,

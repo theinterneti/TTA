@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Performance/Optimization]]
 Intelligent agent coordination optimization with predictive scheduling.
 
 This module provides advanced optimization algorithms for agent coordination,
@@ -15,7 +17,7 @@ import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models import AgentType
@@ -24,7 +26,7 @@ from .response_time_monitor import ResponseTimeMonitor
 logger = logging.getLogger(__name__)
 
 
-class OptimizationStrategy(str, Enum):
+class OptimizationStrategy(StrEnum):
     """Optimization strategies."""
 
     FASTEST_FIRST = "fastest_first"
@@ -33,7 +35,7 @@ class OptimizationStrategy(str, Enum):
     ADAPTIVE = "adaptive"
 
 
-class AgentLoadLevel(str, Enum):
+class AgentLoadLevel(StrEnum):
     """Agent load levels."""
 
     IDLE = "idle"
@@ -415,7 +417,7 @@ class IntelligentAgentCoordinator:
 
         try:
             return statistics.stdev(response_times) / statistics.mean(response_times)
-        except (statistics.StatisticsError, ZeroDivisionError):
+        except statistics.StatisticsError, ZeroDivisionError:
             return 0.0
 
     async def _reserve_agents(self, decision: SchedulingDecision) -> None:

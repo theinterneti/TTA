@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Specs/Chat.spec]]
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/LoginPage';
 import { ChatPage } from '../page-objects/ChatPage';

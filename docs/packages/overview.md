@@ -109,3 +109,6 @@ When contributing to packages, ensure:
 4. **Semantic versioning**: Follow semver for releases
 
 [Contributing guide →](../development/contributing.md)
+
+
+---

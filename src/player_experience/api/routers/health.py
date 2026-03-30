@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Health]]
 Health check API endpoints for TTA system monitoring.
 
 Provides endpoints for checking system health and component status.
@@ -102,7 +104,7 @@ async def system_health(
         health_checker.register_check("neo4j", lambda: check_neo4j_health(neo4j_driver))
 
     health_checker.register_check(
-        "agent_orchestration", lambda: check_agent_orchestration_health()
+        "agent_orchestration", check_agent_orchestration_health
     )
 
     openrouter_key = os.getenv("OPENROUTER_API_KEY")

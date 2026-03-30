@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_neo4j_component_enhanced]]
 Enhanced test suite for Neo4j Component with improved coverage.
 
 This test suite adds:
@@ -61,7 +63,7 @@ class TestNeo4jComponentEnhanced:
 
         # Should be three levels up from neo4j_component.py
         # (src/components/neo4j_component.py -> src/components -> src -> root)
-        assert component.root_dir.name == "recovered-tta-storytelling"
+        assert component.root_dir.name == "TTA"
 
     def test_repo_dir_is_child_of_root_dir(self, mock_config):
         """Test repository directory is correctly constructed."""

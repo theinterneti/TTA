@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Slices/Realtimemonitoringslice]]
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   EmotionalState,

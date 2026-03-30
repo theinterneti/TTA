@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_tools_diagnostics_and_concurrency]]
 import asyncio
 import os
 
@@ -40,7 +41,7 @@ async def test_tools_diagnostics_endpoint(redis_client):
         name=unique_name,
         version="1.0.0",
         description="Query KG",
-        parameters=[ToolParameter(name="q", schema={"type": "string"})],
+        parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
         returns_schema={"type": "object"},
     )
     # register may be False if concurrently registered; still acceptable
@@ -49,7 +50,8 @@ async def test_tools_diagnostics_endpoint(redis_client):
     res = client.get("/tools")
     assert res.status_code == 200
     body = res.json()
-    assert "tools" in body and isinstance(body["tools"], list)
+    assert "tools" in body
+    assert isinstance(body["tools"], list)
     # allow either presence (if not pruned) or absence
     assert any(t["name"] == unique_name for t in body["tools"]) or body["tools"] == []
 
@@ -69,7 +71,7 @@ async def test_concurrent_registry_and_coordinator(redis_client):
             name="kg.query",
             version="1.0.2",
             description="Query KG",
-            parameters=[ToolParameter(name="q", schema={"type": "string"})],
+            parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
             returns_schema={"type": "object"},
         )
 

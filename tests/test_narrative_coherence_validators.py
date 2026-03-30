@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_narrative_coherence_validators]]
 Tests for Narrative Coherence validators.
 
 This module tests the coherence validation, contradiction detection,
@@ -11,6 +13,8 @@ import uuid
 from datetime import datetime
 
 import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.coherence.coherence_validator import CoherenceValidator
 from tta_narrative.coherence.contradiction_detector import (
     ContradictionDetector,

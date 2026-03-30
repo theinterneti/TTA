@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Neo4j_connection_probe]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 import argparse

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Models]]
 Data models for the Model Management System.
 
 This module contains the core data structures used throughout the model
@@ -205,6 +207,9 @@ class ModelSelectionCriteria:
     # Preferences
     prefer_local_models: bool = False
     prefer_free_models: bool = True
+
+    # Timeout for the full model selection call (seconds)
+    selection_timeout_seconds: float = 30.0
     require_streaming: bool = False
 
 

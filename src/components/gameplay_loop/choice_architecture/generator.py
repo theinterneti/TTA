@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Choice_architecture/Generator]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Choice_architecture/Generator]]
 Choice Generator for Therapeutic Text Adventure
 
 This module implements choice generation functionality that creates meaningful,
@@ -9,8 +12,11 @@ therapeutic goals while maintaining player agency.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    from langchain_core.language_models import BaseChatModel
 
 from ..models.core import (
     Choice,
@@ -41,8 +47,13 @@ class ChoiceGenerator:
     progression and therapeutic goals while maintaining player agency.
     """
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
+    ):
         self.config = config or {}
+        self.llm = llm
 
         # Choice generation resources
         self.choice_templates: dict[ChoiceType, list[ChoiceTemplate]] = {}
@@ -89,9 +100,9 @@ class ChoiceGenerator:
             max_choices = requirements.get("max_choices", 4)
 
             # Generate choices for each required type
-            for choice_type in choice_types_needed:
+            for slot_index, choice_type in enumerate(choice_types_needed):
                 choice = await self._generate_choice_by_type(
-                    choice_type, scene, session_state, requirements
+                    choice_type, scene, session_state, requirements, slot_index
                 )
                 if choice:
                     generated_choices.append(choice)
@@ -147,7 +158,7 @@ class ChoiceGenerator:
             logger.error(f"Failed to generate emotion-appropriate choice: {e}")
             return None
 
-    async def generate_safe_choice(
+    async def generate_safe_choice(  # noqa: ARG002
         self, emotional_state: str, session_state: SessionState
     ) -> Choice | None:
         """
@@ -376,18 +387,21 @@ class ChoiceGenerator:
         scene: Scene,
         session_state: SessionState,
         requirements: dict[str, Any],
+        slot_index: int = 0,
     ) -> Choice | None:
         """Generate a choice of a specific type."""
         templates = self.choice_templates.get(choice_type, [])
         if not templates:
             return None
 
-        # Select appropriate template
-        template = await self._select_template(templates, scene, session_state)
+        # Select appropriate template, rotating by slot to avoid repetition
+        template = await self._select_template(
+            templates, scene, session_state, slot_index
+        )
 
         # Generate choice from template
         return await self._generate_from_template(
-            template, scene, session_state, requirements
+            template, scene, session_state, requirements, slot_index
         )
 
     async def _generate_additional_choice(
@@ -400,6 +414,7 @@ class ChoiceGenerator:
         """Generate an additional choice to fill remaining slots."""
         # Determine what type of choice would be most beneficial
         existing_types = [choice.choice_type for choice in existing_choices]
+        slot_index = len(existing_choices)
 
         # Prefer therapeutic choices if we don't have enough
         therapeutic_count = sum(
@@ -410,40 +425,42 @@ class ChoiceGenerator:
 
         if therapeutic_count / (total_choices + 1) < therapeutic_ratio:
             return await self._generate_choice_by_type(
-                ChoiceType.THERAPEUTIC, scene, session_state, requirements
+                ChoiceType.THERAPEUTIC, scene, session_state, requirements, slot_index
             )
 
         # Otherwise, generate a narrative choice
         return await self._generate_choice_by_type(
-            ChoiceType.NARRATIVE, scene, session_state, requirements
+            ChoiceType.NARRATIVE, scene, session_state, requirements, slot_index
         )
 
-    async def _select_template(
-        self, templates: list[ChoiceTemplate], scene: Scene, session_state: SessionState
+    async def _select_template(  # noqa: ARG002
+        self,
+        templates: list[ChoiceTemplate],
+        scene: Scene,
+        session_state: SessionState,
+        slot_index: int = 0,
     ) -> ChoiceTemplate:
         """Select the most appropriate template for the context."""
         if not templates:
             return templates[0]
 
         # Score templates based on therapeutic focus alignment
-        best_template = None
-        best_score = 0
-
-        for template in templates:
+        scored: list[tuple[int, int, ChoiceTemplate]] = []
+        for i, template in enumerate(templates):
             score = 0
-
-            # Score based on therapeutic tag alignment
             for tag in template.therapeutic_tags:
                 if tag in scene.therapeutic_focus:
                     score += 2
                 elif any(tag in focus for focus in scene.therapeutic_focus):
                     score += 1
+            scored.append((score, i, template))
 
-            if score > best_score:
-                best_score = score
-                best_template = template
+        scored.sort(key=lambda x: x[0], reverse=True)
+        best_score = scored[0][0]
 
-        return best_template or templates[0]
+        # Among equally-scored templates, rotate by slot_index to avoid repetition
+        top_templates = [t for s, _, t in scored if s == best_score]
+        return top_templates[slot_index % len(top_templates)]
 
     async def _generate_from_template(
         self,
@@ -451,6 +468,7 @@ class ChoiceGenerator:
         scene: Scene,
         session_state: SessionState,
         requirements: dict[str, Any],
+        slot_index: int = 0,
     ) -> Choice:
         """Generate a choice from a template."""
         # Determine difficulty level
@@ -462,15 +480,9 @@ class ChoiceGenerator:
         elif complexity_preference == "complex":
             difficulty_level = DifficultyLevel.CHALLENGING
 
-        # Get appropriate text variant
-        difficulty_key = difficulty_level.value
-        choice_text = template.difficulty_variants.get(
-            difficulty_key,
-            (
-                template.text_patterns[0]
-                if template.text_patterns
-                else "Continue your journey"
-            ),
+        # Generate choice text: try LLM first, fall back to template patterns.
+        choice_text = await self._generate_choice_text(
+            template, scene, session_state, difficulty_level, slot_index
         )
 
         # Generate description
@@ -501,6 +513,90 @@ class ChoiceGenerator:
             emotional_context=[session_state.emotional_state.value],
             therapeutic_value=therapeutic_value,
         )
+
+    async def _generate_choice_text(
+        self,
+        template: ChoiceTemplate,
+        scene: Scene,
+        session_state: SessionState,
+        difficulty_level: DifficultyLevel,
+        slot_index: int,
+    ) -> str:
+        """Return choice text, using LLM when available with template fallback."""
+        if self.llm is not None:
+            llm_text = await self._generate_choice_text_llm(
+                template, scene, session_state, slot_index
+            )
+            if llm_text:
+                return llm_text
+
+        # Template fallback: rotate through patterns by slot_index
+        patterns = template.text_patterns
+        if patterns:
+            return patterns[slot_index % len(patterns)]
+        difficulty_key = difficulty_level.value
+        return template.difficulty_variants.get(difficulty_key, "Continue your journey")
+
+    async def _generate_choice_text_llm(
+        self,
+        template: ChoiceTemplate,
+        scene: Scene,
+        session_state: SessionState,
+        slot_index: int,
+    ) -> str | None:
+        """Ask the LLM to write a contextualised choice based on the template."""
+        from langchain_core.messages import HumanMessage, SystemMessage  # noqa: PLC0415
+
+        patterns = template.text_patterns
+        base_pattern = (
+            patterns[slot_index % len(patterns)]
+            if patterns
+            else "Take a meaningful step"
+        )
+        tags_str = (
+            ", ".join(template.therapeutic_tags)
+            if template.therapeutic_tags
+            else "wellbeing"
+        )
+
+        system_prompt = (
+            "You are a compassionate writer for a therapeutic text adventure game. "
+            "Write supportive, non-clinical choice text in second person (starting with a verb). "
+            "Keep it to 10–20 words."
+        )
+        user_prompt = (
+            f"Scene: {scene.title}\n"
+            f"Scene summary: {scene.description[:120]}\n"
+            f"Player emotional state: {session_state.emotional_state.value}\n"
+            f"Choice type: {template.choice_type.value}\n"
+            f"Therapeutic focus: {tags_str}\n"
+            f"Base pattern: {base_pattern}\n\n"
+            "Write ONE choice option (10–20 words) that:\n"
+            "- Is contextually specific to this scene\n"
+            "- Keeps the therapeutic intent of the base pattern\n"
+            "- Feels natural and encouraging\n"
+            "Return only the choice text, no quotes or explanation."
+        )
+
+        try:
+            if self.llm is None:
+                return None
+            response = await self.llm.ainvoke(
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=user_prompt),
+                ]
+            )
+            content = response.content
+            text = content.strip() if isinstance(content, str) else str(content).strip()
+            # Sanity-check: must be non-empty and reasonably short
+            if text and len(text) <= 200:
+                return text
+            logger.warning("LLM choice text too long or empty, using template")
+            return None
+        except Exception as e:
+            logger.warning("LLM choice generation failed, using template: %s", e)
+            return None
 
     async def _generate_base_choice(
         self, choice_type: ChoiceType, session_state: SessionState
@@ -561,9 +657,11 @@ class ChoiceGenerator:
             adapted_choice.therapeutic_value = min(
                 adapted_choice.therapeutic_value, 0.7
             )
-        elif complexity == "increased":
-            if adapted_choice.difficulty_level == DifficultyLevel.GENTLE:
-                adapted_choice.difficulty_level = DifficultyLevel.STANDARD
+        elif (
+            complexity == "increased"
+            and adapted_choice.difficulty_level == DifficultyLevel.GENTLE
+        ):
+            adapted_choice.difficulty_level = DifficultyLevel.STANDARD
 
         # Add therapeutic emphasis tags
         if therapeutic_emphasis not in adapted_choice.therapeutic_tags:
@@ -575,7 +673,7 @@ class ChoiceGenerator:
         return adapted_choice
 
     # Helper Calculation Methods
-    async def _generate_choice_description(
+    async def _generate_choice_description(  # noqa: ARG002
         self, template: ChoiceTemplate, scene: Scene, session_state: SessionState
     ) -> str:
         """Generate a description for a choice based on template and context."""

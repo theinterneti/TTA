@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/Manual-testing-validation.staging.spec]]
 /**
  * Manual Testing Validation Script for TTA Staging Environment
  *

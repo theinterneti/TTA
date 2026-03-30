@@ -1,5 +1,7 @@
 """Tests for monitoring.metrics_collector module."""
 
+# Logseq: [[TTA.dev/Tests/Monitoring/Test_metrics_collector]]
+
 from src.monitoring.metrics_collector import record_request_metric
 
 

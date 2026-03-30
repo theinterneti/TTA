@@ -1,5 +1,7 @@
 """Human oversight escalation and notification systems."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Crisis_detection/Escalation]]
+
 from __future__ import annotations
 
 import logging

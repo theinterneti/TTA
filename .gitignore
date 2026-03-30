@@ -81,6 +81,9 @@ mutation-report.html
 cosmic-ray*.toml
 session*.sqlite
 
+# pytest-profiling output
+prof/
+
 # Batch processing and generation results
 batch*_results.json
 batch*_generation_results.json
@@ -105,6 +108,7 @@ workflow_sync_report.json
 # -------------------------------------------------
 logs/
 *.log
+.observability/traces.jsonl
 *.tmp
 *.temp
 .tmp/
@@ -146,6 +150,10 @@ secrets/
 query_notebook.py
 simple_query.py
 test_openhands_file_generation.py
+
+# IDE and editor project files
+.kateproject
+.coding-session.json
 
 # Storybook node_modules (should use workspace root)
 src/player_experience/frontend/.storybook/node_modules/
@@ -345,8 +353,9 @@ PYRIGHT_BASELINE_*.txt
 /quick-validation.spec.ts
 /tsconfig.json
 
-# Test mock node_modules (contains invalid JSON configs)
+# Test/simulation node_modules (tracked by mistake, now untracked)
 /tests/e2e/mocks/node_modules/
+/testing/simulation/node_modules/
 
 # -------------------------------------------------
 # 18) Staging and environment-specific directories
@@ -419,6 +428,9 @@ gha-creds-*.json
 .augment/rules/integrated-workflow.md
 .augment/rules/use-serena-tools.md
 
+# Claude Code local settings (contains machine-specific paths and permissions)
+.claude/settings.local.json
+
 # Serena AI configuration
 .serena/
 
@@ -463,3 +475,8 @@ backups/
 # Root-level test files (should be in tests/ directory)
 /test_*.py
 !tests/test_*.py
+
+# Legacy agentic component runtime/state directories
+platform/dev/agentic/*/runtime/
+platform/dev/agentic/*/state/
+.worktrees/

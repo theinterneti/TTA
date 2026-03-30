@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Langgraph_orchestrator]]
 LangGraph-integrated Agent Orchestrator.
 
 This module integrates the unified agent orchestrator with LangGraph workflows
@@ -14,7 +16,6 @@ from typing import Any, TypedDict
 
 import redis.asyncio as aioredis
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 
 from tta_ai.prompts import PromptRegistry
@@ -80,7 +81,9 @@ class LangGraphAgentOrchestrator:
         self.neo4j_manager = neo4j_manager
         self.model_name = model_name
 
-        # Initialize LLM
+        # Initialize LLM (lazy import to avoid Python 3.14 segfault)
+        from langchain_openai import ChatOpenAI
+
         self.llm = ChatOpenAI(
             api_key=openai_api_key, model=model_name, temperature=0.7, max_tokens=1000
         )

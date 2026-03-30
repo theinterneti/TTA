@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Tools/Coordinator]]
 ToolCoordinator for dynamic tool generation, validation, and sharing (Task 7.1).
 """
 

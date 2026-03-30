@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Debug Neo4j connection - check protocol support."""
 
+# Logseq: [[TTA.dev/Scripts/Test_neo4j_debug]]
+
 import logging
 
 from neo4j import GraphDatabase, basic_auth

@@ -1,4 +1,5 @@
 """
+
 Narrative Analysis System for Extended Session Quality Evaluation
 
 Provides advanced narrative quality assessment focusing on coherence,

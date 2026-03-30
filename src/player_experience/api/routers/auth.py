@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Auth]]
 Enhanced authentication router for the Player Experience API.
 
 This module provides endpoints for user authentication, registration,
@@ -45,6 +47,8 @@ from ..auth import (
     LoginRequest,
     RefreshTokenRequest,
     Token,
+    _get_token_cache,
+    create_refresh_token,
     security,
 )
 
@@ -69,7 +73,7 @@ except Exception as e:
     logger.warning(f"⚠️ UserRepository connection failed: {e}. Using Redis fallback.")
     # Create a simple Redis-based user repository as fallback
     try:
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         import redis
 
@@ -106,7 +110,7 @@ except Exception as e:
                     "email": email,
                     "password_hash": password_hash,
                     "role": role.value,
-                    "created_at": datetime.utcnow().isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
                     "is_active": "true",  # Convert boolean to string for Redis
                 }
 
@@ -116,7 +120,7 @@ except Exception as e:
                 self.redis_client.set(f"email:{email}", user_id)
 
                 return User(
-                    user_id, username, email, password_hash, role, datetime.utcnow()
+                    user_id, username, email, password_hash, role, datetime.now(UTC)
                 )
 
             def get_user_by_username(self, username: str):
@@ -145,7 +149,16 @@ except Exception as e:
 
             def update_last_login(self, user_id: str) -> bool:
                 result = self.redis_client.hset(
-                    f"user:{user_id}", "last_login", datetime.utcnow().isoformat()
+                    f"user:{user_id}", "last_login", datetime.now(UTC).isoformat()
+                )
+                return bool(result)
+
+            def update_password(self, username: str, password_hash: str) -> bool:
+                user_id = self.redis_client.get(f"username:{username}")
+                if not user_id:
+                    return False
+                result = self.redis_client.hset(
+                    f"user:{user_id}", "password_hash", password_hash
                 )
                 return bool(result)
 
@@ -429,10 +442,31 @@ async def login(
                 f"Unexpected error during player profile auto-creation: {e}",
                 exc_info=True,
             )
+        # Auto-initialize default character and world for new players (Issue #60)
+        try:
+            from ...services.default_character_world_service import (
+                DefaultCharacterWorldService,
+            )
+
+            default_service = DefaultCharacterWorldService()
+            character_id, world_id, session_id = (
+                default_service.initialize_default_character_and_world(player_id)
+            )
+            if character_id:
+                logger.debug(
+                    f"Auto-initialized default character {character_id}, world {world_id}, and session {session_id} for player {player_id}"
+                )
+        except Exception as e:
+            logger.warning(
+                f"Failed to auto-initialize default character/world for player {player_id}: {e}",
+                exc_info=True,
+            )
+            # Don't block login if character/world initialization fails
+
         finally:
             # Record player profile auto-creation metrics
             if autocreation_start_time is not None:
-                duration = time.time() - autocreation_start_time
+                duration = time.time() - autocreation_start_time  # type: ignore[possibly-unbound]
                 try:
                     from src.monitoring.prometheus_metrics import get_metrics_collector
 
@@ -525,7 +559,14 @@ async def login(
 
         return LoginResponse(
             access_token=access_token,
-            refresh_token="",  # TODO: Implement refresh token
+            refresh_token=create_refresh_token(
+                {
+                    "sub": user.user_id,
+                    "player_id": user.user_id,
+                    "username": user.username,
+                    "email": user.email,
+                }
+            ),
             token_type="bearer",
             expires_in=auth_service.access_token_expire_minutes * 60,
             mfa_required=False,
@@ -632,7 +673,9 @@ async def setup_mfa(
         HTTPException: If MFA setup fails
     """
     try:
-        setup_info = auth_service.setup_mfa(user.user_id, method)
+        setup_info = auth_service.setup_mfa(
+            user.user_id, method, username=user.username
+        )
 
         return MFASetupResponse(
             method=method.value,
@@ -680,18 +723,25 @@ async def refresh_token(refresh_request: RefreshTokenRequest) -> Token:
 
 @router.post("/logout")
 async def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     user: AuthenticatedUser = Depends(get_current_authenticated_user),
 ) -> dict[str, str]:
     """
     Logout the current user and revoke their session.
 
     Args:
+        credentials: Raw HTTP Bearer credentials (used to invalidate Redis cache)
         user: The current authenticated user
 
     Returns:
         dict: Success message
     """
     try:
+        # Evict token from Redis cache so subsequent requests are rejected immediately
+        cache = _get_token_cache()
+        if cache is not None:
+            await cache.delete(credentials.credentials)
+
         # Revoke the user's session
         if user.session_id:
             auth_service.revoke_session(user.session_id)
@@ -720,18 +770,25 @@ async def logout(
 
 @router.post("/logout-all")
 async def logout_all_sessions(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     user: AuthenticatedUser = Depends(get_current_authenticated_user),
 ) -> dict[str, str]:
     """
     Logout from all sessions for the current user.
 
     Args:
+        credentials: Raw HTTP Bearer credentials (used to invalidate Redis cache)
         user: The current authenticated user
 
     Returns:
         dict: Success message
     """
     try:
+        # Evict the current token from Redis cache immediately
+        cache = _get_token_cache()
+        if cache is not None:
+            await cache.delete(credentials.credentials)
+
         # Revoke all user sessions
         auth_service.revoke_all_user_sessions(user.user_id)
 
@@ -1004,7 +1061,35 @@ async def change_password(
             detail={"message": "Password does not meet requirements", "errors": errors},
         )
 
-    # TODO: Verify current password and update to new password in database
+    if auth_service.user_repository is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Password changes require a configured user repository",
+        )
+
+    stored_user = auth_service.user_repository.get_user_by_username(user.username)
+    if stored_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Authenticated user could not be found",
+        )
+
+    if not auth_service.security_service.verify_password(
+        current_password, stored_user.password_hash
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect",
+        )
+
+    updated = auth_service.user_repository.update_password(
+        user.username, auth_service.security_service.hash_password(new_password)
+    )
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password",
+        )
 
     # Log security event
     from models.auth import SecurityEvent

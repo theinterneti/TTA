@@ -433,3 +433,7 @@ For interactive API exploration, visit:
 
 **Last Updated:** 2025-09-29
 **API Version:** 1.0.0
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Api/Api_documentation]]

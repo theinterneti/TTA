@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Types/Preferences]]
 /**
  * Enhanced Player Preference Types for TTA Therapeutic Storytelling Platform
  *

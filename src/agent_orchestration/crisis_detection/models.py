@@ -1,5 +1,7 @@
 """Crisis detection data models."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Crisis_detection/Models]]
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

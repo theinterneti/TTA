@@ -305,3 +305,7 @@ For issues or questions:
 - [Slack API Documentation](https://api.slack.com)
 - [Playwright Documentation](https://playwright.dev)
 - [Advanced Testing Infrastructure Guide](../tests/e2e-staging/ADVANCED_TESTING_INFRASTRUCTURE.md)
+
+
+---
+**Logseq:** [[TTA.dev/.github/Advanced_testing_setup]]

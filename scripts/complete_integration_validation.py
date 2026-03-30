@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Complete_integration_validation]]
 Complete TTA Core Gameplay Loop Integration Validation Script
 
 This script performs the complete end-to-end validation of the TTA Core Gameplay Loop

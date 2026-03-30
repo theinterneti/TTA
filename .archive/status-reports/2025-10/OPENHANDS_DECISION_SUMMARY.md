@@ -438,3 +438,7 @@ Please fix these issues while maintaining the original functionality:
 **Implementation Start:** 2025-10-28
 **Expected Completion:** 2025-12-08 (6 weeks)
 **Next Review:** 2026-01-27 (3 months)
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Openhands_decision_summary]]

@@ -421,3 +421,7 @@ Ctrl+Shift+U → Open Output Panel
 **Status:** ✅ Fixed
 **Tests Discovered:** 952
 **Last Updated:** 2025-10-04
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Fixes/Vscode_pytest_integration_fix]]

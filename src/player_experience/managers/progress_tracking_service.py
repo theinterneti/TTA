@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Progress_tracking_service]]
 Progress Tracking Service.
 
 Aggregates session data and progress markers to compute summaries, detect milestones,
@@ -12,7 +14,7 @@ from __future__ import annotations
 
 import logging
 from collections import Counter, defaultdict
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from ..database.session_repository import SessionRepository
@@ -129,7 +131,7 @@ class ProgressTrackingService:
         engagement.longest_streak_days = self._calculate_longest_streak(session_dates)
 
         # Calculate weekly and monthly sessions
-        now_date = datetime.utcnow().date()
+        now_date = datetime.now(UTC).date()
         week_ago = now_date - timedelta(days=7)
         month_ago = now_date - timedelta(days=30)
 
@@ -347,7 +349,7 @@ class ProgressTrackingService:
         Generate a comprehensive therapeutic effectiveness report for a player.
         This integrates with therapeutic components to assess treatment outcomes.
         """
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         report_start = now - timedelta(days=30)
 
         # Get session data for analysis
@@ -467,6 +469,14 @@ class ProgressTrackingService:
             generated_at=now,
         )
 
+    async def compute_therapeutic_effectiveness(
+        self, player_id: str, character_id: str | None = None
+    ) -> TherapeuticEffectivenessReport:
+        """Compatibility wrapper for callers using the older method name."""
+        return await self.generate_therapeutic_effectiveness_report(
+            player_id, character_id=character_id
+        )
+
     async def celebrate_milestone_achievement(
         self, player_id: str, milestone: Milestone
     ) -> dict[str, Any]:
@@ -485,7 +495,7 @@ class ProgressTrackingService:
                 player_id, milestone
             ),
             "celebration_type": self._determine_celebration_type(milestone),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         logger.info(
@@ -560,7 +570,7 @@ class ProgressTrackingService:
         ] = await self.session_repository.get_session_summaries(player_id, days * 2)
 
         # Build bucket keys YYYY-MM-DD
-        today = datetime.utcnow().date()
+        today = datetime.now(UTC).date()
         bucket_keys = [
             (today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)
         ][::-1]
@@ -633,6 +643,7 @@ class ProgressTrackingService:
         if not session_dates:
             return 0
         # Normalize inputs to date objects
+        from datetime import UTC
         from datetime import datetime as _dt
 
         from src.common.time_utils import (
@@ -644,7 +655,7 @@ class ProgressTrackingService:
         ref_today = pick_reference_today(dates)
         # Guard: if ref_today is not today (local or UTC), there is no current streak
         today_local = _dt.now().date()
-        today_utc = _dt.utcnow().date()
+        today_utc = _dt.now(UTC).date()
         if ref_today not in (today_local, today_utc):
             return 0
         return consecutive_streak_ending_today(dates, ref_today)
@@ -743,7 +754,7 @@ class ProgressTrackingService:
         """Detect milestones with comprehensive criteria and create celebration highlights."""
         new_milestones: list[Milestone] = []
         highlights: list[ProgressHighlight] = []
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Engagement-based milestones
         for threshold in self.milestone_thresholds["engagement_streak"]:

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Examples/Real_agent_communication_example]]
 Example demonstrating enhanced agent proxy integration with real communication protocols.
 
 This example shows how to use the enhanced agent proxies with real agent communication,

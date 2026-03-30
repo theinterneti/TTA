@@ -192,3 +192,7 @@ docker restart tta-dev-neo4j
 4. ⏸️ Skip Neo4j Browser (not critical for development)
 
 The Neo4j database is **working** - it's just the browser UI that's inaccessible from Windows. This won't block your development!
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Database/2025-10/Neo4j_browser_wsl2_fix]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Characters]]
 Character management router for the Player Experience API.
 
 This module provides REST endpoints for character management with
@@ -7,7 +9,7 @@ authentication, authorization (owner-only), and API documentation.
 
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from ...database.character_repository import CharacterRepository
 from ...managers.character_avatar_manager import (
@@ -88,6 +90,7 @@ def get_character_manager_dep() -> CharacterAvatarManager:
 
 
 class CharacterAppearanceRequest(BaseModel):
+    model_config = ConfigDict(extra="allow")
     age_range: str = Field("adult", description="Age range: child, teen, adult, elder")
     gender_identity: str = Field("non-binary", min_length=1, max_length=50)
     physical_description: str = Field(
@@ -96,6 +99,37 @@ class CharacterAppearanceRequest(BaseModel):
     clothing_style: str = Field("casual", max_length=100)
     distinctive_features: list[str] = Field(default_factory=list, max_length=10)
     avatar_image_url: str | None = Field(None, max_length=500)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_fields(cls, data):
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        age = normalized.pop("age", None)
+        gender = normalized.pop("gender", None)
+
+        if "age_range" not in normalized and age is not None:
+            try:
+                age_value = int(age)
+            except (TypeError, ValueError):
+                age_value = None
+
+            if age_value is not None:
+                if age_value < 13:
+                    normalized["age_range"] = "child"
+                elif age_value < 18:
+                    normalized["age_range"] = "teen"
+                elif age_value >= 65:
+                    normalized["age_range"] = "elder"
+                else:
+                    normalized["age_range"] = "adult"
+
+        if "gender_identity" not in normalized and gender is not None:
+            normalized["gender_identity"] = gender
+
+        return normalized
 
     @field_validator("age_range")
     @classmethod
@@ -133,6 +167,40 @@ class CharacterBackgroundRequest(BaseModel):
     strengths_and_skills: list[str] = Field(default_factory=list, max_length=20)
     life_goals: list[str] = Field(default_factory=list, min_length=1, max_length=15)
     relationships: dict[str, str] = Field(default_factory=dict, max_length=10)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_fields(cls, data):
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        life_situation = normalized.pop("life_situation", None)
+        key_relationships = normalized.pop("key_relationships", None)
+        occupation = normalized.get("occupation")
+
+        if "backstory" not in normalized and life_situation is not None:
+            normalized["backstory"] = str(life_situation)
+
+        if "personality_traits" not in normalized:
+            normalized["personality_traits"] = ["thoughtful"]
+
+        if "life_goals" not in normalized:
+            fallback_goal = (
+                f"Grow beyond {life_situation}"
+                if isinstance(life_situation, str) and life_situation.strip()
+                else f"Grow in {occupation}"
+                if isinstance(occupation, str) and occupation.strip()
+                else "Personal growth"
+            )
+            normalized["life_goals"] = [fallback_goal]
+
+        if "relationships" not in normalized and isinstance(key_relationships, list):
+            normalized["relationships"] = {
+                str(item): "Important relationship" for item in key_relationships
+            }
+
+        return normalized
 
     @field_validator("name")
     @classmethod
@@ -180,6 +248,17 @@ class TherapeuticGoalSchema(BaseModel):
     is_active: bool = True
     therapeutic_approaches: list[TherapeuticApproach] = Field(default_factory=list)
 
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_fields(cls, data):
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        if "progress_percentage" not in normalized and "progress" in normalized:
+            normalized["progress_percentage"] = normalized.pop("progress")
+        return normalized
+
     @field_validator("therapeutic_approaches", mode="before")
     @classmethod
     def _normalize_goal_approaches(cls, v):
@@ -189,6 +268,7 @@ class TherapeuticGoalSchema(BaseModel):
 
 
 class TherapeuticProfileSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
     primary_concerns: list[str] = Field(
         default_factory=list,
         min_length=1,
@@ -206,6 +286,27 @@ class TherapeuticProfileSchema(BaseModel):
     therapeutic_approaches: list[TherapeuticApproach] = Field(
         default_factory=list, max_length=10
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_fields(cls, data):
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        if (
+            "preferred_intensity" not in normalized
+            and "intensity_preference" in normalized
+        ):
+            normalized["preferred_intensity"] = normalized.pop("intensity_preference")
+        if (
+            "therapeutic_approaches" not in normalized
+            and "preferred_approaches" in normalized
+        ):
+            normalized["therapeutic_approaches"] = normalized.pop(
+                "preferred_approaches"
+            )
+        return normalized
 
     @field_validator("primary_concerns", "comfort_zones")
     @classmethod
@@ -244,6 +345,19 @@ class CreateCharacterRequest(BaseModel):
     appearance: CharacterAppearanceRequest
     background: CharacterBackgroundRequest
     therapeutic_profile: TherapeuticProfileSchema
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_nested_fields(cls, data):
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        background = dict(normalized.get("background") or {})
+        if "name" not in background and normalized.get("name"):
+            background["name"] = normalized["name"]
+        normalized["background"] = background
+        return normalized
 
     @field_validator("name")
     @classmethod

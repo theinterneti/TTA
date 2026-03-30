@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Tools/Models]]
 Tool models and validation for dynamic tool system (Task 7.1/7.2).
 """
 
@@ -6,15 +8,16 @@ from __future__ import annotations
 
 import hashlib
 import json
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 from ..models import AgentId
+from .policy_config import ToolPolicyConfig
 
 
-class ToolStatus(str, Enum):
+class ToolStatus(StrEnum):
     ACTIVE = "active"
     DEPRECATED = "deprecated"
 
@@ -23,7 +26,7 @@ class ToolParameter(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
     description: str | None = Field(default=None, max_length=1024)  # Increased from 512
     required: bool = True
-    schema: dict[str, Any] = Field(
+    param_schema: dict[str, Any] = Field(
         default_factory=dict, description="JSON schema for the parameter"
     )
 
@@ -140,9 +143,6 @@ class ToolInvocation(BaseModel):
     arguments: dict[str, Any] = Field(default_factory=dict)
 
 
-from .policy_config import ToolPolicyConfig
-
-
 class ToolPolicy(BaseModel):
     # Base flags retained for backward compatibility (if constructed without config)
     allow_network_tools: bool = False
@@ -204,7 +204,7 @@ class ToolPolicy(BaseModel):
             return d
 
         for p in spec.parameters:
-            if depth(p.schema) > self.max_schema_depth:
+            if depth(p.param_schema) > self.max_schema_depth:
                 raise ValueError("parameter schema too deep")
         if depth(spec.returns_schema) > self.max_schema_depth:
             raise ValueError("returns schema too deep")

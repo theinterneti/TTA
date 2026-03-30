@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Verify-priority1-jwt-fix]]
 Verification Script for Priority 1: JWT Authentication Fix
 
 This script verifies that:

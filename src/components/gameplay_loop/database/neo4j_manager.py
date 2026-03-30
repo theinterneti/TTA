@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Database/Neo4j_manager]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Database/Neo4j_manager]]
 Neo4j Manager for Gameplay Loop
 
 This module provides Neo4j database management functionality for the therapeutic text adventure
@@ -11,7 +14,7 @@ from datetime import datetime
 from typing import Any
 
 import redis.asyncio as redis
-from neo4j import AsyncGraphDatabase
+from neo4j import AsyncDriver, AsyncGraphDatabase
 
 from ..models.core import Choice, Scene, SessionState
 from .schema import GameplayLoopSchema
@@ -34,8 +37,8 @@ class Neo4jGameplayManager:
         self.neo4j_password = neo4j_password
         self.redis_url = redis_url
 
-        self._neo4j_driver = None
-        self._redis_client = None
+        self._neo4j_driver: AsyncDriver | None = None
+        self._redis_client: redis.Redis | None = None  # type: ignore[type-arg]
         self.schema = GameplayLoopSchema()
 
     async def initialize(self) -> bool:
@@ -52,7 +55,7 @@ class Neo4jGameplayManager:
 
             # Initialize Redis
             self._redis_client = redis.from_url(self.redis_url)
-            await self._redis_client.ping()
+            await self._redis_client.ping()  # type: ignore[misc]
             logger.info("Redis connection established")
 
             # Initialize schema
@@ -64,7 +67,7 @@ class Neo4jGameplayManager:
             logger.error(f"Database initialization failed: {e}")
             return False
 
-    async def close(self):
+    async def close(self) -> None:
         """Close database connections."""
         if self._neo4j_driver:
             await self._neo4j_driver.close()
@@ -75,6 +78,7 @@ class Neo4jGameplayManager:
     async def create_session(self, session_state: SessionState) -> bool:
         """Create a new gameplay session in Neo4j."""
         try:
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 CREATE (s:{self.schema.NODE_LABELS["SESSION"]} {{
@@ -99,7 +103,7 @@ class Neo4jGameplayManager:
                 """
 
                 result = await session.run(
-                    query,
+                    query,  # type: ignore[arg-type]
                     {
                         "session_id": session_state.session_id,
                         "user_id": session_state.user_id,
@@ -142,13 +146,14 @@ class Neo4jGameplayManager:
                 return cached_session
 
             # Fallback to Neo4j
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
                 RETURN s
                 """
 
-                result = await session.run(query, {"session_id": session_id})
+                result = await session.run(query, {"session_id": session_id})  # type: ignore[arg-type]
                 record = await result.single()
 
                 if record:
@@ -168,6 +173,7 @@ class Neo4jGameplayManager:
     async def update_session(self, session_state: SessionState) -> bool:
         """Update session state in both Neo4j and Redis."""
         try:
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 MATCH (s:{self.schema.NODE_LABELS["SESSION"]} {{session_id: $session_id}})
@@ -185,7 +191,7 @@ class Neo4jGameplayManager:
                 """
 
                 result = await session.run(
-                    query,
+                    query,  # type: ignore[arg-type]
                     {
                         "session_id": session_state.session_id,
                         "current_scene_id": session_state.current_scene_id,
@@ -217,6 +223,7 @@ class Neo4jGameplayManager:
     async def create_scene(self, scene: Scene) -> bool:
         """Create a new scene in Neo4j."""
         try:
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 CREATE (sc:{self.schema.NODE_LABELS["SCENE"]} {{
@@ -239,7 +246,7 @@ class Neo4jGameplayManager:
                 """
 
                 result = await session.run(
-                    query,
+                    query,  # type: ignore[arg-type]
                     {
                         "scene_id": scene.scene_id,
                         "title": scene.title,
@@ -268,13 +275,14 @@ class Neo4jGameplayManager:
     async def get_scene(self, scene_id: str) -> Scene | None:
         """Retrieve a scene by ID."""
         try:
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 MATCH (sc:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
                 RETURN sc
                 """
 
-                result = await session.run(query, {"scene_id": scene_id})
+                result = await session.run(query, {"scene_id": scene_id})  # type: ignore[arg-type]
                 record = await result.single()
 
                 if record:
@@ -291,17 +299,20 @@ class Neo4jGameplayManager:
     async def _cache_session_state(self, session_state: SessionState) -> None:
         """Cache session state in Redis."""
         try:
+            assert self._redis_client is not None, "Redis client not initialized"
             cache_key = f"session:{session_state.session_id}"
             session_data = session_state.model_dump_json()
-            await self._redis_client.setex(cache_key, 3600, session_data)  # 1 hour TTL
+            await self._redis_client.setex(cache_key, 3600, session_data)  # type: ignore[misc]
         except Exception as e:
             logger.warning(f"Failed to cache session state: {e}")
 
     async def _get_cached_session_state(self, session_id: str) -> SessionState | None:
         """Retrieve cached session state from Redis."""
         try:
+            if self._redis_client is None:
+                return None
             cache_key = f"session:{session_id}"
-            cached_data = await self._redis_client.get(cache_key)
+            cached_data = await self._redis_client.get(cache_key)  # type: ignore[misc]
             if cached_data:
                 session_dict = json.loads(cached_data)
                 return SessionState(**session_dict)
@@ -347,6 +358,7 @@ class Neo4jGameplayManager:
     async def create_choice(self, choice: Choice) -> bool:
         """Create a new choice in Neo4j."""
         try:
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 CREATE (c:{self.schema.NODE_LABELS["CHOICE"]} {{
@@ -371,11 +383,11 @@ class Neo4jGameplayManager:
                 """
 
                 result = await session.run(
-                    query,
+                    query,  # type: ignore[arg-type]
                     {
                         "choice_id": choice.choice_id,
                         "scene_id": choice.scene_id,
-                        "text": choice.text,
+                        "text": choice.choice_text,
                         "description": choice.description,
                         "choice_type": choice.choice_type.value,
                         "difficulty_level": choice.difficulty_level.value,
@@ -404,6 +416,7 @@ class Neo4jGameplayManager:
     async def get_scene_choices(self, scene_id: str) -> list[Choice]:
         """Get all choices for a specific scene."""
         try:
+            assert self._neo4j_driver is not None, "Neo4j driver not initialized"
             async with self._neo4j_driver.session() as session:
                 query = f"""
                 MATCH (sc:{self.schema.NODE_LABELS["SCENE"]} {{scene_id: $scene_id}})
@@ -414,7 +427,7 @@ class Neo4jGameplayManager:
                 ORDER BY c.created_at
                 """
 
-                result = await session.run(query, {"scene_id": scene_id})
+                result = await session.run(query, {"scene_id": scene_id})  # type: ignore[arg-type]
                 choices = []
 
                 async for record in result:
@@ -428,10 +441,30 @@ class Neo4jGameplayManager:
             logger.error(f"Failed to get scene choices: {e}")
             return []
 
+    async def save_session_summary(
+        self, session_id: str, summary: dict[str, Any]
+    ) -> bool:
+        """Save session summary (stored in Redis for now)."""
+        try:
+            if self._redis_client is None:
+                return False
+            cache_key = f"session_summary:{session_id}"
+            await self._redis_client.setex(  # type: ignore[misc]
+                cache_key, 86400, json.dumps(summary)
+            )
+            logger.info(f"Saved session summary for {session_id}")
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to save session summary: {e}")
+            return False
+
     def _neo4j_record_to_choice(self, record: dict[str, Any]) -> Choice:
         """Convert Neo4j record to Choice object."""
         # Convert datetime strings back to datetime objects if needed
         if isinstance(record.get("created_at"), str):
             record["created_at"] = datetime.fromisoformat(record["created_at"])
+        # DB stores "text" field; map to choice_text
+        if "text" in record and "choice_text" not in record:
+            record["choice_text"] = record.pop("text")
 
         return Choice(**record)

@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/Issue #48: Session Persistence - Implementation Guide]]
 > - **Path:** `.augment/kb/Workflows/Issue #48: Session Persistence - Implementation Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Issue #48: Session Persistence - Implementation Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---

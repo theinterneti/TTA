@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Circuit_breaker]]
 Circuit breaker implementation for workflow error handling and graceful degradation.
 
 Provides configurable failure detection, state management, and recovery mechanisms
@@ -14,13 +16,13 @@ import time
 import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class CircuitBreakerState(str, Enum):
+class CircuitBreakerState(StrEnum):
     """Circuit breaker states following the standard pattern."""
 
     CLOSED = "closed"  # Normal operation, failures counted

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA/Components/Narrative_arc_orchestrator/Scale_manager]]
 ScaleManager extracted from narrative_arc_orchestrator_component.
 Implements impact assessment, causal maintenance, and conflict resolution.
 """
@@ -34,30 +36,9 @@ from .models import (
     Resolution,
     ScaleConflict,
 )
-from .resolution_engine import build_simple_resolution
+from .resolution_engine import apply_resolution, build_simple_resolution
 
 logger = logging.getLogger(__name__)
-
-# Robust event loop policy for test environments
-try:
-    import asyncio
-
-    class _RobustEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
-        def get_event_loop(self):
-            try:
-                return super().get_event_loop()
-            except RuntimeError:
-                loop = self.new_event_loop()
-                self.set_event_loop(loop)
-                return loop
-
-    # Only set policy if not already robust
-    current_policy = asyncio.get_event_loop_policy()
-    if not isinstance(current_policy, _RobustEventLoopPolicy):
-        asyncio.set_event_loop_policy(_RobustEventLoopPolicy())
-except Exception as e:
-    # If setting a policy fails, log and continue; tests that use asyncio.run(...) will manage loops
-    logger.debug("Failed to set event loop policy: %s", e)
 
 
 class ScaleManager:
@@ -140,6 +121,7 @@ class ScaleManager:
             conflicts.extend(await self._detect_character_conflicts())
             conflicts.extend(await self._detect_thematic_conflicts())
             conflicts.extend(await self._detect_therapeutic_conflicts())
+            self.active_conflicts = conflicts
             return conflicts
         except Exception as e:
             logger.error(f"Error detecting scale conflicts: {e}")
@@ -309,7 +291,31 @@ class ScaleManager:
 
     async def _implement_resolution(self, resolution: Resolution) -> None:
         logger.debug(f"Implementing resolution {resolution.resolution_id}")
-        # Placeholder
+        applied_resolution = apply_resolution(resolution)
+        affected_event_values = applied_resolution.get("affected_events", [])
+        affected_events = (
+            set(affected_event_values)
+            if isinstance(affected_event_values, list)
+            else set()
+        )
+        recommended_action = str(applied_resolution.get("recommended_action", "adjust"))
+
+        for event in self.get_active_events():
+            if event.event_id not in affected_events:
+                continue
+            event.metadata.setdefault("resolution_ids", []).append(
+                resolution.resolution_id
+            )
+            event.metadata["therapeutic_mitigation"] = recommended_action
+            event.metadata.setdefault("resolved_conflict_ids", []).append(
+                resolution.conflict_id
+            )
+
+        self.active_conflicts = [
+            conflict
+            for conflict in self.active_conflicts
+            if conflict.conflict_id != resolution.conflict_id
+        ]
 
 
 __all__ = ["ScaleManager"]

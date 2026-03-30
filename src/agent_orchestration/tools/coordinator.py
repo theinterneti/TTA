@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Coordinator]]
 ToolCoordinator for dynamic tool generation, validation, and sharing (Task 7.1).
 """
 
@@ -8,6 +10,7 @@ import asyncio
 import contextlib
 import time
 from collections.abc import Awaitable, Callable
+from typing import cast
 
 from .metrics import get_tool_metrics, run_with_metrics
 from .models import ToolPolicy, ToolSpec
@@ -37,11 +40,10 @@ class ToolCoordinator:
         # Acquire a per-signature lock to avoid duplicate creation across tasks.
         async with self._lock_for(signature):
             # Build spec via factory
-            spec = (
-                await factory_fn()
-                if asyncio.iscoroutinefunction(factory_fn)
-                else factory_fn()
-            )
+            if asyncio.iscoroutinefunction(factory_fn):
+                spec = cast(ToolSpec, await factory_fn())
+            else:
+                spec = cast(ToolSpec, factory_fn())
             # Validate safety and constraints before registration
             self._policy.check_safety(spec)
             now = time.time()

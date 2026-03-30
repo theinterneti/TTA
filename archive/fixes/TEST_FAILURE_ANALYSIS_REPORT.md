@@ -371,3 +371,7 @@ uv run pytest -q --tb=short --cov=src --cov-report=xml:coverage-unit.xml
 
 **Report Status:** ✅ COMPLETE
 **Next Action:** Fix import errors, then re-run tests
+
+
+---
+**Logseq:** [[TTA.dev/Archive/Fixes/Test_failure_analysis_report]]

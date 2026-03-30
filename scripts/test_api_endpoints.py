@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_api_endpoints]]
 API Endpoint Testing Script for TTA Core Gameplay Loop Integration
 
 This script performs comprehensive testing of the gameplay API endpoints

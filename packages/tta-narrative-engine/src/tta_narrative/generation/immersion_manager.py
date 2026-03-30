@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/Immersion_manager]]
 Immersion Manager for Therapeutic Text Adventure
 
 This module implements immersion management functionality that enhances
@@ -9,7 +11,7 @@ while maintaining therapeutic effectiveness.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import EmotionalState, Scene, SceneType, SessionState
@@ -17,7 +19,7 @@ from ..models.core import EmotionalState, Scene, SceneType, SessionState
 logger = logging.getLogger(__name__)
 
 
-class ImmersionTechnique(str, Enum):
+class ImmersionTechnique(StrEnum):
     """Techniques for enhancing narrative immersion."""
 
     SENSORY_DETAIL = "sensory_detail"
@@ -29,7 +31,7 @@ class ImmersionTechnique(str, Enum):
     PERSONAL_CONNECTION = "personal_connection"
 
 
-class ImmersionLevel(str, Enum):
+class ImmersionLevel(StrEnum):
     """Levels of immersion to target."""
 
     MINIMAL = "minimal"

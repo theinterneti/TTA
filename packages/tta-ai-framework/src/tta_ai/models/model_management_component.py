@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Model_management_component]]
 Model Management Component.
 
 This module provides the main component for comprehensive AI model management

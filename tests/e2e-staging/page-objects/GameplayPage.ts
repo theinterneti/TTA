@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/Page-objects/Gameplaypage]]
 /**
  * Gameplay Page Object
  *

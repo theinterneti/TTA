@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Agent_orchestration/Proxies]]
 from __future__ import annotations
 
 import asyncio
@@ -771,7 +772,9 @@ class NarrativeGeneratorAgentProxy(Agent):
             if score > 0:
                 tone_scores[tone] = score
 
-        return max(tone_scores, key=tone_scores.get) if tone_scores else "neutral"
+        return (
+            max(tone_scores, key=lambda k: tone_scores[k]) if tone_scores else "neutral"
+        )
 
     def _identify_therapeutic_elements(self, story: str) -> list[str]:
         """Identify therapeutic elements in the narrative."""

@@ -173,3 +173,7 @@ This document describes the comprehensive monitoring metrics and dashboards for 
 - Monitor session duration and activity patterns
 - Add geographic distribution of authentication attempts
 - Implement anomaly detection for unusual authentication patterns
+
+
+---
+**Logseq:** [[TTA.dev/Monitoring/Authentication_metrics]]

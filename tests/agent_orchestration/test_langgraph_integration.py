@@ -1,5 +1,7 @@
 """Tests for agent_orchestration.langgraph_integration module."""
 
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_langgraph_integration]]
+
 
 class TestLanggraphIntegration:
     """Tests for langgraph integration module."""

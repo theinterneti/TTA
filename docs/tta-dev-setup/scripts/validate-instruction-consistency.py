@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+
 Instruction Consistency Validator
 
 Checks that .instructions.md files follow standards and don't conflict.

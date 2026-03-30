@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Unified_orchestrator]]
 Unified Agent Orchestrator for IPA → WBA → NGA coordination.
 
 This module provides a high-level orchestrator that coordinates the three main agents
@@ -12,11 +14,20 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
 import redis.asyncio as aioredis
+
+try:
+    from ttadev.primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        LambdaPrimitive,
+        SequentialPrimitive,
+        WorkflowContext,
+    )
 
 from .adapters import IPAAdapter, NGAAdapter, RetryConfig, WBAAdapter
 from .therapeutic_safety import SafetyLevel, get_global_safety_service
@@ -43,8 +54,8 @@ class OrchestrationState:
     player_id: str
     phase: OrchestrationPhase
     user_input: str
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Phase results
     ipa_result: dict[str, Any] | None = None
@@ -157,7 +168,7 @@ class UnifiedAgentOrchestrator:
         try:
             # Connect to Redis
             self.redis = aioredis.from_url(self.redis_url, decode_responses=True)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             self.initialized = True
             logger.info("Unified Agent Orchestrator initialized successfully")
@@ -212,31 +223,43 @@ class UnifiedAgentOrchestrator:
             # Save initial state
             await self._save_state(state)
 
-            # Phase 1: Input Processing
-            logger.info(f"[{workflow_id}] Phase 1: Input Processing")
-            state = await self._process_input_phase(state)
-            await self._save_state(state)
-
-            # Safety check after input processing
+            # Safety validation on raw input (pre-pipeline)
+            safety_result = await self.safety_service.validate_text(state.user_input)
+            state.safety_level = safety_result.level
             if state.safety_level in [SafetyLevel.BLOCKED, SafetyLevel.WARNING]:
                 logger.warning(
-                    f"[{workflow_id}] Safety concern detected: {state.safety_level.value}"
+                    f"[{workflow_id}] Safety concern on input: {state.safety_level.value}"
                 )
                 return await self._handle_safety_concern(state)
 
-            # Phase 2: World Building
-            logger.info(f"[{workflow_id}] Phase 2: World Building")
-            state = await self._process_world_building_phase(state)
-            await self._save_state(state)
+            # Execute IPA→WBA→NGA pipeline as a single observable unit
+            logger.info(f"[{workflow_id}] Executing IPA→WBA→NGA pipeline")
+            pipeline = self._build_agent_pipeline()
+            pipeline_ctx = WorkflowContext(workflow_id=workflow_id)
+            pipeline_input: dict[str, Any] = {
+                "user_input": state.user_input,
+                "session_id": state.session_id,
+                "player_id": state.player_id,
+                "world_context": state.world_context,
+                "therapeutic_context": state.therapeutic_context,
+                "safety_level": state.safety_level.value,
+                "ipa_result": None,
+                "wba_result": None,
+                "nga_result": None,
+            }
+            pipeline_output = await pipeline.execute(pipeline_input, pipeline_ctx)
 
-            # Phase 3: Narrative Generation
-            logger.info(f"[{workflow_id}] Phase 3: Narrative Generation")
-            state = await self._process_narrative_phase(state)
+            # Map pipeline results back to orchestration state
+            state.ipa_result = pipeline_output["ipa_result"]
+            state.wba_result = pipeline_output["wba_result"]
+            state.nga_result = pipeline_output["nga_result"]
+            state.world_context = pipeline_output["world_context"]
+            state.updated_at = datetime.now(UTC)
             await self._save_state(state)
 
             # Mark as complete
             state.phase = OrchestrationPhase.COMPLETE
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
             await self._save_state(state)
 
             logger.info(f"[{workflow_id}] Workflow completed successfully")
@@ -244,8 +267,8 @@ class UnifiedAgentOrchestrator:
             return {
                 "workflow_id": workflow_id,
                 "success": True,
-                "narrative": state.nga_result.get("story", ""),
-                "intent": state.ipa_result.get("routing", {}).get("intent"),
+                "narrative": (state.nga_result or {}).get("story", ""),
+                "intent": (state.ipa_result or {}).get("routing", {}).get("intent"),
                 "world_updates": state.wba_result,
                 "safety_level": state.safety_level.value,
                 "complete_state": state.to_dict(),
@@ -265,6 +288,103 @@ class UnifiedAgentOrchestrator:
                 "safety_level": state.safety_level.value,
             }
 
+    def _build_agent_pipeline(self) -> SequentialPrimitive:
+        """Build the IPA→WBA→NGA agent pipeline as a SequentialPrimitive.
+
+        Each lambda receives a growing state dict and returns an updated version.
+        The SequentialPrimitive name is set to 'ipa_wba_nga_pipeline' so the
+        EnhancedMetricsCollector records metrics under that prefix.
+        """
+
+        async def ipa_step(
+            data: dict[str, Any], ctx: WorkflowContext
+        ) -> dict[str, Any]:
+            result = await self.ipa_adapter.process_input(
+                data["user_input"], session_id=data["session_id"]
+            )
+            return {**data, "ipa_result": result}
+
+        async def wba_step(
+            data: dict[str, Any], ctx: WorkflowContext
+        ) -> dict[str, Any]:
+            ipa_result = data.get("ipa_result") or {}
+            intent = ipa_result.get("routing", {}).get("intent", "unknown")
+            entities = ipa_result.get("routing", {}).get("entities", {})
+            world_id = data["world_context"].get("world_id", data["session_id"])
+            updates = {
+                "intent": intent,
+                "entities": entities,
+                "player_id": data["player_id"],
+                "session_id": data["session_id"],
+            }
+            wba_result = await self.wba_adapter.process_world_request(
+                world_id=world_id,
+                updates=updates,
+                session_id=data["session_id"],
+            )
+            world_context = dict(data["world_context"])
+            if wba_result.get("world_state"):
+                world_context.update(wba_result["world_state"])
+            return {**data, "wba_result": wba_result, "world_context": world_context}
+
+        async def nga_step(
+            data: dict[str, Any], ctx: WorkflowContext
+        ) -> dict[str, Any]:
+            ipa_result = data.get("ipa_result") or {}
+            intent = ipa_result.get("routing", {}).get("intent")
+            entities = ipa_result.get("routing", {}).get("entities", {})
+            nga_context: dict[str, Any] = {
+                "world_state": data["world_context"],
+                "intent": intent,
+                "entities": entities,
+                "world_updates": data.get("wba_result"),
+                "therapeutic_context": data["therapeutic_context"],
+                "safety_level": data["safety_level"],
+            }
+            world_updates_desc = (data.get("wba_result") or {}).get("description", "")
+            prompt = f"Player input: {data['user_input']}\n"
+            prompt += f"Detected intent: {intent or 'unknown'}\n"
+            if world_updates_desc:
+                prompt += f"World changes: {world_updates_desc}\n"
+            prompt += (
+                "\nGenerate a narrative response that:"
+                "\n- Acknowledges the player's action"
+                "\n- Describes the world changes"
+                "\n- Maintains therapeutic tone"
+                "\n- Encourages continued engagement"
+            )
+            nga_result = await self.nga_adapter.generate_narrative(
+                prompt=prompt, context=nga_context, session_id=data["session_id"]
+            )
+            world_context_meta = nga_result.get("world_context_meta") or {}
+            tokens = world_context_meta.get("total_tokens")
+            if not tokens:
+                # Fallback: approximate from prompt length when NGAAdapter
+                # doesn't propagate world_context_meta (real path).
+                tokens = max(len(prompt) // 4, 1)
+            ctx.state["nga.context_window_tokens"] = tokens
+            logger.debug(
+                "nga.context_window_tokens=%d session_id=%s",
+                tokens,
+                data["session_id"],
+            )
+            return {**data, "nga_result": nga_result}
+
+        pipeline = SequentialPrimitive(
+            [
+                LambdaPrimitive(ipa_step),
+                LambdaPrimitive(wba_step),
+                LambdaPrimitive(nga_step),
+            ]
+        )
+        pipeline.name = "ipa_wba_nga_pipeline"
+        return pipeline
+
+    # ---------------------------------------------------------------------------
+    # Deprecated phase methods — kept for backward compatibility with existing
+    # tests. New code should use _build_agent_pipeline() via process_user_input().
+    # ---------------------------------------------------------------------------
+
     async def _process_input_phase(
         self, state: OrchestrationState
     ) -> OrchestrationState:
@@ -279,7 +399,7 @@ class UnifiedAgentOrchestrator:
             state.ipa_result = ipa_result
 
             state.phase = OrchestrationPhase.WORLD_BUILDING
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
 
             return state
 
@@ -293,8 +413,10 @@ class UnifiedAgentOrchestrator:
         """Process world updates through WBA."""
         try:
             # Extract intent and entities from IPA result
-            intent = state.ipa_result.get("routing", {}).get("intent", "unknown")
-            entities = state.ipa_result.get("routing", {}).get("entities", {})
+            intent = (
+                (state.ipa_result or {}).get("routing", {}).get("intent", "unknown")
+            )
+            entities = (state.ipa_result or {}).get("routing", {}).get("entities", {})
 
             # Build world update request
             world_id = state.world_context.get("world_id", state.session_id)
@@ -316,7 +438,7 @@ class UnifiedAgentOrchestrator:
                 state.world_context.update(wba_result["world_state"])
 
             state.phase = OrchestrationPhase.NARRATIVE_GENERATION
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
 
             return state
 
@@ -335,8 +457,10 @@ class UnifiedAgentOrchestrator:
             # Prepare context for NGA
             nga_context = {
                 "world_state": state.world_context,
-                "intent": state.ipa_result.get("routing", {}).get("intent"),
-                "entities": state.ipa_result.get("routing", {}).get("entities", {}),
+                "intent": (state.ipa_result or {}).get("routing", {}).get("intent"),
+                "entities": (state.ipa_result or {})
+                .get("routing", {})
+                .get("entities", {}),
                 "world_updates": state.wba_result,
                 "therapeutic_context": state.therapeutic_context,
                 "safety_level": state.safety_level.value,
@@ -348,7 +472,7 @@ class UnifiedAgentOrchestrator:
             )
             state.nga_result = nga_result
 
-            state.updated_at = datetime.utcnow()
+            state.updated_at = datetime.now(UTC)
 
             return state
 
@@ -358,8 +482,8 @@ class UnifiedAgentOrchestrator:
 
     def _build_narrative_prompt(self, state: OrchestrationState) -> str:
         """Build a narrative generation prompt from the current state."""
-        intent = state.ipa_result.get("routing", {}).get("intent", "unknown")
-        world_updates = state.wba_result.get("description", "")
+        intent = (state.ipa_result or {}).get("routing", {}).get("intent", "unknown")
+        world_updates = (state.wba_result or {}).get("description", "")
 
         prompt = f"Player input: {state.user_input}\n"
         prompt += f"Detected intent: {intent}\n"

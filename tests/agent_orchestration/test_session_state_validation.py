@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_session_state_validation]]
 Session context and state management validation tests.
 
 This module provides comprehensive validation of session management,

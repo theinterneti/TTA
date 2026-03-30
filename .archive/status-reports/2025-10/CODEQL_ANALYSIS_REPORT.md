@@ -119,3 +119,7 @@
 | **Pre-existing violations** | 30+ | ⚠️ KNOWN |
 | **Blocking issues** | 0 | ✅ NONE |
 | **Merge recommendation** | - | ✅ PROCEED |
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Codeql_analysis_report]]

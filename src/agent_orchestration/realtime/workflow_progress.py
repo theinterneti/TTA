@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Workflow_progress]]
 Incremental update mechanisms for workflow progress tracking.
 
 This module provides workflow progress tracking with incremental updates,
@@ -13,7 +15,7 @@ import logging
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -24,7 +26,7 @@ from .models import (
 logger = logging.getLogger(__name__)
 
 
-class WorkflowStage(str, Enum):
+class WorkflowStage(StrEnum):
     """Workflow execution stages."""
 
     INITIALIZING = "initializing"

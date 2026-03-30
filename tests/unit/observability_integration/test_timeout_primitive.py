@@ -1,5 +1,7 @@
 """Unit tests for TimeoutPrimitive (wrapper-based implementation)."""
 
+# Logseq: [[TTA.dev/Tests/Unit/Observability_integration/Test_timeout_primitive]]
+
 import asyncio
 from unittest.mock import MagicMock
 

@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/__init__]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/__init__]]
 Core Gameplay Loop Data Models
 
 This module provides the foundational data models for the therapeutic text adventure
@@ -17,6 +20,7 @@ from .core import (
 )
 from .interactions import (
     ChoiceOutcome,
+    GameplaySession,
     NarrativeEvent,
     TherapeuticIntervention,
     UserChoice,
@@ -24,10 +28,22 @@ from .interactions import (
 from .progress import (
     CharacterState,
     ProgressMarker,
+    ProgressType,
     SkillDevelopment,
     TherapeuticProgress,
 )
 from .validation import SafetyCheck, TherapeuticValidation, ValidationResult
+from .world_seed import (
+    GuideCharacter,
+    MagicPresence,
+    Motivation,
+    PlayerPosition,
+    PowerSource,
+    TechLevel,
+    WorldScale,
+    WorldSeed,
+    WorldTone,
+)
 
 __all__ = [
     # Core models
@@ -42,10 +58,12 @@ __all__ = [
     # Interaction models
     "UserChoice",
     "ChoiceOutcome",
+    "GameplaySession",
     "NarrativeEvent",
     "TherapeuticIntervention",
     # Progress models
     "ProgressMarker",
+    "ProgressType",
     "TherapeuticProgress",
     "CharacterState",
     "SkillDevelopment",
@@ -53,4 +71,14 @@ __all__ = [
     "ValidationResult",
     "SafetyCheck",
     "TherapeuticValidation",
+    # World Seed models
+    "WorldSeed",
+    "WorldTone",
+    "PowerSource",
+    "PlayerPosition",
+    "WorldScale",
+    "TechLevel",
+    "MagicPresence",
+    "Motivation",
+    "GuideCharacter",
 ]

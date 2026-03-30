@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Primitives/Error_recovery]]
 Error Recovery Framework for Development Scripts.
 
 This module provides error recovery patterns for development automation,

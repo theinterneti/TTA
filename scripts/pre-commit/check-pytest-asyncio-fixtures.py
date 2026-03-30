@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Pre-commit/Check-pytest-asyncio-fixtures]]
 Pre-commit hook to validate pytest-asyncio fixture decorators.
 
 This hook checks that async test fixtures use @pytest_asyncio.fixture

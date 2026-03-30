@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_redis_agent_registry]]
 import asyncio
 import json
 
@@ -51,6 +52,7 @@ async def test_snapshot_async_combines_local_and_redis(redis_client):
     await asyncio.sleep(0.05)
 
     snap = await reg.snapshot_async()
-    assert "local" in snap and "redis_index" in snap
+    assert "local" in snap
+    assert "redis_index" in snap
     assert a.name in snap["local"]
     assert any((d.get("name") == a.name) for d in snap["redis_index"])

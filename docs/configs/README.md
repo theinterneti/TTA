@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/References/Tool Policy Configuration Examples]]
 > - **Path:** `.augment/kb/References/Tool Policy Configuration Examples.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/References/Tool Policy Configuration Examples.md`
 
 **Migration date:** 2025-11-01
+
+
+---

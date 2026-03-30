@@ -1,10 +1,13 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Session_repository]]
 Session repository for database operations.
 
 Handles persistence and retrieval of session data including session context,
 progress markers, and session state management.
 """
 
+import copy
 import json
 import logging
 from dataclasses import asdict
@@ -24,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 class SessionRepository:
     """Repository for session data persistence and retrieval."""
+
+    _memory_sessions: dict[str, dict[str, Any]] = {}
 
     def __init__(self, redis_client=None, neo4j_driver=None):
         """
@@ -48,10 +53,11 @@ class SessionRepository:
             bool: True if session was created successfully
         """
         try:
+            session_data = self._serialize_session_context(session_context)
+
             # Store in Redis for fast access
             if self.redis_client:
                 session_key = f"session:{session_context.session_id}"
-                session_data = self._serialize_session_context(session_context)
                 await self.redis_client.setex(
                     session_key, self._session_cache_ttl, json.dumps(session_data)
                 )
@@ -59,6 +65,11 @@ class SessionRepository:
             # Store in Neo4j for persistence
             if self.neo4j_driver:
                 await self._create_session_in_neo4j(session_context)
+
+            # Mirror to in-memory storage so test/dev flows work without external DBs
+            self._memory_sessions[session_context.session_id] = copy.deepcopy(
+                session_data
+            )
 
             logger.info(f"Created session {session_context.session_id}")
             return True
@@ -88,7 +99,13 @@ class SessionRepository:
 
             # Fall back to Neo4j
             if self.neo4j_driver:
-                return await self._get_session_from_neo4j(session_id)
+                session = await self._get_session_from_neo4j(session_id)
+                if session is not None:
+                    return session
+
+            memory_session = self._memory_sessions.get(session_id)
+            if memory_session is not None:
+                return self._deserialize_session_context(copy.deepcopy(memory_session))
 
             return None
 
@@ -107,10 +124,11 @@ class SessionRepository:
             bool: True if session was updated successfully
         """
         try:
+            session_data = self._serialize_session_context(session_context)
+
             # Update Redis cache
             if self.redis_client:
                 session_key = f"session:{session_context.session_id}"
-                session_data = self._serialize_session_context(session_context)
                 await self.redis_client.setex(
                     session_key, self._session_cache_ttl, json.dumps(session_data)
                 )
@@ -118,6 +136,10 @@ class SessionRepository:
             # Update Neo4j
             if self.neo4j_driver:
                 await self._update_session_in_neo4j(session_context)
+
+            self._memory_sessions[session_context.session_id] = copy.deepcopy(
+                session_data
+            )
 
             logger.info(f"Updated session {session_context.session_id}")
             return True
@@ -197,7 +219,9 @@ class SessionRepository:
                 return await self._get_player_sessions_from_neo4j(
                     player_id, [SessionStatus.ACTIVE, SessionStatus.PAUSED]
                 )
-            return []
+            return self._get_player_sessions_from_memory(
+                player_id, [SessionStatus.ACTIVE, SessionStatus.PAUSED]
+            )
 
         except Exception as e:
             logger.error(f"Failed to get active sessions for player {player_id}: {e}")
@@ -221,7 +245,14 @@ class SessionRepository:
                     character_id, [SessionStatus.ACTIVE]
                 )
                 return sessions[0] if sessions else None
-            return None
+            sessions = [
+                session
+                for session in self._get_player_sessions_from_memory(
+                    player_id="", statuses=[SessionStatus.ACTIVE, SessionStatus.PAUSED]
+                )
+                if session.character_id == character_id
+            ]
+            return sessions[0] if sessions else None
 
         except Exception as e:
             logger.error(
@@ -245,11 +276,52 @@ class SessionRepository:
         try:
             if self.neo4j_driver:
                 return await self._get_session_summaries_from_neo4j(player_id, limit)
-            return []
+            sessions = self._get_player_sessions_from_memory(
+                player_id,
+                [SessionStatus.ACTIVE, SessionStatus.PAUSED, SessionStatus.COMPLETED],
+            )
+            summaries = [self._build_session_summary(session) for session in sessions]
+            return summaries[:limit]
 
         except Exception as e:
             logger.error(f"Failed to get session summaries for player {player_id}: {e}")
             return []
+
+    def _get_player_sessions_from_memory(
+        self, player_id: str, statuses: list[SessionStatus]
+    ) -> list[SessionContext]:
+        """Get sessions from shared in-memory storage."""
+        sessions: list[SessionContext] = []
+        for session_data in self._memory_sessions.values():
+            session = self._deserialize_session_context(copy.deepcopy(session_data))
+            if player_id and session.player_id != player_id:
+                continue
+            if session.status in statuses:
+                sessions.append(session)
+
+        sessions.sort(key=lambda session: session.last_interaction, reverse=True)
+        return sessions
+
+    def _build_session_summary(self, session: SessionContext) -> SessionSummary:
+        """Build a lightweight session summary from a stored context."""
+        return SessionSummary(
+            session_id=session.session_id,
+            character_name=session.character_id,
+            world_name=session.world_id,
+            start_time=session.created_at,
+            end_time=(
+                session.last_interaction
+                if session.status == SessionStatus.COMPLETED
+                else None
+            ),
+            duration_minutes=max(0, session.total_duration_minutes),
+            status=session.status,
+            progress_markers_count=len(session.progress_markers),
+            therapeutic_interventions_count=len(session.therapeutic_interventions_used),
+            key_achievements=[
+                marker.description for marker in session.progress_markers
+            ],
+        )
 
     def _serialize_session_context(self, session: SessionContext) -> dict[str, Any]:
         """Serialize session context for storage."""

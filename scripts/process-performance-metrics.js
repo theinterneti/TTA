@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Scripts/Process-performance-metrics]]
 #!/usr/bin/env node
 
 /**

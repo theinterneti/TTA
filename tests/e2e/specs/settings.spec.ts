@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Specs/Settings.spec]]
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/LoginPage';
 import { SettingsPage } from '../page-objects/SettingsPage';

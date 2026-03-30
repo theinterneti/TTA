@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+
 TTA Home Lab QA Test Runner
 Comprehensive quality assurance testing orchestrator for TTA storytelling system
 """

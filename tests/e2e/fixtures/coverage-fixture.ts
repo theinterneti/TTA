@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Fixtures/Coverage-fixture]]
 import { test as base } from '@playwright/test';
 import { startCoverage, stopCoverage } from '../utils/coverage-helper';
 

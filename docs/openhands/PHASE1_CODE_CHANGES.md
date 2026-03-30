@@ -326,3 +326,6 @@ def test_non_blocking_methods_signature(self, generator):
 
 **For usage examples, see**: `QUICK_START_ASYNC.md`
 **For detailed analysis, see**: `PHASE1_IMPLEMENTATION_COMPLETE.md`
+
+
+---

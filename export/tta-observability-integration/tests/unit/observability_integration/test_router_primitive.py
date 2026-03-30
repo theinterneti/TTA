@@ -1,5 +1,7 @@
 """Unit tests for RouterPrimitive (wrapper-based implementation)."""
 
+# Logseq: [[TTA.dev/Export/Tta-observability-integration/Tests/Unit/Observability_integration/Test_router_primitive]]
+
 from unittest.mock import MagicMock, patch
 
 import pytest

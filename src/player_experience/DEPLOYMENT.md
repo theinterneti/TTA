@@ -227,3 +227,7 @@ python test_deployment.py --environment staging --output results.json
 ```
 
 This deployment guide provides comprehensive coverage of all deployment scenarios and troubleshooting steps for the Player Experience Interface.
+
+
+---
+**Logseq:** [[TTA.dev/Player_experience/Deployment]]

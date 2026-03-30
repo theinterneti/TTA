@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/API Endpoint Specification Template.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Specs/Api-endpoint.spec]]

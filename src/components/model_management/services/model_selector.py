@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Services/Model_selector]]
 Model Selection Service
 
 This module provides intelligent model selection based on task requirements,
@@ -7,6 +9,20 @@ system capabilities, and performance metrics.
 
 import logging
 from datetime import datetime, timedelta
+from typing import Any
+
+try:
+    from ttadev.primitives import (
+        TimeoutPrimitive,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        TimeoutPrimitive,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from ..interfaces import (
     IHardwareDetector,
@@ -20,6 +36,28 @@ from ..interfaces import (
 from ..models import ModelSelectionCriteria, PerformanceMetrics
 
 logger = logging.getLogger(__name__)
+
+
+class _ModelSelectCall(WorkflowPrimitive):
+    """WorkflowPrimitive that executes the actual model selection logic."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        selector: ModelSelector = input_data["selector"]
+        requirements: ModelRequirements = input_data["requirements"]
+        model = await selector._run_selection(requirements)
+        return {"model": model}
+
+
+class _ModelSelectFallback(WorkflowPrimitive):
+    """WorkflowPrimitive that returns None when model selection times out."""
+
+    async def execute(
+        self, input_data: dict[str, Any], context: WorkflowContext
+    ) -> dict[str, Any]:
+        logger.warning("Model selection timed out; returning default (None)")
+        return {"model": None}
 
 
 class ModelSelector(IModelSelector):
@@ -40,7 +78,26 @@ class ModelSelector(IModelSelector):
         self._last_cache_update = {}
 
     async def select_model(self, requirements: ModelRequirements) -> ModelInfo | None:
-        """Select the best model based on requirements."""
+        """Select the best model based on requirements, with configurable timeout."""
+        ctx = WorkflowContext(workflow_id=f"model-select-{id(requirements)}")
+        input_data: dict[str, Any] = {"selector": self, "requirements": requirements}
+        timeout = self.selection_criteria.selection_timeout_seconds
+
+        primitive: WorkflowPrimitive = TimeoutPrimitive(
+            _ModelSelectCall(),
+            timeout_seconds=timeout,
+            fallback=_ModelSelectFallback(),
+        )
+
+        try:
+            result: dict[str, Any] = await primitive.execute(input_data, ctx)
+            return result["model"]  # type: ignore[return-value]
+        except Exception as e:
+            logger.error(f"Model selection failed: {e}")
+            return None
+
+    async def _run_selection(self, requirements: ModelRequirements) -> ModelInfo | None:
+        """Internal: execute the full model selection pipeline."""
         try:
             # Get all available models
             available_models = await self._get_all_available_models()
@@ -106,7 +163,7 @@ class ModelSelector(IModelSelector):
             logger.error(f"Model ranking failed: {e}")
             return models  # Return unranked models as fallback
 
-    async def validate_model_compatibility(
+    async def validate_model_compatibility(  # noqa: PLR0911, PLR0912
         self, model_info: ModelInfo, requirements: ModelRequirements
     ) -> bool:
         """Check if a model is compatible with the requirements."""
@@ -119,14 +176,20 @@ class ModelSelector(IModelSelector):
                     return False
 
             # Check cost requirements
-            if requirements.max_cost_per_token and model_info.cost_per_token:
-                if model_info.cost_per_token > requirements.max_cost_per_token:
-                    return False
+            if (
+                requirements.max_cost_per_token
+                and model_info.cost_per_token
+                and model_info.cost_per_token > requirements.max_cost_per_token
+            ):
+                return False
 
             # Check quality requirements
-            if requirements.min_quality_score and model_info.performance_score:
-                if model_info.performance_score < requirements.min_quality_score:
-                    return False
+            if (
+                requirements.min_quality_score
+                and model_info.performance_score
+                and model_info.performance_score < requirements.min_quality_score
+            ):
+                return False
 
             # Check therapeutic safety
             if requirements.therapeutic_safety_required:
@@ -143,9 +206,12 @@ class ModelSelector(IModelSelector):
                     return False
 
             # Check context length
-            if requirements.context_length_needed and model_info.context_length:
-                if model_info.context_length < requirements.context_length_needed:
-                    return False
+            if (
+                requirements.context_length_needed
+                and model_info.context_length
+                and model_info.context_length < requirements.context_length_needed
+            ):
+                return False
 
             # Check required capabilities
             if requirements.required_capabilities:
@@ -192,7 +258,7 @@ class ModelSelector(IModelSelector):
 
         for model in models:
             if await self.validate_model_compatibility(model, requirements):
-                compatible_models.append(model)
+                compatible_models.append(model)  # noqa: PERF401
 
         return compatible_models
 

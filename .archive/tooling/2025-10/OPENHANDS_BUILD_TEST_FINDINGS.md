@@ -351,3 +351,7 @@ $ find /tmp/openhands_test -type f -name "*.txt"
 **Test Script:** `scripts/openhands_build_component.py`
 **Docker Logs:** Available in terminal output
 **Workspace:** `/tmp/openhands_test` (empty)
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Tooling/2025-10/Openhands_build_test_findings]]

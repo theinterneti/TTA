@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/__init__]]
 Performance monitoring and optimization package for agent orchestration.
 
 This package provides comprehensive performance monitoring, analytics, optimization,

@@ -1,10 +1,13 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/Logging_config]]
 Comprehensive logging configuration for production-grade monitoring.
 
 This module provides structured logging, log aggregation, and integration
 with monitoring systems for the Player Experience Interface.
 """
 
+import contextlib
 import logging
 import logging.handlers
 import os
@@ -13,15 +16,15 @@ import sys
 import threading
 import traceback
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 from pythonjsonlogger import jsonlogger
 
 
-class LogLevel(str, Enum):
+class LogLevel(StrEnum):
     """Log levels for structured logging."""
 
     DEBUG = "DEBUG"
@@ -31,7 +34,7 @@ class LogLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
-class LogCategory(str, Enum):
+class LogCategory(StrEnum):
     """Categories for log messages."""
 
     SYSTEM = "system"
@@ -111,7 +114,7 @@ class StructuredFormatter(jsonlogger.JsonFormatter):  # type: ignore[name-define
         self.service_name = "player-experience-interface"
         self.version = "1.0.0"  # Should be loaded from config
 
-    def add_fields(self, log_record, record, message_dict):
+    def add_fields(self, log_record, record, message_dict):  # type: ignore[override]
         """Add custom fields to log record."""
         super().add_fields(log_record, record, message_dict)
 
@@ -124,7 +127,7 @@ class StructuredFormatter(jsonlogger.JsonFormatter):  # type: ignore[name-define
 
         # Ensure timestamp is in ISO format
         if "timestamp" not in log_record:
-            log_record["timestamp"] = datetime.utcnow().isoformat() + "Z"
+            log_record["timestamp"] = datetime.now(UTC).isoformat() + "Z"
 
         # Add severity mapping for external systems
         level_mapping = {"DEBUG": 0, "INFO": 1, "WARNING": 2, "ERROR": 3, "CRITICAL": 4}
@@ -227,12 +230,8 @@ class AsyncLogHandler(logging.Handler):
 
     def emit(self, record):
         """Emit a log record asynchronously."""
-        try:
+        with contextlib.suppress(queue.Full):
             self.queue.put_nowait(record)
-        except queue.Full:
-            # Drop the log record if queue is full
-            # In production, you might want to implement a different strategy
-            pass
 
     def close(self):
         """Close the handler and clean up resources."""

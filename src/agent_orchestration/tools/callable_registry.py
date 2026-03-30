@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Callable_registry]]
 from __future__ import annotations
 
 import threading

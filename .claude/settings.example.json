@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(uv run:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv lock:*)",
+      "Bash(gh api:*)",
+      "Bash(gh issue:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "hindsight",
+    "codegraphcontext",
+    "sequential-thinking",
+    "github"
+  ]
+}

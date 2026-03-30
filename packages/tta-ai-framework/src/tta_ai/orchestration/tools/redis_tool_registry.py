@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Tools/Redis_tool_registry]]
 Redis-backed ToolRegistry with lifecycle management and caching (Task 7.1/7.2).
 """
 
@@ -7,12 +9,15 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import json
+import logging
 import time
 from typing import Any
 
 from redis.asyncio import Redis
 
 from .models import ToolSpec, ToolStatus
+
+logger = logging.getLogger(__name__)
 
 
 class _LRU:

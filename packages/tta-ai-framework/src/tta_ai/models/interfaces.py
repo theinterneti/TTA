@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Interfaces]]
 Core interfaces for the Model Management System.
 
 This module defines the fundamental interfaces and enums used throughout
@@ -133,7 +135,7 @@ class IModelInstance(ABC):
         pass
 
     @abstractmethod
-    def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
+    def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream."""
         ...
 
@@ -189,7 +191,7 @@ class IModelProvider(ABC):
         """Get metrics for this provider."""
         pass
 
-    async def cleanup(self) -> None:
+    async def cleanup(self) -> None:  # noqa: B027
         """Cleanup provider resources. Optional method with default implementation."""
         # Default implementation: no cleanup needed
         ...
@@ -198,7 +200,7 @@ class IModelProvider(ABC):
         """Get list of free models. Optional method with default implementation."""
         return []
 
-    async def set_free_models_filter(
+    async def set_free_models_filter(  # noqa: B027
         self,
         show_free_only: bool = False,
         prefer_free: bool = True,

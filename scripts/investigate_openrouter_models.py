@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Investigate_openrouter_models]]
 Investigate OpenRouter's available models and their actual IDs.
 
 This script queries OpenRouter's /models endpoint to get the definitive list

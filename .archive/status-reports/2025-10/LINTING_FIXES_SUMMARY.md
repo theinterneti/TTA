@@ -263,3 +263,7 @@ Related: #<issue-number>
 - Ruff documentation: https://docs.astral.sh/ruff/
 - Python PEP 8: https://peps.python.org/pep-0008/
 - GitHub Actions docs: https://docs.github.com/en/actions
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Linting_fixes_summary]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Mocks/__init__]]
 Mock implementations for database and external services.
 
 Provides mock implementations for Neo4j, Redis, and other external dependencies

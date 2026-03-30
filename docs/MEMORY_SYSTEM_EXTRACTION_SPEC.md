@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/Memory System Extraction Specification]]
 > - **Path:** `.augment/kb/Components/Memory System Extraction Specification.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Memory System Extraction Specification.md`
 
 **Migration date:** 2025-11-01
+
+
+---

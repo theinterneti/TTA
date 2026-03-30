@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_websocket_integration]]
 Tests for WebSocket integration in agent orchestration.
 
 This module tests the WebSocket endpoints, connection management,

@@ -259,3 +259,7 @@ npm run test:staging
 ```
 
 That's it! 🎉
+
+
+---
+**Logseq:** [[TTA.dev/Tests/E2e-staging/Quick_start]]

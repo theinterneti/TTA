@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Test_suites/Load_stress_test_suite]]
 Load/Stress Test Suite
 
 Tests system performance and stability under high load including:
@@ -15,7 +17,7 @@ import logging
 import random
 import time
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import psutil
@@ -86,7 +88,7 @@ class LoadStressTestSuite:
                 test_name=test_name,
                 category=TestCategory.LOAD_STRESS,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -142,7 +144,7 @@ class LoadStressTestSuite:
                 logger.error(f"Concurrent user test failed for {user_count} users: {e}")
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -156,7 +158,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -209,7 +211,7 @@ class LoadStressTestSuite:
             logger.error(f"Story generation load test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -223,7 +225,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -260,7 +262,7 @@ class LoadStressTestSuite:
             logger.error(f"Database stress test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -274,7 +276,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -323,7 +325,7 @@ class LoadStressTestSuite:
             logger.error(f"Memory usage test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -337,7 +339,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -377,7 +379,7 @@ class LoadStressTestSuite:
             logger.error(f"Connection pool test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -391,7 +393,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -442,7 +444,7 @@ class LoadStressTestSuite:
             logger.error(f"Sustained load test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -456,7 +458,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -508,7 +510,7 @@ class LoadStressTestSuite:
             logger.error(f"Spike load test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -522,7 +524,7 @@ class LoadStressTestSuite:
             test_name=test_name,
             category=TestCategory.LOAD_STRESS,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -562,7 +564,7 @@ class LoadStressTestSuite:
             logger.error(f"Resource cleanup test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()

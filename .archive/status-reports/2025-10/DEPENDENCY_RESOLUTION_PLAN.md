@@ -246,3 +246,7 @@ If WAIT:
 ---
 
 **Next Steps**: Await approval for Option A implementation.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Dependency_resolution_plan]]

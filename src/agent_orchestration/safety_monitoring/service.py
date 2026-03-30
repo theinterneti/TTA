@@ -1,5 +1,7 @@
 """Safety service orchestration and global service management."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_monitoring/Service]]
+
 from __future__ import annotations
 
 import contextlib  # BUG FIX: Added missing import (line 3513 uses contextlib.suppress())
@@ -54,7 +56,7 @@ class SafetyService:
 
     def suggest_alternative(self, level: SafetyLevel, original: str) -> str:
         """Suggest alternative content for unsafe text."""
-        self._validator or TherapeuticValidator()
+        _ = self._validator or TherapeuticValidator()
         # Generate therapeutic alternative based on level
         if level == SafetyLevel.BLOCKED:
             return (
@@ -83,7 +85,7 @@ def get_global_safety_service() -> SafetyService:
     using TEST_REDIS_URI or default localhost. Disabled by default, can be enabled
     via env AGENT_ORCHESTRATION_SAFETY_ENABLED=true for ad-hoc use or via tests.
     """
-    global _global_safety_service, _global_safety_locked
+    global _global_safety_service
     import os
 
     if _global_safety_service is None:

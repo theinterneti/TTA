@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Validators]]
 Tool validators for naming conventions and description quality (Phase 3 Tool Optimization).
 
 Provides validation for:
@@ -11,10 +13,11 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
+from typing import Any
 
 
-class ValidationSeverity(str, Enum):
+class ValidationSeverity(StrEnum):
     """Severity level for validation findings."""
 
     ERROR = "error"  # Blocks tool registration
@@ -39,7 +42,7 @@ class ValidationResult:
     is_valid: bool
     score: float  # 0.0-1.0 for overall quality, or 1-5 for description quality
     findings: list[ValidationFinding] = field(default_factory=list)
-    details: dict[str, any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 class ToolNameValidator:
@@ -347,7 +350,9 @@ class ToolDescriptionValidator:
             score -= 0.5
 
         # Check for action verbs (good descriptions start with verbs)
-        first_word = description.split()[0].lower() if description.split() else ""
+        first_word = (
+            description.split(maxsplit=1)[0].lower() if description.split() else ""
+        )
         action_verbs = {
             "retrieves",
             "fetches",

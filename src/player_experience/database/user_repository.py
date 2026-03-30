@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/User_repository]]
 User Repository for authentication database operations.
 
 This module provides the UserRepository class that handles all database
@@ -6,7 +8,7 @@ operations for user authentication data, including CRUD operations and queries.
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from ..models.auth import UserRole
@@ -36,7 +38,7 @@ class User:
         self.email = email
         self.password_hash = password_hash
         self.role = role
-        self.created_at = created_at or datetime.utcnow()
+        self.created_at = created_at or datetime.now(UTC)
         self.is_active = True
         self.is_verified = True  # For simplicity, assume verified
 
@@ -126,7 +128,7 @@ class UserRepository:
                 player_id=user_id,
                 username=username,
                 email=email,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(UTC),
                 last_login=None,
                 is_active=True,
                 therapeutic_preferences=TherapeuticPreferences(),
@@ -137,8 +139,8 @@ class UserRepository:
             # Store authentication data in privacy settings metadata (temporary solution)
             # In production, this should be in a separate User authentication table
             # Using setattr for dynamic attributes not in the dataclass definition
-            player_profile.privacy_settings.password_hash = password_hash
-            player_profile.privacy_settings.role = role.value
+            player_profile.privacy_settings.password_hash = password_hash  # type: ignore[attr-defined]
+            player_profile.privacy_settings.role = role.value  # type: ignore[attr-defined]
 
             # Save to database
             success = self.player_repo.create_player_profile(player_profile)
@@ -312,10 +314,36 @@ class UserRepository:
         try:
             player_profile = self.player_repo.get_player_profile(user_id)
             if player_profile:
-                player_profile.last_login = datetime.utcnow()
+                player_profile.last_login = datetime.now(UTC)
                 self.player_repo.update_player_profile(player_profile)
                 return True
             return False
         except Exception as e:
             logger.error(f"Error updating last login for user {user_id}: {e}")
+            return False
+
+    def update_password(self, username: str, password_hash: str) -> bool:
+        """
+        Update a user's password hash.
+
+        Args:
+            username: Username whose password should be updated
+            password_hash: Newly hashed password
+
+        Returns:
+            bool: True if successful
+        """
+        if not self._connected:
+            return False
+
+        try:
+            player_profile = self.player_repo.get_player_by_username(username)
+            if not player_profile:
+                return False
+
+            player_profile.privacy_settings.password_hash = password_hash  # type: ignore[attr-defined]
+            self.player_repo.update_player_profile(player_profile)
+            return True
+        except Exception as e:
+            logger.error(f"Error updating password for user {username}: {e}")
             return False

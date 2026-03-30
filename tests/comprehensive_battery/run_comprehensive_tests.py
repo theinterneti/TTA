@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Run_comprehensive_tests]]
 Comprehensive Test Battery Execution Script
 
 Main entry point for running the comprehensive test battery for the TTA storytelling system.
@@ -10,7 +12,7 @@ import argparse
 import asyncio
 import logging
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Add project root to path
@@ -223,7 +225,7 @@ async def main():
             return 1
 
         # Execute tests
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
         logger.info(f"Test execution started at {start_time}")
 
         # Run selected test categories
@@ -254,7 +256,7 @@ async def main():
             dashboard_results = await test_battery.run_dashboard_verification()
             results.extend(dashboard_results)
 
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
         logger.info(f"Test execution completed at {end_time}")
 
         # Stop metrics collection

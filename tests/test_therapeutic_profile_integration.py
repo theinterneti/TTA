@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_therapeutic_profile_integration]]
 Unit tests for TherapeuticProfileIntegrationService.
 """
 
@@ -67,77 +69,67 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         )
 
         # Should have original concerns plus extracted ones
-        self.assertIn("work stress", enhanced_profile.primary_concerns)
-        self.assertIn(
-            "anxiety", enhanced_profile.primary_concerns
-        )  # From anxious trait
-        self.assertIn(
-            "perfectionism", enhanced_profile.primary_concerns
+        assert "work stress" in enhanced_profile.primary_concerns
+        assert "anxiety" in enhanced_profile.primary_concerns  # From anxious trait
+        assert (
+            "perfectionism" in enhanced_profile.primary_concerns
         )  # From perfectionist trait
 
         # Should have comfort zones from values and traits
-        self.assertIn("nature", enhanced_profile.comfort_zones)
-        self.assertIn("learning", enhanced_profile.comfort_zones)
-        self.assertIn(
-            "learning and growth", enhanced_profile.comfort_zones
+        assert "nature" in enhanced_profile.comfort_zones
+        assert "learning" in enhanced_profile.comfort_zones
+        assert (
+            "learning and growth" in enhanced_profile.comfort_zones
         )  # From education value
 
         # Should have challenge areas
-        self.assertIn("perfectionism", enhanced_profile.challenge_areas)
-        self.assertIn(
-            "stress management", enhanced_profile.challenge_areas
+        assert "perfectionism" in enhanced_profile.challenge_areas
+        assert (
+            "stress management" in enhanced_profile.challenge_areas
         )  # From anxious trait
 
         # Should have coping strategies
-        self.assertIn(
-            "social support", enhanced_profile.coping_strategies
+        assert (
+            "social support" in enhanced_profile.coping_strategies
         )  # From empathetic trait
-        self.assertIn(
-            "planning", enhanced_profile.coping_strategies
-        )  # From organized trait
+        assert "planning" in enhanced_profile.coping_strategies  # From organized trait
 
         # Should have generated therapeutic goals
-        self.assertGreater(len(enhanced_profile.therapeutic_goals), 0)
+        assert len(enhanced_profile.therapeutic_goals) > 0
 
         # Check for specific generated goals
         goal_descriptions = [
             goal.description for goal in enhanced_profile.therapeutic_goals
         ]
-        self.assertTrue(any("anxiety" in desc.lower() for desc in goal_descriptions))
-        self.assertTrue(any("work" in desc.lower() for desc in goal_descriptions))
+        assert any("anxiety" in desc.lower() for desc in goal_descriptions)
+        assert any("work" in desc.lower() for desc in goal_descriptions)
 
     def test_create_personalization_context(self):
         """Test creating personalization context for a character."""
         context = self.service.create_personalization_context(self.test_character)
 
-        self.assertEqual(context.character_id, self.test_character.character_id)
-        self.assertEqual(context.character_name, self.test_character.name)
-        self.assertEqual(
-            context.personality_traits,
-            self.test_character.background.personality_traits,
+        assert context.character_id == self.test_character.character_id
+        assert context.character_name == self.test_character.name
+        assert (
+            context.personality_traits
+            == self.test_character.background.personality_traits
         )
-        self.assertEqual(
-            context.core_values, self.test_character.background.core_values
+        assert context.core_values == self.test_character.background.core_values
+        assert (
+            context.preferred_intensity
+            == self.test_character.therapeutic_profile.preferred_intensity
         )
-        self.assertEqual(
-            context.preferred_intensity,
-            self.test_character.therapeutic_profile.preferred_intensity,
-        )
-        self.assertEqual(
-            context.readiness_level,
-            self.test_character.therapeutic_profile.readiness_level,
+        assert (
+            context.readiness_level
+            == self.test_character.therapeutic_profile.readiness_level
         )
 
         # Should extract life experiences
-        self.assertGreater(len(context.life_experiences), 0)
-        self.assertTrue(
-            any("educational" in exp.lower() for exp in context.life_experiences)
-        )
+        assert len(context.life_experiences) > 0
+        assert any("educational" in exp.lower() for exp in context.life_experiences)
 
         # Should be stored in service
-        self.assertIn(
-            self.test_character.character_id, self.service.personalization_contexts
-        )
+        assert self.test_character.character_id in self.service.personalization_contexts
 
     def test_generate_personalization_recommendations(self):
         """Test generating personalization recommendations."""
@@ -145,11 +137,11 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
             self.test_character
         )
 
-        self.assertGreater(len(recommendations), 0)
+        assert len(recommendations) > 0
 
         # Should have recommendations for different types
         rec_types = [rec.recommendation_type for rec in recommendations]
-        self.assertIn("therapeutic_approach", rec_types)
+        assert "therapeutic_approach" in rec_types
 
         # Should recommend CBT for anxiety
         cbt_recs = [
@@ -157,22 +149,22 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
             for rec in recommendations
             if "CBT" in rec.title or "Cognitive" in rec.title
         ]
-        self.assertGreater(len(cbt_recs), 0)
+        assert len(cbt_recs) > 0
 
         # Should have proper structure
         for rec in recommendations:
-            self.assertIsNotNone(rec.recommendation_id)
-            self.assertEqual(rec.character_id, self.test_character.character_id)
-            self.assertIsNotNone(rec.title)
-            self.assertIsNotNone(rec.description)
-            self.assertIsNotNone(rec.rationale)
-            self.assertGreaterEqual(rec.priority, 1)
-            self.assertLessEqual(rec.priority, 5)
-            self.assertGreaterEqual(rec.confidence_score, 0.0)
-            self.assertLessEqual(rec.confidence_score, 1.0)
+            assert rec.recommendation_id is not None
+            assert rec.character_id == self.test_character.character_id
+            assert rec.title is not None
+            assert rec.description is not None
+            assert rec.rationale is not None
+            assert rec.priority >= 1
+            assert rec.priority <= 5
+            assert rec.confidence_score >= 0.0
+            assert rec.confidence_score <= 1.0
 
         # Should be stored in service
-        self.assertIn(self.test_character.character_id, self.service.recommendations)
+        assert self.test_character.character_id in self.service.recommendations
 
     def test_adapt_therapeutic_content(self):
         """Test adapting therapeutic content for a character."""
@@ -184,21 +176,21 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
             self.test_character, original_content, "dialogue"
         )
 
-        self.assertIsNotNone(adaptation.adaptation_id)
-        self.assertEqual(adaptation.character_id, self.test_character.character_id)
-        self.assertEqual(adaptation.original_content, original_content)
-        self.assertNotEqual(adaptation.adapted_content, original_content)
-        self.assertIsNotNone(adaptation.reasoning)
-        self.assertGreaterEqual(adaptation.effectiveness_score, 0.0)
-        self.assertLessEqual(adaptation.effectiveness_score, 1.0)
+        assert adaptation.adaptation_id is not None
+        assert adaptation.character_id == self.test_character.character_id
+        assert adaptation.original_content == original_content
+        assert adaptation.adapted_content != original_content
+        assert adaptation.reasoning is not None
+        assert adaptation.effectiveness_score >= 0.0
+        assert adaptation.effectiveness_score <= 1.0
 
         # Should replace character name
-        self.assertIn("Alice Johnson", adaptation.adapted_content)
+        assert "Alice Johnson" in adaptation.adapted_content
 
         # Should be stored in service
-        self.assertIn(self.test_character.character_id, self.service.adaptations)
+        assert self.test_character.character_id in self.service.adaptations
         adaptations = self.service.adaptations[self.test_character.character_id]
-        self.assertIn(adaptation, adaptations)
+        assert adaptation in adaptations
 
     def test_adapt_content_for_anxious_character(self):
         """Test content adaptation for character with anxiety traits."""
@@ -222,9 +214,9 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         adaptation = self.service.adapt_therapeutic_content(anxious_character, content)
 
         # Should use anxiety-aware adaptation
-        self.assertEqual(adaptation.adaptation_type, "anxiety_aware_adaptation")
-        self.assertIn("anxiety", adaptation.reasoning.lower())
-        self.assertIn("reassuring", adaptation.adapted_content.lower())
+        assert adaptation.adaptation_type == "anxiety_aware_adaptation"
+        assert "anxiety" in adaptation.reasoning.lower()
+        assert "reassuring" in adaptation.adapted_content.lower()
 
     def test_adapt_content_for_high_intensity_character(self):
         """Test content adaptation for character preferring high intensity."""
@@ -249,9 +241,9 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         )
 
         # Should use intensive adaptation
-        self.assertEqual(adaptation.adaptation_type, "intensive_adaptation")
-        self.assertIn("high-intensity", adaptation.reasoning.lower())
-        self.assertIn("direct", adaptation.adapted_content.lower())
+        assert adaptation.adaptation_type == "intensive_adaptation"
+        assert "high-intensity" in adaptation.reasoning.lower()
+        assert "direct" in adaptation.adapted_content.lower()
 
     def test_get_character_adaptations(self):
         """Test getting adaptations for a character."""
@@ -259,7 +251,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         adaptations = self.service.get_character_adaptations(
             self.test_character.character_id
         )
-        self.assertEqual(len(adaptations), 0)
+        assert len(adaptations) == 0
 
         # Create some adaptations
         self.service.adapt_therapeutic_content(self.test_character, "Content 1")
@@ -269,7 +261,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         adaptations = self.service.get_character_adaptations(
             self.test_character.character_id
         )
-        self.assertEqual(len(adaptations), 2)
+        assert len(adaptations) == 2
 
     def test_get_character_recommendations(self):
         """Test getting recommendations for a character."""
@@ -277,7 +269,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         recommendations = self.service.get_character_recommendations(
             self.test_character.character_id
         )
-        self.assertEqual(len(recommendations), 0)
+        assert len(recommendations) == 0
 
         # Generate recommendations
         self.service.generate_personalization_recommendations(self.test_character)
@@ -286,7 +278,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         recommendations = self.service.get_character_recommendations(
             self.test_character.character_id
         )
-        self.assertGreater(len(recommendations), 0)
+        assert len(recommendations) > 0
 
     def test_update_adaptation_effectiveness(self):
         """Test updating adaptation effectiveness score."""
@@ -302,44 +294,44 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
             adaptation.adaptation_id, new_score
         )
 
-        self.assertTrue(result)
-        self.assertEqual(adaptation.effectiveness_score, new_score)
-        self.assertNotEqual(adaptation.effectiveness_score, original_score)
+        assert result
+        assert adaptation.effectiveness_score == new_score
+        assert adaptation.effectiveness_score != original_score
 
         # Test updating non-existent adaptation
         result = self.service.update_adaptation_effectiveness("non_existent_id", 0.5)
-        self.assertFalse(result)
+        assert not result
 
         # Test score clamping
         self.service.update_adaptation_effectiveness(
             adaptation.adaptation_id, 1.5
         )  # Too high
-        self.assertEqual(adaptation.effectiveness_score, 1.0)
+        assert adaptation.effectiveness_score == 1.0
 
         self.service.update_adaptation_effectiveness(
             adaptation.adaptation_id, -0.5
         )  # Too low
-        self.assertEqual(adaptation.effectiveness_score, 0.0)
+        assert adaptation.effectiveness_score == 0.0
 
     def test_extract_therapeutic_insights(self):
         """Test extracting therapeutic insights from character background."""
         insights = self.service._extract_therapeutic_insights(self.test_background)
 
         # Should extract anxiety from anxious trait
-        self.assertIn("anxiety", insights["primary_concerns"])
+        assert "anxiety" in insights["primary_concerns"]
 
         # Should extract perfectionism from perfectionist trait
-        self.assertIn("perfectionism", insights["primary_concerns"])
+        assert "perfectionism" in insights["primary_concerns"]
 
         # Should extract comfort zones from empathetic trait
-        self.assertIn("helping others", insights["comfort_zones"])
+        assert "helping others" in insights["comfort_zones"]
 
         # Should extract coping strategies from organized trait
-        self.assertIn("planning", insights["coping_strategies"])
+        assert "planning" in insights["coping_strategies"]
 
         # Should extract comfort zones from core values
-        self.assertIn(
-            "learning and growth", insights["comfort_zones"]
+        assert (
+            "learning and growth" in insights["comfort_zones"]
         )  # From education value
 
     def test_generate_therapeutic_goals(self):
@@ -363,25 +355,25 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
 
         goals = self.service._generate_therapeutic_goals(enhanced_character)
 
-        self.assertGreater(len(goals), 0)
+        assert len(goals) > 0
 
         # Should generate anxiety management goal (from extracted anxiety concern)
         anxiety_goals = [
             goal for goal in goals if "anxiety" in goal.description.lower()
         ]
-        self.assertGreater(len(anxiety_goals), 0)
+        assert len(anxiety_goals) > 0
 
         # Should generate work stress goal (from original concern)
         work_goals = [goal for goal in goals if "work" in goal.description.lower()]
-        self.assertGreater(len(work_goals), 0)
+        assert len(work_goals) > 0
 
         # Goals should have proper structure
         for goal in goals:
-            self.assertIsNotNone(goal.goal_id)
-            self.assertIsNotNone(goal.description)
-            self.assertGreater(len(goal.therapeutic_approaches), 0)
-            self.assertGreater(len(goal.milestones), 0)
-            self.assertTrue(goal.is_active)
+            assert goal.goal_id is not None
+            assert goal.description is not None
+            assert len(goal.therapeutic_approaches) > 0
+            assert len(goal.milestones) > 0
+            assert goal.is_active
 
     def test_calculate_readiness_adjustment(self):
         """Test calculating readiness adjustment based on character traits."""
@@ -391,7 +383,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
             personality_traits=["empathetic", "patient", "resilient"],
         )
         adjustment = self.service._calculate_readiness_adjustment(positive_background)
-        self.assertGreater(adjustment, 0)
+        assert adjustment > 0
 
         # Test challenging traits
         challenging_background = CharacterBackground(
@@ -401,7 +393,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         adjustment = self.service._calculate_readiness_adjustment(
             challenging_background
         )
-        self.assertLess(adjustment, 0)
+        assert adjustment < 0
 
         # Test mixed traits
         mixed_background = CharacterBackground(
@@ -410,8 +402,8 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         )
         adjustment = self.service._calculate_readiness_adjustment(mixed_background)
         # Should be close to neutral due to mixed traits
-        self.assertGreaterEqual(adjustment, -0.2)
-        self.assertLessEqual(adjustment, 0.2)
+        assert adjustment >= -0.2
+        assert adjustment <= 0.2
 
     def test_recommend_therapeutic_approaches(self):
         """Test recommending therapeutic approaches."""
@@ -421,7 +413,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
 
         # Should recommend CBT for anxious character
         cbt_recs = [rec for rec in recommendations if "CBT" in rec.title]
-        self.assertGreater(len(cbt_recs), 0)
+        assert len(cbt_recs) > 0
 
         # Test creative character
         creative_background = CharacterBackground(
@@ -442,7 +434,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
             creative_character
         )
         narrative_recs = [rec for rec in creative_recs if "Narrative" in rec.title]
-        self.assertGreater(len(narrative_recs), 0)
+        assert len(narrative_recs) > 0
 
     def test_recommend_intensity_adjustments(self):
         """Test recommending intensity adjustments."""
@@ -465,7 +457,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         low_intensity_recs = [
             rec for rec in recommendations if "Low Intensity" in rec.title
         ]
-        self.assertGreater(len(low_intensity_recs), 0)
+        assert len(low_intensity_recs) > 0
 
         # Test high readiness character
         high_readiness_profile = TherapeuticProfile(readiness_level=0.9)
@@ -486,7 +478,7 @@ class TestTherapeuticProfileIntegrationService(unittest.TestCase):
         high_intensity_recs = [
             rec for rec in recommendations if "Higher Intensity" in rec.title
         ]
-        self.assertGreater(len(high_intensity_recs), 0)
+        assert len(high_intensity_recs) > 0
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_compatibility_checker]]
 Unit tests for CompatibilityChecker.
 """
 
@@ -143,8 +145,8 @@ class TestCompatibilityChecker(unittest.TestCase):
         """Test CompatibilityChecker initialization."""
         # Test default initialization
         checker = CompatibilityChecker()
-        self.assertIsNotNone(checker.weights)
-        self.assertEqual(checker._compatibility_threshold, 0.6)
+        assert checker.weights is not None
+        assert checker._compatibility_threshold == 0.6
 
         # Test initialization with custom weights
         custom_weights = CompatibilityWeights(
@@ -156,7 +158,7 @@ class TestCompatibilityChecker(unittest.TestCase):
         )
 
         checker_with_weights = CompatibilityChecker(custom_weights)
-        self.assertEqual(checker_with_weights.weights, custom_weights)
+        assert checker_with_weights.weights == custom_weights
 
     def test_comprehensive_compatibility_calculation(self):
         """Test comprehensive compatibility calculation."""
@@ -165,14 +167,14 @@ class TestCompatibilityChecker(unittest.TestCase):
             self.test_character, self.beginner_world
         )
 
-        self.assertEqual(report.character_id, self.test_character.character_id)
-        self.assertEqual(report.world_id, self.beginner_world.world_id)
-        self.assertGreaterEqual(report.overall_score, 0.0)
-        self.assertLessEqual(report.overall_score, 1.0)
-        self.assertGreater(len(report.compatibility_factors), 0)
-        self.assertIsInstance(report.recommendations, list)
-        self.assertIsInstance(report.warnings, list)
-        self.assertTrue(report.prerequisites_met)  # No prerequisites for beginner world
+        assert report.character_id == self.test_character.character_id
+        assert report.world_id == self.beginner_world.world_id
+        assert report.overall_score >= 0.0
+        assert report.overall_score <= 1.0
+        assert len(report.compatibility_factors) > 0
+        assert isinstance(report.recommendations, list)
+        assert isinstance(report.warnings, list)
+        assert report.prerequisites_met  # No prerequisites for beginner world
 
     def test_therapeutic_readiness_compatibility(self):
         """Test therapeutic readiness compatibility calculation."""
@@ -187,10 +189,10 @@ class TestCompatibilityChecker(unittest.TestCase):
             if factor.factor_name == "Therapeutic Readiness"
         )
 
-        self.assertIsNotNone(readiness_factor)
-        self.assertGreaterEqual(readiness_factor.score, 0.0)
-        self.assertLessEqual(readiness_factor.score, 1.0)
-        self.assertIn("readiness", readiness_factor.explanation.lower())
+        assert readiness_factor is not None
+        assert readiness_factor.score >= 0.0
+        assert readiness_factor.score <= 1.0
+        assert "readiness" in readiness_factor.explanation.lower()
 
     def test_therapeutic_approach_alignment(self):
         """Test therapeutic approach alignment calculation."""
@@ -204,12 +206,12 @@ class TestCompatibilityChecker(unittest.TestCase):
             if factor.factor_name == "Therapeutic Approach Alignment"
         )
 
-        self.assertIsNotNone(approach_factor)
-        self.assertGreaterEqual(approach_factor.score, 0.0)
-        self.assertLessEqual(approach_factor.score, 1.0)
+        assert approach_factor is not None
+        assert approach_factor.score >= 0.0
+        assert approach_factor.score <= 1.0
 
         # Should have good alignment since both character and world use mindfulness
-        self.assertGreater(approach_factor.score, 0.5)
+        assert approach_factor.score > 0.5
 
     def test_content_safety_compatibility(self):
         """Test content safety compatibility calculation."""
@@ -224,15 +226,15 @@ class TestCompatibilityChecker(unittest.TestCase):
             if factor.factor_name == "Content Safety"
         )
 
-        self.assertIsNotNone(safety_factor)
-        self.assertGreaterEqual(safety_factor.score, 0.0)
-        self.assertLessEqual(safety_factor.score, 1.0)
+        assert safety_factor is not None
+        assert safety_factor.score >= 0.0
+        assert safety_factor.score <= 1.0
 
         # Should have lower safety score due to trigger overlap
-        self.assertLess(safety_factor.score, 0.8)
+        assert safety_factor.score < 0.8
 
         # Should have warnings
-        self.assertGreater(len(report.warnings), 0)
+        assert len(report.warnings) > 0
 
     def test_difficulty_appropriateness(self):
         """Test difficulty appropriateness calculation."""
@@ -247,13 +249,13 @@ class TestCompatibilityChecker(unittest.TestCase):
             if factor.factor_name == "Difficulty Appropriateness"
         )
 
-        self.assertIsNotNone(difficulty_factor)
-        self.assertGreaterEqual(difficulty_factor.score, 0.0)
-        self.assertLessEqual(difficulty_factor.score, 1.0)
+        assert difficulty_factor is not None
+        assert difficulty_factor.score >= 0.0
+        assert difficulty_factor.score <= 1.0
 
         # Character readiness (0.6) maps to ADVANCED difficulty, and world is ADVANCED,
         # so this should be a perfect match (score 1.0)
-        self.assertEqual(difficulty_factor.score, 1.0)
+        assert difficulty_factor.score == 1.0
 
     def test_prerequisite_fulfillment(self):
         """Test prerequisite fulfillment calculation."""
@@ -268,13 +270,13 @@ class TestCompatibilityChecker(unittest.TestCase):
             if factor.factor_name == "Prerequisite Fulfillment"
         )
 
-        self.assertIsNotNone(prerequisite_factor)
-        self.assertGreaterEqual(prerequisite_factor.score, 0.0)
-        self.assertLessEqual(prerequisite_factor.score, 1.0)
+        assert prerequisite_factor is not None
+        assert prerequisite_factor.score >= 0.0
+        assert prerequisite_factor.score <= 1.0
 
         # Should not meet prerequisites since character readiness (0.6) < required (0.8)
-        self.assertFalse(report.prerequisites_met)
-        self.assertGreater(len(report.unmet_prerequisites), 0)
+        assert not report.prerequisites_met
+        assert len(report.unmet_prerequisites) > 0
 
     def test_world_recommendations(self):
         """Test world recommendations generation."""
@@ -288,21 +290,21 @@ class TestCompatibilityChecker(unittest.TestCase):
             self.test_character, available_worlds, max_recommendations=3
         )
 
-        self.assertIsInstance(recommendations, list)
-        self.assertLessEqual(len(recommendations), 3)
-        self.assertGreater(len(recommendations), 0)
+        assert isinstance(recommendations, list)
+        assert len(recommendations) <= 3
+        assert len(recommendations) > 0
 
         # Check that recommendations are sorted by compatibility score
         for i in range(len(recommendations) - 1):
-            self.assertGreaterEqual(
-                recommendations[i][1].overall_score,
-                recommendations[i + 1][1].overall_score,
+            assert (
+                recommendations[i][1].overall_score
+                >= recommendations[i + 1][1].overall_score
             )
 
         # Each recommendation should be a tuple of (WorldDetails, CompatibilityReport)
         for world, report in recommendations:
-            self.assertIsInstance(world, WorldDetails)
-            self.assertIsInstance(report, type(report))  # CompatibilityReport type
+            assert isinstance(world, WorldDetails)
+            assert isinstance(report, type(report))  # CompatibilityReport type
 
     def test_world_suitability_assessment(self):
         """Test world suitability assessment."""
@@ -311,25 +313,25 @@ class TestCompatibilityChecker(unittest.TestCase):
             self.test_character, self.beginner_world
         )
 
-        self.assertIn("suitability_level", assessment)
-        self.assertIn("compatibility_score", assessment)
-        self.assertIn("compatibility_report", assessment)
-        self.assertIn("is_recommended", assessment)
-        self.assertIn("has_safety_concerns", assessment)
-        self.assertIn("prerequisites_met", assessment)
+        assert "suitability_level" in assessment
+        assert "compatibility_score" in assessment
+        assert "compatibility_report" in assessment
+        assert "is_recommended" in assessment
+        assert "has_safety_concerns" in assessment
+        assert "prerequisites_met" in assessment
 
-        self.assertIsInstance(assessment["suitability_level"], str)
-        self.assertIsInstance(assessment["compatibility_score"], float)
-        self.assertIsInstance(assessment["is_recommended"], bool)
-        self.assertIsInstance(assessment["has_safety_concerns"], bool)
-        self.assertIsInstance(assessment["prerequisites_met"], bool)
+        assert isinstance(assessment["suitability_level"], str)
+        assert isinstance(assessment["compatibility_score"], float)
+        assert isinstance(assessment["is_recommended"], bool)
+        assert isinstance(assessment["has_safety_concerns"], bool)
+        assert isinstance(assessment["prerequisites_met"], bool)
 
         # Test with trigger world (should have safety concerns)
         trigger_assessment = self.compatibility_checker.assess_world_suitability(
             self.test_character, self.trigger_world
         )
 
-        self.assertTrue(trigger_assessment["has_safety_concerns"])
+        assert trigger_assessment["has_safety_concerns"]
 
     def test_recommendations_and_warnings_generation(self):
         """Test that appropriate recommendations and warnings are generated."""
@@ -338,15 +340,13 @@ class TestCompatibilityChecker(unittest.TestCase):
             self.test_character, self.advanced_world
         )
 
-        self.assertGreater(len(report.recommendations), 0)
+        assert len(report.recommendations) > 0
 
         # Should recommend easier worlds or mention prerequisites
         recommendation_text = " ".join(report.recommendations).lower()
-        self.assertTrue(
-            any(
-                keyword in recommendation_text
-                for keyword in ["prerequisite", "easier", "beginner", "readiness"]
-            )
+        assert any(
+            keyword in recommendation_text
+            for keyword in ["prerequisite", "easier", "beginner", "readiness"]
         )
 
         # Test with trigger world (should generate safety warnings)
@@ -356,14 +356,12 @@ class TestCompatibilityChecker(unittest.TestCase):
             )
         )
 
-        self.assertGreater(len(trigger_report.warnings), 0)
+        assert len(trigger_report.warnings) > 0
 
         warning_text = " ".join(trigger_report.warnings).lower()
-        self.assertTrue(
-            any(
-                keyword in warning_text
-                for keyword in ["trigger", "content", "support", "difficult"]
-            )
+        assert any(
+            keyword in warning_text
+            for keyword in ["trigger", "content", "support", "difficult"]
         )
 
     def test_edge_cases(self):
@@ -384,8 +382,8 @@ class TestCompatibilityChecker(unittest.TestCase):
             character_no_goals, self.beginner_world
         )
 
-        self.assertIsNotNone(report)
-        self.assertGreaterEqual(report.overall_score, 0.0)
+        assert report is not None
+        assert report.overall_score >= 0.0
 
         # Test world with no therapeutic approaches
         world_no_approaches = WorldDetails(
@@ -402,8 +400,8 @@ class TestCompatibilityChecker(unittest.TestCase):
             self.test_character, world_no_approaches
         )
 
-        self.assertIsNotNone(report)
-        self.assertGreaterEqual(report.overall_score, 0.0)
+        assert report is not None
+        assert report.overall_score >= 0.0
 
     def test_custom_weights(self):
         """Test compatibility calculation with custom weights."""
@@ -424,7 +422,7 @@ class TestCompatibilityChecker(unittest.TestCase):
         )
 
         # Should have lower overall score due to safety concerns being weighted heavily
-        self.assertLess(report.overall_score, 0.7)
+        assert report.overall_score < 0.7
 
 
 if __name__ == "__main__":

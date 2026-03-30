@@ -189,3 +189,7 @@ model_config = SettingsConfigDict(
 ```
 
 This allows Pydantic Settings to ignore environment variables that aren't explicitly defined in the model, which is the standard pattern for development environments where you might have many environment variables for different purposes.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Deployment_status_updated]]

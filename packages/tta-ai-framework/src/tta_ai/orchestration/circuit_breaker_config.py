@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Circuit_breaker_config]]
 Circuit breaker configuration schema and validation.
 
 Provides configuration loading, validation, and default value handling
@@ -237,7 +239,7 @@ class CircuitBreakerConfigManager:
         """Export configuration as dictionary."""
         if not self.validated_config:
             self._validate_config()
-        return self.validated_config.dict()
+        return self.validated_config.model_dump()
 
     def get_config_summary(self) -> dict[str, Any]:
         """Get a summary of current configuration."""

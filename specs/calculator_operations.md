@@ -62,3 +62,7 @@ This component provides basic arithmetic operations and serves as a test case fo
 - No linting errors
 - Type checking passes
 
+
+
+---
+**Logseq:** [[TTA.dev/Specs/Calculator_operations]]

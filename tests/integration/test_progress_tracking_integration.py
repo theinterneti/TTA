@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_progress_tracking_integration]]
 Integration tests for progress tracking and analytics system.
 
 Tests the complete progress tracking workflow including:
@@ -9,13 +11,18 @@ Tests the complete progress tracking workflow including:
 - Integration with session data
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import app
 from src.player_experience.database.session_repository import SessionRepository
+
+# Progress tracking depends on session data from the session management API,
+# which is only partially implemented — keep xfail narrowly scoped to the
+# behaviors that still depend on unfinished Phase 2 work.
+pytestmark = pytest.mark.integration
 from src.player_experience.managers.progress_tracking_service import (
     ProgressTrackingService,
 )
@@ -101,8 +108,8 @@ async def sample_sessions(session_repository):
                 intensity_level=0.5,
                 intervention_frequency="balanced",
             ),
-            created_at=datetime.utcnow() - timedelta(days=10 - i * 2),
-            last_interaction=datetime.utcnow() - timedelta(days=10 - i * 2),
+            created_at=datetime.now(UTC) - timedelta(days=10 - i * 2),
+            last_interaction=datetime.now(UTC) - timedelta(days=10 - i * 2),
             total_duration_minutes=30 + i * 10,
             interaction_count=10 + i * 5,
             progress_markers=[
@@ -111,14 +118,14 @@ async def sample_sessions(session_repository):
                     marker_type=ProgressMarkerType.SKILL_ACQUIRED,
                     description=f"Learned skill {i}",
                     therapeutic_value=0.8,
-                    achieved_at=datetime.utcnow() - timedelta(days=10 - i * 2),
+                    achieved_at=datetime.now(UTC) - timedelta(days=10 - i * 2),
                 ),
                 ProgressMarker(
                     marker_id=f"marker_goal_{i}",
                     marker_type=ProgressMarkerType.THERAPEUTIC_GOAL,
                     description=f"Met goal {i}",
                     therapeutic_value=1.0,
-                    achieved_at=datetime.utcnow() - timedelta(days=10 - i * 2),
+                    achieved_at=datetime.now(UTC) - timedelta(days=10 - i * 2),
                 ),
             ],
         )
@@ -157,7 +164,7 @@ class TestProgressVisualization:
         assert isinstance(data["time_buckets"], list)
 
         # Verify series data structure
-        assert isinstance(data["series"], list)
+        assert isinstance(data["series"], dict)
 
     @pytest.mark.asyncio
     async def test_progress_viz_with_different_timeframes(
@@ -322,4 +329,4 @@ class TestProgressWithRealData:
 
         # Verify data structure
         assert isinstance(viz_data["time_buckets"], list)
-        assert isinstance(viz_data["series"], list)
+        assert isinstance(viz_data["series"], dict)

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_realtime_integration]]
 Integration tests for real-time interaction management components.
 
 This module tests the integration between WebSocket management, event publishing,

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Containers/Enhanced_service_manager]]
 Enhanced Service Manager for TTA Comprehensive Test Battery
 
 Integrates Docker container support with existing mock service architecture,

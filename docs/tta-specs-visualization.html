@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTA — Requirements & Specifications Map</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 8px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #f0f6fc;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: #8b949e;
+      margin-top: 4px;
+    }
+
+    .layout {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    #chart-container {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    svg {
+      display: block;
+    }
+
+    .center-label {
+      font-size: 0.75rem;
+      fill: #8b949e;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .center-label-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      fill: #f0f6fc;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .arc-label {
+      font-size: 11px;
+      fill: #f0f6fc;
+      pointer-events: none;
+      dominant-baseline: middle;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    .arc-path {
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .arc-path:hover {
+      opacity: 0.85;
+    }
+
+    /* Right panel */
+    .right-panel {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .info-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .info-card h2 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8b949e;
+      margin-bottom: 12px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-item {
+      background: #0d1117;
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #58a6ff;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: #8b949e;
+      margin-top: 3px;
+    }
+
+    /* Legend */
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.1s;
+    }
+
+    .legend-item:hover {
+      background: #21262d;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legend-name {
+      font-size: 0.8rem;
+      color: #c9d1d9;
+      flex: 1;
+    }
+
+    .legend-count {
+      font-size: 0.72rem;
+      color: #6e7681;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Hover detail card */
+    .detail-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .detail-card .category-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .detail-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .detail-card p {
+      font-size: 0.78rem;
+      color: #8b949e;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .detail-card .file-path {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.68rem;
+      color: #58a6ff;
+      background: #0d1117;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: block;
+      word-break: break-all;
+    }
+
+    .detail-card .lines-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      color: #8b949e;
+      margin-top: 8px;
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      color: #6e7681;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .default-hint {
+      font-size: 0.8rem;
+      color: #6e7681;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>TTA — Requirements &amp; Specifications Map</h1>
+  <p>Click any segment to explore. Click the center ring to zoom out. Hover for details.</p>
+</header>
+
+<div class="layout">
+  <div id="chart-container"></div>
+
+  <div class="right-panel">
+    <!-- Stats -->
+    <div class="info-card">
+      <h2>Scope at a Glance</h2>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-value">74+</div>
+          <div class="stat-label">Spec &amp; design docs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">~16k</div>
+          <div class="stat-label">Lines of specs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Spec domains</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Archived KIRO features</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">339</div>
+          <div class="stat-label">Python source files</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">1382+</div>
+          <div class="stat-label">Tests</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="info-card" id="legend-card">
+      <h2>Domains — click to highlight</h2>
+      <div id="legend"></div>
+    </div>
+
+    <!-- Hover detail -->
+    <div class="detail-card" id="detail-card">
+      <div class="default-hint">Hover over a segment to see details</div>
+    </div>
+
+    <div class="hint">Arc size is proportional to documentation volume (lines)</div>
+  </div>
+</div>
+
+<script>
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const data = {
+  name: "TTA",
+  children: [
+    {
+      name: "Core Standards",
+      description: "Development standards, quality gates, and agent instructions that govern the entire project.",
+      children: [
+        { name: "CLAUDE.md", value: 127, file: "CLAUDE.md", description: "Primary agent instructions: Python 3.12+, uv only, quality gate (ruff+pyright+pytest), strict boundaries." },
+        { name: "README.md", value: 162, file: "README.md", description: "Project overview, architecture diagram, agent roster (Copilot, Augment, Cline, Gemini), key standards." },
+        { name: "Spec Index", value: 120, file: "specs/README.md", description: "Spec directory index, TTA vs TTA.dev boundary rule: 'TTA = What, TTA.dev = How'." },
+        { name: "Spec Audit Report", value: 547, file: "docs/reports/tta-spec-audit-report.md", description: "2026-03-04 audit: 18 spec gaps, critical/high/medium priority. Gaps mostly now addressed." },
+        { name: "Remediation Plan", value: 50, file: "remediation_plan.md", description: "Historical CI issues tracking — all resolved as of 2026-03-06." },
+      ]
+    },
+    {
+      name: "Game Design",
+      description: "Core game design, narrative design, therapeutic framework, and player experience.",
+      children: [
+        { name: "Game Design Document", value: 527, file: "docs/design/GDD.md", description: "Master GDD (v1.0, living). Vision, philosophy, game world (multiverse + Nexus), AI architecture, ethics, roadmap." },
+        { name: "User Journey Matrix", value: 632, file: "docs/design/user-journey-matrix.md", description: "6 user categories with detailed journey maps: therapeutic, casual, narrative-focused, achievement, social, exploration." },
+        { name: "Data Model Design", value: 376, file: "docs/design/data-model.md", description: "Player profiles, character data, world data, session structures, graph relationships." },
+        { name: "Entertainment-First Design", value: 239, file: "docs/design/entertainment-first-design.md", description: "Clinical → adventure language translation: 'therapeutic goals' → 'personal objectives', 'patient' → 'player'." },
+        { name: "Clinical Consultation", value: 245, file: "docs/design/clinical-consultation-framework.md", description: "Framework for integrating clinical expertise into game design decisions." },
+        { name: "Evidence-Based Frameworks", value: 235, file: "docs/design/evidence-based-frameworks.md", description: "Narrative therapy, CBT integration, mindfulness approaches embedded in gameplay." },
+        { name: "TTA-7 Design Doc", value: 226, file: "docs/design/TTA-7-design-document.md", description: "Design notes for TTA iteration 7 — architectural evolution." },
+        { name: "Core Gameplay Loop", value: 112, file: "docs/design/core-gameplay-loop.md", description: "Player input → IPA → orchestration → NGA output → Neo4j. 6 agents, 4 example scenarios." },
+        { name: "Onboarding Scenarios", value: 117, file: "docs/design/onboarding-scenarios.md", description: "Player onboarding experience — safe entry into the therapeutic narrative." },
+        { name: "Therapeutic Integration", value: 60, file: "docs/design/therapeutic-integration.md", description: "How therapeutic concepts map onto narrative generation and session outcomes." },
+      ]
+    },
+    {
+      name: "Technical Architecture",
+      description: "System architecture, API specs, observability, infrastructure orchestration.",
+      children: [
+        { name: "Observability Integration", value: 680, file: "specs/observability-integration.md", description: "Legacy spec: APM, dashboards, metrics, tracing, alerting. Note: conflates TTA.dev/TTA concerns (per audit)." },
+        { name: "Technical Specifications", value: 414, file: "docs/technical-specifications.md", description: "Authoritative validated tech spec: API endpoints, Neo4j/Redis schemas, HIPAA/GDPR/JWT security, performance targets." },
+        { name: "Architecture Design", value: 340, file: "docs/design/architecture.md", description: "System architecture: frontend (React 18+), backend (FastAPI), databases, AI integration, deployment." },
+        { name: "Orchestration Spec", value: 282, file: "specs/orchestration.md", description: "Docker Compose orchestration, service coordination, component lifecycle management." },
+        { name: "Agentic Primitives Analysis", value: 150, file: "docs/architecture/agentic-primitives-analysis.md", description: "Analysis of reusable workflow primitives: retry, timeout, circuit breaker, cache, router." },
+        { name: "Agentic Primitives Plan", value: 120, file: "docs/architecture/agentic-primitives-implementation-plan.md", description: "Roadmap for extracting primitives into TTA.dev platform package." },
+      ]
+    },
+    {
+      name: "Agent Specs",
+      description: "Behavioral contracts for the 3 core AI agents in the pipeline.",
+      children: [
+        { name: "Agent Orchestration Protocol", value: 72, file: "specs/agents/agent-orchestration-protocol.md", description: "Inter-agent coordination: IPA → WBA → NGA message schemas, sequencing, timeouts, error propagation, retry." },
+        { name: "NGA — Narrative Generator", value: 67, file: "specs/agents/nga-narrative-generator-agent.md", description: "Behavioral contract: inputs (world state + therapeutic goals), outputs (narrative text), LLM + SSE streaming." },
+        { name: "WBA — World Building Agent", value: 66, file: "specs/agents/wba-world-building-agent.md", description: "Behavioral contract: inputs (narrative context, player state), outputs (updated world state), Neo4j/Redis contract." },
+        { name: "IPA — Input Processing Agent", value: 66, file: "specs/agents/ipa-input-processing-agent.md", description: "Behavioral contract: inputs (raw player text), outputs (structured intent + safety assessment), TTA.dev primitives." },
+      ]
+    },
+    {
+      name: "Therapeutic Safety",
+      description: "Crisis detection, emotional safety, HIPAA compliance, and safety interoperability.",
+      children: [
+        { name: "Safety Interoperability", value: 74, file: "specs/therapeutic-safety/safety-interop.md", description: "Critical: maps crisis detection (4-level) ↔ emotional safety (5-level). Resolves system discrepancy. Mapping: SAFE→LOW, CAUTION→LOW, WARNING→MODERATE, UNSAFE→HIGH, CRISIS→CRITICAL." },
+        { name: "Crisis Detection (4-Level)", value: 65, file: "specs/therapeutic-safety/crisis-detection.md", description: "LOW/MODERATE/HIGH/CRITICAL. 7 crisis types (self-harm, suicidal ideation, substance abuse…). 4 intervention types. Escalation state machine. HIPAA audit logging." },
+        { name: "Emotional Safety (5-Level)", value: 65, file: "specs/therapeutic-safety/emotional-safety-system.md", description: "SAFE/CAUTION/WARNING/UNSAFE/CRISIS. Content flags (triggering, overwhelming, retraumatizing…), severity algorithm, intervention scene generation." },
+        { name: "Therapeutic Integration", value: 65, file: "specs/therapeutic-safety/therapeutic-integration.md", description: "How narrative generation integrates therapeutic goals, self-reflection opportunities, safe pacing." },
+      ]
+    },
+    {
+      name: "Persistence",
+      description: "Redis session cache, Neo4j story graph, and HIPAA-compliant data retention.",
+      children: [
+        { name: "Data Retention Policy", value: 69, file: "specs/persistence/data-retention-policy.md", description: "HIPAA-compliant retention periods, deletion procedures, encryption at rest, audit trail retention for crisis records." },
+        { name: "Neo4j Story Graph", value: 64, file: "specs/persistence/neo4j-story-graph.md", description: "Graph schema: User/Character/World/Session nodes, relationship types, index requirements, transaction boundaries." },
+        { name: "Redis Session Cache", value: 63, file: "specs/persistence/redis-session-cache.md", description: "Key naming patterns, TTLs, serialization formats, failover behavior, inter-agent messaging, circuit breaker state." },
+      ]
+    },
+    {
+      name: "TTA.dev Integration",
+      description: "Boundary specs defining what belongs to TTA vs TTA.dev platform primitives.",
+      children: [
+        { name: "Observability Boundary", value: 63, file: "specs/tta-dev-integration/observability-boundary.md", description: "Universal (OpenTelemetry, Prometheus → TTA.dev) vs game-specific (LLM cost tracking, narrative dashboards → TTA)." },
+        { name: "Circuit Breaker Usage", value: 62, file: "specs/tta-dev-integration/circuit-breaker-usage.md", description: "Boundary resolution: circuit breaker is fully implemented in TTA (not delegated). Specifies delegation contract for future." },
+        { name: "Primitive Mapping", value: 60, file: "specs/tta-dev-integration/primitive-mapping.md", description: "Maps each TTA component to TTA.dev primitives (retry, timeout, cache, router). Documents extraction status and migration plan." },
+      ]
+    },
+    {
+      name: "Archive (KIRO)",
+      description: "15 feature specifications from the predecessor KIRO project — requirements + design docs.",
+      children: [
+        { name: "AI Agent Orchestration", value: 130, file: "_archive/kiro/specs/ai-agent-orchestration/", description: "Original agent orchestration requirements and design — predecessor to current IPA/WBA/NGA architecture." },
+        { name: "Narrative Arc Orchestration", value: 130, file: "_archive/kiro/specs/narrative-arc-orchestration/", description: "Narrative arc management: story structure, arc progression, emotional pacing requirements." },
+        { name: "Therapeutic Safety Validation", value: 130, file: "_archive/kiro/specs/therapeutic-safety-content-validation/", description: "Original therapeutic safety validation requirements — informed current 4-level crisis + 5-level emotional systems." },
+        { name: "Coherence Validation", value: 130, file: "_archive/kiro/specs/coherence-validation-system/", description: "Narrative coherence validation: contradiction detection, lore consistency, causal chain validation." },
+        { name: "Knowledge Management", value: 130, file: "_archive/kiro/specs/knowledge-management-system/", description: "Knowledge graph management system: lore, world state, character relationships." },
+        { name: "Player Experience Interface", value: 130, file: "_archive/kiro/specs/player-experience-interface/", description: "Player UI/UX requirements: SSE streaming, session management, frontend architecture." },
+        { name: "Authentication & User Mgmt", value: 130, file: "_archive/kiro/specs/authentication-user-management/", description: "User authentication, JWT, authorization, RBAC requirements." },
+        { name: "Core Gameplay Loop (KIRO)", value: 130, file: "_archive/kiro/specs/core-gameplay-loop/", description: "Original gameplay loop specification — predecessor to current core loop design." },
+        { name: "API Gateway Integration", value: 130, file: "_archive/kiro/specs/api-gateway-service-integration/", description: "API gateway integration requirements, endpoint contracts, service mesh." },
+        { name: "Model Management", value: 130, file: "_archive/kiro/specs/model-management-selection/", description: "LLM model selection, fallback strategy, cost management requirements." },
+        { name: "Monitoring & Observability", value: 130, file: "_archive/kiro/specs/monitoring-observability-platform/", description: "Observability platform: metrics, tracing, alerting, dashboards requirements." },
+        { name: "TTA Living Worlds", value: 130, file: "_archive/kiro/specs/tta-living-worlds/", description: "World/universe management: dynamic world state, multi-world architecture, Dolt branching universes." },
+        { name: "Player Onboarding", value: 130, file: "_archive/kiro/specs/player-onboarding-system/", description: "Player onboarding flow: safe introduction, profile building, therapeutic goal setting." },
+        { name: "Meta-Game Interface", value: 130, file: "_archive/kiro/specs/meta-game-interface-system/", description: "Meta-game UI: character management, world selection, session history, progress visualization." },
+        { name: "Prototype Core Features", value: 130, file: "_archive/kiro/specs/tta-prototype-core-features/", description: "Original prototype core feature requirements — baseline for current MVP." },
+      ]
+    },
+  ]
+};
+
+// ─── Config ──────────────────────────────────────────────────────────────────
+
+const COLORS = {
+  "Core Standards":       "#818cf8",
+  "Game Design":          "#a78bfa",
+  "Technical Architecture":"#38bdf8",
+  "Agent Specs":          "#34d399",
+  "Therapeutic Safety":   "#f87171",
+  "Persistence":          "#fbbf24",
+  "TTA.dev Integration":  "#f472b6",
+  "Archive (KIRO)":       "#6b7280",
+};
+
+const WIDTH = 600;
+const HEIGHT = 600;
+const RADIUS = Math.min(WIDTH, HEIGHT) / 2 - 10;
+
+// ─── Layout ──────────────────────────────────────────────────────────────────
+
+const root = d3.hierarchy(data)
+  .sum(d => d.value || 0)
+  .sort((a, b) => b.value - a.value);
+
+d3.partition().size([2 * Math.PI, root.height + 1])(root);
+
+root.each(d => d.current = d);
+
+// ─── SVG Setup ───────────────────────────────────────────────────────────────
+
+const svg = d3.select("#chart-container")
+  .append("svg")
+  .attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT])
+  .attr("width", WIDTH)
+  .attr("height", HEIGHT)
+  .style("font", "10px sans-serif");
+
+// ─── Arc Generator ───────────────────────────────────────────────────────────
+
+const arcGen = d3.arc()
+  .startAngle(d => d.x0)
+  .endAngle(d => d.x1)
+  .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.008))
+  .padRadius(RADIUS * 0.15)
+  .innerRadius(d => Math.max(0, d.y0) * RADIUS * 0.32)
+  .outerRadius(d => Math.max(0, d.y1 - 0.05) * RADIUS * 0.32);
+
+function arcVisible(d) {
+  return d.y1 <= 3 && d.y0 >= 1 && d.x1 > d.x0;
+}
+
+function labelVisible(d) {
+  return d.y1 <= 3 && d.y0 >= 1 && (d.y1 - d.y0) * (d.x1 - d.x0) > 0.06;
+}
+
+function labelTransform(d) {
+  const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+  const y = (d.y0 + d.y1) / 2 * RADIUS * 0.32;
+  return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
+}
+
+function getColor(d) {
+  let node = d;
+  while (node.depth > 1) node = node.parent;
+  return COLORS[node.data.name] || "#6b7280";
+}
+
+function getAlpha(d) {
+  return d.depth === 1 ? 1.0 : 0.75;
+}
+
+// ─── Draw arcs ───────────────────────────────────────────────────────────────
+
+const g = svg.append("g");
+
+const path = g.append("g")
+  .selectAll("path")
+  .data(root.descendants().slice(1))
+  .join("path")
+    .attr("class", "arc-path")
+    .attr("fill", d => getColor(d))
+    .attr("fill-opacity", d => arcVisible(d.current) ? getAlpha(d) : 0)
+    .attr("pointer-events", d => arcVisible(d.current) ? "auto" : "none")
+    .attr("d", d => arcGen(d.current));
+
+// ─── Labels ──────────────────────────────────────────────────────────────────
+
+const label = g.append("g")
+  .attr("pointer-events", "none")
+  .attr("text-anchor", "middle")
+  .selectAll("text")
+  .data(root.descendants().slice(1))
+  .join("text")
+    .attr("class", "arc-label")
+    .attr("dy", "0.35em")
+    .attr("fill-opacity", d => +labelVisible(d.current))
+    .attr("transform", d => labelTransform(d.current))
+    .text(d => {
+      const nm = d.data.name;
+      if (nm.length > 22) return nm.slice(0, 20) + "…";
+      return nm;
+    });
+
+// ─── Center circle ───────────────────────────────────────────────────────────
+
+const centerG = svg.append("g").attr("text-anchor", "middle").attr("cursor", "pointer");
+
+centerG.append("circle")
+  .attr("r", RADIUS * 0.28)
+  .attr("fill", "#161b22")
+  .attr("stroke", "#30363d")
+  .attr("stroke-width", 1);
+
+const centerTitle = centerG.append("text")
+  .attr("class", "center-label-title")
+  .attr("dy", "-0.3em")
+  .text("TTA");
+
+const centerSub = centerG.append("text")
+  .attr("class", "center-label")
+  .attr("dy", "1.1em")
+  .text("click to zoom out");
+
+// ─── Legend ──────────────────────────────────────────────────────────────────
+
+const legendEl = document.getElementById("legend");
+Object.entries(COLORS).forEach(([name, color]) => {
+  const domainNode = root.children.find(c => c.data.name === name);
+  const total = domainNode ? domainNode.value : 0;
+  const count = domainNode ? domainNode.children.length : 0;
+
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = `
+    <div class="legend-dot" style="background:${color}"></div>
+    <span class="legend-name">${name}</span>
+    <span class="legend-count">${count} specs · ${total.toLocaleString()} lines</span>
+  `;
+  item.addEventListener("mouseenter", () => highlightDomain(name));
+  item.addEventListener("mouseleave", () => resetHighlight());
+  legendEl.appendChild(item);
+});
+
+// ─── Detail card ─────────────────────────────────────────────────────────────
+
+function showDetail(d) {
+  const card = document.getElementById("detail-card");
+  const color = getColor(d);
+  const domainName = d.depth === 1 ? d.data.name : d.parent.data.name;
+  const lines = d.data.value ? `${d.data.value} lines` : `${d.value.toLocaleString()} total lines`;
+  const file = d.data.file || "";
+  const desc = d.data.description || d.data.description || "";
+
+  card.innerHTML = `
+    <div class="category-badge" style="background:${color}22; color:${color}; border:1px solid ${color}44">${domainName}</div>
+    <h3>${d.data.name}</h3>
+    <p>${desc || (d.depth === 1 ? d.data.description : "")}</p>
+    ${file ? `<code class="file-path">${file}</code>` : ""}
+    <div class="lines-badge">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="${color}">
+        <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 8.75 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/>
+      </svg>
+      ${lines}
+    </div>
+  `;
+}
+
+function resetDetail() {
+  const card = document.getElementById("detail-card");
+  card.innerHTML = `<div class="default-hint">Hover over a segment to see details</div>`;
+}
+
+// ─── Highlight by domain ──────────────────────────────────────────────────────
+
+function highlightDomain(name) {
+  path.attr("fill-opacity", d => {
+    if (!arcVisible(d.current)) return 0;
+    const dn = d.depth === 1 ? d.data.name : d.parent.data.name;
+    return dn === name ? 1.0 : 0.2;
+  });
+}
+
+function resetHighlight() {
+  path.attr("fill-opacity", d => arcVisible(d.current) ? getAlpha(d) : 0);
+}
+
+// ─── Hover interactions ──────────────────────────────────────────────────────
+
+path.on("mouseenter", (event, d) => {
+  showDetail(d);
+  // Dim siblings slightly
+  path.attr("fill-opacity", p => {
+    if (!arcVisible(p.current)) return 0;
+    if (p === d) return 1.0;
+    const sameTop = (d.depth === 1 ? d : d.parent) === (p.depth === 1 ? p : p.parent);
+    return sameTop ? 0.9 : (p.depth === 1 ? 0.6 : 0.4);
+  });
+})
+.on("mouseleave", () => {
+  resetDetail();
+  resetHighlight();
+});
+
+// ─── Click to zoom ───────────────────────────────────────────────────────────
+
+let currentFocus = root;
+
+function zoom(event, p) {
+  currentFocus = p;
+
+  const t = svg.transition().duration(500);
+
+  root.each(d => d.target = {
+    x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+    x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+    y0: Math.max(0, d.y0 - p.depth),
+    y1: Math.max(0, d.y1 - p.depth),
+  });
+
+  const tr = t.selectAll("path")
+    .tween("data", d => {
+      const i = d3.interpolate(d.current, d.target);
+      return t => { d.current = i(t); };
+    });
+
+  tr.filter(function(d) { return +this.getAttribute("fill-opacity") || arcVisible(d.target); })
+    .attr("pointer-events", "auto")
+    .attrTween("fill-opacity", d => () => arcVisible(d.current) ? getAlpha(d) : 0)
+    .attrTween("d", d => () => arcGen(d.current));
+
+  tr.filter(function(d) { return !arcVisible(d.target); })
+    .attr("pointer-events", "none");
+
+  label.filter(function(d) {
+    return +this.getAttribute("fill-opacity") || labelVisible(d.target);
+  }).transition(t)
+    .attr("fill-opacity", d => +labelVisible(d.target))
+    .attrTween("transform", d => () => labelTransform(d.current));
+
+  // Update center label
+  if (p.depth > 0) {
+    const nm = p.data.name;
+    centerTitle.text(nm.length > 14 ? nm.slice(0, 13) + "…" : nm);
+    centerSub.text("click to zoom out");
+    centerG.style("cursor", "pointer");
+  } else {
+    centerTitle.text("TTA");
+    centerSub.text("click to zoom out");
+  }
+}
+
+path.on("click", (event, d) => {
+  if (d.children) {
+    zoom(event, d);
+  }
+  event.stopPropagation();
+});
+
+centerG.on("click", (event) => {
+  if (currentFocus !== root) {
+    const parent = currentFocus.parent || root;
+    zoom(event, parent);
+  }
+});
+
+svg.on("click", (event) => {
+  if (currentFocus !== root) zoom(event, root);
+});
+
+</script>
+</body>
+</html>

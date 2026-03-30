@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Utils/Python/Convert_imports]]
 Script to convert absolute imports from src to relative imports in the TTA.prototype repository.
 """
 

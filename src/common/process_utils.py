@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Common/Process_utils]]
 Process utilities: safe subprocess execution helpers.
 
 Design goals:

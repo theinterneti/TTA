@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Services/Test_performance_monitor_concrete]]
 Concrete Value Tests for PerformanceMonitor Service.
 
 This module contains concrete value tests with hardcoded expected values
@@ -9,6 +11,8 @@ import asyncio
 from datetime import datetime
 
 import pytest
+
+pytest.importorskip("tta_ai")
 from tta_ai.models.models import PerformanceMetrics
 from tta_ai.models.services import PerformanceMonitor
 

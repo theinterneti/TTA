@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Agent_event_integration]]
 Real-time event integration for enhanced agent proxies.
 
 This module provides integration between the enhanced agent proxies and the
@@ -56,7 +58,7 @@ class AgentEventIntegrator:
             return False
 
         try:
-            return await self.event_publisher.publish_event(event)
+            return await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
         except Exception as e:
             logger.error(f"Failed to publish event: {e}")
             return False
@@ -252,7 +254,7 @@ class WorkflowEventIntegrator:
             return False
 
         try:
-            return await self.event_publisher.publish_event(event)
+            return await self.event_publisher._publish_event(event)  # type: ignore[union-attr]
         except Exception as e:
             logger.error(f"Failed to publish workflow event: {e}")
             return False
@@ -296,9 +298,8 @@ class WorkflowEventIntegrator:
                 "advance_step": lambda message="": self._advance_workflow_step(
                     workflow_id, message
                 ),
-                "update_progress": lambda progress,
-                message="": self._update_workflow_progress(
-                    workflow_id, progress, message
+                "update_progress": lambda progress, message="": (
+                    self._update_workflow_progress(workflow_id, progress, message)
                 ),
                 "add_metadata": lambda key, value: self._add_workflow_metadata(
                     workflow_id, key, value
@@ -306,7 +307,7 @@ class WorkflowEventIntegrator:
             }
 
             # Send completion event
-            time.time() - start_time
+            _elapsed = time.time() - start_time
             completion_event = create_workflow_progress_event(
                 workflow_id=workflow_id,
                 workflow_type=workflow_type,
@@ -320,7 +321,7 @@ class WorkflowEventIntegrator:
 
         except Exception as e:
             # Send error event
-            time.time() - start_time
+            _elapsed = time.time() - start_time
             current_step = self.active_workflows[workflow_id]["current_step"]
             total_steps = max(self.active_workflows[workflow_id]["total_steps"], 1)
             error_event = create_workflow_progress_event(
@@ -395,8 +396,6 @@ def get_agent_event_integrator(
     enabled: bool = True,
 ) -> AgentEventIntegrator:
     """Get or create agent event integrator."""
-    global _agent_integrators
-
     if agent_id not in _agent_integrators or event_publisher is not None:
         _agent_integrators[agent_id] = AgentEventIntegrator(
             event_publisher=event_publisher, agent_id=agent_id, enabled=enabled

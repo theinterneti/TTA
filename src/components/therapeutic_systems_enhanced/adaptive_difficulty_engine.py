@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Adaptive_difficulty_engine]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Adaptive_difficulty_engine]]
 Therapeutic AdaptiveDifficultyEngine Implementation
 
 This module provides production-ready adaptive difficulty adjustment for the TTA
@@ -7,7 +10,7 @@ performance, therapeutic goals, and emotional safety considerations.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum, IntEnum
 from typing import Any
 from uuid import uuid4
@@ -60,7 +63,7 @@ class PerformanceMetrics:
         self.emotional_stability = 0.0
         self.therapeutic_progress = 0.0
         self.current_difficulty = DifficultyLevel.MODERATE
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.now(UTC)
 
 
 class TherapeuticAdaptiveDifficultyEngine:
@@ -166,7 +169,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             - assessment_reasoning: Explanation of the assessment
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get user's performance history
             performance_history = self.user_performance_history.get(user_id, [])
@@ -187,7 +190,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             # Update metrics
             self.metrics["assessments_performed"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.debug(
                 f"Assessed user capability for {user_id} in {processing_time.total_seconds():.3f}s"
             )
@@ -238,7 +241,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             - strategy_applied: Strategy used for adaptation
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Create performance metrics object
             metrics = self._create_performance_metrics(user_id, performance_data)
@@ -254,7 +257,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             if adjustment_trigger is None:
                 # No adjustment needed
                 current_difficulty = self._get_current_difficulty(user_id)
-                processing_time = datetime.utcnow() - start_time
+                processing_time = datetime.now(UTC) - start_time
                 return {
                     "new_difficulty_level": current_difficulty.name,
                     "adaptation_reason": "Performance stable, no adjustment needed",
@@ -287,7 +290,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             if new_difficulty > current_difficulty:
                 self.metrics["performance_improvements"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Adapted difficulty for user {user_id}: {current_difficulty.name} -> {new_difficulty.name} "
                 f"(Strategy: {strategy.value}, Trigger: {adjustment_trigger.value})"
@@ -543,7 +546,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             }
 
         adjustment_record = {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(UTC),
             "previous_difficulty": self.difficulty_adjustments[user_id][
                 "current_difficulty"
             ],
@@ -556,7 +559,7 @@ class TherapeuticAdaptiveDifficultyEngine:
         self.difficulty_adjustments[user_id]["current_difficulty"] = new_difficulty
 
         # Keep only recent adjustments (last 24 hours)
-        cutoff_time = datetime.utcnow() - timedelta(hours=24)
+        cutoff_time = datetime.now(UTC) - timedelta(hours=24)
         self.difficulty_adjustments[user_id]["adjustments"] = [
             adj
             for adj in self.difficulty_adjustments[user_id]["adjustments"]

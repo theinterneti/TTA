@@ -1,6 +1,6 @@
 # TTA Current Status
 
-> **📋 NOTE**: This file contains historical sprint context. For comprehensive TODO tracking and incomplete work, see [`.augment/TODO-AUDIT.md`](.augment/TODO-AUDIT.md)
+> **📋 NOTE**: This file contains historical sprint context. For live TODO, issue, and milestone tracking, use [`docs/status/todo-audit.md`](./todo-audit.md) and `python3 scripts/todo-audit.py report`.
 
 **Last Updated**: 2025-10-29 10:24 UTC
 **Sprint Focus**: Foundation Fixes & Test Infrastructure
@@ -238,3 +238,6 @@ norecursedirs = archive .git __pycache__ .venv node_modules
 ---
 
 **Next Update**: After full test suite run completes
+
+
+---

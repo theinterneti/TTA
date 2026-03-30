@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_tool_invocation_service]]
 import asyncio
 
 import pytest
@@ -42,8 +43,8 @@ async def test_tool_invocation_service_records_metrics_and_policy(redis_client):
         version="1.0.0",
         description="Add numbers",
         parameters=[
-            ToolParameter(name="a", schema={"type": "number"}),
-            ToolParameter(name="b", schema={"type": "number"}),
+            ToolParameter(name="a", param_schema={"type": "number"}),
+            ToolParameter(name="b", param_schema={"type": "number"}),
         ],
         returns_schema={"type": "number"},
     )

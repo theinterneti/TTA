@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Contract/Model_management/Test_provider_contracts]]
 Contract Tests for Model Provider Interfaces.
 
 Validates that all providers (OpenRouter, Local, Ollama, etc.) conform to the

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/Phase 1: Component Architecture Design.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Agent_orchestration/Phase1_architecture]]

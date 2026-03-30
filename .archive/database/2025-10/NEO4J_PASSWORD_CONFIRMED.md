@@ -105,3 +105,7 @@ See `.github/instructions/data-separation-strategy.md` for comprehensive plan to
 **Last Updated**: 2025-10-26
 **Status**: ✅ Verified and Working
 **Issue**: Authentication works via CLI, may need manual setup in VS Code UI
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Database/2025-10/Neo4j_password_confirmed]]

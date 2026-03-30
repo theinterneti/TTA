@@ -317,3 +317,7 @@ cp .github/specs/therapeutic-feature.spec.md specs/my-feature.spec.md
 
 **Last Updated**: 2025-10-26
 **Status**: Complete - Dual structure implemented, ready for gradual migration
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Agentic_primitives_migration]]

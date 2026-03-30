@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/Model Management Component - Staging Promotion Complete]]
 > - **Path:** `.augment/kb/Components/Model Management Component - Staging Promotion Complete.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Model Management Component - Staging Promotion Complete.md`
 
 **Migration date:** 2025-11-01
+
+
+---

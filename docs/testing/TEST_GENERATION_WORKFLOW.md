@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/Test Generation Workflow]]
 > - **Path:** `.augment/kb/Workflows/Test Generation Workflow.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Test Generation Workflow.md`
 
 **Migration date:** 2025-11-01
+
+
+---

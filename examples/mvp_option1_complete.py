@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Examples/Mvp_option1_complete]]
 Complete MVP Example - Production-Ready Narrative Workflow
 
 This example demonstrates a complete narrative generation workflow using:

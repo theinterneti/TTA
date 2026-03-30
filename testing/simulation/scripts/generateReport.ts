@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Testing/Simulation/Scripts/Generatereport]]
 #!/usr/bin/env ts-node
 /**
  * Production Report Generator for TTA Simulation Framework

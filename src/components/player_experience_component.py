@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Player_experience_component]]
+
+# Logseq: [[TTA/Components/Player_experience_component]]
 Player Experience Component.
 
 This module provides a component for managing the Player Experience Interface.

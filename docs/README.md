@@ -4,12 +4,6 @@ Welcome to the TTA (Therapeutic Text Adventure) documentation!
 
 ## Documentation Structure
 
-### 📚 Primary Knowledge Base
-Most documentation lives in the **Logseq Knowledge Base** at `.augment/kb/`:
-- 306 interconnected documents
-- Architecture, components, workflows, testing, and more
-- See [docs/reference/logseq-kb.md](reference/logseq-kb.md) for navigation
-
 ### 📖 This Directory (`docs/`)
 Complementary documentation for active development:
 
@@ -46,7 +40,6 @@ Complementary documentation for active development:
 - [Test Targets](development/test-targets.md) - Test generation priorities
 
 #### [reference/](reference/) - Quick References
-- [Logseq KB Guide](reference/logseq-kb.md) - Navigate the knowledge base
 
 ## Getting Started
 
@@ -58,7 +51,6 @@ Complementary documentation for active development:
 
 ### Existing Contributors
 - **Daily:** Check [status/current-sprint.md](status/current-sprint.md)
-- **New Features:** Review component architecture in `.augment/kb/TTA___Components___`
 - **Debugging:** Check [guides/database-quick-ref.md](guides/database-quick-ref.md)
 - **Deployment:** Follow [guides/docker-quick-start.md](guides/docker-quick-start.md)
 
@@ -71,14 +63,6 @@ Complementary documentation for active development:
 - Environment setup
 - Common workflows
 
-### Logseq KB (`.augment/kb/`)
-**Purpose:** Deep knowledge and context
-- System architecture
-- Component design decisions
-- Historical context and evolution
-- Agent behavior and patterns
-- Cross-cutting concerns
-
 ### When to Add New Docs
 
 **Add to `docs/`:**
@@ -87,19 +71,11 @@ Complementary documentation for active development:
 - Active work tracking
 - Environment setup instructions
 
-**Add to KB:**
-- Architectural decisions
-- Component specifications
-- Long-term design docs
-- Agent behavioral patterns
-- Cross-project learnings
-
 ## Maintenance
 
 - **`docs/`**: Updated frequently with current status
-- **`.augment/kb/`**: Updated for significant changes or new components
 - **`.archive/`**: Historical reports preserved but not actively maintained
 
 ---
 
-**Questions?** Check the [Logseq KB Guide](reference/logseq-kb.md) or ask in team chat!
+**Questions?** Ask in team chat!

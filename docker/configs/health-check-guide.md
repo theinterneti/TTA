@@ -51,3 +51,7 @@ healthcheck:
 
 ## Manual Application Required
 This guide must be applied manually to each compose file to ensure correctness.
+
+
+---
+**Logseq:** [[TTA.dev/Docker/Configs/Health-check-guide]]

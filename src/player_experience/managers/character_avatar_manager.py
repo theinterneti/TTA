@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Character_avatar_manager]]
 Character creation, customization, and lifecycle management.
 
 This module provides the CharacterAvatarManager service that handles character CRUD operations,
@@ -29,7 +31,7 @@ class CharacterDevelopmentSystem:
     def __init__(self):
         pass
 
-    def initialize_character(self, character_id: str, **kwargs):
+    def initialize_character(self, character_id: str, **kwargs):  # noqa: ARG002
         logger.info(f"Mock: Initialized character {character_id} in development system")
         return {"character_id": character_id, "initialized": True}
 
@@ -40,13 +42,13 @@ class PersonalizationEngine:
     def __init__(self):
         pass
 
-    def create_personalization_profile(self, character_id: str, **kwargs):
+    def create_personalization_profile(self, character_id: str, **kwargs):  # noqa: ARG002
         logger.info(
             f"Mock: Created personalization profile for character {character_id}"
         )
         return {"character_id": character_id, "profile_created": True}
 
-    def update_personalization_profile(self, character_id: str, **kwargs):
+    def update_personalization_profile(self, character_id: str, **kwargs):  # noqa: ARG002
         logger.info(
             f"Mock: Updated personalization profile for character {character_id}"
         )
@@ -175,9 +177,12 @@ class CharacterAvatarManager:
             character_id: The character ID
 
         Returns:
-            The Character object if found, None otherwise
+            The Character object if found and active, None otherwise
         """
-        return self.character_repository.get_character(character_id)
+        character = self.character_repository.get_character(character_id)
+        if character and not character.is_active:
+            return None
+        return character
 
     def get_player_characters(self, player_id: str) -> list[Character]:
         """
@@ -416,7 +421,7 @@ class CharacterAvatarManager:
             traits["neuroticism"] = traits.get("neuroticism", 0.0) + 0.2
 
         # Ensure all values are in valid range
-        for trait_name in traits:
+        for trait_name in traits:  # noqa: PLC0206
             traits[trait_name] = max(-1.0, min(1.0, traits[trait_name]))
 
         return traits

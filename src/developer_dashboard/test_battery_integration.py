@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Developer_dashboard/Test_battery_integration]]
 Developer Dashboard Integration for TTA Comprehensive Test Battery.
 
 Provides real-time test execution monitoring, results visualization,
@@ -9,7 +11,7 @@ import asyncio
 import json
 import logging
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -95,7 +97,7 @@ class TestBatteryDashboard:
                         asdict(result) for result in self.test_results[-10:]
                     ],
                     "service_status": await self._get_service_status(),
-                    "last_updated": datetime.utcnow().isoformat(),
+                    "last_updated": datetime.now(UTC).isoformat(),
                 }
             )
 
@@ -157,7 +159,7 @@ class TestBatteryDashboard:
         message = {
             "type": update_type,
             "data": data,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         # Send to all connected clients
@@ -215,19 +217,19 @@ class TestBatteryDashboard:
             )
 
             manager = MockServiceManager()
-            status = await manager.get_service_status()
+            status = await manager.get_service_status()  # type: ignore[attr-defined]
             await manager.cleanup()
 
             return {
                 "services": status,
-                "last_checked": datetime.utcnow().isoformat(),
+                "last_checked": datetime.now(UTC).isoformat(),
                 "available": True,
             }
         except Exception as e:
             logger.warning(f"Could not get service status: {e}")
             return {
                 "services": {},
-                "last_checked": datetime.utcnow().isoformat(),
+                "last_checked": datetime.now(UTC).isoformat(),
                 "available": False,
                 "error": str(e),
             }
@@ -321,7 +323,7 @@ class TestBatteryDashboard:
                 "history": [
                     asdict(status) for status in self.test_history[-100:]
                 ],  # Keep last 100
-                "last_updated": datetime.utcnow().isoformat(),
+                "last_updated": datetime.now(UTC).isoformat(),
             }
 
             async with aiofiles.open(history_file, "w") as f:
@@ -481,9 +483,9 @@ async def report_test_execution(
                     else TestStatus.FAILED
                 ),
                 start_time=summary_data.get(
-                    "start_time", datetime.utcnow().isoformat()
+                    "start_time", datetime.now(UTC).isoformat()
                 ),
-                end_time=summary_data.get("end_time", datetime.utcnow().isoformat()),
+                end_time=summary_data.get("end_time", datetime.now(UTC).isoformat()),
                 total_tests=summary_data.get("total_tests", 0),
                 passed_tests=summary_data.get("passed_tests", 0),
                 failed_tests=summary_data.get("failed_tests", 0),

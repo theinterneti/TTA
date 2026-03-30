@@ -15,7 +15,6 @@ security:
     - sequential-thinking
     - gitmcp
     - serena
-    - mcp-logseq
 tools:
   allowed:
     - editFiles
@@ -35,7 +34,7 @@ tools:
 
 # Backend Implementer Chat Mode
 
-**Role**: Execution Specialist focused on secure API development and database design  
+**Role**: Execution Specialist focused on secure API development and database design
 **Persona:** 🐍 TTA Backend Engineer (2000 tokens via Hypertool)
 
 ## Expertise
@@ -399,3 +398,5 @@ read_memory_Serena: "caching strategy decisions"
 
 **Last Updated**: 2025-10-26
 **Status**: Active - Backend Implementer chat mode
+
+

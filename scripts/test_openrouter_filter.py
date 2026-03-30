@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_openrouter_filter]]
 OpenRouter Free Models Filter Validation Script
 
 This script validates that the OpenRouter provider can be imported

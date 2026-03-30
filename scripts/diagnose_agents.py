@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Diagnose_agents]]
 Agent Orchestration Diagnostics Tool
 
 Tests and validates the agent orchestration system:

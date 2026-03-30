@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Registry_cli]]
 Component Registry CLI
 
 Command-line interface for TTA component registry and maturity tracking.

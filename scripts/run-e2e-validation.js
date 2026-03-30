@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Scripts/Run-e2e-validation]]
 #!/usr/bin/env node
 /**
  * Comprehensive E2E Validation Runner

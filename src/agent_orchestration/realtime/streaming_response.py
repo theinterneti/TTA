@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Streaming_response]]
 Streaming response system for long-running agent orchestration workflows.
 
 This module provides streaming capabilities for workflows that need to provide
@@ -70,7 +72,8 @@ class StreamingWorkflowResponse:
             # Add callback for progress updates
             if self.operation_id:
                 self.feedback_manager.add_operation_callback(
-                    self.operation_id, self._handle_progress_update
+                    self.operation_id,
+                    self._handle_progress_update,  # type: ignore[arg-type]
                 )
 
         logger.info(f"Started streaming for workflow: {self.workflow_id}")
@@ -120,7 +123,7 @@ class StreamingWorkflowResponse:
             "progress_percentage": progress_percentage,
             "message": message,
             "intermediate_result": intermediate_result,
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": asyncio.get_running_loop().time(),
         }
 
         await self.send_chunk(progress_data, "progress")
@@ -138,7 +141,7 @@ class StreamingWorkflowResponse:
         error_data = {
             "error": error_message,
             "details": error_details,
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": asyncio.get_running_loop().time(),
         }
 
         await self.send_chunk(error_data, "error")
@@ -165,7 +168,7 @@ class StreamingWorkflowResponse:
         # Send completion chunk
         completion_data = {
             "status": "completed",
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": asyncio.get_running_loop().time(),
         }
 
         await self.send_chunk(completion_data, "completion")
@@ -183,7 +186,7 @@ class StreamingWorkflowResponse:
 
         logger.info(f"Completed streaming for workflow: {self.workflow_id}")
 
-    async def generate_stream(self) -> AsyncGenerator[str, None]:
+    async def generate_stream(self) -> AsyncGenerator[str]:
         """Generate the streaming response."""
         try:
             await self.start_streaming()
@@ -193,7 +196,7 @@ class StreamingWorkflowResponse:
                 "workflow_id": self.workflow_id,
                 "workflow_type": self.workflow_type,
                 "user_id": self.user_id,
-                "started_at": asyncio.get_event_loop().time(),
+                "started_at": asyncio.get_running_loop().time(),
             }
 
             yield self._format_chunk(initial_data, "start")
@@ -216,7 +219,7 @@ class StreamingWorkflowResponse:
                     # Send heartbeat
                     heartbeat_data = {
                         "type": "heartbeat",
-                        "timestamp": asyncio.get_event_loop().time(),
+                        "timestamp": asyncio.get_running_loop().time(),
                     }
                     yield self._format_chunk(heartbeat_data, "heartbeat")
 
@@ -241,7 +244,7 @@ class StreamingWorkflowResponse:
             "type": chunk_type,
             "workflow_id": self.workflow_id,
             "data": chunk_data,
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": asyncio.get_running_loop().time(),
         }
 
         # Format as Server-Sent Events (SSE)

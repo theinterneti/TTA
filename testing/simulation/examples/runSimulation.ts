@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Testing/Simulation/Examples/Runsimulation]]
 #!/usr/bin/env ts-node
 
 /**

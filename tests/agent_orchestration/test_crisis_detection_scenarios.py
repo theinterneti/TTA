@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_crisis_detection_scenarios]]
 Realistic crisis detection scenario tests for TherapeuticValidator (Task 17.1).
 
 Tests crisis detection algorithms with realistic therapeutic scenarios to ensure

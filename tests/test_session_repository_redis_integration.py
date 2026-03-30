@@ -1,4 +1,5 @@
-from datetime import datetime
+# Logseq: [[TTA.dev/Tests/Test_session_repository_redis_integration]]
+from datetime import UTC, datetime
 
 import pytest
 
@@ -18,8 +19,8 @@ async def test_session_repository_redis_cache_roundtrip(redis_client):
         character_id="char1",
         world_id="world1",
         status=SessionStatus.ACTIVE,
-        created_at=datetime.utcnow(),
-        last_interaction=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        last_interaction=datetime.now(UTC),
         interaction_count=0,
         total_duration_minutes=0,
         current_scene_id="scene1",

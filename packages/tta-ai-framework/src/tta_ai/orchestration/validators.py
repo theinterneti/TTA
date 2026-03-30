@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Validators]]
 Validation helpers for agent orchestration data structures (Task 2.1).
 """
 

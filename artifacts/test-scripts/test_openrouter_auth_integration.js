@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Artifacts/Test-scripts/Test_openrouter_auth_integration]]
 #!/usr/bin/env node
 
 /**

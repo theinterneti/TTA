@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Local]]
 Local Model Provider Implementation.
 
 This module provides local model management with hardware optimization
@@ -8,16 +10,33 @@ using Hugging Face Transformers.
 import asyncio
 import gc
 import logging
-import os
 from collections.abc import AsyncGenerator
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import psutil
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-from ..interfaces import (
+# Optional GPU dependencies — available with: uv sync --group gpu
+_has_torch = False
+torch: Any = None
+AutoModelForCausalLM: Any = None
+AutoTokenizer: Any = None
+pipeline: Any = None
+
+try:
+    import torch  # type: ignore[import-untyped]  # noqa: F811
+    from transformers import (  # type: ignore[import-untyped]
+        AutoModelForCausalLM,  # noqa: F811
+        AutoTokenizer,  # noqa: F811
+        pipeline,  # noqa: F811
+    )
+
+    _has_torch = True
+except ImportError:
+    pass
+
+from ..interfaces import (  # noqa: E402
     GenerationRequest,
     GenerationResponse,
     IModelInstance,
@@ -25,7 +44,7 @@ from ..interfaces import (
     ModelStatus,
     ProviderType,
 )
-from .base import BaseModelInstance, BaseProvider
+from .base import BaseModelInstance, BaseProvider  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +103,7 @@ class LocalModelInstance(BaseModelInstance):
             if self._pipeline:
                 # Use pipeline for generation
                 pipeline_fn = self._pipeline
-                result = await asyncio.get_event_loop().run_in_executor(
+                result = await asyncio.get_running_loop().run_in_executor(
                     None, lambda: pipeline_fn(request.prompt, **generation_kwargs)
                 )
 
@@ -99,7 +118,7 @@ class LocalModelInstance(BaseModelInstance):
                 )
 
                 with torch.no_grad():
-                    outputs = await asyncio.get_event_loop().run_in_executor(
+                    outputs = await asyncio.get_running_loop().run_in_executor(
                         None, lambda: self._model.generate(inputs, **generation_kwargs)
                     )
 
@@ -144,9 +163,7 @@ class LocalModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream (simplified implementation)."""
         try:
             # For now, generate full text and yield in chunks
@@ -192,7 +209,7 @@ class LocalModelProvider(BaseProvider):
         self._gpu_memory_fraction = config.get("gpu_memory_fraction", 0.8)
 
         # Create cache directory if it doesn't exist
-        os.makedirs(self._models_cache_dir, exist_ok=True)
+        Path(self._models_cache_dir).mkdir(parents=True, exist_ok=True)
 
         return True
 
@@ -315,7 +332,7 @@ class LocalModelProvider(BaseProvider):
                 tokenizer_kwargs["revision"] = revision
                 logger.info(f"Using pinned revision: {revision}")
 
-            tokenizer = await asyncio.get_event_loop().run_in_executor(
+            tokenizer = await asyncio.get_running_loop().run_in_executor(
                 None,
                 lambda: AutoTokenizer.from_pretrained(model_id, **tokenizer_kwargs),  # nosec B615 - revision validated above
             )
@@ -349,7 +366,7 @@ class LocalModelProvider(BaseProvider):
             if self._device_map and device != "cpu":
                 model_kwargs["device_map"] = self._device_map
 
-            loaded_model = await asyncio.get_event_loop().run_in_executor(
+            loaded_model = await asyncio.get_running_loop().run_in_executor(
                 None,
                 lambda: AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),  # nosec B615 - revision validated above
             )

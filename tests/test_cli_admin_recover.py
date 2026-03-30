@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Test_cli_admin_recover]]
 import subprocess
 import sys
 

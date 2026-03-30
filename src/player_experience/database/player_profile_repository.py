@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Player_profile_repository]]
 Repository for Player Profile database operations.
 
 This module provides data access layer for player profiles,
@@ -9,7 +11,7 @@ import contextlib
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -28,8 +30,8 @@ except ImportError:
     ServiceUnavailable = Exception
     ClientError = Exception
 
-from ..models.enums import IntensityLevel, TherapeuticApproach
-from ..models.player import (
+from ..models.enums import IntensityLevel, TherapeuticApproach  # noqa: E402
+from ..models.player import (  # noqa: E402
     CrisisContactInfo,
     PlayerProfile,
     PrivacySettings,
@@ -123,7 +125,7 @@ class PlayerProfileRepository:
 
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
-                elif isinstance(e, (AuthError, _ServiceUnavailable)):
+                elif isinstance(e, AuthError | _ServiceUnavailable):
                     raise PlayerProfileRepositoryError(
                         f"Failed to connect to Neo4j after retries: {e}"
                     ) from e
@@ -549,11 +551,11 @@ class PlayerProfileRepository:
                     # Restore authentication data if present (temporary solution)
                     # Using setattr for dynamic attributes not in PrivacySettings dataclass
                     if "password_hash" in privacy_settings_data:
-                        privacy_settings.password_hash = privacy_settings_data[
+                        privacy_settings.password_hash = privacy_settings_data[  # type: ignore[attr-defined]
                             "password_hash"
                         ]
                     if "role" in privacy_settings_data:
-                        privacy_settings.role = privacy_settings_data["role"]
+                        privacy_settings.role = privacy_settings_data["role"]  # type: ignore[attr-defined]
 
                 # Reconstruct progress summary
                 progress_summary = ProgressSummary()
@@ -635,7 +637,7 @@ class PlayerProfileRepository:
                     return None
 
                 created_at_val = player_data.get("created_at")
-                created_at_dt = _to_dt_profile(created_at_val) or datetime.utcnow()
+                created_at_dt = _to_dt_profile(created_at_val) or datetime.now(UTC)
                 last_login_val = player_data.get("last_login")
                 last_login_dt = (
                     _to_dt_profile(last_login_val) if last_login_val else None

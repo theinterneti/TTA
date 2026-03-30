@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Dev_setup]]
 Development Environment Setup Script
 
 This script sets up a complete development environment for testing

@@ -208,3 +208,7 @@ logger.info(f"User login attempt: {username}")
 
 **Last Updated**: 2025-10-26
 **Status**: Active - Critical safety and security requirements
+
+
+---
+**Logseq:** [[TTA.dev/.github/Instructions/Safety.instructions]]

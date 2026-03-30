@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Setup_mutants_env]]
 Setup script for mutation testing environment.
 
 This script ensures that all necessary __init__.py files are present in the

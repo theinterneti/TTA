@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Capability_matcher]]
 Capability matching algorithms for agent discovery.
 
 This module provides sophisticated algorithms for matching agent capabilities
@@ -8,7 +10,7 @@ against request criteria, supporting various matching strategies and scoring met
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from .models import (
@@ -21,7 +23,7 @@ from .models import (
 logger = logging.getLogger(__name__)
 
 
-class MatchingStrategy(str, Enum):
+class MatchingStrategy(StrEnum):
     """Available capability matching strategies."""
 
     EXACT_MATCH = "exact_match"  # Exact name and version matching

@@ -54,3 +54,7 @@ When you need multiple instances (production, CI/CD, version testing), use the G
 ---
 
 **Ready to migrate?** Run: `./scripts/migrate_to_simple_setup.sh`
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Database/2025-10/Readm_database_simplification]]

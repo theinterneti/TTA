@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Security/Rate_limiter]]
 Advanced rate limiting and DDoS protection system.
 
 This module provides multiple rate limiting algorithms and DDoS protection
@@ -11,8 +13,8 @@ from abc import ABC, abstractmethod
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from enum import Enum
+from datetime import UTC, datetime, timedelta
+from enum import StrEnum
 from typing import Any
 
 import redis
@@ -23,7 +25,7 @@ from ..monitoring.logging_config import LogCategory, LogContext, get_logger
 logger = get_logger(__name__)
 
 
-class RateLimitStrategy(str, Enum):
+class RateLimitStrategy(StrEnum):
     """Rate limiting strategies."""
 
     TOKEN_BUCKET = "token_bucket"
@@ -32,7 +34,7 @@ class RateLimitStrategy(str, Enum):
     LEAKY_BUCKET = "leaky_bucket"
 
 
-class RateLimitScope(str, Enum):
+class RateLimitScope(StrEnum):
     """Scope for rate limiting."""
 
     GLOBAL = "global"
@@ -147,14 +149,14 @@ class TokenBucketRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.burst_capacity,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(hours=1),
+                reset_time=datetime.now(UTC) + timedelta(hours=1),
                 retry_after=3600,
                 limit_type="blacklisted",
             )
@@ -184,7 +186,7 @@ class TokenBucketRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=True,
                     remaining=int(bucket["tokens"]),
-                    reset_time=datetime.utcnow()
+                    reset_time=datetime.now(UTC)
                     + timedelta(seconds=60 / self.config.requests_per_minute),
                 )
             # Calculate retry after
@@ -195,7 +197,7 @@ class TokenBucketRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(seconds=retry_after),
+                reset_time=datetime.now(UTC) + timedelta(seconds=retry_after),
                 retry_after=retry_after,
                 limit_type="rate_limit",
             )
@@ -213,7 +215,7 @@ class SlidingWindowRateLimiter(RateLimiter):
 
     def __init__(self, config: RateLimitConfig):
         super().__init__(config)
-        self.windows: dict[str, deque] = defaultdict(lambda: deque())
+        self.windows: dict[str, deque] = defaultdict(deque)
 
     def check_limit(
         self, identifier: str, endpoint: str | None = None
@@ -223,14 +225,14 @@ class SlidingWindowRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(hours=1),
+                reset_time=datetime.now(UTC) + timedelta(hours=1),
                 retry_after=3600,
                 limit_type="blacklisted",
             )
@@ -255,7 +257,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(seconds=60),
+                    reset_time=datetime.now(UTC) + timedelta(seconds=60),
                     retry_after=60,
                     limit_type="per_minute",
                 )
@@ -264,7 +266,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(hours=1),
+                    reset_time=datetime.now(UTC) + timedelta(hours=1),
                     retry_after=3600,
                     limit_type="per_hour",
                 )
@@ -273,7 +275,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(days=1),
+                    reset_time=datetime.now(UTC) + timedelta(days=1),
                     retry_after=86400,
                     limit_type="per_day",
                 )
@@ -284,7 +286,7 @@ class SlidingWindowRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute - minute_requests - 1,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
     def reset_limit(self, identifier: str):
@@ -309,14 +311,14 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
             return RateLimitResult(
                 allowed=False,
                 remaining=0,
-                reset_time=datetime.utcnow() + timedelta(hours=1),
+                reset_time=datetime.now(UTC) + timedelta(hours=1),
                 retry_after=3600,
                 limit_type="blacklisted",
             )
@@ -348,7 +350,7 @@ class RedisRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
-                    reset_time=datetime.utcnow() + timedelta(minutes=1),
+                    reset_time=datetime.now(UTC) + timedelta(minutes=1),
                     retry_after=60,
                     limit_type="per_minute",
                 )
@@ -356,7 +358,7 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute - current_requests - 1,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
         except redis.RedisError as e:
@@ -365,7 +367,7 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1),
+                reset_time=datetime.now(UTC) + timedelta(minutes=1),
             )
 
     def reset_limit(self, identifier: str):
@@ -517,9 +519,9 @@ class RateLimitMiddleware:
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="Rate limit exceeded",
                 headers={
-                    "Retry-After": str(result.retry_after),
+                    "Retry-After": str(result.retry_after),  # type: ignore[possibly-unbound]
                     "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(int(result.reset_time.timestamp())),
+                    "X-RateLimit-Reset": str(int(result.reset_time.timestamp())),  # type: ignore[possibly-unbound]
                 },
             ) from None
 

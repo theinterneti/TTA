@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Artifacts/Test-scripts/Test-character-creation-fixed]]
 Test character creation with the fixed schema
 """
 

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Registries/Redis_agent_registry]]
 from __future__ import annotations
 
 import asyncio
@@ -130,11 +131,11 @@ class RedisAgentRegistry(AgentRegistry):
                 if hasattr(agent, "get_capabilities"):
                     cap_set = await agent.get_capabilities()
                     if isinstance(cap_set, AgentCapabilitySet):
-                        capabilities = cap_set.dict()
+                        capabilities = cap_set.model_dump()
                 elif hasattr(agent, "capabilities") and agent.capabilities:
                     # Fallback for agents with direct capabilities attribute
                     if isinstance(agent.capabilities, AgentCapabilitySet):
-                        capabilities = agent.capabilities.dict()
+                        capabilities = agent.capabilities.model_dump()
             except Exception:
                 capabilities = None
 
@@ -231,11 +232,11 @@ class RedisAgentRegistry(AgentRegistry):
                 if hasattr(agent, "get_capabilities"):
                     cap_set = await agent.get_capabilities()
                     if isinstance(cap_set, AgentCapabilitySet):
-                        capabilities = cap_set.dict()
+                        capabilities = cap_set.model_dump()
                 elif hasattr(agent, "capabilities") and agent.capabilities:
                     # Fallback for agents with direct capabilities attribute
                     if isinstance(agent.capabilities, AgentCapabilitySet):
-                        capabilities = agent.capabilities.dict()
+                        capabilities = agent.capabilities.model_dump()
             except Exception:
                 capabilities = None
 
@@ -438,7 +439,7 @@ class RedisAgentRegistry(AgentRegistry):
         """Register or update capabilities for an agent."""
         try:
             cap_key = self._capability_key(agent_id)
-            capabilities_data = capability_set.dict()
+            capabilities_data = capability_set.model_dump()
             px = max(1, int(self._ttl * 1000))
 
             await self._redis.set(cap_key, json.dumps(capabilities_data), px=px)

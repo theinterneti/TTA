@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Store]]
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import playerReducer from './slices/playerSlice';

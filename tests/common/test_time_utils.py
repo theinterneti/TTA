@@ -1,5 +1,7 @@
 """Tests for common.time_utils module."""
 
+# Logseq: [[TTA.dev/Tests/Common/Test_time_utils]]
+
 
 class TestTimeUtils:
     """Tests for time utilities."""

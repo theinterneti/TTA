@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Langgraph_orchestrator]]
 LangGraph-integrated Agent Orchestrator.
 
 This module integrates the unified agent orchestrator with LangGraph workflows
@@ -10,12 +12,12 @@ from __future__ import annotations
 import json
 import logging
 import time
-from typing import Any, TypedDict
+from typing import Any, TypedDict, cast
 
 import redis.asyncio as aioredis
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
+from pydantic import SecretStr
 from tta_ai.prompts import PromptRegistry
 
 from .unified_orchestrator import UnifiedAgentOrchestrator
@@ -79,9 +81,14 @@ class LangGraphAgentOrchestrator:
         self.neo4j_manager = neo4j_manager
         self.model_name = model_name
 
-        # Initialize LLM
+        # Initialize LLM (lazy import to avoid Python 3.14 segfault)
+        from langchain_openai import ChatOpenAI
+
         self.llm = ChatOpenAI(
-            api_key=openai_api_key, model=model_name, temperature=0.7, max_tokens=1000
+            api_key=SecretStr(openai_api_key),
+            model=model_name,
+            temperature=0.7,
+            max_completion_tokens=1000,
         )
 
         # Initialize unified orchestrator
@@ -94,8 +101,8 @@ class LangGraphAgentOrchestrator:
         # Redis for caching
         self.redis: aioredis.Redis | None = None
 
-        # Workflows
-        self.workflow: StateGraph | None = None
+        # Workflows (compiled graph; StateGraph.compile() returns a CompiledStateGraph)
+        self.workflow: Any = None
         self.initialized = False
 
         # Initialize prompt registry
@@ -109,7 +116,7 @@ class LangGraphAgentOrchestrator:
 
             # Connect to Redis
             self.redis = aioredis.from_url(self.redis_url, decode_responses=True)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             # Create workflow
             await self._create_agent_workflow()
@@ -259,15 +266,16 @@ class LangGraphAgentOrchestrator:
 
             response = await self.llm.ainvoke([SystemMessage(content=safety_prompt)])
             latency_ms = (time.time() - start_time) * 1000
+            response_text = cast(str, response.content)
 
             # Parse response
-            assessment = json.loads(response.content)
+            assessment = json.loads(response_text)
             state["safety_level"] = assessment["safety_level"]
 
             # Record metrics
             self.prompt_registry.record_metrics(
                 "safety_check",
-                tokens=len(response.content.split()),  # Approximate
+                tokens=len(response_text.split()),  # Approximate
                 latency_ms=latency_ms,
                 cost_usd=0.0002,  # Approximate based on model
                 quality_score=8.5
@@ -338,9 +346,8 @@ class LangGraphAgentOrchestrator:
         start_time = time.time()
         try:
             # Prepare context
-            intent = (
-                state.get("ipa_result", {}).get("routing", {}).get("intent", "unknown")
-            )
+            ipa_result = state["ipa_result"] or {}
+            intent = ipa_result.get("routing", {}).get("intent", "unknown")
             world_context = json.dumps(state["world_context"], indent=2)[:200]
 
             # Use prompt registry for narrative generation
@@ -353,15 +360,16 @@ class LangGraphAgentOrchestrator:
 
             response = await self.llm.ainvoke([SystemMessage(content=response_prompt)])
             latency_ms = (time.time() - start_time) * 1000
+            response_text2 = cast(str, response.content)
 
-            state["narrative_response"] = response.content
-            state["messages"].append(AIMessage(content=response.content))
+            state["narrative_response"] = response_text2
+            state["messages"].append(AIMessage(content=response_text2))
             state["next_actions"] = ["continue", "reflect"]
 
             # Record metrics
             self.prompt_registry.record_metrics(
                 "narrative_generation",
-                tokens=len(response.content.split()),  # Approximate
+                tokens=len(response_text2.split()),  # Approximate
                 latency_ms=latency_ms,
                 cost_usd=0.0005,  # Approximate based on model
                 quality_score=8.0,  # Default quality score

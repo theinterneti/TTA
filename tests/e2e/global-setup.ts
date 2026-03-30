@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Global-setup]]
 import { chromium, FullConfig } from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {

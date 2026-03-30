@@ -1,4 +1,5 @@
 """
+
 Excellence-Focused Narrative Quality Assessment for TTA
 
 This module enhances the existing narrative analysis systems to meet higher

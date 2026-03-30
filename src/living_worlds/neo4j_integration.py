@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Living_worlds/Neo4j_integration]]
 Neo4j Integration for Living Worlds System
 Manages dynamic narrative environments and character relationships
 """
@@ -6,7 +8,7 @@ Manages dynamic narrative environments and character relationships
 import json
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -72,7 +74,7 @@ class LivingWorldsManager:
 
             # Initialize Redis connection
             self.redis = aioredis.from_url(self.redis_url)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             # Create Neo4j constraints and indexes
             await self._create_schema()
@@ -203,7 +205,7 @@ class LivingWorldsManager:
                     type="character",
                     properties=dict(character_node),
                     relationships=[],
-                    last_updated=datetime.utcnow(),
+                    last_updated=datetime.now(UTC),
                 )
 
             raise Exception("Failed to create character")
@@ -262,7 +264,7 @@ class LivingWorldsManager:
                     type="narrative_thread",
                     properties=dict(thread_node),
                     relationships=[],
-                    last_updated=datetime.utcnow(),
+                    last_updated=datetime.now(UTC),
                 )
 
             raise Exception("Failed to create narrative thread")
@@ -315,7 +317,7 @@ class LivingWorldsManager:
                     relationship_type=relationship_type,
                     strength=strength,
                     properties=properties,
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.now(UTC),
                 )
 
             raise Exception("Failed to create relationship")
@@ -351,7 +353,7 @@ class LivingWorldsManager:
                         dict(n) for n in record["narrative_threads"] if n
                     ],
                     "events": [dict(e) for e in record["events"] if e],
-                    "locations": [dict(l) for l in record["locations"] if l],
+                    "locations": [dict(loc) for loc in record["locations"] if loc],
                 }
 
             return {
@@ -418,7 +420,7 @@ class LivingWorldsManager:
                         json.dumps(
                             {
                                 "progress": progress,
-                                "last_updated": datetime.utcnow().isoformat(),
+                                "last_updated": datetime.now(UTC).isoformat(),
                                 "emotional_impact": emotional_impact,
                             }
                         ),

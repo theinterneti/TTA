@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Observability_integration/Primitives/Cache]]
 CachePrimitive - Redis-based caching workflow primitive.
 
 Implements caching layer for expensive LLM calls with TTL-based expiration,
@@ -15,23 +17,32 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import (
-        WorkflowContext,
+    from ttadev.primitives.core.base import (  # type: ignore[import, assignment]
+        WorkflowContext,  # pyright: ignore[reportAssignmentType]
         WorkflowPrimitive,
     )
 except ImportError:
-    # Fallback for development/testing
-    from typing import Protocol
+    try:
+        from tta_dev_primitives.core.base import (  # type: ignore[import]
+            WorkflowContext,  # pyright: ignore[reportAssignmentType]
+            WorkflowPrimitive,
+        )
+    except ImportError:
+        # Fallback stubs for development/testing
+        from typing import Protocol, TypeVar
 
-    class WorkflowContext:  # type: ignore
-        """Mock WorkflowContext for testing."""
+        _T = TypeVar("_T")
+        _U = TypeVar("_U")
 
-        pass
+        class WorkflowContext:  # type: ignore
+            """Mock WorkflowContext for testing."""
 
-    class WorkflowPrimitive(Protocol):  # type: ignore
-        """Minimal WorkflowPrimitive protocol for testing."""
+            pass
 
-        pass
+        class WorkflowPrimitive(Protocol[_T, _U]):  # type: ignore
+            """Minimal WorkflowPrimitive protocol for testing."""
+
+            pass
 
 
 from ..apm_setup import get_meter
@@ -39,7 +50,7 @@ from ..apm_setup import get_meter
 logger = logging.getLogger(__name__)
 
 
-class CachePrimitive(WorkflowPrimitive[Any, Any]):
+class CachePrimitive(WorkflowPrimitive[Any, Any]):  # type: ignore[misc]
     """
     Cache primitive with Redis backend and comprehensive metrics tracking.
 
@@ -142,9 +153,7 @@ class CachePrimitive(WorkflowPrimitive[Any, Any]):
                 name="cache_hit_rate",
                 description="Cache hit rate (0.0-1.0)",
                 callbacks=[
-                    lambda options: [
-                        (get_hit_rate(), {"operation": self.operation_name})
-                    ]
+                    lambda _: [(get_hit_rate(), {"operation": self.operation_name})]  # type: ignore[arg-type]
                 ],
             )
         else:
@@ -275,7 +284,7 @@ class CachePrimitive(WorkflowPrimitive[Any, Any]):
             )
 
         # Execute wrapped primitive
-        result = await self.primitive.execute(input_data, context)
+        result = await self.primitive.execute(input_data, context)  # type: ignore[attr-defined]
 
         # Store in cache (if Redis available)
         if self.redis_client:

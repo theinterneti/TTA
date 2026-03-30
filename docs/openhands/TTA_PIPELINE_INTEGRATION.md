@@ -380,3 +380,6 @@ logger = logging.getLogger("openhands_integration")
 - Configuration: See `ENVIRONMENT_SETUP.md`
 - Integration Analysis: See `INTEGRATION_ANALYSIS_AND_RECOMMENDATION.md`
 - Quick Start: See `QUICK_START_DOCKER.md`
+
+
+---

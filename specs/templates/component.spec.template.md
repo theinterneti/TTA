@@ -451,3 +451,7 @@ class [ConfigName](BaseSettings):
 
 **Notes:**
 [Any additional notes or context]
+
+
+---
+**Logseq:** [[TTA.dev/Specs/Templates/Component.spec.template]]

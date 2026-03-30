@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Test_suites/Adversarial_test_suite]]
 Adversarial Test Suite
 
 Tests edge cases, security vulnerabilities, and error scenarios including:
@@ -12,7 +14,7 @@ Tests edge cases, security vulnerabilities, and error scenarios including:
 
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -79,7 +81,7 @@ class AdversarialTestSuite:
                     test_name=test_name,
                     category=TestCategory.ADVERSARIAL,
                     status=TestStatus.RUNNING,
-                    start_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
                 )
 
                 try:
@@ -111,7 +113,7 @@ class AdversarialTestSuite:
                     }
 
                 finally:
-                    result.end_time = datetime.utcnow()
+                    result.end_time = datetime.now(UTC)
                     result.duration_seconds = (
                         result.end_time - result.start_time
                     ).total_seconds()
@@ -155,7 +157,7 @@ class AdversarialTestSuite:
                 test_name=test_name,
                 category=TestCategory.ADVERSARIAL,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -177,7 +179,7 @@ class AdversarialTestSuite:
                 logger.error(f"Boundary test failed for {test_case['name']}: {e}")
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -202,7 +204,7 @@ class AdversarialTestSuite:
                 test_name=test_name,
                 category=TestCategory.ADVERSARIAL,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -236,7 +238,7 @@ class AdversarialTestSuite:
                 }
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -267,7 +269,7 @@ class AdversarialTestSuite:
                 test_name=test_name,
                 category=TestCategory.ADVERSARIAL,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -295,7 +297,7 @@ class AdversarialTestSuite:
                 )
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -317,7 +319,7 @@ class AdversarialTestSuite:
                 test_name=test_name,
                 category=TestCategory.ADVERSARIAL,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -346,7 +348,7 @@ class AdversarialTestSuite:
                 )
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -360,7 +362,7 @@ class AdversarialTestSuite:
             test_name=test_name,
             category=TestCategory.ADVERSARIAL,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -384,7 +386,7 @@ class AdversarialTestSuite:
             logger.error(f"Concurrent access test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -398,7 +400,7 @@ class AdversarialTestSuite:
             test_name=test_name,
             category=TestCategory.ADVERSARIAL,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -422,7 +424,7 @@ class AdversarialTestSuite:
             result.details = {"exception_raised": str(e), "system_protected": True}
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()
@@ -436,7 +438,7 @@ class AdversarialTestSuite:
             test_name=test_name,
             category=TestCategory.ADVERSARIAL,
             status=TestStatus.RUNNING,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
         )
 
         try:
@@ -458,7 +460,7 @@ class AdversarialTestSuite:
             logger.error(f"Data corruption test failed: {e}")
 
         finally:
-            result.end_time = datetime.utcnow()
+            result.end_time = datetime.now(UTC)
             result.duration_seconds = (
                 result.end_time - result.start_time
             ).total_seconds()

@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/OpenRouter Free Models Filter Guide]]
 > - **Path:** `.augment/kb/Workflows/OpenRouter Free Models Filter Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/OpenRouter Free Models Filter Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---

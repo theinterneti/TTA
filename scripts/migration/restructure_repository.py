@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Migration/Restructure_repository]]
 Repository Restructuring Script for TTA Monorepo Migration
 
 This script automates the migration from the current structure to Option A

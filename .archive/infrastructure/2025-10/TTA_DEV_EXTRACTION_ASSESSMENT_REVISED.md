@@ -391,3 +391,7 @@ This avoids context pollution while still sharing knowledge and patterns.
 **Document Status**: Ready for Review
 **Last Updated**: October 29, 2025
 **Supersedes**: TTA_DEV_EXTRACTION_ASSESSMENT.md (initial draft)
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Tta_dev_extraction_assessment_revised]]

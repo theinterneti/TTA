@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Character_development_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Character_development_system]]
 Therapeutic CharacterDevelopmentSystem Implementation
 
 This module provides production-ready character development and progression
@@ -8,7 +11,7 @@ attribute systems aligned with therapeutic goals and frameworks.
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -128,8 +131,8 @@ class TherapeuticCharacter:
     milestones: list[TherapeuticMilestone] = field(default_factory=list)
     progression_events: list[CharacterProgressionEvent] = field(default_factory=list)
     therapeutic_goals: list[str] = field(default_factory=list)
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    last_updated: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_updated: datetime = field(default_factory=lambda: datetime.now(UTC))
     total_therapeutic_value: float = 0.0
     session_count: int = 0
 
@@ -225,7 +228,7 @@ class TherapeuticCharacterDevelopmentSystem:
             TherapeuticCharacter instance with therapeutic alignment
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Generate character ID and name
             character_id = f"char_{user_id}_{uuid4().hex[:8]}"
@@ -275,7 +278,7 @@ class TherapeuticCharacterDevelopmentSystem:
             # Update metrics
             self.metrics["characters_created"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Created therapeutic character {character_id} for user {user_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -500,7 +503,7 @@ class TherapeuticCharacterDevelopmentSystem:
             Dictionary containing character development results
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get user's character
             if user_id not in self.characters:
@@ -572,7 +575,7 @@ class TherapeuticCharacterDevelopmentSystem:
             if milestone_achieved:
                 self.metrics["milestones_achieved"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.debug(
                 f"Processed therapeutic consequence for user {user_id} in {processing_time.total_seconds():.3f}s"
             )
@@ -642,7 +645,7 @@ class TherapeuticCharacterDevelopmentSystem:
             description=template["description"],
             therapeutic_value=therapeutic_value,
             attributes_impacted=template["attributes"],
-            achievement_date=datetime.utcnow(),
+            achievement_date=datetime.now(UTC),
             session_context={"attribute_changes": attribute_changes},
         )
 
@@ -748,7 +751,7 @@ class TherapeuticCharacterDevelopmentSystem:
             return 0.0
 
         # Look at events from the last 7 days
-        cutoff_date = datetime.utcnow() - timedelta(days=7)
+        cutoff_date = datetime.now(UTC) - timedelta(days=7)
         recent_events = [
             event
             for event in character.progression_events

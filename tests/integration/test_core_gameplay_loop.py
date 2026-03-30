@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_core_gameplay_loop]]
 Integration Tests for Core Gameplay Loop
 
 This module contains comprehensive integration tests for the Core Gameplay Loop
@@ -7,7 +9,7 @@ session start to completion.
 """
 
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 import pytest_asyncio
@@ -62,7 +64,7 @@ class TestCoreGameplayLoopIntegration:
         return controller
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_complete_gameplay_session_flow(self, gameplay_controller):
         """Test complete gameplay session from start to end."""
         controller = gameplay_controller
@@ -94,7 +96,7 @@ class TestCoreGameplayLoopIntegration:
             selected_choice = session.available_choices[0]
 
             # Process the choice
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
             (
                 next_scene,
                 new_choices,
@@ -102,7 +104,7 @@ class TestCoreGameplayLoopIntegration:
             ) = await controller.process_user_choice(
                 session.session_id, selected_choice.choice_id
             )
-            processing_time = (datetime.utcnow() - start_time).total_seconds()
+            processing_time = (datetime.now(UTC) - start_time).total_seconds()
 
             # Validate response time requirement (<2 seconds)
             assert processing_time < 2.0, (
@@ -155,7 +157,7 @@ class TestCoreGameplayLoopIntegration:
         assert final_status is None  # Should be None as session is ended
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_therapeutic_progression_validation(self, gameplay_controller):
         """Test that therapeutic elements are properly integrated throughout gameplay."""
         controller = gameplay_controller
@@ -227,7 +229,7 @@ class TestCoreGameplayLoopIntegration:
         await controller.end_session(session.session_id)
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_emotional_state_adaptation(self, gameplay_controller):
         """Test that the system adapts to different emotional states."""
         controller = gameplay_controller
@@ -287,7 +289,7 @@ class TestCoreGameplayLoopIntegration:
             await controller.end_session(session.session_id)
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Core gameplay loop components not fully implemented")
+    @pytest.mark.integration
     async def test_session_lifecycle_management(self, gameplay_controller):
         """Test comprehensive session lifecycle management."""
         controller = gameplay_controller
@@ -347,7 +349,7 @@ if __name__ == "__main__":
 
         if session.available_choices:
             choice = session.available_choices[0]
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             (
                 next_scene,
@@ -357,7 +359,7 @@ if __name__ == "__main__":
                 session.session_id, choice.choice_id
             )
 
-            (datetime.utcnow() - start_time).total_seconds()
+            (datetime.now(UTC) - start_time).total_seconds()
 
         await controller.end_session(session.session_id)
 

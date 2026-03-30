@@ -1,5 +1,7 @@
 """Simple calculator operations for testing async workflow."""
 
+# Logseq: [[TTA.dev/Test_components/Calculator/Operations]]
+
 
 def add(a: int, b: int) -> int:
     """Add two numbers."""

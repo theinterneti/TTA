@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Utils/Compatibility_checker]]
 Advanced compatibility checking system for character-world matching.
 
 This module provides sophisticated algorithms for assessing compatibility

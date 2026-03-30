@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Error_recovery_manager]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Error_recovery_manager]]
 Production Therapeutic ErrorRecoveryManager Implementation
 
 This module provides comprehensive error handling and recovery mechanisms
@@ -11,7 +14,7 @@ import contextlib
 import logging
 import traceback
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -67,7 +70,7 @@ class ErrorContext:
     # Error details
     severity: ErrorSeverity = ErrorSeverity.MEDIUM
     stack_trace: str = ""
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Recovery tracking
     recovery_attempts: int = 0
@@ -108,7 +111,7 @@ class RecoveryResult:
     manual_intervention_required: bool = False
 
     # Metadata
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -117,7 +120,7 @@ class SystemHealthStatus:
 
     system_name: str = ""
     status: SystemStatus = SystemStatus.HEALTHY
-    last_health_check: datetime = field(default_factory=datetime.utcnow)
+    last_health_check: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Performance metrics
     response_time_ms: float = 0.0
@@ -311,8 +314,9 @@ class TherapeuticErrorRecoveryManager:
         Returns:
             RecoveryResult representing the recovery outcome
         """
+        error_context: ErrorContext | None = None
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Create error context
             error_context = ErrorContext(
@@ -344,7 +348,7 @@ class TherapeuticErrorRecoveryManager:
 
             # Calculate recovery time
             recovery_result.recovery_time_seconds = (
-                datetime.utcnow() - start_time
+                datetime.now(UTC) - start_time
             ).total_seconds()
 
             # Store recovery result
@@ -471,7 +475,7 @@ class TherapeuticErrorRecoveryManager:
 
             health_status = self.system_health[component]
             health_status.recent_errors += 1
-            health_status.last_health_check = datetime.utcnow()
+            health_status.last_health_check = datetime.now(UTC)
 
             # Update status based on error severity
             if error_context.severity == ErrorSeverity.CRITICAL:
@@ -483,7 +487,7 @@ class TherapeuticErrorRecoveryManager:
                 self.degraded_systems.add(component)
 
             # Calculate error rate (errors per hour)
-            one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+            one_hour_ago = datetime.now(UTC) - timedelta(hours=1)
             recent_errors = len(
                 [
                     e
@@ -907,12 +911,12 @@ class TherapeuticErrorRecoveryManager:
     async def _check_system_health(self, system_name: str, system):
         """Check health of a specific system."""
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Try to call health_check method if available
             if hasattr(system, "health_check"):
                 health_result = await system.health_check()
-                response_time = (datetime.utcnow() - start_time).total_seconds() * 1000
+                response_time = (datetime.now(UTC) - start_time).total_seconds() * 1000
 
                 # Update system health status
                 if system_name not in self.system_health:
@@ -921,7 +925,7 @@ class TherapeuticErrorRecoveryManager:
                     )
 
                 health_status = self.system_health[system_name]
-                health_status.last_health_check = datetime.utcnow()
+                health_status.last_health_check = datetime.now(UTC)
                 health_status.response_time_ms = response_time
 
                 # Update status based on health check result
@@ -960,7 +964,7 @@ class TherapeuticErrorRecoveryManager:
     async def _cleanup_old_errors(self):
         """Clean up old errors from history."""
         try:
-            cutoff_date = datetime.utcnow() - timedelta(days=self.error_retention_days)
+            cutoff_date = datetime.now(UTC) - timedelta(days=self.error_retention_days)
 
             # Clean up error history
             self.error_history = [
@@ -1012,7 +1016,7 @@ class TherapeuticErrorRecoveryManager:
                 overall_status = "healthy"
 
             # Get recent error statistics
-            one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+            one_hour_ago = datetime.now(UTC) - timedelta(hours=1)
             recent_errors = len(
                 [e for e in self.error_history if e.timestamp > one_hour_ago]
             )

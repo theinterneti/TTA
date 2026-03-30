@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Tools/Test_response_models]]
 Unit tests for response models (Phase 3 Tool Optimization).
 
 Tests all response models with >90% coverage target.

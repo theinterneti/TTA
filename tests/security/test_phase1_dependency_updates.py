@@ -1,8 +1,10 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Security/Test_phase1_dependency_updates]]
 Phase 1 Security Dependency Update Validation Tests
 
 Tests to validate that Phase 1 security dependency updates work correctly:
-- python-jose 3.3.0 → 3.4.0 (Authentication)
+- PyJWT >= 2.8.0 (Authentication — replaced python-jose)
 - gunicorn 21.2.0 → 22.0.0 (Production Server)
 - python-multipart 0.0.6 → 0.0.18 (Form Parsing)
 - aiohttp 3.9.1 → 3.12.14 (HTTP Client)
@@ -12,26 +14,27 @@ Tests to validate that Phase 1 security dependency updates work correctly:
 from importlib.metadata import version
 
 import pytest
+from packaging.version import Version
 
 
 class TestPhase1DependencyVersions:
     """Verify that all Phase 1 dependencies are at the correct versions."""
 
-    def test_python_jose_version(self):
-        """Verify python-jose is updated to 3.4.0."""
+    def test_pyjwt_version(self):
+        """Verify PyJWT is present (replaced python-jose)."""
         try:
-            jose_version = version("python-jose")
-            assert jose_version >= "3.4.0", (
-                f"python-jose version {jose_version} < 3.4.0"
+            pyjwt_version = version("PyJWT")
+            assert Version(pyjwt_version) >= Version("2.8.0"), (
+                f"PyJWT version {pyjwt_version} < 2.8.0"
             )
         except Exception as e:
-            pytest.skip(f"python-jose not installed: {e}")
+            pytest.fail(f"PyJWT not installed: {e}")
 
     def test_gunicorn_version(self):
         """Verify gunicorn is updated to 22.0.0."""
         try:
             gunicorn_version = version("gunicorn")
-            assert gunicorn_version >= "22.0.0", (
+            assert Version(gunicorn_version) >= Version("22.0.0"), (
                 f"gunicorn version {gunicorn_version} < 22.0.0"
             )
         except Exception as e:
@@ -41,7 +44,7 @@ class TestPhase1DependencyVersions:
         """Verify python-multipart is updated to 0.0.18."""
         try:
             multipart_version = version("python-multipart")
-            assert multipart_version >= "0.0.18", (
+            assert Version(multipart_version) >= Version("0.0.18"), (
                 f"python-multipart version {multipart_version} < 0.0.18"
             )
         except Exception as e:
@@ -51,7 +54,7 @@ class TestPhase1DependencyVersions:
         """Verify aiohttp is updated to 3.12.14."""
         try:
             aiohttp_version = version("aiohttp")
-            assert aiohttp_version >= "3.12.14", (
+            assert Version(aiohttp_version) >= Version("3.12.14"), (
                 f"aiohttp version {aiohttp_version} < 3.12.14"
             )
         except Exception as e:
@@ -61,58 +64,46 @@ class TestPhase1DependencyVersions:
         """Verify Pillow is updated to 10.3.0."""
         try:
             pillow_version = version("Pillow")
-            assert pillow_version >= "10.3.0", (
+            assert Version(pillow_version) >= Version("10.3.0"), (
                 f"Pillow version {pillow_version} < 10.3.0"
             )
         except Exception as e:
             pytest.skip(f"Pillow not installed: {e}")
 
 
-class TestPythonJoseFunctionality:
-    """Test python-jose authentication functionality."""
+class TestPyJWTFunctionality:
+    """Test PyJWT authentication functionality."""
 
     def test_jwt_token_generation(self):
-        """Test JWT token generation with python-jose 3.4.0."""
-        try:
-            from datetime import datetime, timedelta
+        """Test JWT token generation with PyJWT."""
+        from datetime import UTC, datetime, timedelta
 
-            from jose import jwt
+        import jwt
 
-            # Create a test token
-            secret_key = "test-secret-key-for-validation"
-            payload = {
-                "sub": "test-user",
-                "exp": datetime.utcnow() + timedelta(minutes=30),
-            }
+        secret_key = "test-secret-key-for-validation"
+        payload = {
+            "sub": "test-user",
+            "exp": datetime.now(UTC) + timedelta(minutes=30),
+        }
 
-            token = jwt.encode(payload, secret_key, algorithm="HS256")
-            assert token is not None
-            assert isinstance(token, str)
+        token = jwt.encode(payload, secret_key, algorithm="HS256")
+        assert token is not None
+        assert isinstance(token, str)
 
-            # Decode and verify
-            decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
-            assert decoded["sub"] == "test-user"
-
-        except Exception as e:
-            pytest.skip(f"python-jose not available: {e}")
+        decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
+        assert decoded["sub"] == "test-user"
 
     def test_jwt_algorithm_security(self):
-        """Test that algorithm confusion vulnerability is fixed."""
-        try:
-            from jose import jwt
+        """Test that algorithm confusion vulnerability is rejected."""
+        import jwt
 
-            secret_key = "test-secret-key"
-            payload = {"sub": "test-user"}
+        secret_key = "test-secret-key"
+        payload = {"sub": "test-user"}
 
-            # Create token with HS256
-            token = jwt.encode(payload, secret_key, algorithm="HS256")
+        token = jwt.encode(payload, secret_key, algorithm="HS256")
 
-            # Attempt to decode with different algorithm should fail
-            with pytest.raises(Exception):
-                jwt.decode(token, secret_key, algorithms=["RS256"])
-
-        except Exception as e:
-            pytest.skip(f"python-jose not available: {e}")
+        with pytest.raises(Exception):
+            jwt.decode(token, secret_key, algorithms=["RS256"])
 
 
 class TestAiohttpFunctionality:

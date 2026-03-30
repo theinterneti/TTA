@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Providers/Local]]
 Local Model Provider Implementation.
 
 This module provides local model management with hardware optimization
@@ -14,8 +16,18 @@ from datetime import datetime
 from typing import Any
 
 import psutil
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+
+try:
+    import torch  # type: ignore[import-untyped]
+    from transformers import (  # type: ignore[import-untyped]
+        AutoModelForCausalLM,
+        AutoTokenizer,
+        pipeline,
+    )
+
+    _HAS_TORCH = True
+except ImportError:
+    _HAS_TORCH = False
 
 from ..interfaces import (
     GenerationRequest,
@@ -36,7 +48,7 @@ class LocalModelInstance(BaseModelInstance):
     def __init__(
         self,
         model_id: str,
-        provider: "LocalModelProvider",
+        provider: LocalModelProvider,
         model,
         tokenizer,
         device: str,
@@ -144,7 +156,7 @@ class LocalModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream (simplified implementation)."""
         try:
             # For now, generate full text and yield in chunks

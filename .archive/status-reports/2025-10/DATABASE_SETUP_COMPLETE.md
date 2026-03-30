@@ -308,3 +308,7 @@ Try it now:
 1. Run `docker-compose -f docker-compose.dev.yml up -d`
 2. Click the database icons in VS Code sidebar
 3. Start exploring your TTA data!
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Database_setup_complete]]

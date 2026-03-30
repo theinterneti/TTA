@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Status/Phase 3: Systematic Resolution - Final Completion Report]]
 > - **Path:** `.augment/kb/Status/Phase 3: Systematic Resolution - Final Completion Report.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Status/Phase 3: Systematic Resolution - Final Completion Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---

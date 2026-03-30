@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/Comprehensive E2E Testing Guide for TTA Staging.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Tests/E2e-staging/Comprehensive_e2e_guide]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Tools/Policy_config]]
 Policy configuration for tool execution governance.
 
 - Supports file-based YAML/JSON or environment variables
@@ -9,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 
 try:
     import yaml  # type: ignore
@@ -75,7 +78,7 @@ def _parse_int(val: str | None) -> int | None:
 
 
 def _load_from_file(path: str) -> dict:
-    with open(path, encoding="utf-8") as f:
+    with Path(path).open(encoding="utf-8") as f:
         content = f.read()
     # detect by extension
     if path.endswith((".yaml", ".yml")):
@@ -102,7 +105,7 @@ def load_tool_policy_config() -> ToolPolicyConfig:
     base: dict = {}
 
     # 1) File
-    if cfg_path and os.path.exists(cfg_path):
+    if cfg_path and Path(cfg_path).exists():
         try:
             base = _load_from_file(cfg_path)
         except Exception:

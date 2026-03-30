@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Character]]
 Character and related data models.
 """
 

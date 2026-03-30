@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Models]]
 Data models for real-time communication in agent orchestration.
 
 This module defines Pydantic models for WebSocket events, agent status updates,
@@ -8,14 +10,14 @@ workflow progress messages, and other real-time communication data structures.
 from __future__ import annotations
 
 import time
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class EventType(str, Enum):
+class EventType(StrEnum):
     """Types of real-time events."""
 
     AGENT_STATUS = "agent_status"
@@ -28,7 +30,7 @@ class EventType(str, Enum):
     HEARTBEAT = "heartbeat"
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     """Agent status values."""
 
     ONLINE = "online"
@@ -38,9 +40,12 @@ class AgentStatus(str, Enum):
     ERROR = "error"
     STARTING = "starting"
     STOPPING = "stopping"
+    DEGRADED = "degraded"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
 
 
-class WorkflowStatus(str, Enum):
+class WorkflowStatus(StrEnum):
     """Workflow status values."""
 
     PENDING = "pending"
@@ -72,10 +77,12 @@ class WebSocketEvent(BaseModel):
 class AgentStatusEvent(WebSocketEvent):
     """Event for agent status changes."""
 
-    event_type: Literal[EventType.AGENT_STATUS] = Field(default=EventType.AGENT_STATUS)
+    event_type: Literal[EventType.AGENT_STATUS] = Field(  # type: ignore[override]
+        default=EventType.AGENT_STATUS
+    )
     agent_id: str = Field(..., description="Agent identifier")
     agent_type: str = Field(..., description="Type of agent (ipa, wba, nga)")
-    instance: str | None = Field(None, description="Agent instance identifier")
+    instance: str | None = Field(default=None, description="Agent instance identifier")
     status: AgentStatus = Field(..., description="Current agent status")
     previous_status: AgentStatus | None = Field(
         None, description="Previous agent status"
@@ -91,7 +98,7 @@ class AgentStatusEvent(WebSocketEvent):
 class WorkflowProgressEvent(WebSocketEvent):
     """Event for workflow progress updates."""
 
-    event_type: Literal[EventType.WORKFLOW_PROGRESS] = Field(
+    event_type: Literal[EventType.WORKFLOW_PROGRESS] = Field(  # type: ignore[override]
         default=EventType.WORKFLOW_PROGRESS
     )
     workflow_id: str = Field(..., description="Workflow identifier")
@@ -100,19 +107,23 @@ class WorkflowProgressEvent(WebSocketEvent):
     progress_percentage: float = Field(
         ..., ge=0.0, le=100.0, description="Progress percentage (0-100)"
     )
-    current_step: str | None = Field(None, description="Current workflow step")
-    total_steps: int | None = Field(None, description="Total number of steps")
-    completed_steps: int | None = Field(None, description="Number of completed steps")
+    current_step: str | None = Field(default=None, description="Current workflow step")
+    total_steps: int | None = Field(default=None, description="Total number of steps")
+    completed_steps: int | None = Field(
+        default=None, description="Number of completed steps"
+    )
     estimated_completion: float | None = Field(
         None, description="Estimated completion timestamp"
     )
-    user_id: str | None = Field(None, description="User associated with the workflow")
+    user_id: str | None = Field(
+        default=None, description="User associated with the workflow"
+    )
 
 
 class SystemMetricsEvent(WebSocketEvent):
     """Event for system performance metrics."""
 
-    event_type: Literal[EventType.SYSTEM_METRICS] = Field(
+    event_type: Literal[EventType.SYSTEM_METRICS] = Field(  # type: ignore[override]
         default=EventType.SYSTEM_METRICS
     )
     cpu_usage: float | None = Field(
@@ -130,7 +141,9 @@ class SystemMetricsEvent(WebSocketEvent):
     active_workflows: int | None = Field(
         None, ge=0, description="Number of active workflows"
     )
-    message_queue_size: int | None = Field(None, ge=0, description="Message queue size")
+    message_queue_size: int | None = Field(
+        default=None, ge=0, description="Message queue size"
+    )
     response_time_avg: float | None = Field(
         None, ge=0.0, description="Average response time in seconds"
     )
@@ -142,7 +155,7 @@ class SystemMetricsEvent(WebSocketEvent):
 class ProgressiveFeedbackEvent(WebSocketEvent):
     """Event for progressive feedback during long-running operations."""
 
-    event_type: Literal[EventType.PROGRESSIVE_FEEDBACK] = Field(
+    event_type: Literal[EventType.PROGRESSIVE_FEEDBACK] = Field(  # type: ignore[override]
         default=EventType.PROGRESSIVE_FEEDBACK
     )
     operation_id: str = Field(..., description="Operation identifier")
@@ -158,19 +171,27 @@ class ProgressiveFeedbackEvent(WebSocketEvent):
     estimated_remaining: float | None = Field(
         None, description="Estimated remaining time in seconds"
     )
-    user_id: str | None = Field(None, description="User associated with the operation")
+    user_id: str | None = Field(
+        default=None, description="User associated with the operation"
+    )
 
 
 class OptimizationEvent(WebSocketEvent):
     """Event for performance optimization updates."""
 
-    event_type: Literal[EventType.OPTIMIZATION] = Field(default=EventType.OPTIMIZATION)
+    event_type: Literal[EventType.OPTIMIZATION] = Field(  # type: ignore[override]
+        default=EventType.OPTIMIZATION
+    )
     optimization_type: str = Field(..., description="Type of optimization")
     parameter_name: str = Field(..., description="Parameter being optimized")
     old_value: float | int | str = Field(..., description="Previous parameter value")
     new_value: float | int | str = Field(..., description="New parameter value")
-    improvement_metric: str | None = Field(None, description="Metric that improved")
-    improvement_value: float | None = Field(None, description="Amount of improvement")
+    improvement_metric: str | None = Field(
+        default=None, description="Metric that improved"
+    )
+    improvement_value: float | None = Field(
+        default=None, description="Amount of improvement"
+    )
     confidence_score: float | None = Field(
         None, ge=0.0, le=1.0, description="Confidence in optimization"
     )
@@ -179,14 +200,16 @@ class OptimizationEvent(WebSocketEvent):
 class ConnectionStatusEvent(WebSocketEvent):
     """Event for WebSocket connection status changes."""
 
-    event_type: Literal[EventType.CONNECTION_STATUS] = Field(
+    event_type: Literal[EventType.CONNECTION_STATUS] = Field(  # type: ignore[override]
         default=EventType.CONNECTION_STATUS
     )
     connection_id: str = Field(..., description="Connection identifier")
     status: str = Field(
         ..., description="Connection status (connected, disconnected, error)"
     )
-    user_id: str | None = Field(None, description="User associated with the connection")
+    user_id: str | None = Field(
+        default=None, description="User associated with the connection"
+    )
     client_info: dict[str, Any] = Field(
         default_factory=dict, description="Client information"
     )
@@ -195,7 +218,9 @@ class ConnectionStatusEvent(WebSocketEvent):
 class ErrorEvent(WebSocketEvent):
     """Event for error notifications."""
 
-    event_type: Literal[EventType.ERROR] = Field(default=EventType.ERROR)
+    event_type: Literal[EventType.ERROR] = Field(  # type: ignore[override]
+        default=EventType.ERROR
+    )
     error_code: str = Field(..., description="Error code")
     error_message: str = Field(..., description="Human-readable error message")
     error_details: dict[str, Any] = Field(
@@ -212,7 +237,9 @@ class ErrorEvent(WebSocketEvent):
 class HeartbeatEvent(WebSocketEvent):
     """Event for WebSocket heartbeat/ping."""
 
-    event_type: Literal[EventType.HEARTBEAT] = Field(default=EventType.HEARTBEAT)
+    event_type: Literal[EventType.HEARTBEAT] = Field(  # type: ignore[override]
+        default=EventType.HEARTBEAT
+    )
     connection_id: str = Field(..., description="Connection identifier")
     server_timestamp: float = Field(
         default_factory=time.time, description="Server timestamp"
@@ -227,25 +254,29 @@ class EventSubscription(BaseModel):
         ..., description="List of event types to subscribe to"
     )
     filters: dict[str, Any] = Field(default_factory=dict, description="Event filters")
-    user_id: str | None = Field(None, description="User ID for user-specific events")
+    user_id: str | None = Field(
+        default=None, description="User ID for user-specific events"
+    )
 
 
 class EventFilter(BaseModel):
     """Model for event filtering criteria."""
 
-    agent_types: list[str] | None = Field(None, description="Filter by agent types")
-    workflow_types: list[str] | None = Field(
-        None, description="Filter by workflow types"
+    agent_types: list[str] | None = Field(
+        default=None, description="Filter by agent types"
     )
-    user_ids: list[str] | None = Field(None, description="Filter by user IDs")
+    workflow_types: list[str] | None = Field(
+        default=None, description="Filter by workflow types"
+    )
+    user_ids: list[str] | None = Field(default=None, description="Filter by user IDs")
     severity_levels: list[str] | None = Field(
-        None, description="Filter by error severity levels"
+        default=None, description="Filter by error severity levels"
     )
     min_progress: float | None = Field(
-        None, ge=0.0, le=100.0, description="Minimum progress percentage"
+        default=None, ge=0.0, le=100.0, description="Minimum progress percentage"
     )
     max_progress: float | None = Field(
-        None, ge=0.0, le=100.0, description="Maximum progress percentage"
+        default=None, ge=0.0, le=100.0, description="Maximum progress percentage"
     )
 
 
@@ -342,3 +373,32 @@ def create_error_event(
         component=component,
         source=source,
     )
+
+
+def create_system_metrics_event(
+    cpu_usage: float | None = None,
+    memory_usage: float | None = None,
+    memory_usage_mb: float | None = None,
+    active_connections: int | None = None,
+    active_workflows: int | None = None,
+    message_queue_size: int | None = None,
+    response_time_avg: float | None = None,
+    error_rate: float | None = None,
+    metadata: dict[str, Any] | None = None,
+    source: str = "system_monitor",
+) -> SystemMetricsEvent:
+    """Create a system metrics event."""
+    event = SystemMetricsEvent(
+        cpu_usage=cpu_usage,
+        memory_usage=memory_usage,
+        memory_usage_mb=memory_usage_mb,
+        active_connections=active_connections,
+        active_workflows=active_workflows,
+        message_queue_size=message_queue_size,
+        response_time_avg=response_time_avg,
+        error_rate=error_rate,
+        source=source,
+    )
+    if metadata:
+        event.data.update(metadata)
+    return event

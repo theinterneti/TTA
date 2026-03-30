@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Database/__init__]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Database/__init__]]
 Database Management for Gameplay Loop
 
 This module provides database management functionality for the therapeutic text adventure

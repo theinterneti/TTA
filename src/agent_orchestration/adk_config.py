@@ -16,6 +16,8 @@ Note: Google ADK uses environment variables for authentication (GOOGLE_API_KEY o
       No explicit Config class is needed - agents accept model names directly.
 """
 
+# Logseq: [[TTA.dev/Agent_orchestration/Adk_config]]
+
 import os
 from typing import Any
 

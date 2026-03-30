@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Generation/Pacing_controller]]
 Pacing Controller for Therapeutic Text Adventure
 
 This module implements pacing control functionality that manages the rhythm
@@ -9,7 +11,7 @@ learning, and therapeutic effectiveness.
 from __future__ import annotations
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models.core import EmotionalState, Scene, SceneType, SessionState
@@ -17,7 +19,7 @@ from ..models.core import EmotionalState, Scene, SceneType, SessionState
 logger = logging.getLogger(__name__)
 
 
-class PacingStrategy(str, Enum):
+class PacingStrategy(StrEnum):
     """Strategies for pacing control."""
 
     ACCELERATE = "accelerate"
@@ -27,7 +29,7 @@ class PacingStrategy(str, Enum):
     RESET = "reset"
 
 
-class PacingDimension(str, Enum):
+class PacingDimension(StrEnum):
     """Dimensions of pacing that can be controlled."""
 
     NARRATIVE_FLOW = "narrative_flow"
@@ -37,7 +39,7 @@ class PacingDimension(str, Enum):
     INTERACTION_FREQUENCY = "interaction_frequency"
 
 
-class SessionPhase(str, Enum):
+class SessionPhase(StrEnum):
     """Phases of a therapeutic session for pacing context."""
 
     OPENING = "opening"

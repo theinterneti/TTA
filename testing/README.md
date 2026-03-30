@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Testing/TTA Single-Player Storytelling Experience Testing Framework]]
 > - **Path:** `.augment/kb/Testing/TTA Single-Player Storytelling Experience Testing Framework.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Testing/TTA Single-Player Storytelling Experience Testing Framework.md`
 
 **Migration date:** 2025-11-01
+
+
+---

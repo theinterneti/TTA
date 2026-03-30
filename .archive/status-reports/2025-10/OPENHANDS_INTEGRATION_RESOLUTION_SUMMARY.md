@@ -241,3 +241,7 @@ cat docs/OPENHANDS_INTEGRATION_VALIDATION_REPORT.md
 ```bash
 cat docs/OPENHANDS_REAL_WORLD_USAGE.md
 ```
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Openhands_integration_resolution_summary]]

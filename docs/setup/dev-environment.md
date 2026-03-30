@@ -107,3 +107,6 @@ bash scripts/tta-dev.sh logs neo4j  # Just Neo4j
 ---
 
 **Environment Ready for TTA Agent Development** 🚀
+
+
+---

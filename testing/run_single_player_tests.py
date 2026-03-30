@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+
 TTA Single-Player Storytelling Experience Test Runner
 
 This script provides a simple interface to run comprehensive testing

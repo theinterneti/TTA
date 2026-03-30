@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+
 Validation script for Universal Agent Context System export package.
 
 This script validates:

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Protocol_bridge]]
 Protocol bridge for translating between orchestration system messages and real agent communication.
 
 This module provides message routing and protocol translation capabilities to enable
@@ -12,7 +14,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from .adapters import AgentCommunicationError, IPAAdapter, NGAAdapter, WBAAdapter
@@ -22,7 +24,7 @@ from .models import AgentMessage, AgentType
 logger = logging.getLogger(__name__)
 
 
-class ProtocolType(str, Enum):
+class ProtocolType(StrEnum):
     """Supported communication protocols."""
 
     ORCHESTRATION = "orchestration"  # Internal orchestration system protocol

@@ -525,3 +525,7 @@ EOF
 **Document Owner:** QA Team
 **Last Updated:** 2025-10-15
 **Next Review:** After CRITICAL issues resolved
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Testing/2025-10/E2e_validation_issues_and_fixes]]

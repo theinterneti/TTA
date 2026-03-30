@@ -1,9 +1,12 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Lm_studio]]
 LM Studio Provider Implementation.
 
 This module provides integration with LM Studio for local model hosting.
 """
 
+import json
 import logging
 from collections.abc import AsyncGenerator
 from datetime import datetime
@@ -92,9 +95,7 @@ class LMStudioModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using LM Studio API."""
         try:
             # Prepare request payload
@@ -124,8 +125,6 @@ class LMStudioModelInstance(BaseModelInstance):
                             break
 
                         try:
-                            import json
-
                             data = json.loads(data_str)
 
                             if "choices" in data and data["choices"]:
@@ -229,7 +228,9 @@ class LMStudioProvider(BaseProvider):
             raise
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
+        self,
+        model_id: str,
+        config: dict[str, Any],  # noqa: ARG002
     ) -> LMStudioModelInstance:
         """Load an LM Studio model instance."""
         if not self._client:
@@ -260,7 +261,7 @@ class LMStudioProvider(BaseProvider):
             logger.warning(f"LM Studio health check failed: {e}")
             return False
 
-    def _estimate_context_length(self, model_id: str) -> int | None:
+    def _estimate_context_length(self, model_id: str) -> int | None:  # noqa: PLR0911
         """Estimate context length based on model name."""
         model_lower = model_id.lower()
 

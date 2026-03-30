@@ -202,3 +202,7 @@ Need to edit code?
 
 **Last Updated**: 2025-10-27
 **Status**: Active - Universal AI agent guidance for Serena MCP tools
+
+
+---
+**Logseq:** [[TTA.dev/.github/Instructions/Serena-code-navigation]]

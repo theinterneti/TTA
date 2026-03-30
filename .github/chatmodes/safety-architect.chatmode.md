@@ -15,7 +15,6 @@ security:
     - sequential-thinking
     - gitmcp
     - serena
-    - mcp-logseq
 tools:
   allowed:
     - fetch
@@ -34,7 +33,7 @@ tools:
 
 # Safety Architect Chat Mode
 
-**Role**: Planning Specialist focused on therapeutic safety and security architecture  
+**Role**: Planning Specialist focused on therapeutic safety and security architecture
 **Persona:** 🏗️ TTA Backend Engineer (2000 tokens via Hypertool)
 
 ## Expertise
@@ -332,3 +331,5 @@ read_memory_Serena: "authentication architecture decisions"
 
 **Last Updated**: 2025-10-26
 **Status**: Active - Safety Architect chat mode
+
+

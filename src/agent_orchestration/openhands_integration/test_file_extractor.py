@@ -4,8 +4,11 @@ This module provides functions to extract test files, parse coverage percentages
 and verify test quality from OpenHands task output.
 """
 
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Test_file_extractor]]
+
 import re
 from pathlib import Path
+from typing import Any
 
 
 def extract_test_files_from_output(output: str, workspace_path: Path) -> list[Path]:
@@ -105,7 +108,7 @@ def parse_coverage_percentage(pytest_output: str) -> float:
     return 0.0
 
 
-def verify_test_quality(test_file: Path) -> dict[str, any]:
+def verify_test_quality(test_file: Path) -> dict[str, Any]:
     """Verify quality of generated tests.
 
     Checks:

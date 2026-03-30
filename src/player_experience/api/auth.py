@@ -1,21 +1,46 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Auth]]
 Authentication and authorization utilities for the Player Experience API.
 
 This module provides JWT token handling, password hashing, and authentication
 decorators for securing API endpoints.
 """
 
+import logging
 import os
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import bcrypt as _bcrypt
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+from jwt.exceptions import PyJWTError as JWTError
 from pydantic import BaseModel
 
+from ..database.redis_cache import (
+    TokenCache,
+    _deserialize_token_data,
+    _serialize_token_data,
+)
 from ..models.player import PlayerProfile
+
+logger = logging.getLogger(__name__)
+
+# Lazy-initialized Redis token cache (None if Redis unavailable)
+_token_cache: TokenCache | None = None
+
+
+def _get_token_cache() -> TokenCache | None:
+    global _token_cache  # noqa: PLW0603
+    if _token_cache is None:
+        try:
+            _token_cache = TokenCache.from_env()
+        except Exception as exc:
+            logger.debug("TokenCache unavailable (ignored): %s", exc)
+    return _token_cache
+
 
 # Configuration - Use same secret key as EnhancedAuthService
 SECRET_KEY = os.getenv("TTA_AUTH_SECRET_KEY") or os.getenv(
@@ -25,8 +50,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT token scheme
 security = HTTPBearer()
@@ -49,7 +72,7 @@ class Token(BaseModel):
 
     access_token: str
     refresh_token: str
-    token_type: str = "bearer"
+    token_type: str = "bearer"  # noqa: S105
     expires_in: int
 
 
@@ -86,7 +109,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if password matches, False otherwise
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return _bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+    except Exception:
+        return False
 
 
 def get_password_hash(password: str) -> str:
@@ -99,7 +125,7 @@ def get_password_hash(password: str) -> str:
     Returns:
         str: The hashed password
     """
-    return pwd_context.hash(password)
+    return _bcrypt.hashpw(password.encode(), _bcrypt.gensalt()).decode()
 
 
 def create_access_token(
@@ -220,11 +246,25 @@ async def get_current_player(
         HTTPException: If authentication fails
     """
     try:
-        token_data = verify_token(credentials.credentials)
+        raw_token = credentials.credentials
+
+        # Fast path: check Redis cache to avoid repeated HMAC verification
+        cache = _get_token_cache()
+        if cache is not None:
+            cached = await cache.get(raw_token)
+            if cached is not None:
+                return TokenData(**_deserialize_token_data(cached))
+
+        token_data = verify_token(raw_token)
 
         # Check if token is expired
         if token_data.exp and datetime.now(UTC) > token_data.exp:
             raise AuthenticationError("Token has expired")
+
+        # Cache for the token's remaining lifetime
+        if cache is not None and token_data.exp:
+            remaining = int((token_data.exp - datetime.now(UTC)).total_seconds())
+            await cache.set(raw_token, _serialize_token_data(token_data), remaining)
 
         return token_data
     except AuthenticationError as e:
@@ -283,7 +323,7 @@ class AuthService:
     """Service class for authentication operations."""
 
     @staticmethod
-    async def authenticate_player(username: str, password: str) -> PlayerProfile | None:
+    async def authenticate_player(username: str, password: str) -> PlayerProfile | None:  # noqa: ARG004
         """
         Authenticate a player with username and password.
 

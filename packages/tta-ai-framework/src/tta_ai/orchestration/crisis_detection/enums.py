@@ -1,9 +1,11 @@
 """Crisis detection enumerations."""
 
-from enum import Enum
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Crisis_detection/Enums]]
+
+from enum import StrEnum
 
 
-class CrisisType(str, Enum):
+class CrisisType(StrEnum):
     """Types of crisis situations that can be detected."""
 
     SELF_HARM = "self_harm"
@@ -15,7 +17,7 @@ class CrisisType(str, Enum):
     SEVERE_DEPRESSION = "severe_depression"
 
 
-class CrisisLevel(str, Enum):
+class CrisisLevel(StrEnum):
     """Crisis severity levels for intervention protocols."""
 
     LOW = "low"
@@ -24,7 +26,7 @@ class CrisisLevel(str, Enum):
     CRITICAL = "critical"
 
 
-class InterventionType(str, Enum):
+class InterventionType(StrEnum):
     """Types of crisis interventions available."""
 
     AUTOMATED_RESPONSE = "automated_response"
@@ -33,7 +35,7 @@ class InterventionType(str, Enum):
     THERAPEUTIC_REFERRAL = "therapeutic_referral"
 
 
-class EscalationStatus(str, Enum):
+class EscalationStatus(StrEnum):
     """Status of crisis escalation."""
 
     NONE = "none"

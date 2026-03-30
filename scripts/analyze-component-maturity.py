@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Analyze-component-maturity]]
 TTA Component Maturity Analysis Script
 
 Analyzes all components for maturity status, test coverage, code quality,

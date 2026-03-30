@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Status/Phase 3: Implement Automatic Rotation and Retry System]]
 > - **Path:** `.augment/kb/Status/Phase 3: Implement Automatic Rotation and Retry System.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Status/Phase 3: Implement Automatic Rotation and Retry System.md`
 
 **Migration date:** 2025-11-01
+
+
+---

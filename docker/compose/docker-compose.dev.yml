@@ -59,6 +59,28 @@ services:
       - tta-dev-network
     security_opt:
       - no-new-privileges:true
+  dolt:
+    image: dolthub/dolt-sql-server:latest
+    container_name: ${CONTAINER_PREFIX:-tta-dev}-dolt
+    ports:
+      - 3306:3306
+    environment:
+      - DOLT_ROOT_PASSWORD=${DOLT_PASSWORD:-tta_dolt_dev_password}
+    volumes:
+      - dolt_dev_data:/var/lib/dolt
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h localhost -u root -p${DOLT_PASSWORD:-tta_dolt_dev_password} --silent || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - tta-dev-network
+    security_opt:
+      - no-new-privileges:true
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: tta-redis-commander-dev
@@ -131,7 +153,9 @@ volumes:
     name: tta_neo4j_dev_import
   neo4j_dev_plugins:
     name: tta_neo4j_dev_plugins
-  redis_dev_data:
+  dolt_dev_data:
+    name: tta_dolt_dev_data
+
     name: tta_redis_dev_data
   grafana_dev_data:
     name: tta_grafana_dev_data

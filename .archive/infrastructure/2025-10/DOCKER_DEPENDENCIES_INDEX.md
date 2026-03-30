@@ -310,3 +310,7 @@ bash docker/scripts/tta-docker.sh dev restore /path/to/backup.tar.gz
 ---
 
 **Need help?** See linked documentation or run `bash scripts/docker/migration-status.sh` for current status.
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Docker_dependencies_index]]

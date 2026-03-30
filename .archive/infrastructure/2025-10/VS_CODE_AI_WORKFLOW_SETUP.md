@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/🚀 VS Code AI Workflow Setup Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Vs_code_ai_workflow_setup]]

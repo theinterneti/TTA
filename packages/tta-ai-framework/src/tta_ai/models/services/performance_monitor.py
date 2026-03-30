@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Services/Performance_monitor]]
 Performance Monitoring Service.
 
 This module provides real-time performance tracking and metrics collection

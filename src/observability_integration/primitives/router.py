@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Observability_integration/Primitives/Router]]
 RouterPrimitive - LLM request routing workflow primitive.
 
 Routes LLM requests to optimal provider (cheap vs premium model) based on
@@ -13,23 +15,32 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import (
-        WorkflowContext,
+    from ttadev.primitives.core.base import (  # type: ignore[import, assignment]
+        WorkflowContext,  # pyright: ignore[reportAssignmentType]
         WorkflowPrimitive,
     )
 except ImportError:
-    # Fallback for development/testing
-    from typing import Protocol
+    try:
+        from tta_dev_primitives.core.base import (  # type: ignore[import]
+            WorkflowContext,  # pyright: ignore[reportAssignmentType]
+            WorkflowPrimitive,
+        )
+    except ImportError:
+        # Fallback stubs for development/testing
+        from typing import Protocol, TypeVar
 
-    class WorkflowContext:  # type: ignore
-        """Mock WorkflowContext for testing."""
+        _T = TypeVar("_T")
+        _U = TypeVar("_U")
 
-        pass
+        class WorkflowContext:  # type: ignore
+            """Mock WorkflowContext for testing."""
 
-    class WorkflowPrimitive(Protocol):  # type: ignore
-        """Minimal WorkflowPrimitive protocol for testing."""
+            pass
 
-        pass
+        class WorkflowPrimitive(Protocol[_T, _U]):  # type: ignore
+            """Minimal WorkflowPrimitive protocol for testing."""
+
+            pass
 
 
 from ..apm_setup import get_meter
@@ -37,7 +48,7 @@ from ..apm_setup import get_meter
 logger = logging.getLogger(__name__)
 
 
-class RouterPrimitive(WorkflowPrimitive[Any, Any]):
+class RouterPrimitive(WorkflowPrimitive[Any, Any]):  # type: ignore[misc]
     """
     Route requests to optimal LLM provider based on routing strategy.
 
@@ -192,7 +203,7 @@ class RouterPrimitive(WorkflowPrimitive[Any, Any]):
 
             # Execute selected route
             primitive = self.routes[selected_route]
-            result = await primitive.execute(input_data, context)
+            result = await primitive.execute(input_data, context)  # type: ignore[attr-defined]
 
             # Calculate and record cost savings
             # (comparing selected route cost to most expensive route)

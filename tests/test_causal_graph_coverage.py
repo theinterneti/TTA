@@ -1,10 +1,15 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_causal_graph_coverage]]
 Coverage tests for causal_graph module to reach 70%+ coverage.
 
 This module contains tests specifically designed to cover previously
 untested code paths in causal_graph.py.
 """
 
+import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.orchestration.causal_graph import (
     add_edge,
     detect_simple_cycles,

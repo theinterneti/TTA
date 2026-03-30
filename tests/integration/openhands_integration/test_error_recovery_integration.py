@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Openhands_integration/Test_error_recovery_integration]]
 Integration tests for error recovery in OpenHands integration.
 
 Tests explicit rate limit scenarios to verify error recovery works correctly.

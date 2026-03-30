@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Monitoring/__init__]]
 Performance monitoring and metrics collection for the Player Experience Interface.
 
 This module provides comprehensive monitoring capabilities including:

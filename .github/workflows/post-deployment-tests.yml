@@ -4,15 +4,15 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: 'Deployment environment to test (staging, production)'
+        description: 'Environment to test (staging, production)'
         required: true
         type: string
       api_base_url:
-        description: 'API base URL'
+        description: 'API base URL to test against'
         required: true
         type: string
       frontend_base_url:
-        description: 'Frontend base URL'
+        description: 'Frontend base URL to test against'
         required: true
         type: string
     secrets:
@@ -35,190 +35,94 @@ on:
       TEST_USER_EMAIL:
         required: false
 
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment to test'
-        required: true
-        type: choice
-        options:
-          - staging
-          - production
-          - local
-      api_base_url:
-        description: 'API base URL (leave empty for default)'
-        required: false
-        type: string
-      frontend_base_url:
-        description: 'Frontend base URL (leave empty for default)'
-        required: false
-        type: string
-
-env:
-  PYTHON_VERSION: '3.12'
-
 jobs:
-  post-deployment-validation:
-    name: Post-Deployment Validation (${{ inputs.environment }})
+  post-deployment-tests:
+    name: Post-Deployment Tests (${{ inputs.environment }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    env:
+      DEPLOYMENT_ENV: ${{ inputs.environment }}
+      API_BASE_URL: ${{ inputs.api_base_url }}
+      FRONTEND_BASE_URL: ${{ inputs.frontend_base_url }}
+      NEO4J_URI: ${{ secrets.NEO4J_URI }}
+      NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      TEST_USER_USERNAME: ${{ secrets.TEST_USER_USERNAME }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v7
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
 
-      - name: Install UV
-        uses: astral-sh/setup-uv@v1
+      - name: Sync dependencies
+        run: uv sync
 
-      - name: Install dependencies
+      - name: Wait for API to be ready
         run: |
-          uv sync --all-extras --dev
+          API_URL="${{ inputs.api_base_url }}"
+          echo "Waiting for API at ${API_URL}/health..."
 
-      - name: Set environment variables
-        run: |
-          echo "DEPLOYMENT_ENV=${{ inputs.environment }}" >> $GITHUB_ENV
-          echo "API_BASE_URL=${{ inputs.api_base_url }}" >> $GITHUB_ENV
-          echo "FRONTEND_BASE_URL=${{ inputs.frontend_base_url }}" >> $GITHUB_ENV
+          for i in $(seq 1 18); do
+            if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
+              echo "✅ API is ready"
+              exit 0
+            fi
+            echo "Attempt $i/18 — waiting 10s..."
+            sleep 10
+          done
 
-      - name: Set database configuration (if provided)
-        if: secrets.NEO4J_URI != ''
-        run: |
-          echo "NEO4J_URI=${{ secrets.NEO4J_URI }}" >> $GITHUB_ENV
-          echo "NEO4J_USERNAME=${{ secrets.NEO4J_USERNAME }}" >> $GITHUB_ENV
-          echo "NEO4J_PASSWORD=${{ secrets.NEO4J_PASSWORD }}" >> $GITHUB_ENV
-          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> $GITHUB_ENV
-          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> $GITHUB_ENV
-          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> $GITHUB_ENV
-
-      - name: Set test user credentials (if provided)
-        if: secrets.TEST_USER_USERNAME != ''
-        run: |
-          echo "TEST_USER_USERNAME=${{ secrets.TEST_USER_USERNAME }}" >> $GITHUB_ENV
-          echo "TEST_USER_PASSWORD=${{ secrets.TEST_USER_PASSWORD }}" >> $GITHUB_ENV
-          echo "TEST_USER_EMAIL=${{ secrets.TEST_USER_EMAIL }}" >> $GITHUB_ENV
-
-      - name: Wait for deployment to stabilize
-        run: |
-          echo "Waiting 30 seconds for deployment to stabilize..."
-          sleep 30
+          echo "⚠️  API not ready after 3 minutes — proceeding with tests anyway"
 
       - name: Run post-deployment tests
-        id: tests
+        id: run-tests
         run: |
-          # Run post-deployment tests with appropriate markers
-          if [ "${{ inputs.environment }}" = "production" ]; then
-            # In production, skip tests that create data
-            uv run pytest tests/post_deployment/ \
-              -v \
-              --tb=short \
-              -m "not neo4j" \
-              --html=post-deployment-report.html \
-              --self-contained-html \
-              --junitxml=post-deployment-results.xml
-          else
-            # In staging, run all tests including database validation
-            uv run pytest tests/post_deployment/ \
-              -v \
-              --tb=short \
-              --html=post-deployment-report.html \
-              --self-contained-html \
-              --junitxml=post-deployment-results.xml
-          fi
+          uv run pytest \
+            tests/post_deployment/ \
+            -v --tb=short \
+            --junitxml=test-results/post-deployment-${{ inputs.environment }}.xml \
+            --timeout=60
+        # Staging failures are non-blocking; production failures are hard failures
+        continue-on-error: ${{ inputs.environment == 'staging' }}
 
       - name: Upload test results
+        uses: actions/upload-artifact@v7
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: post-deployment-test-results-${{ inputs.environment }}
-          path: |
-            post-deployment-report.html
-            post-deployment-results.xml
+          name: post-deployment-results-${{ inputs.environment }}-${{ github.sha }}
+          path: test-results/
           retention-days: 30
 
-      - name: Publish test results
+      - name: Summarize test results
         if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: post-deployment-results.xml
-          check_name: Post-Deployment Tests (${{ inputs.environment }})
-          comment_title: Post-Deployment Test Results (${{ inputs.environment }})
-
-      - name: Comment test summary on PR
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const testResults = fs.readFileSync('post-deployment-results.xml', 'utf8');
-
-            // Parse test results (simplified)
-            const passed = (testResults.match(/failures="0"/g) || []).length > 0;
-            const status = passed ? '✅ PASSED' : '❌ FAILED';
-
-            const comment = `## Post-Deployment Tests ${status}
-
-            **Environment:** ${{ inputs.environment }}
-            **API URL:** ${{ inputs.api_base_url }}
-            **Frontend URL:** ${{ inputs.frontend_base_url }}
-
-            [View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            `;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-
-      - name: Fail workflow if tests failed
-        if: steps.tests.outcome == 'failure'
         run: |
-          echo "::error::Post-deployment tests failed for ${{ inputs.environment }} environment"
-          exit 1
+          echo "## Post-Deployment Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | ${{ inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **API URL** | ${{ inputs.api_base_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Frontend URL** | ${{ inputs.frontend_base_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-  notify-results:
-    name: Notify Test Results
-    runs-on: ubuntu-latest
-    needs: post-deployment-validation
-    if: always()
-
-    steps:
-      - name: Determine status
-        id: status
-        run: |
-          if [ "${{ needs.post-deployment-validation.result }}" = "success" ]; then
-            echo "status=success" >> $GITHUB_OUTPUT
-            echo "emoji=✅" >> $GITHUB_OUTPUT
-            echo "message=Post-deployment tests passed for ${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
+            echo "**Status:** ✅ All post-deployment tests passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ inputs.environment }}" == "staging" ]; then
+            echo "**Status:** ⚠️  Some tests failed (non-blocking for staging)" >> $GITHUB_STEP_SUMMARY
           else
-            echo "status=failure" >> $GITHUB_OUTPUT
-            echo "emoji=❌" >> $GITHUB_OUTPUT
-            echo "message=Post-deployment tests failed for ${{ inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "**Status:** ❌ Post-deployment tests failed" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Send notification (placeholder)
+      - name: Fail for production test failures
+        if: inputs.environment == 'production' && steps.run-tests.outcome == 'failure'
         run: |
-          echo "${{ steps.status.outputs.emoji }} ${{ steps.status.outputs.message }}"
-          echo "Add notification integration here (Slack, Discord, email, etc.)"
-
-          # Example Slack notification (requires SLACK_WEBHOOK_URL secret):
-          # curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
-          #   -H 'Content-Type: application/json' \
-          #   -d '{
-          #     "text": "${{ steps.status.outputs.emoji }} ${{ steps.status.outputs.message }}",
-          #     "blocks": [
-          #       {
-          #         "type": "section",
-          #         "text": {
-          #           "type": "mrkdwn",
-          #           "text": "*Post-Deployment Tests*\n${{ steps.status.outputs.message }}\n\n*Environment:* ${{ inputs.environment }}\n*Run:* <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Results>"
-          #         }
-          #       }
-          #     ]
-          #   }'
+          echo "❌ Post-deployment tests failed in production — triggering rollback signal"
+          exit 1

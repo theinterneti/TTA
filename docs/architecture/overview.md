@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/Architecture Overview]]
 > - **Path:** `.augment/kb/Architecture/Architecture Overview.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/Architecture Overview.md`
 
 **Migration date:** 2025-11-01
+
+
+---

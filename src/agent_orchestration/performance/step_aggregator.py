@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Step_aggregator]]
 Step timing aggregation for agent orchestration performance monitoring.
 
 This module provides thread-safe aggregation of step timing metrics per agent type,

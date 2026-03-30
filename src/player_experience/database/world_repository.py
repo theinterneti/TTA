@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/World_repository]]
 World Repository for Neo4j persistence.
 
 This module provides database operations for therapeutic worlds,

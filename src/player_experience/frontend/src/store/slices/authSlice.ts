@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Store/Slices/Authslice]]
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authAPI } from '../../services/api';
 import secureStorage, { sessionManager } from '../../utils/secureStorage';

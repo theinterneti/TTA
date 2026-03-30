@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Specs/Preferences.spec]]
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/LoginPage';
 import { PreferencesPage } from '../page-objects/PreferencesPage';

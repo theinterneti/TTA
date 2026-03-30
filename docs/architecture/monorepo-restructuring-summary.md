@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/TTA Monorepo Restructuring Summary]]
 > - **Path:** `.augment/kb/Architecture/TTA Monorepo Restructuring Summary.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/TTA Monorepo Restructuring Summary.md`
 
 **Migration date:** 2025-11-01
+
+
+---

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Analytics/Services/Aggregation_service]]
 Advanced Analytics Aggregation Service
 
 This service provides privacy-compliant aggregate user behavior analysis
@@ -8,7 +10,7 @@ for the TTA system, enabling cross-user insights while maintaining individual pr
 import hashlib
 import logging
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
@@ -150,7 +152,7 @@ class BehaviorPatternDetector:
                     1.0, len(cluster_sessions) / 10.0
                 ),  # Higher confidence with more data
                 user_cohort="engagement_analysis",
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(UTC),
             )
             patterns.append(pattern)
 
@@ -206,7 +208,7 @@ class BehaviorPatternDetector:
                 },
                 confidence_score=min(1.0, len(cluster_data) / 20.0),
                 user_cohort="progress_analysis",
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(UTC),
             )
             patterns.append(pattern)
 
@@ -307,7 +309,7 @@ class AnalyticsAggregationService:
                 "patterns_detected": len(all_patterns),
                 "cohorts_analyzed": len(cohort_data),
                 "total_users": len(user_data),
-                "analysis_timestamp": datetime.utcnow().isoformat(),
+                "analysis_timestamp": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -354,7 +356,7 @@ class AnalyticsAggregationService:
         return {
             "total_cohorts": len(cohort_stats),
             "cohort_statistics": cohort_stats,
-            "analysis_timestamp": datetime.utcnow().isoformat(),
+            "analysis_timestamp": datetime.now(UTC).isoformat(),
         }
 
 
@@ -396,7 +398,7 @@ async def get_patterns(pattern_type: str | None = None, limit: int = 50):
     return PatternResponse(
         patterns=patterns,
         total_count=len(patterns),
-        analysis_timestamp=datetime.utcnow().isoformat(),
+        analysis_timestamp=datetime.now(UTC).isoformat(),
     )
 
 
@@ -413,7 +415,7 @@ async def health_check():
         "status": "healthy",
         "service": "analytics-aggregation",
         "patterns_stored": len(aggregation_service.behavior_patterns),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 

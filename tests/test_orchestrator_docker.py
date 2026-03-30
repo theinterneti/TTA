@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_orchestrator_docker]]
 Tests for TTAOrchestrator Docker command methods.
 
 This module tests the Docker-related methods in TTAOrchestrator
@@ -99,8 +101,11 @@ class TestDockerCommands:
 
     @patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_compose_command_both_repos(self, mock_safe_run, orchestrator):
-        """Test Docker Compose command on both repositories."""
-        # Mock successful subprocess result
+        """Test Docker Compose command with repository='both' runs tta.dev only.
+
+        tta.prototype has been removed from the orchestrator; 'both' now means
+        tta.dev only.
+        """
         mock_result = Mock()
         mock_result.returncode = 0
         mock_result.stdout = "success"
@@ -109,38 +114,29 @@ class TestDockerCommands:
 
         results = orchestrator.run_docker_compose_command(["ps"], repository="both")
 
-        # Should run for both repos
         assert "tta.dev" in results
-        assert "tta.prototype" in results
+        assert "tta.prototype" not in results
         assert results["tta.dev"].returncode == 0
-        assert results["tta.prototype"].returncode == 0
-
-        # Verify safe_run was called twice
-        assert mock_safe_run.call_count == 2
+        assert mock_safe_run.call_count == 1
 
     @patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_compose_command_tta_prototype(
         self, mock_safe_run, orchestrator
     ):
-        """Test Docker Compose command on tta.prototype repository."""
-        # Mock successful subprocess result
+        """Test Docker Compose command with repository='tta.prototype' returns empty.
+
+        tta.prototype has been removed; unsupported repositories return an empty dict.
+        """
         mock_result = Mock()
         mock_result.returncode = 0
-        mock_result.stdout = "success"
-        mock_result.stderr = ""
         mock_safe_run.return_value = mock_result
 
         results = orchestrator.run_docker_compose_command(
             ["down"], repository="tta.prototype"
         )
 
-        # Should only run for tta.prototype
-        assert "tta.prototype" in results
-        assert "tta.dev" not in results
-        assert results["tta.prototype"].returncode == 0
-
-        # Verify safe_run was called once
-        assert mock_safe_run.call_count == 1
+        assert results == {}
+        assert mock_safe_run.call_count == 0
 
     @patch("src.orchestration.orchestrator.safe_run")
     def test_run_docker_compose_command_with_failure(self, mock_safe_run, orchestrator):
@@ -160,34 +156,26 @@ class TestDockerCommands:
         assert mock_safe_run.call_count == 3
 
     @patch("src.orchestration.orchestrator.safe_run")
-    def test_run_docker_compose_command_partial_failure(
+    def test_run_docker_compose_command_tta_dev_failure(
         self, mock_safe_run, orchestrator
     ):
-        """Test Docker Compose command with partial failure (one repo fails)."""
-        # First call (tta.dev) succeeds, second call (tta.prototype) fails
-        success_result = Mock()
-        success_result.returncode = 0
-        success_result.stdout = "success"
-        success_result.stderr = ""
-
+        """Test Docker Compose command raises on tta.dev failure."""
         failure_result = Mock()
         failure_result.returncode = 1
         failure_result.stdout = ""
         failure_result.stderr = "error"
 
         mock_safe_run.side_effect = [
-            success_result,
             failure_result,
             failure_result,
             failure_result,
         ]
 
-        # Should raise exception due to tta.prototype failure
         with pytest.raises(subprocess.SubprocessError):
-            orchestrator.run_docker_compose_command(["up"], repository="both")
+            orchestrator.run_docker_compose_command(["up"], repository="tta.dev")
 
-        # First call succeeds, then 3 retries for tta.prototype
-        assert mock_safe_run.call_count == 4
+        # 3 retries for tta.dev failure
+        assert mock_safe_run.call_count == 3
 
     @patch("src.orchestration.orchestrator.safe_run")
     def test_docker_command_with_complex_args(self, mock_safe_run, orchestrator):

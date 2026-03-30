@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Player_experience/Test_deployment]]
 Player Experience Interface Deployment Validation Tests
 
 This script validates that the Player Experience Interface deployment is working correctly
@@ -511,7 +513,7 @@ async def main():
 
     # Save results if output file specified
     if args.output:
-        with open(args.output, "w") as f:
+        with open(args.output, "w") as f:  # noqa: PTH123
             json.dump(summary, f, indent=2)
         logger.info(f"Test results saved to {args.output}")
 

@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_tool_coordinator]]
 import pytest
 from tta_ai.orchestration.tools.coordinator import ToolCoordinator
 from tta_ai.orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
@@ -15,13 +16,14 @@ async def test_tool_coordinator_create_or_get(redis_client):
             name="kg.query",
             version="1.0.1",
             description="Query KG",
-            parameters=[ToolParameter(name="q", schema={"type": "string"})],
+            parameters=[ToolParameter(name="q", param_schema={"type": "string"})],
             returns_schema={"type": "object"},
             safety_flags=[],
         )
 
     spec = await coord.create_or_get("sig-kg-query-v101", factory)
-    assert spec is not None and spec.name == "kg.query"
+    assert spec is not None
+    assert spec.name == "kg.query"
 
     # second call should not create duplicate
     spec2 = await coord.create_or_get("sig-kg-query-v101", factory)

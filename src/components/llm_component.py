@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Llm_component]]
 LLM Component.
 
 This module provides a component for managing the LLM service.

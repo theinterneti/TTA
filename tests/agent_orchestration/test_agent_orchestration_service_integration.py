@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_agent_orchestration_service_integration]]
 Integration tests for AgentOrchestrationService with real components (Task 16.1).
 
 This module tests the service integration with actual WorkflowManager, MessageCoordinator,

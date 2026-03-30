@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Players]]
 Player management router for the Player Experience API.
 
 This module provides REST endpoints for player profile CRUD operations
@@ -10,12 +12,16 @@ import os
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field, field_validator
 
 from ...database.player_profile_repository import (
     PlayerProfileRepository,
 )
+from ...database.session_repository import SessionRepository
+from ...managers.character_avatar_manager import CharacterAvatarManager
+from ...managers.player_experience_manager import PlayerExperienceManager
 from ...managers.player_profile_manager import (
     DataAccessRestrictedError,
     PlayerProfileManager,
@@ -30,7 +36,10 @@ from ...models.player import (
     PrivacySettings,
     TherapeuticPreferences,
 )
+from ...services.session_store import SessionStore
 from ..auth import TokenData, get_current_active_player
+from .characters import get_character_manager_dep
+from .sessions import get_session_store
 
 router = APIRouter()
 
@@ -76,6 +85,11 @@ def get_player_manager() -> PlayerProfileManager:
 def get_player_manager_dep() -> PlayerProfileManager:
     """Resolve the current player manager provider. This indirection enables tests to patch get_player_manager."""
     return get_player_manager()
+
+
+def get_player_experience_manager_dep() -> PlayerExperienceManager:
+    """Resolve the player experience manager used for dashboard aggregation."""
+    return PlayerExperienceManager(session_repository=SessionRepository())
 
 
 # Request/Response Models for API Documentation
@@ -287,7 +301,7 @@ class PlayerResponse(BaseModel):
 
 
 # Normalization helpers to accept flexible client/test payloads
-from ...utils.normalization import normalize_approaches
+from ...utils.normalization import normalize_approaches  # noqa: E402
 
 
 def _normalize_therapeutic_preferences_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -870,15 +884,18 @@ async def delete_player(
     summary="Get Player Progress Summary",
 )
 async def get_player_progress(
-    player_id: str, current_player: TokenData = Depends(get_current_active_player)
+    player_id: str,
+    current_player: TokenData = Depends(get_current_active_player),
+    manager: PlayerExperienceManager = Depends(get_player_experience_manager_dep),
 ) -> dict:
-    # Minimal progress summary for E2E tests
-    return {
-        "player_id": player_id,
-        "total_sessions": 1,
-        "total_time_minutes": 60,
-        "milestones_achieved": 0,
-    }
+    if current_player.player_id != player_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only access your own progress",
+        )
+
+    payload = await manager.get_progress_api_payload(player_id)
+    return jsonable_encoder(payload)
 
 
 @router.get(
@@ -886,23 +903,23 @@ async def get_player_progress(
     summary="Get Player Dashboard",
 )
 async def get_player_dashboard(
-    player_id: str, current_player: TokenData = Depends(get_current_active_player)
+    player_id: str,
+    current_player: TokenData = Depends(get_current_active_player),
+    manager: PlayerExperienceManager = Depends(get_player_experience_manager_dep),
+    session_store: SessionStore = Depends(get_session_store),
+    character_manager: CharacterAvatarManager = Depends(get_character_manager_dep),
 ) -> dict:
-    # Assemble dashboard using the same character repository as the Characters API
-    try:
-        from .characters import get_character_manager_dep
-
-        cmanager = get_character_manager_dep()
-        chars = cmanager.get_player_characters(player_id)
-        active_character_ids = [c.character_id for c in chars]
-    except Exception:
-        active_character_ids = []
-    # Minimal compatible payload for tests
-    return {
-        "player_id": player_id,
-        "active_characters": active_character_ids,
-        "recommendations": [{"world_id": "world_mindfulness_garden"}],
-    }
+    if current_player.player_id != player_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only access your own dashboard",
+        )
+    payload = await manager.get_dashboard_api_payload(
+        player_id,
+        session_store=session_store,
+        character_manager=character_manager,
+    )
+    return jsonable_encoder(payload)
 
 
 @router.get(

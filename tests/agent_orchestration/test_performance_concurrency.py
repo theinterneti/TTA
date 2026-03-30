@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_performance_concurrency]]
 Performance and concurrency integration tests for multi-agent workflows.
 
 This module implements comprehensive tests for concurrent workflow execution,
@@ -379,7 +381,7 @@ class TestPerformanceBenchmarks:
                 start_time = time.time()
                 completed_workflows = 0
 
-                async def benchmark_workflow(workflow_id):
+                async def benchmark_workflow(workflow_id, metrics_tracker):
                     nonlocal completed_workflows
 
                     request = OrchestrationRequest(
@@ -396,10 +398,10 @@ class TestPerformanceBenchmarks:
                     workflow_time = time.time() - workflow_start
 
                     if error is None:
-                        metrics.record_workflow_time(workflow_time)
+                        metrics_tracker.record_workflow_time(workflow_time)
                         completed_workflows += 1
                     else:
-                        metrics.record_error("workflow_failure")
+                        metrics_tracker.record_error("workflow_failure")
 
                     return error is None
 
@@ -410,7 +412,9 @@ class TestPerformanceBenchmarks:
                 while time.time() - start_time < duration:
                     # Maintain concurrent workflow count
                     while len(active_tasks) < concurrent_count:
-                        task = asyncio.create_task(benchmark_workflow(workflow_id))
+                        task = asyncio.create_task(
+                            benchmark_workflow(workflow_id, metrics)
+                        )
                         active_tasks.add(task)
                         workflow_id += 1
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Execution_engine]]
 Execution engine for OpenHands task orchestration.
 
 Provides:
@@ -164,7 +166,7 @@ class ExecutionEngine:
 
         try:
             # Select model
-            from .model_selector import TaskCategory
+            from .model_selector import TaskCategory  # noqa: PLC0415
 
             category = task.metadata.get("category", TaskCategory.CODE_GENERATION)
             if isinstance(category, str):

@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/References/AI Development Toolkit.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Packages/Ai-dev-toolkit/Readme]]

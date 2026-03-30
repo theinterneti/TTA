@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Security/__init__]]
 Security hardening and compliance features for the Player Experience Interface.
 
 This module provides comprehensive security measures including:

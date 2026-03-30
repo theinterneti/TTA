@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Phase7_monitor_optimized]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

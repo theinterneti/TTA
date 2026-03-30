@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/02-ui-functionality.staging.spec]]
 /**
  * UI/UX Functionality E2E Tests for Staging Environment
  *

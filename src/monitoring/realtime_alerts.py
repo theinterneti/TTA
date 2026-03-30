@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Monitoring/Realtime_alerts]]
 Real-time Alerting System for TTA Monitoring
 
 Integrates with the existing real-time dashboard system to provide
@@ -10,19 +12,19 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 try:
     import requests
 
     REQUESTS_AVAILABLE = True
 except ImportError:
-    REQUESTS_AVAILABLE = False
+    REQUESTS_AVAILABLE = False  # type: ignore[misc]
 
 logger = logging.getLogger(__name__)
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -30,7 +32,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     """Alert status."""
 
     ACTIVE = "active"
@@ -234,7 +236,7 @@ class AlertManager:
         """Check a specific alert rule."""
         try:
             # Query Prometheus
-            response = requests.get(
+            response = requests.get(  # type: ignore[possibly-unbound]
                 f"{self.prometheus_url}/api/v1/query",
                 params={"query": rule.query},
                 timeout=10,
@@ -302,7 +304,7 @@ class AlertManager:
                     logger.info(f"Alert resolved: {alert.message}")
                     await self._send_notifications(alert)
 
-        except requests.RequestException as e:
+        except requests.RequestException as e:  # type: ignore[possibly-unbound]
             logger.error(f"Error querying Prometheus for rule {rule.name}: {e}")
         except Exception as e:
             logger.error(f"Unexpected error checking rule {rule.name}: {e}")
@@ -391,8 +393,8 @@ def webhook_notification_handler(webhook_url: str):
         }
 
         try:
-            requests.post(webhook_url, json=payload, timeout=10)
-        except requests.RequestException as e:
+            requests.post(webhook_url, json=payload, timeout=10)  # type: ignore[possibly-unbound]
+        except requests.RequestException as e:  # type: ignore[possibly-unbound]
             logger.error(f"Failed to send webhook notification: {e}")
 
     return handler

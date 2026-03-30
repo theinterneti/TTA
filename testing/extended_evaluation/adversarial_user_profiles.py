@@ -1,4 +1,5 @@
 """
+
 Adversarial User Profiles for TTA Extended Session Testing
 
 Implements challenging user simulation patterns that test edge cases and stress

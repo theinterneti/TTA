@@ -1,6 +1,9 @@
+# Logseq: [[TTA.dev/Tests/Test_player_experience_manager]]
+
 import asyncio
 import unittest
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, patch
 
 from src.player_experience.database.character_repository import CharacterRepository
 from src.player_experience.database.session_repository import SessionRepository
@@ -43,8 +46,20 @@ class MockProgressService(ProgressTrackingService):
     ):
         class Dummy:
             therapeutic_momentum = 0.7
-            engagement_metrics = type("E", (), {"current_streak_days": 3})()
+            engagement_metrics = type(
+                "E",
+                (),
+                {
+                    "current_streak_days": 3,
+                    "total_sessions": 0,
+                    "total_time_minutes": 0,
+                },
+            )()
             recent_highlights = []
+            progress_trend = "stable"
+            engagement_trend = "stable"
+            milestones_achieved = []
+            last_updated = datetime.now(UTC)
 
         return Dummy()
 
@@ -86,9 +101,28 @@ class MockPersonalizationManager(PersonalizationServiceManager):
         return Dummy()
 
 
+class MockSessionStore:
+    def __init__(self, sessions):
+        self._sessions = sessions
+
+    def list_sessions(self, player_id: str):
+        return list(self._sessions)
+
+
+class MockCharacterManager:
+    def __init__(self, character_ids: list[str]):
+        self._characters = [
+            type("CharacterSummary", (), {"character_id": character_id})()
+            for character_id in character_ids
+        ]
+
+    def get_player_characters(self, player_id: str):
+        return list(self._characters)
+
+
 class TestPlayerExperienceManager(unittest.TestCase):
     def setUp(self):
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         self.summaries = []
         for i in range(3):
             self.summaries.append(
@@ -119,9 +153,9 @@ class TestPlayerExperienceManager(unittest.TestCase):
     def test_dashboard_aggregation(self):
         async def run():
             dashboard = await self.mgr.get_player_dashboard(self.player_id)
-            self.assertEqual(dashboard.player_id, self.player_id)
-            self.assertEqual(len(dashboard.recent_sessions), 3)
-            self.assertGreaterEqual(dashboard.therapeutic_momentum, 0.7)
+            assert dashboard.player_id == self.player_id
+            assert len(dashboard.recent_sessions) == 3
+            assert dashboard.therapeutic_momentum >= 0.7
 
         asyncio.run(run())
 
@@ -129,8 +163,8 @@ class TestPlayerExperienceManager(unittest.TestCase):
         async def run():
             recs = await self.mgr.get_recommendations(self.player_id)
             titles = [r.title for r in recs]
-            self.assertIn("Mindfulness practice", titles)
-            self.assertIn("Stress Management Focus", titles)
+            assert "Mindfulness practice" in titles
+            assert "Stress Management Focus" in titles
 
         asyncio.run(run())
 
@@ -144,8 +178,8 @@ class TestPlayerExperienceManager(unittest.TestCase):
                 content={"rating": 2},
             )
             result = await self.mgr.process_player_feedback(self.player_id, fb)
-            self.assertEqual(result["adaptation_id"], "a1")
-            self.assertIn("reduce_intensity", result["changes_made"])
+            assert result["adaptation_id"] == "a1"
+            assert "reduce_intensity" in result["changes_made"]
 
         asyncio.run(run())
 
@@ -171,13 +205,159 @@ class TestPlayerExperienceManager(unittest.TestCase):
             out = await self.mgr.detect_crisis_and_get_resources(
                 self.player_id, "I want to end it all."
             )
-            self.assertTrue(out["crisis_detected"])
-            self.assertIn("suicidal_ideation", out["crisis_types"])  # enum value
-            self.assertEqual(len(out["resources"]), 1)
+            assert out["crisis_detected"]
+            assert "suicidal_ideation" in out["crisis_types"]  # enum value
+            assert len(out["resources"]) == 1
             r = out["resources"][0]
-            self.assertEqual(r["resource_id"], "res1")
-            self.assertEqual(r["contact"], "988")
-            self.assertTrue(r["emergency"])
+            assert r["resource_id"] == "res1"
+            assert r["contact"] == "988"
+            assert r["emergency"]
+
+        asyncio.run(run())
+
+    def test_dashboard_api_payload_includes_narrative_summary(self):
+        async def run():
+            session_store = MockSessionStore(
+                [{"session_id": "session-1", "updated_at": "2026-03-24T05:00:00+00:00"}]
+            )
+            character_manager = MockCharacterManager(["char-1", "char-2"])
+
+            with patch(
+                "src.player_experience.managers.player_experience_manager.enrich_session_payloads",
+                new=AsyncMock(
+                    return_value=(
+                        [
+                            {
+                                "session_id": "session-1",
+                                "narrative_orchestration": {
+                                    "player_signals": {"coherence_status": "stable"}
+                                },
+                            }
+                        ],
+                        {"stable_sessions": 1, "strained_sessions": 0},
+                    )
+                ),
+            ):
+                payload = await self.mgr.get_dashboard_api_payload(
+                    self.player_id,
+                    session_store=session_store,
+                    character_manager=character_manager,
+                )
+
+            assert payload["player_id"] == self.player_id
+            assert payload["active_characters"] == ["char-1", "char-2"]
+            assert (
+                payload["session_metrics"]["narrative_summary"]["stable_sessions"] == 1
+            )
+            assert payload["recommendations"][0]["recommendation_id"] == "r2"
+            assert payload["recommendations"][0]["recommendation_type"] == (
+                "therapeutic_focus"
+            )
+            assert (
+                payload["recent_sessions"][0]["narrative_orchestration"][
+                    "player_signals"
+                ]["coherence_status"]
+                == "stable"
+            )
+
+        asyncio.run(run())
+
+    def test_dashboard_api_payload_gracefully_handles_enrichment_failure(self):
+        async def run():
+            session_store = MockSessionStore([{"session_id": "session-1"}])
+            character_manager = MockCharacterManager(["char-1"])
+
+            with patch(
+                "src.player_experience.managers.player_experience_manager.enrich_session_payloads",
+                new=AsyncMock(side_effect=RuntimeError("boom")),
+            ):
+                payload = await self.mgr.get_dashboard_api_payload(
+                    self.player_id,
+                    session_store=session_store,
+                    character_manager=character_manager,
+                )
+
+            assert payload["active_characters"] == ["char-1"]
+            assert payload["recent_sessions"] == [{"session_id": "session-1"}]
+            assert payload["session_metrics"]["narrative_summary"] == {
+                "stable_sessions": 0,
+                "strained_sessions": 0,
+            }
+            assert payload["recommendations"][0]["title"] == "Stress Management Focus"
+
+        asyncio.run(run())
+
+    def test_session_list_api_payload_without_narrative(self):
+        async def run():
+            session_store = MockSessionStore(
+                [
+                    {"session_id": "session-1", "status": "active"},
+                    {"session_id": "session-2", "status": "paused"},
+                ]
+            )
+
+            payload = await self.mgr.get_session_list_api_payload(
+                self.player_id,
+                session_store=session_store,
+                include_narrative=False,
+            )
+
+            assert payload["count"] == 2
+            assert payload["sessions"][0]["session_id"] == "session-1"
+            assert "narrative_summary" not in payload
+
+        asyncio.run(run())
+
+    def test_session_list_api_payload_with_narrative_summary(self):
+        async def run():
+            session_store = MockSessionStore([{"session_id": "session-1"}])
+
+            with patch(
+                "src.player_experience.managers.player_experience_manager.enrich_session_payloads",
+                new=AsyncMock(
+                    return_value=(
+                        [
+                            {
+                                "session_id": "session-1",
+                                "narrative_orchestration": {
+                                    "player_signals": {"coherence_status": "stable"}
+                                },
+                            }
+                        ],
+                        {"stable_sessions": 1, "strained_sessions": 0},
+                    )
+                ),
+            ):
+                payload = await self.mgr.get_session_list_api_payload(
+                    self.player_id,
+                    session_store=session_store,
+                    include_narrative=True,
+                )
+
+            assert payload["count"] == 1
+            assert payload["narrative_summary"]["stable_sessions"] == 1
+            assert (
+                payload["sessions"][0]["narrative_orchestration"]["player_signals"][
+                    "coherence_status"
+                ]
+                == "stable"
+            )
+
+        asyncio.run(run())
+
+    def test_progress_api_payload_uses_real_summary_data(self):
+        async def run():
+            payload = await self.mgr.get_progress_api_payload(self.player_id)
+
+            assert payload["player_id"] == self.player_id
+            assert payload["total_sessions"] == 0
+            assert payload["total_time_minutes"] == 0
+            assert payload["milestones_achieved"] == 0
+            assert payload["current_streak_days"] == 3
+            assert payload["therapeutic_momentum"] == 0.7
+            assert payload["progress_trend"] == "stable"
+            assert payload["engagement_trend"] == "stable"
+            assert isinstance(payload["last_updated"], str)
 
         asyncio.run(run())
 

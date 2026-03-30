@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Scripts/Initialize-system]]
 #!/usr/bin/env node
 
 /**

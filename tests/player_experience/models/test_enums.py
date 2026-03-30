@@ -1,5 +1,7 @@
 """Tests for player_experience.models.enums module."""
 
+# Logseq: [[TTA.dev/Tests/Player_experience/Models/Test_enums]]
+
 
 class TestEnumsModule:
     """Tests for enums module."""

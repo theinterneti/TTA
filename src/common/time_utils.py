@@ -1,16 +1,18 @@
 """
+
+# Logseq: [[TTA.dev/Common/Time_utils]]
 Time/date utility helpers to centralize timezone-agnostic date calculations.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 
 def utc_today() -> date:
     """Return today's date in UTC."""
-    return datetime.utcnow().date()
+    return datetime.now(UTC).date()
 
 
 def pick_reference_today(candidates: Iterable[date]) -> date:
@@ -24,7 +26,7 @@ def pick_reference_today(candidates: Iterable[date]) -> date:
     """
     cset = set(candidates)
     local = datetime.now().date()
-    utc = datetime.utcnow().date()
+    utc = datetime.now(UTC).date()
     if local in cset and utc in cset:
         return max(local, utc)
     if utc in cset:

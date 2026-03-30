@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Replayability_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Replayability_system]]
 Production Therapeutic ReplayabilitySystem Implementation
 
 This module provides safe exploration environment with outcome comparison,
@@ -9,7 +12,7 @@ with therapeutic goal achievement tracking.
 import copy
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -73,7 +76,7 @@ class ExplorationSnapshot:
     safety_status: dict[str, Any] = field(default_factory=dict)
 
     # Metadata
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     description: str = ""
 
 
@@ -104,7 +107,7 @@ class AlternativePath:
     # Execution tracking
     is_executed: bool = False
     execution_results: dict[str, Any] = field(default_factory=dict)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -133,7 +136,7 @@ class PathComparison:
     learning_opportunities: list[str] = field(default_factory=list)
 
     # Metadata
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -159,8 +162,8 @@ class ExplorationSession:
 
     # Session management
     is_active: bool = True
-    started_at: datetime = field(default_factory=datetime.utcnow)
-    last_activity: datetime = field(default_factory=datetime.utcnow)
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_activity: datetime = field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = None
 
 
@@ -259,7 +262,7 @@ class TherapeuticReplayabilitySystem:
             ExplorationSnapshot representing the preserved state
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Create deep copy of session state for preservation
             preserved_state = copy.deepcopy(session_state)
@@ -302,7 +305,7 @@ class TherapeuticReplayabilitySystem:
             # Update metrics
             self.metrics["snapshots_created"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Created exploration snapshot {snapshot.snapshot_id} for user {user_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -342,7 +345,7 @@ class TherapeuticReplayabilitySystem:
             ExplorationSession for managing the exploration
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Create exploration session
             exploration = ExplorationSession(
@@ -362,7 +365,7 @@ class TherapeuticReplayabilitySystem:
                 self.user_explorations[user_id] = []
             self.user_explorations[user_id].append(exploration.exploration_id)
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Started exploration session {exploration.exploration_id} for user {user_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -405,7 +408,7 @@ class TherapeuticReplayabilitySystem:
             AlternativePath representing the alternative exploration
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get exploration session and snapshot
             exploration = self.exploration_sessions.get(exploration_id)
@@ -449,7 +452,7 @@ class TherapeuticReplayabilitySystem:
 
             # Track in exploration session
             exploration.paths_explored.append(path.path_id)
-            exploration.last_activity = datetime.utcnow()
+            exploration.last_activity = datetime.now(UTC)
 
             # Track user paths
             if snapshot.user_id not in self.user_paths:
@@ -459,7 +462,7 @@ class TherapeuticReplayabilitySystem:
             # Update metrics
             self.metrics["paths_explored"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Created alternative path {path.path_id} for exploration {exploration_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -498,7 +501,7 @@ class TherapeuticReplayabilitySystem:
             PathComparison with detailed analysis and recommendations
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get exploration session
             exploration = self.exploration_sessions.get(exploration_id)
@@ -566,12 +569,12 @@ class TherapeuticReplayabilitySystem:
 
             # Track in exploration session
             exploration.comparisons_generated.append(comparison.comparison_id)
-            exploration.last_activity = datetime.utcnow()
+            exploration.last_activity = datetime.now(UTC)
 
             # Update metrics
             self.metrics["comparisons_generated"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Generated path comparison {comparison.comparison_id} for exploration {exploration_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -606,7 +609,7 @@ class TherapeuticReplayabilitySystem:
             Restoration results and restored state information
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get snapshot
             snapshot = self.exploration_snapshots.get(snapshot_id)
@@ -642,7 +645,7 @@ class TherapeuticReplayabilitySystem:
             else:
                 restoration_result = {"restored": True, "method": "direct"}
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
 
             response = {
                 "snapshot_id": snapshot_id,
@@ -1155,7 +1158,7 @@ class TherapeuticReplayabilitySystem:
                     user_snapshots.remove(snapshot_id)
 
             # Remove snapshots older than retention period
-            cutoff_date = datetime.utcnow() - timedelta(
+            cutoff_date = datetime.now(UTC) - timedelta(
                 days=self.snapshot_retention_days
             )
             expired_snapshots = []

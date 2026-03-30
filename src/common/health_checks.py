@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Common/Health_checks]]
 System health check utilities for TTA production readiness.
 
 Provides unified health check interface for all system components:
@@ -11,15 +13,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class HealthStatus(str, Enum):
+class HealthStatus(StrEnum):
     """Health check status levels."""
 
     HEALTHY = "healthy"
@@ -56,9 +59,9 @@ class HealthChecker:
 
     def __init__(self):
         """Initialize health checker."""
-        self._checks: dict[str, callable] = {}
+        self._checks: dict[str, Callable] = {}
 
-    def register_check(self, name: str, check_func: callable) -> None:
+    def register_check(self, name: str, check_func: Callable) -> None:
         """
         Register a health check function.
 
@@ -84,24 +87,24 @@ class HealthChecker:
                 component=name,
                 status=HealthStatus.UNKNOWN,
                 message=f"No health check registered for {name}",
-                checked_at=datetime.utcnow(),
+                checked_at=datetime.now(UTC),
             )
 
-        start_time = asyncio.get_event_loop().time()
+        start_time = asyncio.get_running_loop().time()
         try:
             result = await self._checks[name]()
-            end_time = asyncio.get_event_loop().time()
+            end_time = asyncio.get_running_loop().time()
             result.response_time_ms = (end_time - start_time) * 1000
-            result.checked_at = datetime.utcnow()
+            result.checked_at = datetime.now(UTC)
             return result
         except Exception as e:
-            end_time = asyncio.get_event_loop().time()
+            end_time = asyncio.get_running_loop().time()
             logger.error(f"Health check failed for {name}: {e}")
             return HealthCheckResult(
                 component=name,
                 status=HealthStatus.UNHEALTHY,
                 message=f"Health check error: {str(e)}",
-                checked_at=datetime.utcnow(),
+                checked_at=datetime.now(UTC),
                 response_time_ms=(end_time - start_time) * 1000,
             )
 
@@ -262,6 +265,71 @@ async def check_agent_orchestration_health(
             component="agent_orchestration",
             status=HealthStatus.UNHEALTHY,
             message=f"Agent orchestration check failed: {str(e)}",
+        )
+
+
+async def check_dolt_health(database_url: str | None = None) -> HealthCheckResult:
+    """Check Dolt SQL server connection health.
+
+    Attempts a lightweight connection using aiomysql. Degrades gracefully
+    when Dolt is not configured or the aiomysql driver is not installed.
+
+    Args:
+        database_url: mysql+aiomysql:// connection string (falls back to
+                      DOLT_DATABASE_URL env var).
+
+    Returns:
+        HealthCheckResult
+    """
+    import os
+
+    url = database_url or os.getenv("DOLT_DATABASE_URL")
+    if not url:
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.DEGRADED,
+            message="Dolt not configured (DOLT_DATABASE_URL not set)",
+        )
+
+    try:
+        # Parse host/port/password from the URL for a raw ping
+        # mysql+aiomysql://root:<pw>@<host>:<port>/<db>
+        from urllib.parse import urlparse
+
+        import aiomysql  # type: ignore[import-not-found]
+
+        parsed = urlparse(url.replace("mysql+aiomysql://", "mysql://"))
+        conn = await aiomysql.connect(
+            host=parsed.hostname or "localhost",
+            port=parsed.port or 3306,
+            user=parsed.username or "root",
+            password=parsed.password or "",
+            db=parsed.path.lstrip("/") or "tta",
+            connect_timeout=5,
+        )
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT @@version, dolt_version()")
+            row = await cur.fetchone()
+            mysql_version = row[0] if row else "unknown"
+            dolt_version = row[1] if row else "unknown"
+        conn.close()
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.HEALTHY,
+            message="Dolt SQL server connection healthy",
+            details={"mysql_version": mysql_version, "dolt_version": dolt_version},
+        )
+    except ImportError:
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.DEGRADED,
+            message="aiomysql not installed; Dolt health check skipped",
+        )
+    except Exception as e:
+        return HealthCheckResult(
+            component="dolt",
+            status=HealthStatus.UNHEALTHY,
+            message=f"Dolt connection failed: {str(e)}",
         )
 
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Scripts/Workflow/Quality_gates]]
 Quality Gate Validators
 
 Implements quality gates for TTA component maturity workflow:

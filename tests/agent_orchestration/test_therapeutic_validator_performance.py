@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_therapeutic_validator_performance]]
 Performance and accuracy tests for enhanced TherapeuticValidator (Task 17.1).
 
 Tests the performance and accuracy of the therapeutic validation system under

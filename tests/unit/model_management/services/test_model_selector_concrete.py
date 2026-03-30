@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Services/Test_model_selector_concrete]]
 Concrete value tests for ModelSelector.
 
 These tests complement property-based tests by validating business logic correctness
@@ -12,6 +14,8 @@ validate structure but not business logic correctness.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
+pytest.importorskip("tta_ai")
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,

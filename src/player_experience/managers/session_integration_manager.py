@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Session_integration_manager]]
 Session management and context switching functionality.
 
 Handles session lifecycle management, character-world switching, and integration

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Ollama]]
 Ollama Provider Implementation.
 
 This module provides integration with Ollama for containerized local model
@@ -13,11 +15,11 @@ from collections.abc import AsyncGenerator
 from datetime import datetime
 from typing import Any
 
+import docker.errors
+import docker.types
 import httpx
 
 import docker
-import docker.errors
-import docker.types
 
 from ..interfaces import (
     GenerationRequest,
@@ -118,9 +120,7 @@ class OllamaModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using Ollama API."""
         try:
             # Prepare request payload
@@ -277,7 +277,9 @@ class OllamaProvider(BaseProvider):
             raise
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
+        self,
+        model_id: str,
+        config: dict[str, Any],  # noqa: ARG002
     ) -> OllamaModelInstance:
         """Load an Ollama model instance."""
         if not self._client:

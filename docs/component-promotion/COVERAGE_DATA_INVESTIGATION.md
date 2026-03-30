@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/Component Coverage Data Investigation]]
 > - **Path:** `.augment/kb/Components/Component Coverage Data Investigation.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Component Coverage Data Investigation.md`
 
 **Migration date:** 2025-11-01
+
+
+---

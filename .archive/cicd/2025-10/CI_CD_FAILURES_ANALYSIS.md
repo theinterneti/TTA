@@ -199,3 +199,7 @@ The CI/CD failures reveal **technical debt** that existed before our PRs:
 **Analysis Performed By:** GitHub Copilot
 **Workflow Runs Analyzed:** 19004002339 (Dev Workflow), 19004002310 (Tests), 19004002308 (Code Quality)
 **Documentation:** Comprehensive logs reviewed for root cause identification
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Cicd/2025-10/Ci_cd_failures_analysis]]

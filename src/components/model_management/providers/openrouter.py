@@ -1,10 +1,13 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Providers/Openrouter]]
 OpenRouter Provider Implementation.
 
 This module provides integration with OpenRouter API for accessing
 cloud-based AI models with free model filtering capabilities.
 """
 
+import json
 import logging
 import os
 from collections.abc import AsyncGenerator
@@ -94,9 +97,7 @@ class OpenRouterModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(
-        self, request: GenerationRequest
-    ) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using OpenRouter API."""
         try:
             # Prepare request payload
@@ -126,8 +127,6 @@ class OpenRouterModelInstance(BaseModelInstance):
                             break
 
                         try:
-                            import json
-
                             data = json.loads(data_str)
 
                             if "choices" in data and data["choices"]:
@@ -322,7 +321,9 @@ class OpenRouterProvider(BaseProvider):
             raise
 
     async def _load_model_impl(
-        self, model_id: str, config: dict[str, Any]
+        self,
+        model_id: str,
+        config: dict[str, Any],  # noqa: ARG002
     ) -> OpenRouterModelInstance:
         """Load an OpenRouter model instance."""
         if not self._client:
@@ -408,16 +409,15 @@ class OpenRouterProvider(BaseProvider):
             max_cost_per_token = self._max_cost_per_token
 
         all_models = await super().get_available_models()
-        affordable_models = []
-
-        for model in all_models:
-            if model.is_free or (
+        return [
+            model
+            for model in all_models
+            if model.is_free
+            or (
                 model.cost_per_token is not None
                 and model.cost_per_token <= max_cost_per_token
-            ):
-                affordable_models.append(model)
-
-        return affordable_models
+            )
+        ]
 
     async def set_free_models_filter(
         self,

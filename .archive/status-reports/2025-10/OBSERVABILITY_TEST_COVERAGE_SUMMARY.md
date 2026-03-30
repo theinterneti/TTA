@@ -138,3 +138,7 @@ If OpenTelemetry dependency is not desired at this time:
 **Gap**: APM setup requires OpenTelemetry SDK for full coverage
 
 **Decision Required**: Install OpenTelemetry SDK now, or defer to integration testing phase?
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Observability_test_coverage_summary]]

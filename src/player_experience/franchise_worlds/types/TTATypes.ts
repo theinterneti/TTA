@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Types/Ttatypes]]
 /**
  * TypeScript type definitions for TTA models
  *

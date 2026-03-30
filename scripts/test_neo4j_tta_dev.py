@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Quick Neo4j connection test with correct TTA dev credentials."""
 
+# Logseq: [[TTA.dev/Scripts/Test_neo4j_tta_dev]]
+
 import sys
 
 from neo4j import GraphDatabase

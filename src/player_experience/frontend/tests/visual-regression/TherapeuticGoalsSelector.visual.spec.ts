@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Tests/Visual-regression/Therapeuticgoalsselector.visual.spec]]
 import { test, expect } from '@playwright/test';
 
 /**

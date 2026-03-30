@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/TTA Guides & Examples]]
 > - **Path:** `.augment/kb/Workflows/TTA Guides & Examples.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/TTA Guides & Examples.md`
 
 **Migration date:** 2025-11-01
+
+
+---

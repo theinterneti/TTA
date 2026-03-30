@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/GitHub Actions Workflow Templates.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Workflow-templates/Readme]]

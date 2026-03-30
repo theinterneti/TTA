@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced documentation structure for better accessibility
 - Improved CI/CD workflows with better organization and efficiency
 - Phase 6 system validation and quality assurance processes
+- **Dependency upgrades**: Bumped `redis` lower bound to `>=7.2.0` (locked at `7.2.1`) and `neo4j` lower bound to `>=6.1.0` (locked at `6.1.0`, latest). Updated `tta-ai-framework` redis constraint from `>=5.0.0` to `>=7.0.0` for alignment with the main project.
 
 ---
 
@@ -282,3 +283,7 @@ When upgrading from 0.x versions:
 
 **Maintained by**: TTA Development Team
 **Last Updated**: 2025-10-04
+
+
+---
+**Logseq:** [[TTA.dev/Changelog]]

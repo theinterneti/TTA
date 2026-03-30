@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Artifacts/Test-scripts/Test-enhanced-ai-narrative-e2e]]
 #!/usr/bin/env node
 /**
  * Enhanced TTA AI Narrative Generation End-to-End Test

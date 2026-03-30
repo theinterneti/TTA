@@ -16,7 +16,7 @@ warn() { echo -e "${YELLOW}[$(date '+%H:%M:%S')] ⚠️  $1${NC}"; }
 error() { echo -e "${RED}[$(date '+%H:%M:%S')] ❌ $1${NC}"; }
 info() { echo -e "${BLUE}[$(date '+%H:%M:%S')] ℹ️  $1${NC}"; }
 
-PROJECT_ROOT="/home/thein/recovered-tta-storytelling"
+PROJECT_ROOT=\"/home/thein/repos/recovered-tta-storytelling\"
 COMPOSE_FILE="$PROJECT_ROOT/docker-compose.staging-homelab.yml"
 COMPOSE_PROJECT="tta-staging-homelab"
 API_URL="http://localhost:8081"

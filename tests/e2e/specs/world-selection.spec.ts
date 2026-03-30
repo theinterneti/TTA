@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Specs/World-selection.spec]]
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/LoginPage';
 import { WorldSelectionPage } from '../page-objects/WorldSelectionPage';

@@ -1,5 +1,7 @@
 """Safety rule evaluation engine."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_validation/Engine]]
+
 from __future__ import annotations
 
 import json

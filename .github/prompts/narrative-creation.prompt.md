@@ -397,3 +397,7 @@ If issues are discovered:
 
 **Last Updated**: 2025-10-26
 **Status**: Active - Narrative creation workflow with validation gates
+
+
+---
+**Logseq:** [[TTA.dev/.github/Prompts/Narrative-creation.prompt]]

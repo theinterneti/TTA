@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Ai_components/Langgraph_integration]]
 LangGraph Integration for AI-Powered Narrative Workflows
 Manages complex therapeutic conversation flows and decision trees
 """
@@ -7,14 +9,15 @@ import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, TypedDict
 
 import redis.asyncio as aioredis
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
+
+from .llm_factory import get_llm
 
 logger = logging.getLogger(__name__)
 
@@ -60,16 +63,19 @@ class TherapeuticWorkflowManager:
 
     def __init__(
         self,
-        openai_api_key: str,
+        openai_api_key: str = "",  # kept for backward-compat; ignored when provider set
         redis_url: str = "redis://localhost:6379",
-        model_name: str = "gpt-4-turbo-preview",
+        model_name: str | None = None,
+        provider: str | None = None,
     ):
-        self.openai_api_key = openai_api_key
         self.redis_url = redis_url
         self.model_name = model_name
 
-        self.llm = ChatOpenAI(
-            api_key=openai_api_key, model=model_name, temperature=0.7, max_tokens=1000
+        self.llm = get_llm(
+            provider=provider,
+            model=model_name,
+            temperature=0.7,
+            max_tokens=1000,
         )
 
         self.redis: aioredis.Redis | None = None
@@ -81,7 +87,7 @@ class TherapeuticWorkflowManager:
         try:
             # Initialize Redis connection
             self.redis = aioredis.from_url(self.redis_url)
-            await self.redis.ping()
+            await self.redis.ping()  # type: ignore[misc]
 
             # Create therapeutic workflows
             await self._create_therapeutic_workflows()
@@ -140,7 +146,7 @@ class TherapeuticWorkflowManager:
         main_workflow.set_entry_point("assess_emotional_state")
 
         # Compile the workflow
-        self.workflows["main_therapeutic"] = main_workflow.compile()
+        self.workflows["main_therapeutic"] = main_workflow.compile()  # type: ignore[assignment]
 
         # Create specialized workflows
         await self._create_crisis_workflow()
@@ -174,7 +180,7 @@ class TherapeuticWorkflowManager:
         crisis_workflow.add_edge("follow_up_plan", END)
 
         crisis_workflow.set_entry_point("immediate_safety")
-        self.workflows["crisis_intervention"] = crisis_workflow.compile()
+        self.workflows["crisis_intervention"] = crisis_workflow.compile()  # type: ignore[assignment]
 
     async def _create_skill_building_workflow(self):
         """Create skill-building workflow"""
@@ -193,7 +199,7 @@ class TherapeuticWorkflowManager:
         skill_workflow.add_edge("reinforcement", END)
 
         skill_workflow.set_entry_point("identify_skill_gap")
-        self.workflows["skill_building"] = skill_workflow.compile()
+        self.workflows["skill_building"] = skill_workflow.compile()  # type: ignore[assignment]
 
     async def process_patient_input(
         self,
@@ -227,7 +233,7 @@ class TherapeuticWorkflowManager:
 
         try:
             # Execute workflow
-            result = await workflow.ainvoke(initial_state)
+            result = await workflow.ainvoke(initial_state)  # type: ignore[attr-defined]
 
             # Extract response
             response = self._extract_workflow_response(result)
@@ -273,12 +279,12 @@ class TherapeuticWorkflowManager:
         response = await self.llm.ainvoke([SystemMessage(content=assessment_prompt)])
 
         try:
-            assessment = json.loads(response.content)
-            state["emotional_state"] = assessment
+            assessment = json.loads(response.content)  # type: ignore[arg-type]
+            state["emotional_state"] = assessment  # type: ignore[typeddict-item]
             state["messages"].append(AIMessage(content="Emotional state assessed"))
         except json.JSONDecodeError:
             # Fallback assessment
-            state["emotional_state"] = {
+            state["emotional_state"] = {  # type: ignore[typeddict-item]
                 "valence": 0.0,
                 "arousal": 0.5,
                 "crisis_risk": "low",
@@ -296,7 +302,7 @@ class TherapeuticWorkflowManager:
         # Enhanced safety check based on multiple factors
         safety_factors = {
             "crisis_keywords": self._check_crisis_keywords(
-                state["messages"][-1].content
+                state["messages"][-1].content  # type: ignore[arg-type]
             ),
             "emotional_distress": emotional_state.get("valence", 0) < -0.7,
             "high_arousal": emotional_state.get("arousal", 0) > 0.8,
@@ -362,13 +368,13 @@ class TherapeuticWorkflowManager:
                 ),
                 "ai_response": state["messages"][-1].content,
                 "emotional_impact": state["emotional_state"],
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
             state["decision_points"].append(narrative_update)
 
             # Cache narrative progression
-            await self.redis.setex(
+            await self.redis.setex(  # type: ignore[union-attr]
                 f"narrative:{state['session_id']}",
                 3600,  # 1 hour TTL
                 json.dumps(narrative_update),
@@ -395,7 +401,7 @@ class TherapeuticWorkflowManager:
         # Log crisis intervention
         intervention = {
             "type": "crisis_intervention",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "patient_id": state["patient_id"],
             "session_id": state["session_id"],
             "trigger": state["emotional_state"],
@@ -477,7 +483,7 @@ class TherapeuticWorkflowManager:
 
     async def _cache_workflow_result(self, session_id: str, response: dict[str, Any]):
         """Cache workflow result for quick access"""
-        await self.redis.setex(
+        await self.redis.setex(  # type: ignore[union-attr]
             f"workflow_result:{session_id}",
             1800,  # 30 minutes TTL
             json.dumps(response, default=str),

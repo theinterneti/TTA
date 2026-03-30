@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Profiling]]
 Performance profiling utilities for agent coordination.
 
 This module provides profiling and monitoring capabilities to analyze

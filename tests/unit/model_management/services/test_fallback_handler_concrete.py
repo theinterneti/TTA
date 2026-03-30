@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Services/Test_fallback_handler_concrete]]
 Concrete Value Tests for FallbackHandler Service.
 
 This module contains concrete value tests that validate business logic correctness
@@ -9,6 +11,8 @@ tests to achieve high mutation testing scores.
 from unittest.mock import AsyncMock
 
 import pytest
+
+pytest.importorskip("tta_ai")
 from tta_ai.models import (
     ModelInfo,
     ModelRequirements,

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Database/Character_repository]]
 Character Repository for database operations.
 
 This module provides the CharacterRepository class that handles all database
@@ -20,11 +22,12 @@ from ..models.character import (
     TherapeuticProfile,
 )
 from ..models.enums import IntensityLevel, TherapeuticApproach
+from .abstract_repository import AbstractCharacterRepository
 
 logger = logging.getLogger(__name__)
 
 
-class CharacterRepository:
+class CharacterRepository(AbstractCharacterRepository):
     """Repository for character database operations."""
 
     def __init__(

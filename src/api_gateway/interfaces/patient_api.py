@@ -1,11 +1,13 @@
 """
+
+# Logseq: [[TTA.dev/Api_gateway/Interfaces/Patient_api]]
 Patient Interface API Endpoints
 Provides therapeutic gaming and patient-focused functionality
 """
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
@@ -122,7 +124,7 @@ async def start_therapeutic_session(
         }
 
         # Initialize therapeutic integration
-        await therapeutic_system.initialize_session(session_config)
+        await therapeutic_system.initialize_session(session_config)  # type: ignore[attr-defined]
 
         # Set up safety monitoring
         safety_config = {
@@ -135,7 +137,7 @@ async def start_therapeutic_session(
                 "risk_indicators": ["suicidal_ideation", "self_harm"],
             },
         }
-        await safety_system.initialize_monitoring(safety_config)
+        await safety_system.initialize_monitoring(safety_config)  # type: ignore[attr-defined]
 
         # Configure adaptive difficulty
         difficulty_config = {
@@ -144,10 +146,10 @@ async def start_therapeutic_session(
             "adaptation_rate": 0.1,
             "factors": ["emotional_state", "engagement", "skill_level"],
         }
-        await difficulty_engine.initialize_adaptation(difficulty_config)
+        await difficulty_engine.initialize_adaptation(difficulty_config)  # type: ignore[attr-defined]
 
         # Generate initial scenario
-        initial_scenario = await therapeutic_system.generate_scenario(
+        initial_scenario = await therapeutic_system.generate_scenario(  # type: ignore[attr-defined]
             patient_id=patient_id,
             context={"session_start": True, "goals": session_data.goals},
         )
@@ -160,7 +162,7 @@ async def start_therapeutic_session(
         response = TherapeuticSessionResponse(
             id=session_id,
             patient_id=patient_id,
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(UTC),
             status="active",
             therapeutic_framework=session_data.therapeutic_framework,
             progress_metrics={
@@ -198,7 +200,7 @@ async def update_session_progress(
     """Update session progress and metrics"""
     try:
         # Update therapeutic system with progress
-        await therapeutic_system.update_progress(
+        await therapeutic_system.update_progress(  # type: ignore[attr-defined]
             session_id=session_id,
             patient_id=patient_id,
             progress_data={
@@ -210,14 +212,14 @@ async def update_session_progress(
         )
 
         # Safety assessment
-        safety_assessment = await safety_system.assess_emotional_state(
+        safety_assessment = await safety_system.assess_emotional_state(  # type: ignore[attr-defined]
             patient_id=patient_id,
             emotional_state=progress.emotional_state,
             engagement_level=progress.engagement_level,
         )
 
         # Adaptive difficulty adjustment
-        difficulty_adjustment = await difficulty_engine.adjust_difficulty(
+        difficulty_adjustment = await difficulty_engine.adjust_difficulty(  # type: ignore[attr-defined]
             patient_id=patient_id,
             performance_metrics={
                 "engagement": progress.engagement_level,
@@ -238,7 +240,7 @@ async def update_session_progress(
 
         response_data = {
             "session_id": session_id,
-            "updated_at": datetime.utcnow(),
+            "updated_at": datetime.now(UTC),
             "safety_assessment": safety_assessment,
             "difficulty_level": difficulty_adjustment.get("new_level", 3),
             "interventions_triggered": safety_assessment.get("interventions", []),
@@ -260,7 +262,7 @@ async def trigger_intervention(
 ):
     """Manually trigger a therapeutic intervention"""
     try:
-        intervention_response = await therapeutic_system.trigger_intervention(
+        intervention_response = await therapeutic_system.trigger_intervention(  # type: ignore[attr-defined]
             patient_id=patient_id,
             intervention_type=intervention.intervention_type,
             priority=intervention.priority,
@@ -273,7 +275,7 @@ async def trigger_intervention(
         return {
             "intervention_id": str(uuid4()),
             "type": intervention.intervention_type,
-            "triggered_at": datetime.utcnow(),
+            "triggered_at": datetime.now(UTC),
             "content": intervention_response,
             "estimated_duration": intervention_response.get("duration", 5),
         }
@@ -337,7 +339,7 @@ async def monitor_session_safety(
             await asyncio.sleep(30)  # Check every 30 seconds
 
             # Perform safety check
-            safety_status = await safety_system.check_session_safety(
+            safety_status = await safety_system.check_session_safety(  # type: ignore[attr-defined]
                 session_id=session_id, patient_id=patient_id
             )
 
@@ -364,7 +366,7 @@ async def trigger_safety_intervention(
             else "emotional_support"
         )
 
-        await therapeutic_system.trigger_intervention(
+        await therapeutic_system.trigger_intervention(  # type: ignore[attr-defined]
             patient_id=patient_id,
             intervention_type=intervention_type,
             priority="high",
@@ -387,6 +389,6 @@ async def health_check():
     """Health check for patient interface API"""
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(UTC),
         "service": "patient-interface-api",
     }

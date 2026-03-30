@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Components/Playerpreferences/Index]]
 export { default as PlayerPreferencesConfiguration } from './PlayerPreferencesConfiguration';
 export { default as IntensityLevelSelector } from './IntensityLevelSelector';
 export { default as TherapeuticApproachSelector } from './TherapeuticApproachSelector';

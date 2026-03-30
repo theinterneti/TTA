@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Openrouter_auth]]
 OpenRouter Authentication Router
 
 Provides secure authentication endpoints for OpenRouter integration including:
@@ -53,7 +55,7 @@ OPENROUTER_REDIRECT_URI = os.getenv(
 )
 
 # Redis-backed session manager (replaces in-memory storage)
-from ..session_manager import RedisSessionManager
+from ..session_manager import RedisSessionManager  # noqa: E402
 
 _session_manager: RedisSessionManager | None = None
 

@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Services/__tests__/Conflictdetectionservice.test]]
 /**
  * Tests for Enhanced Conflict Detection Service
  */

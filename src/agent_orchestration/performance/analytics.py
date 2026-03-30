@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Analytics]]
 Performance analytics and bottleneck identification algorithms.
 
 This module provides advanced analytics for identifying performance bottlenecks,
@@ -12,7 +14,7 @@ import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from .response_time_monitor import (
@@ -23,7 +25,7 @@ from .response_time_monitor import (
 logger = logging.getLogger(__name__)
 
 
-class BottleneckType(str, Enum):
+class BottleneckType(StrEnum):
     """Types of performance bottlenecks."""
 
     AGENT_OVERLOAD = "agent_overload"
@@ -36,7 +38,7 @@ class BottleneckType(str, Enum):
     CONCURRENT_LIMIT = "concurrent_limit"
 
 
-class TrendDirection(str, Enum):
+class TrendDirection(StrEnum):
     """Performance trend directions."""
 
     IMPROVING = "improving"
@@ -456,7 +458,8 @@ class PerformanceAnalytics:
             recommendations.append(rec)
 
         # General optimization recommendations
-        overall_p95 = statistics.mean([s.p95_duration for s in statistics.values()])
+        _p95_values = [s.p95_duration for s in statistics.values()]
+        overall_p95 = sum(_p95_values) / len(_p95_values) if _p95_values else 0.0
         if overall_p95 > 2.0:
             rec = OptimizationRecommendation(
                 recommendation_id="general_optimization",

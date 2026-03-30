@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_real_agent_communication]]
 Integration tests for real agent communication workflows.
 
 This module tests the enhanced agent proxies with real agent communication,

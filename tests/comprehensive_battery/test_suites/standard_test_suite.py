@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Test_suites/Standard_test_suite]]
 Standard Test Suite
 
 Tests normal user interactions and story generation flows including:
@@ -11,7 +13,7 @@ Tests normal user interactions and story generation flows including:
 
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -103,7 +105,7 @@ class StandardTestSuite:
                 test_name=test_name,
                 category=TestCategory.STANDARD,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -126,7 +128,7 @@ class StandardTestSuite:
                 logger.error(f"Character creation test failed for {user.user_id}: {e}")
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -146,7 +148,7 @@ class StandardTestSuite:
                     test_name=test_name,
                     category=TestCategory.STANDARD,
                     status=TestStatus.RUNNING,
-                    start_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
                 )
 
                 try:
@@ -187,7 +189,7 @@ class StandardTestSuite:
                     logger.error(f"Story generation test failed: {e}")
 
                 finally:
-                    result.end_time = datetime.utcnow()
+                    result.end_time = datetime.now(UTC)
                     result.duration_seconds = (
                         result.end_time - result.start_time
                     ).total_seconds()
@@ -207,7 +209,7 @@ class StandardTestSuite:
                     test_name=test_name,
                     category=TestCategory.STANDARD,
                     status=TestStatus.RUNNING,
-                    start_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
                 )
 
                 try:
@@ -243,7 +245,7 @@ class StandardTestSuite:
                     logger.error(f"Choice consequences test failed: {e}")
 
                 finally:
-                    result.end_time = datetime.utcnow()
+                    result.end_time = datetime.now(UTC)
                     result.duration_seconds = (
                         result.end_time - result.start_time
                     ).total_seconds()
@@ -261,7 +263,7 @@ class StandardTestSuite:
                     test_name=test_name,
                     category=TestCategory.STANDARD,
                     status=TestStatus.RUNNING,
-                    start_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
                 )
 
                 try:
@@ -292,7 +294,7 @@ class StandardTestSuite:
                     logger.error(f"Multi-session continuity test failed: {e}")
 
                 finally:
-                    result.end_time = datetime.utcnow()
+                    result.end_time = datetime.now(UTC)
                     result.duration_seconds = (
                         result.end_time - result.start_time
                     ).total_seconds()
@@ -310,7 +312,7 @@ class StandardTestSuite:
                     test_name=test_name,
                     category=TestCategory.STANDARD,
                     status=TestStatus.RUNNING,
-                    start_time=datetime.utcnow(),
+                    start_time=datetime.now(UTC),
                 )
 
                 try:
@@ -347,7 +349,7 @@ class StandardTestSuite:
                     logger.error(f"Therapeutic integration test failed: {e}")
 
                 finally:
-                    result.end_time = datetime.utcnow()
+                    result.end_time = datetime.now(UTC)
                     result.duration_seconds = (
                         result.end_time - result.start_time
                     ).total_seconds()
@@ -362,7 +364,7 @@ class StandardTestSuite:
                 test_name=test_name,
                 category=TestCategory.STANDARD,
                 status=TestStatus.RUNNING,
-                start_time=datetime.utcnow(),
+                start_time=datetime.now(UTC),
             )
 
             try:
@@ -398,7 +400,7 @@ class StandardTestSuite:
                 logger.error(f"Session persistence test failed: {e}")
 
             finally:
-                result.end_time = datetime.utcnow()
+                result.end_time = datetime.now(UTC)
                 result.duration_seconds = (
                     result.end_time - result.start_time
                 ).total_seconds()
@@ -431,7 +433,7 @@ class StandardTestSuite:
             "character_id": str(uuid.uuid4()),
             "user_id": user.user_id,
             "therapeutic_profile": user.therapeutic_profile,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
 
     async def _validate_character_creation(

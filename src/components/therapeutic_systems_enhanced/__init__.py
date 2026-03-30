@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/__init__]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/__init__]]
 Therapeutic Systems Module
 
 This module provides production-ready therapeutic systems that integrate

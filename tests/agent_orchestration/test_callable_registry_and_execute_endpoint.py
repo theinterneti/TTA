@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_callable_registry_and_execute_endpoint]]
 import asyncio
 import os
 
@@ -65,7 +66,8 @@ async def test_callable_registry_and_execute(redis_client):
     )
     assert resp.status_code == 200
     js = resp.json()
-    assert js.get("ok") is True and js.get("result") == 6
+    assert js.get("ok") is True
+    assert js.get("result") == 6
 
     # Failure path
     spec2 = ToolSpec(name="bad", version="1.0.0", description="fail")
@@ -76,9 +78,12 @@ async def test_callable_registry_and_execute(redis_client):
     )
     assert resp2.status_code == 200
     js2 = resp2.json()
-    assert js2.get("ok") is False and "nope" in js2.get("error", "")
+    assert js2.get("ok") is False
+    assert "nope" in js2.get("error", "")
 
     # Metrics captured
     snap = get_tool_metrics().snapshot()
-    assert "math.add:2.0.0" in snap and snap["math.add:2.0.0"]["successes"] >= 1
-    assert "bad:1.0.0" in snap and snap["bad:1.0.0"]["failures"] >= 1
+    assert "math.add:2.0.0" in snap
+    assert snap["math.add:2.0.0"]["successes"] >= 1
+    assert "bad:1.0.0" in snap
+    assert snap["bad:1.0.0"]["failures"] >= 1

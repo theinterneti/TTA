@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Character_arc_manager]]
+
+# Logseq: [[TTA/Components/Character_arc_manager]]
 Character Arc Manager Component
 
 This module implements the Character Arc Manager component that manages dynamic
@@ -31,7 +34,7 @@ try:
     INTEGRATION_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Character arc integration not available: {e}")
-    INTEGRATION_AVAILABLE = False
+    INTEGRATION_AVAILABLE = False  # type: ignore[misc]
     CharacterArcIntegration = None
 
 
@@ -223,7 +226,7 @@ class CharacterArcManagerComponent(Component):
         self.integration = None
         if INTEGRATION_AVAILABLE:
             try:
-                self.integration = CharacterArcIntegration(self)
+                self.integration = CharacterArcIntegration(self)  # type: ignore[misc]
                 logger.info("Character Development System integration enabled")
             except Exception as e:
                 logger.warning(
@@ -1453,7 +1456,9 @@ class CharacterArcManagerComponent(Component):
                 return len(character_arc.character_history) > 5
             if "relationship" in requirement:
                 player_relationship = character_arc.relationship_dynamics.get("player")
-                return player_relationship and player_relationship.trust_level > 0.5
+                return bool(
+                    player_relationship and player_relationship.trust_level > 0.5
+                )
             if "growth" in requirement:
                 return any(
                     value > 0.6 for value in character_arc.growth_potential.values()

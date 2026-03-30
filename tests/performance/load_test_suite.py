@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Performance/Load_test_suite]]
 Comprehensive Load Testing Suite for TTA Storytelling Platform
 Tests performance under realistic healthcare usage scenarios
 """
@@ -10,7 +12,7 @@ import random
 import statistics
 import time
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import aiohttp
@@ -99,7 +101,7 @@ class TTALoadTester:
             f"Starting load test with {self.config.concurrent_users} concurrent users"
         )
 
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
         end_time = start_time + timedelta(minutes=self.config.test_duration_minutes)
 
         # Create user simulation tasks
@@ -143,7 +145,7 @@ class TTALoadTester:
         self, user: dict[str, Any], session: aiohttp.ClientSession, end_time: datetime
     ):
         """Simulate patient user journey"""
-        while datetime.utcnow() < end_time:
+        while datetime.now(UTC) < end_time:
             try:
                 # 1. Login/Authentication
                 await self._test_endpoint(
@@ -205,10 +207,10 @@ class TTALoadTester:
 
         session_duration = random.randint(300, 1800)  # 5-30 minutes
         session_end = min(
-            datetime.utcnow() + timedelta(seconds=session_duration), end_time
+            datetime.now(UTC) + timedelta(seconds=session_duration), end_time
         )
 
-        while datetime.utcnow() < session_end:
+        while datetime.now(UTC) < session_end:
             action = random.choice(gaming_actions)
 
             if action == "make_choice":
@@ -295,7 +297,7 @@ class TTALoadTester:
         self, user: dict[str, Any], session: aiohttp.ClientSession, end_time: datetime
     ):
         """Simulate clinician user journey"""
-        while datetime.utcnow() < end_time:
+        while datetime.now(UTC) < end_time:
             try:
                 # 1. Login/Authentication
                 await self._test_endpoint(
@@ -413,7 +415,7 @@ class TTALoadTester:
             response_time=response_time,
             status_code=status_code,
             success=success,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             user_id=user_id,
             session_id=session_id,
             error_message=error_message,
@@ -526,7 +528,7 @@ class TTALoadTester:
     async def _save_results_to_csv(self):
         """Save detailed test results to CSV file"""
         filename = (
-            f"load_test_results_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
+            f"load_test_results_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.csv"
         )
 
         with open(filename, "w", newline="") as csvfile:
@@ -603,7 +605,7 @@ class TTALoadTester:
         plt.tight_layout()
 
         chart_filename = (
-            f"load_test_charts_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.png"
+            f"load_test_charts_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.png"
         )
         plt.savefig(chart_filename, dpi=300, bbox_inches="tight")
         plt.close()

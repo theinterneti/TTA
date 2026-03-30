@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/TTA Dependency Graph]]
 > - **Path:** `.augment/kb/Architecture/TTA Dependency Graph.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/TTA Dependency Graph.md`
 
 **Migration date:** 2025-11-01
+
+
+---

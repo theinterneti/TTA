@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Artifacts/Test-scripts/Test_containerized_deployment]]
 Test script for TTA containerized deployment validation
 This script tests the containerized TTA API without requiring Docker rebuild
 """

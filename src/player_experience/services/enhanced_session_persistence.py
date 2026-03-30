@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Services/Enhanced_session_persistence]]
 Enhanced Session Persistence Service with Redis Integration
 
 This service provides comprehensive session persistence, recovery, and analytics
@@ -7,7 +9,7 @@ storage using Redis as the primary backend with intelligent caching and backup.
 
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as redis
@@ -51,7 +53,7 @@ class EnhancedSessionPersistence:
             # Prepare session data for storage
             storage_data = {
                 "session_data": session_data,
-                "saved_at": datetime.utcnow().isoformat(),
+                "saved_at": datetime.now(UTC).isoformat(),
                 "version": "enhanced_v1",
             }
 
@@ -70,7 +72,7 @@ class EnhancedSessionPersistence:
                     "analytics": session_data["session_analytics"],
                     "interaction_count": session_data.get("interaction_count", 0),
                     "emotional_themes": session_data.get("emotional_themes", []),
-                    "saved_at": datetime.utcnow().isoformat(),
+                    "saved_at": datetime.now(UTC).isoformat(),
                 }
                 await self.redis_client.setex(
                     analytics_key, self.analytics_ttl, json.dumps(analytics_data)
@@ -112,7 +114,7 @@ class EnhancedSessionPersistence:
                 session_data = storage_data.get("session_data", {})
 
                 # Update last accessed time
-                session_data["last_accessed"] = datetime.utcnow().isoformat()
+                session_data["last_accessed"] = datetime.now(UTC).isoformat()
                 await self.save_session_state(session_id, session_data)
 
                 logger.info(f"Loaded session state for {session_id}")
@@ -144,7 +146,7 @@ class EnhancedSessionPersistence:
             recovery_key = f"tta:recovery:{session_id}"
             recovery_storage = {
                 "recovery_data": recovery_data,
-                "saved_at": datetime.utcnow().isoformat(),
+                "saved_at": datetime.now(UTC).isoformat(),
                 "version": "recovery_v1",
             }
 
@@ -250,7 +252,7 @@ class EnhancedSessionPersistence:
                 "stored_analytics": len(analytics_keys),
                 "recovery_data_entries": len(recovery_keys),
                 "unique_players": len(player_session_keys),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:

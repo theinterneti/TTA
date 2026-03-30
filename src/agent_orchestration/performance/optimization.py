@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Optimization]]
 Intelligent agent coordination optimization with predictive scheduling.
 
 This module provides advanced optimization algorithms for agent coordination,
@@ -15,7 +17,7 @@ import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models import AgentType
@@ -24,7 +26,7 @@ from .response_time_monitor import ResponseTimeMonitor
 logger = logging.getLogger(__name__)
 
 
-class OptimizationStrategy(str, Enum):
+class OptimizationStrategy(StrEnum):
     """Optimization strategies."""
 
     FASTEST_FIRST = "fastest_first"
@@ -33,7 +35,7 @@ class OptimizationStrategy(str, Enum):
     ADAPTIVE = "adaptive"
 
 
-class AgentLoadLevel(str, Enum):
+class AgentLoadLevel(StrEnum):
     """Agent load levels."""
 
     IDLE = "idle"
@@ -191,7 +193,9 @@ class IntelligentAgentCoordinator:
         self.agent_profiles[agent_id] = profile
         logger.info(f"Registered agent {agent_id} ({agent_type.value})")
 
-    async def schedule_workflow(self, request: WorkflowRequest) -> SchedulingDecision:
+    async def schedule_workflow(
+        self, request: WorkflowRequest
+    ) -> SchedulingDecision | None:
         """Schedule a workflow for execution."""
         # Add to scheduling queue with priority
         priority_score = self._calculate_priority_score(request)

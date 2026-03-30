@@ -256,3 +256,7 @@ All database connections working!
 **Status**: 🔧 Follow the steps above to enable Docker integration
 
 Once completed, update this file with ✅ and any lessons learned!
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Infrastructure/2025-10/Docker_wsl2_setup]]

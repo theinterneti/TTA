@@ -285,3 +285,7 @@ Before proceeding, let's decide:
 3. Verify the merge is correct
 4. Push to remote
 5. Monitor GitHub Actions
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Merge_conflict_resolution_plan]]

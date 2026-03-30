@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/07-complete-user-journey.staging.spec]]
 /**
  * Complete User Journey E2E Test
  *

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Main]]
 TTA Main Script
 
 This script provides a command-line interface for the TTA Orchestrator.
@@ -420,7 +422,9 @@ if __name__ == "__main__":
     finally:
         # Shutdown observability cleanly
         try:
-            from observability_integration import shutdown_observability
+            from observability_integration import (
+                shutdown_observability,  # type: ignore[attr-defined]
+            )
 
             shutdown_observability()
             logger.info("🔌 Observability shutdown complete")

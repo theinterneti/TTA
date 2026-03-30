@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Web-interfaces/Shared/Src/Store/Therapeuticstore]]
 import { configureStore, createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
   TherapeuticSession,

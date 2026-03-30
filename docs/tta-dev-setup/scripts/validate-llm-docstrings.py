@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+
 LLM-Friendly Docstring Validator
 
 Uses an LLM to evaluate if docstrings are clear and understandable to AI agents.

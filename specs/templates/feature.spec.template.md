@@ -436,3 +436,7 @@ async def [function_name]([parameters]) -> [ReturnType]:
 
 **Notes:**
 [Any additional notes or context]
+
+
+---
+**Logseq:** [[TTA.dev/Specs/Templates/Feature.spec.template]]

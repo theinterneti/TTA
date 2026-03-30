@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Model_selector]]
 Model selector for intelligent model selection based on task requirements.
 
 Provides:
@@ -12,13 +14,13 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class TaskCategory(str, Enum):
+class TaskCategory(StrEnum):
     """Task categories for model selection."""
 
     UNIT_TEST = "unit_test"
@@ -29,7 +31,7 @@ class TaskCategory(str, Enum):
     BUILD_SCRIPT = "build_script"
 
 
-class ModelSpecialization(str, Enum):
+class ModelSpecialization(StrEnum):
     """Model specialization types."""
 
     SPEED = "speed"  # Fastest execution

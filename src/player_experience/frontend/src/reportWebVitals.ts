@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Reportwebvitals]]
 import { ReportHandler } from 'web-vitals';
 
 const reportWebVitals = (onPerfEntry?: ReportHandler) => {

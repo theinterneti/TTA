@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Status/Phase 5: Identify TTA-Specific Work Items]]
 > - **Path:** `.augment/kb/Status/Phase 5: Identify TTA-Specific Work Items.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Status/Phase 5: Identify TTA-Specific Work Items.md`
 
 **Migration date:** 2025-11-01
+
+
+---

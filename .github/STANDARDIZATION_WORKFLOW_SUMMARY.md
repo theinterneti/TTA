@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Workflows/TTA Agent Primitive Standardization Workflow - Summary.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.github/Standardization_workflow_summary]]

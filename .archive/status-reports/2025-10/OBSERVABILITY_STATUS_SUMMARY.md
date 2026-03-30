@@ -112,3 +112,7 @@
 cd /home/thein/recovered-tta-storytelling
 uv run pytest tests/unit/observability_integration/ -v --cov=src/observability_integration --cov-report=term-missing
 ```
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Observability_status_summary]]

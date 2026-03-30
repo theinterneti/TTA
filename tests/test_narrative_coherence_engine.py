@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_narrative_coherence_engine]]
 Unit tests for the Narrative Coherence Engine component.
 
 This module contains comprehensive tests for the narrative coherence engine
@@ -48,7 +50,7 @@ class Contradiction:
 def test_narrative_coherence_engine_imports():
     """Test that the narrative coherence engine can be imported."""
     try:
-        from tta_narrative.coherence_engine import (
+        from tta_narrative.coherence_engine import (  # noqa: F401
             ConsistencyIssue,
             Contradiction,
             NarrativeContent,
@@ -58,8 +60,7 @@ def test_narrative_coherence_engine_imports():
 
         assert True, "Successfully imported coherence engine components"
     except ImportError:
-        # If import fails, test the basic structure
-        assert ValidationSeverity.WARNING == ValidationSeverity.WARNING
+        # If import fails, the local ValidationSeverity stub is used for other tests
         assert True, "Basic validation severity enum works"
 
 

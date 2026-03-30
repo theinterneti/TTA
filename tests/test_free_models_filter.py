@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_free_models_filter]]
 Tests for OpenRouter Free Models Filter functionality
 """
 

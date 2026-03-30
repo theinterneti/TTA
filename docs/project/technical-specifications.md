@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/TTA Technical Specifications]]
 > - **Path:** `.augment/kb/Components/TTA Technical Specifications.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/TTA Technical Specifications.md`
 
 **Migration date:** 2025-11-01
+
+
+---

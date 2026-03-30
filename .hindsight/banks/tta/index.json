@@ -1,0 +1,11 @@
+{
+  "bank": "tta",
+  "version": "1.0",
+  "created": "2026-03-22",
+  "categories": [
+    "implementation-failures",
+    "successful-patterns",
+    "architectural-decisions"
+  ],
+  "memories": []
+}

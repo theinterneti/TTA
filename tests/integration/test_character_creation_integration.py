@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_character_creation_integration]]
 Integration tests for character creation end-to-end flow.
 
 Tests the complete character creation workflow from API request through

@@ -1,4 +1,5 @@
 """
+
 Structured User Feedback Collection System for TTA
 
 This module provides comprehensive collection and analysis of structured

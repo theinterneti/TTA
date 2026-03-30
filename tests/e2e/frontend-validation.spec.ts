@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Frontend-validation.spec]]
 /**
  * Frontend-Only Validation Tests
  *

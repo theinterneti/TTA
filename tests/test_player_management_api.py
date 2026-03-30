@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_player_management_api]]
 Integration tests for Player Management API endpoints.
 
 This module provides comprehensive tests for the player management REST API,
@@ -11,7 +13,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 
 from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import (
@@ -626,9 +628,10 @@ class TestPlayerManagementAPI:
         ):
             mock_player_manager.get_player_profile.return_value = sample_player_profile
 
+            cors_headers = {**auth_headers, "Origin": "http://localhost:3000"}
             response = client.get(
                 f"/api/v1/players/{sample_player_profile.player_id}",
-                headers=auth_headers,
+                headers=cors_headers,
             )
 
         assert response.status_code == 200

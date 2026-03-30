@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/Component Status Report Coverage Data Fix]]
 > - **Path:** `.augment/kb/Components/Component Status Report Coverage Data Fix.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Component Status Report Coverage Data Fix.md`
 
 **Migration date:** 2025-11-01
+
+
+---

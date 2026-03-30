@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/Hybrid Task Tracking Guide]]
 > - **Path:** `.augment/kb/Workflows/Hybrid Task Tracking Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Hybrid Task Tracking Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---

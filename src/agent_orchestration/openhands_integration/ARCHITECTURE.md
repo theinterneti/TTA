@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Architecture/OpenHands Integration System Architecture.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/Agent_orchestration/Openhands_integration/Architecture]]

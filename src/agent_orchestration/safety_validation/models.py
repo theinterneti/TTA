@@ -1,5 +1,7 @@
 """Safety validation data models."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_validation/Models]]
+
 from __future__ import annotations
 
 import re

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_rotation_system]]
 Integration test for model rotation system.
 
 Tests:

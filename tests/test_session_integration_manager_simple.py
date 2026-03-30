@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_session_integration_manager_simple]]
 Simplified unit tests for SessionIntegrationManager functionality.
 
 Tests the core session management and context switching functionality
@@ -64,17 +66,17 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             )
 
             # Verify session structure
-            self.assertIsNotNone(result)
-            self.assertEqual(result.player_id, self.test_player_id)
-            self.assertEqual(result.character_id, self.test_character_id)
-            self.assertEqual(result.world_id, self.test_world_id)
-            self.assertEqual(result.status, SessionStatus.ACTIVE)
-            self.assertEqual(result.therapeutic_settings.intensity_level, 0.6)
+            assert result is not None
+            assert result.player_id == self.test_player_id
+            assert result.character_id == self.test_character_id
+            assert result.world_id == self.test_world_id
+            assert result.status == SessionStatus.ACTIVE
+            assert result.therapeutic_settings.intensity_level == 0.6
 
             # Verify repository was called with correct session
             self.mock_repository.create_session.assert_called_once()
             call_args = self.mock_repository.create_session.call_args[0][0]
-            self.assertEqual(call_args.player_id, self.test_player_id)
+            assert call_args.player_id == self.test_player_id
 
             # Verify narrative engine initialization
             self.mock_narrative_engine.initialize_session.assert_called_once()
@@ -110,9 +112,9 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             )
 
             # Verify new session was created
-            self.assertIsNotNone(result)
-            self.assertEqual(result.character_id, "new_char_456")
-            self.assertEqual(result.world_id, "new_world_456")
+            assert result is not None
+            assert result.character_id == "new_char_456"
+            assert result.world_id == "new_world_456"
 
             # Verify current session was paused
             self.mock_repository.pause_session.assert_called_once()
@@ -153,8 +155,8 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             result = await self.manager.pause_session(self.test_player_id)
 
             # Verify session was paused successfully
-            self.assertTrue(result)
-            self.assertEqual(session.status, SessionStatus.PAUSED)
+            assert result
+            assert session.status == SessionStatus.PAUSED
 
             # Verify narrative state was preserved
             self.mock_narrative_engine.get_session_state.assert_called_once_with(
@@ -162,9 +164,9 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             )
 
             # Verify session variables contain narrative state
-            self.assertIn("narrative_state", session.session_variables)
-            self.assertEqual(
-                session.session_variables["narrative_state"]["narrative_position"], 10
+            assert "narrative_state" in session.session_variables
+            assert (
+                session.session_variables["narrative_state"]["narrative_position"] == 10
             )
 
         asyncio.run(run_test())
@@ -202,16 +204,14 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             )
 
             # Verify update was successful
-            self.assertTrue(result)
+            assert result
 
             # Verify session was updated correctly
-            self.assertEqual(session.interaction_count, 1)
-            self.assertIn(
-                "mindfulness_exercise", session.therapeutic_interventions_used
-            )
-            self.assertEqual(session.current_scene_id, "scene_2")
-            self.assertEqual(session.session_variables["current_exercise"], "breathing")
-            self.assertEqual(len(session.emotional_state_history), 1)
+            assert session.interaction_count == 1
+            assert "mindfulness_exercise" in session.therapeutic_interventions_used
+            assert session.current_scene_id == "scene_2"
+            assert session.session_variables["current_exercise"] == "breathing"
+            assert len(session.emotional_state_history) == 1
 
             # Verify repository was called
             self.mock_repository.update_session.assert_called_once_with(session)
@@ -250,10 +250,10 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             result = await self.manager.add_progress_marker(self.test_player_id, marker)
 
             # Verify marker was added
-            self.assertTrue(result)
-            self.assertEqual(len(session.progress_markers), 1)
-            self.assertEqual(session.progress_markers[0].marker_id, "marker_1")
-            self.assertEqual(session.progress_markers[0].therapeutic_value, 0.8)
+            assert result
+            assert len(session.progress_markers) == 1
+            assert session.progress_markers[0].marker_id == "marker_1"
+            assert session.progress_markers[0].therapeutic_value == 0.8
 
             # Verify repository was called
             self.mock_repository.update_session.assert_called_once_with(session)
@@ -293,15 +293,13 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             )
 
             # Verify settings were updated
-            self.assertTrue(result)
-            self.assertEqual(session.therapeutic_settings.intensity_level, 0.8)
-            self.assertEqual(
-                session.therapeutic_settings.preferred_approaches[0],
-                TherapeuticApproach.MINDFULNESS,
+            assert result
+            assert session.therapeutic_settings.intensity_level == 0.8
+            assert (
+                session.therapeutic_settings.preferred_approaches[0]
+                == TherapeuticApproach.MINDFULNESS
             )
-            self.assertEqual(
-                session.therapeutic_settings.intervention_frequency, "frequent"
-            )
+            assert session.therapeutic_settings.intervention_frequency == "frequent"
 
             # Verify narrative engine was updated
             self.mock_narrative_engine.update_therapeutic_settings.assert_called_once_with(
@@ -343,12 +341,12 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             result = await self.manager.get_session_continuity_data("test_session")
 
             # Verify continuity data structure
-            self.assertIn("therapeutic_settings", result)
-            self.assertIn("session_variables", result)
-            self.assertIn("therapeutic_interventions_used", result)
-            self.assertEqual(result["interaction_count"], 5)
-            self.assertEqual(result["total_duration_minutes"], 30)
-            self.assertEqual(len(result["emotional_state_history"]), 2)
+            assert "therapeutic_settings" in result
+            assert "session_variables" in result
+            assert "therapeutic_interventions_used" in result
+            assert result["interaction_count"] == 5
+            assert result["total_duration_minutes"] == 30
+            assert len(result["emotional_state_history"]) == 2
 
             # Verify repository was called
             self.mock_repository.get_session.assert_called_once_with("test_session")
@@ -371,11 +369,11 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             )
 
             # Verify None is returned on failure
-            self.assertIsNone(result)
+            assert result is None
 
             # Test operations on non-existent session
             result = await self.manager.pause_session("non_existent_player")
-            self.assertFalse(result)
+            assert not result
 
             # Mock get_player_active_sessions to return empty list (no active sessions)
             self.mock_repository.get_player_active_sessions = AsyncMock(return_value=[])
@@ -383,7 +381,7 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
             result = await self.manager.update_session_interaction(
                 "non_existent_player", {"test": "data"}
             )
-            self.assertFalse(result)
+            assert not result
 
             result = await self.manager.add_progress_marker(
                 "non_existent_player",
@@ -394,7 +392,7 @@ class TestSessionIntegrationManagerCore(unittest.TestCase):
                     achieved_at=datetime.now(),
                 ),
             )
-            self.assertFalse(result)
+            assert not result
 
         asyncio.run(run_test())
 

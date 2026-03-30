@@ -117,3 +117,6 @@ The login endpoint is failing when trying to query the player profile repository
 ## Decision
 
 Moving on to HIGH-002 (Landing page redirect) to maintain progress on other critical issues. This session persistence issue requires a fresh investigation approach, potentially with database seeding or architectural changes to player profile handling.
+
+
+---

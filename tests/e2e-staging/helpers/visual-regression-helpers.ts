@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e-staging/Helpers/Visual-regression-helpers]]
 /**
  * Visual Regression Testing Helpers
  *

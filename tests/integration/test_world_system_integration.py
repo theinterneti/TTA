@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_world_system_integration]]
 Integration tests for the world system.
 
 Tests world listing, retrieval, validation in session creation,
@@ -9,6 +11,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import app
+
+# World management is partially implemented. Keep xfail targeted to the
+# scenarios that still depend on incomplete Phase 2 behavior.
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture

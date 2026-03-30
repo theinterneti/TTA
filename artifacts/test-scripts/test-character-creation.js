@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Artifacts/Test-scripts/Test-character-creation]]
 const { chromium } = require('playwright');
 
 (async () => {

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Enhanced_coordinator]]
 Enhanced message coordinator that integrates real agent communication with Redis infrastructure.
 
 This module extends the existing RedisMessageCoordinator to support real agent communication

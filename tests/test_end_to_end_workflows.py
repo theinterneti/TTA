@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_end_to_end_workflows]]
 End-to-end integration tests for complete user workflows.
 
 This module tests complete user journeys from character creation through therapeutic interaction,
@@ -8,25 +10,43 @@ including performance tests for concurrent user scenarios.
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 
 from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 
+pytestmark = [pytest.mark.integration, pytest.mark.e2e]
+
+
+def receive_message_with_role(websocket, role: str, max_messages: int = 20) -> dict:
+    """Read WebSocket messages until one with the given role is found."""
+    for _ in range(max_messages):
+        msg = json.loads(websocket.receive_text())
+        if msg.get("role") == role:
+            return msg
+    raise AssertionError(
+        f"No message with role={role!r} received in {max_messages} messages"
+    )
+
 
 @pytest.fixture
-def client():
-    """Create a test FastAPI application client."""
+def app():
+    """Create a test FastAPI application."""
     import src.player_experience.api.config as config_module
 
     config_module.settings = TestingSettings()
-    app = create_app()
+    return create_app()
+
+
+@pytest.fixture
+def client(app):
+    """Create a test FastAPI application client."""
     return TestClient(app)
 
 
@@ -40,7 +60,7 @@ def create_auth_token(
         "sub": player_id,
         "username": username,
         "email": email,
-        "exp": datetime.utcnow() + timedelta(hours=1),
+        "exp": datetime.now(UTC) + timedelta(hours=1),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -60,23 +80,22 @@ def create_test_character_data(name: str = "Test Character") -> dict[str, Any]:
             "occupation": "student",
             "personality_traits": ["empathetic", "curious", "patient"],
             "backstory": "A student exploring personal growth through therapeutic adventures",
+            "life_goals": ["Improve wellbeing"],
         },
         "therapeutic_profile": {
             "readiness_level": 0.7,
             "preferred_intensity": "medium",
             "therapeutic_approaches": ["cbt", "narrative_therapy"],
+            "primary_concerns": ["anxiety", "stress management"],
             "therapeutic_goals": [
                 {
                     "goal_id": "goal-1",
                     "description": "Improve emotional regulation",
                     "target_date": (datetime.now() + timedelta(days=30)).isoformat(),
-                    "priority": "high",
                     "is_active": True,
                 }
             ],
-            "comfort_topics": ["relationships", "personal_growth"],
-            "avoid_topics": ["trauma", "violence"],
-            "trigger_warnings": ["loud_noises"],
+            "comfort_zones": ["relationships", "personal_growth"],
         },
     }
 
@@ -189,9 +208,8 @@ class TestEndToEndUserWorkflows:
             }
             websocket.send_text(json.dumps(user_message))
 
-            # Receive therapeutic response
-            response_msg = json.loads(websocket.receive_text())
-            assert response_msg["role"] == "assistant"
+            # Receive therapeutic response (skip intermediate progress/system events)
+            response_msg = receive_message_with_role(websocket, "assistant")
             assert "text" in response_msg["content"]
             assert response_msg["metadata"]["safety"]["crisis"] is False
 
@@ -248,7 +266,7 @@ class TestEndToEndUserWorkflows:
 
         # Create multiple characters
         characters = []
-        for i, name in enumerate(["Character1", "Character2", "Character3"]):
+        for i, name in enumerate(["Alice", "Bob", "Carol"]):
             char_data = create_test_character_data(name)
             # Vary therapeutic approaches
             char_data["therapeutic_profile"]["therapeutic_approaches"] = [
@@ -328,9 +346,8 @@ class TestEndToEndUserWorkflows:
                 }
                 websocket.send_text(json.dumps(user_message))
 
-                # Receive response
-                response_msg = json.loads(websocket.receive_text())
-                assert response_msg["role"] == "assistant"
+                # Receive response (skip intermediate progress/system events)
+                response_msg = receive_message_with_role(websocket, "assistant")
                 assert "text" in response_msg["content"]
 
         # Verify dashboard shows all characters
@@ -398,7 +415,9 @@ class TestEndToEndUserWorkflows:
                 },
             }
             websocket.send_text(json.dumps(user_message))
-            websocket.receive_text()  # Response
+            receive_message_with_role(
+                websocket, "assistant"
+            )  # Drain progress events and get response
 
             # Provide positive feedback indicating readiness for higher intensity
             feedback = {
@@ -441,8 +460,7 @@ class TestEndToEndUserWorkflows:
             }
             websocket.send_text(json.dumps(follow_up_message))
 
-            response_msg = json.loads(websocket.receive_text())
-            assert response_msg["role"] == "assistant"
+            response_msg = receive_message_with_role(websocket, "assistant")
             # Response should reflect updated intensity and approaches
             assert "text" in response_msg["content"]
 
@@ -487,9 +505,8 @@ class TestConcurrentUserScenarios:
                     }
                     websocket.send_text(json.dumps(user_message))
 
-                    # Receive response
-                    response_msg = json.loads(websocket.receive_text())
-                    assert response_msg["role"] == "assistant"
+                    # Receive response (skip intermediate progress/system events)
+                    receive_message_with_role(websocket, "assistant")
 
                     connection_time = time.time() - start_time
 
@@ -538,7 +555,7 @@ class TestConcurrentUserScenarios:
             assert avg_response_time < 2.0  # Average under 2 seconds
             assert max_response_time < 5.0  # Max under 5 seconds
 
-    def test_concurrent_api_requests(self, client):
+    def test_concurrent_api_requests(self, app, client):
         """Test concurrent API requests performance."""
         num_requests = 20
         request_results = []
@@ -561,11 +578,12 @@ class TestConcurrentUserScenarios:
 
                 endpoint, method = endpoints[request_id % len(endpoints)]
 
-                if method == "GET":
-                    response = client.get(
-                        endpoint,
-                        headers=headers if endpoint.startswith("/api/") else None,
-                    )
+                with TestClient(app) as thread_client:
+                    if method == "GET":
+                        response = thread_client.get(
+                            endpoint,
+                            headers=headers if endpoint.startswith("/api/") else None,
+                        )
 
                 request_time = time.time() - start_time
 
@@ -615,7 +633,7 @@ class TestConcurrentUserScenarios:
             assert avg_response_time < 0.2  # Average under 200ms for UI interactions
             assert max_response_time < 1.0  # Max under 1 second
 
-    def test_session_state_consistency_under_load(self, client):
+    def test_session_state_consistency_under_load(self, app, client):
         """Test that session state remains consistent under concurrent access."""
         player_id = "consistency-test-user"
         token = create_auth_token(player_id)
@@ -662,47 +680,48 @@ class TestConcurrentUserScenarios:
         def concurrent_session_operation(operation_id: int):
             """Perform concurrent operations on the same session."""
             try:
-                if operation_id % 3 == 0:
-                    # Get session details
-                    response = client.get(
-                        f"/api/v1/sessions/{session_id}", headers=headers
-                    )
-                    return {
-                        "operation": "get_session",
-                        "success": response.status_code == 200,
-                    }
-
-                if operation_id % 3 == 1:
-                    # Update session settings
-                    update_data = {
-                        "therapeutic_settings": {
-                            "intensity_level": "medium",
-                            "preferred_approaches": ["cbt", "mindfulness"],
-                            "session_goals": [
-                                "personal_growth",
-                                "emotional_regulation",
-                            ],
-                            "safety_monitoring": True,
+                with TestClient(app) as thread_client:
+                    if operation_id % 3 == 0:
+                        # Get session details
+                        response = thread_client.get(
+                            f"/api/v1/sessions/{session_id}", headers=headers
+                        )
+                        return {
+                            "operation": "get_session",
+                            "success": response.status_code == 200,
                         }
-                    }
-                    response = client.put(
-                        f"/api/v1/sessions/{session_id}",
-                        json=update_data,
-                        headers=headers,
+
+                    if operation_id % 3 == 1:
+                        # Update session settings
+                        update_data = {
+                            "therapeutic_settings": {
+                                "intensity_level": "medium",
+                                "preferred_approaches": ["cbt", "mindfulness"],
+                                "session_goals": [
+                                    "personal_growth",
+                                    "emotional_regulation",
+                                ],
+                                "safety_monitoring": True,
+                            }
+                        }
+                        response = thread_client.put(
+                            f"/api/v1/sessions/{session_id}",
+                            json=update_data,
+                            headers=headers,
+                        )
+                        return {
+                            "operation": "update_session",
+                            "success": response.status_code == 200,
+                        }
+
+                    # Get progress for session
+                    response = thread_client.get(
+                        f"/api/v1/sessions/{session_id}/progress", headers=headers
                     )
                     return {
-                        "operation": "update_session",
+                        "operation": "get_progress",
                         "success": response.status_code == 200,
                     }
-
-                # Get progress for session
-                response = client.get(
-                    f"/api/v1/sessions/{session_id}/progress", headers=headers
-                )
-                return {
-                    "operation": "get_progress",
-                    "success": response.status_code == 200,
-                }
 
             except Exception as e:
                 return {
@@ -768,8 +787,7 @@ class TestErrorHandlingAndRecovery:
             }
             websocket.send_text(json.dumps(continuation_message))
 
-            response_msg = json.loads(websocket.receive_text())
-            assert response_msg["role"] == "assistant"
+            response_msg = receive_message_with_role(websocket, "assistant")
             assert "text" in response_msg["content"]
 
     def test_invalid_data_handling(self, client):
@@ -808,7 +826,7 @@ class TestErrorHandlingAndRecovery:
             "sub": "expired-user",
             "username": "expireduser",
             "email": "expired@example.com",
-            "exp": datetime.utcnow() - timedelta(hours=1),  # Expired
+            "exp": datetime.now(UTC) - timedelta(hours=1),  # Expired
         }
         expired_token = jwt.encode(expired_payload, SECRET_KEY, algorithm=ALGORITHM)
 

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Adapters]]
 Agent communication adapters for bridging orchestration proxies with real agent implementations.
 
 This module provides adapter classes that enable communication between the agent orchestration
@@ -147,9 +149,7 @@ class IPAAdapter:
             intent_result = await retry_with_backoff(_process_with_executor, self.retry_config)
 
             # Convert IntentSchema to dict format expected by orchestration system
-            if hasattr(intent_result, "dict"):
-                intent_dict = intent_result.dict()
-            elif hasattr(intent_result, "model_dump"):
+            if hasattr(intent_result, "model_dump"):
                 intent_dict = intent_result.model_dump()
             else:
                 intent_dict = {"intent": str(intent_result), "confidence": 0.8}

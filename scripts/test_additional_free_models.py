@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_additional_free_models]]
 Additional free model testing for OpenHands integration - Phase 2 Expansion.
 
 Tests newly available free models on OpenRouter to expand coverage and identify

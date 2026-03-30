@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/Accurate P0 Component Status - Verified Data]]
 > - **Path:** `.augment/kb/Components/Accurate P0 Component Status - Verified Data.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/Accurate P0 Component Status - Verified Data.md`
 
 **Migration date:** 2025-11-01
+
+
+---

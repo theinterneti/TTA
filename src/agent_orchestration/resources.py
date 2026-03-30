@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Agent_orchestration/Resources]]
 from __future__ import annotations
 
 import asyncio
@@ -100,7 +101,6 @@ class ResourceManager:
         crit_mem_percent: float = 95.0,
         redis_client: Any = None,
         redis_prefix: str = "ao",
-        circuit_breaker_registry: Any = None,
     ) -> None:
         self.gpu_memory_limit_fraction = float(
             max(0.0, min(1.0, gpu_memory_limit_fraction))
@@ -119,8 +119,6 @@ class ResourceManager:
         self._latest_report: ResourceUsageReport | None = None
         self._emergency_active: bool = False
 
-        # Circuit breaker integration for workflow error handling
-        self._circuit_breaker_registry = circuit_breaker_registry
         self._resource_exhaustion_callbacks: list[
             Callable[[ResourceUsageReport], Awaitable[None]]
         ] = []
@@ -356,7 +354,11 @@ class ResourceManager:
                 meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
                 usage.gpu_memory_total_bytes.append(int(meminfo.total))
                 usage.gpu_memory_used_bytes.append(int(meminfo.used))
-                pct = (meminfo.used / meminfo.total * 100.0) if meminfo.total else 0.0
+                pct = (
+                    (int(meminfo.used) / int(meminfo.total) * 100.0)
+                    if meminfo.total
+                    else 0.0
+                )
                 usage.gpu_utilization.append(float(pct))
             pynvml.nvmlShutdown()
             return
@@ -431,45 +433,12 @@ class ResourceManager:
                 },
             )
 
-            # Trigger circuit breakers for resource exhaustion
-            await self._trigger_resource_exhaustion_circuit_breakers(
-                report, exhaustion_reasons
-            )
-
             # Call registered callbacks
             for callback in self._resource_exhaustion_callbacks:
                 try:
                     await callback(report)
                 except Exception as e:
                     logger.warning(f"Resource exhaustion callback failed: {e}")
-
-    async def _trigger_resource_exhaustion_circuit_breakers(
-        self, report: ResourceUsageReport, exhaustion_reasons: list[str]
-    ) -> None:
-        """Trigger circuit breakers when resource exhaustion is detected."""
-        if not self._circuit_breaker_registry:
-            return
-
-        try:
-            # Get all workflow circuit breakers and trigger them
-            all_metrics = await self._circuit_breaker_registry.get_all_metrics()
-
-            for cb_name in all_metrics:
-                if cb_name.startswith("workflow:"):
-                    circuit_breaker = await self._circuit_breaker_registry.get(cb_name)
-                    if circuit_breaker:
-                        # Force transition to open state due to resource exhaustion
-                        await circuit_breaker._transition_to_open()
-                        logger.warning(
-                            f"Opened circuit breaker {cb_name} due to resource exhaustion",
-                            extra={
-                                "circuit_breaker_name": cb_name,
-                                "exhaustion_reasons": exhaustion_reasons,
-                                "event_type": "circuit_breaker_resource_exhaustion",
-                            },
-                        )
-        except Exception as e:
-            logger.error(f"Failed to trigger resource exhaustion circuit breakers: {e}")
 
     def register_resource_exhaustion_callback(
         self, callback: Callable[[ResourceUsageReport], Awaitable[None]]

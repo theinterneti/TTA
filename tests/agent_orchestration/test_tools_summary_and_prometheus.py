@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_tools_summary_and_prometheus]]
 import os
 
 import pytest
@@ -41,8 +42,10 @@ async def test_tools_summary_and_prom_export(redis_client):
     )
     assert res.status_code == 200
     js = res.json()
-    assert "items" in js and isinstance(js["items"], list)
-    assert "counts" in js and "active" in js["counts"]
+    assert "items" in js
+    assert isinstance(js["items"], list)
+    assert "counts" in js
+    assert "active" in js["counts"]
 
     # prometheus endpoint should include our tool counters/histograms
     resp = client.get("/metrics-prom")

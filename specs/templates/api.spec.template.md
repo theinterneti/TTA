@@ -524,3 +524,7 @@ logger.info(
 
 **Notes:**
 [Any additional notes or context]
+
+
+---
+**Logseq:** [[TTA.dev/Specs/Templates/Api.spec.template]]

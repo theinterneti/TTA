@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_scale_manager_coverage]]
 Coverage tests for ScaleManager to reach 70%+ coverage.
 
 This module contains tests specifically designed to cover previously
@@ -6,6 +8,8 @@ untested code paths in scale_manager.py.
 """
 
 import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.orchestration.conflict_detection import (
     ScaleConflict,
 )

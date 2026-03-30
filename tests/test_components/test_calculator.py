@@ -1,5 +1,7 @@
 """Tests for calculator operations."""
 
+# Logseq: [[TTA.dev/Tests/Test_components/Test_calculator]]
+
 import pytest
 
 from src.test_components.calculator import add, divide, multiply, subtract

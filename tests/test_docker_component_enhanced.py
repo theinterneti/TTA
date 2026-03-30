@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_docker_component_enhanced]]
 Enhanced tests for DockerComponent.
 
 This module provides comprehensive test coverage for DockerComponent
@@ -274,7 +276,7 @@ class TestTemplateFileCopying:
         dockerfile_template = template_path / "Dockerfile"
 
         with (
-            patch.object(Path, "exists") as mock_exists,
+            patch.object(Path, "exists", autospec=True) as mock_exists,
             patch("src.components.docker_component.shutil.copy") as mock_copy,
         ):
             # Dockerfile doesn't exist in repo, but exists in template
@@ -301,7 +303,7 @@ class TestTemplateFileCopying:
         devcontainer_repo = repo_path / ".devcontainer" / "devcontainer.json"
 
         with (
-            patch.object(Path, "exists") as mock_exists,
+            patch.object(Path, "exists", autospec=True) as mock_exists,
             patch("src.components.docker_component.shutil.copy") as mock_copy,
         ):
             # docker-compose.yml doesn't exist in repo, but exists in template
@@ -328,7 +330,7 @@ class TestTemplateFileCopying:
         devcontainer_template = template_path / ".devcontainer" / "devcontainer.json"
 
         with (
-            patch.object(Path, "exists") as mock_exists,
+            patch.object(Path, "exists", autospec=True) as mock_exists,
             patch.object(Path, "mkdir") as mock_mkdir,
             patch("src.components.docker_component.shutil.copy") as mock_copy,
         ):
@@ -381,7 +383,7 @@ services:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file) as mock_open,
+            patch.object(Path, "open", return_value=mock_file) as mock_open,
         ):
             docker_component._standardize_container_names("tta.dev")
 
@@ -389,7 +391,7 @@ services:
             assert mock_open.call_count == 2
 
             # Verify write was called with updated content
-            write_call = mock_open.return_value.__enter__.return_value.write
+            write_call = mock_file.__enter__.return_value.write
             write_call.assert_called_once()
             written_content = write_call.call_args[0][0]
 
@@ -405,7 +407,7 @@ services:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             docker_component._standardize_container_names("tta.prototype")
 
@@ -445,7 +447,7 @@ class TestVSCodeExtensions:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             # Should not raise any warnings
             docker_component._ensure_consistent_extensions("tta.dev")
@@ -466,7 +468,7 @@ class TestVSCodeExtensions:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             # Should log warnings but not raise exception
             docker_component._ensure_consistent_extensions("tta.dev")
@@ -544,12 +546,12 @@ class TestEnvironmentVariables:
 
         with (
             patch.object(Path, "exists", return_value=False),
-            patch("builtins.open", return_value=mock_file) as mock_open,
+            patch.object(Path, "open", return_value=mock_file) as mock_open,
         ):
             docker_component._create_env_example("tta.prototype", env_example_path)
 
             # Verify file was opened for writing
-            mock_open.assert_called_once_with(env_example_path, "w")
+            mock_open.assert_called_once_with("w")
 
             # Verify essential variables were written
             write_calls = mock_file.__enter__.return_value.write.call_args_list
@@ -573,7 +575,7 @@ CODECARBON_OUTPUT_DIR=/app/logs/codecarbon
         mock_file_read.__enter__.return_value.read.return_value = env_content
 
         with (
-            patch("builtins.open", return_value=mock_file_read) as mock_open,
+            patch.object(Path, "open", return_value=mock_file_read) as mock_open,
         ):
             env_path = Path("/fake/path/.env.example")
             docker_component._add_missing_env_vars("tta.dev", env_path)
@@ -593,7 +595,7 @@ NEO4J_URI=bolt://neo4j:7687
 
         mock_file_append = MagicMock()
 
-        with patch("builtins.open") as mock_open:
+        with patch.object(Path, "open") as mock_open:
             # First call for reading, second for appending
             mock_open.side_effect = [mock_file_read, mock_file_append]
 
@@ -630,7 +632,7 @@ services:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             # Should not raise warnings
             docker_component._ensure_consistent_services("tta.dev")
@@ -648,7 +650,7 @@ services:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             # Should log warnings but not raise exception
             docker_component._ensure_consistent_services("tta.dev")
@@ -736,7 +738,7 @@ class TestDockerComponentEdgeCases:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             # Should not crash with empty file
             docker_component._standardize_container_names("tta.dev")
@@ -754,7 +756,7 @@ services:
 
         with (
             patch.object(Path, "exists", return_value=True),
-            patch("builtins.open", return_value=mock_file),
+            patch.object(Path, "open", return_value=mock_file),
         ):
             # Should not crash when no container_name fields present
             docker_component._standardize_container_names("tta.dev")

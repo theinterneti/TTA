@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Tests/E2e/Utils/Coverage-helper]]
 import { Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';

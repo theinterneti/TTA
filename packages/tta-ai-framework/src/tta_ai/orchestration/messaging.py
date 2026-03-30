@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Messaging]]
 Message passing data structures for Agent Orchestration (Task 2.2, 4.2).
 
 Adds reliability primitives used by MessageCoordinator implementations:
@@ -9,7 +11,7 @@ Adds reliability primitives used by MessageCoordinator implementations:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
@@ -28,7 +30,7 @@ class MessageSubscription(BaseModel):
     message_types: list[MessageType] = Field(default_factory=list)
 
 
-class FailureType(str, Enum):
+class FailureType(StrEnum):
     TRANSIENT = "transient"
     PERMANENT = "permanent"
     TIMEOUT = "timeout"

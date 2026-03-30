@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Pre-commit/Run-tests-on-changed-files]]
 Pre-commit hook to run tests for changed source files.
 
 This hook runs tests only for the source files that have been changed,

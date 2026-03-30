@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Database/Schema]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Database/Schema]]
 Neo4j Schema for Gameplay Loop
 
 This module defines the Neo4j database schema for the therapeutic text adventure

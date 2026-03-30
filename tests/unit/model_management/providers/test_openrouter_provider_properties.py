@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Model_management/Providers/Test_openrouter_provider_properties]]
 Property-Based Tests for OpenRouter Provider.
 
 This module uses Hypothesis to test invariants and properties of the
@@ -8,6 +10,8 @@ OpenRouter provider implementation, automatically discovering edge cases.
 import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
+
+pytest.importorskip("tta_ai")
 from tta_ai.models.interfaces import (
     GenerationRequest,
     ModelInfo,

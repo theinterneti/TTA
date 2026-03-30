@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/GitHub Secrets and Variables Configuration Guide]]
 > - **Path:** `.augment/kb/Workflows/GitHub Secrets and Variables Configuration Guide.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/GitHub Secrets and Variables Configuration Guide.md`
 
 **Migration date:** 2025-11-01
+
+
+---

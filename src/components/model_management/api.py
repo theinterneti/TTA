@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Components/Model_management/Api]]
 Model Management API Endpoints.
 
 This module provides FastAPI endpoints for model management functionality.
@@ -268,7 +270,7 @@ async def get_model_recommendations(
 
 
 @router.post("/test", response_model=ModelTestResponse)
-async def test_model_connectivity(
+async def check_model_connectivity(
     request: ModelTestRequest,
     model_mgmt: ModelManagementComponent = Depends(get_model_management),
 ):

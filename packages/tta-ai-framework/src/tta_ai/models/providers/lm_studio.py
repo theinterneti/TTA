@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Models/Providers/Lm_studio]]
 LM Studio Provider Implementation.
 
 This module provides integration with LM Studio for local model hosting.
@@ -27,7 +29,7 @@ logger = logging.getLogger(__name__)
 class LMStudioModelInstance(BaseModelInstance):
     """LM Studio model instance implementation."""
 
-    def __init__(self, model_id: str, provider: "LMStudioProvider", client: httpx.AsyncClient):
+    def __init__(self, model_id: str, provider: LMStudioProvider, client: httpx.AsyncClient):
         super().__init__(model_id, provider)
         self._client = client
         self._status = ModelStatus.READY
@@ -88,7 +90,7 @@ class LMStudioModelInstance(BaseModelInstance):
             self._status = ModelStatus.ERROR
             raise
 
-    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str, None]:
+    async def generate_stream(self, request: GenerationRequest) -> AsyncGenerator[str]:
         """Generate text as a stream using LM Studio API."""
         try:
             # Prepare request payload

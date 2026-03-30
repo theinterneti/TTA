@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Agent_orchestration/Test_performance_validation]]
 Performance validation tests for 2-second response time requirements.
 
 This module provides comprehensive performance validation using the performance

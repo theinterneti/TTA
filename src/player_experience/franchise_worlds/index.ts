@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Index]]
 /**
  * Franchise World System - Main Export Module
  *

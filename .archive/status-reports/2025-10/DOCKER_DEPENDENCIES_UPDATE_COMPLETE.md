@@ -369,3 +369,7 @@ bash scripts/cleanup/reset-test-data.sh
 **Remaining**: Additional documentation, workflows, and cleanup
 **Timeline**: Phase 2-5 can be completed incrementally
 **Breaking**: Yes - old docker-compose commands will not work
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Docker_dependencies_update_complete]]

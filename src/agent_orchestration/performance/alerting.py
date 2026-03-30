@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Performance/Alerting]]
 Response time alerting system with configurable thresholds and escalation.
 
 This module provides comprehensive alerting for response time violations,
@@ -14,7 +16,7 @@ import time
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 
 from .analytics import BottleneckIdentification, PerformanceTrend, TrendDirection
@@ -23,7 +25,7 @@ from .response_time_monitor import OperationType
 logger = logging.getLogger(__name__)
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -32,7 +34,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertType(str, Enum):
+class AlertType(StrEnum):
     """Types of performance alerts."""
 
     RESPONSE_TIME_VIOLATION = "response_time_violation"
@@ -214,7 +216,7 @@ class PerformanceAlerting:
             description=f"{operation_type.value} response time ({metric_value:.2f}s) exceeded {severity.value} threshold ({threshold_value:.2f}s)",
             operation_type=operation_type,
             metric_value=metric_value,
-            threshold_value=threshold_value,
+            threshold_value=threshold_value or 0.0,
             timestamp=time.time(),
             metadata=metadata or {},
         )

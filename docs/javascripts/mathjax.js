@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Docs/Javascripts/Mathjax]]
 window.MathJax = {
   tex: {
     inlineMath: [["\(", "\)"]],

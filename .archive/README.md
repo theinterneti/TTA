@@ -30,3 +30,7 @@ Historical reports, logs, and documentation organized by category and date.
 
 Created: 2025-11-02
 Last Updated: 2025-11-02
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Readme]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Config_manager]]
 Real-time configuration management for WebSocket and event systems.
 
 This module provides dynamic configuration management for real-time features,
@@ -10,13 +12,13 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class RealtimeEnvironment(str, Enum):
+class RealtimeEnvironment(StrEnum):
     """Environment types for real-time configuration."""
 
     DEVELOPMENT = "development"

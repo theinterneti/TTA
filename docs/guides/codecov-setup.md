@@ -177,3 +177,6 @@ uv sync --all-extras
 ---
 
 **Questions?** Check `docs/CODECOV_SETUP.md` or ask the team!
+
+
+---

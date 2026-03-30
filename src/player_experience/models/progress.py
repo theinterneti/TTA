@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Models/Progress]]
 Progress tracking and analytics data models.
 """
 
@@ -79,6 +81,25 @@ class Milestone:
 
         if self.is_achieved and self.achieved_date is None:
             self.achieved_date = datetime.now()
+
+    @property
+    def milestone_type(self) -> str:
+        """Compatibility alias for older milestone consumers."""
+        milestone_key = f"{self.milestone_id} {self.title}".lower()
+        if "streak" in milestone_key:
+            return "engagement_streak"
+        if "session" in milestone_key:
+            return "session_count"
+        if "skill" in milestone_key:
+            return "skills_acquired"
+        if "breakthrough" in milestone_key:
+            return "breakthroughs"
+        return "progress"
+
+    @property
+    def achieved_at(self) -> datetime | None:
+        """Compatibility alias for older milestone consumers."""
+        return self.achieved_date
 
     def add_completed_action(self, action: str) -> None:
         """Mark an action as completed and update progress."""

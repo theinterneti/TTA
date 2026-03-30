@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Testing/Simulation/Scripts/Analyzeresults]]
 #!/usr/bin/env ts-node
 
 /**

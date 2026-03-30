@@ -354,3 +354,6 @@ uv run python scripts/test_database_connections.py
 ```
 
 ✅ **Done!** Neo4j should now work properly from both Windows and WSL.
+
+
+---

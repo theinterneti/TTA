@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Player_profile_manager]]
 Player Profile Manager service.
 
 This module provides business logic for player profile management,

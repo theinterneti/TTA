@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Tools/Cursor]]
 Secure cursor system for pagination (Phase 3 Tool Optimization).
 
 Provides tamper-proof pagination cursors using HMAC-SHA256 signing:

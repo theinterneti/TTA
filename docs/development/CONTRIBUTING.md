@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/Contributing to TTA]]
 > - **Path:** `.augment/kb/Workflows/Contributing to TTA.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/Contributing to TTA.md`
 
 **Migration date:** 2025-11-01
+
+
+---

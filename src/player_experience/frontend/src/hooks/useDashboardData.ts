@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Frontend/Src/Hooks/Usedashboarddata]]
 import { useState, useEffect, useCallback } from 'react';
 
 interface Character {

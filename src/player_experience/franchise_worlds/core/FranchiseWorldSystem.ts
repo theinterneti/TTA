@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Player_experience/Franchise_worlds/Core/Franchiseworldsystem]]
 /**
  * Franchise World System - Core Framework
  *

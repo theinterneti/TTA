@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Components/Component Loader - Staging Readiness Report.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Components/2025-10/Component_loader_staging_readiness]]

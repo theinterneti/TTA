@@ -238,3 +238,6 @@ For issues not covered here:
 2. Verify API key: `echo $OPENROUTER_API_KEY`
 3. Test DNS: `docker run --rm alpine nslookup openrouter.ai`
 4. Check network: `docker run --rm alpine ping 8.8.8.8`
+
+
+---

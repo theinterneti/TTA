@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Gameplay_loop_controller]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Gameplay_loop_controller]]
 Production Therapeutic GameplayLoopController Implementation
 
 This module provides production-ready session lifecycle management with seamless
@@ -8,7 +11,7 @@ orchestration.
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -66,8 +69,8 @@ class SessionState:
     user_id: str
     status: SessionStatus
     current_phase: SessionPhase
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    last_updated: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_updated: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Therapeutic context
     therapeutic_goals: list[str] = field(default_factory=list)
@@ -105,7 +108,7 @@ class SessionOutcome:
     engagement_metrics: dict[str, float]
     safety_incidents: int
     recommendations_for_next_session: list[str]
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class TherapeuticGameplayLoopController:
@@ -197,8 +200,9 @@ class TherapeuticGameplayLoopController:
         Returns:
             SessionState representing the initialized session
         """
+        session_id: str | None = None
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Create or use provided configuration
             if session_config is None:
@@ -241,12 +245,12 @@ class TherapeuticGameplayLoopController:
             # Phase 4: Transition to active gameplay
             session_state.status = SessionStatus.ACTIVE
             session_state.current_phase = SessionPhase.ACTIVE_GAMEPLAY
-            session_state.last_updated = datetime.utcnow()
+            session_state.last_updated = datetime.now(UTC)
 
             # Update metrics
             self.metrics["sessions_started"] += 1
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Started therapeutic session {session_id} for user {user_id} "
                 f"in {processing_time.total_seconds():.3f}s"
@@ -258,7 +262,7 @@ class TherapeuticGameplayLoopController:
             logger.error(f"Error starting session for user {user_id}: {e}")
 
             # Clean up failed session
-            if "session_id" in locals():
+            if session_id is not None:
                 self.active_sessions.pop(session_id, None)
                 self.session_configurations.pop(session_id, None)
 
@@ -291,7 +295,7 @@ class TherapeuticGameplayLoopController:
             Comprehensive response including consequences, safety assessment, and progression
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get session state
             session_state = self.active_sessions.get(session_id)
@@ -333,7 +337,7 @@ class TherapeuticGameplayLoopController:
             session_state.therapeutic_value_accumulated += consequence_result.get(
                 "therapeutic_value", 0.0
             )
-            session_state.last_updated = datetime.utcnow()
+            session_state.last_updated = datetime.now(UTC)
 
             # Check for milestones
             milestone_check = await self._check_milestones(
@@ -355,7 +359,7 @@ class TherapeuticGameplayLoopController:
                     "therapeutic_value": session_state.therapeutic_value_accumulated,
                     "engagement_score": session_state.engagement_score,
                 },
-                "processing_time": (datetime.utcnow() - start_time).total_seconds(),
+                "processing_time": (datetime.now(UTC) - start_time).total_seconds(),
             }
 
             # Enhance response with adventure elements if adventure enhancer is available
@@ -403,8 +407,9 @@ class TherapeuticGameplayLoopController:
         Returns:
             SessionOutcome with comprehensive session summary
         """
+        session_state: SessionState | None = None
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Get session state
             session_state = self.active_sessions.get(session_id)
@@ -413,7 +418,7 @@ class TherapeuticGameplayLoopController:
 
             # Calculate session duration
             session_duration = (
-                datetime.utcnow() - session_state.created_at
+                datetime.now(UTC) - session_state.created_at
             ).total_seconds() / 60.0
 
             # Generate character progression summary
@@ -450,7 +455,7 @@ class TherapeuticGameplayLoopController:
             session_state.status = SessionStatus.COMPLETED
             session_state.current_phase = SessionPhase.CONCLUSION
             session_state.session_duration_minutes = session_duration
-            session_state.last_updated = datetime.utcnow()
+            session_state.last_updated = datetime.now(UTC)
 
             # Store outcome
             self.session_outcomes[session_id] = outcome
@@ -464,7 +469,7 @@ class TherapeuticGameplayLoopController:
             self.metrics["total_therapeutic_value"] += outcome.therapeutic_value_total
             self._update_average_session_duration(session_duration)
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.info(
                 f"Completed session {session_id} (duration: {session_duration:.1f}min) "
                 f"in {processing_time.total_seconds():.3f}s"

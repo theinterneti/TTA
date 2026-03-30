@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Contracts/Consumer/Test_frontend_model_management_contract]]
 Consumer Contract Tests for Frontend Model Management.
 
 This module defines the API contracts that the frontend expects from the

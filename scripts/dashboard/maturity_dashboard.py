@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Dashboard/Maturity_dashboard]]
 Component Maturity Dashboard for TTA Monorepo
 
 Visualizes component maturity status across all packages with interactive filtering.

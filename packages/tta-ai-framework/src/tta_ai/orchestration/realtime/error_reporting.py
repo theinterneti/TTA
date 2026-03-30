@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Error_reporting]]
 Real-time error reporting and recovery notifications.
 
 This module provides comprehensive error reporting and recovery notification
@@ -14,7 +16,7 @@ import time
 import traceback
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -30,7 +32,7 @@ from .models import (
 logger = logging.getLogger(__name__)
 
 
-class ErrorSeverity(str, Enum):
+class ErrorSeverity(StrEnum):
     """Error severity levels."""
 
     LOW = "low"
@@ -39,7 +41,7 @@ class ErrorSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class RecoveryStatus(str, Enum):
+class RecoveryStatus(StrEnum):
     """Recovery attempt status."""
 
     NOT_ATTEMPTED = "not_attempted"

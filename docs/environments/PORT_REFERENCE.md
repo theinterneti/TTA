@@ -340,3 +340,6 @@ driver.verify_connectivity()
 - [Environment Setup Guide](ENVIRONMENT_SETUP_GUIDE.md) - Complete setup instructions
 - [Switching Environments](SWITCHING_ENVIRONMENTS.md) - How to switch between environments
 - [Docker Compose Reference](../docker/DOCKER_COMPOSE_REFERENCE.md) - Docker configuration details
+
+
+---

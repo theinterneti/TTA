@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Config_manager]]
 Real-time configuration management for WebSocket and event systems.
 
 This module provides dynamic configuration management for real-time features,
@@ -9,14 +11,14 @@ from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass
-from enum import Enum
+from dataclasses import dataclass, field
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class RealtimeEnvironment(str, Enum):
+class RealtimeEnvironment(StrEnum):
     """Environment types for real-time configuration."""
 
     DEVELOPMENT = "development"
@@ -35,7 +37,7 @@ class WebSocketConfig:
     connection_timeout: float = 60.0
     max_connections: int = 1000
     auth_required: bool = True
-    cors_origins: list[str] = None
+    cors_origins: list[str] = field(default_factory=lambda: ["*"])
 
     def __post_init__(self):
         if self.cors_origins is None:
@@ -84,10 +86,12 @@ class RealtimeConfig:
 
     enabled: bool = False
     environment: RealtimeEnvironment = RealtimeEnvironment.DEVELOPMENT
-    websocket: WebSocketConfig = None
-    events: EventConfig = None
-    progressive_feedback: ProgressiveFeedbackConfig = None
-    optimization: OptimizationConfig = None
+    websocket: WebSocketConfig = field(default_factory=WebSocketConfig)
+    events: EventConfig = field(default_factory=EventConfig)
+    progressive_feedback: ProgressiveFeedbackConfig = field(
+        default_factory=ProgressiveFeedbackConfig
+    )
+    optimization: OptimizationConfig = field(default_factory=OptimizationConfig)
 
     def __post_init__(self):
         if self.websocket is None:
@@ -161,12 +165,10 @@ class RealtimeConfigManager:
 
     def _get_default_enabled(self) -> bool:
         """Get default enabled state based on environment."""
-        if self._environment in [
+        return self._environment in [
             RealtimeEnvironment.DEVELOPMENT,
             RealtimeEnvironment.TESTING,
-        ]:
-            return True  # Enable by default in dev/test
-        return False  # Disabled by default in staging/production
+        ]
 
     def _load_websocket_config(self, ws_config: dict[str, Any]) -> WebSocketConfig:
         """Load WebSocket configuration."""

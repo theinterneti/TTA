@@ -10,3 +10,7 @@
 > Otherwise, see: `.augment/kb/Status/Observability Integration - Implementation Complete.md`
 
 **Migration date:** 2025-11-01
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Observability/2025-10/Observability_implementation_status]]

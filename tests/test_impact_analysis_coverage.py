@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_impact_analysis_coverage]]
 Coverage tests for impact_analysis module to reach 70%+ coverage.
 
 This module contains tests specifically designed to cover previously
@@ -7,6 +9,8 @@ and edge cases.
 """
 
 import pytest
+
+pytest.importorskip("tta_narrative")
 from tta_narrative.orchestration.impact_analysis import (
     assess_therapeutic_alignment,
     calculate_base_magnitude,

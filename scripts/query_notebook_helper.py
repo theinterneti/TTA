@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Query_notebook_helper]]
 NotebookLM Query Helper
 
 Quick utility to query the TTA research notebook for architectural guidance,

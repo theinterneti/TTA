@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "hindsight": {
+      "url": "http://localhost:8888/mcp/"
+    },
+    "codegraphcontext": {
+      "command": "cgc",
+      "args": ["mcp", "start"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "mcp-sequentialthinking-tools"],
+      "env": {
+        "MAX_HISTORY_SIZE": "1000"
+      }
+    },
+    "github": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
+        "GITHUB_TOOLSETS": "default,projects,labels,orgs"
+      }
+    }
+  }
+}

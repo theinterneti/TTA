@@ -235,3 +235,7 @@ npm uninstall $(npm ls --all --parseable | grep @storybook | awk -F/ '{print $NF
 - [ ] I need more information first
 
 **Reply with your choice or questions!**
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Dependency_resolution_summary]]

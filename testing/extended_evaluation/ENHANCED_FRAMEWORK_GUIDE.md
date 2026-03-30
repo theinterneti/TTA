@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Workflows/TTA Enhanced Extended Session Quality Evaluation Framework]]
 > - **Path:** `.augment/kb/Workflows/TTA Enhanced Extended Session Quality Evaluation Framework.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Workflows/TTA Enhanced Extended Session Quality Evaluation Framework.md`
 
 **Migration date:** 2025-11-01
+
+
+---

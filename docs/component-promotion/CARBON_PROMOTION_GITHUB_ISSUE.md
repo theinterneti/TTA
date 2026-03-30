@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Components/GitHub Issue: Promote Carbon Component to Staging]]
 > - **Path:** `.augment/kb/Components/GitHub Issue: Promote Carbon Component to Staging.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Components/GitHub Issue: Promote Carbon Component to Staging.md`
 
 **Migration date:** 2025-11-01
+
+
+---

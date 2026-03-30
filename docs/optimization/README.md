@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/References/TTA Agentic Primitives - Rules & Patterns]]
 > - **Path:** `.augment/kb/References/TTA Agentic Primitives - Rules & Patterns.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/References/TTA Agentic Primitives - Rules & Patterns.md`
 
 **Migration date:** 2025-11-01
+
+
+---

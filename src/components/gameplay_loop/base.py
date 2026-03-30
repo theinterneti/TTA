@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Base]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Base]]
 Base classes and interfaces for the Core Gameplay Loop system.
 
 This module provides the foundational abstract classes and interfaces that all
@@ -11,18 +14,43 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import Enum, StrEnum
 from typing import Any
 
 from tta_ai.orchestration.service import AgentOrchestrationService
 
-from src.components.base import Component
+try:
+    from src.components.base import Component  # type: ignore[import]
+except ImportError:
+
+    class Component(ABC):  # type: ignore[no-redef]  # noqa: B024
+        """Stub Component base class when src.components.base is not available."""
+
+        name: str = ""
+
+        def __init__(self, name: str, dependencies: list, config: dict) -> None:
+            self.name = name
+            self.dependencies = dependencies
+            self.config = config
+
+        async def start(self) -> None:  # noqa: B027
+            pass
+
+        async def stop(self) -> None:  # noqa: B027
+            pass
+
+        async def health_check(self) -> dict:
+            return {"status": "unknown"}
+
+        def get_component(self, component_type: type) -> object | None:  # noqa: ARG002
+            return None
+
 
 logger = logging.getLogger(__name__)
 
 
-class GameplayLoopState(str, Enum):
+class GameplayLoopState(StrEnum):
     """States of the gameplay loop."""
 
     INITIALIZING = "initializing"
@@ -58,8 +86,8 @@ class GameplayLoopContext:
     safety_level: str = "standard"  # "standard", "elevated", "crisis"
 
     # Session state
-    session_start_time: datetime = field(default_factory=datetime.utcnow)
-    last_activity_time: datetime = field(default_factory=datetime.utcnow)
+    session_start_time: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_activity_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     total_session_time: float = 0.0
 
     # Gameplay state
@@ -74,7 +102,7 @@ class GameplayLoopContext:
     last_error: str | None = None
 
 
-class GameplayLoopComponent(Component, ABC):
+class GameplayLoopComponent(Component, ABC):  # type: ignore[misc]
     """
     Abstract base class for all gameplay loop components.
 
@@ -122,7 +150,7 @@ class GameplayLoopComponent(Component, ABC):
 
         # Initialize agent orchestration integration
         try:
-            from src.components.agent_orchestration_component import (
+            from src.components.agent_orchestration_component import (  # noqa: PLC0415
                 AgentOrchestrationComponent,
             )
 
@@ -189,7 +217,7 @@ class GameplayLoopComponent(Component, ABC):
         context = self._active_contexts.get(session_id)
         if context:
             # Update last activity time
-            context.last_activity_time = datetime.utcnow()
+            context.last_activity_time = datetime.now(UTC)
         return context
 
     async def update_session_context(
@@ -205,7 +233,7 @@ class GameplayLoopComponent(Component, ABC):
             if hasattr(context, key):
                 setattr(context, key, value)
 
-        context.last_activity_time = datetime.utcnow()
+        context.last_activity_time = datetime.now(UTC)
 
         # Notify component of context update
         await self._on_session_context_updated(context)
@@ -252,7 +280,7 @@ class GameplayLoopComponent(Component, ABC):
     def _update_performance_metrics(self, context: GameplayLoopContext) -> None:
         """Update performance metrics for a completed session."""
         session_duration = (
-            datetime.utcnow() - context.session_start_time
+            datetime.now(UTC) - context.session_start_time
         ).total_seconds()
 
         if "sessions" not in self._performance_metrics:

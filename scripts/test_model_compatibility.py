@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Test_model_compatibility]]
 OpenHands Model Compatibility Test Suite
 
 Tests multiple OpenRouter models with predefined tasks to build empirical data

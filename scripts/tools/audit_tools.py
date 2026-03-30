@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+
+# Logseq: [[TTA.dev/Scripts/Tools/Audit_tools]]
 Tool Audit Script - Catalog all existing MCP tools in Redis.
 
 This script connects to Redis, retrieves all registered tools, and exports

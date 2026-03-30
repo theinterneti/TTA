@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Unit/Ai_components/Test_prompt_registry]]
 Unit tests for PromptRegistry.
 """
 
@@ -7,6 +9,8 @@ from pathlib import Path
 
 import pytest
 import yaml
+
+pytest.importorskip("tta_ai")
 from tta_ai.prompts import PromptMetrics, PromptRegistry, PromptTemplate
 
 

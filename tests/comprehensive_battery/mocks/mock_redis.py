@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Comprehensive_battery/Mocks/Mock_redis]]
 Mock Redis client implementation.
 
 Provides mock Redis operations without requiring an actual Redis instance.

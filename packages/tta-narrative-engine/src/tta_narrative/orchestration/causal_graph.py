@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-narrative-engine/Src/Tta_narrative/Orchestration/Causal_graph]]
 Causal graph utilities extracted to a dedicated module.
 ScaleManager remains the orchestrator that uses these operations.
 """

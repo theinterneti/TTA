@@ -12,6 +12,8 @@ Usage:
     python scripts/generate_tests.py src/agent_orchestration/tools/ --package --coverage 75
 """
 
+# Logseq: [[TTA.dev/Scripts/Generate_tests]]
+
 import argparse
 import asyncio
 import logging

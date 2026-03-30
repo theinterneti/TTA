@@ -1,3 +1,4 @@
+// Logseq: [[TTA.dev/Artifacts/Test-scripts/Test-playwright]]
 const { chromium } = require('playwright');
 
 (async () => {

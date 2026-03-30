@@ -1,9 +1,13 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_player_experience_models]]
 Comprehensive tests for player experience data models.
 """
 
 import unittest
 from datetime import datetime
+
+import pytest
 
 from src.player_experience.models import (
     Character,
@@ -53,16 +57,16 @@ class TestPlayerModels(unittest.TestCase):
             session_duration_preference=45,
         )
 
-        self.assertEqual(prefs.intensity_level, IntensityLevel.HIGH)
-        self.assertEqual(len(prefs.preferred_approaches), 2)
-        self.assertEqual(prefs.session_duration_preference, 45)
+        assert prefs.intensity_level == IntensityLevel.HIGH
+        assert len(prefs.preferred_approaches) == 2
+        assert prefs.session_duration_preference == 45
 
     def test_therapeutic_preferences_validation(self):
         """Test therapeutic preferences validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticPreferences(session_duration_preference=5)  # Too short
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticPreferences(session_duration_preference=150)  # Too long
 
     def test_privacy_settings_creation(self):
@@ -73,16 +77,16 @@ class TestPlayerModels(unittest.TestCase):
             data_retention_period_days=180,
         )
 
-        self.assertTrue(privacy.data_collection_consent)
-        self.assertFalse(privacy.research_participation_consent)
-        self.assertEqual(privacy.data_retention_period_days, 180)
+        assert privacy.data_collection_consent
+        assert not privacy.research_participation_consent
+        assert privacy.data_retention_period_days == 180
 
     def test_privacy_settings_validation(self):
         """Test privacy settings validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=20)  # Too short
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PrivacySettings(data_retention_period_days=3000)  # Too long
 
     def test_player_profile_creation(self):
@@ -94,15 +98,15 @@ class TestPlayerModels(unittest.TestCase):
             created_at=datetime.now(),
         )
 
-        self.assertEqual(profile.player_id, "player_123")
-        self.assertEqual(profile.username, "testuser")
-        self.assertEqual(profile.email, "test@example.com")
-        self.assertEqual(len(profile.characters), 0)
-        self.assertTrue(profile.is_active)
+        assert profile.player_id == "player_123"
+        assert profile.username == "testuser"
+        assert profile.email == "test@example.com"
+        assert len(profile.characters) == 0
+        assert profile.is_active
 
     def test_player_profile_validation(self):
         """Test player profile validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="",
                 username="testuser",
@@ -110,7 +114,7 @@ class TestPlayerModels(unittest.TestCase):
                 created_at=datetime.now(),
             )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="player_123",
                 username="ab",  # Too short
@@ -118,7 +122,7 @@ class TestPlayerModels(unittest.TestCase):
                 created_at=datetime.now(),
             )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="player_123",
                 username="testuser",
@@ -138,19 +142,19 @@ class TestPlayerModels(unittest.TestCase):
         # Add characters
         profile.add_character("char_1")
         profile.add_character("char_2")
-        self.assertEqual(len(profile.characters), 2)
+        assert len(profile.characters) == 2
 
         # Test character limit
         for i in range(3, 6):
             profile.add_character(f"char_{i}")
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             profile.add_character("char_6")  # Exceeds limit
 
         # Remove character
         profile.remove_character("char_1")
-        self.assertEqual(len(profile.characters), 4)
-        self.assertNotIn("char_1", profile.characters)
+        assert len(profile.characters) == 4
+        assert "char_1" not in profile.characters
 
 
 class TestCharacterModels(unittest.TestCase):
@@ -165,12 +169,12 @@ class TestCharacterModels(unittest.TestCase):
             clothing_style="professional",
         )
 
-        self.assertEqual(appearance.age_range, "adult")
-        self.assertEqual(appearance.gender_identity, "female")
+        assert appearance.age_range == "adult"
+        assert appearance.gender_identity == "female"
 
     def test_character_appearance_validation(self):
         """Test character appearance validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterAppearance(age_range="invalid")  # Invalid age range
 
     def test_character_background_creation(self):
@@ -182,19 +186,19 @@ class TestCharacterModels(unittest.TestCase):
             core_values=["education", "family", "integrity"],
         )
 
-        self.assertEqual(background.name, "Alice Johnson")
-        self.assertEqual(len(background.personality_traits), 3)
-        self.assertEqual(len(background.core_values), 3)
+        assert background.name == "Alice Johnson"
+        assert len(background.personality_traits) == 3
+        assert len(background.core_values) == 3
 
     def test_character_background_validation(self):
         """Test character background validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterBackground(name="A")  # Too short
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterBackground(name="A" * 60)  # Too long
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CharacterBackground(name="Alice123")  # Invalid characters
 
     def test_therapeutic_goal_creation(self):
@@ -209,13 +213,13 @@ class TestCharacterModels(unittest.TestCase):
             ],
         )
 
-        self.assertEqual(goal.goal_id, "goal_1")
-        self.assertEqual(goal.progress_percentage, 25.0)
-        self.assertTrue(goal.is_active)
+        assert goal.goal_id == "goal_1"
+        assert goal.progress_percentage == 25.0
+        assert goal.is_active
 
     def test_therapeutic_goal_validation(self):
         """Test therapeutic goal validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             TherapeuticGoal(
                 goal_id="goal_1",
                 description="Test goal",
@@ -237,9 +241,9 @@ class TestCharacterModels(unittest.TestCase):
             readiness_level=0.7,
         )
 
-        self.assertEqual(len(profile.primary_concerns), 2)
-        self.assertEqual(len(profile.therapeutic_goals), 1)
-        self.assertEqual(profile.readiness_level, 0.7)
+        assert len(profile.primary_concerns) == 2
+        assert len(profile.therapeutic_goals) == 1
+        assert profile.readiness_level == 0.7
 
     def test_character_creation(self):
         """Test creating a complete character."""
@@ -258,10 +262,10 @@ class TestCharacterModels(unittest.TestCase):
             last_active=datetime.now(),
         )
 
-        self.assertEqual(character.character_id, "char_123")
-        self.assertEqual(character.name, "Test Character")
-        self.assertEqual(character.session_count, 0)
-        self.assertTrue(character.is_active)
+        assert character.character_id == "char_123"
+        assert character.name == "Test Character"
+        assert character.session_count == 0
+        assert character.is_active
 
 
 class TestWorldModels(unittest.TestCase):
@@ -276,16 +280,16 @@ class TestWorldModels(unittest.TestCase):
             challenge_level=DifficultyLevel.ADVANCED,
         )
 
-        self.assertEqual(params.therapeutic_intensity, 0.7)
-        self.assertEqual(params.narrative_pace, "fast")
-        self.assertEqual(params.challenge_level, DifficultyLevel.ADVANCED)
+        assert params.therapeutic_intensity == 0.7
+        assert params.narrative_pace == "fast"
+        assert params.challenge_level == DifficultyLevel.ADVANCED
 
     def test_world_parameters_validation(self):
         """Test world parameters validation."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             WorldParameters(therapeutic_intensity=1.5)  # Out of range
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             WorldParameters(narrative_pace="invalid")  # Invalid pace
 
     def test_world_summary_creation(self):
@@ -299,9 +303,9 @@ class TestWorldModels(unittest.TestCase):
             compatibility_score=0.85,
         )
 
-        self.assertEqual(summary.world_id, "world_123")
-        self.assertEqual(summary.name, "Peaceful Garden")
-        self.assertEqual(summary.compatibility_score, 0.85)
+        assert summary.world_id == "world_123"
+        assert summary.name == "Peaceful Garden"
+        assert summary.compatibility_score == 0.85
 
     def test_compatibility_report_creation(self):
         """Test creating compatibility report."""
@@ -318,8 +322,8 @@ class TestWorldModels(unittest.TestCase):
             compatibility_factors=[factor],
         )
 
-        self.assertEqual(report.overall_score, 0.75)
-        self.assertEqual(len(report.compatibility_factors), 1)
+        assert report.overall_score == 0.75
+        assert len(report.compatibility_factors) == 1
 
 
 class TestSessionModels(unittest.TestCase):
@@ -334,8 +338,8 @@ class TestSessionModels(unittest.TestCase):
             crisis_monitoring_enabled=True,
         )
 
-        self.assertEqual(settings.intensity_level, 0.6)
-        self.assertTrue(settings.crisis_monitoring_enabled)
+        assert settings.intensity_level == 0.6
+        assert settings.crisis_monitoring_enabled
 
     def test_session_context_creation(self):
         """Test creating session context."""
@@ -349,10 +353,10 @@ class TestSessionModels(unittest.TestCase):
             therapeutic_settings=settings,
         )
 
-        self.assertEqual(context.session_id, "session_123")
-        self.assertEqual(context.status, SessionStatus.ACTIVE)
-        self.assertEqual(context.interaction_count, 0)
-        self.assertTrue(context.is_active())
+        assert context.session_id == "session_123"
+        assert context.status == SessionStatus.ACTIVE
+        assert context.interaction_count == 0
+        assert context.is_active()
 
     def test_progress_marker_creation(self):
         """Test creating progress markers."""
@@ -364,8 +368,8 @@ class TestSessionModels(unittest.TestCase):
             therapeutic_value=0.8,
         )
 
-        self.assertEqual(marker.marker_type, ProgressMarkerType.MILESTONE)
-        self.assertEqual(marker.therapeutic_value, 0.8)
+        assert marker.marker_type == ProgressMarkerType.MILESTONE
+        assert marker.therapeutic_value == 0.8
 
 
 class TestProgressModels(unittest.TestCase):
@@ -381,9 +385,9 @@ class TestProgressModels(unittest.TestCase):
             is_achieved=True,
         )
 
-        self.assertEqual(milestone.title, "First Week Complete")
-        self.assertTrue(milestone.is_achieved)
-        self.assertIsNotNone(milestone.achieved_date)
+        assert milestone.title == "First Week Complete"
+        assert milestone.is_achieved
+        assert milestone.achieved_date is not None
 
     def test_engagement_metrics_creation(self):
         """Test creating engagement metrics."""
@@ -394,9 +398,9 @@ class TestProgressModels(unittest.TestCase):
             dropout_risk_score=0.2,
         )
 
-        self.assertEqual(metrics.total_sessions, 10)
-        self.assertEqual(metrics.current_streak_days, 5)
-        self.assertEqual(metrics.dropout_risk_score, 0.2)
+        assert metrics.total_sessions == 10
+        assert metrics.current_streak_days == 5
+        assert metrics.dropout_risk_score == 0.2
 
     def test_progress_summary_creation(self):
         """Test creating progress summary."""
@@ -414,9 +418,9 @@ class TestProgressModels(unittest.TestCase):
             progress_trend="improving",
         )
 
-        self.assertEqual(summary.player_id, "player_123")
-        self.assertEqual(len(summary.milestones_achieved), 1)
-        self.assertEqual(summary.therapeutic_momentum, 0.7)
+        assert summary.player_id == "player_123"
+        assert len(summary.milestones_achieved) == 1
+        assert summary.therapeutic_momentum == 0.7
 
 
 class TestSerialization(unittest.TestCase):
@@ -433,13 +437,13 @@ class TestSerialization(unittest.TestCase):
 
         # Serialize to JSON
         json_data = serialize_model(original)
-        self.assertIsInstance(json_data, str)
+        assert isinstance(json_data, str)
 
         # Deserialize back
         deserialized = deserialize_model(json_data, PlayerProfile)
-        self.assertEqual(deserialized.player_id, original.player_id)
-        self.assertEqual(deserialized.username, original.username)
-        self.assertEqual(deserialized.email, original.email)
+        assert deserialized.player_id == original.player_id
+        assert deserialized.username == original.username
+        assert deserialized.email == original.email
 
     def test_character_serialization(self):
         """Test serializing and deserializing character."""
@@ -460,12 +464,12 @@ class TestSerialization(unittest.TestCase):
 
         # Serialize to JSON
         json_data = serialize_model(original)
-        self.assertIsInstance(json_data, str)
+        assert isinstance(json_data, str)
 
         # Deserialize back
         deserialized = deserialize_model(json_data, Character)
-        self.assertEqual(deserialized.character_id, original.character_id)
-        self.assertEqual(deserialized.name, original.name)
+        assert deserialized.character_id == original.character_id
+        assert deserialized.name == original.name
 
 
 class TestValidation(unittest.TestCase):
@@ -486,7 +490,7 @@ class TestValidation(unittest.TestCase):
     def test_validate_model_failure(self):
         """Test model validation failure."""
         # Create an invalid profile (this will fail in __post_init__)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             PlayerProfile(
                 player_id="",  # Invalid empty ID
                 username="testuser",

@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Gameplay_loop/Models/Validation]]
+
+# Logseq: [[TTA/Components/Gameplay_loop/Models/Validation]]
 Validation Models for Gameplay Loop
 
 This module defines models for validation, safety checks, and therapeutic validation
@@ -7,8 +10,8 @@ within the therapeutic text adventure system.
 
 from __future__ import annotations
 
-from datetime import datetime
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -17,7 +20,7 @@ from pydantic import BaseModel, Field
 from .core import DifficultyLevel, EmotionalState
 
 
-class ValidationStatus(str, Enum):
+class ValidationStatus(StrEnum):
     """Status of validation checks."""
 
     PASSED = "passed"
@@ -27,7 +30,7 @@ class ValidationStatus(str, Enum):
     SKIPPED = "skipped"
 
 
-class SafetyLevel(str, Enum):
+class SafetyLevel(StrEnum):
     """Safety levels for content and interactions."""
 
     SAFE = "safe"
@@ -37,7 +40,7 @@ class SafetyLevel(str, Enum):
     CRISIS = "crisis"
 
 
-class ValidationType(str, Enum):
+class ValidationType(StrEnum):
     """Types of validation checks."""
 
     CONTENT_SAFETY = "content_safety"
@@ -52,49 +55,60 @@ class ValidationResult(BaseModel):
     """Result of a validation check."""
 
     validation_id: str = Field(default_factory=lambda: str(uuid4()))
-    session_id: str = Field(..., description="Session identifier")
+    session_id: str = Field(default="", description="Session identifier")
 
     # Validation details
-    validation_type: ValidationType = Field(..., description="Type of validation")
-    status: ValidationStatus = Field(..., description="Validation status")
+    validation_type: ValidationType = Field(
+        default=ValidationType.CHOICE_VALIDITY, description="Type of validation"
+    )
+    status: ValidationStatus = Field(
+        default=ValidationStatus.PENDING, description="Validation status"
+    )
 
     # Content being validated
-    content_type: str = Field(..., description="Type of content validated")
-    content_id: str | None = Field(None, description="ID of content validated")
+    content_type: str = Field(default="", description="Type of content validated")
+    content_id: str | None = Field(default=None, description="ID of content validated")
 
     # Results
-    is_valid: bool = Field(..., description="Whether validation passed")
+    is_valid: bool = Field(default=True, description="Whether validation passed")
     confidence_score: float = Field(
         default=1.0, ge=0.0, le=1.0, description="Confidence in validation"
     )
 
     # Issues and recommendations
     issues_found: list[str] = Field(default_factory=list)
+    issues: list[str] = Field(
+        default_factory=list, description="Alias for issues_found"
+    )
     warnings: list[str] = Field(default_factory=list)
     recommendations: list[str] = Field(default_factory=list)
+    validation_details: dict[str, Any] = Field(default_factory=dict)
 
     # Context
     user_context: dict[str, Any] = Field(default_factory=dict)
     therapeutic_context: dict[str, Any] = Field(default_factory=dict)
 
     # Metadata
-    validated_at: datetime = Field(default_factory=datetime.utcnow)
+    validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     validator_version: str = Field(default="1.0.0")
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class SafetyCheck(BaseModel):
     """Safety check for user emotional state and content appropriateness."""
 
     check_id: str = Field(default_factory=lambda: str(uuid4()))
-    session_id: str = Field(..., description="Session identifier")
-    user_id: str = Field(..., description="User identifier")
+    session_id: str = Field(default="", description="Session identifier")
+    user_id: str = Field(default="", description="User identifier")
 
-    # Safety assessment
-    safety_level: SafetyLevel = Field(..., description="Assessed safety level")
-    emotional_state: EmotionalState = Field(..., description="User's emotional state")
+    # Safety assessment (safety_level can be a string or SafetyLevel enum)
+    safety_level: str = Field(default="safe", description="Assessed safety level")
+    emotional_state: EmotionalState = Field(
+        default=EmotionalState.CALM, description="User's emotional state"
+    )
+
+    # Simplified safety flags used by validator
+    is_safe: bool = Field(default=True, description="Whether content/choice is safe")
+    issues: list[str] = Field(default_factory=list, description="Safety issues found")
 
     # Risk factors
     risk_factors: list[str] = Field(default_factory=list)
@@ -115,27 +129,33 @@ class SafetyCheck(BaseModel):
 
     # Context
     triggering_content: str | None = Field(
-        None, description="Content that triggered this check"
+        default=None, description="Content that triggered this check"
     )
     user_history: dict[str, Any] = Field(default_factory=dict)
 
     # Metadata
-    checked_at: datetime = Field(default_factory=datetime.utcnow)
-    expires_at: datetime | None = Field(None, description="When this check expires")
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
+    checked_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    expires_at: datetime | None = Field(
+        default=None, description="When this check expires"
+    )
 
 
 class TherapeuticValidation(BaseModel):
     """Validation of therapeutic appropriateness and effectiveness."""
 
     validation_id: str = Field(default_factory=lambda: str(uuid4()))
-    session_id: str = Field(..., description="Session identifier")
+    session_id: str = Field(default="", description="Session identifier")
 
     # Content being validated
-    content_type: str = Field(..., description="Type of therapeutic content")
-    content_description: str = Field(..., description="Description of content")
+    content_type: str = Field(default="", description="Type of therapeutic content")
+    content_description: str = Field(default="", description="Description of content")
+
+    # Simplified validation flags used by validator
+    is_therapeutically_appropriate: bool = Field(default=True)
+    therapeutic_alignment_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    issues: list[str] = Field(default_factory=list)
+    therapeutic_benefits: list[str] = Field(default_factory=list)
+    validator_credentials: str | None = Field(default=None)
 
     # Therapeutic assessment
     therapeutic_appropriateness: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -172,11 +192,7 @@ class TherapeuticValidation(BaseModel):
     session_context: dict[str, Any] = Field(default_factory=dict)
 
     # Metadata
-    validated_at: datetime = Field(default_factory=datetime.utcnow)
-    validator_credentials: str | None = Field(None)
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
+    validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ContentValidation(BaseModel):
@@ -215,8 +231,5 @@ class ContentValidation(BaseModel):
     modification_suggestions: list[str] = Field(default_factory=list)
 
     # Metadata
-    validated_at: datetime = Field(default_factory=datetime.utcnow)
+    validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     validation_version: str = Field(default="1.0.0")
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}

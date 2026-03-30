@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Realtime/Agent_event_integration]]
 Real-time event integration for enhanced agent proxies.
 
 This module provides integration between the enhanced agent proxies and the

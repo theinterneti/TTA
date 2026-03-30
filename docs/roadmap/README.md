@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/References/TTA Roadmap Documentation]]
 > - **Path:** `.augment/kb/References/TTA Roadmap Documentation.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/References/TTA Roadmap Documentation.md`
 
 **Migration date:** 2025-11-01
+
+
+---

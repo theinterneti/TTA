@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Cli]]
 CLI interface for OpenHands integration.
 
 Provides:
@@ -218,7 +220,7 @@ def run_engine(workers: int, duration: int) -> None:
 def select_model(task_type: str, complexity: str, quality_threshold: float) -> None:
     """Select optimal model for task."""
     try:
-        from .model_selector import ModelSelector, TaskCategory
+        from .model_selector import ModelSelector, TaskCategory  # noqa: PLC0415
 
         selector = ModelSelector()
 

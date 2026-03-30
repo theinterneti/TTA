@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Capabilities/Auto_discovery]]
 Auto-discovery mechanisms for agent capability registration during startup.
 
 This module provides intelligent auto-discovery that automatically registers
@@ -15,7 +17,7 @@ import socket
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ..models import (
@@ -29,7 +31,7 @@ from ..registries.redis_agent_registry import RedisAgentRegistry
 logger = logging.getLogger(__name__)
 
 
-class DiscoveryStrategy(str, Enum):
+class DiscoveryStrategy(StrEnum):
     """Auto-discovery strategies."""
 
     IMMEDIATE = "immediate"  # Register immediately on startup
@@ -38,7 +40,7 @@ class DiscoveryStrategy(str, Enum):
     MANUAL = "manual"  # Manual registration only
 
 
-class DiscoveryStatus(str, Enum):
+class DiscoveryStatus(StrEnum):
     """Discovery status for components."""
 
     PENDING = "pending"

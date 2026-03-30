@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_orchestrator_config]]
 Tests for TTAConfig configuration management.
 
 This module tests the TTAConfig class to achieve comprehensive coverage
@@ -12,31 +14,16 @@ import yaml
 
 from src.orchestration.config import TTAConfig
 
+# Capture the real closure dict at module load time (before any test replaces _instances)
+_REAL_CONFIG_INSTANCES = TTAConfig._instances
+
 
 @pytest.fixture(autouse=True)
 def reset_singleton():
-    """Reset TTAConfig singleton before each test."""
-    # Patch the singleton decorator to return the class directly
-    # This allows each test to create a fresh instance
-    from src.orchestration import decorators
-
-    original_singleton = decorators.singleton
-
-    # Replace singleton with a pass-through decorator
-    decorators.singleton = lambda cls: cls
-
-    # Reload TTAConfig to apply the patched decorator
-    import importlib
-
-    from src.orchestration import config
-
-    importlib.reload(config)
-
+    """Reset TTAConfig singleton before and after each test."""
+    _REAL_CONFIG_INSTANCES.clear()
     yield
-
-    # Restore original singleton decorator
-    decorators.singleton = original_singleton
-    importlib.reload(config)
+    _REAL_CONFIG_INSTANCES.clear()
 
 
 class TestTTAConfigLoading:

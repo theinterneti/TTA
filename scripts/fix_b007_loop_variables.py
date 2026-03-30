@@ -1,3 +1,4 @@
+# Logseq: [[TTA.dev/Scripts/Fix_b007_loop_variables]]
 # ruff: noqa: ALL
 #!/usr/bin/env python3
 """

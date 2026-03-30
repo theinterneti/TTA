@@ -234,3 +234,7 @@ from observability_integration.primitives import (
 
 **Status:** ✅ Ready for Export
 **Last Updated:** 2025-10-28
+
+
+---
+**Logseq:** [[TTA.dev/.archive/Status-reports/2025-10/Observability_package_summary]]

@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Managers/Personalization_service_manager]]
 Therapeutic personalization and adaptation management.
 
 This module provides comprehensive therapeutic personalization services,
@@ -27,8 +29,13 @@ try:
     import os
     import sys
 
-    prototype_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "..", "tta.prototype", "core"
+    prototype_path = os.path.join(  # noqa: PTH118
+        os.path.dirname(__file__),  # noqa: PTH120
+        "..",
+        "..",
+        "..",
+        "tta.prototype",
+        "core",  # noqa: PTH120
     )
     if prototype_path not in sys.path:
         sys.path.append(prototype_path)

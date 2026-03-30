@@ -8,8 +8,11 @@ to prevent import errors in existing tests.
 TODO: Extract full implementation from therapeutic_safety.py.backup lines 2771-3347
 """
 
+# Logseq: [[TTA.dev/Agent_orchestration/Safety_monitoring/Dashboard]]
+
 from __future__ import annotations
 
+import time
 from typing import Any
 
 
@@ -46,15 +49,13 @@ class SafetyMonitoringDashboard:
 
     def get_real_time_status(self) -> dict[str, Any]:
         """Get real-time status (stub)."""
-        import time
-
         return {
             "timestamp": time.time(),
             "system_health": "healthy",
-            "components": [
-                {"name": "therapeutic_validator", "status": "active"},
-                {"name": "crisis_manager", "status": "active"},
-                {"name": "escalation_system", "status": "active"},
-                {"name": "protocol_engine", "status": "active"},
-            ],
+            "components": {
+                "therapeutic_validator": {"status": "active"},
+                "crisis_manager": {"status": "active"},
+                "escalation_system": {"status": "active"},
+                "protocol_engine": {"status": "active"},
+            },
         }

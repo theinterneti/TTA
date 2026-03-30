@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Realtime/Event_subscriber]]
 Redis-based event subscriber for real-time agent orchestration communication.
 
 This module provides event subscription and distribution capabilities using Redis pub/sub,

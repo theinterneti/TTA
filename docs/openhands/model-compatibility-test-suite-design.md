@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/OpenHands Model Compatibility Test Suite - Design Document]]
 > - **Path:** `.augment/kb/Architecture/OpenHands Model Compatibility Test Suite - Design Document.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/OpenHands Model Compatibility Test Suite - Design Document.md`
 
 **Migration date:** 2025-11-01
+
+
+---

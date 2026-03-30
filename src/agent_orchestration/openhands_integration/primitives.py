@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Agent_orchestration/Openhands_integration/Primitives]]
 Workflow primitives for OpenHands integration.
 
 Provides composable workflow primitives that wrap OpenHands-specific functionality
@@ -12,7 +14,7 @@ Primitives:
 
 Example:
     ```python
-    from tta_dev_primitives.core.base import WorkflowContext
+    from ttadev.primitives.core.base import WorkflowContext
     from .primitives import (
         ModelSelectionPrimitive,
         TaskExecutionPrimitive,
@@ -40,8 +42,18 @@ import logging
 import time
 from typing import Any
 
-from pydantic import BaseModel, Field
-from tta_dev_primitives.core.base import WorkflowContext, WorkflowPrimitive
+from pydantic import BaseModel, ConfigDict, Field
+
+try:
+    from ttadev.primitives.core.base import (  # type: ignore[import]
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+except ImportError:
+    from tta_dev_primitives.core.base import (  # type: ignore[no-redef]
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector
@@ -65,8 +77,7 @@ class OpenHandsTaskInput(BaseModel):
     requirements: TaskRequirements | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class OpenHandsTaskOutput(BaseModel):
@@ -81,12 +92,11 @@ class OpenHandsTaskOutput(BaseModel):
     success: bool = False
     error: str | None = None
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class ModelSelectionPrimitive(
-    WorkflowPrimitive[OpenHandsTaskInput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskInput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for selecting optimal model for task.
@@ -196,7 +206,7 @@ class ModelSelectionPrimitive(
 
 
 class TaskExecutionPrimitive(
-    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for executing task via OpenHands adapter.
@@ -305,7 +315,7 @@ class TaskExecutionPrimitive(
 
 
 class ResultValidationPrimitive(
-    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for validating task results.
@@ -417,7 +427,7 @@ class ResultValidationPrimitive(
 
 
 class MetricsRecordingPrimitive(
-    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]
+    WorkflowPrimitive[OpenHandsTaskOutput, OpenHandsTaskOutput]  # type: ignore[misc]
 ):
     """
     Primitive for recording execution metrics.

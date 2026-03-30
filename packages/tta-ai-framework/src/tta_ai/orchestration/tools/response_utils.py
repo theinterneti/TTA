@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Packages/Tta-ai-framework/Src/Tta_ai/Orchestration/Tools/Response_utils]]
 Response wrapper utilities for MCP tools (Phase 3 Tool Optimization).
 
 Provides convenience functions and decorators for creating standardized tool responses:

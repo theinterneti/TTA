@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Player_experience/Api/Routers/Chat]]
 WebSocket chat router for the Player Experience API.
 
 Implements authenticated WebSocket endpoint for therapeutic chat.
@@ -10,7 +12,7 @@ import contextlib
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
@@ -143,7 +145,7 @@ def _outgoing_message(
         "role": role,
         "session_id": session_id,
         "content": content,
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(UTC).isoformat() + "Z",
         "metadata": metadata or {},
     }
 
@@ -227,7 +229,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
             raw = await websocket.receive_text()
 
             # Sliding window rate limit per connection
-            now_ts = datetime.utcnow().timestamp()
+            now_ts = datetime.now(UTC).timestamp()
             while window and (now_ts - window[0]) > window_seconds:
                 window.popleft()
             window.append(now_ts)
@@ -336,7 +338,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         )
 
                         # Get agent event integrator
-                        agent_integrator = get_agent_event_integrator(
+                        agent_integrator = get_agent_event_integrator(  # type: ignore[possibly-unbound]
                             agent_id=f"chat_agent_{player_id}"
                         )
 
@@ -359,7 +361,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                             user_input=text,
                             session_id=session_id or "default",
                             world_id=metadata.get("world_id"),
-                            workflow_id=f"chat_{player_id}_{int(datetime.utcnow().timestamp() * 1000)}",
+                            workflow_id=f"chat_{player_id}_{int(datetime.now(UTC).timestamp() * 1000)}",
                         )
 
                         # Progressive feedback: Generating response
@@ -383,7 +385,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         # Therapeutic Safety Validation: Validate AI-generated response
                         if therapeutic_safety_available:
                             try:
-                                safety_service = get_global_safety_service()
+                                safety_service = get_global_safety_service()  # type: ignore[possibly-unbound]
                                 safety_validation_result = (
                                     await safety_service.validate_text(ai_response_text)
                                 )
@@ -391,7 +393,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                 # If response is blocked, use alternative content
                                 if (
                                     safety_validation_result.level
-                                    == SafetyLevel.BLOCKED
+                                    == SafetyLevel.BLOCKED  # type: ignore[possibly-unbound]
                                 ):
                                     logger.warning(
                                         f"AI response blocked by safety validation for session {session_id}"
@@ -399,14 +401,15 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                     ai_response_text = (
                                         safety_validation_result.alternative_content
                                         or safety_service.suggest_alternative(
-                                            SafetyLevel.BLOCKED, ai_response_text
+                                            SafetyLevel.BLOCKED,  # type: ignore[possibly-unbound]
+                                            ai_response_text,
                                         )
                                     )
                                     metadata["safety_override"] = True
 
                                 # If crisis detected in AI response, initiate intervention
                                 if safety_validation_result.crisis_detected:
-                                    crisis_manager = CrisisInterventionManager()
+                                    crisis_manager = CrisisInterventionManager()  # type: ignore[possibly-unbound]
                                     crisis_assessment = crisis_manager.assess_crisis(
                                         safety_validation_result,
                                         {
@@ -644,7 +647,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         marker_id=f"pm_{uuid.uuid4().hex[:10]}",
                         marker_type=ProgressMarkerType.SKILL_ACQUIRED,
                         description=f"Completed guided exercise: {base}",
-                        achieved_at=datetime.utcnow(),
+                        achieved_at=datetime.now(UTC),
                         therapeutic_value=0.2,
                     )
                     await sim.add_progress_marker(player_id, marker)

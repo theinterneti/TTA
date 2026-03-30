@@ -6,7 +6,9 @@
 > - **New location:** [[TTA/Architecture/Agent Orchestration]]
 > - **Path:** `.augment/kb/Architecture/Agent Orchestration.md`
 >
-> If using Logseq with TTA-notes, you can access it directly in the graph.
 > Otherwise, see: `.augment/kb/Architecture/Agent Orchestration.md`
 
 **Migration date:** 2025-11-01
+
+
+---

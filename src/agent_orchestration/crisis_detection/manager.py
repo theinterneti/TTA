@@ -1,7 +1,10 @@
 """Crisis intervention management and coordination."""
 
+# Logseq: [[TTA.dev/Agent_orchestration/Crisis_detection/Manager]]
+
 from __future__ import annotations
 
+import contextlib
 import logging
 import time
 import uuid
@@ -78,11 +81,8 @@ class CrisisInterventionManager:
         # Convert crisis_types from strings to CrisisType enums
         crisis_types_enums = []
         for ct_str in validation_result.crisis_types:
-            try:
+            with contextlib.suppress(ValueError):
                 crisis_types_enums.append(CrisisType(ct_str))
-            except ValueError:
-                # Skip invalid crisis types
-                pass
 
         return CrisisAssessment(
             crisis_level=crisis_level,

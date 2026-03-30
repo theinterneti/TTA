@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Integration/Test_session_engine_integration]]
 Integration tests for session engine.
 
 Tests the complete session lifecycle:
@@ -13,6 +15,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import app
+
+# Session management is partially implemented. Keep xfail only on the specific
+# behaviors that are still pending from Phase 2 instead of the whole module.
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture

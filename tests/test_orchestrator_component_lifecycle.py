@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Tests/Test_orchestrator_component_lifecycle]]
 Tests for TTAOrchestrator component lifecycle methods.
 
 This module tests component start/stop, status retrieval, and lifecycle management

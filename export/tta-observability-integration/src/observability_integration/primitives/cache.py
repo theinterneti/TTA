@@ -1,4 +1,6 @@
 """
+
+# Logseq: [[TTA.dev/Export/Tta-observability-integration/Src/Observability_integration/Primitives/Cache]]
 CachePrimitive - Redis-based caching workflow primitive.
 
 Implements caching layer for expensive LLM calls with TTL-based expiration,

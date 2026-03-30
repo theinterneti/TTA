@@ -1,4 +1,7 @@
 """
+Logseq: [[TTA.dev/Components/Therapeutic_systems_enhanced/Consequence_system]]
+
+# Logseq: [[TTA/Components/Therapeutic_systems_enhanced/Consequence_system]]
 Therapeutic ConsequenceSystem Implementation
 
 This module provides the production ConsequenceSystem that provides the interface
@@ -7,7 +10,7 @@ evidence-based therapeutic consequence generation.
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -116,7 +119,7 @@ class TherapeuticConsequenceSystem:
             - character_impact: Dict mapping attributes to impact values
         """
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
 
             # Handle empty/invalid input early
             if not choice or not user_id:
@@ -179,7 +182,7 @@ class TherapeuticConsequenceSystem:
                             scenario_context,
                         )
 
-            processing_time = datetime.utcnow() - start_time
+            processing_time = datetime.now(UTC) - start_time
             logger.debug(
                 f"Processed choice consequence for user {user_id} in {processing_time.total_seconds():.3f}s"
             )
@@ -458,7 +461,7 @@ class TherapeuticConsequenceSystem:
             impact["resilience"] = 0.05  # Small resilience boost for making any choice
 
         # Cap all impacts at reasonable levels
-        for attr in impact:
+        for attr in impact:  # noqa: PLC0206
             impact[attr] = min(impact[attr], 0.2)  # Cap at 0.2 per choice
 
         return impact
