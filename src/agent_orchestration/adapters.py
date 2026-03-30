@@ -481,11 +481,32 @@ class NGAAdapter:
 
             world_context = _minimal_world_context(location_id or "unknown")
 
+        # Assemble world context meta from builder when available for observability
+        world_context_meta: dict[str, Any] = {}
+        if self._builder and session_id and location_id:
+            try:
+                assembled = await self._builder.build(
+                    session_id=session_id,
+                    location_id=location_id,
+                    player_id=player_id or "",
+                    player_character=player_character,
+                )
+                world_context_meta = {
+                    "total_tokens": assembled.total_tokens,
+                    "neo4j_available": assembled.neo4j_available,
+                    "truncated_tiers": assembled.truncated_tiers,
+                }
+            except Exception:
+                logger.warning(
+                    "NGA: world context builder failed; continuing without meta"
+                )
+
         input_data: dict[str, Any] = {
             "prompt": prompt,
             "context": context,
             "processed_input": processed_input,
             "world_context": world_context,
+            "world_context_meta": world_context_meta,
         }
 
         strategy = RetryStrategy(
