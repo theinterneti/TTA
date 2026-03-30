@@ -10,7 +10,11 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from tta_dev_primitives import WorkflowContext
+
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 
 from src.agent_orchestration.adapters import (
     RetryConfig,
@@ -23,6 +27,7 @@ from src.agent_orchestration.adapters import (
 # ---------------------------------------------------------------------------
 # _transform_wba_result
 # ---------------------------------------------------------------------------
+
 
 class TestTransformWBAResult:
     def test_populates_all_fields(self) -> None:
@@ -52,13 +57,12 @@ class TestTransformWBAResult:
 # _WBACall primitive
 # ---------------------------------------------------------------------------
 
+
 class TestWBACall:
     @pytest.mark.asyncio
     async def test_execute_calls_wba_process(self) -> None:
         wba_instance = MagicMock()
-        wba_instance.process = MagicMock(
-            return_value={"world_state": {"id": "w1"}}
-        )
+        wba_instance.process = MagicMock(return_value={"world_state": {"id": "w1"}})
         ctx = WorkflowContext(workflow_id="ses-1")
         input_data: dict[str, Any] = {
             "wba_instance": wba_instance,
@@ -92,13 +96,12 @@ class TestWBACall:
 # _WBAFallback primitive
 # ---------------------------------------------------------------------------
 
+
 class TestWBAFallback:
     @pytest.mark.asyncio
     async def test_returns_mock_structure_no_updates(self) -> None:
         ctx = WorkflowContext(workflow_id="s")
-        result = await _WBAFallback().execute(
-            {"world_id": "w42", "updates": None}, ctx
-        )
+        result = await _WBAFallback().execute({"world_id": "w42", "updates": None}, ctx)
         assert result["source"] == "mock_fallback"
         assert result["world_id"] == "w42"
         assert result["updated"] is False
@@ -121,14 +124,13 @@ class TestWBAFallback:
 # WBAAdapter.process_world_request — primitive path
 # ---------------------------------------------------------------------------
 
+
 class TestWBAAdapterPrimitivePath:
     def _make_adapter_available(self) -> Any:
         from src.agent_orchestration.adapters import WBAAdapter
 
         mock_wba = MagicMock()
-        mock_wba.process = MagicMock(
-            return_value={"world_state": {"id": "w1"}}
-        )
+        mock_wba.process = MagicMock(return_value={"world_state": {"id": "w1"}})
         adapter = WBAAdapter(fallback_to_mock=True)
         adapter._available = True  # type: ignore[attr-defined]
         adapter._wba_instance = mock_wba  # type: ignore[attr-defined]
@@ -209,6 +211,7 @@ class TestWBAAdapterPrimitivePath:
 # WBAAdapter — unavailable path (unchanged behaviour)
 # ---------------------------------------------------------------------------
 
+
 class TestWBAAdapterUnavailablePath:
     @pytest.mark.asyncio
     async def test_unavailable_with_fallback_returns_mock(self) -> None:
@@ -231,8 +234,6 @@ class TestWBAAdapterUnavailablePath:
         from src.agent_orchestration.adapters import WBAAdapter
 
         adapter = WBAAdapter(fallback_to_mock=True)
-        result = await adapter.process_world_request(
-            "w1", updates={"danger": 5}
-        )
+        result = await adapter.process_world_request("w1", updates={"danger": 5})
         assert result["world_state"]["danger"] == 5
         assert result["updated"] is True

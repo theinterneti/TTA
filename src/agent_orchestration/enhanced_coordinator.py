@@ -259,9 +259,9 @@ class EnhancedRedisMessageCoordinator(RedisMessageCoordinator):
             "real_agents_enabled": True,
             "fallback_enabled": self.fallback_to_mock,
             "adapters_available": {
-                "ipa": self.ipa_adapter._available if self.ipa_adapter else False,
-                "wba": self.wba_adapter._available if self.wba_adapter else False,
-                "nga": self.nga_adapter._available if self.nga_adapter else False,
+                "ipa": bool(self.ipa_adapter),
+                "wba": bool(self.wba_adapter),
+                "nga": bool(self.nga_adapter),
             },
         }
 

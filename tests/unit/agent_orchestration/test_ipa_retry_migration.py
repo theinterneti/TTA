@@ -11,7 +11,11 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from tta_dev_primitives import WorkflowContext
+
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 
 from src.agent_orchestration.adapters import (
     RetryConfig,
@@ -24,6 +28,7 @@ from src.agent_orchestration.adapters import (
 # ---------------------------------------------------------------------------
 # _transform_ipa_result
 # ---------------------------------------------------------------------------
+
 
 class TestTransformIPAResult:
     def test_pydantic_model_dump(self) -> None:
@@ -67,6 +72,7 @@ class TestTransformIPAResult:
 # _IPACall primitive
 # ---------------------------------------------------------------------------
 
+
 class TestIPACall:
     @pytest.mark.asyncio
     async def test_execute_calls_real_fn(self) -> None:
@@ -79,9 +85,7 @@ class TestIPACall:
         ctx = WorkflowContext(workflow_id="session-001")
 
         primitive = _IPACall()
-        result = await primitive.execute(
-            {"text": "go south", "real_fn": real_fn}, ctx
-        )
+        result = await primitive.execute({"text": "go south", "real_fn": real_fn}, ctx)
 
         real_fn.assert_called_once_with("go south")
         assert result["source"] == "real_ipa"
@@ -120,6 +124,7 @@ class TestIPACall:
 # _IPAFallback primitive
 # ---------------------------------------------------------------------------
 
+
 class TestIPAFallback:
     @pytest.mark.asyncio
     async def test_returns_mock_structure(self) -> None:
@@ -141,6 +146,7 @@ class TestIPAFallback:
 # ---------------------------------------------------------------------------
 # IPAAdapter.process_input integration (primitive path)
 # ---------------------------------------------------------------------------
+
 
 class TestIPAAdapterPrimitivePath:
     """IPAAdapter when real IPA is available uses FallbackPrimitive(RetryPrimitive(...))."""
@@ -239,6 +245,7 @@ class TestIPAAdapterPrimitivePath:
 # ---------------------------------------------------------------------------
 # IPAAdapter.process_input — unavailable path (unchanged behaviour)
 # ---------------------------------------------------------------------------
+
 
 class TestIPAAdapterUnavailablePath:
     @pytest.mark.asyncio

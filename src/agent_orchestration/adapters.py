@@ -3,52 +3,45 @@
 # Logseq: [[TTA.dev/Agent_orchestration/Adapters]]
 Agent communication adapters for bridging orchestration proxies with real agent implementations.
 
-This module provides adapter classes that enable communication between the agent orchestration
-system and the actual agent implementations in tta.prod/src/agents/.
+This module provides adapter classes that delegate to the native IPA/WBA/NGA agents
+in ``src.components.ipa``, ``src.components.wba``, and ``src.components.nga``.
 """
 
 from __future__ import annotations
 
-import asyncio
 import logging
-import sys
-from pathlib import Path
 from typing import Any
 
-from tta_dev_primitives import (
-    FallbackPrimitive,
-    RetryPrimitive,
-    RetryStrategy,
-    WorkflowContext,
-    WorkflowPrimitive,
-)
-from tta_dev_primitives.observability import ObservablePrimitive
+try:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+    from ttadev.primitives.observability import ObservablePrimitive
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+    from tta_dev_primitives.observability import (
+        ObservablePrimitive,  # type: ignore[no-redef]
+    )
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,
 )
 
-# Add tta.prod to Python path for importing real agents
-tta_prod_path = Path(__file__).parent.parent.parent / "tta.prod" / "src"
-if str(tta_prod_path) not in sys.path:
-    sys.path.insert(0, str(tta_prod_path))
-
-try:
-    from agents.base import BaseAgent  # type: ignore[import]
-    from agents.dynamic_agents import WorldBuildingAgent  # type: ignore[import]
-    from agents.ipa import IntentSchema, process_input  # type: ignore[import]
-    from agents.narrative_generator import (  # type: ignore[import-not-found]
-        generate_narrative_response,
-    )
-except ImportError as e:
-    logging.warning(
-        f"Could not import real agents: {e}. Using fallback implementations."
-    )
-    process_input = None
-    IntentSchema = None
-    generate_narrative_response = None
-    WorldBuildingAgent = None
-    BaseAgent = None
+from src.components.ipa.agent import IPAAgent as _NativeIPA
+from src.components.ipa.models import ProcessedInput
+from src.components.nga.agent import NGAAgent as _NativeNGA
+from src.components.wba.agent import WBAAgent as _NativeWBA
+from src.components.world_context.models import WorldContext
 
 logger = logging.getLogger(__name__)
 
@@ -84,41 +77,45 @@ class RetryConfig:
         self.jitter = jitter
 
 
-def _transform_ipa_result(text: str, intent_result: Any) -> dict[str, Any]:
-    """Convert raw IPA intent result to orchestration format."""
-    if hasattr(intent_result, "model_dump"):
-        intent_dict: dict[str, Any] = intent_result.model_dump()
-    else:
-        intent_dict = {"intent": str(intent_result), "confidence": 0.8}
+def _transform_ipa_result(text: str, result: ProcessedInput) -> dict[str, Any]:
+    """Convert a ProcessedInput to the legacy orchestration dict format."""
     return {
-        "normalized_text": text,
+        "normalized_text": result.normalized_text,
         "routing": {
-            "intent": intent_dict.get("intent", "unknown"),
-            "confidence": intent_dict.get("confidence", 0.8),
-            "entities": intent_dict.get("entities", {}),
-            "direction": intent_dict.get("direction"),
-            "object": intent_dict.get("object"),
-            "npc": intent_dict.get("npc"),
+            "intent": result.intent.value,
+            "confidence": result.intent_confidence,
+            "entities": {e.name: e.entity_type for e in result.entities},
+            "npc": result.npc_names[0] if result.npc_names else None,
         },
-        "raw_intent": intent_dict,
-        "source": "real_ipa",
+        "raw_intent": result.model_dump(),
+        "source": "native_ipa",
+        "processed_input": result,
     }
 
 
-class _IPACall(WorkflowPrimitive):
-    """WorkflowPrimitive that executes the real IPA process_input function."""
+class _IPACall(WorkflowPrimitive):  # type: ignore[misc]
+    """WorkflowPrimitive that executes the native IPAAgent."""
+
+    def __init__(self, agent: _NativeIPA) -> None:
+        self._agent = agent
 
     async def execute(
         self, input_data: dict[str, Any], context: WorkflowContext
     ) -> dict[str, Any]:
         text: str = input_data["text"]
-        real_fn = input_data["real_fn"]
-        loop = asyncio.get_running_loop()
-        intent_result = await loop.run_in_executor(None, real_fn, text)
-        return _transform_ipa_result(text, intent_result)
+        session_id: str = input_data.get("session_id", "")
+        player_id: str = input_data.get("player_id", "")
+        location_id: str | None = input_data.get("location_id")
+        result: ProcessedInput = await self._agent.process(
+            raw_text=text,
+            session_id=session_id,
+            player_id=player_id,
+            location_id=location_id,
+        )
+        return _transform_ipa_result(text, result)
 
 
-class _IPAFallback(WorkflowPrimitive):
+class _IPAFallback(WorkflowPrimitive):  # type: ignore[misc]
     """WorkflowPrimitive that returns the mock IPA response."""
 
     async def execute(
@@ -134,7 +131,7 @@ class _IPAFallback(WorkflowPrimitive):
 
 
 class IPAAdapter:
-    """Adapter for communicating with the real Input Processor Agent."""
+    """Adapter for communicating with the Input Processing Agent."""
 
     def __init__(
         self,
@@ -142,12 +139,13 @@ class IPAAdapter:
         retry_config: RetryConfig | None = None,
         world_context_builder: Any | None = None,
         cb_config: CircuitBreakerConfig | None = None,
+        ipa_agent: _NativeIPA | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
-        self._available = process_input is not None and IntentSchema is not None
         self._builder = world_context_builder
         self._cb_config = cb_config or CircuitBreakerConfig()
+        self._agent = ipa_agent or _NativeIPA()
 
     async def process_input(
         self,
@@ -157,7 +155,7 @@ class IPAAdapter:
         player_id: str | None = None,
         player_character: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Process player input using the real IPA implementation.
+        """Process player input using the native IPA implementation.
 
         Args:
             text:             Player input text to process.
@@ -170,34 +168,15 @@ class IPAAdapter:
             Dict containing processed intent and routing information.
 
         Raises:
-            AgentCommunicationError: If communication with IPA fails and
-                fallback_to_mock is False.
+            AgentCommunicationError: If the IPA fails and fallback_to_mock is False.
         """
         ctx = WorkflowContext(workflow_id=session_id or f"ipa-{id(self)}")
-        input_data: dict[str, Any] = {"text": text, "real_fn": process_input}
-
-        # Enrich with world context when builder is available
-        if self._builder is not None and session_id and location_id:
-            try:
-                assembled = await self._builder.build(
-                    session_id=session_id,
-                    location_id=location_id,
-                    player_id=player_id or "",
-                    player_character=player_character,
-                )
-                input_data["world_context"] = assembled.text
-                input_data["world_context_meta"] = {
-                    "total_tokens": assembled.total_tokens,
-                    "neo4j_available": assembled.neo4j_available,
-                    "truncated_tiers": assembled.truncated_tiers,
-                }
-                logger.debug(
-                    "IPA world context assembled: session=%s tokens=%d",
-                    session_id,
-                    assembled.total_tokens,
-                )
-            except Exception as exc:
-                logger.warning("IPA: world context build failed: %s", exc)
+        input_data: dict[str, Any] = {
+            "text": text,
+            "session_id": session_id or "",
+            "player_id": player_id or "",
+            "location_id": location_id,
+        }
 
         strategy = RetryStrategy(
             max_retries=self.retry_config.max_retries,
@@ -206,23 +185,15 @@ class IPAAdapter:
             jitter=self.retry_config.jitter,
         )
 
-        if not self._available:
-            if self.fallback_to_mock:
-                logger.warning(
-                    "Real IPA not available, using fallback mock implementation"
-                )
-                return self._mock_process_input(text)
-            raise AgentCommunicationError("Real IPA implementation not available")
-
-        call: WorkflowPrimitive = _IPACall()
-        retry_call = RetryPrimitive(call, strategy=strategy)
+        call: WorkflowPrimitive = _IPACall(self._agent)
+        retry_call = RetryPrimitive(call, strategy=strategy)  # type: ignore[arg-type]
         circuit_call = CircuitBreakerPrimitive(retry_call, config=self._cb_config)  # type: ignore[arg-type]
         primitive: WorkflowPrimitive
         if self.fallback_to_mock:
             primitive = FallbackPrimitive(circuit_call, _IPAFallback())  # type: ignore[arg-type]
         else:
             primitive = circuit_call  # type: ignore[assignment]
-        primitive = ObservablePrimitive(primitive, "ipa_processing")
+        primitive = ObservablePrimitive(primitive, "ipa_processing")  # type: ignore[assignment, arg-type]
 
         try:
             return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
@@ -240,40 +211,41 @@ class IPAAdapter:
 
 
 def _transform_wba_result(
-    world_id: str, updates: dict[str, Any] | None, raw: dict[str, Any]
+    world_id: str, updates: dict[str, Any] | None, world_context: WorldContext
 ) -> dict[str, Any]:
-    """Convert raw WBA result to orchestration format."""
+    """Convert a WorldContext to the legacy orchestration dict format."""
     return {
         "world_id": world_id,
-        "world_state": raw.get("world_state", {}),
+        "world_state": {
+            "id": world_id,
+            "location": world_context.location.model_dump(),
+            "npcs": [n.model_dump() for n in world_context.npcs],
+            "active_events": [e.model_dump() for e in world_context.active_events],
+        },
         "updated": updates is not None,
         "cached": False,
-        "source": "real_wba",
-        "raw_result": raw,
+        "source": "native_wba",
+        "world_context": world_context,
     }
 
 
-class _WBACall(WorkflowPrimitive):
-    """WorkflowPrimitive that executes the real WBA process function."""
+class _WBACall(WorkflowPrimitive):  # type: ignore[misc]
+    """WorkflowPrimitive that executes the native WBAAgent."""
+
+    def __init__(self, agent: _NativeWBA) -> None:
+        self._agent = agent
 
     async def execute(
         self, input_data: dict[str, Any], context: WorkflowContext
     ) -> dict[str, Any]:
-        wba_instance = input_data["wba_instance"]
-        wba_input: dict[str, Any] = input_data["wba_input"]
         world_id: str = input_data["world_id"]
         updates: dict[str, Any] | None = input_data["updates"]
-
-        loop = asyncio.get_running_loop()
-        raw: dict[str, Any] = await loop.run_in_executor(
-            None,
-            wba_instance.process,
-            wba_input,  # type: ignore[misc]
-        )
-        return _transform_wba_result(world_id, updates, raw)
+        processed_input: ProcessedInput = input_data["processed_input"]
+        world_context: WorldContext = await self._agent.build(processed_input)
+        return _transform_wba_result(world_id, updates, world_context)
 
 
-class _WBAFallback(WorkflowPrimitive):
+class _WBAFallback(WorkflowPrimitive):  # type: ignore[misc]
     """WorkflowPrimitive that returns the mock WBA response."""
 
     async def execute(
@@ -294,32 +266,25 @@ class _WBAFallback(WorkflowPrimitive):
 
 
 class WBAAdapter:
-    """Adapter for communicating with the real World Builder Agent."""
+    """Adapter for the World Building Agent."""
 
     def __init__(
         self,
-        neo4j_manager=None,
+        neo4j_manager: Any = None,
         tools: dict[str, Any] | None = None,
         fallback_to_mock: bool = True,
         retry_config: RetryConfig | None = None,
         world_context_builder: Any | None = None,
         cb_config: CircuitBreakerConfig | None = None,
+        wba_agent: _NativeWBA | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
         self.neo4j_manager = neo4j_manager
         self.tools = tools or {}
-        self._available = WorldBuildingAgent is not None
-        self._wba_instance = None
         self._builder = world_context_builder
         self._cb_config = cb_config or CircuitBreakerConfig()
-
-        if self._available and neo4j_manager:
-            try:
-                self._wba_instance = WorldBuildingAgent(neo4j_manager, self.tools)  # type: ignore[misc]
-            except Exception as e:
-                logger.warning(f"Failed to initialize WBA instance: {e}")
-                self._available = False
+        self._agent = wba_agent or _NativeWBA(builder=world_context_builder)
 
     async def process_world_request(
         self,
@@ -330,57 +295,38 @@ class WBAAdapter:
         player_id: str | None = None,
         player_character: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Process world building request using the real WBA implementation.
+        """Process world building request using the native WBA implementation.
 
         Args:
             world_id:         ID of the world to process.
             updates:          Optional updates to apply to the world.
             session_id:       Optional session ID for WorkflowContext observability.
             location_id:      Optional current location (enables world context).
-            player_id:        Optional player ID (passed to builder).
+            player_id:        Optional player ID.
             player_character: Optional character dict (tier-6 context).
 
         Returns:
             Dict containing world state and processing results
 
         Raises:
-            AgentCommunicationError: If communication with WBA fails and
-                fallback_to_mock is False
+            AgentCommunicationError: If the WBA fails and fallback_to_mock is False.
         """
         ctx = WorkflowContext(workflow_id=session_id or f"wba-{id(self)}")
+
+        # Build a minimal ProcessedInput so WBAAgent.build() has the context it needs
+        processed_input = ProcessedInput(
+            raw_text="",
+            normalized_text="",
+            session_id=session_id or "",
+            player_id=player_id or "",
+            location_id=location_id,
+        )
+
         input_data: dict[str, Any] = {
-            "wba_instance": self._wba_instance,
-            "wba_input": {
-                "world_id": world_id,
-                "action": "update" if updates else "fetch",
-                "updates": updates or {},
-            },
             "world_id": world_id,
             "updates": updates,
+            "processed_input": processed_input,
         }
-
-        # Enrich with world context when builder is available
-        if self._builder is not None and session_id and location_id:
-            try:
-                assembled = await self._builder.build(
-                    session_id=session_id,
-                    location_id=location_id,
-                    player_id=player_id or "",
-                    player_character=player_character,
-                )
-                input_data["world_context"] = assembled.text
-                input_data["world_context_meta"] = {
-                    "total_tokens": assembled.total_tokens,
-                    "neo4j_available": assembled.neo4j_available,
-                    "truncated_tiers": assembled.truncated_tiers,
-                }
-                logger.debug(
-                    "WBA world context assembled: session=%s tokens=%d",
-                    session_id,
-                    assembled.total_tokens,
-                )
-            except Exception as exc:
-                logger.warning("WBA: world context build failed: %s", exc)
 
         strategy = RetryStrategy(
             max_retries=self.retry_config.max_retries,
@@ -389,23 +335,15 @@ class WBAAdapter:
             jitter=self.retry_config.jitter,
         )
 
-        if not self._available or not self._wba_instance:
-            if self.fallback_to_mock:
-                logger.warning(
-                    "Real WBA not available, using fallback mock implementation"
-                )
-                return self._mock_process_world(world_id, updates)
-            raise AgentCommunicationError("Real WBA implementation not available")
-
-        call: WorkflowPrimitive = _WBACall()
-        retry_call = RetryPrimitive(call, strategy=strategy)
+        call: WorkflowPrimitive = _WBACall(self._agent)
+        retry_call = RetryPrimitive(call, strategy=strategy)  # type: ignore[arg-type]
         circuit_call = CircuitBreakerPrimitive(retry_call, config=self._cb_config)  # type: ignore[arg-type]
         primitive: WorkflowPrimitive
         if self.fallback_to_mock:
             primitive = FallbackPrimitive(circuit_call, _WBAFallback())  # type: ignore[arg-type]
         else:
             primitive = circuit_call  # type: ignore[assignment]
-        primitive = ObservablePrimitive(primitive, "wba_processing")
+        primitive = ObservablePrimitive(primitive, "wba_processing")  # type: ignore[assignment, arg-type]
 
         try:
             return await primitive.execute(input_data, ctx)  # type: ignore[return-value]
@@ -430,38 +368,35 @@ class WBAAdapter:
 
 
 def _transform_nga_result(
-    prompt: str, context: dict[str, Any] | None, raw: dict[str, Any]
+    prompt: str, context: dict[str, Any] | None, narrative: str
 ) -> dict[str, Any]:
-    """Convert raw NGA result to orchestration format."""
-    story_text = raw.get(
-        "response",
-        raw.get("story", f"Generated story for: {prompt[:64]}..."),
-    )
+    """Convert a narrative string to the legacy orchestration dict format."""
     return {
-        "story": story_text,
-        "raw": story_text,
+        "story": narrative,
+        "raw": narrative,
         "context_used": bool(context),
-        "source": "real_nga",
-        "raw_result": raw,
+        "source": "native_nga",
     }
 
 
-class _NGACall(WorkflowPrimitive):
-    """WorkflowPrimitive that executes the real NGA generate_narrative_response function."""
+class _NGACall(WorkflowPrimitive):  # type: ignore[misc]
+    """WorkflowPrimitive that executes the native NGAAgent."""
+
+    def __init__(self, agent: _NativeNGA) -> None:
+        self._agent = agent
 
     async def execute(
         self, input_data: dict[str, Any], context: WorkflowContext
     ) -> dict[str, Any]:
-        nga_input: dict[str, Any] = input_data["nga_input"]
         prompt: str = input_data["prompt"]
         ctx_data: dict[str, Any] | None = input_data["context"]
-        real_fn = input_data["real_fn"]
-        loop = asyncio.get_running_loop()
-        raw: dict[str, Any] = await loop.run_in_executor(None, real_fn, nga_input)
-        return _transform_nga_result(prompt, ctx_data, raw)
+        processed_input: ProcessedInput = input_data["processed_input"]
+        world_context: WorldContext = input_data["world_context"]
+        narrative = await self._agent.generate(processed_input, world_context)
+        return _transform_nga_result(prompt, ctx_data, narrative)
 
 
-class _NGAFallback(WorkflowPrimitive):
+class _NGAFallback(WorkflowPrimitive):  # type: ignore[misc]
     """WorkflowPrimitive that returns the mock NGA response."""
 
     async def execute(
@@ -483,7 +418,7 @@ class _NGAFallback(WorkflowPrimitive):
 
 
 class NGAAdapter:
-    """Adapter for communicating with the real Narrative Generator Agent."""
+    """Adapter for the Narrative Generation Agent."""
 
     def __init__(
         self,
@@ -491,12 +426,13 @@ class NGAAdapter:
         retry_config: RetryConfig | None = None,
         world_context_builder: Any | None = None,
         cb_config: CircuitBreakerConfig | None = None,
+        nga_agent: _NativeNGA | None = None,
     ):
         self.fallback_to_mock = fallback_to_mock
         self.retry_config = retry_config or RetryConfig()
-        self._available = generate_narrative_response is not None
         self._builder = world_context_builder
         self._cb_config = cb_config or CircuitBreakerConfig()
+        self._agent = nga_agent or _NativeNGA()
 
     async def generate_narrative(
         self,
@@ -506,64 +442,50 @@ class NGAAdapter:
         location_id: str | None = None,
         player_id: str | None = None,
         player_character: dict[str, Any] | None = None,
+        processed_input: ProcessedInput | None = None,
+        world_context: WorldContext | None = None,
     ) -> dict[str, Any]:
-        """Generate narrative content using the real NGA implementation.
+        """Generate narrative content using the native NGA implementation.
 
         Args:
-            prompt:           Narrative generation prompt.
-            context:          Optional context for narrative generation.
-            session_id:       Optional session ID for world context assembly.
-            location_id:      Optional current location (enables world context).
-            player_id:        Optional player ID (passed to builder).
+            prompt:           Narrative generation prompt / player input text.
+            context:          Optional context dict for downstream use.
+            session_id:       Optional session ID for WorkflowContext observability.
+            location_id:      Optional current location (used to build world context).
+            player_id:        Optional player ID.
             player_character: Optional character dict (tier-6 context).
+            processed_input:  Pre-built ProcessedInput (skips IPA reconstruction).
+            world_context:    Pre-built WorldContext (skips WBA call).
 
         Returns:
-            Dict containing generated narrative and metadata
+            Dict containing generated narrative and metadata.
 
         Raises:
-            AgentCommunicationError: If communication with NGA fails
+            AgentCommunicationError: If the NGA fails and fallback_to_mock is False.
         """
-        # Enrich prompt with world context when builder is available
-        world_context_text: str = ""
-        world_context_meta: dict[str, Any] = {}
-        if self._builder is not None and session_id and location_id:
-            try:
-                assembled = await self._builder.build(
-                    session_id=session_id,
-                    location_id=location_id,
-                    player_id=player_id or "",
-                    player_character=player_character,
-                )
-                world_context_text = assembled.text
-                world_context_meta = {
-                    "total_tokens": assembled.total_tokens,
-                    "neo4j_available": assembled.neo4j_available,
-                    "truncated_tiers": assembled.truncated_tiers,
-                }
-                logger.debug(
-                    "NGA world context assembled: session=%s tokens=%d",
-                    session_id,
-                    assembled.total_tokens,
-                )
-            except Exception as exc:
-                logger.warning("NGA: world context build failed: %s", exc)
-
         ctx = WorkflowContext(workflow_id=session_id or f"nga-{id(self)}")
-        nga_input: dict[str, Any] = {
-            "prompt": prompt,
-            "context": context or {},
-            "player_input": prompt,  # NGA expects player_input field
-        }
-        if world_context_text:
-            nga_input["world_context"] = world_context_text
-            nga_input["world_context_meta"] = world_context_meta
+
+        # Build ProcessedInput stub if not pre-supplied
+        if processed_input is None:
+            processed_input = ProcessedInput(
+                raw_text=prompt,
+                normalized_text=prompt.lower().strip(),
+                session_id=session_id or "",
+                player_id=player_id or "",
+                location_id=location_id,
+            )
+
+        # Build WorldContext stub if not pre-supplied
+        if world_context is None:
+            from src.components.wba.agent import _minimal_world_context
+
+            world_context = _minimal_world_context(location_id or "unknown")
 
         input_data: dict[str, Any] = {
-            "nga_input": nga_input,
             "prompt": prompt,
             "context": context,
-            "real_fn": generate_narrative_response,
-            "world_context_meta": world_context_meta,
+            "processed_input": processed_input,
+            "world_context": world_context,
         }
 
         strategy = RetryStrategy(
@@ -573,25 +495,15 @@ class NGAAdapter:
             jitter=self.retry_config.jitter,
         )
 
-        if not self._available:
-            if self.fallback_to_mock:
-                logger.warning(
-                    "Real NGA not available, using fallback mock implementation"
-                )
-                return self._mock_generate_narrative(
-                    prompt, context, world_context_meta
-                )
-            raise AgentCommunicationError("Real NGA implementation not available")
-
-        call: WorkflowPrimitive = _NGACall()
-        retry_call = RetryPrimitive(call, strategy=strategy)
+        call: WorkflowPrimitive = _NGACall(self._agent)
+        retry_call = RetryPrimitive(call, strategy=strategy)  # type: ignore[arg-type]
         circuit_call = CircuitBreakerPrimitive(retry_call, config=self._cb_config)  # type: ignore[arg-type]
         primitive: WorkflowPrimitive
         if self.fallback_to_mock:
             primitive = FallbackPrimitive(circuit_call, _NGAFallback())  # type: ignore[arg-type]
         else:
             primitive = circuit_call  # type: ignore[assignment]
-        primitive = ObservablePrimitive(primitive, "nga_processing")
+        primitive = ObservablePrimitive(primitive, "nga_processing")  # type: ignore[assignment, arg-type]
 
         try:
             return await primitive.execute(input_data, ctx)  # type: ignore[return-value]

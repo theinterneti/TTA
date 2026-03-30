@@ -26,13 +26,23 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from tta_dev_primitives import (
-    FallbackPrimitive,
-    RetryPrimitive,
-    RetryStrategy,
-    WorkflowContext,
-    WorkflowPrimitive,
-)
+
+try:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import GuideCharacter, WorldSeed

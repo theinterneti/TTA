@@ -15,7 +15,11 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from tta_dev_primitives import WorkflowContext
+
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerError,
@@ -37,6 +41,7 @@ from src.agent_orchestration.adapters import (
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _cb_config(threshold: int = 3, recovery: float = 0.01) -> CircuitBreakerConfig:
     """Small thresholds so tests don't need many iterations."""
@@ -131,7 +136,12 @@ class TestIPAAdapterCircuitBreaker:
         fail_then_succeed = AsyncMock(
             side_effect=[
                 RuntimeError("down"),
-                {"normalized_text": "ok", "routing": {}, "raw_intent": {}, "source": "real_ipa"},
+                {
+                    "normalized_text": "ok",
+                    "routing": {},
+                    "raw_intent": {},
+                    "source": "real_ipa",
+                },
             ]
         )
         with patch.object(_IPACall, "execute", fail_then_succeed):

@@ -20,7 +20,11 @@ from src.components.gameplay_loop.models.world_seed import (
     WorldSeed,
     WorldTone,
 )
-from tta_dev_primitives import WorkflowContext
+
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +126,10 @@ class TestSynthesisFallback:
         fallback = _SynthesisFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"seed": _MINIMAL_SEED}, ctx)
-        assert "silver river" in result["scene_text"].lower() or "midnight" in result["scene_text"].lower()
+        assert (
+            "silver river" in result["scene_text"].lower()
+            or "midnight" in result["scene_text"].lower()
+        )
 
     @pytest.mark.asyncio
     async def test_fallback_location_has_required_keys(self) -> None:
@@ -154,9 +161,7 @@ class TestSynthesisCall:
         ctx = WorkflowContext(workflow_id="test")
 
         mock_llm = AsyncMock()
-        mock_llm.ainvoke.return_value = MagicMock(
-            content=json.dumps(_SYNTHESIS_RESULT)
-        )
+        mock_llm.ainvoke.return_value = MagicMock(content=json.dumps(_SYNTHESIS_RESULT))
 
         result = await call.execute(
             {"llm": mock_llm, "messages": [], "seed": _MINIMAL_SEED}, ctx
@@ -219,7 +224,8 @@ class TestMessageBuilding:
     def test_messages_include_player_character_override(self) -> None:
         service = _make_service()
         msgs = service._build_messages(
-            _MINIMAL_SEED, {"name": "Aldric Brightblade", "background": "former soldier"}
+            _MINIMAL_SEED,
+            {"name": "Aldric Brightblade", "background": "former soldier"},
         )
         combined = " ".join(m.content for m in msgs)
         assert "Aldric Brightblade" in combined
@@ -247,7 +253,9 @@ class TestSynthesizeNoDriver:
     async def test_synthesize_no_driver_returns_first_scene(self) -> None:
         service = _make_service(driver=None)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s1")
 
         assert isinstance(result, FirstScene)
@@ -259,7 +267,9 @@ class TestSynthesizeNoDriver:
         """Without a driver, node IDs are generated but npc_ids will be empty."""
         service = _make_service(driver=None)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s2")
 
         assert result.npc_ids == []
@@ -268,10 +278,13 @@ class TestSynthesizeNoDriver:
     async def test_synthesize_no_driver_location_id_is_uuid(self) -> None:
         service = _make_service(driver=None)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s3")
 
         import re
+
         uuid_re = re.compile(
             r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         )
@@ -281,7 +294,9 @@ class TestSynthesizeNoDriver:
     async def test_synthesize_raw_synthesis_preserved(self) -> None:
         service = _make_service(driver=None)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s4")
 
         assert result.raw_synthesis == _SYNTHESIS_RESULT
@@ -329,7 +344,9 @@ class TestSynthesizeWithDriver:
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s6")
 
         driver.session.assert_called_once()
@@ -340,7 +357,9 @@ class TestSynthesizeWithDriver:
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             await service.synthesize(_MINIMAL_SEED, session_id="s7")
 
         neo_session = driver.session.return_value
@@ -352,7 +371,9 @@ class TestSynthesizeWithDriver:
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s8")
 
         assert len(result.npc_ids) == 1
@@ -362,7 +383,9 @@ class TestSynthesizeWithDriver:
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
-        with patch.object(service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=_SYNTHESIS_RESULT)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s9")
 
         assert result.event_id != ""
@@ -374,7 +397,9 @@ class TestSynthesizeWithDriver:
         service = _make_service(driver=driver)
 
         no_npc_synthesis = {**_SYNTHESIS_RESULT, "npcs": []}
-        with patch.object(service, "_call_llm", AsyncMock(return_value=no_npc_synthesis)):
+        with patch.object(
+            service, "_call_llm", AsyncMock(return_value=no_npc_synthesis)
+        ):
             result = await service.synthesize(_MINIMAL_SEED, session_id="s10")
 
         assert result.npc_ids == []
@@ -387,8 +412,18 @@ class TestSynthesizeWithDriver:
         multi_npc = {
             **_SYNTHESIS_RESULT,
             "npcs": [
-                {"name": "A", "role": "guard", "description": "tall", "disposition": "neutral"},
-                {"name": "B", "role": "merchant", "description": "stout", "disposition": "friendly"},
+                {
+                    "name": "A",
+                    "role": "guard",
+                    "description": "tall",
+                    "disposition": "neutral",
+                },
+                {
+                    "name": "B",
+                    "role": "merchant",
+                    "description": "stout",
+                    "disposition": "friendly",
+                },
             ],
         }
         driver = self._make_driver()

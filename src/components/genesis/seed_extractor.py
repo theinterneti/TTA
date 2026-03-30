@@ -16,13 +16,23 @@ import re
 from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
-from tta_dev_primitives import (
-    FallbackPrimitive,
-    RetryPrimitive,
-    RetryStrategy,
-    WorkflowContext,
-    WorkflowPrimitive,
-)
+
+try:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from src.ai_components.llm_factory import get_llm
 
