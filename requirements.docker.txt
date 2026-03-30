@@ -127,7 +127,7 @@ pycparser==3.0 ; implementation_name != 'PyPy' and platform_python_implementatio
 pydantic==2.12.5 ; sys_platform == 'linux'
 pydantic-core==2.41.5 ; sys_platform == 'linux'
 pydantic-settings==2.13.1 ; sys_platform == 'linux'
-pygments==2.19.2 ; sys_platform == 'linux'
+pygments==2.20.0 ; sys_platform == 'linux'
 pyjwt==2.12.1 ; sys_platform == 'linux'
 pymysql==1.1.2 ; sys_platform == 'linux'
 pyotp==2.9.0 ; sys_platform == 'linux'
