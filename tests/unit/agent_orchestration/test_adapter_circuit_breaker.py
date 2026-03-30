@@ -15,7 +15,10 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from tta_dev_primitives import WorkflowContext
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerError,

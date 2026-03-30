@@ -10,7 +10,10 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from tta_dev_primitives import WorkflowContext
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 
 from src.agent_orchestration.adapters import (
     RetryConfig,

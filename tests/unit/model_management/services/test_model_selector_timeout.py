@@ -23,9 +23,12 @@ from tta_ai.models.services.model_selector import (  # noqa: E402
 )
 
 try:
-    from tta_dev_primitives import WorkflowContext
+    from ttadev.primitives import WorkflowContext
 except ImportError:
-    pytest.skip("tta_dev_primitives not available", allow_module_level=True)
+    try:
+        from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
+    except ImportError:
+        pytest.skip("ttadev.primitives not available", allow_module_level=True)
 
 from tta_ai.models import ModelInfo, ModelRequirements, ProviderType, TaskType  # noqa: E402
 
@@ -206,7 +209,10 @@ class TestModelSelectorSelectModelTimeout:
     @pytest.mark.asyncio
     async def test_select_model_uses_timeout_primitive(self) -> None:
         """TimeoutPrimitive.execute is called with correct timeout."""
-        from tta_dev_primitives import TimeoutPrimitive
+        try:
+            from ttadev.primitives import TimeoutPrimitive
+        except ImportError:
+            from tta_dev_primitives import TimeoutPrimitive  # type: ignore[no-redef]
 
         selector = _make_selector(timeout_seconds=15.0)
         model = _make_model()

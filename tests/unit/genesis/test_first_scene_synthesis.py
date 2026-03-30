@@ -20,7 +20,10 @@ from src.components.gameplay_loop.models.world_seed import (
     WorldSeed,
     WorldTone,
 )
-from tta_dev_primitives import WorkflowContext
+try:
+    from ttadev.primitives import WorkflowContext
+except ImportError:
+    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
 
 
 # ---------------------------------------------------------------------------

@@ -15,14 +15,24 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from tta_dev_primitives import (
-    FallbackPrimitive,
-    RetryPrimitive,
-    RetryStrategy,
-    WorkflowContext,
-    WorkflowPrimitive,
-)
-from tta_dev_primitives.observability import ObservablePrimitive
+try:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+    from ttadev.primitives.observability import ObservablePrimitive
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+    from tta_dev_primitives.observability import ObservablePrimitive  # type: ignore[no-redef]
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

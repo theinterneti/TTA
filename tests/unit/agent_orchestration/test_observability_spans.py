@@ -27,7 +27,7 @@ class TestIPAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_ipa_observable_on_real_path(self) -> None:
         """ObservablePrimitive.execute is called when the real agent is available."""
-        from tta_dev_primitives.observability import ObservablePrimitive
+        from ttadev.primitives.observability import ObservablePrimitive
 
         adapter = IPAAdapter(fallback_to_mock=True)
         adapter._available = True  # force real path
@@ -53,7 +53,7 @@ class TestIPAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_ipa_span_name_on_real_path(self) -> None:
         """IPA span is named 'ipa_processing'."""
-        from tta_dev_primitives.observability import ObservablePrimitive
+        from ttadev.primitives.observability import ObservablePrimitive
 
         adapter = IPAAdapter(fallback_to_mock=True)
         adapter._available = True
@@ -98,7 +98,7 @@ class TestWBAObservabilitySpan:
         """ObservablePrimitive.execute is called when the real WBA is available."""
         from unittest.mock import MagicMock
 
-        from tta_dev_primitives.observability import ObservablePrimitive
+        from ttadev.primitives.observability import ObservablePrimitive
 
         adapter = WBAAdapter(fallback_to_mock=True)
         adapter._available = True
@@ -124,7 +124,7 @@ class TestWBAObservabilitySpan:
         """WBA span is named 'wba_processing'."""
         from unittest.mock import MagicMock
 
-        from tta_dev_primitives.observability import ObservablePrimitive
+        from ttadev.primitives.observability import ObservablePrimitive
 
         adapter = WBAAdapter(fallback_to_mock=True)
         adapter._available = True
@@ -166,7 +166,7 @@ class TestNGAObservabilitySpan:
         """ObservablePrimitive.execute is called when the real NGA is available."""
         from unittest.mock import MagicMock
 
-        from tta_dev_primitives.observability import ObservablePrimitive
+        from ttadev.primitives.observability import ObservablePrimitive
 
         adapter = NGAAdapter(fallback_to_mock=True)
         adapter._available = True
@@ -192,7 +192,7 @@ class TestNGAObservabilitySpan:
         """NGA span is named 'nga_processing'."""
         from unittest.mock import MagicMock
 
-        from tta_dev_primitives.observability import ObservablePrimitive
+        from ttadev.primitives.observability import ObservablePrimitive
 
         adapter = NGAAdapter(fallback_to_mock=True)
         adapter._available = True
@@ -236,7 +236,7 @@ class TestPipelineSequentialPrimitive:
 
     def test_build_agent_pipeline_returns_sequential_with_correct_name(self) -> None:
         """Pipeline is a SequentialPrimitive with 3 steps and the expected name."""
-        from tta_dev_primitives import SequentialPrimitive
+        from ttadev.primitives import SequentialPrimitive
 
         from src.agent_orchestration.unified_orchestrator import (
             UnifiedAgentOrchestrator,
@@ -262,7 +262,7 @@ class TestPipelineSequentialPrimitive:
         """Pipeline executes IPA, WBA, and NGA steps and all results appear in output."""
         from unittest.mock import AsyncMock
 
-        from tta_dev_primitives import WorkflowContext
+        from ttadev.primitives import WorkflowContext
 
         from src.agent_orchestration.unified_orchestrator import (
             UnifiedAgentOrchestrator,
@@ -310,7 +310,7 @@ class TestPipelineSequentialPrimitive:
         """WBA adapter is called with intent and entities extracted from IPA result."""
         from unittest.mock import AsyncMock
 
-        from tta_dev_primitives import WorkflowContext
+        from ttadev.primitives import WorkflowContext
 
         from src.agent_orchestration.unified_orchestrator import (
             UnifiedAgentOrchestrator,
@@ -361,7 +361,7 @@ class TestPipelineSequentialPrimitive:
         """NGA lambda receives a world_state dict that reflects the WBA world_state update."""
         from unittest.mock import AsyncMock
 
-        from tta_dev_primitives import WorkflowContext
+        from ttadev.primitives import WorkflowContext
 
         from src.agent_orchestration.unified_orchestrator import (
             UnifiedAgentOrchestrator,

@@ -19,13 +19,22 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from langchain_core.messages import HumanMessage, SystemMessage
-from tta_dev_primitives import (
-    FallbackPrimitive,
-    RetryPrimitive,
-    RetryStrategy,
-    WorkflowContext,
-    WorkflowPrimitive,
-)
+try:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import WorldSeed

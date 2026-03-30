@@ -19,7 +19,10 @@ from enum import Enum
 from typing import Any
 
 import redis.asyncio as aioredis
-from tta_dev_primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext
+try:
+    from ttadev.primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext
+except ImportError:
+    from tta_dev_primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext  # type: ignore[no-redef]
 
 from .adapters import IPAAdapter, NGAAdapter, RetryConfig, WBAAdapter
 from .therapeutic_safety import SafetyLevel, get_global_safety_service
