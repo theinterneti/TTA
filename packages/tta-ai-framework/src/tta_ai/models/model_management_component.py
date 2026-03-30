@@ -17,14 +17,20 @@ from src.orchestration.decorators import log_entry_exit, timing_decorator
 # Guarded import — TTA.dev UniversalLLMPrimitive (optional dependency)
 try:
     from ttadev.primitives import LLMProvider, LLMRequest, UniversalLLMPrimitive
-    from ttadev.primitives.core import WorkflowContext
+    try:
+        from ttadev.primitives.core.base import WorkflowContext
+    except ImportError:
+        from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[no-redef]
 
     _UNIVERSAL_LLM_AVAILABLE = True
 except ImportError:
     _UNIVERSAL_LLM_AVAILABLE = False
     if TYPE_CHECKING:
         from ttadev.primitives import LLMProvider, LLMRequest, UniversalLLMPrimitive
-        from ttadev.primitives.core import WorkflowContext
+        try:
+            from ttadev.primitives.core.base import WorkflowContext
+        except ImportError:
+            from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[assignment]
 
 from .interfaces import (
     GenerationRequest,
@@ -75,7 +81,7 @@ class ModelManagementComponent(Component):
         self.active_models: dict[str, IModelInstance] = {}
 
         # TTA.dev UniversalLLMPrimitive (preferred path when ttadev is available)
-        self._universal_llm: "UniversalLLMPrimitive | None" = None
+        self._universal_llm: UniversalLLMPrimitive | None = None
         if _UNIVERSAL_LLM_AVAILABLE:
             self._universal_llm = self._build_universal_llm()
 
@@ -414,7 +420,7 @@ class ModelManagementComponent(Component):
             logger.warning(f"Failed to load model configuration, using defaults: {e}")
             return ModelManagementConfig()
 
-    def _build_universal_llm(self) -> "UniversalLLMPrimitive | None":
+    def _build_universal_llm(self) -> UniversalLLMPrimitive | None:
         """Build a UniversalLLMPrimitive mapped from the active provider config.
 
         Provider mapping:
@@ -431,6 +437,12 @@ class ModelManagementComponent(Component):
             default = self.model_config.default_provider or "openrouter"
 
             cfg = provider_configs.get(default)
+            # Only build if the selected provider is explicitly configured
+            if not cfg:
+                logger.debug(
+                    "UniversalLLMPrimitive skipped: provider '%s' not configured", default
+                )
+                return None
             provider_kwargs: dict[str, Any] = {}
 
             if default == "openrouter":
@@ -461,19 +473,36 @@ class ModelManagementComponent(Component):
 
     async def _generate_via_universal_llm(
         self, prompt: str, **kwargs
-    ) -> "GenerationResponse | None":
+    ) -> GenerationResponse | None:
         """Delegate generation to ttadev UniversalLLMPrimitive and bridge the response."""
         if self._universal_llm is None:
             return None
         try:
             default = self.model_config.default_provider or "openrouter"
-            provider_configs = self.model_config.providers
-            cfg = provider_configs.get(default)
 
-            # Resolve the model name: prefer an explicitly configured model, then a safe default.
-            model_name: str = kwargs.get("model") or (
-                cfg.models[0].model_id if cfg and getattr(cfg, "models", None) else None
-            ) or "openai/gpt-4.1-mini"
+            # Resolve the model name:
+            # 1) explicit `model` kwarg
+            # 2) task_type match from ModelManagementConfig.models
+            # 3) first configured model
+            # 4) safe hardcoded default
+            task_type = kwargs.get("task_type")
+            configured_model_id: str | None = None
+            models = getattr(self.model_config, "models", None) or []
+            if models:
+                if task_type is not None:
+                    for m in models:
+                        m_task_types = getattr(m, "task_types", None)
+                        m_task_type = getattr(m, "task_type", None)
+                        if (m_task_types and task_type in m_task_types) or (
+                            m_task_type is not None and m_task_type == task_type
+                        ):
+                            configured_model_id = getattr(m, "model_id", None)
+                            if configured_model_id:
+                                break
+                if configured_model_id is None:
+                    configured_model_id = getattr(models[0], "model_id", None)
+
+            model_name: str = kwargs.get("model") or configured_model_id or "openai/gpt-4.1-mini"
 
             messages = [{"role": "user", "content": prompt}]
             system = kwargs.get("system_prompt")
@@ -576,7 +605,7 @@ class ModelManagementComponent(Component):
         """
         try:
             # --- preferred path: ttadev UniversalLLMPrimitive ---
-            if self._universal_llm is not None:
+            if self._universal_llm is not None and self.initialized:
                 response = await self._generate_via_universal_llm(prompt, **kwargs)
                 if response is not None:
                     return response
