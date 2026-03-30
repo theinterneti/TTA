@@ -4518,6 +4518,9 @@ dev = [
     { name = "pytest-cov", marker = "sys_platform == 'linux'" },
     { name = "ruff", marker = "sys_platform == 'linux'" },
 ]
+tta-control-plane = [
+    { name = "ttadev", marker = "sys_platform == 'linux'" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -4533,8 +4536,9 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "redis", specifier = ">=7.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.13.0" },
+    { name = "ttadev", marker = "extra == 'tta-control-plane'", git = "https://github.com/theinterneti/TTA.dev.git?rev=main" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["dev", "tta-control-plane"]
 
 [[package]]
 name = "tta-dev-integrations"

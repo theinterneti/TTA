@@ -11,11 +11,18 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any
 
-from tta_dev_primitives import (
-    TimeoutPrimitive,
-    WorkflowContext,
-    WorkflowPrimitive,
-)
+try:
+    from ttadev.primitives import (
+        TimeoutPrimitive,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+except ImportError:
+    from tta_dev_primitives import (  # type: ignore[no-redef]
+        TimeoutPrimitive,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from ..interfaces import (
     IHardwareDetector,

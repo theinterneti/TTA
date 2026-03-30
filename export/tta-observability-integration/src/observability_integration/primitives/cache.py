@@ -17,23 +17,29 @@ from collections.abc import Callable
 from typing import Any
 
 try:
-    from tta_dev_primitives.core.base import (
+    from ttadev.primitives.core.base import (
         WorkflowContext,
         WorkflowPrimitive,
     )
 except ImportError:
-    # Fallback for development/testing
-    from typing import Protocol
+    try:
+        from tta_dev_primitives.core.base import (
+            WorkflowContext,
+            WorkflowPrimitive,
+        )
+    except ImportError:
+        # Fallback for development/testing
+        from typing import Protocol
 
-    class WorkflowContext:  # type: ignore
-        """Mock WorkflowContext for testing."""
+        class WorkflowContext:  # type: ignore
+            """Mock WorkflowContext for testing."""
 
-        pass
+            pass
 
-    class WorkflowPrimitive(Protocol):  # type: ignore
-        """Minimal WorkflowPrimitive protocol for testing."""
+        class WorkflowPrimitive(Protocol):  # type: ignore
+            """Minimal WorkflowPrimitive protocol for testing."""
 
-        pass
+            pass
 
 
 from ..apm_setup import get_meter

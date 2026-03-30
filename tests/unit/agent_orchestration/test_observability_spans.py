@@ -27,10 +27,19 @@ class TestIPAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_ipa_observable_on_real_path(self) -> None:
         """ObservablePrimitive.execute is called when the real agent is available."""
+        from unittest.mock import AsyncMock, MagicMock
+
         from ttadev.primitives.observability import ObservablePrimitive
 
-        adapter = IPAAdapter(fallback_to_mock=True)
-        adapter._available = True  # force real path
+        from src.components.ipa.models import ProcessedInput
+
+        mock_agent = MagicMock()
+        mock_agent.process = AsyncMock(
+            return_value=ProcessedInput(
+                raw_text="test", normalized_text="test"
+            )
+        )
+        adapter = IPAAdapter(fallback_to_mock=True, ipa_agent=mock_agent)
 
         captured: list[object] = []
         original_execute = ObservablePrimitive.execute
@@ -41,25 +50,25 @@ class TestIPAObservabilitySpan:
             captured.append(self_inner)
             return await original_execute(self_inner, input_data, ctx)  # type: ignore[arg-type]
 
-        def mock_fn(text: str) -> object:
-            return type("R", (), {"intent": "explore", "confidence": 0.9})()
-
         with patch.object(ObservablePrimitive, "execute", spy_execute):
-            # Patch the real_fn used by _IPACall so it doesn't call None
-            import src.agent_orchestration.adapters as _m
-
-            with patch.object(_m, "process_input", mock_fn):
-                await adapter.process_input("test", session_id="s2")
+            await adapter.process_input("test", session_id="s2")
 
         assert len(captured) >= 1, "ObservablePrimitive.execute was not called"
 
     @pytest.mark.asyncio
     async def test_ipa_span_name_on_real_path(self) -> None:
         """IPA span is named 'ipa_processing'."""
+        from unittest.mock import AsyncMock, MagicMock
+
         from ttadev.primitives.observability import ObservablePrimitive
 
-        adapter = IPAAdapter(fallback_to_mock=True)
-        adapter._available = True
+        from src.components.ipa.models import ProcessedInput
+
+        mock_agent = MagicMock()
+        mock_agent.process = AsyncMock(
+            return_value=ProcessedInput(raw_text="test", normalized_text="test")
+        )
+        adapter = IPAAdapter(fallback_to_mock=True, ipa_agent=mock_agent)
 
         names: list[str] = []
         original_init = ObservablePrimitive.__init__
@@ -70,15 +79,7 @@ class TestIPAObservabilitySpan:
             names.append(name)
             original_init(self_inner, primitive, name)  # type: ignore[arg-type]
 
-        def mock_fn(text: str) -> object:
-            return type("R", (), {"intent": "explore", "confidence": 0.9})()
-
-        import src.agent_orchestration.adapters as _m
-
-        with (
-            patch.object(ObservablePrimitive, "__init__", spy_init),
-            patch.object(_m, "process_input", mock_fn),
-        ):
+        with patch.object(ObservablePrimitive, "__init__", spy_init):
             await adapter.process_input("test", session_id="s3")
 
         assert "ipa_processing" in names
@@ -102,16 +103,19 @@ class TestWBAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_wba_observable_on_real_path(self) -> None:
         """ObservablePrimitive.execute is called when the real WBA is available."""
-        from unittest.mock import MagicMock
+        from unittest.mock import AsyncMock, MagicMock
 
         from ttadev.primitives.observability import ObservablePrimitive
 
-        adapter = WBAAdapter(fallback_to_mock=True)
-        adapter._available = True
+        from src.components.world_context.models import LocationFact, WorldContext
 
-        mock_wba = MagicMock()
-        mock_wba.process.return_value = {"world_state": {}, "events": []}
-        adapter._wba_instance = mock_wba
+        mock_agent = MagicMock()
+        mock_agent.build = AsyncMock(
+            return_value=WorldContext(
+                location_id="loc-1", location=LocationFact(id="loc-1", name="Forest")
+            )
+        )
+        adapter = WBAAdapter(fallback_to_mock=True, wba_agent=mock_agent)
 
         captured: list[object] = []
         original_execute = ObservablePrimitive.execute
@@ -130,16 +134,19 @@ class TestWBAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_wba_span_name_on_real_path(self) -> None:
         """WBA span is named 'wba_processing'."""
-        from unittest.mock import MagicMock
+        from unittest.mock import AsyncMock, MagicMock
 
         from ttadev.primitives.observability import ObservablePrimitive
 
-        adapter = WBAAdapter(fallback_to_mock=True)
-        adapter._available = True
+        from src.components.world_context.models import LocationFact, WorldContext
 
-        mock_wba = MagicMock()
-        mock_wba.process.return_value = {"world_state": {}, "events": []}
-        adapter._wba_instance = mock_wba
+        mock_agent = MagicMock()
+        mock_agent.build = AsyncMock(
+            return_value=WorldContext(
+                location_id="loc-1", location=LocationFact(id="loc-1", name="Forest")
+            )
+        )
+        adapter = WBAAdapter(fallback_to_mock=True, wba_agent=mock_agent)
 
         names: list[str] = []
         original_init = ObservablePrimitive.__init__
@@ -174,16 +181,13 @@ class TestNGAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_nga_observable_on_real_path(self) -> None:
         """ObservablePrimitive.execute is called when the real NGA is available."""
-        from unittest.mock import MagicMock
+        from unittest.mock import AsyncMock, MagicMock
 
         from ttadev.primitives.observability import ObservablePrimitive
 
-        adapter = NGAAdapter(fallback_to_mock=True)
-        adapter._available = True
-
-        mock_nga = MagicMock()
-        mock_nga.generate.return_value = {"narrative": "Once upon a time..."}
-        adapter._nga_instance = mock_nga
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(return_value="Once upon a time...")
+        adapter = NGAAdapter(fallback_to_mock=True, nga_agent=mock_agent)
 
         captured: list[object] = []
         original_execute = ObservablePrimitive.execute
@@ -202,16 +206,13 @@ class TestNGAObservabilitySpan:
     @pytest.mark.asyncio
     async def test_nga_span_name_on_real_path(self) -> None:
         """NGA span is named 'nga_processing'."""
-        from unittest.mock import MagicMock
+        from unittest.mock import AsyncMock, MagicMock
 
         from ttadev.primitives.observability import ObservablePrimitive
 
-        adapter = NGAAdapter(fallback_to_mock=True)
-        adapter._available = True
-
-        mock_nga = MagicMock()
-        mock_nga.generate.return_value = {"narrative": "Once upon a time..."}
-        adapter._nga_instance = mock_nga
+        mock_agent = MagicMock()
+        mock_agent.generate = AsyncMock(return_value="Once upon a time...")
+        adapter = NGAAdapter(fallback_to_mock=True, nga_agent=mock_agent)
 
         names: list[str] = []
         original_init = ObservablePrimitive.__init__
