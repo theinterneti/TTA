@@ -46,9 +46,7 @@ def _make_world_context(location_id: str = "loc-forest") -> WorldContext:
             name="Forest Clearing",
             description="Tall pines surround you.",
         ),
-        npcs=[
-            NPCState(id="npc-1", name="Old Hermit", role="guide", is_active=True)
-        ],
+        npcs=[NPCState(id="npc-1", name="Old Hermit", role="guide", is_active=True)],
     )
 
 

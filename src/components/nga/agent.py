@@ -72,7 +72,9 @@ def _build_user_message(
 
     # World grounding
     loc = world_context.location
-    parts.append(f"## Current Location\n{loc.name}: {loc.description or '(no description)'}")
+    parts.append(
+        f"## Current Location\n{loc.name}: {loc.description or '(no description)'}"
+    )
     if world_context.zone:
         parts.append(f"Zone: {world_context.zone.name}")
 
@@ -120,9 +122,7 @@ def _build_user_message(
         )
 
     if processed_input.needs_safety_check:
-        parts.append(
-            "⚠ Safety signal detected — respond with warmth and extra care."
-        )
+        parts.append("⚠ Safety signal detected — respond with warmth and extra care.")
 
     # Optional recent history
     if history:

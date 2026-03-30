@@ -221,7 +221,9 @@ class TestModelSelectorSelectModelTimeout:
         captured: list[float] = []
         original_init = TimeoutPrimitive.__init__
 
-        def patched_init(self_tp: Any, primitive: Any, timeout_seconds: float, **kwargs: Any) -> None:
+        def patched_init(
+            self_tp: Any, primitive: Any, timeout_seconds: float, **kwargs: Any
+        ) -> None:
             captured.append(timeout_seconds)
             original_init(self_tp, primitive, timeout_seconds, **kwargs)
 

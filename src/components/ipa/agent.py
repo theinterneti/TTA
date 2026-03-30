@@ -220,9 +220,7 @@ class IPAAgent:
             logger.debug("IPA: unknown intent value %r — using UNKNOWN", intent_str)
             intent = Intent.UNKNOWN
 
-        normalized_text: str = result.get(
-            "normalized_text", raw_text.lower().strip()
-        )
+        normalized_text: str = result.get("normalized_text", raw_text.lower().strip())
         intent_confidence: float = float(result.get("intent_confidence", 0.5))
 
         logger.info(

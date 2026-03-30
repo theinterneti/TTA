@@ -11,6 +11,7 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:

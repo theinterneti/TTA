@@ -185,9 +185,7 @@ class TestNGALLMCall:
         call = _NGALLMCall(llm)
         ctx = WorkflowContext(workflow_id="test")
         with pytest.raises(RuntimeError):
-            await call.execute(
-                {"system_prompt": "s", "user_message": "u"}, ctx
-            )
+            await call.execute({"system_prompt": "s", "user_message": "u"}, ctx)
 
 
 # ---------------------------------------------------------------------------

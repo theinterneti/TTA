@@ -35,7 +35,9 @@ class TestIPAObservabilitySpan:
         captured: list[object] = []
         original_execute = ObservablePrimitive.execute
 
-        async def spy_execute(self_inner: object, input_data: object, ctx: object) -> object:
+        async def spy_execute(
+            self_inner: object, input_data: object, ctx: object
+        ) -> object:
             captured.append(self_inner)
             return await original_execute(self_inner, input_data, ctx)  # type: ignore[arg-type]
 
@@ -45,6 +47,7 @@ class TestIPAObservabilitySpan:
         with patch.object(ObservablePrimitive, "execute", spy_execute):
             # Patch the real_fn used by _IPACall so it doesn't call None
             import src.agent_orchestration.adapters as _m
+
             with patch.object(_m, "process_input", mock_fn):
                 await adapter.process_input("test", session_id="s2")
 
@@ -61,7 +64,9 @@ class TestIPAObservabilitySpan:
         names: list[str] = []
         original_init = ObservablePrimitive.__init__
 
-        def spy_init(self_inner: ObservablePrimitive, primitive: object, name: str) -> None:
+        def spy_init(
+            self_inner: ObservablePrimitive, primitive: object, name: str
+        ) -> None:
             names.append(name)
             original_init(self_inner, primitive, name)  # type: ignore[arg-type]
 
@@ -69,8 +74,11 @@ class TestIPAObservabilitySpan:
             return type("R", (), {"intent": "explore", "confidence": 0.9})()
 
         import src.agent_orchestration.adapters as _m
-        with patch.object(ObservablePrimitive, "__init__", spy_init), \
-             patch.object(_m, "process_input", mock_fn):
+
+        with (
+            patch.object(ObservablePrimitive, "__init__", spy_init),
+            patch.object(_m, "process_input", mock_fn),
+        ):
             await adapter.process_input("test", session_id="s3")
 
         assert "ipa_processing" in names
@@ -88,9 +96,7 @@ class TestWBAObservabilitySpan:
     async def test_wba_mock_path_executes_successfully(self) -> None:
         """ObservablePrimitive wrapper does not break WBA mock path."""
         adapter = WBAAdapter(fallback_to_mock=True)
-        result = await adapter.process_world_request(
-            world_id="w1", session_id="s5"
-        )
+        result = await adapter.process_world_request(world_id="w1", session_id="s5")
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
@@ -110,7 +116,9 @@ class TestWBAObservabilitySpan:
         captured: list[object] = []
         original_execute = ObservablePrimitive.execute
 
-        async def spy_execute(self_inner: object, input_data: object, ctx: object) -> object:
+        async def spy_execute(
+            self_inner: object, input_data: object, ctx: object
+        ) -> object:
             captured.append(self_inner)
             return await original_execute(self_inner, input_data, ctx)  # type: ignore[arg-type]
 
@@ -136,7 +144,9 @@ class TestWBAObservabilitySpan:
         names: list[str] = []
         original_init = ObservablePrimitive.__init__
 
-        def spy_init(self_inner: ObservablePrimitive, primitive: object, name: str) -> None:
+        def spy_init(
+            self_inner: ObservablePrimitive, primitive: object, name: str
+        ) -> None:
             names.append(name)
             original_init(self_inner, primitive, name)  # type: ignore[arg-type]
 
@@ -178,7 +188,9 @@ class TestNGAObservabilitySpan:
         captured: list[object] = []
         original_execute = ObservablePrimitive.execute
 
-        async def spy_execute(self_inner: object, input_data: object, ctx: object) -> object:
+        async def spy_execute(
+            self_inner: object, input_data: object, ctx: object
+        ) -> object:
             captured.append(self_inner)
             return await original_execute(self_inner, input_data, ctx)  # type: ignore[arg-type]
 
@@ -204,7 +216,9 @@ class TestNGAObservabilitySpan:
         names: list[str] = []
         original_init = ObservablePrimitive.__init__
 
-        def spy_init(self_inner: ObservablePrimitive, primitive: object, name: str) -> None:
+        def spy_init(
+            self_inner: ObservablePrimitive, primitive: object, name: str
+        ) -> None:
             names.append(name)
             original_init(self_inner, primitive, name)  # type: ignore[arg-type]
 
@@ -275,9 +289,21 @@ class TestPipelineSequentialPrimitive:
         nga_return = {"story": "You walk into the forest."}
 
         with (
-            patch.object(orchestrator.ipa_adapter, "process_input", AsyncMock(return_value=ipa_return)),
-            patch.object(orchestrator.wba_adapter, "process_world_request", AsyncMock(return_value=wba_return)),
-            patch.object(orchestrator.nga_adapter, "generate_narrative", AsyncMock(return_value=nga_return)),
+            patch.object(
+                orchestrator.ipa_adapter,
+                "process_input",
+                AsyncMock(return_value=ipa_return),
+            ),
+            patch.object(
+                orchestrator.wba_adapter,
+                "process_world_request",
+                AsyncMock(return_value=wba_return),
+            ),
+            patch.object(
+                orchestrator.nga_adapter,
+                "generate_narrative",
+                AsyncMock(return_value=nga_return),
+            ),
         ):
             pipeline = orchestrator._build_agent_pipeline()
             ctx = WorkflowContext(workflow_id="wf-test-2")
@@ -325,9 +351,17 @@ class TestPipelineSequentialPrimitive:
         wba_mock = AsyncMock(return_value=wba_return)
 
         with (
-            patch.object(orchestrator.ipa_adapter, "process_input", AsyncMock(return_value=ipa_return)),
+            patch.object(
+                orchestrator.ipa_adapter,
+                "process_input",
+                AsyncMock(return_value=ipa_return),
+            ),
             patch.object(orchestrator.wba_adapter, "process_world_request", wba_mock),
-            patch.object(orchestrator.nga_adapter, "generate_narrative", AsyncMock(return_value=nga_return)),
+            patch.object(
+                orchestrator.nga_adapter,
+                "generate_narrative",
+                AsyncMock(return_value=nga_return),
+            ),
         ):
             pipeline = orchestrator._build_agent_pipeline()
             ctx = WorkflowContext(workflow_id="wf-test-3")
@@ -375,14 +409,24 @@ class TestPipelineSequentialPrimitive:
 
         captured_nga_context: list[dict] = []
 
-        async def spy_generate(prompt: str, context: dict | None = None, session_id: str = "") -> dict:
+        async def spy_generate(
+            prompt: str, context: dict | None = None, session_id: str = ""
+        ) -> dict:
             if context:
                 captured_nga_context.append(dict(context))
             return nga_return
 
         with (
-            patch.object(orchestrator.ipa_adapter, "process_input", AsyncMock(return_value=ipa_return)),
-            patch.object(orchestrator.wba_adapter, "process_world_request", AsyncMock(return_value=wba_return)),
+            patch.object(
+                orchestrator.ipa_adapter,
+                "process_input",
+                AsyncMock(return_value=ipa_return),
+            ),
+            patch.object(
+                orchestrator.wba_adapter,
+                "process_world_request",
+                AsyncMock(return_value=wba_return),
+            ),
             patch.object(orchestrator.nga_adapter, "generate_narrative", spy_generate),
         ):
             pipeline = orchestrator._build_agent_pipeline()
@@ -459,4 +503,3 @@ class TestPipelineSequentialPrimitive:
 
         # Assert — response contains safety_intervention flag
         assert response.get("safety_intervention") is True
-
