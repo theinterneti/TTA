@@ -89,6 +89,8 @@ dependencies = [
     "docker>=7.0.0",
     # Dolt (branching database) — imported directly in dolt_manager / dolt_session_store
     "pymysql>=1.0.0",
+    # Async MySQL/Dolt client for DoltWorldRepository
+    "aiomysql>=0.2.0",
 ]
 
 # DEPRECATED: Use dependency-groups instead (see below)
