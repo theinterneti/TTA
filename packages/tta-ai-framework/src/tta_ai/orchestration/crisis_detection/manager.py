@@ -14,8 +14,8 @@ from .enums import CrisisLevel, CrisisType, EscalationStatus, InterventionType
 from .models import CrisisAssessment, CrisisIntervention, InterventionAction
 
 try:
-    from ttadev.control_plane.service import ControlPlaneService
     from ttadev.control_plane.models import GateType
+    from ttadev.control_plane.service import ControlPlaneService
 
     _CONTROL_PLANE_AVAILABLE = True
 except ImportError:
