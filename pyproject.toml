@@ -466,6 +466,8 @@ norecursedirs = [
     "tests/post_deployment",
     "tests/comprehensive_battery",
     "tests/performance",
+    "tests/unit/agent_orchestration",
+    "tests/integration/agent_orchestration",
     ".git",
     "__pycache__",
     ".venv",
