@@ -124,6 +124,36 @@ class GuideCharacter(BaseModel):
     intro_line: str  # the first thing the guide says in-world
 
 
+class GuideVoice(BaseModel):
+    """
+    Voice and intervention parameters for the Guide narrator.
+
+    Generated during the Genesis Session from world culture + player preferences.
+    Stored in WorldSeed and injected into NGA on every turn.
+    """
+
+    tone: str = "warm-ancient"
+    # Examples: 'warm-ancient', 'playful-wise', 'matter-of-fact', 'melancholic-hopeful'
+
+    formality: str = "neutral"
+    # 'archaic' | 'neutral' | 'contemporary'
+
+    intervention_style: str = "gentle"
+    # 'gentle' | 'direct' | 'mostly-silent'
+
+    reflection_frequency: str = "occasional"
+    # 'rare' | 'occasional' | 'frequent'
+
+    @property
+    def system_prompt_fragment(self) -> str:
+        """Return a compact description for NGA system prompt injection."""
+        return (
+            f"The Guide speaks in a {self.tone} voice with {self.formality} register. "
+            f"Intervention style: {self.intervention_style}. "
+            f"Reflection prompts: {self.reflection_frequency}."
+        )
+
+
 # ── The WorldSeed ─────────────────────────────────────────────────────────────
 
 
@@ -192,6 +222,7 @@ class WorldSeed(BaseModel):
 
     # ── Guide character (generated in Act 4) ──────────────────────────────
     guide: GuideCharacter | None = None
+    guide_voice: GuideVoice | None = None
 
     # ── Meta ───────────────────────────────────────────────────────────────
     seed_hash: str | None = Field(
