@@ -49,7 +49,14 @@ Hindsight MCP: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api h
 uv run ruff check src/ --fix
 uv run ruff format src/
 uv run pyright src/
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+make test
+```
+
+## Continuous Testing
+
+```bash
+make watch        # Reruns unit tests on every .py/.toml save (cancels in-progress run)
+make watch-all    # Same, but includes integration tests (requires Neo4j + Redis)
 ```
 
 ## L0 / TTA.dev Interaction Rule

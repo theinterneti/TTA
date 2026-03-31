@@ -38,7 +38,7 @@ MCP server: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hind
 ```bash
 uv run ruff check src/ --fix && uv run ruff format src/
 uv run pyright src/
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+make test
 ```
 
 ## Strict Boundaries
@@ -59,8 +59,10 @@ uv sync --all-extras                            # Install all deps
 uv run ruff check src/ --fix                    # Lint + auto-fix
 uv run ruff format src/                         # Format
 uv run pyright src/                             # Type check
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/  # Unit tests
-uv run pytest --cov=src --cov-report=term-missing tests/                  # Coverage
+make test                                       # Unit tests (no services)
+make test-integration                           # Full suite (Neo4j + Redis)
+make watch                                      # Continuous unit tests on save
+uv run pytest --cov=src --cov-report=term-missing tests/  # Coverage
 uv run python src/main.py start                 # Start API server
 ```
 

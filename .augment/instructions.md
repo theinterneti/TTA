@@ -52,7 +52,7 @@ tests/                      # Test suite
 uv run ruff check src/ --fix
 uv run ruff format src/
 uv run pyright src/
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+make test
 ```
 
 ---
@@ -126,10 +126,13 @@ class AgentWorkflowState(TypedDict):
 
 ```bash
 # Unit tests (fast, no services)
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+make test
 
-# Integration tests (needs Redis/Neo4j)
-uv run pytest -q -m "integration" tests/
+# Continuous testing (reruns on every .py/.toml save)
+make watch
+
+# Integration tests (needs Redis + Neo4j)
+make test-integration
 
 # Never run post_deployment locally — needs live deployment
 ```

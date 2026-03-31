@@ -25,7 +25,7 @@ TTA is an AI-powered therapeutic text adventure game. Players make choices that 
 ```bash
 uv run ruff check src/ --fix && uv run ruff format src/
 uv run pyright src/
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+make test
 ```
 
 ---
@@ -70,11 +70,14 @@ packages/tta-narrative-engine/    # Workspace package: narrative generation
 # Install all deps (including TTA.dev path sources)
 uv sync --all-extras
 
-# Run unit tests
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+# Run unit tests (no services)
+make test
+
+# Continuous testing (reruns on file save)
+make watch
 
 # Run integration tests (needs Redis + Neo4j running)
-uv run pytest -m "integration" tests/
+make test-integration
 
 # Start API server
 uv run python src/main.py start

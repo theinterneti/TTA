@@ -55,7 +55,7 @@ Always run before finishing any task:
 ```bash
 uv run ruff check src/ --fix && uv run ruff format src/
 uv run pyright src/
-uv run pytest -q -m "not integration and not neo4j and not redis" tests/
+make test
 ```
 
 ---

@@ -194,8 +194,9 @@ uv run ruff check src/ tests/ --fix
 uv run ruff format src/ tests/
 
 # Testing
-uv run pytest tests/unit/                    # Unit tests
-uv run pytest -m "redis or neo4j"          # Database tests
+make test                                    # Unit tests (fast, no services)
+make watch                                   # Continuous unit tests on save
+make test-integration                        # Full suite (Neo4j + Redis)
 uv run pytest --cov=src --cov-report=html  # Coverage
 
 # Services
