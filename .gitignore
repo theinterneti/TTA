@@ -482,3 +482,4 @@ backups/
 platform/dev/agentic/*/runtime/
 platform/dev/agentic/*/state/
 .worktrees/
+tests/tests/
