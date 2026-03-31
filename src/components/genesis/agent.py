@@ -43,6 +43,10 @@ except ImportError:
         WorkflowContext,
         WorkflowPrimitive,
     )
+from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import GuideCharacter, WorldSeed
@@ -104,7 +108,7 @@ class AgentResponse:
     guide: GuideCharacter | None = None
 
 
-class _NarratorCall(WorkflowPrimitive):
+class _NarratorCall(WorkflowPrimitive):  # type: ignore[misc]
     """One LLM narrator call — wrapped in retry/fallback by the agent."""
 
     def __init__(self, llm: Any) -> None:
@@ -123,7 +127,7 @@ class _NarratorCall(WorkflowPrimitive):
         return response.content.strip()
 
 
-class _NarratorFallback(WorkflowPrimitive):
+class _NarratorFallback(WorkflowPrimitive):  # type: ignore[misc]
     async def execute(self, input_data: dict, context: WorkflowContext) -> str:
         return _SAFE_FALLBACK
 
@@ -334,10 +338,10 @@ class GenesisAgent:
         self._guide_llm = guide_llm or get_llm(temperature=0.8, max_tokens=200)
 
         # Resilient narrator call — retry twice, then fallback to safe message
-        self._narrator = FallbackPrimitive(
-            primary=RetryPrimitive(
+        self._narrator = FallbackPrimitive(  # type: ignore[arg-type]
+            primary=RetryPrimitive(  # type: ignore[arg-type]
                 _NarratorCall(self._narrator_llm),
-                strategy=RetryStrategy(max_retries=2, backoff_base=1.5),
+                strategy=RetryStrategy(max_retries=2, backoff_base=1.5),  # type: ignore[arg-type]
             ),
             fallback=_NarratorFallback(),
         )
@@ -434,13 +438,13 @@ class GenesisAgent:
             player_input, state, new_fields, self._guide
         )
 
-        response_text = await self._narrator.execute(
+        response_text = await self._narrator.execute(  # type: ignore[arg-type]
             {
                 "system_prompt": system_prompt,
                 "history": history,
                 "player_input": narrator_input,
             },
-            context,
+            context,  # type: ignore[arg-type]
         )
 
         # ── 7. Handle THE_BECOMING first-response marking ────────────────

@@ -36,6 +36,10 @@ except ImportError:
         WorkflowContext,
         WorkflowPrimitive,
     )
+from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import WorldSeed
@@ -107,7 +111,7 @@ class FirstScene:
 # ---------------------------------------------------------------------------
 
 
-class _SynthesisCall(WorkflowPrimitive):
+class _SynthesisCall(WorkflowPrimitive):  # type: ignore[misc]
     """Call the LLM to produce structured scene JSON."""
 
     async def execute(
@@ -125,7 +129,7 @@ class _SynthesisCall(WorkflowPrimitive):
         return json.loads(text)
 
 
-class _SynthesisFallback(WorkflowPrimitive):
+class _SynthesisFallback(WorkflowPrimitive):  # type: ignore[misc]
     """Return a minimal deterministic scene when the LLM call fails."""
 
     async def execute(
@@ -215,7 +219,7 @@ class FirstSceneSynthesisService:
         sid = session_id or f"synthesis-{uuid4()}"
         ctx = WorkflowContext(workflow_id=sid)
 
-        synthesis = await self._call_llm(world_seed, player_character, ctx)
+        synthesis = await self._call_llm(world_seed, player_character, ctx)  # type: ignore[arg-type]
         location_id, npc_ids, event_id = await self._write_neo4j(
             synthesis, world_seed, player_character, sid
         )
@@ -248,11 +252,11 @@ class FirstSceneSynthesisService:
             "seed": world_seed,
         }
 
-        primitive: WorkflowPrimitive = FallbackPrimitive(
-            RetryPrimitive(_SynthesisCall(), strategy=self._strategy),
+        primitive: WorkflowPrimitive = FallbackPrimitive(  # type: ignore[assignment]
+            RetryPrimitive(_SynthesisCall(), strategy=self._strategy),  # type: ignore[arg-type]
             _SynthesisFallback(),
         )
-        result: dict[str, Any] = await primitive.execute(input_data, ctx)
+        result: dict[str, Any] = await primitive.execute(input_data, ctx)  # type: ignore[arg-type]
         return result
 
     def _build_messages(

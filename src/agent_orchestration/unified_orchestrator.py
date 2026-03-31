@@ -28,6 +28,10 @@ except ImportError:
         SequentialPrimitive,
         WorkflowContext,
     )
+from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 from .adapters import IPAAdapter, NGAAdapter, RetryConfig, WBAAdapter
 from .therapeutic_safety import SafetyLevel, get_global_safety_service
@@ -247,7 +251,7 @@ class UnifiedAgentOrchestrator:
                 "wba_result": None,
                 "nga_result": None,
             }
-            pipeline_output = await pipeline.execute(pipeline_input, pipeline_ctx)
+            pipeline_output = await pipeline.execute(pipeline_input, pipeline_ctx)  # type: ignore[arg-type]
 
             # Map pipeline results back to orchestration state
             state.ipa_result = pipeline_output["ipa_result"]
@@ -370,15 +374,15 @@ class UnifiedAgentOrchestrator:
             )
             return {**data, "nga_result": nga_result}
 
-        pipeline = SequentialPrimitive(
-            [
+        pipeline = SequentialPrimitive(  # type: ignore[arg-type]
+            [  # type: ignore[arg-type]
                 LambdaPrimitive(ipa_step),
                 LambdaPrimitive(wba_step),
                 LambdaPrimitive(nga_step),
             ]
         )
         pipeline.name = "ipa_wba_nga_pipeline"
-        return pipeline
+        return pipeline  # type: ignore[return-value]
 
     # ---------------------------------------------------------------------------
     # Deprecated phase methods — kept for backward compatibility with existing

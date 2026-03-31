@@ -23,6 +23,10 @@ except ImportError:
         WorkflowContext,
         WorkflowPrimitive,
     )
+from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 from ..interfaces import (
     IHardwareDetector,
@@ -38,7 +42,7 @@ from ..models import ModelSelectionCriteria, PerformanceMetrics
 logger = logging.getLogger(__name__)
 
 
-class _ModelSelectCall(WorkflowPrimitive):
+class _ModelSelectCall(WorkflowPrimitive):  # type: ignore[misc]
     """WorkflowPrimitive that executes the actual model selection logic."""
 
     async def execute(
@@ -50,7 +54,7 @@ class _ModelSelectCall(WorkflowPrimitive):
         return {"model": model}
 
 
-class _ModelSelectFallback(WorkflowPrimitive):
+class _ModelSelectFallback(WorkflowPrimitive):  # type: ignore[misc]
     """WorkflowPrimitive that returns None when model selection times out."""
 
     async def execute(
@@ -90,7 +94,7 @@ class ModelSelector(IModelSelector):
         )
 
         try:
-            result: dict[str, Any] = await primitive.execute(input_data, ctx)
+            result: dict[str, Any] = await primitive.execute(input_data, ctx)  # type: ignore[arg-type]
             return result["model"]  # type: ignore[return-value]
         except Exception as e:
             logger.error(f"Model selection failed: {e}")

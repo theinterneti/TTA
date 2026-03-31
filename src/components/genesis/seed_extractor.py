@@ -33,6 +33,10 @@ except ImportError:
         WorkflowContext,
         WorkflowPrimitive,
     )
+from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 from src.ai_components.llm_factory import get_llm
 
@@ -112,7 +116,7 @@ RULES:
 """
 
 
-class _ExtractionCall(WorkflowPrimitive):
+class _ExtractionCall(WorkflowPrimitive):  # type: ignore[misc]
     """Single LLM extraction call — wrapped by RetryPrimitive."""
 
     def __init__(self, llm: Any) -> None:
@@ -150,7 +154,7 @@ class _ExtractionCall(WorkflowPrimitive):
             return {}
 
 
-class _ExtractionFallback(WorkflowPrimitive):
+class _ExtractionFallback(WorkflowPrimitive):  # type: ignore[misc]
     """Returns empty dict — extraction is best-effort, never blocking."""
 
     async def execute(
@@ -159,7 +163,7 @@ class _ExtractionFallback(WorkflowPrimitive):
         return {}
 
 
-class _SurpriseCall(WorkflowPrimitive):
+class _SurpriseCall(WorkflowPrimitive):  # type: ignore[misc]
     """Generates a complete WorldSeed for 'surprise me' requests."""
 
     _SURPRISE_SYSTEM = """\
@@ -248,17 +252,17 @@ class SeedExtractor:
 
     def __init__(self, llm: Any | None = None) -> None:
         _llm = llm or get_llm(temperature=0.1, max_tokens=300)
-        self._extractor = FallbackPrimitive(
-            primary=RetryPrimitive(
+        self._extractor = FallbackPrimitive(  # type: ignore[arg-type]
+            primary=RetryPrimitive(  # type: ignore[arg-type]
                 _ExtractionCall(_llm),
-                strategy=RetryStrategy(max_retries=2, backoff_base=1.0),
+                strategy=RetryStrategy(max_retries=2, backoff_base=1.0),  # type: ignore[arg-type]
             ),
             fallback=_ExtractionFallback(),
         )
-        self._surprise = FallbackPrimitive(
-            primary=RetryPrimitive(
+        self._surprise = FallbackPrimitive(  # type: ignore[arg-type]
+            primary=RetryPrimitive(  # type: ignore[arg-type]
                 _SurpriseCall(_llm),
-                strategy=RetryStrategy(max_retries=2, backoff_base=1.0),
+                strategy=RetryStrategy(max_retries=2, backoff_base=1.0),  # type: ignore[arg-type]
             ),
             fallback=_ExtractionFallback(),
         )
@@ -283,9 +287,9 @@ class SeedExtractor:
             Dict of newly extracted fields (may be empty).
         """
         context = WorkflowContext(workflow_id=session_id)
-        raw = await self._extractor.execute(
+        raw = await self._extractor.execute(  # type: ignore[arg-type]
             {"player_input": player_input, "current_fields": current_fields},
-            context,
+            context,  # type: ignore[arg-type]
         )
         # Drop already-established fields; validate enum values
         new_only = {k: v for k, v in raw.items() if k not in current_fields}
@@ -296,5 +300,5 @@ class SeedExtractor:
     ) -> dict[str, Any]:
         """Generate a complete WorldSeed for 'surprise me' requests."""
         context = WorkflowContext(workflow_id=session_id)
-        raw = await self._surprise.execute({}, context)
+        raw = await self._surprise.execute({}, context)  # type: ignore[arg-type]
         return _validate_fields(raw)

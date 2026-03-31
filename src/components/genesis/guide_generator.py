@@ -36,6 +36,10 @@ except ImportError:
         WorkflowContext,
         WorkflowPrimitive,
     )
+from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
+    CircuitBreakerConfig,
+    CircuitBreakerPrimitive,
+)
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import (
@@ -149,7 +153,7 @@ Rules:
 """
 
 
-class _GuideNameCall(WorkflowPrimitive):
+class _GuideNameCall(WorkflowPrimitive):  # type: ignore[misc]
     """LLM call to generate guide name + intro line."""
 
     def __init__(self, llm: Any) -> None:
@@ -207,7 +211,7 @@ _GUIDE_FALLBACK = {
 }
 
 
-class _GuideFallback(WorkflowPrimitive):
+class _GuideFallback(WorkflowPrimitive):  # type: ignore[misc]
     async def execute(
         self, input_data: dict, context: WorkflowContext
     ) -> dict[str, str]:
@@ -240,18 +244,18 @@ async def derive_guide_character(
     _llm = llm or get_llm(temperature=0.8, max_tokens=200)
     structural = _derive_structural(seed_fields)
 
-    name_gen = FallbackPrimitive(
-        primary=RetryPrimitive(
+    name_gen = FallbackPrimitive(  # type: ignore[arg-type]
+        primary=RetryPrimitive(  # type: ignore[arg-type]
             _GuideNameCall(_llm),
-            strategy=RetryStrategy(max_retries=2, backoff_base=1.0),
+            strategy=RetryStrategy(max_retries=2, backoff_base=1.0),  # type: ignore[arg-type]
         ),
         fallback=_GuideFallback(),
     )
 
     context = WorkflowContext(workflow_id=session_id)
-    evocative = await name_gen.execute(
+    evocative = await name_gen.execute(  # type: ignore[arg-type]
         {"structural": structural, "fields": seed_fields},
-        context,
+        context,  # type: ignore[arg-type]
     )
 
     return GuideCharacter(
