@@ -43,6 +43,8 @@ except ImportError:
     class WorkflowPrimitive:  # type: ignore[no-redef]
         async def execute(self, data: object, ctx: object) -> object: ...
 
+from src.agent_orchestration.crisis_detection.detector import CrisisDetector
+from src.agent_orchestration.crisis_detection.enums import CrisisLevel
 from src.ai_components.llm_factory import get_llm
 
 from .models import (
@@ -160,11 +162,15 @@ class IPAAgent:
         # result.npc_names == ["blacksmith"]
     """
 
-    def __init__(self, llm: Any | None = None) -> None:
+    def __init__(
+        self, llm: Any | None = None, crisis_detector: CrisisDetector | None = None
+    ) -> None:
         """
         Args:
             llm: LLM instance for intent classification. Defaults to
                  a low-temperature model via ``get_llm()``.
+            crisis_detector: Crisis detector instance. Defaults to
+                             ``CrisisDetector()`` with built-in patterns.
         """
         _llm = llm or get_llm(temperature=0.1, max_tokens=400)
         self._primitive = FallbackPrimitive(
@@ -174,6 +180,7 @@ class IPAAgent:
             ),
             fallback=_IPAFallback(),
         )
+        self._crisis_detector = crisis_detector or CrisisDetector()
 
     async def process(
         self,
@@ -238,6 +245,24 @@ class IPAAgent:
             tone.safety_signal,
         )
 
+        # Run crisis detection (synchronous, non-blocking)
+        crisis = self._crisis_detector.assess(raw_text)
+
+        # If LLM detected safety_signal=True but crisis detector returned LOW,
+        # bump to MODERATE — the LLM has broader context for distress cues.
+        if tone.safety_signal and crisis.crisis_level == CrisisLevel.LOW:
+            crisis_level = CrisisLevel.MODERATE
+        else:
+            crisis_level = crisis.crisis_level
+
+        if crisis_level != CrisisLevel.LOW:
+            logger.warning(
+                "ipa: crisis_level=%s confidence=%.2f session=%s",
+                crisis_level,
+                crisis.confidence,
+                session_id,
+            )
+
         return ProcessedInput(
             raw_text=raw_text,
             normalized_text=normalized_text,
@@ -248,4 +273,6 @@ class IPAAgent:
             session_id=session_id,
             player_id=player_id,
             location_id=location_id,
+            crisis_level=crisis_level,
+            crisis_confidence=crisis.confidence,
         )
