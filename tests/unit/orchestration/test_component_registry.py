@@ -76,7 +76,7 @@ class TestComponentRegistry(unittest.TestCase):
         (self.temp_components_dir / "__init__.py").touch()
         (self.temp_components_dir / "dummy_component.py").write_text(
             """from src.orchestration.component import Component
-from tests.test_component_registry import DummyComponent
+from tests.unit.orchestration.test_component_registry import DummyComponent
 """
         )
         (self.temp_components_dir / "non_component_class.py").write_text(

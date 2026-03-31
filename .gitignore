@@ -186,6 +186,8 @@ tta.dev/neo4j/plugins/
 redis/
 redis-data/
 dump.rdb
+# Allow test directory for redis integration tests
+!tests/integration/redis/
 
 # -------------------------------------------------
 # 8) Environment & secrets (do NOT commit secrets)
