@@ -15,11 +15,15 @@ And private helpers:
 
 from __future__ import annotations
 
+import pytest
+
 from unittest.mock import MagicMock
 
 from src.player_experience.services.default_character_world_service import (
     DefaultCharacterWorldService,
 )
+
+pytestmark = pytest.mark.unit
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -67,18 +71,21 @@ def _make_service(
 
 class TestInitializeDefaultCharacterAndWorld:
     def test_skips_when_player_has_existing_characters(self):
+        """Initialize Default Character And World: skips when player has existing characters."""
         existing = [MagicMock()]
         svc = _make_service(player_characters=existing)
         result = svc.initialize_default_character_and_world("p1")
         assert result == (None, None, None)
 
     def test_returns_none_triple_when_character_creation_fails(self):
+        """Initialize Default Character And World: returns none triple when character creation fails."""
         svc = _make_service()
         svc.character_manager.create_character.side_effect = RuntimeError("db error")
         result = svc.initialize_default_character_and_world("p1")
         assert result == (None, None, None)
 
     def test_returns_char_and_none_when_world_not_found(self):
+        """Initialize Default Character And World: returns char and none when world not found."""
         char = MagicMock()
         char.character_id = "char-123"
         svc = _make_service(create_character_result=char)
@@ -90,6 +97,7 @@ class TestInitializeDefaultCharacterAndWorld:
         assert session_id is None
 
     def test_full_success_returns_all_three_ids(self):
+        """Initialize Default Character And World: full success returns all three ids."""
         char = MagicMock()
         char.character_id = "char-456"
         svc = _make_service(create_character_result=char)
@@ -101,6 +109,7 @@ class TestInitializeDefaultCharacterAndWorld:
         assert len(session_id) > 0
 
     def test_unexpected_exception_returns_none_triple(self):
+        """Initialize Default Character And World: unexpected exception returns none triple."""
         svc = _make_service()
         svc.character_manager.get_player_characters.side_effect = RuntimeError(
             "unexpected"
@@ -109,11 +118,13 @@ class TestInitializeDefaultCharacterAndWorld:
         assert result == (None, None, None)
 
     def test_calls_get_player_characters_with_player_id(self):
+        """Initialize Default Character And World: calls get player characters with player id."""
         svc = _make_service()
         svc.initialize_default_character_and_world("player-42")
         svc.character_manager.get_player_characters.assert_called_once_with("player-42")
 
     def test_verifies_default_world_exists(self):
+        """Initialize Default Character And World: verifies default world exists."""
         svc = _make_service()
         svc.initialize_default_character_and_world("p1")
         svc.world_manager.get_world_details.assert_called_once_with(
@@ -121,6 +132,7 @@ class TestInitializeDefaultCharacterAndWorld:
         )
 
     def test_world_check_skipped_when_char_creation_fails(self):
+        """Initialize Default Character And World: world check skipped when char creation fails."""
         svc = _make_service()
         svc.character_manager.create_character.side_effect = RuntimeError("fail")
         svc.initialize_default_character_and_world("p1")
@@ -134,6 +146,7 @@ class TestInitializeDefaultCharacterAndWorld:
 
 class TestCreateDefaultCharacter:
     def test_returns_character_id_on_success(self):
+        """Create Default Character: returns character id on success."""
         char = MagicMock()
         char.character_id = "char-789"
         svc = _make_service(create_character_result=char)
@@ -141,12 +154,14 @@ class TestCreateDefaultCharacter:
         assert result == "char-789"
 
     def test_returns_none_on_exception(self):
+        """Create Default Character: returns none on exception."""
         svc = _make_service()
         svc.character_manager.create_character.side_effect = ValueError("bad data")
         result = svc._create_default_character("p1")
         assert result is None
 
     def test_passes_player_id_to_manager(self):
+        """Create Default Character: passes player id to manager."""
         svc = _make_service()
         svc._create_default_character("player-99")
         call_args = svc.character_manager.create_character.call_args
@@ -160,6 +175,7 @@ class TestCreateDefaultCharacter:
 
 class TestCreateInitialSession:
     def test_returns_uuid_string(self):
+        """Create Initial Session: returns uuid string."""
         svc = _make_service()
         session_id = svc._create_initial_session("p1", "c1", "w1")
         assert session_id is not None
@@ -167,6 +183,7 @@ class TestCreateInitialSession:
         assert "-" in session_id
 
     def test_returns_different_ids_each_call(self):
+        """Create Initial Session: returns different ids each call."""
         svc = _make_service()
         s1 = svc._create_initial_session("p1", "c1", "w1")
         s2 = svc._create_initial_session("p1", "c1", "w1")

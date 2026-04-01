@@ -39,23 +39,28 @@ from src.components.narrative_coherence.rules import (
 
 
 def test_severity_weights_lore_expected_keys():
+    """Severity weights lore expected keys."""
     assert set(SEVERITY_WEIGHTS_LORE) == {"INFO", "WARNING", "ERROR", "CRITICAL"}
 
 
 def test_severity_weights_lore_ordered():
+    """Severity weights lore ordered."""
     w = SEVERITY_WEIGHTS_LORE
     assert w["INFO"] < w["WARNING"] < w["ERROR"] < w["CRITICAL"]
 
 
 def test_severity_weights_therapeutic_expected_keys():
+    """Severity weights therapeutic expected keys."""
     assert set(SEVERITY_WEIGHTS_THERAPEUTIC) == {"INFO", "WARNING", "ERROR", "CRITICAL"}
 
 
 def test_overall_weights_sum_to_one():
+    """Overall weights sum to one."""
     assert sum(OVERALL_WEIGHTS.values()) == pytest.approx(1.0)
 
 
 def test_overall_weights_expected_components():
+    """Overall weights expected components."""
     assert set(OVERALL_WEIGHTS) == {"lore", "character", "causal", "therapeutic"}
 
 
@@ -65,6 +70,7 @@ def test_overall_weights_expected_components():
 
 
 def test_validation_severity_values():
+    """Validation severity values."""
     assert ValidationSeverity.INFO.value == "info"
     assert ValidationSeverity.WARNING.value == "warning"
     assert ValidationSeverity.ERROR.value == "error"
@@ -72,6 +78,7 @@ def test_validation_severity_values():
 
 
 def test_consistency_issue_type_values():
+    """Consistency issue type values."""
     assert ConsistencyIssueType.LORE_VIOLATION.value == "lore_violation"
     assert (
         ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT.value
@@ -85,6 +92,7 @@ def test_consistency_issue_type_values():
 
 
 def test_narrative_content_defaults():
+    """Narrative content defaults."""
     content = NarrativeContent(content_id="c1", content_type="scene", text="A forest.")
     assert content.related_characters == []
     assert content.themes == []
@@ -93,6 +101,7 @@ def test_narrative_content_defaults():
 
 
 def test_narrative_content_character_alias():
+    """Narrative content character alias."""
     content = NarrativeContent(
         content_id="c1",
         content_type="scene",
@@ -105,6 +114,7 @@ def test_narrative_content_character_alias():
 
 
 def test_validation_result_defaults():
+    """Validation result defaults."""
     result = ValidationResult(is_valid=True, consistency_score=0.9)
     assert result.detected_issues == []
     assert result.suggested_corrections == []
@@ -112,6 +122,7 @@ def test_validation_result_defaults():
 
 
 def test_consistency_issue_defaults():
+    """Consistency issue defaults."""
     issue = ConsistencyIssue(
         issue_id="i1",
         issue_type=ConsistencyIssueType.LORE_VIOLATION,
@@ -124,6 +135,7 @@ def test_consistency_issue_defaults():
 
 
 def test_lore_entry_defaults():
+    """Lore entry defaults."""
     entry = LoreEntry(
         lore_id="l1", category="character", title="Hero", description="A brave hero."
     )
@@ -133,18 +145,21 @@ def test_lore_entry_defaults():
 
 
 def test_storyline_thread_defaults():
+    """Storyline thread defaults."""
     thread = StorylineThread(thread_id="t1", title="Main quest")
     assert thread.participants == []
     assert thread.resolution_target is None
 
 
 def test_convergence_validation_defaults():
+    """Convergence validation defaults."""
     cv = ConvergenceValidation(session_id="s1", storyline_count=3, is_convergent=True)
     assert cv.strong_connections == []
     assert cv.convergence_score == 0.0
 
 
 def test_contradiction_defaults():
+    """Contradiction defaults."""
     c = Contradiction(
         contradiction_id="x1",
         type="temporal",
@@ -156,6 +171,7 @@ def test_contradiction_defaults():
 
 
 def test_creative_solution_defaults():
+    """Creative solution defaults."""
     cs = CreativeSolution(
         solution_id="s1", solution_type="rewrite", description="Rewrite scene"
     )
@@ -169,6 +185,7 @@ def test_creative_solution_defaults():
 
 
 def test_causal_validator_init_loads_rules():
+    """Causal validator init loads rules."""
     v = CausalValidator(config={})
     assert "temporal_precedence" in v.causal_rules
     assert "logical_necessity" in v.causal_rules
@@ -177,6 +194,7 @@ def test_causal_validator_init_loads_rules():
 
 
 def test_causal_validator_init_loads_logical_operators():
+    """Causal validator init loads logical operators."""
     v = CausalValidator(config={})
     assert "if" in v.logical_operators
     assert "therefore" in v.logical_operators
@@ -184,6 +202,7 @@ def test_causal_validator_init_loads_logical_operators():
 
 
 def test_causal_validator_init_loads_consequence_patterns():
+    """Causal validator init loads consequence patterns."""
     v = CausalValidator(config={})
     assert "immediate" in v.consequence_patterns
     assert "delayed" in v.consequence_patterns
@@ -198,6 +217,7 @@ def test_causal_validator_init_loads_consequence_patterns():
 
 @pytest.mark.asyncio
 async def test_causal_validator_empty_branch_valid():
+    """Causal validator empty branch valid."""
     v = CausalValidator(config={})
     result = await v.validate_causal_logic([])
     assert result.is_valid is True
@@ -207,6 +227,7 @@ async def test_causal_validator_empty_branch_valid():
 
 @pytest.mark.asyncio
 async def test_causal_validator_empty_branch_returns_corrections():
+    """Causal validator empty branch returns corrections."""
     v = CausalValidator(config={})
     result = await v.validate_causal_logic([])
     assert result.suggested_corrections == []
@@ -219,6 +240,7 @@ async def test_causal_validator_empty_branch_returns_corrections():
 
 @pytest.mark.asyncio
 async def test_causal_validator_non_empty_branch_no_issues():
+    """Causal validator non empty branch no issues."""
     v = CausalValidator(config={})
     content = NarrativeContent(
         content_id="c1", content_type="scene", text="A begins, B follows."
@@ -231,6 +253,7 @@ async def test_causal_validator_non_empty_branch_no_issues():
 
 @pytest.mark.asyncio
 async def test_causal_validator_respects_custom_threshold():
+    """Causal validator respects custom threshold."""
     v = CausalValidator(config={"causal_threshold": 0.99})
     result = await v.validate_causal_logic([])
     # score=1.0 still passes even with 0.99 threshold
@@ -243,11 +266,13 @@ async def test_causal_validator_respects_custom_threshold():
 
 
 def test_causal_consistency_score_no_issues():
+    """Causal consistency score no issues."""
     v = CausalValidator(config={})
     assert v._calculate_causal_consistency_score([]) == pytest.approx(1.0)
 
 
 def test_causal_consistency_score_with_critical_issue():
+    """Causal consistency score with critical issue."""
     v = CausalValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i1",
@@ -262,6 +287,7 @@ def test_causal_consistency_score_with_critical_issue():
 
 
 def test_causal_consistency_score_with_low_confidence():
+    """Causal consistency score with low confidence."""
     v = CausalValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i1",
@@ -281,6 +307,7 @@ def test_causal_consistency_score_with_low_confidence():
 
 @pytest.mark.asyncio
 async def test_causal_generate_corrections_for_issues():
+    """Causal generate corrections for issues."""
     v = CausalValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i1",
@@ -300,6 +327,7 @@ async def test_causal_generate_corrections_for_issues():
 
 
 def test_coherence_validator_init_default_thresholds():
+    """Coherence validator init default thresholds."""
     v = CoherenceValidator(config={})
     assert v.consistency_threshold == pytest.approx(0.7)
     assert v.lore_compliance_threshold == pytest.approx(0.8)
@@ -307,6 +335,7 @@ def test_coherence_validator_init_default_thresholds():
 
 
 def test_coherence_validator_init_custom_thresholds():
+    """Coherence validator init custom thresholds."""
     v = CoherenceValidator(config={"consistency_threshold": 0.5})
     assert v.consistency_threshold == pytest.approx(0.5)
 
@@ -318,6 +347,7 @@ def test_coherence_validator_init_custom_thresholds():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_clean_content_is_valid():
+    """Coherence validator clean content is valid."""
     v = CoherenceValidator(config={})
     content = NarrativeContent(
         content_id="c1", content_type="scene", text="The hero walks through the forest."
@@ -331,6 +361,7 @@ async def test_coherence_validator_clean_content_is_valid():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_clean_content_scores_all_ones():
+    """Coherence validator clean content scores all ones."""
     v = CoherenceValidator(config={})
     content = NarrativeContent(
         content_id="c2", content_type="dialogue", text="Hello world."
@@ -351,6 +382,7 @@ async def test_coherence_validator_clean_content_scores_all_ones():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_unknown_character_emits_warning():
+    """Coherence validator unknown character emits warning."""
     v = CoherenceValidator(config={"character_consistency_threshold": 0.0})
     content = NarrativeContent(
         content_id="c3",
@@ -376,6 +408,7 @@ async def test_coherence_validator_unknown_character_emits_warning():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_lore_must_not_constraint_violation():
+    """Coherence validator lore must not constraint violation."""
     v = CoherenceValidator(config={})
     lore = LoreEntry(
         lore_id="l1",
@@ -402,6 +435,7 @@ async def test_coherence_validator_lore_must_not_constraint_violation():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_lore_must_have_constraint_satisfied():
+    """Coherence validator lore must have constraint satisfied."""
     v = CoherenceValidator(config={})
     lore = LoreEntry(
         lore_id="l2",
@@ -429,6 +463,7 @@ async def test_coherence_validator_lore_must_have_constraint_satisfied():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_lore_must_have_constraint_violated():
+    """Coherence validator lore must have constraint violated."""
     v = CoherenceValidator(config={})
     lore = LoreEntry(
         lore_id="l3",
@@ -459,11 +494,13 @@ async def test_coherence_validator_lore_must_have_constraint_violated():
 
 
 def test_calculate_lore_compliance_no_issues():
+    """Calculate lore compliance no issues."""
     v = CoherenceValidator(config={})
     assert v._calculate_lore_compliance_score([]) == pytest.approx(1.0)
 
 
 def test_calculate_lore_compliance_critical_full_penalty():
+    """Calculate lore compliance critical full penalty."""
     v = CoherenceValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i1",
@@ -477,11 +514,13 @@ def test_calculate_lore_compliance_critical_full_penalty():
 
 
 def test_calculate_therapeutic_alignment_no_issues():
+    """Calculate therapeutic alignment no issues."""
     v = CoherenceValidator(config={})
     assert v._calculate_therapeutic_alignment_score([]) == pytest.approx(1.0)
 
 
 def test_calculate_overall_consistency_score():
+    """Calculate overall consistency score."""
     v = CoherenceValidator(config={})
     result = ValidationResult(
         is_valid=True,
@@ -496,6 +535,7 @@ def test_calculate_overall_consistency_score():
 
 
 def test_calculate_overall_consistency_score_partial():
+    """Calculate overall consistency score partial."""
     v = CoherenceValidator(config={})
     result = ValidationResult(
         is_valid=True,
@@ -515,6 +555,7 @@ def test_calculate_overall_consistency_score_partial():
 
 @pytest.mark.asyncio
 async def test_generate_generic_correction_lore_violation():
+    """Generate generic correction lore violation."""
     v = CoherenceValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i1",
@@ -530,6 +571,7 @@ async def test_generate_generic_correction_lore_violation():
 
 @pytest.mark.asyncio
 async def test_generate_generic_correction_character_inconsistency():
+    """Generate generic correction character inconsistency."""
     v = CoherenceValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i2",
@@ -545,6 +587,7 @@ async def test_generate_generic_correction_character_inconsistency():
 
 @pytest.mark.asyncio
 async def test_generate_corrections_uses_suggested_fix_when_present():
+    """Generate corrections uses suggested fix when present."""
     v = CoherenceValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i3",
@@ -559,6 +602,7 @@ async def test_generate_corrections_uses_suggested_fix_when_present():
 
 @pytest.mark.asyncio
 async def test_generate_corrections_therapeutic_misalignment():
+    """Generate corrections therapeutic misalignment."""
     v = CoherenceValidator(config={})
     issue = ConsistencyIssue(
         issue_id="i4",
@@ -580,8 +624,11 @@ from src.components.narrative_coherence.contradiction_detector import (
     ContradictionDetector,
 )
 
+pytestmark = pytest.mark.unit
+
 
 def test_contradiction_detector_init_loads_patterns():
+    """Contradiction detector init loads patterns."""
     d = ContradictionDetector(config={})
     assert "negation" in d.contradiction_patterns
     assert "affirmation" in d.contradiction_patterns
@@ -591,6 +638,7 @@ def test_contradiction_detector_init_loads_patterns():
 
 
 def test_contradiction_detector_init_loads_temporal_markers():
+    """Contradiction detector init loads temporal markers."""
     d = ContradictionDetector(config={})
     assert "yesterday" in d.temporal_markers
     assert "tomorrow" in d.temporal_markers
@@ -598,6 +646,7 @@ def test_contradiction_detector_init_loads_temporal_markers():
 
 
 def test_contradiction_detector_init_loads_causal_indicators():
+    """Contradiction detector init loads causal indicators."""
     d = ContradictionDetector(config={})
     assert "because" in d.causal_indicators
     assert "therefore" in d.causal_indicators
@@ -606,6 +655,7 @@ def test_contradiction_detector_init_loads_causal_indicators():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_empty_history_returns_empty():
+    """Contradiction detector empty history returns empty."""
     d = ContradictionDetector(config={})
     result = await d.detect_contradictions([])
     assert result == []
@@ -613,6 +663,7 @@ async def test_contradiction_detector_empty_history_returns_empty():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_single_item_returns_empty():
+    """Contradiction detector single item returns empty."""
     d = ContradictionDetector(config={})
     content = NarrativeContent(
         content_id="c1", content_type="scene", text="The hero walks."
@@ -623,6 +674,7 @@ async def test_contradiction_detector_single_item_returns_empty():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_multiple_items_no_contradictions():
+    """Contradiction detector multiple items no contradictions."""
     d = ContradictionDetector(config={})
     items = [
         NarrativeContent(content_id=f"c{i}", content_type="scene", text=f"Scene {i}.")

@@ -40,6 +40,8 @@ from src.player_experience.utils import (
     validate_model,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestPlayerModels(unittest.TestCase):
     """Test player-related data models."""

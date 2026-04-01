@@ -18,6 +18,8 @@ from src.orchestration.component import Component
 from src.orchestration.component_registry import ComponentRegistry
 from src.orchestration.config import TTAConfig
 
+pytestmark = pytest.mark.unit
+
 
 # Dummy Component for testing
 class DummyComponent(Component):

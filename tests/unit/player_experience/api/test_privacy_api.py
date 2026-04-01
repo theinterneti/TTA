@@ -1,3 +1,4 @@
+import pytest
 """
 
 # Logseq: [[TTA.dev/Tests/Test_privacy_api]]
@@ -25,6 +26,8 @@ from src.player_experience.services.privacy_service import (
     PrivacySettings,
     ProcessingPurpose,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class TestPrivacyCompliance(unittest.TestCase):

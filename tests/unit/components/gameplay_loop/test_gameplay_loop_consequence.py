@@ -122,6 +122,7 @@ class TestConsequenceSystemInit:
     """Test construction and initialization of ConsequenceSystem."""
 
     def test_default_construction(self):
+        """Consequence System Init: default construction."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -133,6 +134,7 @@ class TestConsequenceSystemInit:
         assert cs.causality_clarity == "high"
 
     def test_custom_config(self):
+        """Consequence System Init: custom config."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -148,6 +150,7 @@ class TestConsequenceSystemInit:
         assert cs.causality_clarity == "medium"
 
     async def test_initialize_calls_subsystem_initializers(self):
+        """Consequence System Init: initialize calls subsystem initializers."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -166,6 +169,7 @@ class TestConsequenceSystemInit:
         cs.progress_tracker.initialize.assert_called_once()
 
     async def test_initialize_returns_false_on_error(self):
+        """Consequence System Init: initialize returns false on error."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -225,6 +229,7 @@ class TestGenerateConsequences:
         return cs
 
     async def test_returns_consequence_set(self):
+        """Generate Consequences: returns consequence set."""
         cs = self._make_system_with_mocks()
         uc = _make_user_choice()
         scene = _make_scene()
@@ -236,6 +241,7 @@ class TestGenerateConsequences:
         assert result.choice_id == uc.choice_id
 
     async def test_consequence_set_has_immediate_outcomes(self):
+        """Generate Consequences: consequence set has immediate outcomes."""
         cs = self._make_system_with_mocks()
         result = await cs.generate_consequences(
             _make_user_choice(), _make_scene(), _make_session()
@@ -243,6 +249,7 @@ class TestGenerateConsequences:
         assert "You feel calmer" in result.immediate_outcomes
 
     async def test_consequence_set_has_therapeutic_insights(self):
+        """Generate Consequences: consequence set has therapeutic insights."""
         cs = self._make_system_with_mocks()
         result = await cs.generate_consequences(
             _make_user_choice(), _make_scene(), _make_session()
@@ -250,6 +257,7 @@ class TestGenerateConsequences:
         assert "You showed courage" in result.therapeutic_insights
 
     async def test_consequence_set_has_causality_explanation(self):
+        """Generate Consequences: consequence set has causality explanation."""
         cs = self._make_system_with_mocks()
         result = await cs.generate_consequences(
             _make_user_choice(), _make_scene(), _make_session()
@@ -257,6 +265,7 @@ class TestGenerateConsequences:
         assert result.causality_explanation == "Because of your choice"
 
     async def test_consequence_set_has_progress_markers(self):
+        """Generate Consequences: consequence set has progress markers."""
         cs = self._make_system_with_mocks()
         result = await cs.generate_consequences(
             _make_user_choice(), _make_scene(), _make_session()
@@ -264,6 +273,7 @@ class TestGenerateConsequences:
         assert "therapeutic_milestone" in result.progress_markers
 
     async def test_consequence_set_has_skill_development(self):
+        """Generate Consequences: consequence set has skill development."""
         cs = self._make_system_with_mocks()
         result = await cs.generate_consequences(
             _make_user_choice(), _make_scene(), _make_session()
@@ -271,6 +281,7 @@ class TestGenerateConsequences:
         assert "coping_strategies" in result.skill_development
 
     async def test_falls_back_on_exception(self):
+        """Generate Consequences: falls back on exception."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -301,6 +312,7 @@ class TestEvaluateConsequenceImpact:
         return ConsequenceSystem()
 
     async def test_returns_dict_with_expected_keys(self):
+        """Evaluate Consequence Impact: returns dict with expected keys."""
         cs = self._make_system()
         cs_set = _make_consequence_set()
         result = await cs.evaluate_consequence_impact(cs_set, _make_session())
@@ -313,6 +325,7 @@ class TestEvaluateConsequenceImpact:
         assert "growth_indicators" in result
 
     async def test_overall_impact_between_0_and_1(self):
+        """Evaluate Consequence Impact: overall impact between 0 and 1."""
         cs = self._make_system()
         cs_set = _make_consequence_set(
             therapeutic_value=0.8,
@@ -324,6 +337,7 @@ class TestEvaluateConsequenceImpact:
         assert 0.0 <= result["overall_impact"] <= 1.0
 
     async def test_impact_areas_populated(self):
+        """Evaluate Consequence Impact: impact areas populated."""
         cs = self._make_system()
         cs_set = _make_consequence_set(
             therapeutic_insights=["insight"],
@@ -339,18 +353,21 @@ class TestEvaluateConsequenceImpact:
         assert "story_progression" in result["impact_areas"]
 
     async def test_growth_indicators_high_therapeutic_value(self):
+        """Evaluate Consequence Impact: growth indicators high therapeutic value."""
         cs = self._make_system()
         cs_set = _make_consequence_set(therapeutic_value=0.9)
         result = await cs.evaluate_consequence_impact(cs_set, _make_session())
         assert "high_therapeutic_value" in result["growth_indicators"]
 
     async def test_growth_indicators_multiple_learning_paths(self):
+        """Evaluate Consequence Impact: growth indicators multiple learning paths."""
         cs = self._make_system()
         cs_set = _make_consequence_set(learning_opportunities=["path1", "path2"])
         result = await cs.evaluate_consequence_impact(cs_set, _make_session())
         assert "multiple_learning_paths" in result["growth_indicators"]
 
     async def test_growth_indicators_positive_emotional(self):
+        """Evaluate Consequence Impact: growth indicators positive emotional."""
         cs = self._make_system()
         cs_set = _make_consequence_set(
             emotional_impact={"primary_emotion": "positive", "intensity": 0.8}
@@ -373,6 +390,7 @@ class TestEvaluateConsequenceImpact:
         assert "overall_impact" in result
 
     async def test_learning_impact_with_long_causality(self):
+        """Evaluate Consequence Impact: learning impact with long causality."""
         cs = self._make_system()
         cs_set = _make_consequence_set(
             learning_opportunities=["path1", "path2", "path3"],
@@ -383,6 +401,7 @@ class TestEvaluateConsequenceImpact:
         assert result["learning_impact"] > 0.0
 
     async def test_emotional_impact_with_positive_emotion(self):
+        """Evaluate Consequence Impact: emotional impact with positive emotion."""
         cs = self._make_system()
         cs_set = _make_consequence_set(
             emotional_impact={"primary_emotion": "hopeful", "intensity": 0.7},
@@ -417,6 +436,7 @@ class TestAdaptConsequences:
         return cs
 
     async def test_returns_adapted_consequence_set(self):
+        """Adapt Consequences: returns adapted consequence set."""
         cs = self._make_system_with_mocks()
         original = _make_consequence_set(choice_id="c1")
         result = await cs.adapt_consequences_for_emotional_state(
@@ -426,6 +446,7 @@ class TestAdaptConsequences:
         assert result.consequence_id != original.consequence_id  # new ID
 
     async def test_adapted_insights_are_applied(self):
+        """Adapt Consequences: adapted insights are applied."""
         cs = self._make_system_with_mocks()
         original = _make_consequence_set()
         result = await cs.adapt_consequences_for_emotional_state(
@@ -434,6 +455,7 @@ class TestAdaptConsequences:
         assert result.therapeutic_insights == ["Adapted insight"]
 
     async def test_adapted_causality_is_applied(self):
+        """Adapt Consequences: adapted causality is applied."""
         cs = self._make_system_with_mocks()
         original = _make_consequence_set()
         result = await cs.adapt_consequences_for_emotional_state(
@@ -442,6 +464,7 @@ class TestAdaptConsequences:
         assert result.causality_explanation == "Adapted causality explanation"
 
     async def test_returns_original_on_exception(self):
+        """Adapt Consequences: returns original on exception."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -464,6 +487,7 @@ class TestAdaptConsequences:
 
 class TestFallbackConsequences:
     async def test_fallback_has_required_fields(self):
+        """Fallback Consequences: fallback has required fields."""
         from src.components.gameplay_loop.consequence_system.system import (
             ConsequenceSystem,
         )
@@ -488,6 +512,7 @@ class TestFallbackConsequences:
 
 class TestTherapeuticFramerInit:
     def test_default_construction(self):
+        """Therapeutic Framer Init: default construction."""
         tf = TherapeuticFramer()
         assert tf.config == {}
         assert tf.framing_templates == {}
@@ -496,11 +521,13 @@ class TestTherapeuticFramerInit:
         assert tf.growth_framing_strategies == {}
 
     async def test_initialize_returns_true(self):
+        """Therapeutic Framer Init: initialize returns true."""
         tf = TherapeuticFramer()
         result = await tf.initialize()
         assert result is True
 
     async def test_initialize_populates_templates(self):
+        """Therapeutic Framer Init: initialize populates templates."""
         tf = TherapeuticFramer()
         await tf.initialize()
         assert "positive_outcome" in tf.framing_templates
@@ -508,6 +535,7 @@ class TestTherapeuticFramerInit:
         assert "neutral_outcome" in tf.framing_templates
 
     async def test_initialize_populates_learning_patterns(self):
+        """Therapeutic Framer Init: initialize populates learning patterns."""
         tf = TherapeuticFramer()
         await tf.initialize()
         assert "self_awareness" in tf.learning_opportunity_patterns
@@ -515,12 +543,14 @@ class TestTherapeuticFramerInit:
         assert "mindfulness_practice" in tf.learning_opportunity_patterns
 
     async def test_initialize_populates_growth_strategies(self):
+        """Therapeutic Framer Init: initialize populates growth strategies."""
         tf = TherapeuticFramer()
         await tf.initialize()
         assert "reframe_challenges" in tf.growth_framing_strategies
         assert "highlight_progress" in tf.growth_framing_strategies
 
     async def test_initialize_returns_false_on_error(self):
+        """Therapeutic Framer Init: initialize returns false on error."""
         tf = TherapeuticFramer()
         with patch.object(
             tf, "_load_framing_templates", side_effect=RuntimeError("err")
@@ -542,6 +572,7 @@ class TestFrameOutcomes:
         return tf
 
     async def test_returns_dict_with_expected_keys(self, initialized_framer):
+        """Frame Outcomes: returns dict with expected keys."""
         uc = _make_user_choice()
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert "insights" in result
@@ -551,6 +582,7 @@ class TestFrameOutcomes:
         assert "positive_reframes" in result
 
     async def test_high_therapeutic_value_insight(self, initialized_framer):
+        """Frame Outcomes: high therapeutic value insight."""
         uc = _make_user_choice(therapeutic_value=0.8)
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert len(result["insights"]) > 0
@@ -558,18 +590,21 @@ class TestFrameOutcomes:
         assert "strong therapeutic engagement" in combined
 
     async def test_medium_therapeutic_value_insight(self, initialized_framer):
+        """Frame Outcomes: medium therapeutic value insight."""
         uc = _make_user_choice(therapeutic_value=0.5)
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         combined = " ".join(result["insights"])
         assert "therapeutic journey" in combined
 
     async def test_low_therapeutic_value_insight(self, initialized_framer):
+        """Frame Outcomes: low therapeutic value insight."""
         uc = _make_user_choice(therapeutic_value=0.2)
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         combined = " ".join(result["insights"])
         assert "Every choice" in combined
 
     async def test_positive_emotional_outcome_adds_insight(self, initialized_framer):
+        """Frame Outcomes: positive emotional outcome adds insight."""
         uc = _make_user_choice(therapeutic_value=0.7)
         outcomes = {"emotional_impact": {"primary_emotion": "positive"}}
         result = await initialized_framer.frame_outcomes(outcomes, uc, _make_session())
@@ -579,6 +614,7 @@ class TestFrameOutcomes:
     async def test_therapeutic_value_boosted_for_positive_emotion(
         self, initialized_framer
     ):
+        """Frame Outcomes: therapeutic value boosted for positive emotion."""
         uc = _make_user_choice(therapeutic_value=0.7)
         outcomes = {"emotional_impact": {"primary_emotion": "hopeful"}}
         result = await initialized_framer.frame_outcomes(outcomes, uc, _make_session())
@@ -586,6 +622,7 @@ class TestFrameOutcomes:
         assert result["therapeutic_value"] == pytest.approx(0.8, abs=0.01)
 
     async def test_learning_opportunities_from_tags(self, initialized_framer):
+        """Frame Outcomes: learning opportunities from tags."""
         uc = _make_user_choice(therapeutic_tags=["self_awareness"])
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert len(result["learning_opportunities"]) > 0
@@ -593,22 +630,26 @@ class TestFrameOutcomes:
     async def test_learning_opportunities_fallback_when_no_tags(
         self, initialized_framer
     ):
+        """Frame Outcomes: learning opportunities fallback when no tags."""
         uc = _make_user_choice(therapeutic_tags=[])
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert len(result["learning_opportunities"]) > 0
         assert "values" in result["learning_opportunities"][0]
 
     async def test_growth_aspects_therapeutic_engagement(self, initialized_framer):
+        """Frame Outcomes: growth aspects therapeutic engagement."""
         uc = _make_user_choice(therapeutic_value=0.7)
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert "therapeutic_engagement" in result["growth_aspects"]
 
     async def test_growth_aspects_resilience_tag(self, initialized_framer):
+        """Frame Outcomes: growth aspects resilience tag."""
         uc = _make_user_choice(therapeutic_value=0.7, therapeutic_tags=["resilience"])
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert "resilience" in result["growth_aspects"]
 
     async def test_positive_reframes_not_empty(self, initialized_framer):
+        """Frame Outcomes: positive reframes not empty."""
         uc = _make_user_choice()
         result = await initialized_framer.frame_outcomes({}, uc, _make_session())
         assert len(result["positive_reframes"]) > 0
@@ -636,6 +677,7 @@ class TestAdaptFramingForEmotion:
         return tf
 
     async def test_crisis_state_returns_safety_insight(self, initialized_framer):
+        """Adapt Framing For Emotion: crisis state returns safety insight."""
         cs_set = _make_consequence_set(
             therapeutic_insights=["Original insight"],
             learning_opportunities=["Original learning"],
@@ -647,6 +689,7 @@ class TestAdaptFramingForEmotion:
         assert "safe" in result["insights"][0].lower()
 
     async def test_crisis_state_boosts_therapeutic_value(self, initialized_framer):
+        """Adapt Framing For Emotion: crisis state boosts therapeutic value."""
         cs_set = _make_consequence_set(therapeutic_value=0.3)
         result = await initialized_framer.adapt_framing_for_emotion(
             cs_set, EmotionalState.CRISIS.value, _make_session()
@@ -654,6 +697,7 @@ class TestAdaptFramingForEmotion:
         assert result["therapeutic_value"] >= 0.7
 
     async def test_anxious_state_limits_insights_to_one(self, initialized_framer):
+        """Adapt Framing For Emotion: anxious state limits insights to one."""
         cs_set = _make_consequence_set(
             therapeutic_insights=["Insight 1", "Insight 2", "Insight 3"],
             therapeutic_value=0.5,
@@ -665,6 +709,7 @@ class TestAdaptFramingForEmotion:
         assert "one step" in result["insights"][0].lower()
 
     async def test_anxious_state_limits_learning_to_one(self, initialized_framer):
+        """Adapt Framing For Emotion: anxious state limits learning to one."""
         cs_set = _make_consequence_set(
             learning_opportunities=["learn1", "learn2"],
             therapeutic_value=0.5,
@@ -675,6 +720,7 @@ class TestAdaptFramingForEmotion:
         assert len(result["learning_opportunities"]) == 1
 
     async def test_anxious_state_boosts_value_slightly(self, initialized_framer):
+        """Adapt Framing For Emotion: anxious state boosts value slightly."""
         cs_set = _make_consequence_set(therapeutic_value=0.6)
         result = await initialized_framer.adapt_framing_for_emotion(
             cs_set, EmotionalState.ANXIOUS.value, _make_session()
@@ -682,6 +728,7 @@ class TestAdaptFramingForEmotion:
         assert result["therapeutic_value"] >= 0.6
 
     async def test_calm_state_preserves_insights(self, initialized_framer):
+        """Adapt Framing For Emotion: calm state preserves insights."""
         cs_set = _make_consequence_set(
             therapeutic_insights=["A", "B", "C"],
             therapeutic_value=0.5,
@@ -692,6 +739,7 @@ class TestAdaptFramingForEmotion:
         assert result["insights"] == ["A", "B", "C"]
 
     async def test_distressed_state_safety_focus(self, initialized_framer):
+        """Adapt Framing For Emotion: distressed state safety focus."""
         cs_set = _make_consequence_set(
             therapeutic_insights=["Normal insight"],
             learning_opportunities=["Normal learning"],
@@ -704,6 +752,7 @@ class TestAdaptFramingForEmotion:
         assert "focus on safety" in result["learning_opportunities"][0].lower()
 
     async def test_empty_insights_returns_fallback(self, initialized_framer):
+        """Adapt Framing For Emotion: empty insights returns fallback."""
         cs_set = _make_consequence_set(therapeutic_insights=[], therapeutic_value=0.5)
         result = await initialized_framer.adapt_framing_for_emotion(
             cs_set, EmotionalState.CALM.value, _make_session()
@@ -711,6 +760,7 @@ class TestAdaptFramingForEmotion:
         assert len(result["insights"]) > 0
 
     async def test_returns_fallback_on_invalid_state(self, initialized_framer):
+        """Adapt Framing For Emotion: returns fallback on invalid state."""
         cs_set = _make_consequence_set()
         result = await initialized_framer.adapt_framing_for_emotion(
             cs_set, "not_a_valid_state", _make_session()

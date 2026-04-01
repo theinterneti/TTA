@@ -1,3 +1,4 @@
+import pytest
 """
 
 # Logseq: [[TTA.dev/Tests/Test_session_narrative_integration]]
@@ -16,6 +17,8 @@ from src.player_experience.managers.session_integration_manager import (
 )
 from src.player_experience.models.enums import SessionStatus, TherapeuticApproach
 from src.player_experience.models.session import SessionContext, TherapeuticSettings
+
+pytestmark = pytest.mark.unit
 
 
 class MockInteractiveNarrativeEngine:

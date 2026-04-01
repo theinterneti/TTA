@@ -30,6 +30,8 @@ from src.components.narrative_arc_orchestrator.resolution_engine import (
     build_simple_resolution,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -86,6 +88,7 @@ def _conflict(
 
 def test_detect_temporal_conflicts_returns_empty():
     # Arrange
+    """Detect temporal conflicts returns empty."""
     events = [
         _event("e1", NarrativeScale.SHORT_TERM),
         _event("e2", NarrativeScale.LONG_TERM),
@@ -95,16 +98,19 @@ def test_detect_temporal_conflicts_returns_empty():
 
 
 def test_detect_character_conflicts_returns_empty():
+    """Detect character conflicts returns empty."""
     events = [_event("e1"), _event("e2")]
     assert detect_character_conflicts(events) == []
 
 
 def test_detect_thematic_conflicts_returns_empty():
+    """Detect thematic conflicts returns empty."""
     events = [_event("e1"), _event("e2")]
     assert detect_thematic_conflicts(events) == []
 
 
 def test_placeholder_detectors_accept_empty_list():
+    """Placeholder detectors accept empty list."""
     assert detect_temporal_conflicts([]) == []
     assert detect_character_conflicts([]) == []
     assert detect_thematic_conflicts([]) == []
@@ -117,6 +123,7 @@ def test_placeholder_detectors_accept_empty_list():
 
 def test_detect_therapeutic_conflicts_skips_same_scale_events():
     # Arrange – two events on the same scale; large alignment gap but same scale
+    """Detect therapeutic conflicts skips same scale events."""
     same_scale_events = [
         _event(
             "e1",
@@ -140,6 +147,7 @@ def test_detect_therapeutic_conflicts_skips_same_scale_events():
 
 def test_detect_therapeutic_conflicts_no_conflict_when_gap_small():
     # Arrange – events on different scales, small alignment gap, no unsafe
+    """Detect therapeutic conflicts no conflict when gap small."""
     events = [
         _event(
             "e1",
@@ -160,6 +168,7 @@ def test_detect_therapeutic_conflicts_no_conflict_when_gap_small():
 
 
 def test_detect_therapeutic_conflicts_single_event_no_pairs():
+    """Detect therapeutic conflicts single event no pairs."""
     assert detect_therapeutic_conflicts([_event("solo")]) == []
 
 
@@ -270,6 +279,7 @@ def test_detect_therapeutic_conflicts_severity_clamped_to_one():
 
 def test_build_simple_resolution_non_therapeutic():
     # Arrange
+    """Build simple resolution non therapeutic."""
     conflict = _conflict(conflict_type="temporal")
 
     # Act
@@ -286,6 +296,7 @@ def test_build_simple_resolution_non_therapeutic():
 
 def test_build_simple_resolution_therapeutic_reframe():
     # Arrange
+    """Build simple resolution therapeutic reframe."""
     conflict = _conflict(
         conflict_type="therapeutic",
         recommended_action="therapeutic_reframe",
@@ -300,6 +311,7 @@ def test_build_simple_resolution_therapeutic_reframe():
 
 
 def test_build_simple_resolution_assigns_unique_ids():
+    """Build simple resolution assigns unique ids."""
     conflict = _conflict()
     r1 = build_simple_resolution(conflict)
     r2 = build_simple_resolution(conflict)
@@ -307,6 +319,7 @@ def test_build_simple_resolution_assigns_unique_ids():
 
 
 def test_build_simple_resolution_metadata_contains_affected_events():
+    """Build simple resolution metadata contains affected events."""
     conflict = _conflict()
     resolution = build_simple_resolution(conflict)
     assert resolution.metadata["affected_events"] == list(conflict.affected_events)
@@ -319,6 +332,7 @@ def test_build_simple_resolution_metadata_contains_affected_events():
 
 def test_apply_resolution_returns_applied_status():
     # Arrange
+    """Apply resolution returns applied status."""
     conflict = _conflict(conflict_type="temporal")
     resolution = build_simple_resolution(conflict)
 
@@ -331,6 +345,7 @@ def test_apply_resolution_returns_applied_status():
 
 
 def test_apply_resolution_includes_affected_events():
+    """Apply resolution includes affected events."""
     conflict = _conflict()
     resolution = build_simple_resolution(conflict)
     result = apply_resolution(resolution)
@@ -339,6 +354,7 @@ def test_apply_resolution_includes_affected_events():
 
 def test_apply_resolution_falls_back_to_resolution_type_when_no_action():
     # Arrange – resolution with no recommended_action in metadata
+    """Apply resolution falls back to resolution type when no action."""
     conflict = _conflict()
     resolution = build_simple_resolution(conflict)
     del resolution.metadata["recommended_action"]
@@ -351,6 +367,7 @@ def test_apply_resolution_falls_back_to_resolution_type_when_no_action():
 
 
 def test_apply_resolution_uses_recommended_action_from_metadata():
+    """Apply resolution uses recommended action from metadata."""
     conflict = _conflict(
         conflict_type="therapeutic",
         recommended_action="safety_stabilization",

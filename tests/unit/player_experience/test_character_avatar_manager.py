@@ -25,6 +25,8 @@ from src.player_experience.models.character import (
 )
 from src.player_experience.models.enums import IntensityLevel
 
+pytestmark = pytest.mark.unit
+
 
 class TestCharacterAvatarManager(unittest.TestCase):
     """Test CharacterAvatarManager functionality."""

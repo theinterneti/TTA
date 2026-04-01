@@ -14,6 +14,8 @@ Tests cover:
 
 from __future__ import annotations
 
+import pytest
+
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
 
@@ -33,6 +35,8 @@ from src.player_experience.managers.player_profile_manager import (
     PlayerProfileManagerError,
 )
 from src.player_experience.models.player import PlayerProfile
+
+pytestmark = pytest.mark.unit
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -138,6 +142,7 @@ def _mock_experience_manager() -> MagicMock:
 
 class TestPlayersRoot:
     def test_returns_200_with_message(self):
+        """Players Root: returns 200 with message."""
         client = _build_app(_mock_manager())
         resp = client.get("/")
         assert resp.status_code == 200
@@ -156,6 +161,7 @@ _CREATE_PAYLOAD = {
 
 class TestCreatePlayer:
     def test_success_returns_201(self):
+        """Create Player: success returns 201."""
         manager = _mock_manager()
         player = _make_player("new-player")
         manager.create_player_profile.return_value = player
@@ -167,6 +173,7 @@ class TestCreatePlayer:
         assert data["username"] == "testuser"
 
     def test_conflict_returns_409(self):
+        """Create Player: conflict returns 409."""
         manager = _mock_manager()
         manager.create_player_profile.side_effect = PlayerProfileManagerError(
             "username already exists"
@@ -176,6 +183,7 @@ class TestCreatePlayer:
         assert resp.status_code == 409
 
     def test_general_manager_error_returns_400(self):
+        """Create Player: general manager error returns 400."""
         manager = _mock_manager()
         manager.create_player_profile.side_effect = PlayerProfileManagerError(
             "some error"
@@ -185,11 +193,13 @@ class TestCreatePlayer:
         assert resp.status_code == 400
 
     def test_invalid_email_returns_422(self):
+        """Create Player: invalid email returns 422."""
         client = _build_app(_mock_manager())
         resp = client.post("/", json={"username": "user1", "email": "not-an-email"})
         assert resp.status_code == 422
 
     def test_invalid_username_returns_422(self):
+        """Create Player: invalid username returns 422."""
         client = _build_app(_mock_manager())
         resp = client.post("/", json={"username": "ab", "email": "x@example.com"})
         assert resp.status_code == 422
@@ -202,6 +212,7 @@ class TestCreatePlayer:
 
 class TestGetPlayer:
     def test_not_found_returns_404(self):
+        """Get Player: not found returns 404."""
         manager = _mock_manager()
         manager.get_player_profile.return_value = None
         client = _build_app(manager)
@@ -210,6 +221,7 @@ class TestGetPlayer:
         assert "not found" in resp.json()["detail"].lower()
 
     def test_access_restricted_returns_403(self):
+        """Get Player: access restricted returns 403."""
         manager = _mock_manager()
         manager.get_player_profile.side_effect = DataAccessRestrictedError("denied")
         client = _build_app(manager)
@@ -217,6 +229,7 @@ class TestGetPlayer:
         assert resp.status_code == 403
 
     def test_manager_error_for_different_player_returns_403(self):
+        """Get Player: manager error for different player returns 403."""
         manager = _mock_manager()
         manager.get_player_profile.side_effect = PlayerProfileManagerError("error")
         # Current player is "player-1" but requesting "other-player" → 403
@@ -225,6 +238,7 @@ class TestGetPlayer:
         assert resp.status_code == 403
 
     def test_success_returns_200(self):
+        """Get Player: success returns 200."""
         manager = _mock_manager()
         player = _make_player("player-1")
         manager.get_player_profile.return_value = player
@@ -245,6 +259,7 @@ class TestGetPlayer:
 class TestUpdatePlayer:
     def test_access_restricted_returns_403(self):
         # DataAccessRestrictedError is caught explicitly → 403
+        """Update Player: access restricted returns 403."""
         manager = _mock_manager()
         manager.update_player_profile.side_effect = DataAccessRestrictedError("denied")
         client = _build_app(manager)
@@ -252,6 +267,7 @@ class TestUpdatePlayer:
         assert resp.status_code == 403
 
     def test_conflict_returns_409(self):
+        """Update Player: conflict returns 409."""
         manager = _mock_manager()
         manager.update_player_profile.side_effect = PlayerProfileManagerError(
             "username already exists"
@@ -261,6 +277,7 @@ class TestUpdatePlayer:
         assert resp.status_code == 409
 
     def test_general_manager_error_returns_400(self):
+        """Update Player: general manager error returns 400."""
         manager = _mock_manager()
         manager.update_player_profile.side_effect = PlayerProfileManagerError(
             "some error"
@@ -278,6 +295,7 @@ class TestUpdatePlayer:
 class TestDeletePlayer:
     def test_access_restricted_returns_403(self):
         # DataAccessRestrictedError is caught explicitly → 403
+        """Delete Player: access restricted returns 403."""
         manager = _mock_manager()
         manager.delete_player_profile.side_effect = DataAccessRestrictedError("denied")
         client = _build_app(manager)
@@ -285,6 +303,7 @@ class TestDeletePlayer:
         assert resp.status_code == 403
 
     def test_not_found_returns_404(self):
+        """Delete Player: not found returns 404."""
         manager = _mock_manager()
         manager.delete_player_profile.return_value = False
         client = _build_app(manager)
@@ -292,6 +311,7 @@ class TestDeletePlayer:
         assert resp.status_code == 404
 
     def test_success_returns_204(self):
+        """Delete Player: success returns 204."""
         manager = _mock_manager()
         manager.delete_player_profile.return_value = True
         client = _build_app(manager)
@@ -299,6 +319,7 @@ class TestDeletePlayer:
         assert resp.status_code == 204
 
     def test_access_restricted_returns_403(self):
+        """Delete Player: access restricted returns 403."""
         manager = _mock_manager()
         manager.delete_player_profile.side_effect = DataAccessRestrictedError("denied")
         client = _build_app(manager)
@@ -313,6 +334,7 @@ class TestDeletePlayer:
 
 class TestGetPlayerProgress:
     def test_returns_200_with_expected_fields(self):
+        """Get Player Progress: returns 200 with expected fields."""
         client = _build_app(
             _mock_manager(), experience_manager_mock=_mock_experience_manager()
         )
@@ -326,6 +348,7 @@ class TestGetPlayerProgress:
         assert data["therapeutic_momentum"] == 0.7
 
     def test_rejects_progress_access_for_other_player(self):
+        """Get Player Progress: rejects progress access for other player."""
         client = _build_app(
             _mock_manager(),
             player_id="player-1",
@@ -342,6 +365,7 @@ class TestGetPlayerProgress:
 
 class TestGetPlayerDashboard:
     def test_returns_200_with_player_id(self):
+        """Get Player Dashboard: returns 200 with player id."""
         client = _build_app(
             _mock_manager(), experience_manager_mock=_mock_experience_manager()
         )
@@ -353,6 +377,7 @@ class TestGetPlayerDashboard:
         assert "recommendations" in data
 
     def test_includes_recent_sessions_and_narrative_summary(self):
+        """Get Player Dashboard: includes recent sessions and narrative summary."""
         experience_manager = _mock_experience_manager()
         experience_manager.get_dashboard_api_payload = AsyncMock(
             return_value={
@@ -405,6 +430,7 @@ class TestGetPlayerDashboard:
         )
 
     def test_rejects_dashboard_access_for_other_player(self):
+        """Get Player Dashboard: rejects dashboard access for other player."""
         client = _build_app(
             _mock_manager(),
             player_id="player-1",
@@ -422,6 +448,7 @@ class TestGetPlayerDashboard:
 class TestExportPlayerData:
     def test_access_restricted_returns_403(self):
         # DataAccessRestrictedError is caught explicitly → 403
+        """Export Player Data: access restricted returns 403."""
         manager = _mock_manager()
         manager.export_player_data.side_effect = DataAccessRestrictedError("denied")
         client = _build_app(manager)

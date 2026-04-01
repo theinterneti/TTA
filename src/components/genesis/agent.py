@@ -12,7 +12,7 @@ Architecture:
           wrapped in FallbackPrimitive(RetryPrimitive(...))
 
 All LLM calls use TTA.dev's RetryPrimitive + FallbackPrimitive from
-tta_dev_primitives, with get_llm() from src.ai_components.llm_factory for
+ttadev.primitives, with get_llm() from src.ai_components.llm_factory for
 provider selection.
 
 See: docs/design/genesis-session.md
@@ -36,13 +36,19 @@ try:
         WorkflowPrimitive,
     )
 except ImportError:
-    from tta_dev_primitives import (  # type: ignore[no-redef]
-        FallbackPrimitive,
-        RetryPrimitive,
-        RetryStrategy,
-        WorkflowContext,
-        WorkflowPrimitive,
-    )
+    # ttadev not available — minimal stubs for type checking
+    class FallbackPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class RetryPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class RetryStrategy:  # type: ignore[no-redef]
+        def __init__(self, **kwargs: object) -> None: ...
+    class WorkflowContext:  # type: ignore[no-redef]
+        def __init__(self, **kwargs: object) -> None: ...
+    class WorkflowPrimitive:  # type: ignore[no-redef]
+        async def execute(self, data: object, ctx: object) -> object: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

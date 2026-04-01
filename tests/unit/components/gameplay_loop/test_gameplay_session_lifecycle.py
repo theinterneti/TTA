@@ -94,6 +94,7 @@ class TestGetSessionStatusDbFallback:
         return ctrl, mock_db
 
     async def test_active_session_returned_from_memory(self):
+        """Get Session Status Db Fallback: active session returned from memory."""
         ctrl, mock_db = await self._make_controller()
         ss = _make_session_state()
         gs = _make_gameplay_session(ss)
@@ -108,6 +109,7 @@ class TestGetSessionStatusDbFallback:
         mock_db.get_session.assert_not_called()
 
     async def test_paused_session_returned_from_db(self):
+        """Get Session Status Db Fallback: paused session returned from db."""
         ss = _make_session_state()
         ctrl, mock_db = await self._make_controller(db_get_session_return=ss)
 
@@ -119,6 +121,7 @@ class TestGetSessionStatusDbFallback:
         mock_db.get_session.assert_called_once_with(ss.session_id)
 
     async def test_returns_none_when_not_in_memory_or_db(self):
+        """Get Session Status Db Fallback: returns none when not in memory or db."""
         ctrl, mock_db = await self._make_controller(db_get_session_return=None)
 
         result = await ctrl.get_session_status("nonexistent-session")
@@ -126,6 +129,7 @@ class TestGetSessionStatusDbFallback:
         assert result is None
 
     async def test_paused_status_has_zero_available_choices(self):
+        """Get Session Status Db Fallback: paused status has zero available choices."""
         ss = _make_session_state()
         ctrl, _ = await self._make_controller(db_get_session_return=ss)
 
@@ -136,6 +140,7 @@ class TestGetSessionStatusDbFallback:
         assert result["available_choices"] == []
 
     async def test_paused_status_includes_emotional_state(self):
+        """Get Session Status Db Fallback: paused status includes emotional state."""
         ss = _make_session_state()
         ss.emotional_state = EmotionalState.ANXIOUS
         ctrl, _ = await self._make_controller(db_get_session_return=ss)
@@ -146,6 +151,7 @@ class TestGetSessionStatusDbFallback:
         assert result["emotional_state"] == EmotionalState.ANXIOUS.value
 
     async def test_paused_status_includes_total_choices(self):
+        """Get Session Status Db Fallback: paused status includes total choices."""
         ss = _make_session_state()
         ss.choice_history = [
             {"choice_id": "c1", "therapeutic_value": 0.8},
@@ -159,6 +165,7 @@ class TestGetSessionStatusDbFallback:
         assert result["total_choices"] == 2
 
     async def test_paused_status_computes_therapeutic_engagement(self):
+        """Get Session Status Db Fallback: paused status computes therapeutic engagement."""
         ss = _make_session_state()
         ss.choice_history = [
             {"therapeutic_value": 0.8},
@@ -172,6 +179,7 @@ class TestGetSessionStatusDbFallback:
         assert abs(result["therapeutic_engagement"] - 0.7) < 0.01
 
     async def test_db_error_returns_none(self):
+        """Get Session Status Db Fallback: db error returns none."""
         ctrl, mock_db = await self._make_controller()
         mock_db.get_session = AsyncMock(side_effect=RuntimeError("db error"))
 
@@ -210,6 +218,7 @@ def _make_service_mock() -> MagicMock:
 
 class TestPauseSessionRoute:
     def test_pause_returns_200_on_success(self):
+        """Pause Session Route: pause returns 200 on success."""
         svc = _make_service_mock()
         svc.pause_session.return_value = {
             "success": True,
@@ -229,6 +238,7 @@ class TestPauseSessionRoute:
         assert data["session_id"] == "sess-1"
 
     def test_pause_returns_401_on_auth_error(self):
+        """Pause Session Route: pause returns 401 on auth error."""
         svc = _make_service_mock()
         svc.pause_session.return_value = {
             "success": False,
@@ -245,6 +255,7 @@ class TestPauseSessionRoute:
         assert resp.status_code == 401
 
     def test_pause_returns_404_on_session_not_found(self):
+        """Pause Session Route: pause returns 404 on session not found."""
         svc = _make_service_mock()
         svc.pause_session.return_value = {
             "success": False,
@@ -261,6 +272,7 @@ class TestPauseSessionRoute:
         assert resp.status_code == 404
 
     def test_pause_returns_403_on_access_denied(self):
+        """Pause Session Route: pause returns 403 on access denied."""
         svc = _make_service_mock()
         svc.pause_session.return_value = {
             "success": False,
@@ -277,6 +289,7 @@ class TestPauseSessionRoute:
         assert resp.status_code == 403
 
     def test_pause_calls_service_with_correct_session_id(self):
+        """Pause Session Route: pause calls service with correct session id."""
         svc = _make_service_mock()
         svc.pause_session.return_value = {
             "success": True,
@@ -296,6 +309,7 @@ class TestPauseSessionRoute:
 
 class TestResumeSessionRoute:
     def test_resume_returns_200_on_success(self):
+        """Resume Session Route: resume returns 200 on success."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": True,
@@ -321,6 +335,7 @@ class TestResumeSessionRoute:
         assert data["session_id"] == "sess-1"
 
     def test_resume_returns_401_on_auth_error(self):
+        """Resume Session Route: resume returns 401 on auth error."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": False,
@@ -337,6 +352,7 @@ class TestResumeSessionRoute:
         assert resp.status_code == 401
 
     def test_resume_returns_404_on_session_not_found(self):
+        """Resume Session Route: resume returns 404 on session not found."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": False,
@@ -353,6 +369,7 @@ class TestResumeSessionRoute:
         assert resp.status_code == 404
 
     def test_resume_returns_403_on_access_denied(self):
+        """Resume Session Route: resume returns 403 on access denied."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": False,
@@ -369,6 +386,7 @@ class TestResumeSessionRoute:
         assert resp.status_code == 403
 
     def test_resume_returns_404_on_session_error(self):
+        """Resume Session Route: resume returns 404 on session error."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": False,
@@ -385,6 +403,7 @@ class TestResumeSessionRoute:
         assert resp.status_code == 404
 
     def test_resume_calls_service_with_correct_session_id(self):
+        """Resume Session Route: resume calls service with correct session id."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": True,
@@ -403,6 +422,7 @@ class TestResumeSessionRoute:
         assert call_kwargs.kwargs["session_id"] == "sess-xyz"
 
     def test_resume_includes_session_data_in_response(self):
+        """Resume Session Route: resume includes session data in response."""
         svc = _make_service_mock()
         svc.resume_session.return_value = {
             "success": True,
@@ -433,6 +453,7 @@ class TestResumeSessionRoute:
 
 class TestCreateSessionRoute:
     def test_create_returns_200_on_success(self):
+        """Create Session Route: create returns 200 on success."""
         svc = _make_service_mock()
         svc.create_authenticated_session.return_value = {
             "success": True,
@@ -455,6 +476,7 @@ class TestCreateSessionRoute:
         assert data["session_id"] == "sess-new"
 
     def test_create_passes_therapeutic_context(self):
+        """Create Session Route: create passes therapeutic context."""
         svc = _make_service_mock()
         svc.create_authenticated_session.return_value = {
             "success": True,
@@ -476,6 +498,7 @@ class TestCreateSessionRoute:
         )
 
     def test_create_returns_401_on_auth_error(self):
+        """Create Session Route: create returns 401 on auth error."""
         svc = _make_service_mock()
         svc.create_authenticated_session.return_value = {
             "success": False,
@@ -493,6 +516,7 @@ class TestCreateSessionRoute:
         assert resp.status_code == 401
 
     def test_create_returns_422_on_safety_error(self):
+        """Create Session Route: create returns 422 on safety error."""
         svc = _make_service_mock()
         svc.create_authenticated_session.return_value = {
             "success": False,
@@ -510,6 +534,7 @@ class TestCreateSessionRoute:
         assert resp.status_code == 422
 
     def test_create_accepts_empty_therapeutic_context(self):
+        """Create Session Route: create accepts empty therapeutic context."""
         svc = _make_service_mock()
         svc.create_authenticated_session.return_value = {
             "success": True,
@@ -535,6 +560,7 @@ class TestCreateSessionRoute:
 
 class TestProcessChoiceRoute:
     def test_choice_returns_200_on_success(self):
+        """Process Choice Route: choice returns 200 on success."""
         svc = _make_service_mock()
         svc.process_validated_choice.return_value = {
             "success": True,
@@ -557,6 +583,7 @@ class TestProcessChoiceRoute:
         assert data["choice_result"]["next_scene"]["title"] == "The River"
 
     def test_choice_passes_correct_args(self):
+        """Process Choice Route: choice passes correct args."""
         svc = _make_service_mock()
         svc.process_validated_choice.return_value = {
             "success": True,
@@ -578,6 +605,7 @@ class TestProcessChoiceRoute:
         )
 
     def test_choice_returns_401_on_auth_error(self):
+        """Process Choice Route: choice returns 401 on auth error."""
         svc = _make_service_mock()
         svc.process_validated_choice.return_value = {
             "success": False,
@@ -595,6 +623,7 @@ class TestProcessChoiceRoute:
         assert resp.status_code == 401
 
     def test_choice_returns_404_on_session_not_found(self):
+        """Process Choice Route: choice returns 404 on session not found."""
         svc = _make_service_mock()
         svc.process_validated_choice.return_value = {
             "success": False,
@@ -612,6 +641,7 @@ class TestProcessChoiceRoute:
         assert resp.status_code == 404
 
     def test_choice_returns_403_on_access_denied(self):
+        """Process Choice Route: choice returns 403 on access denied."""
         svc = _make_service_mock()
         svc.process_validated_choice.return_value = {
             "success": False,
@@ -636,6 +666,7 @@ class TestProcessChoiceRoute:
 
 class TestGetSessionStatusRoute:
     def test_get_status_returns_200_on_success(self):
+        """Get Session Status Route: get status returns 200 on success."""
         svc = _make_service_mock()
         svc.get_session_with_auth.return_value = {
             "success": True,
@@ -654,6 +685,7 @@ class TestGetSessionStatusRoute:
         assert data["session_status"]["is_active"] is True
 
     def test_get_status_returns_404_on_not_found(self):
+        """Get Session Status Route: get status returns 404 on not found."""
         svc = _make_service_mock()
         svc.get_session_with_auth.return_value = {
             "success": False,
@@ -670,6 +702,7 @@ class TestGetSessionStatusRoute:
         assert resp.status_code == 404
 
     def test_get_status_returns_403_on_access_denied(self):
+        """Get Session Status Route: get status returns 403 on access denied."""
         svc = _make_service_mock()
         svc.get_session_with_auth.return_value = {
             "success": False,
@@ -686,6 +719,7 @@ class TestGetSessionStatusRoute:
         assert resp.status_code == 403
 
     def test_get_status_returns_401_on_auth_error(self):
+        """Get Session Status Route: get status returns 401 on auth error."""
         svc = _make_service_mock()
         svc.get_session_with_auth.return_value = {
             "success": False,
@@ -709,6 +743,7 @@ class TestGetSessionStatusRoute:
 
 class TestEndSessionRoute:
     def test_end_returns_200_on_success(self):
+        """End Session Route: end returns 200 on success."""
         svc = _make_service_mock()
         svc.end_session_with_auth.return_value = {
             "success": True,
@@ -727,6 +762,7 @@ class TestEndSessionRoute:
         assert data["session_id"] == "sess-1"
 
     def test_end_returns_401_on_auth_error(self):
+        """End Session Route: end returns 401 on auth error."""
         svc = _make_service_mock()
         svc.end_session_with_auth.return_value = {
             "success": False,
@@ -743,6 +779,7 @@ class TestEndSessionRoute:
         assert resp.status_code == 401
 
     def test_end_returns_404_on_not_found(self):
+        """End Session Route: end returns 404 on not found."""
         svc = _make_service_mock()
         svc.end_session_with_auth.return_value = {
             "success": False,
@@ -759,6 +796,7 @@ class TestEndSessionRoute:
         assert resp.status_code == 404
 
     def test_end_returns_403_on_access_denied(self):
+        """End Session Route: end returns 403 on access denied."""
         svc = _make_service_mock()
         svc.end_session_with_auth.return_value = {
             "success": False,
@@ -775,6 +813,7 @@ class TestEndSessionRoute:
         assert resp.status_code == 403
 
     def test_end_calls_service_with_correct_args(self):
+        """End Session Route: end calls service with correct args."""
         svc = _make_service_mock()
         svc.end_session_with_auth.return_value = {
             "success": True,
@@ -801,6 +840,7 @@ class TestEndSessionRoute:
 
 class TestGetUserSessionsRoute:
     def test_list_returns_200_on_success(self):
+        """Get User Sessions Route: list returns 200 on success."""
         svc = _make_service_mock()
         svc.get_user_sessions.return_value = {
             "success": True,
@@ -820,6 +860,7 @@ class TestGetUserSessionsRoute:
         assert data["user_id"] == "user-1"
 
     def test_list_returns_sessions(self):
+        """Get User Sessions Route: list returns sessions."""
         svc = _make_service_mock()
         svc.get_user_sessions.return_value = {
             "success": True,
@@ -841,6 +882,7 @@ class TestGetUserSessionsRoute:
         assert resp.json()["session_metrics"]["total_count"] == 2
 
     def test_list_returns_401_on_auth_error(self):
+        """Get User Sessions Route: list returns 401 on auth error."""
         svc = _make_service_mock()
         svc.get_user_sessions.return_value = {
             "success": False,
@@ -864,6 +906,7 @@ class TestGetUserSessionsRoute:
 
 class TestHealthRoute:
     def test_health_returns_200(self):
+        """Health Route: health returns 200."""
         svc = _make_service_mock()
         svc.get_integration_status.return_value = {
             "gameplay_component": {"available": True}
@@ -877,6 +920,7 @@ class TestHealthRoute:
         assert data["status"] == "healthy"
 
     def test_health_includes_real_timestamp(self):
+        """Health Route: health includes real timestamp."""
         svc = _make_service_mock()
         svc.get_integration_status.return_value = {}
         client = _build_test_app(svc)
@@ -889,6 +933,7 @@ class TestHealthRoute:
         assert "T" in data["timestamp"]  # ISO format
 
     def test_health_includes_integration_status(self):
+        """Health Route: health includes integration status."""
         svc = _make_service_mock()
         svc.get_integration_status.return_value = {
             "gameplay_service": {"initialized": True}

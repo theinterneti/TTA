@@ -10,6 +10,8 @@ from fastapi.testclient import TestClient
 from src.player_experience.api.app import create_app
 from src.player_experience.api.config import TestingSettings
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def client() -> TestClient:
@@ -21,6 +23,7 @@ def client() -> TestClient:
 
 
 def test_characters_root_requires_auth(client: TestClient) -> None:
+    """Characters root requires auth."""
     resp = client.get("/api/v1/characters/")
     assert resp.status_code == 401
     body = resp.json()
@@ -33,16 +36,19 @@ def test_characters_root_requires_auth(client: TestClient) -> None:
 
 def test_list_characters_requires_auth(client: TestClient) -> None:
     # list endpoint shares same path as root but with response model
+    """List characters requires auth."""
     resp = client.get("/api/v1/characters/")
     assert resp.status_code == 401
 
 
 def test_get_character_requires_auth(client: TestClient) -> None:
+    """Get character requires auth."""
     resp = client.get("/api/v1/characters/char-123")
     assert resp.status_code == 401
 
 
 def test_update_therapeutic_profile_requires_auth(client: TestClient) -> None:
+    """Update therapeutic profile requires auth."""
     resp = client.patch(
         "/api/v1/characters/char-123/therapeutic-profile",
         json={

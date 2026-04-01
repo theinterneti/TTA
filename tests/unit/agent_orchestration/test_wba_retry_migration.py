@@ -13,7 +13,7 @@ import pytest
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:
-    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
+    pytest.skip("ttadev.primitives not available", allow_module_level=True)
 
 from src.agent_orchestration.adapters import (
     RetryConfig,

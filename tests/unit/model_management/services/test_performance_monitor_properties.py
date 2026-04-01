@@ -17,6 +17,8 @@ pytest.importorskip("tta_ai")
 from tta_ai.models.models import TaskType
 from tta_ai.models.services import PerformanceMonitor
 
+pytestmark = pytest.mark.unit
+
 # ============================================================================
 # Hypothesis Strategies
 # ============================================================================

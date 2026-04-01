@@ -1,15 +1,20 @@
 # Logseq: [[TTA.dev/Tests/Test_orchestrator_lifecycle_validation]]
 from __future__ import annotations
 
+import pytest
+
 from unittest.mock import Mock, patch
 
 from src.components.player_experience_component import PlayerExperienceComponent
 from src.orchestration import TTAOrchestrator
 from src.orchestration.component import ComponentStatus
 
+pytestmark = pytest.mark.unit
+
 
 def test_player_experience_lifecycle_via_orchestrator() -> None:
     # Patch imports so orchestrator registers the component
+    """Player experience lifecycle via orchestrator."""
     with (
         patch(
             "src.orchestration.orchestrator.TTAOrchestrator._validate_repositories"

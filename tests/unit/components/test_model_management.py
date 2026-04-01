@@ -26,6 +26,8 @@ from src.components.model_management.models import (
 from src.components.model_management.providers import OpenRouterProvider
 from src.components.model_management.services import HardwareDetector, ModelSelector
 
+pytestmark = pytest.mark.unit
+
 
 class TestModelManagementComponent:
     """Test cases for the main ModelManagementComponent."""

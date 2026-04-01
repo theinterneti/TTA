@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from unittest.mock import AsyncMock, Mock, patch
 
 from fastapi import FastAPI
@@ -12,6 +14,8 @@ from src.player_experience.api.routers.gameplay import (
     router,
 )
 
+pytestmark = pytest.mark.unit
+
 
 def _make_client(service: Mock) -> TestClient:
     app = FastAPI()
@@ -21,6 +25,7 @@ def _make_client(service: Mock) -> TestClient:
 
 
 def test_get_session_status_preserves_narrative_orchestration() -> None:
+    """Get session status preserves narrative orchestration."""
     service = Mock()
     service.get_session_with_auth = AsyncMock(
         return_value={
@@ -64,6 +69,7 @@ def test_get_session_status_preserves_narrative_orchestration() -> None:
 
 
 def test_get_user_sessions_preserves_narrative_summary() -> None:
+    """Get user sessions preserves narrative summary."""
     service = Mock()
     service.get_user_sessions = AsyncMock(
         return_value={

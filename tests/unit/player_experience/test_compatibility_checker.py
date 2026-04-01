@@ -1,3 +1,4 @@
+import pytest
 """
 
 # Logseq: [[TTA.dev/Tests/Test_compatibility_checker]]
@@ -24,6 +25,8 @@ from src.player_experience.utils.compatibility_checker import (
     CompatibilityChecker,
     CompatibilityWeights,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class TestCompatibilityChecker(unittest.TestCase):

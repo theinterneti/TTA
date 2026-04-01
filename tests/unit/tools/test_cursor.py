@@ -20,6 +20,8 @@ from src.agent_orchestration.tools.cursor import (
     set_cursor_manager,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestCursorData:
     """Tests for CursorData model."""

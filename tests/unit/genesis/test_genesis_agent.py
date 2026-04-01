@@ -23,6 +23,8 @@ from src.components.genesis.guide_generator import _derive_structural, derive_gu
 from src.components.genesis.seed_extractor import SeedExtractor, _validate_fields
 from src.components.genesis.session_state import Act, GenesisSessionState
 
+pytestmark = pytest.mark.unit
+
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -44,6 +46,7 @@ def _fresh_state(session_id: str = "test-session") -> GenesisSessionState:
 class TestSeedExtractor:
     @pytest.mark.asyncio
     async def test_extracts_clean_fields(self) -> None:
+        """Seed Extractor: extracts clean fields."""
         llm = _make_llm('{"tone": "getting_worse", "power_source": "magic"}')
         extractor = SeedExtractor(llm=llm)
         result = await extractor.extract("A dying world of wizards", {}, Act.BUILDING_WORLD)
@@ -52,6 +55,7 @@ class TestSeedExtractor:
 
     @pytest.mark.asyncio
     async def test_skips_already_established_fields(self) -> None:
+        """Seed Extractor: skips already established fields."""
         llm = _make_llm('{"tone": "getting_better", "power_source": "magic"}')
         extractor = SeedExtractor(llm=llm)
         result = await extractor.extract(
@@ -64,6 +68,7 @@ class TestSeedExtractor:
 
     @pytest.mark.asyncio
     async def test_returns_empty_on_vague_input(self) -> None:
+        """Seed Extractor: returns empty on vague input."""
         llm = _make_llm("{}")
         extractor = SeedExtractor(llm=llm)
         result = await extractor.extract("I don't know", {}, Act.BUILDING_WORLD)
@@ -71,6 +76,7 @@ class TestSeedExtractor:
 
     @pytest.mark.asyncio
     async def test_handles_llm_failure_gracefully(self) -> None:
+        """Seed Extractor: handles llm failure gracefully."""
         llm = MagicMock()
         llm.ainvoke = AsyncMock(side_effect=Exception("network error"))
         extractor = SeedExtractor(llm=llm)
@@ -80,6 +86,7 @@ class TestSeedExtractor:
 
     @pytest.mark.asyncio
     async def test_handles_malformed_json(self) -> None:
+        """Seed Extractor: handles malformed json."""
         llm = _make_llm("not json at all")
         extractor = SeedExtractor(llm=llm)
         result = await extractor.extract("Some input", {}, Act.BUILDING_WORLD)
@@ -87,6 +94,7 @@ class TestSeedExtractor:
 
     @pytest.mark.asyncio
     async def test_generates_surprise_seed(self) -> None:
+        """Seed Extractor: generates surprise seed."""
         surprise_data = (
             '{"tone":"getting_worse","power_source":"magic","player_position":"outsider",'
             '"one_specific_detail":"a burning library","scale":"city",'
@@ -99,6 +107,7 @@ class TestSeedExtractor:
         assert result["one_specific_detail"] == "a burning library"
 
     def test_validate_fields_drops_invalid_enums(self) -> None:
+        """Seed Extractor: validate fields drops invalid enums."""
         raw = {
             "tone": "getting_worse",
             "power_source": "INVALID_VALUE",
@@ -110,6 +119,7 @@ class TestSeedExtractor:
         assert clean["character_name"] == "Aelith"
 
     def test_validate_fields_strips_whitespace(self) -> None:
+        """Seed Extractor: validate fields strips whitespace."""
         raw = {"character_name": "  Aelith  ", "character_trait": "  skilled thief  "}
         clean = _validate_fields(raw)
         assert clean["character_name"] == "Aelith"
@@ -121,6 +131,7 @@ class TestSeedExtractor:
 
 class TestGuideGenerator:
     def test_derive_structural_fantasy(self) -> None:
+        """Guide Generator: derive structural fantasy."""
         fields = {
             "tone": "getting_worse",
             "power_source": "magic",
@@ -135,6 +146,7 @@ class TestGuideGenerator:
         assert "grave" in result["speech_register"]
 
     def test_derive_structural_cyberpunk(self) -> None:
+        """Guide Generator: derive structural cyberpunk."""
         fields = {
             "tone": "getting_worse",
             "power_source": "technology",
@@ -147,12 +159,14 @@ class TestGuideGenerator:
         assert result["social_position"] == "architect of systems"
 
     def test_derive_structural_defaults_gracefully(self) -> None:
+        """Guide Generator: derive structural defaults gracefully."""
         result = _derive_structural({})
         assert result["entity_type"] is not None
         assert result["social_position"] is not None
 
     @pytest.mark.asyncio
     async def test_derive_guide_character_returns_object(self) -> None:
+        """Guide Generator: derive guide character returns object."""
         llm = _make_llm('{"name": "Veyra", "intro_line": "You arrived earlier than expected."}')
         fields = {
             "tone": "getting_worse",
@@ -168,6 +182,7 @@ class TestGuideGenerator:
 
     @pytest.mark.asyncio
     async def test_guide_uses_fallback_on_llm_failure(self) -> None:
+        """Guide Generator: guide uses fallback on llm failure."""
         llm = MagicMock()
         llm.ainvoke = AsyncMock(side_effect=RuntimeError("LLM down"))
         guide = await derive_guide_character({}, llm=llm)
@@ -188,16 +203,19 @@ class TestTransitionLogic:
         return state
 
     def test_void_advances_after_three_turns(self) -> None:
+        """Transition Logic: void advances after three turns."""
         state = self._state_with_turns(Act.VOID, 2)  # 2 recorded + 1 in-flight = 3
         result = _should_transition(state, {})
         assert result == Act.BUILDING_WORLD
 
     def test_void_does_not_advance_too_early(self) -> None:
+        """Transition Logic: void does not advance too early."""
         state = self._state_with_turns(Act.VOID, 1)  # 1 recorded + 1 in-flight = 2 < 3
         result = _should_transition(state, {})
         assert result is None
 
     def test_building_world_advances_with_complete_fields(self) -> None:
+        """Transition Logic: building world advances with complete fields."""
         state = self._state_with_turns(Act.BUILDING_WORLD, 2)  # 2 recorded + 1 = 3 min
         preview = {
             "tone": "getting_worse",
@@ -209,18 +227,21 @@ class TestTransitionLogic:
         assert result == Act.SLIP_PHASE
 
     def test_building_world_does_not_advance_without_all_fields(self) -> None:
+        """Transition Logic: building world does not advance without all fields."""
         state = self._state_with_turns(Act.BUILDING_WORLD, 5)
         preview = {"tone": "getting_worse"}  # missing 3 required fields
         result = _should_transition(state, preview)
         assert result is None
 
     def test_building_character_advances_when_char_fields_complete(self) -> None:
+        """Transition Logic: building character advances when char fields complete."""
         state = self._state_with_turns(Act.BUILDING_CHARACTER, 1)  # 1 recorded + 1 = 2
         preview = {"character_name": "Aelith", "character_motivation": "curiosity"}
         result = _should_transition(state, preview)
         assert result == Act.FIRST_LIGHT
 
     def test_first_light_advances_only_when_confirmed(self) -> None:
+        """Transition Logic: first light advances only when confirmed."""
         state = GenesisSessionState(session_id="t")
         state.act = Act.FIRST_LIGHT
         state.first_light_confirmed = False
@@ -229,6 +250,7 @@ class TestTransitionLogic:
         assert _should_transition(state, {}) == Act.THE_BECOMING
 
     def test_the_becoming_advances_when_guide_introduced(self) -> None:
+        """Transition Logic: the becoming advances when guide introduced."""
         state = GenesisSessionState(session_id="t")
         state.act = Act.THE_BECOMING
         state.guide_introduced = False
@@ -237,6 +259,7 @@ class TestTransitionLogic:
         assert _should_transition(state, {}) == Act.THE_THRESHOLD
 
     def test_the_threshold_advances_after_five_turns(self) -> None:
+        """Transition Logic: the threshold advances after five turns."""
         state = self._state_with_turns(Act.THE_THRESHOLD, 4)  # 4 recorded + 1 = 5
         assert _should_transition(state, {}) == Act.SESSION_BEGUN
 
@@ -246,20 +269,24 @@ class TestTransitionLogic:
 
 class TestHelpers:
     def test_surprise_request_detection(self) -> None:
+        """Helpers: surprise request detection."""
         assert _is_surprise_request("surprise me")
         assert _is_surprise_request("You decide, I don't mind")
         assert _is_surprise_request("It's up to you")
         assert not _is_surprise_request("I want a dark world")
 
     def test_first_light_confirm_detect(self) -> None:
+        """Helpers: first light confirm detect."""
         assert _check_first_light_response("Yes, that's perfect") == "confirm"
         assert _check_first_light_response("Yeah I love it") == "confirm"
 
     def test_first_light_redirect_detect(self) -> None:
+        """Helpers: first light redirect detect."""
         assert _check_first_light_response("No, more like a desert") == "redirect"
         assert _check_first_light_response("Actually change the climate") == "redirect"
 
     def test_first_light_neutral(self) -> None:
+        """Helpers: first light neutral."""
         assert _check_first_light_response("Tell me more") is None
 
 
@@ -283,6 +310,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_returns_agent_response(self) -> None:
+        """Genesis Agent: returns agent response."""
         agent = self._make_agent()
         state = _fresh_state()
         response = await agent.respond(state, "Hello")
@@ -292,6 +320,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_records_turn_in_state(self) -> None:
+        """Genesis Agent: records turn in state."""
         agent = self._make_agent()
         state = _fresh_state()
         await agent.respond(state, "Hello world")
@@ -300,6 +329,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_merges_extracted_fields(self) -> None:
+        """Genesis Agent: merges extracted fields."""
         agent = self._make_agent(extractor_json='{"tone":"getting_worse"}')
         state = _fresh_state()
         state.act = Act.BUILDING_WORLD
@@ -309,6 +339,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_act_advances_in_void(self) -> None:
+        """Genesis Agent: act advances in void."""
         agent = self._make_agent()
         state = _fresh_state()
         # Need 3 turns in VOID to advance
@@ -319,6 +350,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_surprise_me_sets_flag(self) -> None:
+        """Genesis Agent: surprise me sets flag."""
         extractor_llm = _make_llm(
             '{"tone":"getting_worse","power_source":"magic",'
             '"player_position":"outsider","one_specific_detail":"a tower"}'
@@ -331,6 +363,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_is_not_complete_before_session_begun(self) -> None:
+        """Genesis Agent: is not complete before session begun."""
         agent = self._make_agent()
         state = _fresh_state()
         response = await agent.respond(state, "Hello")
@@ -339,6 +372,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_guide_character_generated_in_becoming(self) -> None:
+        """Genesis Agent: guide character generated in becoming."""
         guide_llm = _make_llm('{"name":"Veyra","intro_line":"You were not expected."}')
         agent = self._make_agent()
         agent._guide_llm = guide_llm
@@ -378,6 +412,7 @@ class TestGenesisAgent:
 
     @pytest.mark.asyncio
     async def test_reset_clears_guide(self) -> None:
+        """Genesis Agent: reset clears guide."""
         agent = self._make_agent()
         agent._guide = MagicMock()  # simulate guide already generated
         await agent.reset()

@@ -19,7 +19,7 @@ import pytest
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:
-    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
+    pytest.skip("ttadev.primitives not available", allow_module_level=True)
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerError,

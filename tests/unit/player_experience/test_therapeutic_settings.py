@@ -21,6 +21,8 @@ from src.player_experience.models.therapeutic_settings import (
     TherapeuticPreferencesValidator,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestTherapeuticBoundary(unittest.TestCase):
     """Test cases for TherapeuticBoundary model."""

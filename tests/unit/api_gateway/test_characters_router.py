@@ -13,6 +13,8 @@ Tests cover:
 
 from __future__ import annotations
 
+import pytest
+
 from datetime import datetime
 from unittest.mock import MagicMock
 
@@ -35,6 +37,8 @@ from src.player_experience.models.character import (
     TherapeuticGoal,
     TherapeuticProfile,
 )
+
+pytestmark = pytest.mark.unit
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -98,12 +102,14 @@ def _mock_manager() -> MagicMock:
 
 class TestListCharacters:
     def test_empty_list_returns_200(self):
+        """List Characters: empty list returns 200."""
         client = _build_app(_mock_manager())
         resp = client.get("/")
         assert resp.status_code == 200
         assert resp.json() == []
 
     def test_returns_serialized_characters(self):
+        """List Characters: returns serialized characters."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_player_characters.return_value = [char]
@@ -117,11 +123,13 @@ class TestListCharacters:
         assert data[0]["name"] == "Hero"
 
     def test_no_player_id_in_token_returns_401(self):
+        """List Characters: no player id in token returns 401."""
         client = _build_app(_mock_manager(), player_id=None)
         resp = client.get("/")
         assert resp.status_code == 401
 
     def test_manager_exception_returns_500(self):
+        """List Characters: manager exception returns 500."""
         manager = _mock_manager()
         manager.get_player_characters.side_effect = RuntimeError("db failure")
         client = _build_app(manager)
@@ -136,12 +144,14 @@ class TestListCharacters:
 
 class TestGetCharacter:
     def test_not_found_returns_404(self):
+        """Get Character: not found returns 404."""
         client = _build_app(_mock_manager())
         resp = client.get("/char-x")
         assert resp.status_code == 404
         assert "not found" in resp.json()["detail"].lower()
 
     def test_wrong_owner_returns_403(self):
+        """Get Character: wrong owner returns 403."""
         manager = _mock_manager()
         char = _make_character(player_id="other-player", character_id="c1")
         manager.get_character.return_value = char
@@ -150,6 +160,7 @@ class TestGetCharacter:
         assert resp.status_code == 403
 
     def test_own_character_returns_200(self):
+        """Get Character: own character returns 200."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
@@ -159,6 +170,7 @@ class TestGetCharacter:
         assert resp.json()["character_id"] == "c1"
 
     def test_exception_returns_500(self):
+        """Get Character: exception returns 500."""
         manager = _mock_manager()
         manager.get_character.side_effect = RuntimeError("db error")
         client = _build_app(manager)
@@ -198,6 +210,7 @@ _CREATE_PAYLOAD = {
 
 class TestCreateCharacter:
     def test_character_limit_exceeded_returns_400(self):
+        """Create Character: character limit exceeded returns 400."""
         manager = _mock_manager()
         manager.create_character.side_effect = CharacterLimitExceededError(
             "Limit reached"
@@ -208,6 +221,7 @@ class TestCreateCharacter:
         assert "Limit" in resp.json()["detail"]
 
     def test_value_error_returns_400(self):
+        """Create Character: value error returns 400."""
         manager = _mock_manager()
         manager.create_character.side_effect = ValueError("Invalid value")
         client = _build_app(manager)
@@ -215,6 +229,7 @@ class TestCreateCharacter:
         assert resp.status_code == 400
 
     def test_unexpected_exception_returns_500(self):
+        """Create Character: unexpected exception returns 500."""
         manager = _mock_manager()
         manager.create_character.side_effect = RuntimeError("unexpected")
         client = _build_app(manager)
@@ -222,6 +237,7 @@ class TestCreateCharacter:
         assert resp.status_code == 500
 
     def test_success_returns_201(self):
+        """Create Character: success returns 201."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="new-char")
         manager.create_character.return_value = char
@@ -231,6 +247,7 @@ class TestCreateCharacter:
         assert resp.json()["character_id"] == "new-char"
 
     def test_no_player_id_in_token_returns_401(self):
+        """Create Character: no player id in token returns 401."""
         client = _build_app(_mock_manager(), player_id=None)
         resp = client.post("/", json=_CREATE_PAYLOAD)
         assert resp.status_code == 401
@@ -243,6 +260,7 @@ class TestCreateCharacter:
 
 class TestUpdateCharacter:
     def test_not_found_returns_404(self):
+        """Update Character: not found returns 404."""
         manager = _mock_manager()
         manager.get_character.return_value = None
         client = _build_app(manager)
@@ -250,6 +268,7 @@ class TestUpdateCharacter:
         assert resp.status_code == 404
 
     def test_wrong_owner_returns_403(self):
+        """Update Character: wrong owner returns 403."""
         manager = _mock_manager()
         char = _make_character(player_id="other", character_id="c1")
         manager.get_character.return_value = char
@@ -258,6 +277,7 @@ class TestUpdateCharacter:
         assert resp.status_code == 403
 
     def test_character_not_found_error_from_update_returns_404(self):
+        """Update Character: character not found error from update returns 404."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
@@ -274,6 +294,7 @@ class TestUpdateCharacter:
 
 class TestDeleteCharacter:
     def test_not_found_returns_404(self):
+        """Delete Character: not found returns 404."""
         manager = _mock_manager()
         manager.get_character.return_value = None
         client = _build_app(manager)
@@ -281,6 +302,7 @@ class TestDeleteCharacter:
         assert resp.status_code == 404
 
     def test_wrong_owner_returns_403(self):
+        """Delete Character: wrong owner returns 403."""
         manager = _mock_manager()
         char = _make_character(player_id="other", character_id="c1")
         manager.get_character.return_value = char
@@ -289,6 +311,7 @@ class TestDeleteCharacter:
         assert resp.status_code == 403
 
     def test_success_returns_204(self):
+        """Delete Character: success returns 204."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
@@ -298,6 +321,7 @@ class TestDeleteCharacter:
         assert resp.status_code == 204
 
     def test_delete_returns_false_means_404(self):
+        """Delete Character: delete returns false means 404."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
@@ -314,11 +338,13 @@ class TestDeleteCharacter:
 
 class TestGetTherapeuticProfile:
     def test_character_not_found_returns_404(self):
+        """Get Therapeutic Profile: character not found returns 404."""
         client = _build_app(_mock_manager())
         resp = client.get("/c1/therapeutic-profile")
         assert resp.status_code == 404
 
     def test_wrong_owner_returns_403(self):
+        """Get Therapeutic Profile: wrong owner returns 403."""
         manager = _mock_manager()
         char = _make_character(player_id="other", character_id="c1")
         manager.get_character.return_value = char
@@ -327,6 +353,7 @@ class TestGetTherapeuticProfile:
         assert resp.status_code == 403
 
     def test_profile_not_found_returns_404(self):
+        """Get Therapeutic Profile: profile not found returns 404."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
@@ -336,6 +363,7 @@ class TestGetTherapeuticProfile:
         assert resp.status_code == 404
 
     def test_success_returns_200_with_profile_data(self):
+        """Get Therapeutic Profile: success returns 200 with profile data."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char
@@ -362,11 +390,13 @@ _PROFILE_PAYLOAD = {
 
 class TestUpdateTherapeuticProfile:
     def test_character_not_found_returns_404(self):
+        """Update Therapeutic Profile: character not found returns 404."""
         client = _build_app(_mock_manager())
         resp = client.patch("/c1/therapeutic-profile", json=_PROFILE_PAYLOAD)
         assert resp.status_code == 404
 
     def test_wrong_owner_returns_403(self):
+        """Update Therapeutic Profile: wrong owner returns 403."""
         manager = _mock_manager()
         char = _make_character(player_id="other", character_id="c1")
         manager.get_character.return_value = char
@@ -375,6 +405,7 @@ class TestUpdateTherapeuticProfile:
         assert resp.status_code == 403
 
     def test_update_returns_false_means_404(self):
+        """Update Therapeutic Profile: update returns false means 404."""
         manager = _mock_manager()
         char = _make_character(player_id="player-1", character_id="c1")
         manager.get_character.return_value = char

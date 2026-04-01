@@ -30,6 +30,8 @@ from src.player_experience.services.privacy_service import (
     ProcessingPurpose,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestEncryptionService(unittest.TestCase):
     """Test encryption service functionality."""

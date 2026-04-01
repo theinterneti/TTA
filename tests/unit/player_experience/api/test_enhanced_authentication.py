@@ -29,6 +29,8 @@ from src.player_experience.services.auth_service import (
     SecurityService,
 )
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def security_settings():

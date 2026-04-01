@@ -28,6 +28,8 @@ from src.player_experience.models.player import (
     TherapeuticPreferences,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestPlayerProfileSchemaManager(unittest.TestCase):
     """Test PlayerProfileSchemaManager functionality."""

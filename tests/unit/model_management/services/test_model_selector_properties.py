@@ -23,6 +23,8 @@ from tta_ai.models import (
 from tta_ai.models.models import ModelSelectionCriteria
 from tta_ai.models.services import ModelSelector
 
+pytestmark = pytest.mark.unit
+
 # ============================================================================
 # Hypothesis Strategies
 # ============================================================================

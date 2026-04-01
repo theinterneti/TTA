@@ -16,6 +16,8 @@ from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def client() -> TestClient:
@@ -45,6 +47,7 @@ def _recv_assistant(ws, max_messages: int = 20) -> dict:
 
 
 def test_interactive_buttons_suggested_on_anxiety(client: TestClient) -> None:
+    """Interactive buttons suggested on anxiety."""
     token = _auth_token("player-anxious")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
         _recv_json(ws)  # welcome
@@ -66,6 +69,7 @@ def test_interactive_buttons_suggested_on_anxiety(client: TestClient) -> None:
 
 
 def test_guided_exercise_flow_records_progress(client: TestClient) -> None:
+    """Guided exercise flow records progress."""
     token = _auth_token("player-exercise")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
         _recv_json(ws)  # welcome

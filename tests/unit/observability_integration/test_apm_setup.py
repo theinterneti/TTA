@@ -1,3 +1,4 @@
+import pytest
 """Unit tests for APM setup (OpenTelemetry initialization)."""
 
 # Logseq: [[TTA.dev/Tests/Unit/Observability_integration/Test_apm_setup]]
@@ -10,6 +11,8 @@ from src.observability_integration.apm_setup import (
     initialize_observability,
     shutdown_observability,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class TestAPMInitialization:

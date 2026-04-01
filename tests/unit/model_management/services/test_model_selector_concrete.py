@@ -25,6 +25,8 @@ from tta_ai.models import (
 from tta_ai.models.models import ModelSelectionCriteria
 from tta_ai.models.services.model_selector import ModelSelector
 
+pytestmark = pytest.mark.unit
+
 
 class TestModelSelectorConcreteRanking:
     """Concrete tests for model ranking logic."""

@@ -12,6 +12,8 @@ from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def client() -> TestClient:
@@ -30,21 +32,25 @@ def auth_headers() -> dict[str, str]:
 
 
 def test_worlds_root_requires_auth(client: TestClient) -> None:
+    """Worlds root requires auth."""
     resp = client.get("/api/v1/worlds/")
     assert resp.status_code == 401
 
 
 def test_get_world_requires_auth(client: TestClient) -> None:
+    """Get world requires auth."""
     resp = client.get("/api/v1/worlds/world_mindfulness_garden")
     assert resp.status_code == 401
 
 
 def test_check_compatibility_requires_auth(client: TestClient) -> None:
+    """Check compatibility requires auth."""
     resp = client.get("/api/v1/worlds/world_mindfulness_garden/compatibility/char-123")
     assert resp.status_code == 401
 
 
 def test_customize_requires_auth(client: TestClient) -> None:
+    """Customize requires auth."""
     resp = client.post("/api/v1/worlds/world_mindfulness_garden/customize", json={})
     assert resp.status_code == 401
 
@@ -55,6 +61,7 @@ def test_customize_requires_auth(client: TestClient) -> None:
 def test_list_worlds_happy_path(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
+    """List worlds happy path."""
     resp = client.get("/api/v1/worlds/?limit=1&offset=0", headers=auth_headers)
     assert resp.status_code == 200
     data = resp.json()
@@ -66,6 +73,7 @@ def test_list_worlds_happy_path(
 def test_get_world_details_happy_path(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
+    """Get world details happy path."""
     resp = client.get("/api/v1/worlds/world_mindfulness_garden", headers=auth_headers)
     assert resp.status_code == 200
     data = resp.json()
@@ -76,6 +84,7 @@ def test_get_world_details_happy_path(
 def test_compatibility_happy_path(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
+    """Compatibility happy path."""
     resp = client.get(
         "/api/v1/worlds/world_mindfulness_garden/compatibility/char-xyz",
         headers=auth_headers,
@@ -89,6 +98,7 @@ def test_compatibility_happy_path(
 def test_customize_world_happy_path(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
+    """Customize world happy path."""
     payload = {"therapeutic_intensity": 0.7, "session_length_preference": 45}
     resp = client.post(
         "/api/v1/worlds/world_mindfulness_garden/customize",
@@ -105,6 +115,7 @@ def test_customize_world_happy_path(
 
 
 def test_get_world_not_found(client: TestClient, auth_headers: dict[str, str]) -> None:
+    """Get world not found."""
     resp = client.get("/api/v1/worlds/does-not-exist", headers=auth_headers)
     assert resp.status_code == 404
 
@@ -112,6 +123,7 @@ def test_get_world_not_found(client: TestClient, auth_headers: dict[str, str]) -
 def test_customize_world_not_found(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
+    """Customize world not found."""
     resp = client.post(
         "/api/v1/worlds/does-not-exist/customize",
         headers=auth_headers,
@@ -124,6 +136,7 @@ def test_customize_world_invalid_params(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
     # invalid session length < 10
+    """Customize world invalid params."""
     payload = {"session_length_preference": 5}
     resp = client.post(
         "/api/v1/worlds/world_mindfulness_garden/customize",
@@ -136,6 +149,7 @@ def test_customize_world_invalid_params(
 def test_list_worlds_pagination(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
+    """List worlds pagination."""
     resp_all = client.get("/api/v1/worlds/", headers=auth_headers)
     assert resp_all.status_code == 200
     total = len(resp_all.json())

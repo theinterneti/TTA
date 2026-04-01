@@ -12,6 +12,8 @@ from src.player_experience.services.message_service import (
     MessageService,
 )
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture(autouse=True)
 def clear_history():
@@ -35,6 +37,7 @@ def mock_llm():
 
 class TestSendMessage:
     async def test_returns_success_response(self, service, mock_llm):
+        """Send Message: returns success response."""
         service._llm = mock_llm
         session_id = str(uuid.uuid4())
 
@@ -51,6 +54,7 @@ class TestSendMessage:
         assert "timestamp" in result
 
     async def test_builds_conversation_history(self, service, mock_llm):
+        """Send Message: builds conversation history."""
         mock_llm.ainvoke = AsyncMock(
             side_effect=[
                 MagicMock(content="First response."),
@@ -75,6 +79,7 @@ class TestSendMessage:
         assert history[3] == {"role": "assistant", "content": "Second response."}
 
     async def test_sessions_are_isolated(self, service, mock_llm):
+        """Send Message: sessions are isolated."""
         service._llm = mock_llm
         sid_a = str(uuid.uuid4())
         sid_b = str(uuid.uuid4())
@@ -92,6 +97,7 @@ class TestSendMessage:
         assert _SESSION_HISTORY[sid_b][0]["content"] == "Session B"
 
     async def test_fallback_on_llm_invocation_error(self, service, mock_llm):
+        """Send Message: fallback on llm invocation error."""
         mock_llm.ainvoke = AsyncMock(side_effect=RuntimeError("upstream error"))
         service._llm = mock_llm
 
@@ -108,6 +114,7 @@ class TestSendMessage:
         assert history[-1]["role"] == "assistant"
 
     async def test_fallback_when_no_llm(self, service):
+        """Send Message: fallback when no llm."""
         with patch.object(service, "_get_llm", return_value=None):
             result = await service.send_message(
                 session_id=str(uuid.uuid4()),
@@ -119,6 +126,7 @@ class TestSendMessage:
         assert result["response"]
 
     async def test_character_world_in_system_prompt(self, service, mock_llm):
+        """Send Message: character world in system prompt."""
         captured: list = []
 
         async def capture(messages):
@@ -141,6 +149,7 @@ class TestSendMessage:
         assert "Crystal Caverns" in system_content
 
     async def test_default_character_world_used(self, service, mock_llm):
+        """Send Message: default character world used."""
         captured: list = []
 
         async def capture(messages):
@@ -161,6 +170,7 @@ class TestSendMessage:
         assert "mindfulness garden" in system_content
 
     async def test_message_id_is_unique(self, service, mock_llm):
+        """Send Message: message id is unique."""
         service._llm = mock_llm
         session_id = str(uuid.uuid4())
         mock_llm.ainvoke = AsyncMock(
@@ -179,6 +189,7 @@ class TestSendMessage:
 
 class TestClearHistory:
     def test_clear_session_history(self, service):
+        """Clear History: clear session history."""
         session_id = str(uuid.uuid4())
         _SESSION_HISTORY[session_id] = [{"role": "user", "content": "hi"}]
 
@@ -187,9 +198,11 @@ class TestClearHistory:
         assert session_id not in _SESSION_HISTORY
 
     def test_clear_nonexistent_session_is_safe(self, service):
+        """Clear History: clear nonexistent session is safe."""
         service.clear_session_history("does-not-exist")  # must not raise
 
     def test_get_session_history_returns_copy(self, service):
+        """Clear History: get session history returns copy."""
         session_id = str(uuid.uuid4())
         _SESSION_HISTORY[session_id] = [{"role": "user", "content": "hi"}]
 
@@ -200,4 +213,5 @@ class TestClearHistory:
         assert len(_SESSION_HISTORY[session_id]) == 1
 
     def test_get_session_history_empty_for_unknown_session(self, service):
+        """Clear History: get session history empty for unknown session."""
         assert service.get_session_history("unknown") == []

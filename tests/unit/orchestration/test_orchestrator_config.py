@@ -14,6 +14,8 @@ import yaml
 
 from src.orchestration.config import TTAConfig
 
+pytestmark = pytest.mark.unit
+
 # Capture the real closure dict at module load time (before any test replaces _instances)
 _REAL_CONFIG_INSTANCES = TTAConfig._instances
 

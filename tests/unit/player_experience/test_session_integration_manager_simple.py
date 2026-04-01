@@ -1,3 +1,4 @@
+import pytest
 """
 
 # Logseq: [[TTA.dev/Tests/Test_session_integration_manager_simple]]
@@ -25,6 +26,8 @@ from src.player_experience.models.session import (
     SessionContext,
     TherapeuticSettings,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class TestSessionIntegrationManagerCore(unittest.TestCase):

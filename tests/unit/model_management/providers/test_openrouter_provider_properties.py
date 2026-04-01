@@ -18,6 +18,8 @@ from tta_ai.models.interfaces import (
     ProviderType,
 )
 
+pytestmark = pytest.mark.unit
+
 # ============================================================================
 # Custom Hypothesis Strategies
 # ============================================================================

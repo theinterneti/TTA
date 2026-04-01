@@ -29,6 +29,8 @@ import pytest
 
 from src.components.docker_component import DockerComponent
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def mock_config():

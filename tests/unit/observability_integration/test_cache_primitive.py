@@ -9,6 +9,8 @@ import pytest
 
 from src.observability_integration.primitives.cache import CachePrimitive
 
+pytestmark = pytest.mark.unit
+
 
 # Mock WorkflowPrimitive for testing
 class MockPrimitive:

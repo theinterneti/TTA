@@ -21,6 +21,8 @@ import pytest
 from src.components.neo4j_component import Neo4jComponent
 from src.orchestration import TTAConfig
 
+pytestmark = pytest.mark.unit
+
 
 class TestNeo4jComponentLifecycle:
     """Test Neo4j component lifecycle operations."""

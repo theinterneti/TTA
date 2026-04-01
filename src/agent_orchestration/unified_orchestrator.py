@@ -23,11 +23,15 @@ import redis.asyncio as aioredis
 try:
     from ttadev.primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext
 except ImportError:
-    from tta_dev_primitives import (  # type: ignore[no-redef]
-        LambdaPrimitive,
-        SequentialPrimitive,
-        WorkflowContext,
-    )
+    # ttadev not available — minimal stubs for type checking
+    class LambdaPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class SequentialPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class WorkflowContext:  # type: ignore[no-redef]
+        def __init__(self, **kwargs: object) -> None: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

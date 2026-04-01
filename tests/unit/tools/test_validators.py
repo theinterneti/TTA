@@ -15,6 +15,8 @@ from src.agent_orchestration.tools.validators import (
     ValidationSeverity,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestToolNameValidator:
     """Tests for ToolNameValidator."""

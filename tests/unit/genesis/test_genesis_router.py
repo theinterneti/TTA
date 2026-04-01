@@ -37,6 +37,8 @@ from src.components.genesis.session_store import (
 )
 from src.player_experience.api.routers.genesis import router
 
+pytestmark = pytest.mark.unit
+
 # ── Test fixtures ─────────────────────────────────────────────────────────────
 
 
@@ -138,6 +140,7 @@ class TestStartGenesisSession:
         open_agent_response: AgentResponse,
     ) -> None:
         # Arrange
+        """Start Genesis Session: start returns 201 with session id."""
         mock_store = MagicMock()
         mock_store.save = AsyncMock()
         mock_agent = MagicMock()
@@ -162,6 +165,7 @@ class TestStartGenesisSession:
         client: TestClient,
         open_agent_response: AgentResponse,
     ) -> None:
+        """Start Genesis Session: start stores session."""
         mock_store = MagicMock()
         mock_store.save = AsyncMock()
         mock_agent = MagicMock()
@@ -179,6 +183,7 @@ class TestStartGenesisSession:
         self,
         client: TestClient,
     ) -> None:
+        """Start Genesis Session: start returns 500 on agent failure."""
         mock_store = MagicMock()
         mock_store.save = AsyncMock()
         mock_agent = MagicMock()
@@ -203,6 +208,7 @@ class TestRespondToGenesis:
         blank_state: GenesisSessionState,
         open_agent_response: AgentResponse,
     ) -> None:
+        """Respond To Genesis: respond success."""
         mock_store, mock_agent = _make_mocks(blank_state, open_agent_response)
 
         with (
@@ -228,6 +234,7 @@ class TestRespondToGenesis:
         blank_state: GenesisSessionState,
         open_agent_response: AgentResponse,
     ) -> None:
+        """Respond To Genesis: respond saves updated state."""
         mock_store, mock_agent = _make_mocks(blank_state, open_agent_response)
 
         with (
@@ -245,6 +252,7 @@ class TestRespondToGenesis:
         self,
         client: TestClient,
     ) -> None:
+        """Respond To Genesis: respond unknown session returns 404."""
         mock_store = MagicMock()
         mock_store.load = AsyncMock(return_value=None)
 
@@ -263,6 +271,7 @@ class TestRespondToGenesis:
         client: TestClient,
         session_id: str,
     ) -> None:
+        """Respond To Genesis: respond already complete returns 409."""
         complete_state = GenesisSessionState(
             session_id=session_id, act=Act.SESSION_BEGUN
         )
@@ -284,6 +293,7 @@ class TestRespondToGenesis:
         client: TestClient,
         blank_state: GenesisSessionState,
     ) -> None:
+        """Respond To Genesis: respond agent failure returns 500."""
         mock_store = MagicMock()
         mock_store.load = AsyncMock(return_value=blank_state)
         mock_store.save = AsyncMock()
@@ -307,6 +317,7 @@ class TestRespondToGenesis:
         blank_state: GenesisSessionState,
         complete_agent_response: AgentResponse,
     ) -> None:
+        """Respond To Genesis: respond complete includes world seed."""
         mock_store, mock_agent = _make_mocks(blank_state, complete_agent_response)
 
         with (
@@ -333,6 +344,7 @@ class TestRespondToGenesis:
         client: TestClient,
         session_id: str,
     ) -> None:
+        """Respond To Genesis: respond empty input returns 422."""
         resp = client.post(
             f"/api/v1/genesis/{session_id}/respond",
             json={"player_input": ""},
@@ -349,6 +361,7 @@ class TestGetGenesisSession:
         client: TestClient,
         session_id: str,
     ) -> None:
+        """Get Genesis Session: get returns 200 with status."""
         state = GenesisSessionState(
             session_id=session_id,
             seed_fields={"tone": "hopeful"},
@@ -375,6 +388,7 @@ class TestGetGenesisSession:
         self,
         client: TestClient,
     ) -> None:
+        """Get Genesis Session: get unknown session returns 404."""
         mock_store = MagicMock()
         mock_store.load = AsyncMock(return_value=None)
 
@@ -390,6 +404,7 @@ class TestGetGenesisSession:
         client: TestClient,
         session_id: str,
     ) -> None:
+        """Get Genesis Session: get complete session shows is complete."""
         state = GenesisSessionState(session_id=session_id, act=Act.SESSION_BEGUN)
         mock_store = MagicMock()
         mock_store.load = AsyncMock(return_value=state)
@@ -408,6 +423,7 @@ class TestGetGenesisSession:
 
 class TestSessionStoreSerialization:
     def test_roundtrip_minimal_state(self, session_id: str) -> None:
+        """Session Store Serialization: roundtrip minimal state."""
         state = GenesisSessionState(session_id=session_id)
         restored = _state_from_dict(_state_to_dict(state))
         assert restored.session_id == session_id
@@ -416,6 +432,7 @@ class TestSessionStoreSerialization:
         assert restored.seed_fields == {}
 
     def test_roundtrip_with_turns(self, session_id: str) -> None:
+        """Session Store Serialization: roundtrip with turns."""
         state = GenesisSessionState(
             session_id=session_id,
             act=Act.BUILDING_WORLD,
@@ -440,6 +457,7 @@ class TestSessionStoreSerialization:
     def test_roundtrip_with_guide_character(
         self, session_id: str, guide: GuideCharacter
     ) -> None:
+        """Session Store Serialization: roundtrip with guide character."""
         state = GenesisSessionState(
             session_id=session_id,
             guide_introduced=True,
@@ -452,16 +470,19 @@ class TestSessionStoreSerialization:
         assert restored.guide_character.entity_type == guide.entity_type
 
     def test_roundtrip_without_guide_character(self, session_id: str) -> None:
+        """Session Store Serialization: roundtrip without guide character."""
         state = GenesisSessionState(session_id=session_id)
         restored = _state_from_dict(_state_to_dict(state))
         assert restored.guide_character is None
 
     def test_roundtrip_surprise_me_flag(self, session_id: str) -> None:
+        """Session Store Serialization: roundtrip surprise me flag."""
         state = GenesisSessionState(session_id=session_id, surprise_me=True)
         restored = _state_from_dict(_state_to_dict(state))
         assert restored.surprise_me is True
 
     def test_roundtrip_first_light_paragraph(self, session_id: str) -> None:
+        """Session Store Serialization: roundtrip first light paragraph."""
         paragraph = "The sky turned amber as you stepped through."
         state = GenesisSessionState(
             session_id=session_id,
@@ -473,6 +494,7 @@ class TestSessionStoreSerialization:
         assert restored.first_light_confirmed is True
 
     def test_roundtrip_preserves_timestamps(self, session_id: str) -> None:
+        """Session Store Serialization: roundtrip preserves timestamps."""
         state = GenesisSessionState(session_id=session_id)
         original_created = state.created_at
         restored = _state_from_dict(_state_to_dict(state))
@@ -493,6 +515,7 @@ class TestGenesisSessionStoreMemory:
 
     @pytest.mark.asyncio
     async def test_save_and_load(self, session_id: str) -> None:
+        """Genesis Session Store Memory: save and load."""
         store = self._force_fallback_store()
         state = GenesisSessionState(session_id=session_id, surprise_me=True)
         await store.save(state)
@@ -504,12 +527,14 @@ class TestGenesisSessionStoreMemory:
 
     @pytest.mark.asyncio
     async def test_load_missing_returns_none(self) -> None:
+        """Genesis Session Store Memory: load missing returns none."""
         store = self._force_fallback_store()
         result = await store.load("nonexistent-id")
         assert result is None
 
     @pytest.mark.asyncio
     async def test_delete_removes_session(self, session_id: str) -> None:
+        """Genesis Session Store Memory: delete removes session."""
         store = self._force_fallback_store()
         state = GenesisSessionState(session_id=session_id)
         await store.save(state)
@@ -518,6 +543,7 @@ class TestGenesisSessionStoreMemory:
 
     @pytest.mark.asyncio
     async def test_exists_true_after_save(self, session_id: str) -> None:
+        """Genesis Session Store Memory: exists true after save."""
         store = self._force_fallback_store()
         state = GenesisSessionState(session_id=session_id)
         await store.save(state)
@@ -525,11 +551,13 @@ class TestGenesisSessionStoreMemory:
 
     @pytest.mark.asyncio
     async def test_exists_false_before_save(self) -> None:
+        """Genesis Session Store Memory: exists false before save."""
         store = self._force_fallback_store()
         assert await store.exists("never-saved") is False
 
     @pytest.mark.asyncio
     async def test_save_updates_updated_at(self, session_id: str) -> None:
+        """Genesis Session Store Memory: save updates updated at."""
         store = self._force_fallback_store()
         state = GenesisSessionState(session_id=session_id)
         original_ts = state.updated_at
@@ -542,6 +570,7 @@ class TestGenesisSessionStoreMemory:
     async def test_save_with_guide_character(
         self, session_id: str, guide: GuideCharacter
     ) -> None:
+        """Genesis Session Store Memory: save with guide character."""
         store = self._force_fallback_store()
         state = GenesisSessionState(
             session_id=session_id, guide_character=guide, guide_introduced=True

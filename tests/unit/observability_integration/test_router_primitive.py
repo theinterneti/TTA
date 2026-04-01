@@ -8,6 +8,8 @@ import pytest
 
 from src.observability_integration.primitives.router import RouterPrimitive
 
+pytestmark = pytest.mark.unit
+
 
 # Mock WorkflowPrimitive for testing
 class MockPrimitive:

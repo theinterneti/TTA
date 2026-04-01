@@ -1,11 +1,15 @@
 # Logseq: [[TTA.dev/Tests/Test_progress_viz_endpoint]]
 from __future__ import annotations
 
+import pytest
+
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import create_access_token
 from src.player_experience.api.config import TestingSettings
+
+pytestmark = pytest.mark.unit
 
 
 def _client_with_token(player_id: str = "playerTest") -> tuple[TestClient, str]:
@@ -21,6 +25,7 @@ def _client_with_token(player_id: str = "playerTest") -> tuple[TestClient, str]:
 
 
 def test_progress_viz_endpoint_returns_series() -> None:
+    """Progress viz endpoint returns series."""
     client, token = _client_with_token()
     resp = client.get(
         "/api/v1/players/playerTest/progress/viz?days=7",

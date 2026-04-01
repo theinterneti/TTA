@@ -11,11 +11,14 @@ import pytest
 
 from src.common.neo4j_schema import WorldGraphSchema
 
+pytestmark = pytest.mark.unit
+
 
 class TestWorldGraphSchemaNodes:
     """Test node label constants."""
 
     def test_all_node_labels_defined(self) -> None:
+        """World Graph Schema Nodes: all node labels defined."""
         n = WorldGraphSchema.Nodes
         assert n.LOCATION == "Location"
         assert n.NPC == "NPC"
@@ -26,6 +29,7 @@ class TestWorldGraphSchemaNodes:
         assert n.ZONE == "Zone"
 
     def test_node_labels_are_strings(self) -> None:
+        """World Graph Schema Nodes: node labels are strings."""
         n = WorldGraphSchema.Nodes
         for attr in ("LOCATION", "NPC", "WORLD_RULE", "WORLD_EVENT",
                      "PLAYER_CHARACTER", "FACTION", "ZONE"):
@@ -36,6 +40,7 @@ class TestWorldGraphSchemaRels:
     """Test relationship type constants."""
 
     def test_all_relationship_types_defined(self) -> None:
+        """World Graph Schema Rels: all relationship types defined."""
         r = WorldGraphSchema.Rels
         assert r.CONNECTED_TO == "CONNECTED_TO"
         assert r.LIVES_IN == "LIVES_IN"
@@ -56,33 +61,39 @@ class TestGetConstraints:
     """Test constraint Cypher statement generation."""
 
     def test_returns_list_of_strings(self) -> None:
+        """Get Constraints: returns list of strings."""
         stmts = WorldGraphSchema.get_constraints()
         assert isinstance(stmts, list)
         assert all(isinstance(s, str) for s in stmts)
 
     def test_covers_all_seven_node_labels(self) -> None:
+        """Get Constraints: covers all seven node labels."""
         stmts = "\n".join(WorldGraphSchema.get_constraints())
         for label in ("Location", "NPC", "WorldRule", "WorldEvent",
                       "PlayerCharacter", "Faction", "Zone"):
             assert label in stmts, f"Expected {label} in constraints"
 
     def test_unique_constraints_use_if_not_exists(self) -> None:
+        """Get Constraints: unique constraints use if not exists."""
         stmts = WorldGraphSchema.get_constraints()
         for stmt in stmts:
             assert "IF NOT EXISTS" in stmt
 
     def test_uniqueness_constraints_on_id(self) -> None:
+        """Get Constraints: uniqueness constraints on id."""
         stmts = [s for s in WorldGraphSchema.get_constraints()
                  if "IS UNIQUE" in s]
         # One per node label
         assert len(stmts) == 7
 
     def test_not_null_constraints_present(self) -> None:
+        """Get Constraints: not null constraints present."""
         stmts = [s for s in WorldGraphSchema.get_constraints()
                  if "IS NOT NULL" in s]
         assert len(stmts) >= 4
 
     def test_no_duplicate_constraint_names(self) -> None:
+        """Get Constraints: no duplicate constraint names."""
         import re
         stmts = WorldGraphSchema.get_constraints()
         names = []
@@ -97,26 +108,31 @@ class TestGetIndexes:
     """Test index Cypher statement generation."""
 
     def test_returns_list_of_strings(self) -> None:
+        """Get Indexes: returns list of strings."""
         stmts = WorldGraphSchema.get_indexes()
         assert isinstance(stmts, list)
         assert all(isinstance(s, str) for s in stmts)
 
     def test_covers_all_seven_node_labels(self) -> None:
+        """Get Indexes: covers all seven node labels."""
         stmts = "\n".join(WorldGraphSchema.get_indexes())
         for label in ("Location", "NPC", "WorldRule", "WorldEvent",
                       "PlayerCharacter", "Faction", "Zone"):
             assert label in stmts, f"Expected {label} in indexes"
 
     def test_indexes_use_if_not_exists(self) -> None:
+        """Get Indexes: indexes use if not exists."""
         stmts = WorldGraphSchema.get_indexes()
         for stmt in stmts:
             assert "IF NOT EXISTS" in stmt
 
     def test_minimum_index_count(self) -> None:
         # At least one index per node label (7) plus extras
+        """Get Indexes: minimum index count."""
         assert len(WorldGraphSchema.get_indexes()) >= 7
 
     def test_no_duplicate_index_names(self) -> None:
+        """Get Indexes: no duplicate index names."""
         import re
         stmts = WorldGraphSchema.get_indexes()
         names = []
@@ -127,6 +143,7 @@ class TestGetIndexes:
         assert len(names) == len(set(names)), "Duplicate index names found"
 
     def test_active_flag_indexed_for_world_event(self) -> None:
+        """Get Indexes: active flag indexed for world event."""
         stmts = "\n".join(WorldGraphSchema.get_indexes())
         assert "WorldEvent" in stmts
         assert "is_active" in stmts
@@ -149,6 +166,7 @@ class TestInitialize:
     async def test_returns_true_on_full_success(
         self, mock_driver: MagicMock
     ) -> None:
+        """Initialize: returns true on full success."""
         result = await WorldGraphSchema.initialize(mock_driver)
         assert result is True
 
@@ -156,6 +174,7 @@ class TestInitialize:
     async def test_calls_run_for_all_statements(
         self, mock_driver: MagicMock
     ) -> None:
+        """Initialize: calls run for all statements."""
         await WorldGraphSchema.initialize(mock_driver)
         session = mock_driver.session.return_value.__aenter__.return_value
         expected_calls = (
@@ -166,6 +185,7 @@ class TestInitialize:
 
     @pytest.mark.asyncio
     async def test_returns_false_on_partial_failure(self) -> None:
+        """Initialize: returns false on partial failure."""
         session = AsyncMock()
         session.run = AsyncMock(side_effect=[Exception("already exists"), None])
         session.__aenter__ = AsyncMock(return_value=session)
@@ -206,6 +226,7 @@ class TestInitialize:
     async def test_logs_success(
         self, mock_driver: MagicMock, caplog: pytest.LogCaptureFixture
     ) -> None:
+        """Initialize: logs success."""
         import logging
         with caplog.at_level(logging.INFO, logger="src.common.neo4j_schema"):
             await WorldGraphSchema.initialize(mock_driver)
@@ -215,6 +236,7 @@ class TestInitialize:
     async def test_logs_warning_on_partial_failure(
         self, caplog: pytest.LogCaptureFixture
     ) -> None:
+        """Initialize: logs warning on partial failure."""
         import logging
         session = AsyncMock()
         session.run = AsyncMock(side_effect=Exception("constraint exists"))

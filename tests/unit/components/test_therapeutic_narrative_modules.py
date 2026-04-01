@@ -7,6 +7,8 @@ Mirrors the conventions established in test_gameplay_loop_narrative_engine.py.
 
 from __future__ import annotations
 
+import pytest
+
 from src.components.gameplay_loop.models.core import (
     ChoiceType,
     DifficultyLevel,
@@ -62,6 +64,8 @@ from src.components.gameplay_loop.narrative.therapeutic_integrator import (
     NarrativeTechnique,
     TherapeuticIntegrator,
 )
+
+pytestmark = pytest.mark.unit
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -126,11 +130,13 @@ def _make_user_choice(
 
 class TestAdaptiveDifficultyEngine:
     async def test_initialize_returns_true(self):
+        """Adaptive Difficulty Engine: initialize returns true."""
         engine = AdaptiveDifficultyEngine()
         result = await engine.initialize()
         assert result is True
 
     async def test_assess_performance_average_default(self):
+        """Adaptive Difficulty Engine: assess performance average default."""
         engine = AdaptiveDifficultyEngine()
         await engine.initialize()
         session = _make_session()
@@ -138,6 +144,7 @@ class TestAdaptiveDifficultyEngine:
         assert level == PerformanceLevel.AVERAGE
 
     async def test_assess_performance_excelling(self):
+        """Adaptive Difficulty Engine: assess performance excelling."""
         engine = AdaptiveDifficultyEngine()
         await engine.initialize()
         session = _make_session()
@@ -151,6 +158,7 @@ class TestAdaptiveDifficultyEngine:
         assert level == PerformanceLevel.EXCELLING
 
     async def test_adjust_difficulty_returns_scene(self):
+        """Adaptive Difficulty Engine: adjust difficulty returns scene."""
         engine = AdaptiveDifficultyEngine()
         await engine.initialize()
         session = _make_session()
@@ -159,6 +167,7 @@ class TestAdaptiveDifficultyEngine:
         assert isinstance(adjusted, Scene)
 
     async def test_adjust_difficulty_preserves_title(self):
+        """Adaptive Difficulty Engine: adjust difficulty preserves title."""
         engine = AdaptiveDifficultyEngine()
         await engine.initialize()
         session = _make_session()
@@ -167,6 +176,7 @@ class TestAdaptiveDifficultyEngine:
         assert adjusted.title == scene.title
 
     async def test_get_recommended_difficulty(self):
+        """Adaptive Difficulty Engine: get recommended difficulty."""
         engine = AdaptiveDifficultyEngine()
         await engine.initialize()
         session = _make_session()
@@ -174,6 +184,7 @@ class TestAdaptiveDifficultyEngine:
         assert isinstance(level, DifficultyLevel)
 
     async def test_record_performance_no_error(self):
+        """Adaptive Difficulty Engine: record performance no error."""
         engine = AdaptiveDifficultyEngine()
         await engine.initialize()
         session = _make_session()
@@ -188,11 +199,13 @@ class TestAdaptiveDifficultyEngine:
 
 class TestEmotionalSafetySystem:
     async def test_initialize_returns_true(self):
+        """Emotional Safety System: initialize returns true."""
         system = EmotionalSafetySystem()
         result = await system.initialize()
         assert result is True
 
     async def test_assess_content_safety_safe(self):
+        """Emotional Safety System: assess content safety safe."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CALM)
@@ -203,6 +216,7 @@ class TestEmotionalSafetySystem:
         assert "safety_level" in result
 
     async def test_assess_content_safety_crisis(self):
+        """Emotional Safety System: assess content safety crisis."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CRISIS)
@@ -210,6 +224,7 @@ class TestEmotionalSafetySystem:
         assert isinstance(result, dict)
 
     async def test_filter_unsafe_content_safe_passthrough(self):
+        """Emotional Safety System: filter unsafe content safe passthrough."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CALM)
@@ -218,6 +233,7 @@ class TestEmotionalSafetySystem:
         assert isinstance(filtered, Scene)
 
     async def test_filter_unsafe_content_crisis_replaced(self):
+        """Emotional Safety System: filter unsafe content crisis replaced."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CRISIS)
@@ -226,6 +242,7 @@ class TestEmotionalSafetySystem:
         assert isinstance(filtered, Scene)
 
     async def test_check_emotional_boundaries_calm(self):
+        """Emotional Safety System: check emotional boundaries calm."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CALM)
@@ -233,6 +250,7 @@ class TestEmotionalSafetySystem:
         assert isinstance(level, SafetyLevel)
 
     async def test_check_emotional_boundaries_crisis(self):
+        """Emotional Safety System: check emotional boundaries crisis."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CRISIS)
@@ -240,6 +258,7 @@ class TestEmotionalSafetySystem:
         assert isinstance(level, SafetyLevel)
 
     async def test_trigger_safety_intervention_none_for_safe(self):
+        """Emotional Safety System: trigger safety intervention none for safe."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CALM)
@@ -247,6 +266,7 @@ class TestEmotionalSafetySystem:
         assert result is None
 
     async def test_trigger_safety_intervention_scene_for_crisis(self):
+        """Emotional Safety System: trigger safety intervention scene for crisis."""
         system = EmotionalSafetySystem()
         await system.initialize()
         session = _make_session(EmotionalState.CRISIS)
@@ -261,11 +281,13 @@ class TestEmotionalSafetySystem:
 
 class TestTherapeuticIntegrationSystem:
     async def test_initialize_returns_true(self):
+        """Therapeutic Integration System: initialize returns true."""
         system = TherapeuticIntegrationSystem()
         result = await system.initialize()
         assert result is True
 
     async def test_set_therapeutic_goals(self):
+        """Therapeutic Integration System: set therapeutic goals."""
         system = TherapeuticIntegrationSystem()
         await system.initialize()
         session = _make_session()
@@ -275,6 +297,7 @@ class TestTherapeuticIntegrationSystem:
         assert success is True
 
     async def test_set_therapeutic_goals_empty_list(self):
+        """Therapeutic Integration System: set therapeutic goals empty list."""
         system = TherapeuticIntegrationSystem()
         await system.initialize()
         session = _make_session()
@@ -282,6 +305,7 @@ class TestTherapeuticIntegrationSystem:
         assert isinstance(success, bool)
 
     async def test_track_goal_progress(self):
+        """Therapeutic Integration System: track goal progress."""
         system = TherapeuticIntegrationSystem()
         await system.initialize()
         session = _make_session()
@@ -291,6 +315,7 @@ class TestTherapeuticIntegrationSystem:
         assert isinstance(progress, dict)
 
     async def test_log_therapeutic_evidence(self):
+        """Therapeutic Integration System: log therapeutic evidence."""
         system = TherapeuticIntegrationSystem()
         await system.initialize()
         await system.log_therapeutic_evidence(
@@ -301,6 +326,7 @@ class TestTherapeuticIntegrationSystem:
         )
 
     async def test_generate_progress_report(self):
+        """Therapeutic Integration System: generate progress report."""
         system = TherapeuticIntegrationSystem()
         await system.initialize()
         session = _make_session()
@@ -309,6 +335,7 @@ class TestTherapeuticIntegrationSystem:
         assert isinstance(report, dict)
 
     async def test_generate_progress_report_no_goals(self):
+        """Therapeutic Integration System: generate progress report no goals."""
         system = TherapeuticIntegrationSystem()
         await system.initialize()
         session = _make_session()
@@ -323,11 +350,13 @@ class TestTherapeuticIntegrationSystem:
 
 class TestTherapeuticIntegrator:
     async def test_initialize_returns_true(self):
+        """Therapeutic Integrator: initialize returns true."""
         integrator = TherapeuticIntegrator()
         result = await integrator.initialize()
         assert result is True
 
     async def test_integrate_therapeutic_context(self):
+        """Therapeutic Integrator: integrate therapeutic context."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         session = _make_session()
@@ -337,6 +366,7 @@ class TestTherapeuticIntegrator:
         assert isinstance(result, Scene)
 
     async def test_integrate_therapeutic_context_empty_goals(self):
+        """Therapeutic Integrator: integrate therapeutic context empty goals."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         session = _make_session()
@@ -346,6 +376,7 @@ class TestTherapeuticIntegrator:
         assert isinstance(result, Scene)
 
     async def test_select_integration_mode_subtle_for_crisis(self):
+        """Therapeutic Integrator: select integration mode subtle for crisis."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         session = _make_session(EmotionalState.CRISIS)
@@ -354,6 +385,7 @@ class TestTherapeuticIntegrator:
         assert mode == IntegrationMode.SUBTLE
 
     async def test_select_integration_mode_for_calm(self):
+        """Therapeutic Integrator: select integration mode for calm."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         session = _make_session(EmotionalState.CALM)
@@ -361,6 +393,7 @@ class TestTherapeuticIntegrator:
         assert isinstance(mode, IntegrationMode)
 
     async def test_select_integration_mode_intensive_for_high_effectiveness(self):
+        """Therapeutic Integrator: select integration mode intensive for high effectiveness."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         session = _make_session(EmotionalState.ENGAGED)
@@ -372,6 +405,7 @@ class TestTherapeuticIntegrator:
         assert isinstance(mode, IntegrationMode)
 
     async def test_apply_narrative_technique(self):
+        """Therapeutic Integrator: apply narrative technique."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         scene = _make_scene()
@@ -382,6 +416,7 @@ class TestTherapeuticIntegrator:
         assert isinstance(result, Scene)
 
     async def test_apply_narrative_technique_scaffolding(self):
+        """Therapeutic Integrator: apply narrative technique scaffolding."""
         integrator = TherapeuticIntegrator()
         await integrator.initialize()
         scene = _make_scene()
@@ -399,11 +434,13 @@ class TestTherapeuticIntegrator:
 
 class TestNarrativeConsequenceSystem:
     async def test_initialize_returns_true(self):
+        """Narrative Consequence System: initialize returns true."""
         system = NarrativeConsequenceSystem()
         result = await system.initialize()
         assert result is True
 
     async def test_evaluate_consequences(self):
+        """Narrative Consequence System: evaluate consequences."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         session = _make_session()
@@ -412,6 +449,7 @@ class TestNarrativeConsequenceSystem:
         assert isinstance(consequences, list)
 
     async def test_evaluate_consequences_therapeutic_choice(self):
+        """Narrative Consequence System: evaluate consequences therapeutic choice."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         session = _make_session()
@@ -421,6 +459,7 @@ class TestNarrativeConsequenceSystem:
         assert isinstance(consequences, list)
 
     async def test_apply_consequences(self):
+        """Narrative Consequence System: apply consequences."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         scene = _make_scene()
@@ -435,6 +474,7 @@ class TestNarrativeConsequenceSystem:
         assert isinstance(result, Scene)
 
     async def test_apply_consequences_empty_list(self):
+        """Narrative Consequence System: apply consequences empty list."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         scene = _make_scene()
@@ -442,6 +482,7 @@ class TestNarrativeConsequenceSystem:
         assert isinstance(result, Scene)
 
     async def test_track_consequence_chain(self):
+        """Narrative Consequence System: track consequence chain."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         consequence = {
@@ -452,12 +493,14 @@ class TestNarrativeConsequenceSystem:
         await system.track_consequence_chain("s1", consequence)
 
     async def test_get_active_consequences(self):
+        """Narrative Consequence System: get active consequences."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         result = await system.get_active_consequences("s1")
         assert isinstance(result, list)
 
     async def test_get_active_consequences_after_evaluate(self):
+        """Narrative Consequence System: get active consequences after evaluate."""
         system = NarrativeConsequenceSystem()
         await system.initialize()
         session = _make_session()
@@ -476,11 +519,13 @@ class TestNarrativeConsequenceSystem:
 
 class TestCharacterDevelopmentSystem:
     async def test_initialize_returns_true(self):
+        """Character Development System: initialize returns true."""
         system = CharacterDevelopmentSystem()
         result = await system.initialize()
         assert result is True
 
     async def test_track_character_growth(self):
+        """Character Development System: track character growth."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -489,6 +534,7 @@ class TestCharacterDevelopmentSystem:
         assert isinstance(growth, dict)
 
     async def test_track_character_growth_failure_outcome(self):
+        """Character Development System: track character growth failure outcome."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -497,6 +543,7 @@ class TestCharacterDevelopmentSystem:
         assert isinstance(growth, dict)
 
     async def test_assess_arc_phase_introduction(self):
+        """Character Development System: assess arc phase introduction."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -505,6 +552,7 @@ class TestCharacterDevelopmentSystem:
         assert phase == ArcPhase.INTRODUCTION
 
     async def test_assess_arc_phase_growth(self):
+        """Character Development System: assess arc phase growth."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -518,6 +566,7 @@ class TestCharacterDevelopmentSystem:
         assert phase == ArcPhase.GROWTH
 
     async def test_generate_development_milestone(self):
+        """Character Development System: generate development milestone."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -527,6 +576,7 @@ class TestCharacterDevelopmentSystem:
         assert marker is None or isinstance(marker, ProgressMarker)
 
     async def test_generate_development_milestone_cognitive(self):
+        """Character Development System: generate development milestone cognitive."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -541,12 +591,14 @@ class TestCharacterDevelopmentSystem:
         assert marker is None or isinstance(marker, ProgressMarker)
 
     async def test_get_character_arc_summary(self):
+        """Character Development System: get character arc summary."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         summary = await system.get_character_arc_summary("s1")
         assert isinstance(summary, dict)
 
     async def test_get_character_arc_summary_after_growth(self):
+        """Character Development System: get character arc summary after growth."""
         system = CharacterDevelopmentSystem()
         await system.initialize()
         session = _make_session()
@@ -563,11 +615,13 @@ class TestCharacterDevelopmentSystem:
 
 class TestReplayabilitySystem:
     async def test_initialize_returns_true(self):
+        """Replayability System: initialize returns true."""
         system = ReplayabilitySystem()
         result = await system.initialize()
         assert result is True
 
     async def test_register_branch_point(self):
+        """Replayability System: register branch point."""
         system = ReplayabilitySystem()
         await system.initialize()
         session = _make_session()
@@ -579,6 +633,7 @@ class TestReplayabilitySystem:
         assert len(branch_id) > 0
 
     async def test_register_branch_point_single_choice(self):
+        """Replayability System: register branch point single choice."""
         system = ReplayabilitySystem()
         await system.initialize()
         session = _make_session()
@@ -587,6 +642,7 @@ class TestReplayabilitySystem:
         assert isinstance(branch_id, str)
 
     async def test_explore_alternative_path(self):
+        """Replayability System: explore alternative path."""
         system = ReplayabilitySystem()
         await system.initialize()
         session = _make_session()
@@ -598,18 +654,21 @@ class TestReplayabilitySystem:
         assert result is None or isinstance(result, dict)
 
     async def test_explore_alternative_invalid_branch(self):
+        """Replayability System: explore alternative invalid branch."""
         system = ReplayabilitySystem()
         await system.initialize()
         result = await system.explore_alternative_path("nonexistent-branch", "Go right")
         assert result is None
 
     async def test_get_timeline_summary(self):
+        """Replayability System: get timeline summary."""
         system = ReplayabilitySystem()
         await system.initialize()
         summary = await system.get_timeline_summary("s1")
         assert isinstance(summary, dict)
 
     async def test_get_timeline_summary_with_branches(self):
+        """Replayability System: get timeline summary with branches."""
         system = ReplayabilitySystem()
         await system.initialize()
         session = _make_session()
@@ -619,6 +678,7 @@ class TestReplayabilitySystem:
         assert isinstance(summary, dict)
 
     async def test_calculate_discovery_percentage(self):
+        """Replayability System: calculate discovery percentage."""
         system = ReplayabilitySystem()
         await system.initialize()
         pct = await system.calculate_discovery_percentage("s1")
@@ -626,6 +686,7 @@ class TestReplayabilitySystem:
         assert 0.0 <= pct <= 100.0
 
     async def test_calculate_discovery_percentage_with_exploration(self):
+        """Replayability System: calculate discovery percentage with exploration."""
         system = ReplayabilitySystem()
         await system.initialize()
         session = _make_session()
@@ -644,11 +705,13 @@ class TestReplayabilitySystem:
 
 class TestCollaborativeSystem:
     async def test_initialize_returns_true(self):
+        """Collaborative System: initialize returns true."""
         system = CollaborativeSystem()
         result = await system.initialize()
         assert result is True
 
     async def test_create_collaborative_session(self):
+        """Collaborative System: create collaborative session."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -659,6 +722,7 @@ class TestCollaborativeSystem:
         assert "collab_session_id" in collab
 
     async def test_create_collaborative_session_group_therapy(self):
+        """Collaborative System: create collaborative session group therapy."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -668,6 +732,7 @@ class TestCollaborativeSystem:
         assert isinstance(collab, dict)
 
     async def test_add_participant(self):
+        """Collaborative System: add participant."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -681,6 +746,7 @@ class TestCollaborativeSystem:
         assert isinstance(success, bool)
 
     async def test_add_participant_full_session(self):
+        """Collaborative System: add participant full session."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -698,6 +764,7 @@ class TestCollaborativeSystem:
         assert isinstance(result, bool)
 
     async def test_process_collaborative_choice(self):
+        """Collaborative System: process collaborative choice."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -712,6 +779,7 @@ class TestCollaborativeSystem:
         assert isinstance(result, dict)
 
     async def test_generate_group_narrative(self):
+        """Collaborative System: generate group narrative."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -723,6 +791,7 @@ class TestCollaborativeSystem:
         assert result is None or isinstance(result, Scene)
 
     async def test_generate_group_narrative_invalid_session(self):
+        """Collaborative System: generate group narrative invalid session."""
         system = CollaborativeSystem()
         await system.initialize()
         session = _make_session()
@@ -737,11 +806,13 @@ class TestCollaborativeSystem:
 
 class TestErrorRecoveryManager:
     async def test_initialize_returns_true(self):
+        """Error Recovery Manager: initialize returns true."""
         manager = ErrorRecoveryManager()
         result = await manager.initialize()
         assert result is True
 
     async def test_create_checkpoint(self):
+        """Error Recovery Manager: create checkpoint."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         session = _make_session()
@@ -750,6 +821,7 @@ class TestErrorRecoveryManager:
         assert len(checkpoint_id) > 0
 
     async def test_restore_checkpoint(self):
+        """Error Recovery Manager: restore checkpoint."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         session = _make_session()
@@ -759,12 +831,14 @@ class TestErrorRecoveryManager:
         assert restored.user_id == session.user_id
 
     async def test_restore_checkpoint_not_found(self):
+        """Error Recovery Manager: restore checkpoint not found."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         result = await manager.restore_checkpoint("nonexistent-checkpoint")
         assert result is None
 
     async def test_handle_error_low_severity(self):
+        """Error Recovery Manager: handle error low severity."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         session = _make_session()
@@ -773,6 +847,7 @@ class TestErrorRecoveryManager:
         assert isinstance(result, SessionState)
 
     async def test_handle_error_critical_severity(self):
+        """Error Recovery Manager: handle error critical severity."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         session = _make_session()
@@ -782,6 +857,7 @@ class TestErrorRecoveryManager:
         assert isinstance(result, SessionState)
 
     async def test_get_recovery_strategy(self):
+        """Error Recovery Manager: get recovery strategy."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         error = ValueError("test error")
@@ -789,6 +865,7 @@ class TestErrorRecoveryManager:
         assert isinstance(strategy, RecoveryStrategy)
 
     async def test_get_recovery_strategy_runtime_error(self):
+        """Error Recovery Manager: get recovery strategy runtime error."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         error = RuntimeError("severe problem")
@@ -796,11 +873,13 @@ class TestErrorRecoveryManager:
         assert isinstance(strategy, RecoveryStrategy)
 
     async def test_log_error(self):
+        """Error Recovery Manager: log error."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         await manager.log_error("s1", ValueError("oops"), ErrorSeverity.LOW)
 
     async def test_log_error_critical(self):
+        """Error Recovery Manager: log error critical."""
         manager = ErrorRecoveryManager()
         await manager.initialize()
         await manager.log_error("s1", RuntimeError("crash"), ErrorSeverity.CRITICAL)

@@ -32,6 +32,8 @@ from src.player_experience.services.auth_service import (
     SecurityService,
 )
 
+pytestmark = pytest.mark.unit
+
 _SECRET = "test-secret-key-for-unit-tests"
 
 # Valid password meeting all SecuritySettings defaults
@@ -66,12 +68,14 @@ def _make_player_user(user_id: str = "u1") -> AuthenticatedUser:
 
 class TestSecurityServicePasswordValidation:
     def test_valid_password_passes_all_requirements(self):
+        """Security Service Password Validation: valid password passes all requirements."""
         svc = SecurityService(SecuritySettings())
         ok, errors = svc.validate_password_strength(_VALID_PW)
         assert ok is True
         assert errors == []
 
     def test_too_short_fails(self):
+        """Security Service Password Validation: too short fails."""
         settings = SecuritySettings(
             password_min_length=12,
             password_require_uppercase=False,
@@ -85,30 +89,35 @@ class TestSecurityServicePasswordValidation:
         assert any("12 characters" in e for e in errors)
 
     def test_missing_uppercase_fails(self):
+        """Security Service Password Validation: missing uppercase fails."""
         svc = SecurityService(SecuritySettings(password_require_uppercase=True))
         ok, errors = svc.validate_password_strength("nouppercase1!")
         assert ok is False
         assert any("uppercase" in e for e in errors)
 
     def test_missing_lowercase_fails(self):
+        """Security Service Password Validation: missing lowercase fails."""
         svc = SecurityService(SecuritySettings(password_require_lowercase=True))
         ok, errors = svc.validate_password_strength("NOLOWERCASE1!")
         assert ok is False
         assert any("lowercase" in e for e in errors)
 
     def test_missing_numbers_fails(self):
+        """Security Service Password Validation: missing numbers fails."""
         svc = SecurityService(SecuritySettings(password_require_numbers=True))
         ok, errors = svc.validate_password_strength("NoNumbers!!")
         assert ok is False
         assert any("number" in e for e in errors)
 
     def test_missing_special_fails(self):
+        """Security Service Password Validation: missing special fails."""
         svc = SecurityService(SecuritySettings(password_require_special=True))
         ok, errors = svc.validate_password_strength("NoSpecial12")
         assert ok is False
         assert any("special" in e for e in errors)
 
     def test_multiple_failures_returns_all_errors(self):
+        """Security Service Password Validation: multiple failures returns all errors."""
         settings = SecuritySettings(
             password_min_length=20,
             password_require_uppercase=True,
@@ -121,32 +130,38 @@ class TestSecurityServicePasswordValidation:
 
 class TestSecurityServiceHashAndToken:
     def test_hash_and_verify_password_round_trip(self):
+        """Security Service Hash And Token: hash and verify password round trip."""
         svc = SecurityService(SecuritySettings())
         hashed = svc.hash_password("my-password-123!")
         assert svc.verify_password("my-password-123!", hashed) is True
 
     def test_verify_wrong_password_returns_false(self):
+        """Security Service Hash And Token: verify wrong password returns false."""
         svc = SecurityService(SecuritySettings())
         hashed = svc.hash_password("correct-pass-1!")
         assert svc.verify_password("wrong-pass-1!", hashed) is False
 
     def test_generate_secure_token_is_string(self):
+        """Security Service Hash And Token: generate secure token is string."""
         svc = SecurityService(SecuritySettings())
         token = svc.generate_secure_token()
         assert isinstance(token, str)
         assert len(token) > 0
 
     def test_generate_backup_codes_default_count(self):
+        """Security Service Hash And Token: generate backup codes default count."""
         svc = SecurityService(SecuritySettings())
         codes = svc.generate_backup_codes()
         assert len(codes) == 10
 
     def test_generate_backup_codes_custom_count(self):
+        """Security Service Hash And Token: generate backup codes custom count."""
         svc = SecurityService(SecuritySettings())
         codes = svc.generate_backup_codes(count=5)
         assert len(codes) == 5
 
     def test_backup_codes_are_uppercase_hex(self):
+        """Security Service Hash And Token: backup codes are uppercase hex."""
         svc = SecurityService(SecuritySettings())
         codes = svc.generate_backup_codes(count=3)
         for code in codes:
@@ -164,6 +179,7 @@ class TestMFAService:
         return MFAService(MFAConfig())
 
     def test_generate_totp_secret_returns_secret_and_qr(self):
+        """M F A Service: generate totp secret returns secret and qr."""
         svc = self._svc()
         secret, qr_url = svc.generate_totp_secret("u1", "alice")
         assert isinstance(secret, str)
@@ -171,6 +187,7 @@ class TestMFAService:
         assert qr_url.startswith("data:image/png;base64,")
 
     def test_verify_totp_code_with_valid_current_code(self):
+        """M F A Service: verify totp code with valid current code."""
         import pyotp
 
         svc = self._svc()
@@ -179,17 +196,20 @@ class TestMFAService:
         assert svc.verify_totp_code(secret, valid_code) is True
 
     def test_verify_totp_code_wrong_code_returns_false(self):
+        """M F A Service: verify totp code wrong code returns false."""
         svc = self._svc()
         secret, _ = svc.generate_totp_secret("u1", "alice")
         assert svc.verify_totp_code(secret, "000000") is False
 
     def test_create_mfa_challenge_stored_in_active_challenges(self):
+        """M F A Service: create mfa challenge stored in active challenges."""
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         assert challenge.challenge_id in svc.active_challenges
         assert challenge.method == MFAMethod.TOTP
 
     def test_verify_mfa_challenge_invalid_id_raises(self):
+        """M F A Service: verify mfa challenge invalid id raises."""
         svc = self._svc()
         verification = MFAVerification(
             challenge_id="nonexistent", code="123456", method=MFAMethod.TOTP
@@ -198,6 +218,7 @@ class TestMFAService:
             svc.verify_mfa_challenge(verification, secret="dummy")
 
     def test_verify_mfa_challenge_expired_raises(self):
+        """M F A Service: verify mfa challenge expired raises."""
         from datetime import UTC, datetime, timedelta
 
         svc = self._svc()
@@ -213,6 +234,7 @@ class TestMFAService:
             svc.verify_mfa_challenge(verification, secret="dummy")
 
     def test_verify_mfa_challenge_too_many_attempts_raises(self):
+        """M F A Service: verify mfa challenge too many attempts raises."""
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         challenge_id = challenge.challenge_id
@@ -225,6 +247,7 @@ class TestMFAService:
             svc.verify_mfa_challenge(verification, secret="dummy")
 
     def test_cleanup_expired_challenges_removes_expired(self):
+        """M F A Service: cleanup expired challenges removes expired."""
         from datetime import UTC, datetime, timedelta
 
         svc = self._svc()
@@ -237,12 +260,14 @@ class TestMFAService:
         assert challenge.challenge_id not in svc.active_challenges
 
     def test_cleanup_leaves_active_challenges_intact(self):
+        """M F A Service: cleanup leaves active challenges intact."""
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.TOTP)
         svc.cleanup_expired_challenges()
         assert challenge.challenge_id in svc.active_challenges
 
     def test_verify_backup_code_succeeds_and_consumes_code(self):
+        """M F A Service: verify backup code succeeds and consumes code."""
         svc = self._svc()
         challenge = svc.create_mfa_challenge("u1", MFAMethod.BACKUP_CODES)
         backup_codes = ["ABC12345", "DEF67890"]
@@ -270,6 +295,7 @@ class TestMFAService:
 
 class TestEnhancedAuthServiceRegistration:
     def test_register_user_success_without_repository(self):
+        """Enhanced Auth Service Registration: register user success without repository."""
         svc = _make_service()
         reg = UserRegistration(
             username="alice", email="alice@ex.com", password=_VALID_PW
@@ -279,6 +305,7 @@ class TestEnhancedAuthServiceRegistration:
         assert errors == []
 
     def test_register_user_weak_password_fails(self):
+        """Enhanced Auth Service Registration: register user weak password fails."""
         svc = _make_service()
         # lowercase-only password fails uppercase/numbers/special checks
         reg = UserRegistration(
@@ -289,6 +316,7 @@ class TestEnhancedAuthServiceRegistration:
         assert len(errors) > 0
 
     def test_register_user_logs_security_event(self):
+        """Enhanced Auth Service Registration: register user logs security event."""
         svc = _make_service()
         reg = UserRegistration(
             username="carol", email="carol@ex.com", password=_VALID_PW
@@ -298,6 +326,7 @@ class TestEnhancedAuthServiceRegistration:
         assert "user_registration" in event_types
 
     def test_register_with_repo_checks_duplicate_username(self):
+        """Enhanced Auth Service Registration: register with repo checks duplicate username."""
         from unittest.mock import MagicMock
 
         repo = MagicMock()
@@ -315,6 +344,7 @@ class TestEnhancedAuthServiceRegistration:
 
 class TestEnhancedAuthServiceAuthentication:
     def test_authenticate_demo_user_success(self):
+        """Enhanced Auth Service Authentication: authenticate demo user success."""
         svc = _make_service()
         creds = UserCredentials(username="demo_user", password="DemoPassword123!")
         user = svc.authenticate_user(creds)
@@ -323,24 +353,28 @@ class TestEnhancedAuthServiceAuthentication:
         assert user.role == UserRole.PLAYER
 
     def test_authenticate_demo_user_wrong_password_returns_none(self):
+        """Enhanced Auth Service Authentication: authenticate demo user wrong password returns none."""
         svc = _make_service()
         creds = UserCredentials(username="demo_user", password="WrongPassword123!")
         user = svc.authenticate_user(creds)
         assert user is None
 
     def test_authenticate_unknown_user_returns_none(self):
+        """Enhanced Auth Service Authentication: authenticate unknown user returns none."""
         svc = _make_service()
         creds = UserCredentials(username="unknown_user", password=_VALID_PW)
         user = svc.authenticate_user(creds)
         assert user is None
 
     def test_authenticate_unknown_user_records_failed_attempt(self):
+        """Enhanced Auth Service Authentication: authenticate unknown user records failed attempt."""
         svc = _make_service()
         creds = UserCredentials(username="ghost", password=_VALID_PW)
         svc.authenticate_user(creds)
         assert "ghost" in svc.failed_login_attempts
 
     def test_authenticate_locked_account_raises(self):
+        """Enhanced Auth Service Authentication: authenticate locked account raises."""
         svc = _make_service()
         for _ in range(5):  # max_login_attempts = 5
             svc.record_failed_login("alice")
@@ -350,6 +384,7 @@ class TestEnhancedAuthServiceAuthentication:
             svc.authenticate_user(creds)
 
     def test_authenticate_logs_success_event(self):
+        """Enhanced Auth Service Authentication: authenticate logs success event."""
         svc = _make_service()
         creds = UserCredentials(username="demo_user", password="DemoPassword123!")
         svc.authenticate_user(creds)
@@ -359,6 +394,7 @@ class TestEnhancedAuthServiceAuthentication:
 
 class TestEnhancedAuthServiceSessionAndToken:
     def test_create_session_stored_in_active_sessions(self):
+        """Enhanced Auth Service Session And Token: create session stored in active sessions."""
         svc = _make_service()
         user = _make_player_user()
         session_id = svc.create_session(user)
@@ -366,6 +402,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert svc.active_sessions[session_id].user_id == user.user_id
 
     def test_create_access_token_returns_string(self):
+        """Enhanced Auth Service Session And Token: create access token returns string."""
         svc = _make_service()
         user = _make_player_user()
         session_id = svc.create_session(user)
@@ -374,6 +411,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert len(token) > 0
 
     def test_create_access_token_uses_player_id_field(self):
+        """Enhanced Auth Service Session And Token: create access token uses player id field."""
         import jwt as _jwt
 
         svc = _make_service()
@@ -384,6 +422,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert payload["player_id"] == "player-99"
 
     def test_create_access_token_defaults_player_id_to_user_id(self):
+        """Enhanced Auth Service Session And Token: create access token defaults player id to user id."""
         import jwt as _jwt
 
         svc = _make_service()
@@ -394,6 +433,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert payload["player_id"] == "u42"
 
     def test_verify_access_token_round_trip(self):
+        """Enhanced Auth Service Session And Token: verify access token round trip."""
         svc = _make_service()
         user = _make_player_user()
         session_id = svc.create_session(user)
@@ -403,11 +443,13 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert verified.username == user.username
 
     def test_verify_invalid_token_raises(self):
+        """Enhanced Auth Service Session And Token: verify invalid token raises."""
         svc = _make_service()
         with pytest.raises(AuthenticationError):
             svc.verify_access_token("this.is.invalid")
 
     def test_verify_token_after_session_revoked_raises(self):
+        """Enhanced Auth Service Session And Token: verify token after session revoked raises."""
         svc = _make_service()
         user = _make_player_user()
         session_id = svc.create_session(user)
@@ -417,6 +459,7 @@ class TestEnhancedAuthServiceSessionAndToken:
             svc.verify_access_token(token)
 
     def test_revoke_all_user_sessions(self):
+        """Enhanced Auth Service Session And Token: revoke all user sessions."""
         svc = _make_service()
         user = _make_player_user()
         s1 = svc.create_session(user)
@@ -426,6 +469,7 @@ class TestEnhancedAuthServiceSessionAndToken:
         assert not svc.active_sessions[s2].is_active
 
     def test_cleanup_expired_sessions(self):
+        """Enhanced Auth Service Session And Token: cleanup expired sessions."""
         from datetime import UTC, datetime, timedelta
 
         svc = _make_service()
@@ -441,6 +485,7 @@ class TestEnhancedAuthServiceSessionAndToken:
 
 class TestEnhancedAuthServiceMFASetup:
     def test_setup_mfa_uses_passed_username_and_stores_backup_codes(self):
+        """Enhanced Auth Service M F A Setup: setup mfa uses passed username and stores backup codes."""
         svc = _make_service()
 
         setup_info = svc.setup_mfa("u1", MFAMethod.TOTP, username="alice")
@@ -451,18 +496,21 @@ class TestEnhancedAuthServiceMFASetup:
 
 class TestEnhancedAuthServicePermissions:
     def test_require_permission_returns_true_when_granted(self):
+        """Enhanced Auth Service Permissions: require permission returns true when granted."""
         svc = _make_service()
         user = _make_player_user()
         result = svc.require_permission(user, Permission.CREATE_CHARACTER)
         assert result is True
 
     def test_require_permission_raises_when_missing(self):
+        """Enhanced Auth Service Permissions: require permission raises when missing."""
         svc = _make_service()
         user = _make_player_user()
         with pytest.raises(AuthorizationError):
             svc.require_permission(user, Permission.MANAGE_USERS)
 
     def test_require_permission_logs_denial_event(self):
+        """Enhanced Auth Service Permissions: require permission logs denial event."""
         svc = _make_service()
         user = _make_player_user()
         with pytest.raises(AuthorizationError):
@@ -473,22 +521,26 @@ class TestEnhancedAuthServicePermissions:
 
 class TestAccountLockout:
     def test_not_locked_by_default(self):
+        """Account Lockout: not locked by default."""
         svc = _make_service()
         assert svc.is_account_locked("alice") is False
 
     def test_locked_after_max_attempts(self):
+        """Account Lockout: locked after max attempts."""
         svc = _make_service()
         for _ in range(5):
             svc.record_failed_login("alice")
         assert svc.is_account_locked("alice") is True
 
     def test_not_locked_below_max_attempts(self):
+        """Account Lockout: not locked below max attempts."""
         svc = _make_service()
         for _ in range(4):
             svc.record_failed_login("alice")
         assert svc.is_account_locked("alice") is False
 
     def test_clear_failed_attempts(self):
+        """Account Lockout: clear failed attempts."""
         svc = _make_service()
         for _ in range(5):
             svc.record_failed_login("alice")

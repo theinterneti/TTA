@@ -41,6 +41,8 @@ from src.components.model_management.providers.openrouter import (
     OpenRouterProvider,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # Ollama: model loading
 # ---------------------------------------------------------------------------
@@ -48,6 +50,7 @@ from src.components.model_management.providers.openrouter import (
 
 class TestOllamaLoadModelImpl:
     async def test_load_model_impl_returns_instance_when_available(self):
+        """Ollama Load Model Impl: load model impl returns instance when available."""
         provider = OllamaProvider()
         provider._available_models = [
             ModelInfo("llama3.1:8b", "Llama", ProviderType.OLLAMA)
@@ -57,6 +60,7 @@ class TestOllamaLoadModelImpl:
         assert instance.model_id == "llama3.1:8b"
 
     async def test_load_model_impl_pulls_when_not_available(self):
+        """Ollama Load Model Impl: load model impl pulls when not available."""
         provider = OllamaProvider()
         provider._available_models = []  # Model not there yet
 
@@ -78,6 +82,7 @@ class TestOllamaLoadModelImpl:
         assert instance.model_id == "new-model:7b"
 
     async def test_load_model_impl_raises_if_pull_fails(self):
+        """Ollama Load Model Impl: load model impl raises if pull fails."""
         provider = OllamaProvider()
         provider._available_models = []
 
@@ -95,6 +100,7 @@ class TestOllamaLoadModelImpl:
             await provider._load_model_impl("nonexistent:latest", {})
 
     async def test_load_model_impl_raises_without_client(self):
+        """Ollama Load Model Impl: load model impl raises without client."""
         provider = OllamaProvider()
         provider._client = None
         with pytest.raises(RuntimeError, match="not initialized"):
@@ -108,12 +114,14 @@ class TestOllamaLoadModelImpl:
 
 class TestOllamaContainerStatus:
     async def test_container_not_running_when_no_docker_client(self):
+        """Ollama Container Status: container not running when no docker client."""
         provider = OllamaProvider()
         provider._docker_client = None
         result = await provider._is_ollama_container_running()
         assert result is False
 
     async def test_container_running_when_status_is_running(self):
+        """Ollama Container Status: container running when status is running."""
         provider = OllamaProvider()
         mock_docker = MagicMock()
         mock_container = MagicMock()
@@ -124,6 +132,7 @@ class TestOllamaContainerStatus:
         assert result is True
 
     async def test_container_not_running_when_status_is_exited(self):
+        """Ollama Container Status: container not running when status is exited."""
         provider = OllamaProvider()
         mock_docker = MagicMock()
         mock_container = MagicMock()
@@ -134,6 +143,7 @@ class TestOllamaContainerStatus:
         assert result is False
 
     async def test_container_not_found_returns_false(self):
+        """Ollama Container Status: container not found returns false."""
         import docker.errors
 
         provider = OllamaProvider()
@@ -146,6 +156,7 @@ class TestOllamaContainerStatus:
         assert result is False
 
     async def test_exception_during_container_check_returns_false(self):
+        """Ollama Container Status: exception during container check returns false."""
         provider = OllamaProvider()
         mock_docker = MagicMock()
         mock_docker.containers.get = MagicMock(side_effect=RuntimeError("docker error"))
@@ -161,12 +172,14 @@ class TestOllamaContainerStatus:
 
 class TestOllamaWaitForReady:
     async def test_wait_for_ollama_returns_when_healthy(self):
+        """Ollama Wait For Ready: wait for ollama returns when healthy."""
         provider = OllamaProvider()
         provider._provider_health_check = AsyncMock(return_value=True)
         # Should return immediately
         await provider._wait_for_ollama_ready(timeout_seconds=5)
 
     async def test_wait_for_ollama_raises_on_timeout(self):
+        """Ollama Wait For Ready: wait for ollama raises on timeout."""
         provider = OllamaProvider()
         provider._provider_health_check = AsyncMock(return_value=False)
         with pytest.raises(TimeoutError):
@@ -181,6 +194,7 @@ class TestOllamaWaitForReady:
 class TestOllamaModelInstanceGenerateStream:
     async def test_generate_stream_yields_chunks(self):
         # Mock streaming response with 3 chunks
+        """Ollama Model Instance Generate Stream: generate stream yields chunks."""
         chunks = [
             json.dumps({"response": "Hello", "done": False}),
             json.dumps({"response": " World", "done": False}),
@@ -213,6 +227,7 @@ class TestOllamaModelInstanceGenerateStream:
         assert "" not in collected  # Empty strings skipped
 
     async def test_generate_stream_sets_error_status_on_exception(self):
+        """Ollama Model Instance Generate Stream: generate stream sets error status on exception."""
         mock_client = MagicMock()
         mock_client.stream = MagicMock(side_effect=httpx.ConnectError("refused"))
         provider = OllamaProvider()
@@ -232,6 +247,7 @@ class TestOllamaModelInstanceGenerateStream:
 
 class TestLMStudioModelInstanceGenerateStream:
     async def test_generate_stream_yields_sse_content(self):
+        """L M Studio Model Instance Generate Stream: generate stream yields sse content."""
         sse_lines = [
             "data: " + json.dumps({"choices": [{"delta": {"content": "Hi"}}]}),
             "data: " + json.dumps({"choices": [{"delta": {"content": " there"}}]}),
@@ -265,6 +281,7 @@ class TestLMStudioModelInstanceGenerateStream:
         assert " there" in collected
 
     async def test_generate_stream_skips_non_data_lines(self):
+        """L M Studio Model Instance Generate Stream: generate stream skips non data lines."""
         sse_lines = [
             "event: update",  # non-data line
             "data: " + json.dumps({"choices": [{"delta": {"content": "text"}}]}),
@@ -304,6 +321,7 @@ class TestLMStudioModelInstanceGenerateStream:
 
 class TestOpenRouterModelInstanceGenerateStream:
     async def test_generate_stream_yields_sse_content(self):
+        """Open Router Model Instance Generate Stream: generate stream yields sse content."""
         sse_lines = [
             "data: " + json.dumps({"choices": [{"delta": {"content": "OR chunk 1"}}]}),
             "data: " + json.dumps({"choices": [{"delta": {"content": " OR chunk 2"}}]}),
@@ -344,6 +362,7 @@ class TestOpenRouterModelInstanceGenerateStream:
 
 class TestCustomAPIProviderInitialize:
     async def test_initialize_provider_with_openai_type(self):
+        """Custom A P I Provider Initialize: initialize provider with openai type."""
         provider = CustomAPIProvider()
         provider._api_configs = {
             "my-openai": {
@@ -366,6 +385,7 @@ class TestCustomAPIProviderInitialize:
         assert "my-openai" in provider._clients
 
     async def test_initialize_provider_with_anthropic_type(self):
+        """Custom A P I Provider Initialize: initialize provider with anthropic type."""
         provider = CustomAPIProvider()
         provider._api_configs = {
             "my-anthropic": {
@@ -386,6 +406,7 @@ class TestCustomAPIProviderInitialize:
         assert result is True
 
     async def test_initialize_provider_handles_exception(self):
+        """Custom A P I Provider Initialize: initialize provider handles exception."""
         provider = CustomAPIProvider()
         provider._api_configs = {
             "bad-api": {
@@ -408,6 +429,7 @@ class TestCustomAPIProviderInitialize:
 
 class TestCustomAPIProviderHealthCheck:
     async def test_health_check_all_clients_healthy(self):
+        """Custom A P I Provider Health Check: health check all clients healthy."""
         provider = CustomAPIProvider()
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -419,6 +441,7 @@ class TestCustomAPIProviderHealthCheck:
         assert result is True
 
     async def test_health_check_half_healthy(self):
+        """Custom A P I Provider Health Check: health check half healthy."""
         provider = CustomAPIProvider()
         healthy_response = MagicMock()
         healthy_response.status_code = 200
@@ -434,6 +457,7 @@ class TestCustomAPIProviderHealthCheck:
         assert result is True
 
     async def test_health_check_no_healthy_clients(self):
+        """Custom A P I Provider Health Check: health check no healthy clients."""
         provider = CustomAPIProvider()
         bad_client = AsyncMock()
         bad_client.get = AsyncMock(side_effect=httpx.ConnectError("refused"))
@@ -449,6 +473,7 @@ class TestCustomAPIProviderHealthCheck:
 
 class TestCustomAPIProviderRefreshModels:
     async def test_refresh_available_models_from_api(self):
+        """Custom A P I Provider Refresh Models: refresh available models from api."""
         provider = CustomAPIProvider()
         provider._api_configs = {
             "my-api": {
@@ -476,6 +501,7 @@ class TestCustomAPIProviderRefreshModels:
         assert len(provider._available_models) == 2
 
     async def test_refresh_falls_back_to_predefined_on_error(self):
+        """Custom A P I Provider Refresh Models: refresh falls back to predefined on error."""
         provider = CustomAPIProvider()
         provider._api_configs = {
             "my-api": {
@@ -494,6 +520,7 @@ class TestCustomAPIProviderRefreshModels:
         assert len(provider._available_models) >= 2
 
     async def test_refresh_uses_predefined_when_api_returns_non_200(self):
+        """Custom A P I Provider Refresh Models: refresh uses predefined when api returns non 200."""
         provider = CustomAPIProvider()
         provider._api_configs = {
             "my-api": {
@@ -521,6 +548,7 @@ class TestCustomAPIProviderRefreshModels:
 
 class TestCustomAPIModelInstanceGenerateStream:
     async def test_generate_stream_openai_format(self):
+        """Custom A P I Model Instance Generate Stream: generate stream openai format."""
         sse_lines = [
             "data: " + json.dumps({"choices": [{"delta": {"content": "Hello"}}]}),
             "data: [DONE]",
@@ -554,6 +582,7 @@ class TestCustomAPIModelInstanceGenerateStream:
         assert "Hello" in collected
 
     async def test_generate_stream_anthropic_format(self):
+        """Custom A P I Model Instance Generate Stream: generate stream anthropic format."""
         sse_lines = [
             "data: "
             + json.dumps(
@@ -590,6 +619,7 @@ class TestCustomAPIModelInstanceGenerateStream:
         assert "Ant chunk" in collected
 
     async def test_generate_stream_sets_error_status_on_exception(self):
+        """Custom A P I Model Instance Generate Stream: generate stream sets error status on exception."""
         mock_client = MagicMock()
         mock_client.stream = MagicMock(side_effect=httpx.ConnectError("refused"))
         provider = CustomAPIProvider()
@@ -609,6 +639,7 @@ class TestCustomAPIModelInstanceGenerateStream:
 
 class TestOpenRouterRefreshModels:
     async def test_refresh_handles_models_with_string_zero_pricing(self):
+        """Open Router Refresh Models: refresh handles models with string zero pricing."""
         provider = OpenRouterProvider()
         mock_client = AsyncMock()
         mock_response = MagicMock()
@@ -631,6 +662,7 @@ class TestOpenRouterRefreshModels:
         assert model.is_free is True
 
     async def test_refresh_handles_models_with_no_pricing(self):
+        """Open Router Refresh Models: refresh handles models with no pricing."""
         provider = OpenRouterProvider()
         mock_client = AsyncMock()
         mock_response = MagicMock()
@@ -653,6 +685,7 @@ class TestOpenRouterRefreshModels:
         assert model.cost_per_token is None
 
     async def test_refresh_infers_chat_capabilities_from_name(self):
+        """Open Router Refresh Models: refresh infers chat capabilities from name."""
         provider = OpenRouterProvider()
         mock_client = AsyncMock()
         mock_response = MagicMock()
@@ -674,6 +707,7 @@ class TestOpenRouterRefreshModels:
         assert "instruction_following" in model.capabilities
 
     async def test_refresh_raises_without_client(self):
+        """Open Router Refresh Models: refresh raises without client."""
         provider = OpenRouterProvider()
         provider._client = None
         with pytest.raises(RuntimeError, match="not initialized"):
@@ -687,6 +721,7 @@ class TestOpenRouterRefreshModels:
 
 class TestBaseProviderLoadModel:
     async def test_load_model_reloads_if_existing_unhealthy(self):
+        """Base Provider Load Model: load model reloads if existing unhealthy."""
         from src.components.model_management.providers.base import BaseProvider
 
         class MinimalProvider(BaseProvider):
@@ -741,6 +776,7 @@ class TestBaseProviderLoadModel:
         assert instance.model_id == "test-model"
 
     async def test_load_model_raises_if_not_initialized(self):
+        """Base Provider Load Model: load model raises if not initialized."""
         from src.components.model_management.providers.base import BaseProvider
 
         class MinimalProvider(BaseProvider):

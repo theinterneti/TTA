@@ -18,6 +18,8 @@ from src.components.narrative_arc_orchestrator.resolution_engine import (
 )
 from src.components.narrative_arc_orchestrator.scale_manager import ScaleManager
 
+pytestmark = pytest.mark.unit
+
 
 def _event(
     event_id: str,

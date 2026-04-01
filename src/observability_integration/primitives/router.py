@@ -20,13 +20,7 @@ try:
         WorkflowPrimitive,
     )
 except ImportError:
-    try:
-        from tta_dev_primitives.core.base import (  # type: ignore[import]
-            WorkflowContext,  # pyright: ignore[reportAssignmentType]
-            WorkflowPrimitive,
-        )
-    except ImportError:
-        # Fallback stubs for development/testing
+    # Fallback stubs for development/testing
         from typing import Protocol, TypeVar
 
         _T = TypeVar("_T")

@@ -1,9 +1,8 @@
 """Abstract Unit of Work base class for transactional boundaries.
 
 Provides :class:`AbstractUnitOfWork` — the interface that all UoW
-implementations must satisfy.  Previously this was sourced from
-``tta_dev_primitives.persistence``, but that sub-module does not ship
-with tta-dev-primitives v1.3.x, so we define it locally here.
+implementations must satisfy.  Defined locally; the ``ttadev.primitives``
+package does not expose a UoW abstraction.
 """
 
 from __future__ import annotations

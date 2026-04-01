@@ -8,6 +8,8 @@ import pytest
 
 from src.player_experience.services.session_store import SessionStore
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def store(tmp_path):
@@ -39,6 +41,7 @@ def pid() -> str:
 
 class TestCreateAndGetSession:
     def test_create_returns_metadata(self, store):
+        """Create And Get Session: create returns metadata."""
         session_id, player_id = sid(), pid()
         meta = store.create_session(session_id, player_id, character_name="Aria")
         assert meta["session_id"] == session_id
@@ -48,6 +51,7 @@ class TestCreateAndGetSession:
         assert "created_at" in meta
 
     def test_get_returns_persisted_session(self, store):
+        """Create And Get Session: get returns persisted session."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         result = store.get_session(session_id)
@@ -55,6 +59,7 @@ class TestCreateAndGetSession:
         assert result["session_id"] == session_id
 
     def test_get_returns_none_for_unknown(self, store):
+        """Create And Get Session: get returns none for unknown."""
         assert store.get_session("does-not-exist") is None
 
     def test_create_persists_across_new_connection(self, tmp_path):
@@ -73,6 +78,7 @@ class TestCreateAndGetSession:
 
 class TestListSessions:
     def test_lists_sessions_for_player(self, store):
+        """List Sessions: lists sessions for player."""
         player_id = pid()
         ids = [sid() for _ in range(3)]
         for s in ids:
@@ -82,6 +88,7 @@ class TestListSessions:
         assert {s["session_id"] for s in sessions} == set(ids)
 
     def test_does_not_list_other_players_sessions(self, store):
+        """List Sessions: does not list other players sessions."""
         p1, p2 = pid(), pid()
         store.create_session(sid(), p1)
         store.create_session(sid(), p2)
@@ -89,9 +96,11 @@ class TestListSessions:
         assert len(store.list_sessions(p2)) == 1
 
     def test_empty_for_unknown_player(self, store):
+        """List Sessions: empty for unknown player."""
         assert store.list_sessions("ghost") == []
 
     def test_includes_message_count(self, store):
+        """List Sessions: includes message count."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         store.save_message(session_id, player_id, "user", "hello")
@@ -105,6 +114,7 @@ class TestListSessions:
 
 class TestSaveAndLoadMessages:
     def test_save_and_load_round_trip(self, store):
+        """Save And Load Messages: save and load round trip."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         store.save_message(session_id, player_id, "user", "Hello")
@@ -116,6 +126,7 @@ class TestSaveAndLoadMessages:
         assert msgs[1] == {"role": "assistant", "content": "Hi there"}
 
     def test_load_full_includes_message_id_and_timestamp(self, store):
+        """Save And Load Messages: load full includes message id and timestamp."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         mid = store.save_message(session_id, player_id, "user", "Test")
@@ -126,6 +137,7 @@ class TestSaveAndLoadMessages:
         assert "created_at" in full[0]
 
     def test_messages_ordered_by_insertion(self, store):
+        """Save And Load Messages: messages ordered by insertion."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         for i in range(5):
@@ -136,9 +148,11 @@ class TestSaveAndLoadMessages:
         assert contents == [f"msg {i}" for i in range(5)]
 
     def test_load_empty_for_unknown_session(self, store):
+        """Save And Load Messages: load empty for unknown session."""
         assert store.load_messages("ghost") == []
 
     def test_persists_across_new_connection(self, tmp_path):
+        """Save And Load Messages: persists across new connection."""
         db = tmp_path / "sessions.db"
         session_id, player_id = sid(), pid()
 
@@ -157,6 +171,7 @@ class TestSaveAndLoadMessages:
 
 class TestClearMessages:
     def test_clears_all_messages(self, store):
+        """Clear Messages: clears all messages."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         store.save_message(session_id, player_id, "user", "A")
@@ -167,6 +182,7 @@ class TestClearMessages:
         assert store.load_messages(session_id) == []
 
     def test_session_metadata_preserved_after_clear(self, store):
+        """Clear Messages: session metadata preserved after clear."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id, character_name="Aria")
         store.save_message(session_id, player_id, "user", "Hello")
@@ -177,6 +193,7 @@ class TestClearMessages:
         assert meta["character_name"] == "Aria"
 
     def test_clear_nonexistent_session_returns_zero(self, store):
+        """Clear Messages: clear nonexistent session returns zero."""
         assert store.clear_messages("ghost") == 0
 
 
@@ -185,6 +202,7 @@ class TestClearMessages:
 
 class TestCopySession:
     def test_copy_creates_new_session(self, store):
+        """Copy Session: copy creates new session."""
         session_id, player_id = sid(), pid()
         store.create_session(
             session_id, player_id, character_name="Aria", world_name="Forest"
@@ -197,6 +215,7 @@ class TestCopySession:
         assert new_meta["session_id"] != session_id
 
     def test_copy_duplicates_messages(self, store):
+        """Copy Session: copy duplicates messages."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         store.save_message(session_id, player_id, "user", "msg1")
@@ -211,6 +230,7 @@ class TestCopySession:
         assert new_msgs[1]["content"] == "reply1"
 
     def test_copy_preserves_character_and_world(self, store):
+        """Copy Session: copy preserves character and world."""
         session_id, player_id = sid(), pid()
         store.create_session(
             session_id, player_id, character_name="Aria", world_name="Crystal Caverns"
@@ -235,9 +255,11 @@ class TestCopySession:
         assert len(original_msgs) == 1  # original unchanged
 
     def test_copy_nonexistent_returns_none(self, store):
+        """Copy Session: copy nonexistent returns none."""
         assert store.copy_session("does-not-exist") is None
 
     def test_copy_accepts_explicit_new_id(self, store):
+        """Copy Session: copy accepts explicit new id."""
         session_id, player_id = sid(), pid()
         store.create_session(session_id, player_id)
         new_id = sid()
@@ -251,6 +273,7 @@ class TestCopySession:
 
 class TestInMemoryFallback:
     def test_create_and_get_in_memory(self, mem_store):
+        """In Memory Fallback: create and get in memory."""
         session_id, player_id = sid(), pid()
         mem_store.create_session(session_id, player_id)
         result = mem_store.get_session(session_id)
@@ -258,6 +281,7 @@ class TestInMemoryFallback:
         assert result["session_id"] == session_id
 
     def test_save_and_load_in_memory(self, mem_store):
+        """In Memory Fallback: save and load in memory."""
         session_id, player_id = sid(), pid()
         mem_store.create_session(session_id, player_id)
         mem_store.save_message(session_id, player_id, "user", "hello")
@@ -266,6 +290,7 @@ class TestInMemoryFallback:
         assert msgs[0]["content"] == "hello"
 
     def test_clear_in_memory(self, mem_store):
+        """In Memory Fallback: clear in memory."""
         session_id, player_id = sid(), pid()
         mem_store.create_session(session_id, player_id)
         mem_store.save_message(session_id, player_id, "user", "hi")

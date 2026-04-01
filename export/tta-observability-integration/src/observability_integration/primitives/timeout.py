@@ -20,12 +20,6 @@ try:
         WorkflowPrimitive,
     )
 except ImportError:
-    try:
-        from tta_dev_primitives.core.base import (
-            WorkflowContext,
-            WorkflowPrimitive,
-        )
-    except ImportError:
         # Fallback for development/testing
         from typing import Protocol
 

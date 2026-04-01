@@ -16,6 +16,8 @@ from src.orchestration.component import Component, ComponentStatus
 from src.orchestration.config import TTAConfig
 from src.orchestration.orchestrator import TTAOrchestrator
 
+pytestmark = pytest.mark.unit
+
 
 class TestComponentIntegration:
     """Integration tests for Component class."""
