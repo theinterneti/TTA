@@ -110,6 +110,47 @@ def _strip_state_block(text: str) -> tuple[str, dict]:
     return clean, state
 
 
+def _normalize_state(state: dict) -> dict:
+    """Normalize extracted state: deduplicate, clean underscores, fix case."""
+    normalized: dict = {}
+
+    # Location: replace underscores with spaces, strip excess whitespace
+    if state.get("location"):
+        normalized["location"] = state["location"].replace("_", " ").strip()
+
+    # Inventory: normalize and deduplicate case-insensitively, filter garbage
+    if state.get("inventory") is not None:
+        seen: set[str] = set()
+        clean_items: list[str] = []
+        for item in state["inventory"]:
+            item = item.replace("_", " ").strip()
+            # Filter: skip if >40 chars (phrases, not items), or empty
+            if not item or len(item) > 40:
+                continue
+            key = item.lower()
+            if key not in seen:
+                seen.add(key)
+                clean_items.append(item.title())
+        normalized["inventory"] = clean_items
+
+    # NPCs: normalize and deduplicate case-insensitively, filter garbage
+    if state.get("npcs") is not None:
+        seen_npcs: set[str] = set()
+        clean_npcs: list[str] = []
+        for npc in state["npcs"]:
+            npc = npc.replace("_", " ").strip()
+            # Filter: skip if >30 chars (phrases, not names), or contains digits
+            if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
+                continue
+            key = npc.lower()
+            if key not in seen_npcs:
+                seen_npcs.add(key)
+                clean_npcs.append(npc.title())
+        normalized["npcs"] = clean_npcs
+
+    return normalized
+
+
 @dataclasses.dataclass
 class GameState:
     session_id: str
@@ -362,7 +403,7 @@ async def run_simulation(
         scripted = scripted[:n_turns]
 
     llm = None
-    if not dry_run and mode == "openrouter":
+    if not dry_run and mode in ("openrouter", "hybrid"):
         llm = get_llm(provider=provider, model=model, temperature=0.8, max_tokens=800)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -409,7 +450,7 @@ async def run_simulation(
             response_text = ""
             for _sim_attempt in range(3):
                 try:
-                    if mode == "openrouter":
+                    if mode in ("openrouter", "hybrid"):
                         ai_response = await llm.ainvoke(messages)
                         response_text = (
                             ai_response.content
@@ -438,6 +479,22 @@ async def run_simulation(
                     if is_retryable and _sim_attempt < 2:
                         print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in 10s…")
                         await asyncio.sleep(10)
+                    elif mode == "hybrid" and _sim_attempt == 2:
+                        # hybrid: OpenRouter failed — fall back to local gemma3:4b narration
+                        print("  🔀 OpenRouter failed — falling back to gemma3:4b local narration")
+                        msgs_dicts = []
+                        for m in messages:
+                            if isinstance(m, SystemMessage):
+                                msgs_dicts.append({"role": "system", "content": m.content})
+                            elif isinstance(m, HumanMessage):
+                                msgs_dicts.append({"role": "user", "content": m.content})
+                            elif isinstance(m, AIMessage):
+                                msgs_dicts.append({"role": "assistant", "content": m.content})
+                        try:
+                            response_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
+                        except Exception as fallback_exc:
+                            print(f"  ⚠️  Fallback also failed: {fallback_exc}")
+                        break
                     else:
                         print(
                             f"  ⚠️  LLM error after {_sim_attempt + 1} attempts: {exc}"
@@ -450,31 +507,49 @@ async def run_simulation(
 
         # Update game state — strip [STATE] block first, then update structured fields
         response_text, extracted_state = _strip_state_block(response_text)
+        extracted_state = _normalize_state(extracted_state)
 
-        # Blended mode: if [STATE] missing, use qwen2.5:3b to extract state
-        if mode == "blended" and not extracted_state and response_text and not dry_run:
+        # Blended: qwen fallback only if [STATE] missing.
+        # Hybrid: qwen ALWAYS extracts state (don't rely on OpenRouter to include [STATE]).
+        use_qwen_extraction = (
+            not dry_run
+            and response_text
+            and (
+                (mode == "blended" and not extracted_state)
+                or mode == "hybrid"
+            )
+        )
+        if use_qwen_extraction:
             extraction_prompt = (
-                "Given this game narrative, extract the current game state. "
-                "Reply ONLY with a state block in EXACTLY this format (no other text):\n"
-                "[STATE]location=<current location>|inventory=<item1,item2 or empty>|npcs=<npc1,npc2 or empty>[/STATE]\n\n"
+                "Extract game state from this narrative. "
+                "Rules: location = 2-4 word place name (snake_case). "
+                "inventory = only tangible physical items the character is holding or carrying (max 5, comma-separated, title case, no duplicates). "
+                "npcs = only named characters or creatures present (max 3, title case, no duplicates). "
+                "Use 'empty' if none.\n"
+                "Reply with ONLY this exact format, nothing else:\n"
+                "[STATE]location=<location>|inventory=<items or empty>|npcs=<names or empty>[/STATE]\n\n"
                 f"Narrative:\n{response_text}"
             )
             try:
                 raw_extraction = await _call_ollama_sim(
-                    [{"role": "user", "content": extraction_prompt}], "qwen2.5:3b"
+                    [{"role": "user", "content": extraction_prompt}], "qwen3:1.7b"
                 )
-                _, extracted_state = _strip_state_block(raw_extraction)
+                _, qwen_state = _strip_state_block(raw_extraction)
+                qwen_state = _normalize_state(qwen_state)
+                # In hybrid mode, qwen is always authoritative; in blended it's fallback
+                if qwen_state:
+                    extracted_state = qwen_state
             except Exception:
                 pass
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
             for item in extracted_state.get("inventory", []):
-                if item not in game_state.inventory:
+                if item.lower() not in [i.lower() for i in game_state.inventory]:
                     game_state.inventory.append(item)
         if extracted_state.get("npcs") is not None:
             for npc in extracted_state.get("npcs", []):
-                if npc not in game_state.known_npcs:
+                if npc.lower() not in [n.lower() for n in game_state.known_npcs]:
                     game_state.known_npcs.append(npc)
 
         game_state.raw_history.append({"role": "human", "content": player_input})
@@ -563,7 +638,7 @@ async def run_simulation(
                     "decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
                 )
                 try:
-                    if mode == "openrouter":
+                    if mode in ("openrouter", "hybrid"):
                         from langchain_core.messages import SystemMessage as SM
 
                         summary_result = await llm.ainvoke(
@@ -694,8 +769,12 @@ def main() -> None:
     parser.add_argument(
         "--mode",
         default="openrouter",
-        choices=["openrouter", "ollama", "blended"],
-        help="LLM mode: openrouter (default), ollama (gemma3:4b local), blended (gemma narrates + qwen extracts state)",
+        choices=["openrouter", "ollama", "blended", "hybrid"],
+        help=(
+            "LLM mode: openrouter (default), ollama (gemma3:4b local), "
+            "blended (gemma narrates + qwen extracts state), "
+            "hybrid (OpenRouter narrates fast + qwen always extracts state, gemma fallback)"
+        ),
     )
     args = parser.parse_args()
 
