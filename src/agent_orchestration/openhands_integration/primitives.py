@@ -50,11 +50,7 @@ try:
         WorkflowPrimitive,
     )
 except ImportError:
-    # ttadev not available — minimal stubs for type checking
-    class WorkflowContext:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowPrimitive:  # type: ignore[no-redef]
-        async def execute(self, data: object, ctx: object) -> object: ...
+    pass  # ttadev not available — real types provided by try branch above
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector

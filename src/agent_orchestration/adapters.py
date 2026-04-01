@@ -10,7 +10,21 @@ in ``src.components.ipa``, ``src.components.wba``, and ``src.components.nga``.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+    from ttadev.primitives.observability import ObservablePrimitive
+
+    from src.components.ipa.agent import IPAAgent as _NativeIPA
+    from src.components.nga.agent import NGAAgent as _NativeNGA
+    from src.components.wba.agent import WBAAgent as _NativeWBA
 
 try:
     from ttadev.primitives import (
@@ -42,10 +56,7 @@ from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerPrimitive,
 )
 
-from src.components.ipa.agent import IPAAgent as _NativeIPA
 from src.components.ipa.models import ProcessedInput
-from src.components.nga.agent import NGAAgent as _NativeNGA
-from src.components.wba.agent import WBAAgent as _NativeWBA
 from src.components.world_context.models import WorldContext
 
 logger = logging.getLogger(__name__)
@@ -150,7 +161,10 @@ class IPAAdapter:
         self.retry_config = retry_config or RetryConfig()
         self._builder = world_context_builder
         self._cb_config = cb_config or CircuitBreakerConfig()
-        self._agent = ipa_agent or _NativeIPA()
+        if ipa_agent is None:
+            from src.components.ipa.agent import IPAAgent
+            ipa_agent = IPAAgent()
+        self._agent = ipa_agent
 
     async def process_input(
         self,
@@ -289,7 +303,10 @@ class WBAAdapter:
         self.tools = tools or {}
         self._builder = world_context_builder
         self._cb_config = cb_config or CircuitBreakerConfig()
-        self._agent = wba_agent or _NativeWBA(builder=world_context_builder)
+        if wba_agent is None:
+            from src.components.wba.agent import WBAAgent
+            wba_agent = WBAAgent(builder=world_context_builder)
+        self._agent = wba_agent
 
     async def process_world_request(
         self,
@@ -437,7 +454,10 @@ class NGAAdapter:
         self.retry_config = retry_config or RetryConfig()
         self._builder = world_context_builder
         self._cb_config = cb_config or CircuitBreakerConfig()
-        self._agent = nga_agent or _NativeNGA()
+        if nga_agent is None:
+            from src.components.nga.agent import NGAAgent
+            nga_agent = NGAAgent()
+        self._agent = nga_agent
 
     async def generate_narrative(
         self,

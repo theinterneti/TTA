@@ -20,6 +20,15 @@ from uuid import uuid4
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
+if TYPE_CHECKING:
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+
 try:
     from ttadev.primitives import (
         FallbackPrimitive,

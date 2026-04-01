@@ -9,7 +9,14 @@ system capabilities, and performance metrics.
 
 import logging
 from datetime import datetime, timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ttadev.primitives import (
+        TimeoutPrimitive,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 try:
     from ttadev.primitives import (

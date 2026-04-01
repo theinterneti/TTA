@@ -16,9 +16,16 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import redis.asyncio as aioredis
+
+if TYPE_CHECKING:
+    from ttadev.primitives import (
+        LambdaPrimitive,
+        SequentialPrimitive,
+        WorkflowContext,
+    )
 
 try:
     from ttadev.primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext

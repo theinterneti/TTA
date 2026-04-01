@@ -11,9 +11,13 @@ Tests:
 - Primitive composition
 """
 
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+
+if TYPE_CHECKING:
+    from ttadev.primitives.core.base import WorkflowContext
 
 try:
     from ttadev.primitives.core.base import WorkflowContext  # type: ignore[import]
