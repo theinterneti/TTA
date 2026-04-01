@@ -243,9 +243,10 @@ class TestNeo4jComponentEnhanced:
             error_call = mock_logger.error.call_args[0][0]
             assert "Failed to start Neo4j" in error_call
 
+    @patch("time.sleep")
     @patch("src.components.neo4j_component.safe_run")
     @patch.object(Neo4jComponent, "_is_neo4j_running")
-    def test_start_timeout_logging(self, mock_is_running, mock_safe_run, mock_config):
+    def test_start_timeout_logging(self, mock_is_running, mock_safe_run, mock_sleep, mock_config):
         """Test start method logs timeout appropriately."""
         mock_is_running.return_value = False
         mock_safe_run.return_value = Mock(returncode=0, stderr="")

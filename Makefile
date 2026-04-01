@@ -51,12 +51,12 @@ test-status:
 
 # Continuous unit testing — cancels and restarts on each file save (-r)
 watch:
-	watchexec -r -e py,toml --clear -- uv run pytest -q -x -m "not integration and not neo4j and not redis" tests/
+	watchexec -r -e py,toml --clear -- ./scripts/watch-unit.sh
 
 # Continuous unit testing scoped to tests/unit/ — faster feedback than watch
 watch-unit:
-	watchexec -r -e py,toml --clear -- uv run pytest -q -x -m "not integration and not neo4j and not redis" tests/unit/
+	watchexec -r -e py,toml --clear -- ./scripts/watch-unit.sh
 
 # Continuous full testing — requires Neo4j + Redis services running
 watch-all:
-	watchexec -r -e py,toml --clear -- uv run pytest -q -x --neo4j --redis tests/
+	watchexec -r -e py,toml --clear -- ./scripts/watch-all.sh

@@ -100,9 +100,10 @@ class TestNeo4jComponentLifecycle:
         assert result is True
         # Should not attempt to start if already running
 
+    @patch("time.sleep")
     @patch("src.components.neo4j_component.safe_run")
     @patch.object(Neo4jComponent, "_is_neo4j_running")
-    def test_start_timeout(self, mock_is_running, mock_safe_run, mock_config):
+    def test_start_timeout(self, mock_is_running, mock_safe_run, mock_sleep, mock_config):
         """Test component handles timeout when Neo4j doesn't start."""
         # Setup: docker-compose succeeds but Neo4j never becomes running
         mock_is_running.return_value = False
