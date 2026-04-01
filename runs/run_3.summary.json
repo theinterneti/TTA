@@ -1,0 +1,29 @@
+{
+  "session_id": "65444edc",
+  "n_turns": 3,
+  "turns_completed": 3,
+  "avg_response_words": 20.3,
+  "avg_latency_ms": 0.0,
+  "coherence_callback_turns": 0,
+  "coherence_callback_rate": 0.0,
+  "entity_first_appearance": {
+    "archive": 1,
+    "brass_handles": 2,
+    "contracts": 2
+  },
+  "entity_recurrence": {
+    "archive": [
+      1,
+      3
+    ]
+  },
+  "final_context_messages": 7,
+  "final_context_chars": 2009,
+  "summarization_triggered": false,
+  "final_summary": "",
+  "structured_state_gap": {
+    "location_tracked": false,
+    "inventory_tracked": false,
+    "npcs_tracked": false
+  }
+}

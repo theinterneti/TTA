@@ -1,0 +1,24 @@
+{
+  "session_id": "ca61c3fb",
+  "n_turns": 2,
+  "turns_completed": 2,
+  "avg_response_words": 21.5,
+  "avg_latency_ms": 0.0,
+  "coherence_callback_turns": 0,
+  "coherence_callback_rate": 0.0,
+  "entity_first_appearance": {
+    "archive": 1,
+    "brass_handles": 2,
+    "contracts": 2
+  },
+  "entity_recurrence": {},
+  "final_context_messages": 5,
+  "final_context_chars": 2310,
+  "summarization_triggered": false,
+  "final_summary": "",
+  "structured_state_gap": {
+    "location_tracked": false,
+    "inventory_tracked": false,
+    "npcs_tracked": false
+  }
+}
