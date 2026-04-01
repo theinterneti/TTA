@@ -11,6 +11,8 @@ Tests cover:
 
 from __future__ import annotations
 
+import pytest
+
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -25,6 +27,8 @@ from src.common.health_checks import (
     get_health_checker,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # HealthCheckResult
 # ---------------------------------------------------------------------------
@@ -32,6 +36,7 @@ from src.common.health_checks import (
 
 class TestHealthCheckResult:
     def test_to_dict_shape(self):
+        """Health Check Result: to dict shape."""
         now = datetime(2025, 1, 1, 12, 0, 0)
         result = HealthCheckResult(
             component="redis",
@@ -50,6 +55,7 @@ class TestHealthCheckResult:
         assert "2025-01-01" in d["checked_at"]
 
     def test_to_dict_none_fields(self):
+        """Health Check Result: to dict none fields."""
         result = HealthCheckResult(
             component="x", status=HealthStatus.UNKNOWN, message="no info"
         )
@@ -59,6 +65,7 @@ class TestHealthCheckResult:
         assert d["response_time_ms"] is None
 
     def test_status_is_strenum(self):
+        """Health Check Result: status is strenum."""
         assert isinstance(HealthStatus.HEALTHY, str)
         assert HealthStatus.HEALTHY == "healthy"
 
@@ -70,6 +77,7 @@ class TestHealthCheckResult:
 
 class TestHealthCheckerRegisterAndCheck:
     async def test_unknown_component_returns_unknown_status(self):
+        """Health Checker Register And Check: unknown component returns unknown status."""
         checker = HealthChecker()
         result = await checker.check_component("nonexistent")
         assert result.status == HealthStatus.UNKNOWN
@@ -77,6 +85,7 @@ class TestHealthCheckerRegisterAndCheck:
         assert result.component == "nonexistent"
 
     async def test_successful_check_sets_response_time_and_checked_at(self):
+        """Health Checker Register And Check: successful check sets response time and checked at."""
         checker = HealthChecker()
 
         async def _ok():
@@ -93,6 +102,7 @@ class TestHealthCheckerRegisterAndCheck:
         assert result.checked_at is not None
 
     async def test_exception_in_check_returns_unhealthy(self):
+        """Health Checker Register And Check: exception in check returns unhealthy."""
         checker = HealthChecker()
 
         async def _boom():
@@ -106,6 +116,7 @@ class TestHealthCheckerRegisterAndCheck:
         assert result.response_time_ms is not None
 
     async def test_check_all_runs_all_checks(self):
+        """Health Checker Register And Check: check all runs all checks."""
         checker = HealthChecker()
 
         async def _a():
@@ -146,18 +157,21 @@ class TestGetSystemStatus:
         return overall
 
     async def test_all_healthy_returns_healthy(self):
+        """Get System Status: all healthy returns healthy."""
         assert (
             await self._status_for([HealthStatus.HEALTHY, HealthStatus.HEALTHY])
             == HealthStatus.HEALTHY
         )
 
     async def test_any_unhealthy_returns_unhealthy(self):
+        """Get System Status: any unhealthy returns unhealthy."""
         assert (
             await self._status_for([HealthStatus.HEALTHY, HealthStatus.UNHEALTHY])
             == HealthStatus.UNHEALTHY
         )
 
     async def test_degraded_without_unhealthy_returns_degraded(self):
+        """Get System Status: degraded without unhealthy returns degraded."""
         assert (
             await self._status_for([HealthStatus.HEALTHY, HealthStatus.DEGRADED])
             == HealthStatus.DEGRADED
@@ -165,17 +179,20 @@ class TestGetSystemStatus:
 
     async def test_empty_checks_returns_healthy(self):
         # all(...) on an empty iterable is vacuously True → HEALTHY
+        """Get System Status: empty checks returns healthy."""
         checker = HealthChecker()
         overall, details = await checker.get_system_status()
         assert overall == HealthStatus.HEALTHY
 
     async def test_unknown_present_returns_unknown(self):
+        """Get System Status: unknown present returns unknown."""
         assert (
             await self._status_for([HealthStatus.HEALTHY, HealthStatus.UNKNOWN])
             == HealthStatus.UNKNOWN
         )
 
     async def test_details_dict_contains_to_dict_output(self):
+        """Get System Status: details dict contains to dict output."""
         checker = HealthChecker()
 
         async def _ok():
@@ -196,6 +213,7 @@ class TestGetSystemStatus:
 
 class TestCheckRedisHealth:
     async def test_healthy_when_ping_succeeds(self):
+        """Check Redis Health: healthy when ping succeeds."""
         client = AsyncMock()
         client.ping = AsyncMock()
         client.info = AsyncMock(
@@ -206,6 +224,7 @@ class TestCheckRedisHealth:
         assert result.details["version"] == "7.0.5"
 
     async def test_unhealthy_when_ping_raises(self):
+        """Check Redis Health: unhealthy when ping raises."""
         client = AsyncMock()
         client.ping = AsyncMock(side_effect=ConnectionError("refused"))
         result = await check_redis_health(client)
@@ -220,6 +239,7 @@ class TestCheckRedisHealth:
 
 class TestCheckNeo4jHealth:
     async def test_healthy_when_connectivity_ok(self):
+        """Check Neo4j Health: healthy when connectivity ok."""
         driver = AsyncMock()
         driver.verify_connectivity = AsyncMock()
         record = MagicMock()
@@ -237,6 +257,7 @@ class TestCheckNeo4jHealth:
         assert result.details["version"] == "5.0.0"
 
     async def test_unhealthy_when_connectivity_fails(self):
+        """Check Neo4j Health: unhealthy when connectivity fails."""
         driver = AsyncMock()
         driver.verify_connectivity = AsyncMock(side_effect=Exception("auth failed"))
         result = await check_neo4j_health(driver)
@@ -251,14 +272,17 @@ class TestCheckNeo4jHealth:
 
 class TestCheckAgentOrchestrationHealth:
     async def test_degraded_when_no_args(self):
+        """Check Agent Orchestration Health: degraded when no args."""
         result = await check_agent_orchestration_health()
         assert result.status == HealthStatus.DEGRADED
 
     async def test_healthy_when_registry_provided(self):
+        """Check Agent Orchestration Health: healthy when registry provided."""
         result = await check_agent_orchestration_health(agent_registry=MagicMock())
         assert result.status == HealthStatus.HEALTHY
 
     async def test_healthy_when_both_provided(self):
+        """Check Agent Orchestration Health: healthy when both provided."""
         result = await check_agent_orchestration_health(
             agent_registry=MagicMock(), workflow_manager=MagicMock()
         )
@@ -274,11 +298,13 @@ class TestCheckAgentOrchestrationHealth:
 
 class TestCheckOpenRouterHealth:
     async def test_degraded_when_no_api_key(self):
+        """Check Open Router Health: degraded when no api key."""
         result = await check_openrouter_health(api_key=None)
         assert result.status == HealthStatus.DEGRADED
         assert "not configured" in result.message
 
     async def test_healthy_when_200(self):
+        """Check Open Router Health: healthy when 200."""
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": ["m1", "m2", "m3"]}
@@ -295,6 +321,7 @@ class TestCheckOpenRouterHealth:
         assert result.details["models_available"] == 3
 
     async def test_degraded_when_non_200(self):
+        """Check Open Router Health: degraded when non 200."""
         mock_response = MagicMock()
         mock_response.status_code = 401
 
@@ -309,6 +336,7 @@ class TestCheckOpenRouterHealth:
         assert result.status == HealthStatus.DEGRADED
 
     async def test_unhealthy_when_network_error(self):
+        """Check Open Router Health: unhealthy when network error."""
         mock_client = AsyncMock()
         mock_client.get = AsyncMock(side_effect=Exception("timeout"))
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
@@ -327,6 +355,7 @@ class TestCheckOpenRouterHealth:
 
 class TestGetHealthCheckerSingleton:
     def test_returns_same_instance(self):
+        """Get Health Checker Singleton: returns same instance."""
         import src.common.health_checks as hc
 
         hc._health_checker = None  # reset
@@ -335,6 +364,7 @@ class TestGetHealthCheckerSingleton:
         assert a is b
 
     def test_returns_health_checker_instance(self):
+        """Get Health Checker Singleton: returns health checker instance."""
         import src.common.health_checks as hc
 
         hc._health_checker = None

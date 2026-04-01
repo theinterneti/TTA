@@ -10,6 +10,8 @@ Tests cover:
 
 from __future__ import annotations
 
+import pytest
+
 from unittest.mock import MagicMock
 
 from fastapi import FastAPI
@@ -17,6 +19,8 @@ from fastapi.testclient import TestClient
 
 from src.player_experience.api.auth import TokenData, get_current_active_player
 from src.player_experience.api.routers.worlds import get_world_manager_dep, router
+
+pytestmark = pytest.mark.unit
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -49,18 +53,21 @@ def _mock_manager() -> MagicMock:
 
 class TestListWorlds:
     def test_empty_list_returns_200(self):
+        """List Worlds: empty list returns 200."""
         client = _build_app(_mock_manager())
         resp = client.get("/")
         assert resp.status_code == 200
         assert resp.json() == []
 
     def test_pagination_params_accepted(self):
+        """List Worlds: pagination params accepted."""
         client = _build_app(_mock_manager())
         resp = client.get("/?limit=5&offset=0")
         assert resp.status_code == 200
         assert isinstance(resp.json(), list)
 
     def test_character_id_filter_accepted(self):
+        """List Worlds: character id filter accepted."""
         client = _build_app(_mock_manager())
         resp = client.get("/?character_id=char-1")
         assert resp.status_code == 200
@@ -73,12 +80,14 @@ class TestListWorlds:
 
 class TestGetWorld:
     def test_not_found_returns_404(self):
+        """Get World: not found returns 404."""
         client = _build_app(_mock_manager())
         resp = client.get("/world-x")
         assert resp.status_code == 404
         assert resp.json()["detail"] == "World not found"
 
     def test_calls_manager_with_world_id(self):
+        """Get World: calls manager with world id."""
         manager = _mock_manager()
         client = _build_app(manager)
         client.get("/world-123")
@@ -92,6 +101,7 @@ class TestGetWorld:
 
 class TestCheckWorldCompatibility:
     def test_world_not_found_returns_404(self):
+        """Check World Compatibility: world not found returns 404."""
         manager = _mock_manager()
         manager.check_world_compatibility_by_id.return_value = None
         manager.get_world_details.return_value = None
@@ -100,6 +110,7 @@ class TestCheckWorldCompatibility:
         assert resp.status_code == 404
 
     def test_compatibility_check_failed_returns_400(self):
+        """Check World Compatibility: compatibility check failed returns 400."""
         manager = _mock_manager()
         # Compatibility returns None but world exists → 400
         manager.check_world_compatibility_by_id.return_value = None
@@ -112,6 +123,7 @@ class TestCheckWorldCompatibility:
         assert "Compatibility check failed" in resp.json()["detail"]
 
     def test_calls_manager_with_correct_ids(self):
+        """Check World Compatibility: calls manager with correct ids."""
         manager = _mock_manager()
         client = _build_app(manager)
         client.get("/world-99/compatibility/char-42")
@@ -127,12 +139,14 @@ class TestCheckWorldCompatibility:
 
 class TestCustomizeWorld:
     def test_world_not_found_returns_404(self):
+        """Customize World: world not found returns 404."""
         client = _build_app(_mock_manager())
         resp = client.post("/world-x/customize", json={})
         assert resp.status_code == 404
         assert resp.json()["detail"] == "World not found"
 
     def test_calls_manager_with_world_id(self):
+        """Customize World: calls manager with world id."""
         manager = _mock_manager()
         client = _build_app(manager)
         client.post("/world-123/customize", json={})

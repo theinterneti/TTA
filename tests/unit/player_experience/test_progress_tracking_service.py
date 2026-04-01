@@ -1,3 +1,4 @@
+import pytest
 # Logseq: [[TTA.dev/Tests/Test_progress_tracking_service]]
 import asyncio
 import unittest
@@ -17,6 +18,8 @@ from src.player_experience.models.session import (
     SessionSummary,
     TherapeuticSettings,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class MockSessionRepository:
@@ -84,6 +87,7 @@ class TestProgressTrackingService(unittest.TestCase):
         self.player_id = "playerA"
 
     def test_compute_progress_summary(self):
+        """Progress Tracking Service: compute progress summary."""
         async def run():
             summary = await self.service.compute_progress_summary(self.player_id)
             assert summary.player_id == self.player_id
@@ -94,6 +98,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_detect_and_update_milestones(self):
+        """Progress Tracking Service: detect and update milestones."""
         async def run():
             milestones, highlights = await self.service.detect_and_update_milestones(
                 self.player_id
@@ -106,6 +111,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_generate_progress_insights(self):
+        """Progress Tracking Service: generate progress insights."""
         async def run():
             recs = await self.service.generate_progress_insights(self.player_id)
             assert isinstance(recs, list)
@@ -115,6 +121,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_get_visualization_data(self):
+        """Progress Tracking Service: get visualization data."""
         async def run():
             viz = await self.service.get_visualization_data(self.player_id, days=7)
             assert len(viz.time_buckets) == 7
@@ -125,6 +132,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_therapeutic_effectiveness_report(self):
+        """Progress Tracking Service: therapeutic effectiveness report."""
         async def run():
             report = await self.service.generate_therapeutic_effectiveness_report(
                 self.player_id
@@ -139,6 +147,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_milestone_celebration(self):
+        """Progress Tracking Service: milestone celebration."""
         async def run():
             milestone = Milestone(
                 milestone_id="test_milestone",
@@ -157,6 +166,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_enhanced_progress_summary_with_therapeutic_integration(self):
+        """Progress Tracking Service: enhanced progress summary with therapeutic integration."""
         async def run():
             # Add more diverse progress markers
             settings = TherapeuticSettings()
@@ -206,6 +216,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_comprehensive_milestone_detection(self):
+        """Progress Tracking Service: comprehensive milestone detection."""
         async def run():
             # Create session summaries for streak detection
             now = datetime.now(UTC)
@@ -246,6 +257,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_enhanced_progress_insights_generation(self):
+        """Progress Tracking Service: enhanced progress insights generation."""
         async def run():
             # Create a scenario with high therapeutic momentum
             high_momentum_summaries = []
@@ -286,6 +298,7 @@ class TestProgressTrackingService(unittest.TestCase):
         asyncio.run(run())
 
     def test_dropout_risk_calculation(self):
+        """Progress Tracking Service: dropout risk calculation."""
         async def run():
             # Create scenario with very high dropout risk (no recent sessions, very old activity)
             old_summaries = []
@@ -337,6 +350,7 @@ class TestProgressTrackingService(unittest.TestCase):
 
     def test_therapeutic_value_assessment(self):
         # Test the therapeutic value assessment helper method
+        """Progress Tracking Service: therapeutic value assessment."""
         session_summary = SessionSummary(
             session_id="test_session",
             character_name="Test Char",
@@ -374,6 +388,7 @@ class TestProgressTrackingService(unittest.TestCase):
 
     def test_streak_calculation_accuracy(self):
         # Test streak calculation with various scenarios
+        """Progress Tracking Service: streak calculation accuracy."""
         now = datetime.now().date()
 
         # Test consecutive streak
@@ -392,6 +407,7 @@ class TestProgressTrackingService(unittest.TestCase):
         assert no_streak == 0
 
     def test_visualization_data_accuracy(self):
+        """Progress Tracking Service: visualization data accuracy."""
         async def run():
             # Test visualization data generation
             viz_data = await self.service.get_visualization_data(self.player_id, days=7)

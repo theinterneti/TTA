@@ -14,6 +14,8 @@ from src.player_experience.managers.world_management_module import WorldManageme
 from src.player_experience.models.enums import DifficultyLevel
 from src.player_experience.models.world import CompatibilityReport, WorldParameters
 
+pytestmark = pytest.mark.unit
+
 
 class TestWorldManagementModule(unittest.TestCase):
     """Test cases for WorldManagementModule."""

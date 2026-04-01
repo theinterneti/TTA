@@ -1,3 +1,4 @@
+import pytest
 # Logseq: [[TTA.dev/Tests/Test_orchestrator_topo_sort]]
 import sys
 import unittest
@@ -7,6 +8,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.orchestration import TTAOrchestrator
+
+pytestmark = pytest.mark.unit
 
 
 class TestOrchestratorTopoSort(unittest.TestCase):

@@ -18,6 +18,8 @@ from src.orchestration import (
 )
 from src.orchestration.component import Component, ComponentStatus
 
+pytestmark = pytest.mark.unit
+
 
 class MockComponent(Component):
     """Simple mock component for testing."""

@@ -1,10 +1,14 @@
 # Logseq: [[TTA.dev/Tests/Test_metrics_endpoint]]
 from __future__ import annotations
 
+import pytest
+
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import create_app
 from src.player_experience.api.config import TestingSettings
+
+pytestmark = pytest.mark.unit
 
 
 def _make_client() -> TestClient:
@@ -16,6 +20,7 @@ def _make_client() -> TestClient:
 
 
 def test_metrics_endpoint_available_in_debug() -> None:
+    """Metrics endpoint available in debug."""
     client = _make_client()
     resp = client.get("/metrics")
     # /metrics is the Prometheus endpoint (always available, plain text format)
@@ -25,6 +30,7 @@ def test_metrics_endpoint_available_in_debug() -> None:
 def test_metrics_json_endpoint_available_in_debug() -> None:
     # The debug-gated JSON metrics endpoint is at /metrics (shadowed by Prometheus)
     # Test the Prometheus metrics-prom endpoint which is also debug-gated
+    """Metrics json endpoint available in debug."""
     client = _make_client()
     resp = client.get("/metrics-prom")
     # Should be accessible in debug mode
@@ -33,6 +39,7 @@ def test_metrics_json_endpoint_available_in_debug() -> None:
 
 def test_metrics_endpoint_hidden_in_production() -> None:
     # Simulate production settings
+    """Metrics endpoint hidden in production."""
     import src.player_experience.api.config as config_module
 
     # Use DevelopmentSettings with debug=False to mimic production behavior without strong key validation

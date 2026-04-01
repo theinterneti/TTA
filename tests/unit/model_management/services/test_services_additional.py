@@ -27,6 +27,8 @@ from src.components.model_management.services.performance_monitor import (
     PerformanceMonitor,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -71,6 +73,7 @@ def _make_requirements(**kwargs) -> ModelRequirements:
 
 class TestFallbackHandlerAdditional:
     async def test_handle_model_failure_increments_count(self):
+        """Fallback Handler Additional: handle model failure increments count."""
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[])
         handler = FallbackHandler(providers={"test": mock_provider})
@@ -82,6 +85,7 @@ class TestFallbackHandlerAdditional:
         assert handler._failure_counts["model-a"] == 2
 
     async def test_handle_model_failure_marks_critical_after_max_retries(self):
+        """Fallback Handler Additional: handle model failure marks critical after max retries."""
         config = FallbackConfiguration(max_retries=2)
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[])
@@ -100,6 +104,7 @@ class TestFallbackHandlerAdditional:
     async def test_handle_model_failure_updates_provider_health_on_connection_error(
         self,
     ):
+        """Fallback Handler Additional: handle model failure updates provider health on connection error."""
         model = _make_model("model-a")
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[model])
@@ -113,6 +118,7 @@ class TestFallbackHandlerAdditional:
         assert handler._provider_health.get("test") is False
 
     async def test_handle_model_failure_ignores_non_provider_errors(self):
+        """Fallback Handler Additional: handle model failure ignores non provider errors."""
         model = _make_model("model-a")
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[model])
@@ -126,6 +132,7 @@ class TestFallbackHandlerAdditional:
         assert handler._provider_health.get("test") is True
 
     def test_reset_model_failures_removes_failure_record(self):
+        """Fallback Handler Additional: reset model failures removes failure record."""
         handler = FallbackHandler(providers={})
         handler._failed_models["model-x"] = datetime.now()
         handler._failure_counts["model-x"] = 5
@@ -136,11 +143,13 @@ class TestFallbackHandlerAdditional:
         assert "model-x" not in handler._failure_counts
 
     def test_reset_model_failures_returns_true_for_unknown_model(self):
+        """Fallback Handler Additional: reset model failures returns true for unknown model."""
         handler = FallbackHandler(providers={})
         result = handler.reset_model_failures("nonexistent")
         assert result is True
 
     def test_reset_provider_health_sets_to_true(self):
+        """Fallback Handler Additional: reset provider health sets to true."""
         handler = FallbackHandler(providers={"my-prov": AsyncMock()})
         handler._provider_health["my-prov"] = False
 
@@ -149,11 +158,13 @@ class TestFallbackHandlerAdditional:
         assert handler._provider_health["my-prov"] is True
 
     def test_reset_provider_health_returns_false_for_unknown(self):
+        """Fallback Handler Additional: reset provider health returns false for unknown."""
         handler = FallbackHandler(providers={})
         result = handler.reset_provider_health("unknown-provider")
         assert result is False
 
     async def test_cleanup_old_failures_removes_stale_records(self):
+        """Fallback Handler Additional: cleanup old failures removes stale records."""
         handler = FallbackHandler(providers={})
         old_time = datetime.now() - timedelta(hours=25)
         handler._failed_models["old-model"] = old_time
@@ -166,6 +177,7 @@ class TestFallbackHandlerAdditional:
         assert handler._failure_counts["old-model"] == 0
 
     async def test_cleanup_old_failures_keeps_recent_records(self):
+        """Fallback Handler Additional: cleanup old failures keeps recent records."""
         handler = FallbackHandler(providers={})
         handler._failed_models["recent-model"] = datetime.now()
         handler._failure_counts["recent-model"] = 2
@@ -175,6 +187,7 @@ class TestFallbackHandlerAdditional:
         assert "recent-model" in handler._failed_models
 
     def test_get_failure_statistics_structure(self):
+        """Fallback Handler Additional: get failure statistics structure."""
         handler = FallbackHandler(providers={"prov": AsyncMock()})
         handler._failed_models["model-x"] = datetime.now()
         handler._failure_counts["model-x"] = 3
@@ -189,6 +202,7 @@ class TestFallbackHandlerAdditional:
         assert stats["recent_failures_1h"] == 1
 
     def test_get_failure_statistics_excludes_old_failures_from_recent(self):
+        """Fallback Handler Additional: get failure statistics excludes old failures from recent."""
         handler = FallbackHandler(providers={})
         old_time = datetime.now() - timedelta(hours=2)
         handler._failed_models["old-model"] = old_time
@@ -199,31 +213,37 @@ class TestFallbackHandlerAdditional:
         assert stats["recent_failures_1h"] == 0
 
     def test_get_model_provider_identifies_gpt(self):
+        """Fallback Handler Additional: get model provider identifies gpt."""
         handler = FallbackHandler(providers={})
         result = handler._get_model_provider("gpt-4o-mini")
         assert result == "openai"
 
     def test_get_model_provider_identifies_claude(self):
+        """Fallback Handler Additional: get model provider identifies claude."""
         handler = FallbackHandler(providers={})
         result = handler._get_model_provider("claude-3-haiku")
         assert result == "anthropic"
 
     def test_get_model_provider_identifies_llama(self):
+        """Fallback Handler Additional: get model provider identifies llama."""
         handler = FallbackHandler(providers={})
         result = handler._get_model_provider("llama3.1:8b")
         assert result == "local"
 
     def test_get_model_provider_identifies_qwen(self):
+        """Fallback Handler Additional: get model provider identifies qwen."""
         handler = FallbackHandler(providers={})
         result = handler._get_model_provider("qwen2.5:7b")
         assert result == "local"
 
     def test_get_model_provider_returns_unknown_for_unrecognized(self):
+        """Fallback Handler Additional: get model provider returns unknown for unrecognized."""
         handler = FallbackHandler(providers={})
         result = handler._get_model_provider("some-random-model-xyz")
         assert result == "unknown"
 
     async def test_get_fallback_model_returns_none_when_no_healthy_providers(self):
+        """Fallback Handler Additional: get fallback model returns none when no healthy providers."""
         mock_provider = AsyncMock()
         mock_provider.health_check = AsyncMock(return_value=False)
         mock_provider.get_available_models = AsyncMock(return_value=[])
@@ -233,6 +253,7 @@ class TestFallbackHandlerAdditional:
         assert result is None
 
     async def test_get_fallback_model_excludes_failed_model_from_results(self):
+        """Fallback Handler Additional: get fallback model excludes failed model from results."""
         model_a = _make_model("model-a")
         model_b = _make_model("model-b")
         mock_provider = AsyncMock()
@@ -246,6 +267,7 @@ class TestFallbackHandlerAdditional:
         assert result.model_id == "model-b"
 
     async def test_get_fallback_model_returns_none_when_all_filtered(self):
+        """Fallback Handler Additional: get fallback model returns none when all filtered."""
         model_a = _make_model("model-a")
         mock_provider = AsyncMock()
         mock_provider.health_check = AsyncMock(return_value=True)
@@ -258,6 +280,7 @@ class TestFallbackHandlerAdditional:
         assert result is None
 
     async def test_filter_failed_models_excludes_recently_failed(self):
+        """Fallback Handler Additional: filter failed models excludes recently failed."""
         handler = FallbackHandler(providers={})
         # Mark model as recently failed
         handler._failed_models["recent-fail"] = datetime.now() - timedelta(minutes=5)
@@ -272,6 +295,7 @@ class TestFallbackHandlerAdditional:
         assert "healthy-model" in ids
 
     async def test_filter_failed_models_excludes_max_retries_exceeded(self):
+        """Fallback Handler Additional: filter failed models excludes max retries exceeded."""
         config = FallbackConfiguration(max_retries=3)
         handler = FallbackHandler(providers={}, fallback_config=config)
         handler._failure_counts["overloaded-model"] = 5  # > max_retries
@@ -286,6 +310,7 @@ class TestFallbackHandlerAdditional:
         assert "ok-model" in ids
 
     async def test_filter_compatible_models_excludes_exceeding_cost(self):
+        """Fallback Handler Additional: filter compatible models excludes exceeding cost."""
         handler = FallbackHandler(providers={})
         models = [
             _make_model("cheap", cost_per_token=0.0001),
@@ -298,6 +323,7 @@ class TestFallbackHandlerAdditional:
         assert "expensive" not in ids
 
     async def test_filter_compatible_models_excludes_insufficient_context(self):
+        """Fallback Handler Additional: filter compatible models excludes insufficient context."""
         handler = FallbackHandler(providers={})
         models = [
             _make_model("large-ctx", context_length=32000),
@@ -310,6 +336,7 @@ class TestFallbackHandlerAdditional:
         assert "small-ctx" not in ids
 
     async def test_filter_compatible_models_excludes_missing_capabilities(self):
+        """Fallback Handler Additional: filter compatible models excludes missing capabilities."""
         handler = FallbackHandler(providers={})
         models = [
             _make_model("capable", capabilities=["chat", "code"]),
@@ -322,12 +349,14 @@ class TestFallbackHandlerAdditional:
         assert "limited" not in ids
 
     async def test_select_fallback_model_returns_none_on_empty_list(self):
+        """Fallback Handler Additional: select fallback model returns none on empty list."""
         handler = FallbackHandler(providers={})
         requirements = _make_requirements()
         result = await handler._select_fallback_model([], "failed", requirements)
         assert result is None
 
     async def test_select_fallback_model_defaults_to_performance_based(self):
+        """Fallback Handler Additional: select fallback model defaults to performance based."""
         handler = FallbackHandler(providers={})
         models = [
             _make_model("high-perf", performance_score=9.0),
@@ -339,6 +368,7 @@ class TestFallbackHandlerAdditional:
         assert result.model_id == "high-perf"
 
     async def test_get_healthy_models_skips_unhealthy_providers(self):
+        """Fallback Handler Additional: get healthy models skips unhealthy providers."""
         healthy_model = _make_model("good-model")
         mock_healthy = AsyncMock()
         mock_healthy.health_check = AsyncMock(return_value=True)
@@ -355,6 +385,7 @@ class TestFallbackHandlerAdditional:
         assert "good-model" in ids
 
     async def test_get_healthy_models_handles_provider_exception(self):
+        """Fallback Handler Additional: get healthy models handles provider exception."""
         mock_provider = AsyncMock()
         mock_provider.health_check = AsyncMock(side_effect=RuntimeError("crash"))
 
@@ -372,6 +403,7 @@ class TestFallbackHandlerAdditional:
 
 class TestPerformanceMonitorAdditional:
     async def test_start_and_stop_background_tasks(self):
+        """Performance Monitor Additional: start and stop background tasks."""
         monitor = PerformanceMonitor()
         await monitor.start()
         assert monitor._running is True
@@ -381,6 +413,7 @@ class TestPerformanceMonitorAdditional:
         assert monitor._running is False
 
     async def test_record_metrics_stores_in_memory_cache(self):
+        """Performance Monitor Additional: record metrics stores in memory cache."""
         monitor = PerformanceMonitor()
         await monitor.record_metrics(
             "model-a", {"response_time_ms": 150, "total_tokens": 50}
@@ -390,6 +423,7 @@ class TestPerformanceMonitorAdditional:
         assert metric.response_time_ms == 150
 
     async def test_get_model_performance_no_metrics_returns_empty_message(self):
+        """Performance Monitor Additional: get model performance no metrics returns empty message."""
         monitor = PerformanceMonitor()
         result = await monitor.get_model_performance("nonexistent-model", 24)
         assert result["model_id"] == "nonexistent-model"
@@ -397,6 +431,7 @@ class TestPerformanceMonitorAdditional:
         assert "No metrics available" in result["message"]
 
     async def test_get_model_performance_with_metrics_returns_stats(self):
+        """Performance Monitor Additional: get model performance with metrics returns stats."""
         monitor = PerformanceMonitor()
         await monitor.record_metrics(
             "model-a",
@@ -408,6 +443,7 @@ class TestPerformanceMonitorAdditional:
         assert "average_response_time_ms" in result
 
     async def test_get_model_performance_filters_by_timeframe(self):
+        """Performance Monitor Additional: get model performance filters by timeframe."""
         monitor = PerformanceMonitor()
         # Manually inject an old metric
         from src.components.model_management.models import PerformanceMetrics
@@ -428,6 +464,7 @@ class TestPerformanceMonitorAdditional:
         assert result["metrics_count"] == 0
 
     async def test_get_system_performance_aggregates_models(self):
+        """Performance Monitor Additional: get system performance aggregates models."""
         monitor = PerformanceMonitor()
         await monitor.record_metrics(
             "model-a",
@@ -442,6 +479,7 @@ class TestPerformanceMonitorAdditional:
         assert result["active_models"] >= 0  # May be 0 since metrics may be > 1h old
 
     async def test_get_model_usage_stats_returns_model_usage_stats_object(self):
+        """Performance Monitor Additional: get model usage stats returns model usage stats object."""
         monitor = PerformanceMonitor()
         await monitor.record_metrics(
             "model-a",
@@ -457,6 +495,7 @@ class TestPerformanceMonitorAdditional:
         assert stats.total_requests >= 0
 
     async def test_record_metrics_with_redis_calls_store(self):
+        """Performance Monitor Additional: record metrics with redis calls store."""
         mock_redis = AsyncMock()
         mock_redis.lpush = AsyncMock()
         mock_redis.ltrim = AsyncMock()
@@ -467,6 +506,7 @@ class TestPerformanceMonitorAdditional:
         mock_redis.lpush.assert_called_once()
 
     async def test_cleanup_old_metrics_removes_stale_entries(self):
+        """Performance Monitor Additional: cleanup old metrics removes stale entries."""
         monitor = PerformanceMonitor()
         monitor.retention_days = 1  # 1 day retention
 
@@ -487,11 +527,13 @@ class TestPerformanceMonitorAdditional:
         assert len(monitor._metrics_cache["model-a"]) == 0
 
     async def test_aggregate_metrics_does_not_raise(self):
+        """Performance Monitor Additional: aggregate metrics does not raise."""
         monitor = PerformanceMonitor()
         # Should complete without error
         await monitor._aggregate_metrics()
 
     async def test_get_model_performance_handles_exception(self):
+        """Performance Monitor Additional: get model performance handles exception."""
         monitor = PerformanceMonitor()
         # Corrupt the cache to trigger an exception path
         monitor._metrics_cache["bad-model"] = "not-a-deque"  # type: ignore
@@ -500,6 +542,7 @@ class TestPerformanceMonitorAdditional:
         assert "error" in result or "metrics_count" in result
 
     async def test_get_system_performance_handles_empty_cache(self):
+        """Performance Monitor Additional: get system performance handles empty cache."""
         monitor = PerformanceMonitor()
         result = await monitor.get_system_performance()
         assert result["total_models"] == 0
@@ -530,6 +573,7 @@ class TestModelSelectorAdditional:
         return _make
 
     async def test_select_model_returns_none_when_no_models(self, make_selector):
+        """Model Selector Additional: select model returns none when no models."""
         mock_provider = AsyncMock()
         mock_provider.get_available_models = AsyncMock(return_value=[])
         selector = make_selector({"prov": mock_provider})
@@ -538,6 +582,7 @@ class TestModelSelectorAdditional:
         assert result is None
 
     async def test_select_model_returns_best_model(self, make_selector):
+        """Model Selector Additional: select model returns best model."""
         model_a = _make_model("model-a", performance_score=9.0)
         model_b = _make_model("model-b", performance_score=3.0)
         mock_provider = AsyncMock()
@@ -558,6 +603,7 @@ class TestModelSelectorAdditional:
         assert result is None
 
     async def test_get_all_available_models_aggregates_providers(self, make_selector):
+        """Model Selector Additional: get all available models aggregates providers."""
         model_a = _make_model("model-a")
         model_b = _make_model("model-b")
         mock_prov_1 = AsyncMock()
@@ -571,6 +617,7 @@ class TestModelSelectorAdditional:
         assert "model-b" in ids
 
     async def test_get_all_available_models_handles_provider_error(self, make_selector):
+        """Model Selector Additional: get all available models handles provider error."""
         mock_prov = AsyncMock()
         mock_prov.get_available_models = AsyncMock(side_effect=RuntimeError("fail"))
         selector = make_selector({"bad-prov": mock_prov})
@@ -581,6 +628,7 @@ class TestModelSelectorAdditional:
     async def test_filter_compatible_models_requires_context_length(
         self, make_selector
     ):
+        """Model Selector Additional: filter compatible models requires context length."""
         model_large = _make_model("large", context_length=32000)
         model_small = _make_model("small", context_length=1024)
         mock_prov = AsyncMock()
@@ -594,6 +642,7 @@ class TestModelSelectorAdditional:
         assert "small" not in ids
 
     async def test_filter_compatible_models_requires_safety(self, make_selector):
+        """Model Selector Additional: filter compatible models requires safety."""
         model_safe = _make_model("safe", therapeutic_safety_score=8.0)
         model_unsafe = _make_model("unsafe", therapeutic_safety_score=5.0)
         mock_prov = AsyncMock()
@@ -607,6 +656,7 @@ class TestModelSelectorAdditional:
         assert "unsafe" not in ids
 
     async def test_filter_compatible_models_requires_max_cost(self, make_selector):
+        """Model Selector Additional: filter compatible models requires max cost."""
         model_cheap = _make_model("cheap", cost_per_token=0.0001)
         model_expensive = _make_model("expensive", cost_per_token=0.01)
         mock_prov = AsyncMock()
@@ -620,6 +670,7 @@ class TestModelSelectorAdditional:
         assert "expensive" not in ids
 
     async def test_rank_models_returns_sorted_list(self, make_selector):
+        """Model Selector Additional: rank models returns sorted list."""
         model_high = _make_model(
             "high", performance_score=9.0, therapeutic_safety_score=9.0
         )
@@ -636,6 +687,7 @@ class TestModelSelectorAdditional:
             assert ranked[0].model_id == "high"
 
     async def test_calculate_model_score_returns_positive_value(self, make_selector):
+        """Model Selector Additional: calculate model score returns positive value."""
         model = _make_model(
             "test",
             performance_score=7.0,
@@ -649,6 +701,7 @@ class TestModelSelectorAdditional:
         assert score > 0
 
     async def test_calculate_model_score_free_model_gets_bonus(self, make_selector):
+        """Model Selector Additional: calculate model score free model gets bonus."""
         model_free = _make_model("free", is_free=True, cost_per_token=0.0)
         model_paid = _make_model("paid", is_free=False, cost_per_token=0.005)
         mock_prov = AsyncMock()
@@ -661,6 +714,7 @@ class TestModelSelectorAdditional:
         assert score_free >= score_paid
 
     async def test_select_model_handles_exception_gracefully(self, make_selector):
+        """Model Selector Additional: select model handles exception gracefully."""
         mock_prov = AsyncMock()
         mock_prov.get_available_models = AsyncMock(
             side_effect=RuntimeError("provider crashed")
@@ -677,6 +731,7 @@ class TestModelSelectorAdditional:
 
 class TestFallbackHandlerPreferDifferentProvider:
     async def test_prefer_different_provider_selects_different_provider(self):
+        """Fallback Handler Prefer Different Provider: prefer different provider selects different provider."""
         model_same = _make_model(
             "same-prov-model",
             provider_type=ProviderType.OPENROUTER,

@@ -20,6 +20,8 @@ from src.orchestration.decorators import (
     timing_decorator,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestRetryDecorator:
     """Test suite for @retry decorator."""

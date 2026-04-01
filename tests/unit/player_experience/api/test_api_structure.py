@@ -13,6 +13,8 @@ from fastapi.testclient import TestClient
 from src.player_experience.api.app import create_app
 from src.player_experience.api.config import TestingSettings
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def test_app():

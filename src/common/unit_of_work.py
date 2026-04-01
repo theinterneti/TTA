@@ -2,7 +2,7 @@
 
 Provides :class:`AbstractUnitOfWork` — the interface that all UoW
 implementations must satisfy.  Previously this was sourced from
-``tta_dev_primitives.persistence``, but that sub-module does not ship
+``ttadev.primitives``, but that sub-module does not ship
 with tta-dev-primitives v1.3.x, so we define it locally here.
 """
 

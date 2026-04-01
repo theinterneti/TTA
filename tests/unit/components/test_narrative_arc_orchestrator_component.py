@@ -15,6 +15,8 @@ from src.components.narrative_arc_orchestrator_component import (
     PlayerChoice,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class FakeClosableDependency:
     """Simple dependency with a close hook."""

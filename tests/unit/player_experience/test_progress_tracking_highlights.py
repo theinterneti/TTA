@@ -1,3 +1,4 @@
+import pytest
 # Logseq: [[TTA.dev/Tests/Test_progress_tracking_highlights]]
 import asyncio
 from datetime import UTC, datetime, timedelta
@@ -9,6 +10,8 @@ from src.player_experience.models.enums import SessionStatus
 from src.player_experience.models.session import (
     SessionSummary,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class MockSessionRepository:
@@ -28,6 +31,7 @@ class MockSessionRepository:
 
 
 def test_highlights_created_for_session_milestone():
+    """Highlights created for session milestone."""
     now = datetime.now(UTC)
     # 10 completed sessions to trigger session milestone
     summaries = []
@@ -61,6 +65,7 @@ def test_highlights_created_for_session_milestone():
 
 
 def test_highlights_created_for_streak_milestone():
+    """Highlights created for streak milestone."""
     now = datetime.now(UTC)
     # 8 consecutive daily sessions triggers 7-day streak highlight
     summaries = []

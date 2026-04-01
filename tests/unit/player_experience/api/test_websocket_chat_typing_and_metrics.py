@@ -17,6 +17,8 @@ from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 from src.player_experience.api.routers.chat import METRICS, reset_metrics
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def client() -> TestClient:
@@ -33,6 +35,7 @@ def _auth_token(player_id: str = "player-typing") -> str:
 
 
 def test_typing_events_emitted_when_opt_in(client: TestClient) -> None:
+    """Typing events emitted when opt in."""
     reset_metrics()
     token = _auth_token()
     with client.websocket_connect(f"/ws/chat?token={token}&typing=1") as ws:
@@ -56,6 +59,7 @@ def test_typing_events_emitted_when_opt_in(client: TestClient) -> None:
 
 
 def test_metrics_incremented(client: TestClient) -> None:
+    """Metrics incremented."""
     reset_metrics()
     token = _auth_token("player-metrics")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:

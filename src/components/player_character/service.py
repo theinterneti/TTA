@@ -22,13 +22,19 @@ try:
         WorkflowPrimitive,
     )
 except ImportError:
-    from tta_dev_primitives import (  # type: ignore[no-redef]
-        FallbackPrimitive,
-        RetryPrimitive,
-        RetryStrategy,
-        WorkflowContext,
-        WorkflowPrimitive,
-    )
+    # ttadev not available — minimal stubs for type checking
+    class FallbackPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class RetryPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class RetryStrategy:  # type: ignore[no-redef]
+        def __init__(self, **kwargs: object) -> None: ...
+    class WorkflowContext:  # type: ignore[no-redef]
+        def __init__(self, **kwargs: object) -> None: ...
+    class WorkflowPrimitive:  # type: ignore[no-redef]
+        async def execute(self, data: object, ctx: object) -> object: ...
 
 from src.ai_components.llm_factory import get_llm
 

@@ -18,6 +18,8 @@ from src.components.world_context.models import (
     WorldContext,
 )
 
+pytestmark = pytest.mark.unit
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -69,12 +71,14 @@ def _make_builder(world_context: WorldContext | None = None) -> Any:
 
 class TestMinimalWorldContext:
     def test_returns_valid_world_context(self) -> None:
+        """Minimal World Context: returns valid world context."""
         ctx = _minimal_world_context("loc-unknown")
         assert ctx.location_id == "loc-unknown"
         assert ctx.location.id == "loc-unknown"
         assert len(ctx.npcs) == 0
 
     def test_location_name_is_sensible(self) -> None:
+        """Minimal World Context: location name is sensible."""
         ctx = _minimal_world_context("xyz")
         assert ctx.location.name == "Unknown Location"
 
@@ -87,6 +91,7 @@ class TestMinimalWorldContext:
 class TestWBAAgentNoBuilder:
     @pytest.mark.asyncio
     async def test_returns_stub_when_no_builder(self) -> None:
+        """W B A Agent No Builder: returns stub when no builder."""
         agent = WBAAgent(builder=None)
         pi = _make_processed_input(location_id="loc-x")
         result = await agent.build(pi)
@@ -95,6 +100,7 @@ class TestWBAAgentNoBuilder:
 
     @pytest.mark.asyncio
     async def test_returns_stub_when_no_location_id(self) -> None:
+        """W B A Agent No Builder: returns stub when no location id."""
         agent = WBAAgent(builder=MagicMock())
         pi = _make_processed_input(location_id=None)
         result = await agent.build(pi)
@@ -109,6 +115,7 @@ class TestWBAAgentNoBuilder:
 class TestWBAAgentWithBuilder:
     @pytest.mark.asyncio
     async def test_returns_world_context_from_builder(self) -> None:
+        """W B A Agent With Builder: returns world context from builder."""
         wc = _make_world_context("loc-forest")
         builder = _make_builder(world_context=wc)
         agent = WBAAgent(builder=builder)
@@ -120,6 +127,7 @@ class TestWBAAgentWithBuilder:
 
     @pytest.mark.asyncio
     async def test_builder_called_with_correct_args(self) -> None:
+        """W B A Agent With Builder: builder called with correct args."""
         wc = _make_world_context()
         builder = _make_builder(world_context=wc)
         agent = WBAAgent(builder=builder)
@@ -145,6 +153,7 @@ class TestWBAAgentWithBuilder:
 
     @pytest.mark.asyncio
     async def test_falls_back_when_builder_raises(self) -> None:
+        """W B A Agent With Builder: falls back when builder raises."""
         builder = MagicMock()
         builder.build = AsyncMock(side_effect=Exception("Neo4j unavailable"))
         agent = WBAAgent(builder=builder)
@@ -154,6 +163,7 @@ class TestWBAAgentWithBuilder:
 
     @pytest.mark.asyncio
     async def test_player_character_forwarded(self) -> None:
+        """W B A Agent With Builder: player character forwarded."""
         wc = _make_world_context()
         builder = _make_builder(world_context=wc)
         agent = WBAAgent(builder=builder)

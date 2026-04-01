@@ -27,6 +27,8 @@ from tta_narrative.coherence.models import (
     ValidationSeverity,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestCoherenceValidator:
     """Tests for CoherenceValidator - Phase 1 (15 tests)."""

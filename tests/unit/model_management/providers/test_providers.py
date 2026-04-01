@@ -49,6 +49,8 @@ from src.components.model_management.providers.openrouter import (
     OpenRouterProvider,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # Helpers / concrete BaseProvider subclass for testing abstract methods
 # ---------------------------------------------------------------------------
@@ -102,20 +104,24 @@ class TestBaseProvider:
         return ConcreteProvider()
 
     async def test_initialize_sets_initialized_flag(self, provider):
+        """Base Provider: initialize sets initialized flag."""
         result = await provider.initialize({})
         assert result is True
         assert provider._initialized is True
 
     async def test_get_available_models_raises_if_not_initialized(self, provider):
+        """Base Provider: get available models raises if not initialized."""
         with pytest.raises(RuntimeError, match="not initialized"):
             await provider.get_available_models()
 
     async def test_get_available_models_returns_list_when_initialized(self, provider):
+        """Base Provider: get available models returns list when initialized."""
         await provider.initialize({})
         models = await provider.get_available_models()
         assert isinstance(models, list)
 
     async def test_get_available_models_applies_free_only_filter(self, provider):
+        """Base Provider: get available models applies free only filter."""
         await provider.initialize({})
         provider._available_models = [
             ModelInfo("free-m", "Free", ProviderType.OPENROUTER, is_free=True),
@@ -126,6 +132,7 @@ class TestBaseProvider:
         assert models[0].model_id == "free-m"
 
     async def test_get_available_models_applies_max_cost_filter(self, provider):
+        """Base Provider: get available models applies max cost filter."""
         await provider.initialize({})
         provider._available_models = [
             ModelInfo("cheap", "Cheap", ProviderType.OPENROUTER, cost_per_token=0.0001),
@@ -140,6 +147,7 @@ class TestBaseProvider:
         assert models[0].model_id == "cheap"
 
     async def test_get_available_models_applies_min_context_filter(self, provider):
+        """Base Provider: get available models applies min context filter."""
         await provider.initialize({})
         provider._available_models = [
             ModelInfo("large", "Large", ProviderType.OPENROUTER, context_length=32000),
@@ -152,6 +160,7 @@ class TestBaseProvider:
         assert models[0].model_id == "large"
 
     async def test_get_available_models_applies_capabilities_filter(self, provider):
+        """Base Provider: get available models applies capabilities filter."""
         await provider.initialize({})
         provider._available_models = [
             ModelInfo(
@@ -174,10 +183,12 @@ class TestBaseProvider:
         assert models[0].model_id == "cap-model"
 
     async def test_unload_model_returns_true_if_not_loaded(self, provider):
+        """Base Provider: unload model returns true if not loaded."""
         result = await provider.unload_model("nonexistent-model")
         assert result is True
 
     async def test_unload_model_removes_loaded_model(self, provider):
+        """Base Provider: unload model removes loaded model."""
         await provider.initialize({})
         instance = ConcreteModelInstance("test-model", provider)
         provider._loaded_models["test-model"] = instance
@@ -186,6 +197,7 @@ class TestBaseProvider:
         assert "test-model" not in provider._loaded_models
 
     async def test_get_provider_metrics_returns_dict(self, provider):
+        """Base Provider: get provider metrics returns dict."""
         await provider.initialize({})
         metrics = await provider.get_provider_metrics()
         assert metrics["provider_type"] == ProviderType.OPENROUTER.value
@@ -194,18 +206,22 @@ class TestBaseProvider:
         assert "available_models_count" in metrics
 
     def test_should_refresh_models_when_never_refreshed(self, provider):
+        """Base Provider: should refresh models when never refreshed."""
         provider._last_model_refresh = None
         assert provider._should_refresh_models() is True
 
     def test_should_not_refresh_models_when_recently_refreshed(self, provider):
+        """Base Provider: should not refresh models when recently refreshed."""
         provider._last_model_refresh = datetime.now()
         assert provider._should_refresh_models() is False
 
     def test_should_refresh_models_when_stale(self, provider):
+        """Base Provider: should refresh models when stale."""
         provider._last_model_refresh = datetime.now() - timedelta(hours=2)
         assert provider._should_refresh_models() is True
 
     async def test_health_check_returns_true_when_healthy(self, provider):
+        """Base Provider: health check returns true when healthy."""
         result = await provider.health_check()
         assert result is True
 
@@ -234,23 +250,28 @@ class TestBaseModelInstance:
         return ConcreteModelInstance("test-model", provider)
 
     def test_model_id_property(self, instance):
+        """Base Model Instance: model id property."""
         assert instance.model_id == "test-model"
 
     def test_initial_status_is_unknown(self, instance):
+        """Base Model Instance: initial status is unknown."""
         assert instance.status == ModelStatus.UNKNOWN
 
     async def test_health_check_sets_status_ready_on_success(self, instance):
+        """Base Model Instance: health check sets status ready on success."""
         result = await instance.health_check()
         assert result is True
         assert instance.status == ModelStatus.READY
 
     async def test_get_metrics_returns_dict_with_model_id(self, instance):
+        """Base Model Instance: get metrics returns dict with model id."""
         metrics = await instance.get_metrics()
         assert metrics["model_id"] == "test-model"
         assert "status" in metrics
         assert "provider_type" in metrics
 
     def test_update_metrics_persists_values(self, instance):
+        """Base Model Instance: update metrics persists values."""
         instance._update_metrics({"latency_ms": 100})
         assert instance._metrics["latency_ms"] == 100
 
@@ -266,9 +287,11 @@ class TestOllamaProvider:
         return OllamaProvider()
 
     def test_provider_type_is_ollama(self, provider):
+        """Ollama Provider: provider type is ollama."""
         assert provider.provider_type == ProviderType.OLLAMA
 
     async def test_validate_config_sets_defaults(self, provider):
+        """Ollama Provider: validate config sets defaults."""
         result = await provider._validate_config({})
         assert result is True
         assert provider._ollama_host == "localhost"
@@ -276,6 +299,7 @@ class TestOllamaProvider:
         assert provider._use_docker is True
 
     async def test_validate_config_uses_provided_values(self, provider):
+        """Ollama Provider: validate config uses provided values."""
         config = {
             "host": "192.168.1.10",
             "port": 11435,
@@ -290,53 +314,67 @@ class TestOllamaProvider:
         assert provider._container_name == "my-ollama"
 
     def test_estimate_context_length_llama31(self, provider):
+        """Ollama Provider: estimate context length llama31."""
         assert provider._estimate_context_length("llama3.1:8b") == 128000
 
     def test_estimate_context_length_llama32(self, provider):
+        """Ollama Provider: estimate context length llama32."""
         assert provider._estimate_context_length("llama3.2:3b") == 128000
 
     def test_estimate_context_length_old_llama(self, provider):
+        """Ollama Provider: estimate context length old llama."""
         assert provider._estimate_context_length("llama2:13b") == 4096
 
     def test_estimate_context_length_qwen(self, provider):
+        """Ollama Provider: estimate context length qwen."""
         assert provider._estimate_context_length("qwen2.5:7b") == 32768
 
     def test_estimate_context_length_mistral(self, provider):
+        """Ollama Provider: estimate context length mistral."""
         assert provider._estimate_context_length("mistral:7b") == 32768
 
     def test_estimate_context_length_phi(self, provider):
+        """Ollama Provider: estimate context length phi."""
         assert provider._estimate_context_length("phi3:mini") == 4096
 
     def test_estimate_context_length_unknown(self, provider):
+        """Ollama Provider: estimate context length unknown."""
         assert provider._estimate_context_length("unknown-model") == 4096
 
     def test_determine_capabilities_basic(self, provider):
+        """Ollama Provider: determine capabilities basic."""
         caps = provider._determine_capabilities("gemma3:4b")
         assert "text_generation" in caps
 
     def test_determine_capabilities_instruct_chat(self, provider):
+        """Ollama Provider: determine capabilities instruct chat."""
         caps = provider._determine_capabilities("llama3.1:8b-instruct")
         assert "instruction_following" in caps
         assert "chat" in caps
 
     def test_determine_capabilities_chat_model(self, provider):
+        """Ollama Provider: determine capabilities chat model."""
         caps = provider._determine_capabilities("mistral-chat:7b")
         assert "chat" in caps
 
     def test_determine_capabilities_code_model(self, provider):
+        """Ollama Provider: determine capabilities code model."""
         caps = provider._determine_capabilities("deepseek-coder:1.3b")
         assert "code_generation" in caps
 
     def test_determine_capabilities_vision_model(self, provider):
+        """Ollama Provider: determine capabilities vision model."""
         caps = provider._determine_capabilities("llava:vision-7b")
         assert "vision" in caps
 
     async def test_provider_health_check_returns_false_without_client(self, provider):
+        """Ollama Provider: provider health check returns false without client."""
         provider._client = None
         result = await provider._provider_health_check()
         assert result is False
 
     async def test_provider_health_check_returns_true_on_200(self, provider):
+        """Ollama Provider: provider health check returns true on 200."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -346,6 +384,7 @@ class TestOllamaProvider:
         assert result is True
 
     async def test_provider_health_check_returns_false_on_error(self, provider):
+        """Ollama Provider: provider health check returns false on error."""
         mock_client = AsyncMock()
         mock_client.get = AsyncMock(side_effect=httpx.ConnectError("refused"))
         provider._client = mock_client
@@ -353,6 +392,7 @@ class TestOllamaProvider:
         assert result is False
 
     async def test_refresh_available_models_parses_response(self, provider):
+        """Ollama Provider: refresh available models parses response."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -370,6 +410,7 @@ class TestOllamaProvider:
         assert "qwen2.5:7b" in ids
 
     async def test_refresh_available_models_skips_empty_names(self, provider):
+        """Ollama Provider: refresh available models skips empty names."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -384,15 +425,18 @@ class TestOllamaProvider:
         assert len(provider._available_models) == 1
 
     async def test_refresh_available_models_raises_without_client(self, provider):
+        """Ollama Provider: refresh available models raises without client."""
         with pytest.raises(RuntimeError, match="not initialized"):
             await provider._refresh_available_models()
 
     async def test_unload_model_impl_does_nothing(self, provider):
         # OllamaProvider._unload_model_impl is a no-op
+        """Ollama Provider: unload model impl does nothing."""
         instance = MagicMock()
         await provider._unload_model_impl(instance)  # Should not raise
 
     async def test_cleanup_closes_client(self, provider):
+        """Ollama Provider: cleanup closes client."""
         mock_client = AsyncMock()
         provider._client = mock_client
         await provider.cleanup()
@@ -415,6 +459,7 @@ class TestOllamaModelInstanceGenerate:
         return OllamaModelInstance("test/model", provider, mock_client)
 
     async def test_generate_returns_text_from_response(self):
+        """Ollama Model Instance Generate: generate returns text from response."""
         instance = self._make_instance(
             {
                 "response": "Hello!",
@@ -433,12 +478,14 @@ class TestOllamaModelInstanceGenerate:
         assert response.usage["total_tokens"] == 8
 
     async def test_generate_raises_on_empty_response(self):
+        """Ollama Model Instance Generate: generate raises on empty response."""
         instance = self._make_instance({"response": "", "eval_count": 0})
         request = GenerationRequest(prompt="Hi")
         with pytest.raises(ValueError, match="No response"):
             await instance.generate(request)
 
     async def test_generate_sets_error_status_on_exception(self):
+        """Ollama Model Instance Generate: generate sets error status on exception."""
         mock_client = AsyncMock()
         mock_client.post = AsyncMock(side_effect=httpx.ConnectError("refused"))
         provider = OllamaProvider()
@@ -449,6 +496,7 @@ class TestOllamaModelInstanceGenerate:
         assert instance.status == ModelStatus.ERROR
 
     async def test_generate_with_stop_sequences(self):
+        """Ollama Model Instance Generate: generate with stop sequences."""
         mock_response = MagicMock()
         mock_response.json.return_value = {"response": "ok", "eval_count": 1}
         mock_client = AsyncMock()
@@ -464,6 +512,7 @@ class TestOllamaModelInstanceGenerate:
         assert payload["options"]["stop"] == ["STOP", "END"]
 
     async def test_generate_metadata_has_provider_key(self):
+        """Ollama Model Instance Generate: generate metadata has provider key."""
         instance = self._make_instance({"response": "answer", "eval_count": 2})
         request = GenerationRequest(prompt="test")
         response = await instance.generate(request)
@@ -481,14 +530,17 @@ class TestLMStudioProvider:
         return LMStudioProvider()
 
     def test_provider_type_is_lm_studio(self, provider):
+        """L M Studio Provider: provider type is lm studio."""
         assert provider.provider_type == ProviderType.LM_STUDIO
 
     async def test_validate_config_uses_default_url(self, provider):
+        """L M Studio Provider: validate config uses default url."""
         result = await provider._validate_config({})
         assert result is True
         assert provider._base_url == "http://localhost:1234"
 
     async def test_validate_config_uses_provided_url(self, provider):
+        """L M Studio Provider: validate config uses provided url."""
         result = await provider._validate_config(
             {"base_url": "http://192.168.1.5:1234"}
         )
@@ -496,35 +548,45 @@ class TestLMStudioProvider:
         assert provider._base_url == "http://192.168.1.5:1234"
 
     def test_estimate_context_length_llama31(self, provider):
+        """L M Studio Provider: estimate context length llama31."""
         assert provider._estimate_context_length("llama-3.1-8b-instruct") == 128000
 
     def test_estimate_context_length_llama32(self, provider):
+        """L M Studio Provider: estimate context length llama32."""
         assert provider._estimate_context_length("llama-3.2-3b") == 128000
 
     def test_estimate_context_length_old_llama(self, provider):
+        """L M Studio Provider: estimate context length old llama."""
         assert provider._estimate_context_length("llama-2-13b") == 4096
 
     def test_estimate_context_length_qwen(self, provider):
+        """L M Studio Provider: estimate context length qwen."""
         assert provider._estimate_context_length("qwen-2.5-7b") == 32768
 
     def test_estimate_context_length_mistral(self, provider):
+        """L M Studio Provider: estimate context length mistral."""
         assert provider._estimate_context_length("mistral-7b") == 32768
 
     def test_estimate_context_length_phi(self, provider):
+        """L M Studio Provider: estimate context length phi."""
         assert provider._estimate_context_length("phi-3-mini") == 4096
 
     def test_estimate_context_length_gemma(self, provider):
+        """L M Studio Provider: estimate context length gemma."""
         assert provider._estimate_context_length("gemma-2-9b") == 8192
 
     def test_estimate_context_length_default(self, provider):
+        """L M Studio Provider: estimate context length default."""
         assert provider._estimate_context_length("unknown-model-5b") == 4096
 
     async def test_provider_health_check_returns_false_without_client(self, provider):
+        """L M Studio Provider: provider health check returns false without client."""
         provider._client = None
         result = await provider._provider_health_check()
         assert result is False
 
     async def test_provider_health_check_returns_true_on_200(self, provider):
+        """L M Studio Provider: provider health check returns true on 200."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -534,6 +596,7 @@ class TestLMStudioProvider:
         assert result is True
 
     async def test_provider_health_check_returns_false_on_exception(self, provider):
+        """L M Studio Provider: provider health check returns false on exception."""
         mock_client = AsyncMock()
         mock_client.get = AsyncMock(side_effect=httpx.ConnectError("refused"))
         provider._client = mock_client
@@ -541,6 +604,7 @@ class TestLMStudioProvider:
         assert result is False
 
     async def test_refresh_available_models_parses_response(self, provider):
+        """L M Studio Provider: refresh available models parses response."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -556,6 +620,7 @@ class TestLMStudioProvider:
         assert all(m.is_free for m in provider._available_models)
 
     async def test_refresh_available_models_skips_empty_ids(self, provider):
+        """L M Studio Provider: refresh available models skips empty ids."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -570,12 +635,14 @@ class TestLMStudioProvider:
         assert len(provider._available_models) == 1
 
     async def test_load_model_impl_raises_if_model_not_available(self, provider):
+        """L M Studio Provider: load model impl raises if model not available."""
         provider._available_models = []
         provider._client = AsyncMock()
         with pytest.raises(ValueError, match="not available"):
             await provider._load_model_impl("nonexistent-model", {})
 
     async def test_load_model_impl_returns_instance_when_available(self, provider):
+        """L M Studio Provider: load model impl returns instance when available."""
         provider._available_models = [
             ModelInfo("available/model", "Avail", ProviderType.LM_STUDIO)
         ]
@@ -584,6 +651,7 @@ class TestLMStudioProvider:
         assert instance.model_id == "available/model"
 
     async def test_cleanup_closes_client(self, provider):
+        """L M Studio Provider: cleanup closes client."""
         mock_client = AsyncMock()
         provider._client = mock_client
         await provider.cleanup()
@@ -606,6 +674,7 @@ class TestLMStudioModelInstanceGenerate:
         return LMStudioModelInstance("lms-model", provider, mock_client)
 
     async def test_generate_returns_text(self):
+        """L M Studio Model Instance Generate: generate returns text."""
         instance = self._make_instance(
             {
                 "choices": [{"message": {"content": "LMS response"}}],
@@ -623,18 +692,21 @@ class TestLMStudioModelInstanceGenerate:
         assert resp.metadata["provider"] == "lm_studio"
 
     async def test_generate_raises_on_empty_choices(self):
+        """L M Studio Model Instance Generate: generate raises on empty choices."""
         instance = self._make_instance({"choices": []})
         req = GenerationRequest(prompt="Hello")
         with pytest.raises(ValueError, match="No choices"):
             await instance.generate(req)
 
     async def test_generate_raises_on_missing_choices_key(self):
+        """L M Studio Model Instance Generate: generate raises on missing choices key."""
         instance = self._make_instance({})
         req = GenerationRequest(prompt="Hello")
         with pytest.raises((ValueError, KeyError)):
             await instance.generate(req)
 
     async def test_generate_sets_error_status_on_exception(self):
+        """L M Studio Model Instance Generate: generate sets error status on exception."""
         mock_client = AsyncMock()
         mock_client.post = AsyncMock(side_effect=httpx.ConnectError("refused"))
         provider = LMStudioProvider()
@@ -644,6 +716,7 @@ class TestLMStudioModelInstanceGenerate:
         assert instance.status == ModelStatus.ERROR
 
     async def test_generate_with_stop_sequences(self):
+        """L M Studio Model Instance Generate: generate with stop sequences."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "choices": [{"message": {"content": "ok"}}],
@@ -671,44 +744,53 @@ class TestOpenRouterProvider:
         return OpenRouterProvider()
 
     def test_provider_type_is_openrouter(self, provider):
+        """Open Router Provider: provider type is openrouter."""
         assert provider.provider_type == ProviderType.OPENROUTER
 
     async def test_validate_config_requires_api_key(self, provider):
+        """Open Router Provider: validate config requires api key."""
         result = await provider._validate_config({})
         assert result is False
 
     async def test_validate_config_sets_api_key(self, provider):
+        """Open Router Provider: validate config sets api key."""
         result = await provider._validate_config({"api_key": "sk-test-123"})
         assert result is True
         assert provider._api_key == "sk-test-123"
 
     async def test_validate_config_sets_base_url(self, provider):
+        """Open Router Provider: validate config sets base url."""
         await provider._validate_config(
             {"api_key": "sk-123", "base_url": "https://custom.openrouter.ai"}
         )
         assert provider._base_url == "https://custom.openrouter.ai"
 
     def test_get_bool_config_from_bool_value(self, provider):
+        """Open Router Provider: get bool config from bool value."""
         provider._config = {"show_free_only": True}
         result = provider._get_bool_config("show_free_only", "NOPE_ENV", False)
         assert result is True
 
     def test_get_bool_config_from_string_true(self, provider):
+        """Open Router Provider: get bool config from string true."""
         provider._config = {"show_free_only": "yes"}
         result = provider._get_bool_config("show_free_only", "NOPE_ENV", False)
         assert result is True
 
     def test_get_bool_config_from_string_false(self, provider):
+        """Open Router Provider: get bool config from string false."""
         provider._config = {"show_free_only": "false"}
         result = provider._get_bool_config("show_free_only", "NOPE_ENV", True)
         assert result is False
 
     def test_get_bool_config_falls_back_to_default(self, provider):
+        """Open Router Provider: get bool config falls back to default."""
         provider._config = {}
         result = provider._get_bool_config("missing_key", "NOPE_ENV_99999", True)
         assert result is True
 
     def test_get_bool_config_reads_env_var(self, provider, monkeypatch):
+        """Open Router Provider: get bool config reads env var."""
         provider._config = {}
         monkeypatch.setenv("OPENROUTER_SHOW_FREE_ONLY", "1")
         result = provider._get_bool_config(
@@ -717,16 +799,19 @@ class TestOpenRouterProvider:
         assert result is True
 
     def test_get_float_config_from_config(self, provider):
+        """Open Router Provider: get float config from config."""
         provider._config = {"max_cost_per_token": 0.005}
         result = provider._get_float_config("max_cost_per_token", "NOPE", 0.001)
         assert result == 0.005
 
     def test_get_float_config_falls_back_to_default(self, provider):
+        """Open Router Provider: get float config falls back to default."""
         provider._config = {}
         result = provider._get_float_config("missing", "NOPE_ENV_99999", 0.999)
         assert result == 0.999
 
     def test_get_float_config_from_env_var(self, provider, monkeypatch):
+        """Open Router Provider: get float config from env var."""
         provider._config = {}
         monkeypatch.setenv("OPENROUTER_MAX_COST_PER_TOKEN", "0.0025")
         result = provider._get_float_config(
@@ -735,6 +820,7 @@ class TestOpenRouterProvider:
         assert result == 0.0025
 
     async def test_set_free_models_filter_updates_settings(self, provider):
+        """Open Router Provider: set free models filter updates settings."""
         await provider.set_free_models_filter(
             show_free_only=True, prefer_free=False, max_cost_per_token=0.002
         )
@@ -743,17 +829,20 @@ class TestOpenRouterProvider:
         assert provider._max_cost_per_token == 0.002
 
     async def test_get_filter_settings_returns_dict(self, provider):
+        """Open Router Provider: get filter settings returns dict."""
         settings = await provider.get_filter_settings()
         assert "show_free_only" in settings
         assert "prefer_free_models" in settings
         assert "max_cost_per_token" in settings
 
     async def test_provider_health_check_returns_false_without_client(self, provider):
+        """Open Router Provider: provider health check returns false without client."""
         provider._client = None
         result = await provider._provider_health_check()
         assert result is False
 
     async def test_provider_health_check_returns_true_on_200(self, provider):
+        """Open Router Provider: provider health check returns true on 200."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -800,6 +889,7 @@ class TestOpenRouterProvider:
         assert models[0].is_free is True
 
     async def test_get_free_models_filters_correctly(self, provider):
+        """Open Router Provider: get free models filters correctly."""
         await provider._validate_config({"api_key": "sk-test"})
         provider._initialized = True
         provider._available_models = [
@@ -811,6 +901,7 @@ class TestOpenRouterProvider:
         assert all(m.is_free for m in models)
 
     async def test_get_affordable_models_includes_free_and_cheap(self, provider):
+        """Open Router Provider: get affordable models includes free and cheap."""
         await provider._validate_config({"api_key": "sk-test"})
         provider._initialized = True
         provider._available_models = [
@@ -830,6 +921,7 @@ class TestOpenRouterProvider:
         assert "expensive/m" not in ids
 
     async def test_estimate_cost_returns_none_for_unknown_model(self, provider):
+        """Open Router Provider: estimate cost returns none for unknown model."""
         await provider._validate_config({"api_key": "sk-test"})
         provider._initialized = True
         provider._available_models = []
@@ -838,6 +930,7 @@ class TestOpenRouterProvider:
         assert cost is None
 
     async def test_estimate_cost_returns_value_for_known_model(self, provider):
+        """Open Router Provider: estimate cost returns value for known model."""
         await provider._validate_config({"api_key": "sk-test"})
         provider._initialized = True
         provider._available_models = [
@@ -853,12 +946,14 @@ class TestOpenRouterProvider:
         assert cost == pytest.approx(1.0)
 
     async def test_load_model_impl_raises_if_not_available(self, provider):
+        """Open Router Provider: load model impl raises if not available."""
         provider._client = AsyncMock()
         provider._available_models = []
         with pytest.raises(ValueError, match="not available"):
             await provider._load_model_impl("nonexistent", {})
 
     async def test_cleanup_closes_client(self, provider):
+        """Open Router Provider: cleanup closes client."""
         mock_client = AsyncMock()
         provider._client = mock_client
         await provider.cleanup()
@@ -866,6 +961,7 @@ class TestOpenRouterProvider:
         assert provider._client is None
 
     async def test_refresh_available_models_parses_pricing(self, provider):
+        """Open Router Provider: refresh available models parses pricing."""
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -916,6 +1012,7 @@ class TestOpenRouterModelInstanceGenerate:
         return OpenRouterModelInstance("or/model", provider, mock_client)
 
     async def test_generate_returns_text(self):
+        """Open Router Model Instance Generate: generate returns text."""
         instance = self._make_instance(
             {
                 "choices": [{"message": {"content": "OR response"}}],
@@ -928,11 +1025,13 @@ class TestOpenRouterModelInstanceGenerate:
         assert resp.metadata["provider"] == "openrouter"
 
     async def test_generate_raises_on_empty_choices(self):
+        """Open Router Model Instance Generate: generate raises on empty choices."""
         instance = self._make_instance({"choices": []})
         with pytest.raises(ValueError, match="No choices"):
             await instance.generate(GenerationRequest(prompt="Hi"))
 
     async def test_generate_sets_error_status_on_exception(self):
+        """Open Router Model Instance Generate: generate sets error status on exception."""
         mock_client = AsyncMock()
         mock_client.post = AsyncMock(side_effect=httpx.TimeoutException("timeout"))
         provider = OpenRouterProvider()
@@ -953,13 +1052,16 @@ class TestCustomAPIProvider:
         return CustomAPIProvider()
 
     def test_provider_type_is_custom_api(self, provider):
+        """Custom A P I Provider: provider type is custom api."""
         assert provider.provider_type == ProviderType.CUSTOM_API
 
     async def test_validate_config_fails_if_no_providers(self, provider):
+        """Custom A P I Provider: validate config fails if no providers."""
         result = await provider._validate_config({})
         assert result is False
 
     async def test_validate_config_fails_if_missing_api_key(self, provider):
+        """Custom A P I Provider: validate config fails if missing api key."""
         config = {
             "custom_providers": {"my-api": {"base_url": "https://api.example.com"}}
         }
@@ -967,11 +1069,13 @@ class TestCustomAPIProvider:
         assert result is False
 
     async def test_validate_config_fails_if_missing_base_url(self, provider):
+        """Custom A P I Provider: validate config fails if missing base url."""
         config = {"custom_providers": {"my-api": {"api_key": "sk-123"}}}
         result = await provider._validate_config(config)
         assert result is False
 
     async def test_validate_config_succeeds_with_valid_provider(self, provider):
+        """Custom A P I Provider: validate config succeeds with valid provider."""
         config = {
             "custom_providers": {
                 "my-api": {
@@ -985,53 +1089,65 @@ class TestCustomAPIProvider:
         assert "my-api" in provider._api_configs
 
     def test_get_model_pricing_returns_defaults(self, provider):
+        """Custom A P I Provider: get model pricing returns defaults."""
         cost, is_free = provider._get_model_pricing("openai", "gpt-4o-mini")
         assert cost == 0.000001
         assert is_free is False
 
     def test_get_model_capabilities_base(self, provider):
+        """Custom A P I Provider: get model capabilities base."""
         caps = provider._get_model_capabilities("any", "regular-model")
         assert "text_generation" in caps
         assert "chat" in caps
 
     def test_get_model_capabilities_instruct(self, provider):
+        """Custom A P I Provider: get model capabilities instruct."""
         caps = provider._get_model_capabilities("any", "instruct-model")
         assert "instruction_following" in caps
 
     def test_get_model_capabilities_code(self, provider):
+        """Custom A P I Provider: get model capabilities code."""
         caps = provider._get_model_capabilities("any", "code-model")
         assert "code_generation" in caps
 
     def test_get_model_capabilities_claude(self, provider):
+        """Custom A P I Provider: get model capabilities claude."""
         caps = provider._get_model_capabilities("any", "claude-3-haiku")
         assert "analysis" in caps
         assert "creative_writing" in caps
 
     def test_get_model_context_length_gpt4(self, provider):
+        """Custom A P I Provider: get model context length gpt4."""
         assert provider._get_model_context_length("any", "gpt-4o-mini") == 128000
 
     def test_get_model_context_length_claude(self, provider):
+        """Custom A P I Provider: get model context length claude."""
         assert (
             provider._get_model_context_length("any", "claude-3-haiku-20240307")
             == 200000
         )
 
     def test_get_model_context_length_default(self, provider):
+        """Custom A P I Provider: get model context length default."""
         assert provider._get_model_context_length("any", "unknown-model") == 4096
 
     def test_get_therapeutic_safety_score_claude(self, provider):
+        """Custom A P I Provider: get therapeutic safety score claude."""
         score = provider._get_therapeutic_safety_score("any", "claude-3-haiku")
         assert score == 9.0
 
     def test_get_therapeutic_safety_score_gpt4(self, provider):
+        """Custom A P I Provider: get therapeutic safety score gpt4."""
         score = provider._get_therapeutic_safety_score("any", "gpt-4o")
         assert score == 8.0
 
     def test_get_therapeutic_safety_score_default(self, provider):
+        """Custom A P I Provider: get therapeutic safety score default."""
         score = provider._get_therapeutic_safety_score("any", "random-model")
         assert score == 7.0
 
     def test_get_predefined_models_anthropic(self, provider):
+        """Custom A P I Provider: get predefined models anthropic."""
         config = {"api_type": "anthropic"}
         models = provider._get_predefined_models("anthropic", config)
         assert len(models) >= 2
@@ -1039,6 +1155,7 @@ class TestCustomAPIProvider:
         assert any("claude" in mid for mid in model_ids)
 
     def test_get_predefined_models_openai(self, provider):
+        """Custom A P I Provider: get predefined models openai."""
         config = {"api_type": "openai"}
         models = provider._get_predefined_models("openai", config)
         assert len(models) >= 1
@@ -1046,10 +1163,12 @@ class TestCustomAPIProvider:
         assert any("gpt" in mid for mid in model_ids)
 
     async def test_provider_health_check_no_clients(self, provider):
+        """Custom A P I Provider: provider health check no clients."""
         result = await provider._provider_health_check()
         assert result is False
 
     async def test_cleanup_closes_all_clients(self, provider):
+        """Custom A P I Provider: cleanup closes all clients."""
         mock_client1 = AsyncMock()
         mock_client2 = AsyncMock()
         provider._clients = {"api1": mock_client1, "api2": mock_client2}
@@ -1059,10 +1178,12 @@ class TestCustomAPIProvider:
         assert len(provider._clients) == 0
 
     async def test_load_model_impl_raises_if_no_providers(self, provider):
+        """Custom A P I Provider: load model impl raises if no providers."""
         with pytest.raises(ValueError, match="No provider"):
             await provider._load_model_impl("some-model", {})
 
     async def test_unload_model_impl_does_nothing(self, provider):
+        """Custom A P I Provider: unload model impl does nothing."""
         instance = MagicMock()
         await provider._unload_model_impl(instance)  # Should not raise
 
@@ -1089,6 +1210,7 @@ class TestCustomAPIModelInstance:
         )
 
     async def test_generate_openai_format(self):
+        """Custom A P I Model Instance: generate openai format."""
         instance = self._make_instance(
             {
                 "choices": [{"message": {"content": "OpenAI response"}}],
@@ -1100,6 +1222,7 @@ class TestCustomAPIModelInstance:
         assert resp.metadata["api_type"] == "openai"
 
     async def test_generate_anthropic_format(self):
+        """Custom A P I Model Instance: generate anthropic format."""
         instance = self._make_instance(
             {
                 "content": [{"text": "Anthropic response"}],
@@ -1112,6 +1235,7 @@ class TestCustomAPIModelInstance:
         assert resp.metadata["api_type"] == "anthropic"
 
     async def test_generate_sets_error_status_on_exception(self):
+        """Custom A P I Model Instance: generate sets error status on exception."""
         mock_client = AsyncMock()
         mock_client.post = AsyncMock(side_effect=httpx.ConnectError("refused"))
         provider = CustomAPIProvider()
@@ -1123,6 +1247,7 @@ class TestCustomAPIModelInstance:
         assert instance.status == ModelStatus.ERROR
 
     async def test_prepare_openai_request(self):
+        """Custom A P I Model Instance: prepare openai request."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance(
@@ -1143,6 +1268,7 @@ class TestCustomAPIModelInstance:
         assert payload["stream"] is False
 
     async def test_prepare_anthropic_request(self):
+        """Custom A P I Model Instance: prepare anthropic request."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance(
@@ -1160,6 +1286,7 @@ class TestCustomAPIModelInstance:
         assert payload["stop_sequences"] == ["END"]
 
     def test_extract_openai_response(self):
+        """Custom A P I Model Instance: extract openai response."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
@@ -1167,6 +1294,7 @@ class TestCustomAPIModelInstance:
         assert instance._extract_openai_response(data) == "hello"
 
     def test_extract_openai_response_raises_on_no_choices(self):
+        """Custom A P I Model Instance: extract openai response raises on no choices."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
@@ -1174,6 +1302,7 @@ class TestCustomAPIModelInstance:
             instance._extract_openai_response({"choices": []})
 
     def test_extract_anthropic_response_list_content(self):
+        """Custom A P I Model Instance: extract anthropic response list content."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
@@ -1181,6 +1310,7 @@ class TestCustomAPIModelInstance:
         assert instance._extract_anthropic_response(data) == "anthropic reply"
 
     def test_extract_anthropic_response_raises_on_empty_content(self):
+        """Custom A P I Model Instance: extract anthropic response raises on empty content."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})
@@ -1188,6 +1318,7 @@ class TestCustomAPIModelInstance:
             instance._extract_anthropic_response({"content": []})
 
     def test_extract_anthropic_usage(self):
+        """Custom A P I Model Instance: extract anthropic usage."""
         mock_client = AsyncMock()
         provider = CustomAPIProvider()
         instance = CustomAPIModelInstance("custom/model", provider, mock_client, {})

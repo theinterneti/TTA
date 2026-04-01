@@ -17,6 +17,8 @@ import pytest
 
 from src.orchestration.config import TTAConfig
 
+pytestmark = pytest.mark.unit
+
 
 class TestTTAConfig(unittest.TestCase):
     """Test the TTA Configuration."""

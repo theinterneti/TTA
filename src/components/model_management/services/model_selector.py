@@ -18,11 +18,14 @@ try:
         WorkflowPrimitive,
     )
 except ImportError:
-    from tta_dev_primitives import (  # type: ignore[no-redef]
-        TimeoutPrimitive,
-        WorkflowContext,
-        WorkflowPrimitive,
-    )
+    # ttadev not available — minimal stubs for type checking
+    class TimeoutPrimitive:  # type: ignore[no-redef]
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+        async def execute(self, data: object, ctx: object) -> object: ...
+    class WorkflowContext:  # type: ignore[no-redef]
+        def __init__(self, **kwargs: object) -> None: ...
+    class WorkflowPrimitive:  # type: ignore[no-redef]
+        async def execute(self, data: object, ctx: object) -> object: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

@@ -79,6 +79,7 @@ def _mock_connection(fetchone_return: dict | None = None, rowcount: int = 1):
 
 class TestDoltGameplayManagerInit:
     async def test_initialize_returns_true_when_dolt_up(self):
+        """Dolt Gameplay Manager Init: initialize returns true when dolt up."""
         mgr = DoltGameplayManager()
         with patch.object(mgr, "_ensure_tables") as mock_ensure:
             mock_ensure.return_value = None
@@ -87,6 +88,7 @@ class TestDoltGameplayManagerInit:
         assert mgr._available is True
 
     async def test_initialize_returns_false_when_dolt_down(self):
+        """Dolt Gameplay Manager Init: initialize returns false when dolt down."""
         mgr = DoltGameplayManager()
         with patch.object(
             mgr,
@@ -98,6 +100,7 @@ class TestDoltGameplayManagerInit:
         assert mgr._available is False
 
     async def test_close_is_noop(self):
+        """Dolt Gameplay Manager Init: close is noop."""
         mgr = DoltGameplayManager()
         # Should not raise
         await mgr.close()
@@ -110,12 +113,14 @@ class TestDoltGameplayManagerInit:
 
 class TestCreateSession:
     async def test_returns_false_when_unavailable(self):
+        """Create Session: returns false when unavailable."""
         mgr = DoltGameplayManager()
         # _available is False by default
         result = await mgr.create_session(_make_session())
         assert result is False
 
     async def test_returns_true_on_success(self):
+        """Create Session: returns true on success."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection()
@@ -124,6 +129,7 @@ class TestCreateSession:
         assert result is True
 
     async def test_returns_false_on_db_error(self):
+        """Create Session: returns false on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
@@ -138,11 +144,13 @@ class TestCreateSession:
 
 class TestGetSession:
     async def test_returns_none_when_unavailable(self):
+        """Get Session: returns none when unavailable."""
         mgr = DoltGameplayManager()
         result = await mgr.get_session("session-1")
         assert result is None
 
     async def test_returns_none_when_not_found(self):
+        """Get Session: returns none when not found."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection(fetchone_return=None)
@@ -151,6 +159,7 @@ class TestGetSession:
         assert result is None
 
     async def test_returns_session_state_when_found(self):
+        """Get Session: returns session state when found."""
         mgr = DoltGameplayManager()
         mgr._available = True
         session = _make_session()
@@ -162,6 +171,7 @@ class TestGetSession:
         assert result.session_id == session.session_id
 
     async def test_returns_none_on_db_error(self):
+        """Get Session: returns none on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
@@ -169,6 +179,7 @@ class TestGetSession:
         assert result is None
 
     async def test_returns_none_on_invalid_json(self):
+        """Get Session: returns none on invalid json."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection(fetchone_return={"state_json": "{not valid json}"})
@@ -184,11 +195,13 @@ class TestGetSession:
 
 class TestUpdateSession:
     async def test_returns_false_when_unavailable(self):
+        """Update Session: returns false when unavailable."""
         mgr = DoltGameplayManager()
         result = await mgr.update_session(_make_session())
         assert result is False
 
     async def test_returns_true_when_row_updated(self):
+        """Update Session: returns true when row updated."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection(rowcount=1)
@@ -197,6 +210,7 @@ class TestUpdateSession:
         assert result is True
 
     async def test_returns_false_when_row_not_found(self):
+        """Update Session: returns false when row not found."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection(rowcount=0)
@@ -205,6 +219,7 @@ class TestUpdateSession:
         assert result is False
 
     async def test_returns_false_on_db_error(self):
+        """Update Session: returns false on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
@@ -219,11 +234,13 @@ class TestUpdateSession:
 
 class TestCreateScene:
     async def test_returns_false_when_unavailable(self):
+        """Create Scene: returns false when unavailable."""
         mgr = DoltGameplayManager()
         result = await mgr.create_scene(_make_scene())
         assert result is False
 
     async def test_returns_true_on_success(self):
+        """Create Scene: returns true on success."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection()
@@ -232,6 +249,7 @@ class TestCreateScene:
         assert result is True
 
     async def test_returns_false_on_db_error(self):
+        """Create Scene: returns false on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
@@ -246,11 +264,13 @@ class TestCreateScene:
 
 class TestGetScene:
     async def test_returns_none_when_unavailable(self):
+        """Get Scene: returns none when unavailable."""
         mgr = DoltGameplayManager()
         result = await mgr.get_scene("scene-1")
         assert result is None
 
     async def test_returns_none_when_not_found(self):
+        """Get Scene: returns none when not found."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection(fetchone_return=None)
@@ -259,6 +279,7 @@ class TestGetScene:
         assert result is None
 
     async def test_returns_scene_when_found(self):
+        """Get Scene: returns scene when found."""
         mgr = DoltGameplayManager()
         mgr._available = True
         scene = _make_scene()
@@ -269,6 +290,7 @@ class TestGetScene:
         assert result.scene_id == scene.scene_id
 
     async def test_returns_none_on_db_error(self):
+        """Get Scene: returns none on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
@@ -283,11 +305,13 @@ class TestGetScene:
 
 class TestSaveSessionSummary:
     async def test_returns_false_when_unavailable(self):
+        """Save Session Summary: returns false when unavailable."""
         mgr = DoltGameplayManager()
         result = await mgr.save_session_summary("session-1", {"key": "value"})
         assert result is False
 
     async def test_returns_true_on_success(self):
+        """Save Session Summary: returns true on success."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection()
@@ -298,6 +322,7 @@ class TestSaveSessionSummary:
         assert result is True
 
     async def test_returns_false_on_db_error(self):
+        """Save Session Summary: returns false on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):
@@ -305,6 +330,7 @@ class TestSaveSessionSummary:
         assert result is False
 
     async def test_accepts_empty_summary(self):
+        """Save Session Summary: accepts empty summary."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection()
@@ -356,11 +382,13 @@ def _mock_connection_fetchall(rows: list[dict]) -> MagicMock:
 
 class TestGetSessionsForUser:
     async def test_returns_empty_when_unavailable(self):
+        """Get Sessions For User: returns empty when unavailable."""
         mgr = DoltGameplayManager()
         result = await mgr.get_sessions_for_user("user-1")
         assert result == []
 
     async def test_returns_empty_when_no_sessions(self):
+        """Get Sessions For User: returns empty when no sessions."""
         mgr = DoltGameplayManager()
         mgr._available = True
         conn = _mock_connection_fetchall([])
@@ -369,6 +397,7 @@ class TestGetSessionsForUser:
         assert result == []
 
     async def test_returns_session_states_for_user(self):
+        """Get Sessions For User: returns session states for user."""
         mgr = DoltGameplayManager()
         mgr._available = True
         ss1 = SessionState(user_id="user-1")
@@ -385,6 +414,7 @@ class TestGetSessionsForUser:
         assert all(s.user_id == "user-1" for s in result)
 
     async def test_skips_corrupt_json_rows(self):
+        """Get Sessions For User: skips corrupt json rows."""
         mgr = DoltGameplayManager()
         mgr._available = True
         ss = SessionState(user_id="user-1")
@@ -399,6 +429,7 @@ class TestGetSessionsForUser:
         assert result[0].session_id == ss.session_id
 
     async def test_returns_empty_on_db_error(self):
+        """Get Sessions For User: returns empty on db error."""
         mgr = DoltGameplayManager()
         mgr._available = True
         with patch.object(mgr, "_connect", side_effect=RuntimeError("db error")):

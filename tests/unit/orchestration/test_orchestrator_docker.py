@@ -14,6 +14,8 @@ import pytest
 
 from src.orchestration.orchestrator import TTAOrchestrator
 
+pytestmark = pytest.mark.unit
+
 
 class TestDockerCommands:
     """Test suite for Docker command methods."""

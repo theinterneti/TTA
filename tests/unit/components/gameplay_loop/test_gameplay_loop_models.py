@@ -74,12 +74,14 @@ class TestEnums:
     """Test all StrEnum types."""
 
     def test_difficulty_level_values(self):
+        """Enums: difficulty level values."""
         assert DifficultyLevel.GENTLE == "gentle"
         assert DifficultyLevel.STANDARD == "standard"
         assert DifficultyLevel.CHALLENGING == "challenging"
         assert DifficultyLevel.INTENSIVE == "intensive"
 
     def test_emotional_state_values(self):
+        """Enums: emotional state values."""
         assert EmotionalState.CALM == "calm"
         assert EmotionalState.ENGAGED == "engaged"
         assert EmotionalState.ANXIOUS == "anxious"
@@ -88,6 +90,7 @@ class TestEnums:
         assert EmotionalState.CRISIS == "crisis"
 
     def test_scene_type_values(self):
+        """Enums: scene type values."""
         assert SceneType.INTRODUCTION == "introduction"
         assert SceneType.EXPLORATION == "exploration"
         assert SceneType.CHALLENGE == "challenge"
@@ -96,6 +99,7 @@ class TestEnums:
         assert SceneType.RESOLUTION == "resolution"
 
     def test_choice_type_values(self):
+        """Enums: choice type values."""
         assert ChoiceType.NARRATIVE == "narrative"
         assert ChoiceType.THERAPEUTIC == "therapeutic"
         assert ChoiceType.SKILL_BUILDING == "skill_building"
@@ -103,32 +107,39 @@ class TestEnums:
         assert ChoiceType.SOCIAL_INTERACTION == "social_interaction"
 
     def test_intervention_type_values(self):
+        """Enums: intervention type values."""
         assert InterventionType.MINDFULNESS == "mindfulness"
         assert InterventionType.CRISIS_SUPPORT == "crisis_support"
 
     def test_outcome_type_values(self):
+        """Enums: outcome type values."""
         assert OutcomeType.SUCCESS == "success"
         assert OutcomeType.FAILURE == "failure"
         assert OutcomeType.NEUTRAL == "neutral"
 
     def test_event_type_values(self):
+        """Enums: event type values."""
         assert EventType.SCENE_TRANSITION == "scene_transition"
         assert EventType.ACHIEVEMENT == "achievement"
 
     def test_progress_type_values(self):
+        """Enums: progress type values."""
         assert ProgressType.SKILL_ACQUIRED == "skill_acquired"
         assert ProgressType.THERAPEUTIC_BREAKTHROUGH == "therapeutic_breakthrough"
         assert ProgressType.RESILIENCE_BUILDING == "resilience_building"
 
     def test_skill_category_values(self):
+        """Enums: skill category values."""
         assert SkillCategory.EMOTIONAL_REGULATION == "emotional_regulation"
         assert SkillCategory.MINDFULNESS == "mindfulness"
 
     def test_character_attribute_values(self):
+        """Enums: character attribute values."""
         assert CharacterAttribute.CONFIDENCE == "confidence"
         assert CharacterAttribute.RESILIENCE == "resilience"
 
     def test_validation_status_values(self):
+        """Enums: validation status values."""
         assert ValidationStatus.PASSED == "passed"
         assert ValidationStatus.FAILED == "failed"
         assert ValidationStatus.WARNING == "warning"
@@ -136,12 +147,14 @@ class TestEnums:
         assert ValidationStatus.SKIPPED == "skipped"
 
     def test_safety_level_values(self):
+        """Enums: safety level values."""
         assert SafetyLevel.SAFE == "safe"
         assert SafetyLevel.CAUTION == "caution"
         assert SafetyLevel.DANGER == "danger"
         assert SafetyLevel.CRISIS == "crisis"
 
     def test_validation_type_values(self):
+        """Enums: validation type values."""
         assert ValidationType.CONTENT_SAFETY == "content_safety"
         assert ValidationType.CHOICE_VALIDITY == "choice_validity"
 
@@ -153,6 +166,7 @@ class TestEnums:
 
 class TestTherapeuticContext:
     def test_default_instantiation(self):
+        """Therapeutic Context: default instantiation."""
         ctx = TherapeuticContext()
         assert ctx.primary_goals == []
         assert ctx.secondary_goals == []
@@ -165,6 +179,7 @@ class TestTherapeuticContext:
         assert ctx.progress_markers == []
 
     def test_with_values(self):
+        """Therapeutic Context: with values."""
         ctx = TherapeuticContext(
             primary_goals=["anxiety_management"],
             secondary_goals=["resilience"],
@@ -181,6 +196,7 @@ class TestTherapeuticContext:
         assert ctx.completed_objectives == ["obj2"]
 
     def test_lists_are_independent(self):
+        """Therapeutic Context: lists are independent."""
         ctx1 = TherapeuticContext()
         ctx2 = TherapeuticContext()
         ctx1.primary_goals.append("goal")
@@ -194,6 +210,7 @@ class TestTherapeuticContext:
 
 class TestGameplayMetrics:
     def test_default_instantiation(self):
+        """Gameplay Metrics: default instantiation."""
         m = GameplayMetrics()
         assert m.total_choices_made == 0
         assert m.therapeutic_choices_made == 0
@@ -208,6 +225,7 @@ class TestGameplayMetrics:
         assert m.emotional_state_changes == []
 
     def test_with_values(self):
+        """Gameplay Metrics: with values."""
         m = GameplayMetrics(
             total_choices_made=5,
             therapeutic_choices_made=3,
@@ -225,6 +243,7 @@ class TestGameplayMetrics:
 
 class TestScene:
     def test_required_fields(self):
+        """Scene: required fields."""
         scene = Scene(
             title="Test Scene",
             description="A description",
@@ -235,6 +254,7 @@ class TestScene:
         assert scene.narrative_content == "The narrative"
 
     def test_default_values(self):
+        """Scene: default values."""
         scene = Scene(title="T", description="D", narrative_content="N")
         assert scene.scene_type == SceneType.EXPLORATION
         assert scene.difficulty_level == DifficultyLevel.STANDARD
@@ -249,11 +269,13 @@ class TestScene:
         assert scene.player_choices_made == []
 
     def test_scene_id_is_generated(self):
+        """Scene: scene id is generated."""
         s1 = Scene(title="T", description="D", narrative_content="N")
         s2 = Scene(title="T", description="D", narrative_content="N")
         assert s1.scene_id != s2.scene_id
 
     def test_custom_scene_type(self):
+        """Scene: custom scene type."""
         scene = Scene(
             title="T",
             description="D",
@@ -263,6 +285,7 @@ class TestScene:
         assert scene.scene_type == SceneType.THERAPEUTIC
 
     def test_missing_required_fields_raises(self):
+        """Scene: missing required fields raises."""
         with pytest.raises(ValidationError):
             Scene(description="D", narrative_content="N")  # missing title
 
@@ -274,10 +297,12 @@ class TestScene:
 
 class TestChoice:
     def test_required_fields(self):
+        """Choice: required fields."""
         c = Choice(choice_text="Go left")
         assert c.choice_text == "Go left"
 
     def test_default_values(self):
+        """Choice: default values."""
         c = Choice(choice_text="Go left")
         assert c.scene_id == ""
         assert c.description is None
@@ -298,27 +323,32 @@ class TestChoice:
         assert c.availability_reason is None
 
     def test_therapeutic_value_bounds(self):
+        """Choice: therapeutic value bounds."""
         with pytest.raises(ValidationError):
             Choice(choice_text="T", therapeutic_value=-0.1)
         with pytest.raises(ValidationError):
             Choice(choice_text="T", therapeutic_value=1.1)
 
     def test_agency_level_bounds(self):
+        """Choice: agency level bounds."""
         with pytest.raises(ValidationError):
             Choice(choice_text="T", agency_level=-0.1)
         with pytest.raises(ValidationError):
             Choice(choice_text="T", agency_level=1.1)
 
     def test_meaningfulness_score_bounds(self):
+        """Choice: meaningfulness score bounds."""
         with pytest.raises(ValidationError):
             Choice(choice_text="T", meaningfulness_score=-0.1)
 
     def test_choice_id_generated(self):
+        """Choice: choice id generated."""
         c1 = Choice(choice_text="T")
         c2 = Choice(choice_text="T")
         assert c1.choice_id != c2.choice_id
 
     def test_full_instantiation(self):
+        """Choice: full instantiation."""
         c = Choice(
             choice_text="Meditate",
             scene_id="scene-1",
@@ -342,11 +372,13 @@ class TestChoice:
 
 class TestConsequenceSet:
     def test_required_fields(self):
+        """Consequence Set: required fields."""
         cs = ConsequenceSet(choice_id="choice-1")
         assert cs.choice_id == "choice-1"
         assert cs.session_id == ""
 
     def test_default_values(self):
+        """Consequence Set: default values."""
         cs = ConsequenceSet(choice_id="c1")
         assert cs.immediate_effects == {}
         assert cs.delayed_effects == {}
@@ -371,10 +403,12 @@ class TestConsequenceSet:
         assert cs.application_time is None
 
     def test_therapeutic_value_bounds(self):
+        """Consequence Set: therapeutic value bounds."""
         with pytest.raises(ValidationError):
             ConsequenceSet(choice_id="c1", therapeutic_value_realized=1.5)
 
     def test_consequence_id_generated(self):
+        """Consequence Set: consequence id generated."""
         c1 = ConsequenceSet(choice_id="x")
         c2 = ConsequenceSet(choice_id="x")
         assert c1.consequence_id != c2.consequence_id
@@ -387,10 +421,12 @@ class TestConsequenceSet:
 
 class TestSessionState:
     def test_required_fields(self):
+        """Session State: required fields."""
         ss = SessionState(user_id="user-1")
         assert ss.user_id == "user-1"
 
     def test_default_values(self):
+        """Session State: default values."""
         ss = SessionState(user_id="u1")
         assert ss.character_id is None
         assert ss.world_id is None
@@ -412,11 +448,13 @@ class TestSessionState:
         assert ss.safety_alerts == []
 
     def test_session_id_generated(self):
+        """Session State: session id generated."""
         s1 = SessionState(user_id="u")
         s2 = SessionState(user_id="u")
         assert s1.session_id != s2.session_id
 
     def test_update_activity_increments_time(self):
+        """Session State: update activity increments time."""
         ss = SessionState(user_id="u1")
         ss.is_paused = False
         # Give it a tiny bit of time so total_session_time > 0
@@ -426,6 +464,7 @@ class TestSessionState:
         assert ss.metrics.active_time > 0.0
 
     def test_update_activity_while_paused(self):
+        """Session State: update activity while paused."""
         ss = SessionState(user_id="u1")
         ss.is_paused = True
         time.sleep(0.01)
@@ -435,6 +474,7 @@ class TestSessionState:
         assert ss.metrics.active_time == 0.0
 
     def test_add_choice_to_history_narrative(self):
+        """Session State: add choice to history narrative."""
         ss = SessionState(user_id="u1")
         choice = Choice(
             choice_text="Go north",
@@ -447,6 +487,7 @@ class TestSessionState:
         assert ss.metrics.therapeutic_choices_made == 0
 
     def test_add_choice_to_history_therapeutic(self):
+        """Session State: add choice to history therapeutic."""
         ss = SessionState(user_id="u1")
         choice = Choice(
             choice_text="Breathe deeply",
@@ -457,6 +498,7 @@ class TestSessionState:
         assert ss.metrics.therapeutic_choices_made == 1
 
     def test_add_choice_to_history_skill_building(self):
+        """Session State: add choice to history skill building."""
         ss = SessionState(user_id="u1")
         choice = Choice(
             choice_text="Practice skill",
@@ -467,6 +509,7 @@ class TestSessionState:
         assert ss.metrics.therapeutic_choices_made == 1
 
     def test_add_choice_to_history_emotional_regulation(self):
+        """Session State: add choice to history emotional regulation."""
         ss = SessionState(user_id="u1")
         choice = Choice(
             choice_text="Regulate emotion",
@@ -477,6 +520,7 @@ class TestSessionState:
         assert ss.metrics.therapeutic_choices_made == 1
 
     def test_add_choice_records_fields(self):
+        """Session State: add choice records fields."""
         ss = SessionState(user_id="u1")
         choice = Choice(
             choice_text="Test choice",
@@ -491,6 +535,7 @@ class TestSessionState:
         assert record["outcome"] == outcome
 
     def test_transition_to_scene(self):
+        """Session State: transition to scene."""
         ss = SessionState(user_id="u1")
         scene1 = Scene(title="S1", description="D1", narrative_content="N1")
         scene2 = Scene(title="S2", description="D2", narrative_content="N2")
@@ -506,11 +551,13 @@ class TestSessionState:
         assert scene1.scene_id in ss.scene_history
 
     def test_calculate_engagement_score_zero_time(self):
+        """Session State: calculate engagement score zero time."""
         ss = SessionState(user_id="u1")
         score = ss.calculate_engagement_score()
         assert score == 0.0
 
     def test_calculate_engagement_score_with_data(self):
+        """Session State: calculate engagement score with data."""
         ss = SessionState(user_id="u1")
         ss.total_session_time = 120.0  # 2 minutes
         ss.metrics.total_choices_made = 4
@@ -527,6 +574,7 @@ class TestSessionState:
 
 class TestUserChoice:
     def test_required_fields(self):
+        """User Choice: required fields."""
         uc = UserChoice(
             choice_id="c1",
             session_id="s1",
@@ -540,6 +588,7 @@ class TestUserChoice:
         assert uc.choice_text == "Go right"
 
     def test_default_values(self):
+        """User Choice: default values."""
         uc = UserChoice(
             choice_id="c1",
             session_id="s1",
@@ -557,6 +606,7 @@ class TestUserChoice:
         assert uc.difficulty_perceived is None
 
     def test_therapeutic_value_bounds(self):
+        """User Choice: therapeutic value bounds."""
         with pytest.raises(ValidationError):
             UserChoice(
                 choice_id="c1",
@@ -569,6 +619,7 @@ class TestUserChoice:
             )
 
     def test_user_confidence_bounds(self):
+        """User Choice: user confidence bounds."""
         with pytest.raises(ValidationError):
             UserChoice(
                 choice_id="c1",
@@ -583,11 +634,13 @@ class TestUserChoice:
 
 class TestChoiceOutcome:
     def test_required_fields(self):
+        """Choice Outcome: required fields."""
         co = ChoiceOutcome(choice_id="c1", outcome_type="success")
         assert co.choice_id == "c1"
         assert co.outcome_type == "success"
 
     def test_defaults(self):
+        """Choice Outcome: defaults."""
         co = ChoiceOutcome(choice_id="c1", outcome_type="neutral")
         assert co.session_id == ""
         assert co.narrative_response == ""
@@ -607,6 +660,7 @@ class TestChoiceOutcome:
 
 class TestNarrativeEvent:
     def test_required_fields(self):
+        """Narrative Event: required fields."""
         ev = NarrativeEvent(
             session_id="s1",
             event_type=EventType.SCENE_TRANSITION,
@@ -619,6 +673,7 @@ class TestNarrativeEvent:
         assert ev.title == "A scene transition"
 
     def test_defaults(self):
+        """Narrative Event: defaults."""
         ev = NarrativeEvent(
             session_id="s1",
             event_type=EventType.ACHIEVEMENT,
@@ -637,6 +692,7 @@ class TestNarrativeEvent:
 
 class TestTherapeuticIntervention:
     def test_required_fields(self):
+        """Therapeutic Intervention: required fields."""
         ti = TherapeuticIntervention(
             session_id="s1",
             intervention_type=InterventionType.MINDFULNESS,
@@ -650,6 +706,7 @@ class TestTherapeuticIntervention:
         assert ti.intervention_type == InterventionType.MINDFULNESS
 
     def test_defaults(self):
+        """Therapeutic Intervention: defaults."""
         ti = TherapeuticIntervention(
             session_id="s1",
             intervention_type=InterventionType.GROUNDING,
@@ -672,6 +729,7 @@ class TestTherapeuticIntervention:
 
 class TestAgencyAssessment:
     def test_required_fields(self):
+        """Agency Assessment: required fields."""
         aa = AgencyAssessment(
             choice_id="c1",
             agency_level="HIGH",
@@ -682,10 +740,12 @@ class TestAgencyAssessment:
         assert aa.empowerment_score == 0.9
 
     def test_empowerment_score_bounds(self):
+        """Agency Assessment: empowerment score bounds."""
         with pytest.raises(ValidationError):
             AgencyAssessment(choice_id="c1", agency_level="HIGH", empowerment_score=1.5)
 
     def test_defaults(self):
+        """Agency Assessment: defaults."""
         aa = AgencyAssessment(
             choice_id="c1", agency_level="MODERATE", empowerment_score=0.5
         )
@@ -696,11 +756,13 @@ class TestAgencyAssessment:
 
 class TestGameplaySession:
     def test_required_fields(self):
+        """Gameplay Session: required fields."""
         gs = GameplaySession(session_id="s1", user_id="u1")
         assert gs.session_id == "s1"
         assert gs.user_id == "u1"
 
     def test_defaults(self):
+        """Gameplay Session: defaults."""
         gs = GameplaySession(session_id="s1", user_id="u1")
         assert gs.current_scene_id is None
         assert gs.current_scene is None
@@ -720,6 +782,7 @@ class TestGameplaySession:
 
 class TestProgressMarker:
     def test_defaults(self):
+        """Progress Marker: defaults."""
         pm = ProgressMarker()
         assert pm.session_id == ""
         assert pm.user_id == ""
@@ -736,10 +799,12 @@ class TestProgressMarker:
         assert pm.skills_involved == []
 
     def test_progress_value_bounds(self):
+        """Progress Marker: progress value bounds."""
         with pytest.raises(ValidationError):
             ProgressMarker(progress_value=1.5)
 
     def test_marker_id_generated(self):
+        """Progress Marker: marker id generated."""
         m1 = ProgressMarker()
         m2 = ProgressMarker()
         assert m1.marker_id != m2.marker_id
@@ -747,6 +812,7 @@ class TestProgressMarker:
 
 class TestSkillDevelopment:
     def test_required_fields(self):
+        """Skill Development: required fields."""
         sd = SkillDevelopment(
             user_id="u1",
             skill_category=SkillCategory.MINDFULNESS,
@@ -758,6 +824,7 @@ class TestSkillDevelopment:
         assert sd.skill_name == "Breathing"
 
     def test_defaults(self):
+        """Skill Development: defaults."""
         sd = SkillDevelopment(
             user_id="u1",
             skill_category=SkillCategory.RESILIENCE,
@@ -777,6 +844,7 @@ class TestSkillDevelopment:
         assert sd.mastery_achieved is None
 
     def test_update_skill_level_improves_with_good_outcome(self):
+        """Skill Development: update skill level improves with good outcome."""
         sd = SkillDevelopment(
             user_id="u1",
             skill_category=SkillCategory.MINDFULNESS,
@@ -791,6 +859,7 @@ class TestSkillDevelopment:
         assert sd.last_practiced is not None
 
     def test_update_skill_level_poor_outcome_counts_attempt(self):
+        """Skill Development: update skill level poor outcome counts attempt."""
         sd = SkillDevelopment(
             user_id="u1",
             skill_category=SkillCategory.MINDFULNESS,
@@ -804,6 +873,7 @@ class TestSkillDevelopment:
     def test_update_skill_level_achieves_mastery(self):
         # learning_rate=1.0 so improvement = 1.0 * (1.0 - 0.99) = 0.01
         # new level = 0.99 + 0.01 = 1.0 which equals target_level=1.0
+        """Skill Development: update skill level achieves mastery."""
         sd = SkillDevelopment(
             user_id="u1",
             skill_category=SkillCategory.RESILIENCE,
@@ -817,6 +887,7 @@ class TestSkillDevelopment:
         assert sd.mastery_achieved is not None
 
     def test_update_skill_level_cap_at_1(self):
+        """Skill Development: update skill level cap at 1."""
         sd = SkillDevelopment(
             user_id="u1",
             skill_category=SkillCategory.RESILIENCE,
@@ -829,6 +900,7 @@ class TestSkillDevelopment:
         assert sd.current_level <= 1.0
 
     def test_skill_level_bounds(self):
+        """Skill Development: skill level bounds."""
         with pytest.raises(ValidationError):
             SkillDevelopment(
                 user_id="u1",
@@ -841,6 +913,7 @@ class TestSkillDevelopment:
 
 class TestCharacterState:
     def test_required_fields(self):
+        """Character State: required fields."""
         cs = CharacterState(
             user_id="u1",
             session_id="s1",
@@ -850,6 +923,7 @@ class TestCharacterState:
         assert cs.name == "Hero"
 
     def test_defaults(self):
+        """Character State: defaults."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         assert cs.background == ""
         assert cs.current_emotional_state == EmotionalState.CALM
@@ -861,12 +935,14 @@ class TestCharacterState:
         assert cs.resources == {}
 
     def test_attributes_initialized_for_all_enum_values(self):
+        """Character State: attributes initialized for all enum values."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         for attr in CharacterAttribute:
             assert attr in cs.attributes
             assert cs.attributes[attr] == 0.5
 
     def test_modify_attribute_clamps_at_bounds(self):
+        """Character State: modify attribute clamps at bounds."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         cs.modify_attribute(CharacterAttribute.CONFIDENCE, 2.0)
         assert cs.attributes[CharacterAttribute.CONFIDENCE] == 1.0
@@ -875,6 +951,7 @@ class TestCharacterState:
         assert cs.attributes[CharacterAttribute.CONFIDENCE] == 0.0
 
     def test_modify_attribute_updates_timestamp(self):
+        """Character State: modify attribute updates timestamp."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         before = cs.updated_at
         time.sleep(0.01)
@@ -882,6 +959,7 @@ class TestCharacterState:
         assert cs.updated_at >= before
 
     def test_add_experience_no_level_up(self):
+        """Character State: add experience no level up."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         leveled_up = cs.add_experience(10)
         assert leveled_up is False
@@ -889,6 +967,7 @@ class TestCharacterState:
         assert cs.level == 1
 
     def test_add_experience_causes_level_up(self):
+        """Character State: add experience causes level up."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         # level formula: int((experience / 100) ** 0.5) + 1
         # Need 100 xp to reach level 2
@@ -897,6 +976,7 @@ class TestCharacterState:
         assert cs.level == 2
 
     def test_add_experience_multiple_increments(self):
+        """Character State: add experience multiple increments."""
         cs = CharacterState(user_id="u1", session_id="s1", name="Hero")
         cs.add_experience(50)
         cs.add_experience(50)
@@ -906,10 +986,12 @@ class TestCharacterState:
 
 class TestTherapeuticProgress:
     def test_required_fields(self):
+        """Therapeutic Progress: required fields."""
         tp = TherapeuticProgress(user_id="u1")
         assert tp.user_id == "u1"
 
     def test_defaults(self):
+        """Therapeutic Progress: defaults."""
         tp = TherapeuticProgress(user_id="u1")
         assert tp.primary_therapeutic_goals == []
         assert tp.secondary_goals == []
@@ -926,11 +1008,13 @@ class TestTherapeuticProgress:
         assert tp.average_session_length == 0.0
 
     def test_progress_id_generated(self):
+        """Therapeutic Progress: progress id generated."""
         p1 = TherapeuticProgress(user_id="u1")
         p2 = TherapeuticProgress(user_id="u1")
         assert p1.progress_id != p2.progress_id
 
     def test_overall_progress_bounds(self):
+        """Therapeutic Progress: overall progress bounds."""
         with pytest.raises(ValidationError):
             TherapeuticProgress(user_id="u1", overall_progress=1.5)
 
@@ -942,6 +1026,7 @@ class TestTherapeuticProgress:
 
 class TestValidationResult:
     def test_defaults(self):
+        """Validation Result: defaults."""
         vr = ValidationResult()
         assert vr.session_id == ""
         assert vr.validation_type == ValidationType.CHOICE_VALIDITY
@@ -960,6 +1045,7 @@ class TestValidationResult:
         assert vr.validator_version == "1.0.0"
 
     def test_with_values(self):
+        """Validation Result: with values."""
         vr = ValidationResult(
             is_valid=False,
             confidence_score=0.7,
@@ -974,6 +1060,7 @@ class TestValidationResult:
 
 class TestSafetyCheck:
     def test_defaults(self):
+        """Safety Check: defaults."""
         sc = SafetyCheck()
         assert sc.session_id == ""
         assert sc.user_id == ""
@@ -994,6 +1081,7 @@ class TestSafetyCheck:
         assert sc.user_history == {}
 
     def test_check_id_generated(self):
+        """Safety Check: check id generated."""
         sc1 = SafetyCheck()
         sc2 = SafetyCheck()
         assert sc1.check_id != sc2.check_id
@@ -1001,6 +1089,7 @@ class TestSafetyCheck:
 
 class TestTherapeuticValidation:
     def test_defaults(self):
+        """Therapeutic Validation: defaults."""
         tv = TherapeuticValidation()
         assert tv.session_id == ""
         assert tv.content_type == ""
@@ -1030,6 +1119,7 @@ class TestTherapeuticValidation:
 
 class TestContentValidation:
     def test_required_fields(self):
+        """Content Validation: required fields."""
         cv = ContentValidation(
             content_id="c1",
             content_type="scene",
@@ -1040,6 +1130,7 @@ class TestContentValidation:
         assert cv.content_text == "Some narrative text"
 
     def test_defaults(self):
+        """Content Validation: defaults."""
         cv = ContentValidation(content_id="c1", content_type="scene", content_text="T")
         assert cv.contains_triggers is False
         assert cv.trigger_types == []
@@ -1059,6 +1150,7 @@ class TestContentValidation:
         assert cv.validation_version == "1.0.0"
 
     def test_missing_required_raises(self):
+        """Content Validation: missing required raises."""
         with pytest.raises(ValidationError):
             ContentValidation(
                 content_id="c1", content_type="scene"

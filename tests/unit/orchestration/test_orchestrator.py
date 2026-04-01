@@ -13,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.orchestration import TTAConfig, TTAOrchestrator
 from src.orchestration.component import Component, ComponentStatus
 
+pytestmark = pytest.mark.unit
+
 
 class MockComponent(Component):
     def __init__(

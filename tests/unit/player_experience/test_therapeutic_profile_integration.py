@@ -1,3 +1,4 @@
+import pytest
 """
 
 # Logseq: [[TTA.dev/Tests/Test_therapeutic_profile_integration]]
@@ -17,6 +18,8 @@ from src.player_experience.models.character import (
     TherapeuticProfile,
 )
 from src.player_experience.models.enums import IntensityLevel
+
+pytestmark = pytest.mark.unit
 
 
 class TestTherapeuticProfileIntegrationService(unittest.TestCase):

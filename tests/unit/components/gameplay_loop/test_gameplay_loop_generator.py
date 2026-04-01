@@ -107,20 +107,24 @@ async def generator() -> ChoiceGenerator:
 
 class TestChoiceGeneratorInit:
     async def test_initialize_returns_true(self):
+        """Choice Generator Init: initialize returns true."""
         gen = ChoiceGenerator()
         result = await gen.initialize()
         assert result is True
 
     async def test_templates_populated_after_init(self, generator: ChoiceGenerator):
+        """Choice Generator Init: templates populated after init."""
         assert len(generator.choice_templates) > 0
         assert ChoiceType.THERAPEUTIC in generator.choice_templates
         assert ChoiceType.NARRATIVE in generator.choice_templates
 
     async def test_emotional_adaptations_populated(self, generator: ChoiceGenerator):
+        """Choice Generator Init: emotional adaptations populated."""
         assert EmotionalState.CALM in generator.emotional_adaptations
         assert EmotionalState.CRISIS in generator.emotional_adaptations
 
     async def test_double_initialize_still_returns_true(self):
+        """Choice Generator Init: double initialize still returns true."""
         gen = ChoiceGenerator()
         await gen.initialize()
         result = await gen.initialize()
@@ -134,6 +138,7 @@ class TestChoiceGeneratorInit:
 
 class TestGenerateChoices:
     async def test_returns_up_to_max_choices(self, generator: ChoiceGenerator):
+        """Generate Choices: returns up to max choices."""
         scene = _make_scene()
         session = _make_session()
         reqs = _base_requirements(max_choices=3)
@@ -141,6 +146,7 @@ class TestGenerateChoices:
         assert len(choices) <= 3
 
     async def test_fills_max_choices_slots(self, generator: ChoiceGenerator):
+        """Generate Choices: fills max choices slots."""
         scene = _make_scene()
         session = _make_session()
         reqs = _base_requirements(max_choices=3)
@@ -148,6 +154,7 @@ class TestGenerateChoices:
         assert len(choices) == 3
 
     async def test_returns_choice_objects(self, generator: ChoiceGenerator):
+        """Generate Choices: returns choice objects."""
         scene = _make_scene()
         session = _make_session()
         choices = await generator.generate_choices(scene, session, _base_requirements())
@@ -155,6 +162,7 @@ class TestGenerateChoices:
             assert isinstance(c, Choice)
 
     async def test_choices_have_unique_ids(self, generator: ChoiceGenerator):
+        """Generate Choices: choices have unique ids."""
         scene = _make_scene()
         session = _make_session()
         choices = await generator.generate_choices(scene, session, _base_requirements())
@@ -162,6 +170,7 @@ class TestGenerateChoices:
         assert len(ids) == len(set(ids)), "All choice IDs must be unique"
 
     async def test_requested_types_included(self, generator: ChoiceGenerator):
+        """Generate Choices: requested types included."""
         scene = _make_scene()
         session = _make_session()
         reqs = _base_requirements(
@@ -176,6 +185,7 @@ class TestGenerateChoices:
     async def test_empty_requirements_still_fills_choices(
         self, generator: ChoiceGenerator
     ):
+        """Generate Choices: empty requirements still fills choices."""
         scene = _make_scene()
         session = _make_session()
         reqs = _base_requirements(choice_types=[], max_choices=2)
@@ -192,6 +202,7 @@ class TestDistinctChoices:
     """Regression tests for the repetitive-choices bug (slot_index fix)."""
 
     async def test_three_choices_have_distinct_texts(self, generator: ChoiceGenerator):
+        """Distinct Choices: three choices have distinct texts."""
         scene = _make_scene()
         session = _make_session()
         reqs = _base_requirements(max_choices=3)
@@ -202,6 +213,7 @@ class TestDistinctChoices:
         )
 
     async def test_four_choices_have_distinct_texts(self, generator: ChoiceGenerator):
+        """Distinct Choices: four choices have distinct texts."""
         scene = _make_scene()
         session = _make_session()
         reqs = _base_requirements(max_choices=4)
@@ -240,6 +252,7 @@ class TestDistinctChoices:
 
 class TestSelectTemplate:
     async def test_returns_a_template(self, generator: ChoiceGenerator):
+        """Select Template: returns a template."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         scene = _make_scene()
         session = _make_session()
@@ -249,6 +262,7 @@ class TestSelectTemplate:
     async def test_slot0_and_slot1_differ_when_multiple_templates(
         self, generator: ChoiceGenerator
     ):
+        """Select Template: slot0 and slot1 differ when multiple templates."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         if len(templates) < 2:
             pytest.skip("Need at least 2 templates for rotation test")
@@ -260,6 +274,7 @@ class TestSelectTemplate:
         assert t0 is not t1
 
     async def test_rotation_wraps_around(self, generator: ChoiceGenerator):
+        """Select Template: rotation wraps around."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         scene = _make_scene()
         session = _make_session()
@@ -290,6 +305,7 @@ class TestSelectTemplate:
 
 class TestGenerateFromTemplate:
     async def test_uses_text_patterns(self, generator: ChoiceGenerator):
+        """Generate From Template: uses text patterns."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         template = templates[0]
         scene = _make_scene()
@@ -305,6 +321,7 @@ class TestGenerateFromTemplate:
     async def test_different_slots_produce_different_text(
         self, generator: ChoiceGenerator
     ):
+        """Generate From Template: different slots produce different text."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         template = templates[0]
         if len(template.text_patterns) < 2:
@@ -321,6 +338,7 @@ class TestGenerateFromTemplate:
         assert c0.choice_text != c1.choice_text
 
     async def test_slot_wraps_modulo_pattern_count(self, generator: ChoiceGenerator):
+        """Generate From Template: slot wraps modulo pattern count."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         template = templates[0]
         scene = _make_scene()
@@ -336,6 +354,7 @@ class TestGenerateFromTemplate:
         assert c0.choice_text == cn.choice_text
 
     async def test_choice_has_valid_therapeutic_value(self, generator: ChoiceGenerator):
+        """Generate From Template: choice has valid therapeutic value."""
         templates = generator.choice_templates[ChoiceType.THERAPEUTIC]
         template = templates[0]
         scene = _make_scene()
@@ -346,6 +365,7 @@ class TestGenerateFromTemplate:
         assert 0.0 <= choice.therapeutic_value <= 1.0
 
     async def test_choice_has_valid_agency_level(self, generator: ChoiceGenerator):
+        """Generate From Template: choice has valid agency level."""
         templates = generator.choice_templates[ChoiceType.NARRATIVE]
         template = templates[0]
         scene = _make_scene()
@@ -363,11 +383,13 @@ class TestGenerateFromTemplate:
 
 class TestGenerateSafeChoice:
     async def test_returns_a_choice(self, generator: ChoiceGenerator):
+        """Generate Safe Choice: returns a choice."""
         session = _make_session()
         choice = await generator.generate_safe_choice("anxious", session)
         assert isinstance(choice, Choice)
 
     async def test_anxious_text_is_calming(self, generator: ChoiceGenerator):
+        """Generate Safe Choice: anxious text is calming."""
         session = _make_session(EmotionalState.ANXIOUS)
         choice = await generator.generate_safe_choice("anxious", session)
         assert choice is not None
@@ -379,18 +401,21 @@ class TestGenerateSafeChoice:
     async def test_unknown_state_returns_generic_choice(
         self, generator: ChoiceGenerator
     ):
+        """Generate Safe Choice: unknown state returns generic choice."""
         session = _make_session()
         choice = await generator.generate_safe_choice("unknown_state", session)
         assert isinstance(choice, Choice)
         assert choice.choice_text  # non-empty
 
     async def test_safe_choice_type_is_therapeutic(self, generator: ChoiceGenerator):
+        """Generate Safe Choice: safe choice type is therapeutic."""
         session = _make_session()
         choice = await generator.generate_safe_choice("anxious", session)
         assert choice is not None
         assert choice.choice_type == ChoiceType.THERAPEUTIC
 
     async def test_safe_choice_difficulty_is_gentle(self, generator: ChoiceGenerator):
+        """Generate Safe Choice: safe choice difficulty is gentle."""
         session = _make_session()
         choice = await generator.generate_safe_choice("overwhelmed", session)
         assert choice is not None
@@ -404,6 +429,7 @@ class TestGenerateSafeChoice:
 
 class TestGenerateEmotionAppropriateChoice:
     async def test_returns_choice_for_known_state(self, generator: ChoiceGenerator):
+        """Generate Emotion Appropriate Choice: returns choice for known state."""
         session = _make_session(EmotionalState.ANXIOUS)
         choice = await generator.generate_emotion_appropriate_choice(
             ChoiceType.THERAPEUTIC, "anxious", session
@@ -423,6 +449,7 @@ class TestGenerateEmotionAppropriateChoice:
         assert result is None
 
     async def test_calming_tone_applied_for_anxious(self, generator: ChoiceGenerator):
+        """Generate Emotion Appropriate Choice: calming tone applied for anxious."""
         session = _make_session(EmotionalState.ANXIOUS)
         choice = await generator.generate_emotion_appropriate_choice(
             ChoiceType.THERAPEUTIC, "anxious", session
@@ -432,6 +459,7 @@ class TestGenerateEmotionAppropriateChoice:
         assert choice.choice_text.lower().startswith("gently")
 
     async def test_difficulty_reduced_for_overwhelmed(self, generator: ChoiceGenerator):
+        """Generate Emotion Appropriate Choice: difficulty reduced for overwhelmed."""
         session = _make_session(EmotionalState.OVERWHELMED)
         choice = await generator.generate_emotion_appropriate_choice(
             ChoiceType.THERAPEUTIC, "overwhelmed", session

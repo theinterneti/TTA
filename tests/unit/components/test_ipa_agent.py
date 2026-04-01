@@ -20,10 +20,12 @@ from src.components.ipa.models import (
     ProcessedInput,
 )
 
+pytestmark = pytest.mark.unit
+
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:
-    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
+    pytest.skip("ttadev.primitives not available", allow_module_level=True)
 
 
 # ---------------------------------------------------------------------------
@@ -69,6 +71,7 @@ def _ipa_json(
 
 class TestProcessedInput:
     def test_npc_names_property(self) -> None:
+        """Processed Input: npc names property."""
         pi = ProcessedInput(
             raw_text="talk to the guard",
             normalized_text="talk to the guard",
@@ -80,6 +83,7 @@ class TestProcessedInput:
         assert pi.npc_names == ["guard"]
 
     def test_location_references_property(self) -> None:
+        """Processed Input: location references property."""
         pi = ProcessedInput(
             raw_text="go to the forest",
             normalized_text="go to the forest",
@@ -90,10 +94,12 @@ class TestProcessedInput:
         assert pi.location_references == ["forest"]
 
     def test_needs_safety_check_false_by_default(self) -> None:
+        """Processed Input: needs safety check false by default."""
         pi = ProcessedInput(raw_text="hello", normalized_text="hello")
         assert not pi.needs_safety_check
 
     def test_needs_safety_check_true_on_signal(self) -> None:
+        """Processed Input: needs safety check true on signal."""
         pi = ProcessedInput(
             raw_text="I feel hopeless",
             normalized_text="i feel hopeless",
@@ -104,6 +110,7 @@ class TestProcessedInput:
         assert pi.needs_safety_check
 
     def test_default_intent_is_unknown(self) -> None:
+        """Processed Input: default intent is unknown."""
         pi = ProcessedInput(raw_text="...", normalized_text="...")
         assert pi.intent == Intent.UNKNOWN
 
@@ -116,6 +123,7 @@ class TestProcessedInput:
 class TestIPALLMCall:
     @pytest.mark.asyncio
     async def test_parses_clean_json(self) -> None:
+        """I P A L L M Call: parses clean json."""
         payload = _ipa_json(intent="interact", confidence=0.85)
         llm = _make_llm(payload)
         call = _IPALLMCall(llm)
@@ -126,6 +134,7 @@ class TestIPALLMCall:
 
     @pytest.mark.asyncio
     async def test_strips_markdown_fences(self) -> None:
+        """I P A L L M Call: strips markdown fences."""
         payload = f"```json\n{_ipa_json()}\n```"
         llm = _make_llm(payload)
         call = _IPALLMCall(llm)
@@ -135,6 +144,7 @@ class TestIPALLMCall:
 
     @pytest.mark.asyncio
     async def test_raises_on_invalid_json(self) -> None:
+        """I P A L L M Call: raises on invalid json."""
         llm = _make_llm("not valid json at all")
         call = _IPALLMCall(llm)
         ctx = WorkflowContext(workflow_id="test")
@@ -150,6 +160,7 @@ class TestIPALLMCall:
 class TestIPAFallback:
     @pytest.mark.asyncio
     async def test_returns_unknown_intent(self) -> None:
+        """I P A Fallback: returns unknown intent."""
         fallback = _IPAFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"raw_text": "something"}, ctx)
@@ -158,6 +169,7 @@ class TestIPAFallback:
 
     @pytest.mark.asyncio
     async def test_normalizes_raw_text(self) -> None:
+        """I P A Fallback: normalizes raw text."""
         fallback = _IPAFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"raw_text": "  HELLO WORLD  "}, ctx)
@@ -172,6 +184,7 @@ class TestIPAFallback:
 class TestIPAAgent:
     @pytest.mark.asyncio
     async def test_explore_intent(self) -> None:
+        """I P A Agent: explore intent."""
         agent = IPAAgent(llm=_make_llm(_ipa_json(intent="explore", confidence=0.9)))
         result = await agent.process("I go north into the forest", session_id="s1")
         assert result.intent == Intent.EXPLORE
@@ -179,6 +192,7 @@ class TestIPAAgent:
 
     @pytest.mark.asyncio
     async def test_interact_intent_with_npc(self) -> None:
+        """I P A Agent: interact intent with npc."""
         payload = _ipa_json(
             intent="interact",
             entities=[{"name": "blacksmith", "entity_type": "npc", "confidence": 0.95}],
@@ -192,6 +206,7 @@ class TestIPAAgent:
 
     @pytest.mark.asyncio
     async def test_safety_signal_propagated(self) -> None:
+        """I P A Agent: safety signal propagated."""
         payload = _ipa_json(
             intent="journal",
             primary="sad",
@@ -205,6 +220,7 @@ class TestIPAAgent:
 
     @pytest.mark.asyncio
     async def test_unknown_intent_on_bad_value(self) -> None:
+        """I P A Agent: unknown intent on bad value."""
         payload = _ipa_json(intent="fly_to_mars")  # not a valid Intent
         agent = IPAAgent(llm=_make_llm(payload))
         result = await agent.process("weird input", session_id="s1")
@@ -223,6 +239,7 @@ class TestIPAAgent:
 
     @pytest.mark.asyncio
     async def test_session_and_player_ids_attached(self) -> None:
+        """I P A Agent: session and player ids attached."""
         agent = IPAAgent(llm=_make_llm(_ipa_json()))
         result = await agent.process(
             "go north",
@@ -237,6 +254,7 @@ class TestIPAAgent:
     @pytest.mark.asyncio
     async def test_malformed_entity_skipped(self) -> None:
         # entity missing 'entity_type' key — should be skipped
+        """I P A Agent: malformed entity skipped."""
         payload = json.dumps(
             {
                 "intent": "explore",

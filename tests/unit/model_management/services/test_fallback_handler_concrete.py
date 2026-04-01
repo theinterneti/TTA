@@ -22,6 +22,8 @@ from tta_ai.models import (
 from tta_ai.models.models import FallbackConfiguration
 from tta_ai.models.services import FallbackHandler
 
+pytestmark = pytest.mark.unit
+
 # ============================================================================
 # Concrete Value Tests - Selection Strategies
 # ============================================================================

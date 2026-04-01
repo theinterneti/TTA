@@ -35,6 +35,8 @@ from src.components.narrative_coherence_engine import (
     ValidationSeverity,
 )
 
+pytestmark = pytest.mark.unit
+
 # The engine re-exports CoherenceValidator/ContradictionDetector/CausalValidator
 # from src.components.narrative_coherence.*, which return their own ValidationResult.
 # Import the extracted ValidationResult for isinstance checks on those classes.
@@ -89,6 +91,7 @@ def _engine() -> NarrativeCoherenceEngine:
 
 
 def test_validation_severity_values():
+    """Validation severity values."""
     assert ValidationSeverity.INFO.value == "info"
     assert ValidationSeverity.WARNING.value == "warning"
     assert ValidationSeverity.ERROR.value == "error"
@@ -96,6 +99,7 @@ def test_validation_severity_values():
 
 
 def test_consistency_issue_type_values():
+    """Consistency issue type values."""
     assert ConsistencyIssueType.LORE_VIOLATION.value == "lore_violation"
     assert (
         ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT.value
@@ -109,6 +113,7 @@ def test_consistency_issue_type_values():
 
 
 def test_consistency_issue_defaults():
+    """Consistency issue defaults."""
     issue = ConsistencyIssue(
         issue_id="i-1",
         issue_type=ConsistencyIssueType.LORE_VIOLATION,
@@ -122,6 +127,7 @@ def test_consistency_issue_defaults():
 
 
 def test_validation_result_defaults():
+    """Validation result defaults."""
     vr = ValidationResult(is_valid=True, consistency_score=0.9)
     assert vr.detected_issues == []
     assert vr.lore_compliance == 0.0
@@ -131,6 +137,7 @@ def test_validation_result_defaults():
 
 
 def test_narrative_content_defaults():
+    """Narrative content defaults."""
     c = _content()
     assert c.characters == []
     assert c.locations == []
@@ -139,6 +146,7 @@ def test_narrative_content_defaults():
 
 
 def test_lore_entry_defaults():
+    """Lore entry defaults."""
     le = LoreEntry(
         lore_id="l-1",
         category="location",
@@ -150,6 +158,7 @@ def test_lore_entry_defaults():
 
 
 def test_contradiction_defaults():
+    """Contradiction defaults."""
     c = _contradiction()
     assert c.evidence == []
     assert c.resolution_suggestions == []
@@ -157,6 +166,7 @@ def test_contradiction_defaults():
 
 
 def test_creative_solution_defaults():
+    """Creative solution defaults."""
     cs = CreativeSolution(
         solution_id="s-1",
         solution_type="character_driven",
@@ -169,6 +179,7 @@ def test_creative_solution_defaults():
 
 
 def test_narrative_resolution_defaults():
+    """Narrative resolution defaults."""
     solution = CreativeSolution(
         solution_id="s-1", solution_type="character_driven", description="desc"
     )
@@ -183,6 +194,7 @@ def test_narrative_resolution_defaults():
 
 
 def test_retroactive_change_fields():
+    """Retroactive change fields."""
     rc = RetroactiveChange(
         change_id="rc-1",
         target_content_id="c-1",
@@ -196,6 +208,7 @@ def test_retroactive_change_fields():
 
 
 def test_storyline_thread_defaults():
+    """Storyline thread defaults."""
     st = StorylineThread(thread_id="t-1", title="Main Quest")
     assert st.participants == []
     assert st.current_tension == 0.0
@@ -203,6 +216,7 @@ def test_storyline_thread_defaults():
 
 
 def test_convergence_validation_fields():
+    """Convergence validation fields."""
     cv = ConvergenceValidation(
         session_id="s-1",
         storyline_count=3,
@@ -221,6 +235,7 @@ def test_convergence_validation_fields():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_valid_content():
+    """Coherence validator valid content."""
     validator = CoherenceValidator(config={})
     content = _content()
     result = await validator.validate_narrative_consistency(content)
@@ -231,6 +246,7 @@ async def test_coherence_validator_valid_content():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_empty_text():
+    """Coherence validator empty text."""
     validator = CoherenceValidator(config={})
     content = _content(text="")
     result = await validator.validate_narrative_consistency(content)
@@ -239,6 +255,7 @@ async def test_coherence_validator_empty_text():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_with_characters():
+    """Coherence validator with characters."""
     validator = CoherenceValidator(config={})
     content = NarrativeContent(
         content_id="c-2",
@@ -302,6 +319,7 @@ async def test_coherence_validator_with_lore_positive_constraint():
 
 @pytest.mark.asyncio
 async def test_coherence_validator_consistency_threshold_config():
+    """Coherence validator consistency threshold config."""
     validator = CoherenceValidator(config={"consistency_threshold": 0.5})
     assert validator.consistency_threshold == 0.5
 
@@ -313,6 +331,7 @@ async def test_coherence_validator_consistency_threshold_config():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_empty_history():
+    """Contradiction detector empty history."""
     detector = ContradictionDetector(config={})
     result = await detector.detect_contradictions([])
     assert result == []
@@ -320,6 +339,7 @@ async def test_contradiction_detector_empty_history():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_single_item():
+    """Contradiction detector single item."""
     detector = ContradictionDetector(config={})
     result = await detector.detect_contradictions([_content()])
     assert isinstance(result, list)
@@ -327,6 +347,7 @@ async def test_contradiction_detector_single_item():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_two_items():
+    """Contradiction detector two items."""
     detector = ContradictionDetector(config={})
     c1 = _content("c1", text="The sky is blue.")
     c2 = _content("c2", text="The sky is green.")
@@ -336,6 +357,7 @@ async def test_contradiction_detector_two_items():
 
 @pytest.mark.asyncio
 async def test_contradiction_detector_returns_contradiction_objects():
+    """Contradiction detector returns contradiction objects."""
     detector = ContradictionDetector(config={})
     c1 = _content("c1")
     c2 = _content("c2")
@@ -351,6 +373,7 @@ async def test_contradiction_detector_returns_contradiction_objects():
 
 @pytest.mark.asyncio
 async def test_causal_validator_empty_branch():
+    """Causal validator empty branch."""
     validator = CausalValidator(config={})
     result = await validator.validate_causal_logic([])
     assert isinstance(result, _ExtractedValidationResult)
@@ -358,6 +381,7 @@ async def test_causal_validator_empty_branch():
 
 @pytest.mark.asyncio
 async def test_causal_validator_single_item():
+    """Causal validator single item."""
     validator = CausalValidator(config={})
     result = await validator.validate_causal_logic([_content()])
     assert isinstance(result, _ExtractedValidationResult)
@@ -366,6 +390,7 @@ async def test_causal_validator_single_item():
 
 @pytest.mark.asyncio
 async def test_causal_validator_multiple_items():
+    """Causal validator multiple items."""
     validator = CausalValidator(config={})
     branch = [_content(f"c-{i}", text=f"Event {i} occurred.") for i in range(3)]
     result = await validator.validate_causal_logic(branch)
@@ -378,6 +403,7 @@ async def test_causal_validator_multiple_items():
 
 
 def test_engine_construction():
+    """Engine construction."""
     engine = _engine()
     assert engine.coherence_validator is not None
     assert engine.contradiction_detector is not None
@@ -387,6 +413,7 @@ def test_engine_construction():
 
 
 def test_engine_start_stop():
+    """Engine start stop."""
     engine = _engine()
     assert engine.start() is True
     assert engine.stop() is True
@@ -401,6 +428,7 @@ def test_engine_start_stop():
 
 @pytest.mark.asyncio
 async def test_engine_validate_narrative_consistency_happy_path():
+    """Engine validate narrative consistency happy path."""
     engine = _engine()
     content = _content()
     result = await engine.validate_narrative_consistency(content, "session-1")
@@ -413,6 +441,7 @@ async def test_engine_validate_narrative_consistency_happy_path():
 
 @pytest.mark.asyncio
 async def test_engine_validate_caches_result():
+    """Engine validate caches result."""
     engine = _engine()
     content = _content()
     await engine.validate_narrative_consistency(content, "session-1")
@@ -422,6 +451,7 @@ async def test_engine_validate_caches_result():
 
 @pytest.mark.asyncio
 async def test_engine_validate_returns_cached_result():
+    """Engine validate returns cached result."""
     engine = _engine()
     content = _content()
     result1 = await engine.validate_narrative_consistency(content, "session-1")
@@ -431,6 +461,7 @@ async def test_engine_validate_returns_cached_result():
 
 @pytest.mark.asyncio
 async def test_engine_validate_multiple_sessions_are_independent():
+    """Engine validate multiple sessions are independent."""
     engine = _engine()
     c1 = _content("c1")
     c2 = _content("c2")
@@ -442,6 +473,7 @@ async def test_engine_validate_multiple_sessions_are_independent():
 
 @pytest.mark.asyncio
 async def test_engine_validate_error_returns_invalid_result():
+    """Engine validate error returns invalid result."""
     engine = _engine()
     # Mock coherence_validator to raise
     engine.coherence_validator.validate_narrative_consistency = AsyncMock(
@@ -460,6 +492,7 @@ async def test_engine_validate_error_returns_invalid_result():
 
 @pytest.mark.asyncio
 async def test_engine_detect_contradictions_empty_history():
+    """Engine detect contradictions empty history."""
     engine = _engine()
     result = await engine.detect_contradictions("no-history")
     assert result == []
@@ -467,6 +500,7 @@ async def test_engine_detect_contradictions_empty_history():
 
 @pytest.mark.asyncio
 async def test_engine_detect_contradictions_single_item_history():
+    """Engine detect contradictions single item history."""
     engine = _engine()
     engine.content_history["s-1"] = [_content()]
     result = await engine.detect_contradictions("s-1")
@@ -475,6 +509,7 @@ async def test_engine_detect_contradictions_single_item_history():
 
 @pytest.mark.asyncio
 async def test_engine_detect_contradictions_two_item_history():
+    """Engine detect contradictions two item history."""
     engine = _engine()
     engine.content_history["s-1"] = [_content("c1"), _content("c2")]
     result = await engine.detect_contradictions("s-1")
@@ -483,6 +518,7 @@ async def test_engine_detect_contradictions_two_item_history():
 
 @pytest.mark.asyncio
 async def test_engine_detect_contradictions_error_returns_empty():
+    """Engine detect contradictions error returns empty."""
     engine = _engine()
     engine.content_history["s-1"] = [_content("c1"), _content("c2")]
     engine.contradiction_detector.detect_contradictions = AsyncMock(
@@ -499,6 +535,7 @@ async def test_engine_detect_contradictions_error_returns_empty():
 
 @pytest.mark.asyncio
 async def test_engine_validate_causal_logic():
+    """Engine validate causal logic."""
     engine = _engine()
     branch = [_content(f"c{i}") for i in range(3)]
     result = await engine.validate_causal_logic(branch)
@@ -508,6 +545,7 @@ async def test_engine_validate_causal_logic():
 
 @pytest.mark.asyncio
 async def test_engine_validate_causal_logic_error_returns_invalid():
+    """Engine validate causal logic error returns invalid."""
     engine = _engine()
     engine.causal_validator.validate_causal_logic = AsyncMock(
         side_effect=RuntimeError("causal down")
@@ -524,6 +562,7 @@ async def test_engine_validate_causal_logic_error_returns_invalid():
 
 @pytest.mark.asyncio
 async def test_engine_get_coherence_status_no_history():
+    """Engine get coherence status no history."""
     engine = _engine()
     status = await engine.get_coherence_status("empty-session")
     assert status["content_count"] == 0
@@ -533,6 +572,7 @@ async def test_engine_get_coherence_status_no_history():
 
 @pytest.mark.asyncio
 async def test_engine_get_coherence_status_with_content():
+    """Engine get coherence status with content."""
     engine = _engine()
     content = _content()
     await engine.validate_narrative_consistency(content, "s-1")
@@ -564,6 +604,7 @@ async def test_engine_get_coherence_status_validation_error_handled():
 
 @pytest.mark.asyncio
 async def test_engine_resolve_conflicts_empty_list():
+    """Engine resolve conflicts empty list."""
     engine = _engine()
     result = await engine.resolve_narrative_conflicts([], "s-1")
     assert result == []
@@ -571,6 +612,7 @@ async def test_engine_resolve_conflicts_empty_list():
 
 @pytest.mark.asyncio
 async def test_engine_resolve_conflicts_returns_list():
+    """Engine resolve conflicts returns list."""
     engine = _engine()
     contradiction = _contradiction()
     result = await engine.resolve_narrative_conflicts([contradiction], "s-1")
@@ -583,11 +625,13 @@ async def test_engine_resolve_conflicts_returns_list():
 
 
 def test_engine_cache_miss_returns_none():
+    """Engine cache miss returns none."""
     engine = _engine()
     assert engine._get_cached_validation("missing_key") is None
 
 
 def test_engine_cache_store_and_retrieve():
+    """Engine cache store and retrieve."""
     engine = _engine()
     vr = ValidationResult(is_valid=True, consistency_score=0.9)
     vr.validation_timestamp = datetime.now()
@@ -596,6 +640,7 @@ def test_engine_cache_store_and_retrieve():
 
 
 def test_engine_cache_expired_returns_none():
+    """Engine cache expired returns none."""
     engine = _engine()
     engine.cache_ttl = 0  # immediate expiry
     vr = ValidationResult(is_valid=True, consistency_score=0.9)
@@ -608,6 +653,7 @@ def test_engine_cache_expired_returns_none():
 
 
 def test_engine_cleanup_cache_removes_expired():
+    """Engine cleanup cache removes expired."""
     engine = _engine()
     engine.cache_ttl = 0
     vr = ValidationResult(is_valid=True, consistency_score=0.9)

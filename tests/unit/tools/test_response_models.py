@@ -22,6 +22,8 @@ from src.agent_orchestration.tools.response_models import (
     get_json_schema,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestToolMetadata:
     """Tests for ToolMetadata model."""

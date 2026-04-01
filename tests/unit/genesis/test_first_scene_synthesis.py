@@ -21,10 +21,12 @@ from src.components.gameplay_loop.models.world_seed import (
     WorldTone,
 )
 
+pytestmark = pytest.mark.unit
+
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:
-    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
+    pytest.skip("ttadev.primitives not available", allow_module_level=True)
 
 
 # ---------------------------------------------------------------------------
@@ -80,6 +82,7 @@ def _make_service(driver: Any = None) -> FirstSceneSynthesisService:
 
 class TestFirstScene:
     def test_default_construction(self) -> None:
+        """First Scene: default construction."""
         scene = FirstScene(
             scene_text="You arrive.",
             location_id="loc-1",
@@ -92,6 +95,7 @@ class TestFirstScene:
         assert scene.raw_synthesis == {}
 
     def test_full_construction(self) -> None:
+        """First Scene: full construction."""
         scene = FirstScene(
             scene_text="You step into the tavern.",
             location_id="loc-2",
@@ -113,6 +117,7 @@ class TestFirstScene:
 class TestSynthesisFallback:
     @pytest.mark.asyncio
     async def test_fallback_returns_dict(self) -> None:
+        """Synthesis Fallback: fallback returns dict."""
         fallback = _SynthesisFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"seed": _MINIMAL_SEED}, ctx)
@@ -123,6 +128,7 @@ class TestSynthesisFallback:
 
     @pytest.mark.asyncio
     async def test_fallback_includes_seed_detail(self) -> None:
+        """Synthesis Fallback: fallback includes seed detail."""
         fallback = _SynthesisFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"seed": _MINIMAL_SEED}, ctx)
@@ -133,6 +139,7 @@ class TestSynthesisFallback:
 
     @pytest.mark.asyncio
     async def test_fallback_location_has_required_keys(self) -> None:
+        """Synthesis Fallback: fallback location has required keys."""
         fallback = _SynthesisFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"seed": _MINIMAL_SEED}, ctx)
@@ -143,6 +150,7 @@ class TestSynthesisFallback:
 
     @pytest.mark.asyncio
     async def test_fallback_npcs_is_list(self) -> None:
+        """Synthesis Fallback: fallback npcs is list."""
         fallback = _SynthesisFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({"seed": _MINIMAL_SEED}, ctx)
@@ -157,6 +165,7 @@ class TestSynthesisFallback:
 class TestSynthesisCall:
     @pytest.mark.asyncio
     async def test_call_parses_json_response(self) -> None:
+        """Synthesis Call: call parses json response."""
         call = _SynthesisCall()
         ctx = WorkflowContext(workflow_id="test")
 
@@ -171,6 +180,7 @@ class TestSynthesisCall:
 
     @pytest.mark.asyncio
     async def test_call_strips_markdown_fences(self) -> None:
+        """Synthesis Call: call strips markdown fences."""
         call = _SynthesisCall()
         ctx = WorkflowContext(workflow_id="test")
 
@@ -185,6 +195,7 @@ class TestSynthesisCall:
 
     @pytest.mark.asyncio
     async def test_call_raises_on_invalid_json(self) -> None:
+        """Synthesis Call: call raises on invalid json."""
         call = _SynthesisCall()
         ctx = WorkflowContext(workflow_id="test")
 
@@ -204,24 +215,28 @@ class TestSynthesisCall:
 
 class TestMessageBuilding:
     def test_messages_include_seed_tone(self) -> None:
+        """Message Building: messages include seed tone."""
         service = _make_service()
         msgs = service._build_messages(_MINIMAL_SEED, None)
         combined = " ".join(m.content for m in msgs)
         assert "getting_better" in combined
 
     def test_messages_include_seed_detail(self) -> None:
+        """Message Building: messages include seed detail."""
         service = _make_service()
         msgs = service._build_messages(_MINIMAL_SEED, None)
         combined = " ".join(m.content for m in msgs)
         assert "silver river" in combined.lower()
 
     def test_messages_include_character_name(self) -> None:
+        """Message Building: messages include character name."""
         service = _make_service()
         msgs = service._build_messages(_RICH_SEED, None)
         combined = " ".join(m.content for m in msgs)
         assert "Mira Stonewave" in combined
 
     def test_messages_include_player_character_override(self) -> None:
+        """Message Building: messages include player character override."""
         service = _make_service()
         msgs = service._build_messages(
             _MINIMAL_SEED,
@@ -232,12 +247,14 @@ class TestMessageBuilding:
         assert "former soldier" in combined
 
     def test_messages_include_geography_when_present(self) -> None:
+        """Message Building: messages include geography when present."""
         service = _make_service()
         msgs = service._build_messages(_RICH_SEED, None)
         combined = " ".join(m.content for m in msgs)
         assert "island chain" in combined
 
     def test_system_prompt_mentions_json(self) -> None:
+        """Message Building: system prompt mentions json."""
         service = _make_service()
         msgs = service._build_messages(_MINIMAL_SEED, None)
         assert "JSON" in msgs[0].content
@@ -251,6 +268,7 @@ class TestMessageBuilding:
 class TestSynthesizeNoDriver:
     @pytest.mark.asyncio
     async def test_synthesize_no_driver_returns_first_scene(self) -> None:
+        """Synthesize No Driver: synthesize no driver returns first scene."""
         service = _make_service(driver=None)
 
         with patch.object(
@@ -276,6 +294,7 @@ class TestSynthesizeNoDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_no_driver_location_id_is_uuid(self) -> None:
+        """Synthesize No Driver: synthesize no driver location id is uuid."""
         service = _make_service(driver=None)
 
         with patch.object(
@@ -292,6 +311,7 @@ class TestSynthesizeNoDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_raw_synthesis_preserved(self) -> None:
+        """Synthesize No Driver: synthesize raw synthesis preserved."""
         service = _make_service(driver=None)
 
         with patch.object(
@@ -341,6 +361,7 @@ class TestSynthesizeWithDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_calls_neo4j_session(self) -> None:
+        """Synthesize With Driver: synthesize calls neo4j session."""
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
@@ -354,6 +375,7 @@ class TestSynthesizeWithDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_creates_location_node(self) -> None:
+        """Synthesize With Driver: synthesize creates location node."""
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
@@ -368,6 +390,7 @@ class TestSynthesizeWithDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_npc_ids_populated(self) -> None:
+        """Synthesize With Driver: synthesize npc ids populated."""
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
@@ -380,6 +403,7 @@ class TestSynthesizeWithDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_event_id_non_empty(self) -> None:
+        """Synthesize With Driver: synthesize event id non empty."""
         driver = self._make_driver()
         service = _make_service(driver=driver)
 
@@ -409,6 +433,7 @@ class TestSynthesizeWithDriver:
 
     @pytest.mark.asyncio
     async def test_synthesize_multiple_npcs(self) -> None:
+        """Synthesize With Driver: synthesize multiple npcs."""
         multi_npc = {
             **_SYNTHESIS_RESULT,
             "npcs": [

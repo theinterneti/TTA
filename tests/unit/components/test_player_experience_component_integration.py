@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """
 
@@ -19,6 +20,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.components.player_experience_component import PlayerExperienceComponent
 from src.orchestration import TTAConfig, TTAOrchestrator
 from src.orchestration.component import ComponentStatus
+
+pytestmark = pytest.mark.unit
 
 
 class TestPlayerExperienceComponentIntegration(unittest.TestCase):

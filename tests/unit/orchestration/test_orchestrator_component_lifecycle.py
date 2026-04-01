@@ -14,6 +14,8 @@ import pytest
 from src.orchestration import TTAOrchestrator
 from src.orchestration.component import Component, ComponentStatus
 
+pytestmark = pytest.mark.unit
+
 
 class MockComponent(Component):
     """Mock component for testing."""

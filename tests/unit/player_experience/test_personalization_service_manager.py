@@ -27,6 +27,8 @@ from src.player_experience.models.therapeutic_settings import (
     EnhancedTherapeuticSettings,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestCrisisDetectionSystem(unittest.TestCase):
     """Test cases for CrisisDetectionSystem."""

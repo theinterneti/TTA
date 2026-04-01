@@ -16,6 +16,8 @@ from src.player_experience.api.app import create_app
 from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def client() -> TestClient:
@@ -32,6 +34,7 @@ def _auth_token(player_id: str = "player-1") -> str:
 
 
 def test_ws_rejects_without_token(client: TestClient) -> None:
+    """Ws rejects without token."""
     with client.websocket_connect("/ws/chat") as ws:  # Expect failure/close
         # When FastAPI closes policy violation, TestClient raises on receive
         with pytest.raises(Exception):
@@ -39,6 +42,7 @@ def test_ws_rejects_without_token(client: TestClient) -> None:
 
 
 def test_ws_connects_with_token_and_welcome(client: TestClient) -> None:
+    """Ws connects with token and welcome."""
     token = _auth_token()
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
         msg = json.loads(ws.receive_text())
@@ -56,6 +60,7 @@ def _recv_assistant(ws, max_messages: int = 20) -> dict:
 
 
 def test_user_message_roundtrip(client: TestClient) -> None:
+    """User message roundtrip."""
     token = _auth_token("player-xyz")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
         # consume welcome
@@ -73,6 +78,7 @@ def test_user_message_roundtrip(client: TestClient) -> None:
 
 
 def test_feedback_processing_ack(client: TestClient) -> None:
+    """Feedback processing ack."""
     token = _auth_token("player-abc")
     with client.websocket_connect(f"/ws/chat?token={token}") as ws:
         ws.receive_text()  # welcome

@@ -34,6 +34,8 @@ from src.components.world_context.models import (
     ZoneSummary,
 )
 
+pytestmark = pytest.mark.unit
+
 
 # ---------------------------------------------------------------------------
 # TierBudget
@@ -42,6 +44,7 @@ from src.components.world_context.models import (
 
 class TestTierBudget:
     def test_default_values_sum_to_total_or_less(self) -> None:
+        """Tier Budget: default values sum to total or less."""
         budget = TierBudget()
         total_tiers = (
             budget.tier1_system
@@ -55,6 +58,7 @@ class TestTierBudget:
         assert total_tiers <= budget.total
 
     def test_budget_for_each_tier(self) -> None:
+        """Tier Budget: budget for each tier."""
         budget = TierBudget()
         assert budget.budget_for(TIER_SYSTEM) == budget.tier1_system
         assert budget.budget_for(TIER_SCENE) == budget.tier2_scene
@@ -64,11 +68,13 @@ class TestTierBudget:
         assert budget.budget_for(TIER_CHARACTER) == budget.tier6_character
 
     def test_unknown_tier_raises_key_error(self) -> None:
+        """Tier Budget: unknown tier raises key error."""
         budget = TierBudget()
         with pytest.raises(KeyError):
             budget.budget_for("tier99_unknown")
 
     def test_overallocation_raises_value_error(self) -> None:
+        """Tier Budget: overallocation raises value error."""
         with pytest.raises(ValueError, match="exceed total"):
             TierBudget(
                 total=100,
@@ -81,6 +87,7 @@ class TestTierBudget:
             )
 
     def test_minimal_factory(self) -> None:
+        """Tier Budget: minimal factory."""
         budget = TierBudget.minimal()
         assert budget.total == 1200
         total = (
@@ -94,6 +101,7 @@ class TestTierBudget:
         assert total == budget.total
 
     def test_all_tiers_constant_covers_all_keys(self) -> None:
+        """Tier Budget: all tiers constant covers all keys."""
         budget = TierBudget()
         for tier in ALL_TIERS:
             budget.budget_for(tier)  # must not raise
@@ -106,24 +114,29 @@ class TestTierBudget:
 
 class TestTokenCounter:
     def test_empty_string_returns_zero(self) -> None:
+        """Token Counter: empty string returns zero."""
         counter = TokenCounter()
         assert counter.count("") == 0
 
     def test_non_empty_returns_positive(self) -> None:
+        """Token Counter: non empty returns positive."""
         counter = TokenCounter()
         assert counter.count("Hello, world!") > 0
 
     def test_fits_within_budget(self) -> None:
+        """Token Counter: fits within budget."""
         counter = TokenCounter()
         text = "a" * 10  # definitely small
         assert counter.fits(text, 1000) is True
 
     def test_does_not_fit_tiny_budget(self) -> None:
+        """Token Counter: does not fit tiny budget."""
         counter = TokenCounter()
         text = "word " * 200  # ~200 tokens
         assert counter.fits(text, 1) is False
 
     def test_truncate_returns_shorter_text(self) -> None:
+        """Token Counter: truncate returns shorter text."""
         counter = TokenCounter()
         long_text = "word " * 500
         truncated = counter.truncate_to_budget(long_text, 50)
@@ -131,17 +144,20 @@ class TestTokenCounter:
         assert truncated.endswith("…")
 
     def test_truncate_already_fits(self) -> None:
+        """Token Counter: truncate already fits."""
         counter = TokenCounter()
         short = "short"
         result = counter.truncate_to_budget(short, 1000)
         assert result == short
 
     def test_truncate_zero_budget(self) -> None:
+        """Token Counter: truncate zero budget."""
         counter = TokenCounter()
         result = counter.truncate_to_budget("text", 0)
         assert result == ""
 
     def test_backend_attribute(self) -> None:
+        """Token Counter: backend attribute."""
         counter = TokenCounter()
         assert counter.backend in ("tiktoken", "char_count")
 
@@ -225,6 +241,7 @@ class TestWorldContextBuilder:
 
     @pytest.mark.asyncio
     async def test_build_with_system_prompt(self) -> None:
+        """World Context Builder: build with system prompt."""
         builder = WorldContextBuilder()
         result = await builder.build(
             session_id="sess-001",
@@ -237,6 +254,7 @@ class TestWorldContextBuilder:
 
     @pytest.mark.asyncio
     async def test_build_with_character(self) -> None:
+        """World Context Builder: build with character."""
         builder = WorldContextBuilder()
         result = await builder.build(
             session_id="sess-001",
@@ -249,6 +267,7 @@ class TestWorldContextBuilder:
 
     @pytest.mark.asyncio
     async def test_build_with_session_store(self) -> None:
+        """World Context Builder: build with session store."""
         store = MagicMock()
         store.load_messages.return_value = [
             {"role": "user", "content": "Hello"},
@@ -345,12 +364,14 @@ class TestWorldContextBuilder:
 
     @pytest.mark.asyncio
     async def test_assembly_time_ms_positive(self) -> None:
+        """World Context Builder: assembly time ms positive."""
         builder = WorldContextBuilder()
         result = await builder.build("sess-001", "", "p1")
         assert result.assembly_time_ms >= 0.0
 
     @pytest.mark.asyncio
     async def test_all_tiers_in_result(self) -> None:
+        """World Context Builder: all tiers in result."""
         builder = WorldContextBuilder()
         result = await builder.build("sess-001", "", "p1")
         for tier in ALL_TIERS:
@@ -383,6 +404,7 @@ class TestHistoryCompressor:
 
     @pytest.mark.asyncio
     async def test_returns_recent_half_when_over_budget(self) -> None:
+        """History Compressor: returns recent half when over budget."""
         compressor = HistoryCompressor(redis_client=None)
         counter = TokenCounter()
         turns = self._make_turns(20)
@@ -443,12 +465,14 @@ class TestHistoryCompressor:
 
     @pytest.mark.asyncio
     async def test_get_stored_summary_no_redis(self) -> None:
+        """History Compressor: get stored summary no redis."""
         compressor = HistoryCompressor(redis_client=None)
         result = await compressor.get_stored_summary("sess-001")
         assert result is None
 
     @pytest.mark.asyncio
     async def test_clear_summary(self) -> None:
+        """History Compressor: clear summary."""
         mock_redis = AsyncMock()
         compressor = HistoryCompressor(redis_client=mock_redis)
         await compressor.clear_summary("sess-001")

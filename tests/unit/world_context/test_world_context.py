@@ -30,6 +30,8 @@ from src.components.world_context.traversal import (
     QUERY_ZONE_AND_FACTION_RULES,
 )
 
+pytestmark = pytest.mark.unit
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -237,6 +239,7 @@ _ZONE = {
 
 class TestWorldContextModel:
     def test_minimal_construction(self) -> None:
+        """World Context Model: minimal construction."""
         ctx = WorldContext(
             location_id="loc-001",
             location=LocationFact(id="loc-001", name="Forest"),
@@ -250,6 +253,7 @@ class TestWorldContextModel:
         assert ctx.traversal_depth == 3
 
     def test_depth_clamped_by_validator(self) -> None:
+        """World Context Model: depth clamped by validator."""
         ctx = WorldContext(
             location_id="x",
             location=LocationFact(id="x", name="X"),
@@ -258,19 +262,23 @@ class TestWorldContextModel:
         assert ctx.traversal_depth == 1
 
     def test_location_fact_extra_fields(self) -> None:
+        """World Context Model: location fact extra fields."""
         loc = LocationFact(id="x", name="Y", extra={"custom": 42})
         assert loc.extra["custom"] == 42
 
     def test_npc_state_defaults(self) -> None:
+        """World Context Model: npc state defaults."""
         npc = NPCState(id="n", name="Bob")
         assert npc.is_active is True
         assert npc.emotional_state is None
 
     def test_world_rule_priority_default(self) -> None:
+        """World Context Model: world rule priority default."""
         rule = WorldRuleSummary(id="r", name="R", rule_text="text")
         assert rule.priority == 0
 
     def test_connected_location_optional_fields(self) -> None:
+        """World Context Model: connected location optional fields."""
         cl = ConnectedLocation(id="l", name="Cave")
         assert cl.direction is None
         assert cl.distance is None
@@ -285,6 +293,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_returns_world_context(self) -> None:
+        """Neo4j Traversal Engine Depth3: returns world context."""
         driver = _make_driver(
             location=_LOC, rules=[_RULE], npcs=[_NPC],
             events=[_EVENT], connected=[_CONNECTED],
@@ -297,6 +306,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_location_populated(self) -> None:
+        """Neo4j Traversal Engine Depth3: location populated."""
         driver = _make_driver(location=_LOC)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001")
         assert ctx is not None
@@ -306,6 +316,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_npcs_populated(self) -> None:
+        """Neo4j Traversal Engine Depth3: npcs populated."""
         driver = _make_driver(location=_LOC, npcs=[_NPC])
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001")
         assert ctx is not None
@@ -315,6 +326,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_active_events_populated(self) -> None:
+        """Neo4j Traversal Engine Depth3: active events populated."""
         driver = _make_driver(location=_LOC, events=[_EVENT])
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001")
         assert ctx is not None
@@ -323,6 +335,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_rules_include_location_and_zone_rules(self) -> None:
+        """Neo4j Traversal Engine Depth3: rules include location and zone rules."""
         driver = _make_driver(
             location=_LOC, rules=[_RULE],
             zone=_ZONE, zone_rules=[_ZONE_RULE],
@@ -335,6 +348,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_zone_populated(self) -> None:
+        """Neo4j Traversal Engine Depth3: zone populated."""
         driver = _make_driver(location=_LOC, zone=_ZONE)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001")
         assert ctx is not None
@@ -343,6 +357,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_traversal_depth_recorded(self) -> None:
+        """Neo4j Traversal Engine Depth3: traversal depth recorded."""
         driver = _make_driver(location=_LOC)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=3)
         assert ctx is not None
@@ -350,6 +365,7 @@ class TestNeo4jTraversalEngineDepth3:
 
     @pytest.mark.asyncio
     async def test_query_time_recorded(self) -> None:
+        """Neo4j Traversal Engine Depth3: query time recorded."""
         driver = _make_driver(location=_LOC)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001")
         assert ctx is not None
@@ -376,6 +392,7 @@ class TestNeo4jTraversalEngineDepth1:
 
     @pytest.mark.asyncio
     async def test_depth1_no_npcs_or_events(self) -> None:
+        """Neo4j Traversal Engine Depth1: depth1 no npcs or events."""
         driver = _make_driver(location=_LOC, npcs=[_NPC], events=[_EVENT])
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=1)
         assert ctx is not None
@@ -387,6 +404,7 @@ class TestNeo4jTraversalEngineDepth1:
 
     @pytest.mark.asyncio
     async def test_depth1_rules_included(self) -> None:
+        """Neo4j Traversal Engine Depth1: depth1 rules included."""
         driver = _make_driver(location=_LOC, rules=[_RULE])
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=1)
         assert ctx is not None
@@ -398,6 +416,7 @@ class TestNeo4jTraversalEngineDepth2:
 
     @pytest.mark.asyncio
     async def test_depth2_has_npcs_and_events(self) -> None:
+        """Neo4j Traversal Engine Depth2: depth2 has npcs and events."""
         driver = _make_driver(
             location=_LOC, npcs=[_NPC], events=[_EVENT], connected=[_CONNECTED]
         )
@@ -409,6 +428,7 @@ class TestNeo4jTraversalEngineDepth2:
 
     @pytest.mark.asyncio
     async def test_depth2_no_zone(self) -> None:
+        """Neo4j Traversal Engine Depth2: depth2 no zone."""
         driver = _make_driver(location=_LOC, zone=_ZONE)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=2)
         assert ctx is not None
@@ -419,12 +439,14 @@ class TestNeo4jTraversalEngineDepth2:
 class TestNeo4jTraversalEngineEdgeCases:
     @pytest.mark.asyncio
     async def test_returns_none_for_missing_location(self) -> None:
+        """Neo4j Traversal Engine Edge Cases: returns none for missing location."""
         driver = _make_driver(location=None)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-999")
         assert ctx is None
 
     @pytest.mark.asyncio
     async def test_depth_clamped_to_max_3(self) -> None:
+        """Neo4j Traversal Engine Edge Cases: depth clamped to max 3."""
         driver = _make_driver(location=_LOC)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=99)
         assert ctx is not None
@@ -432,6 +454,7 @@ class TestNeo4jTraversalEngineEdgeCases:
 
     @pytest.mark.asyncio
     async def test_depth_clamped_to_min_1(self) -> None:
+        """Neo4j Traversal Engine Edge Cases: depth clamped to min 1."""
         driver = _make_driver(location=_LOC)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=0)
         assert ctx is not None
@@ -439,6 +462,7 @@ class TestNeo4jTraversalEngineEdgeCases:
 
     @pytest.mark.asyncio
     async def test_no_zone_at_depth3_is_fine(self) -> None:
+        """Neo4j Traversal Engine Edge Cases: no zone at depth3 is fine."""
         driver = _make_driver(location=_LOC, zone=None)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001", depth=3)
         assert ctx is not None
@@ -446,6 +470,7 @@ class TestNeo4jTraversalEngineEdgeCases:
 
     @pytest.mark.asyncio
     async def test_empty_graph_returns_bare_location(self) -> None:
+        """Neo4j Traversal Engine Edge Cases: empty graph returns bare location."""
         driver = _make_driver(location=_LOC)
         ctx = await Neo4jTraversalEngine(driver).build_context("loc-001")
         assert ctx is not None
@@ -460,14 +485,18 @@ class TestNeo4jTraversalEngineEdgeCases:
 
 class TestQueryConstants:
     def test_location_query_uses_correct_label(self) -> None:
+        """Query Constants: location query uses correct label."""
         assert "Location" in QUERY_LOCATION
         assert "$location_id" in QUERY_LOCATION
 
     def test_npcs_query_uses_correct_relationship(self) -> None:
+        """Query Constants: npcs query uses correct relationship."""
         assert "LIVES_IN" in QUERY_NPCS or "CURRENTLY_AT" in QUERY_NPCS
 
     def test_events_query_filters_active(self) -> None:
+        """Query Constants: events query filters active."""
         assert "is_active" in QUERY_ACTIVE_EVENTS
 
     def test_zone_and_faction_rules_query_uses_union(self) -> None:
+        """Query Constants: zone and faction rules query uses union."""
         assert "UNION" in QUERY_ZONE_AND_FACTION_RULES

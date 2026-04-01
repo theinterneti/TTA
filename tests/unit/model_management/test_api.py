@@ -25,6 +25,8 @@ from src.components.model_management.interfaces import (
     TaskType,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -66,6 +68,7 @@ def _make_client(component_mock) -> TestClient:
 
 class TestHealthCheck:
     def test_health_returns_200(self):
+        """Health Check: health returns 200."""
         app = FastAPI()
         app.include_router(router)
         client = TestClient(app)
@@ -112,6 +115,7 @@ class TestGenerateEndpoint:
         return component
 
     def test_generate_success(self, mock_component):
+        """Generate Endpoint: generate success."""
         client = _make_client(mock_component)
         payload = {"prompt": "Tell me a story", "task_type": "general_chat"}
         resp = client.post("/api/v1/models/generate", json=payload)
@@ -123,6 +127,7 @@ class TestGenerateEndpoint:
         assert data["latency_ms"] == 250.0
 
     def test_generate_no_response_returns_5xx(self, mock_component):
+        """Generate Endpoint: generate no response returns 5xx."""
         mock_component.generate_text = AsyncMock(return_value=None)
         client = _make_client(mock_component)
         payload = {"prompt": "test"}
@@ -131,6 +136,7 @@ class TestGenerateEndpoint:
         assert resp.status_code in (503, 500)
 
     def test_generate_exception_returns_500(self, mock_component):
+        """Generate Endpoint: generate exception returns 500."""
         mock_component.generate_text = AsyncMock(side_effect=RuntimeError("model down"))
         client = _make_client(mock_component)
         payload = {"prompt": "test"}
@@ -138,6 +144,7 @@ class TestGenerateEndpoint:
         assert resp.status_code == 500
 
     def test_generate_uses_default_task_type(self, mock_component):
+        """Generate Endpoint: generate uses default task type."""
         client = _make_client(mock_component)
         payload = {"prompt": "hello"}
         resp = client.post("/api/v1/models/generate", json=payload)
@@ -146,6 +153,7 @@ class TestGenerateEndpoint:
         assert call_kwargs.kwargs["task_type"] == TaskType.GENERAL_CHAT
 
     def test_generate_passes_all_params(self, mock_component):
+        """Generate Endpoint: generate passes all params."""
         client = _make_client(mock_component)
         payload = {
             "prompt": "test prompt",
@@ -166,6 +174,7 @@ class TestGenerateEndpoint:
         assert call_kwargs["top_p"] == 0.85
 
     def test_generate_response_with_no_metadata(self, mock_component):
+        """Generate Endpoint: generate response with no metadata."""
         gen_resp = MagicMock()
         gen_resp.text = "hello"
         gen_resp.model_id = "test/model"
@@ -199,6 +208,7 @@ class TestAvailableModelsEndpoint:
         return component
 
     def test_get_available_models_success(self, mock_component):
+        """Available Models Endpoint: get available models success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/available")
         assert resp.status_code == 200
@@ -208,6 +218,7 @@ class TestAvailableModelsEndpoint:
         assert data[1]["model_id"] == "model-b"
 
     def test_get_available_models_with_provider_filter(self, mock_component):
+        """Available Models Endpoint: get available models with provider filter."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/available?provider=openrouter")
         assert resp.status_code == 200
@@ -216,6 +227,7 @@ class TestAvailableModelsEndpoint:
         )
 
     def test_get_available_models_free_only(self, mock_component):
+        """Available Models Endpoint: get available models free only."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/available?free_only=true")
         assert resp.status_code == 200
@@ -224,6 +236,7 @@ class TestAvailableModelsEndpoint:
         )
 
     def test_get_available_models_contains_expected_fields(self, mock_component):
+        """Available Models Endpoint: get available models contains expected fields."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/available")
         data = resp.json()
@@ -240,6 +253,7 @@ class TestAvailableModelsEndpoint:
         assert "performance_score" in model
 
     def test_get_available_models_exception_returns_500(self, mock_component):
+        """Available Models Endpoint: get available models exception returns 500."""
         mock_component.get_available_models = AsyncMock(
             side_effect=Exception("db error")
         )
@@ -264,6 +278,7 @@ class TestFreeModelsEndpoint:
         return component
 
     def test_get_free_models_success(self, mock_component):
+        """Free Models Endpoint: get free models success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/free")
         assert resp.status_code == 200
@@ -272,12 +287,14 @@ class TestFreeModelsEndpoint:
         assert data[0]["is_free"] is True
 
     def test_get_free_models_with_provider(self, mock_component):
+        """Free Models Endpoint: get free models with provider."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/free?provider=ollama")
         assert resp.status_code == 200
         mock_component.get_free_models.assert_called_once_with("ollama")
 
     def test_get_free_models_exception_returns_500(self, mock_component):
+        """Free Models Endpoint: get free models exception returns 500."""
         mock_component.get_free_models = AsyncMock(side_effect=RuntimeError("fail"))
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/free")
@@ -300,6 +317,7 @@ class TestAffordableModelsEndpoint:
         return component
 
     def test_get_affordable_models_success(self, mock_component):
+        """Affordable Models Endpoint: get affordable models success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/affordable")
         assert resp.status_code == 200
@@ -307,12 +325,14 @@ class TestAffordableModelsEndpoint:
         assert len(data) == 1
 
     def test_get_affordable_models_custom_threshold(self, mock_component):
+        """Affordable Models Endpoint: get affordable models custom threshold."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/affordable?max_cost_per_token=0.0005")
         assert resp.status_code == 200
         mock_component.get_affordable_models.assert_called_once_with(0.0005, None)
 
     def test_get_affordable_models_exception_returns_500(self, mock_component):
+        """Affordable Models Endpoint: get affordable models exception returns 500."""
         mock_component.get_affordable_models = AsyncMock(side_effect=Exception("fail"))
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/affordable")
@@ -335,6 +355,7 @@ class TestOpenRouterFreeModelsEndpoint:
         return component
 
     def test_get_openrouter_free_models_success(self, mock_component):
+        """Open Router Free Models Endpoint: get openrouter free models success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/openrouter/free")
         assert resp.status_code == 200
@@ -343,6 +364,7 @@ class TestOpenRouterFreeModelsEndpoint:
         assert data[0]["model_id"] == "or/free-model"
 
     def test_get_openrouter_free_models_exception_returns_500(self, mock_component):
+        """Open Router Free Models Endpoint: get openrouter free models exception returns 500."""
         mock_component.get_openrouter_free_models = AsyncMock(
             side_effect=Exception("or down")
         )
@@ -367,6 +389,7 @@ class TestRecommendationsEndpoint:
         return component
 
     def test_get_recommendations_success(self, mock_component):
+        """Recommendations Endpoint: get recommendations success."""
         client = _make_client(mock_component)
         resp = client.get(
             "/api/v1/models/recommendations?task_type=narrative_generation"
@@ -376,6 +399,7 @@ class TestRecommendationsEndpoint:
         assert data == ["model-a", "model-b"]
 
     def test_get_recommendations_exception_returns_500(self, mock_component):
+        """Recommendations Endpoint: get recommendations exception returns 500."""
         mock_component.get_model_recommendations = AsyncMock(
             side_effect=ValueError("bad task")
         )
@@ -409,6 +433,7 @@ class TestModelConnectivityEndpoint:
         return component
 
     def test_test_model_success(self, mock_component):
+        """Model Connectivity Endpoint: test model success."""
         client = _make_client(mock_component)
         payload = {"model_id": "test/model", "provider_name": "openrouter"}
         resp = client.post("/api/v1/models/test", json=payload)
@@ -419,6 +444,7 @@ class TestModelConnectivityEndpoint:
         assert data["status"] == "success"
 
     def test_test_model_exception_returns_500(self, mock_component):
+        """Model Connectivity Endpoint: test model exception returns 500."""
         mock_component.test_model_connectivity = AsyncMock(
             side_effect=RuntimeError("connect error")
         )
@@ -450,6 +476,7 @@ class TestSystemStatusEndpoint:
         return component
 
     def test_get_system_status_success(self, mock_component):
+        """System Status Endpoint: get system status success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/status")
         assert resp.status_code == 200
@@ -458,6 +485,7 @@ class TestSystemStatusEndpoint:
         assert data["active_models"] == 2
 
     def test_get_system_status_exception_returns_500(self, mock_component):
+        """System Status Endpoint: get system status exception returns 500."""
         mock_component.get_system_status = AsyncMock(side_effect=Exception("crash"))
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/status")
@@ -478,6 +506,7 @@ class TestLoadModelEndpoint:
         return component
 
     def test_load_model_returns_loading_status(self, mock_component):
+        """Load Model Endpoint: load model returns loading status."""
         client = _make_client(mock_component)
         resp = client.post("/api/v1/models/load/openrouter/test-model")
         assert resp.status_code == 200
@@ -500,6 +529,7 @@ class TestUnloadModelEndpoint:
         return component
 
     def test_unload_model_success(self, mock_component):
+        """Unload Model Endpoint: unload model success."""
         client = _make_client(mock_component)
         resp = client.delete("/api/v1/models/unload/test-model")
         assert resp.status_code == 200
@@ -507,12 +537,14 @@ class TestUnloadModelEndpoint:
         assert data["status"] == "unloaded"
 
     def test_unload_model_not_found_returns_404(self, mock_component):
+        """Unload Model Endpoint: unload model not found returns 404."""
         mock_component.unload_model = AsyncMock(return_value=False)
         client = _make_client(mock_component)
         resp = client.delete("/api/v1/models/unload/nonexistent-model")
         assert resp.status_code in (404, 500)
 
     def test_unload_model_exception_returns_500(self, mock_component):
+        """Unload Model Endpoint: unload model exception returns 500."""
         mock_component.unload_model = AsyncMock(side_effect=Exception("unload fail"))
         client = _make_client(mock_component)
         resp = client.delete("/api/v1/models/unload/bad-model")
@@ -537,6 +569,7 @@ class TestModelPerformanceEndpoint:
         return component
 
     def test_get_model_performance_success(self, mock_component):
+        """Model Performance Endpoint: get model performance success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/performance/test-model")
         assert resp.status_code == 200
@@ -544,6 +577,7 @@ class TestModelPerformanceEndpoint:
         assert data["model_id"] == "test-model"
 
     def test_get_model_performance_no_monitor_returns_5xx(self, mock_component):
+        """Model Performance Endpoint: get model performance no monitor returns 5xx."""
         mock_component.performance_monitor = None
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/performance/test-model")
@@ -551,6 +585,7 @@ class TestModelPerformanceEndpoint:
         assert resp.status_code in (503, 500)
 
     def test_get_model_performance_custom_timeframe(self, mock_component):
+        """Model Performance Endpoint: get model performance custom timeframe."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/performance/test-model?timeframe_hours=48")
         assert resp.status_code == 200
@@ -577,6 +612,7 @@ class TestSystemPerformanceEndpoint:
         return component
 
     def test_get_system_performance_success(self, mock_component):
+        """System Performance Endpoint: get system performance success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/performance")
         assert resp.status_code == 200
@@ -584,6 +620,7 @@ class TestSystemPerformanceEndpoint:
         assert data["total_models"] == 3
 
     def test_get_system_performance_no_monitor_returns_5xx(self, mock_component):
+        """System Performance Endpoint: get system performance no monitor returns 5xx."""
         mock_component.performance_monitor = None
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/performance")
@@ -618,6 +655,7 @@ class TestFallbackStatisticsEndpoint:
         return component
 
     def test_get_fallback_statistics_success(self, mock_component):
+        """Fallback Statistics Endpoint: get fallback statistics success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/fallback/statistics")
         assert resp.status_code == 200
@@ -625,12 +663,14 @@ class TestFallbackStatisticsEndpoint:
         assert "total_failed_models" in data
 
     def test_get_fallback_statistics_no_handler_returns_5xx(self, mock_component):
+        """Fallback Statistics Endpoint: get fallback statistics no handler returns 5xx."""
         mock_component.fallback_handler = None
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/fallback/statistics")
         assert resp.status_code in (503, 500)
 
     def test_get_fallback_statistics_exception_returns_500(self, mock_component):
+        """Fallback Statistics Endpoint: get fallback statistics exception returns 500."""
         mock_component.fallback_handler.get_failure_statistics = MagicMock(
             side_effect=Exception("stats error")
         )
@@ -655,6 +695,7 @@ class TestResetModelFailuresEndpoint:
         return component
 
     def test_reset_model_failures_success(self, mock_component):
+        """Reset Model Failures Endpoint: reset model failures success."""
         client = _make_client(mock_component)
         resp = client.post("/api/v1/models/fallback/reset/test-model")
         assert resp.status_code == 200
@@ -663,6 +704,7 @@ class TestResetModelFailuresEndpoint:
         assert data["model_id"] == "test-model"
 
     def test_reset_model_failures_not_found_returns_404(self, mock_component):
+        """Reset Model Failures Endpoint: reset model failures not found returns 404."""
         mock_component.fallback_handler.reset_model_failures = MagicMock(
             return_value=False
         )
@@ -671,12 +713,14 @@ class TestResetModelFailuresEndpoint:
         assert resp.status_code in (404, 500)
 
     def test_reset_model_failures_no_handler_returns_5xx(self, mock_component):
+        """Reset Model Failures Endpoint: reset model failures no handler returns 5xx."""
         mock_component.fallback_handler = None
         client = _make_client(mock_component)
         resp = client.post("/api/v1/models/fallback/reset/test-model")
         assert resp.status_code in (503, 500)
 
     def test_reset_model_failures_exception_returns_500(self, mock_component):
+        """Reset Model Failures Endpoint: reset model failures exception returns 500."""
         mock_component.fallback_handler.reset_model_failures = MagicMock(
             side_effect=Exception("reset error")
         )
@@ -706,6 +750,7 @@ class TestOpenRouterFilterEndpoints:
         return component
 
     def test_set_openrouter_filter_success(self, mock_component):
+        """Open Router Filter Endpoints: set openrouter filter success."""
         client = _make_client(mock_component)
         resp = client.post(
             "/api/v1/models/openrouter/filter?show_free_only=true&prefer_free=true&max_cost_per_token=0.0005"
@@ -716,6 +761,7 @@ class TestOpenRouterFilterEndpoints:
         assert data["settings"]["show_free_only"] is True
 
     def test_set_openrouter_filter_exception_returns_500(self, mock_component):
+        """Open Router Filter Endpoints: set openrouter filter exception returns 500."""
         mock_component.set_openrouter_filter = AsyncMock(
             side_effect=Exception("filter error")
         )
@@ -724,6 +770,7 @@ class TestOpenRouterFilterEndpoints:
         assert resp.status_code == 500
 
     def test_get_openrouter_filter_success(self, mock_component):
+        """Open Router Filter Endpoints: get openrouter filter success."""
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/openrouter/filter")
         assert resp.status_code == 200
@@ -732,12 +779,14 @@ class TestOpenRouterFilterEndpoints:
         assert "settings" in data
 
     def test_get_openrouter_filter_not_available_returns_404(self, mock_component):
+        """Open Router Filter Endpoints: get openrouter filter not available returns 404."""
         mock_component.get_openrouter_filter_settings = MagicMock(return_value=None)
         client = _make_client(mock_component)
         resp = client.get("/api/v1/models/openrouter/filter")
         assert resp.status_code in (404, 500)
 
     def test_get_openrouter_filter_exception_returns_500(self, mock_component):
+        """Open Router Filter Endpoints: get openrouter filter exception returns 500."""
         mock_component.get_openrouter_filter_settings = MagicMock(
             side_effect=Exception("filter read error")
         )
@@ -753,6 +802,7 @@ class TestOpenRouterFilterEndpoints:
 
 class TestApiModels:
     def test_generation_request_defaults(self):
+        """Api Models: generation request defaults."""
         req = GenerationRequest(prompt="hello")
         assert req.task_type is not None
         assert req.max_tokens == 2048
@@ -761,6 +811,7 @@ class TestApiModels:
         assert req.stream is False
 
     def test_generation_response_fields(self):
+        """Api Models: generation response fields."""
         resp = GenerationResponse(
             text="result",
             model_id="test/model",
@@ -772,11 +823,13 @@ class TestApiModels:
         assert resp.metadata is None
 
     def test_model_test_request(self):
+        """Api Models: model test request."""
         req = ModelTestRequest(model_id="test/model", provider_name="openrouter")
         assert req.model_id == "test/model"
         assert req.provider_name == "openrouter"
 
     def test_system_status_response(self):
+        """Api Models: system status response."""
         status = SystemStatusResponse(
             initialized=True,
             active_models=3,

@@ -29,6 +29,8 @@ from src.player_experience.models.session import (
     TherapeuticSettings,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestSessionRepository(unittest.TestCase):
     """Test session repository functionality."""
@@ -612,6 +614,7 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
 
 @pytest.mark.asyncio
 async def test_repo_create_session_pytest():
+    """Repo create session pytest."""
     t = TestSessionRepository()
     t.setUp()
     await t._async_create_session()
@@ -619,6 +622,7 @@ async def test_repo_create_session_pytest():
 
 @pytest.mark.asyncio
 async def test_repo_get_session_from_cache_pytest():
+    """Repo get session from cache pytest."""
     t = TestSessionRepository()
     t.setUp()
     await t._async_get_session_from_cache()
@@ -626,6 +630,7 @@ async def test_repo_get_session_from_cache_pytest():
 
 @pytest.mark.asyncio
 async def test_repo_pause_session_pytest():
+    """Repo pause session pytest."""
     t = TestSessionRepository()
     t.setUp()
     await t._async_pause_session()
@@ -633,6 +638,7 @@ async def test_repo_pause_session_pytest():
 
 @pytest.mark.asyncio
 async def test_repo_end_session_pytest():
+    """Repo end session pytest."""
     t = TestSessionRepository()
     t.setUp()
     await t._async_end_session()
@@ -640,6 +646,7 @@ async def test_repo_end_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_create_session_pytest():
+    """Mgr create session pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_create_session()
@@ -647,6 +654,7 @@ async def test_mgr_create_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_switch_context_new_session_pytest():
+    """Mgr switch context new session pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_switch_character_world_context_new_session()
@@ -654,6 +662,7 @@ async def test_mgr_switch_context_new_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_switch_context_existing_session_pytest():
+    """Mgr switch context existing session pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_switch_character_world_context_existing_session()
@@ -661,6 +670,7 @@ async def test_mgr_switch_context_existing_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_pause_session_pytest():
+    """Mgr pause session pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_pause_session()
@@ -668,6 +678,7 @@ async def test_mgr_pause_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_resume_session_pytest():
+    """Mgr resume session pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_resume_session()
@@ -675,6 +686,7 @@ async def test_mgr_resume_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_end_session_pytest():
+    """Mgr end session pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_end_session()
@@ -682,6 +694,7 @@ async def test_mgr_end_session_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_update_session_interaction_pytest():
+    """Mgr update session interaction pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_update_session_interaction()
@@ -689,6 +702,7 @@ async def test_mgr_update_session_interaction_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_add_progress_marker_pytest():
+    """Mgr add progress marker pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_add_progress_marker()
@@ -696,6 +710,7 @@ async def test_mgr_add_progress_marker_pytest():
 
 @pytest.mark.asyncio
 async def test_mgr_update_therapeutic_settings_pytest():
+    """Mgr update therapeutic settings pytest."""
     t = TestSessionIntegrationManager()
     t.setUp()
     await t._async_update_therapeutic_settings()
@@ -703,6 +718,7 @@ async def test_mgr_update_therapeutic_settings_pytest():
 
 @pytest.mark.asyncio
 async def test_integration_complete_session_lifecycle_pytest():
+    """Integration complete session lifecycle pytest."""
     t = TestSessionLifecycleIntegration()
     t.setUp()
     await t._async_complete_session_lifecycle()

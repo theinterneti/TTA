@@ -16,6 +16,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+pytestmark = pytest.mark.unit
+
 # Patch path for get_gameplay_service used inside _session_cleanup_loop.
 _SVC_PATCH = "src.player_experience.api.routers.gameplay.get_gameplay_service"
 

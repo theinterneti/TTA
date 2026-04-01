@@ -1,3 +1,4 @@
+import pytest
 """
 
 # Logseq: [[TTA.dev/Tests/Test_free_models_filter]]
@@ -6,6 +7,8 @@ Tests for OpenRouter Free Models Filter functionality
 
 import os
 from unittest.mock import Mock, patch
+
+pytestmark = pytest.mark.unit
 
 
 # Mock the model management components for testing

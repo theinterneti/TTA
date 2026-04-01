@@ -27,10 +27,12 @@ from src.components.world_context.models import (
     ZoneSummary,
 )
 
+pytestmark = pytest.mark.unit
+
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:
-    from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
+    pytest.skip("ttadev.primitives not available", allow_module_level=True)
 
 
 # ---------------------------------------------------------------------------
@@ -109,30 +111,35 @@ def _simple_processed_input(
 
 class TestBuildUserMessage:
     def test_includes_location_name(self) -> None:
+        """Build User Message: includes location name."""
         pi = _simple_processed_input()
         wc = _simple_world_context()
         msg = _build_user_message(pi, wc, history=None)
         assert "Village Square" in msg
 
     def test_includes_npc_names(self) -> None:
+        """Build User Message: includes npc names."""
         pi = _simple_processed_input()
         wc = _rich_world_context()
         msg = _build_user_message(pi, wc, history=None)
         assert "Merchant" in msg
 
     def test_includes_events(self) -> None:
+        """Build User Message: includes events."""
         pi = _simple_processed_input()
         wc = _rich_world_context()
         msg = _build_user_message(pi, wc, history=None)
         assert "Festival" in msg
 
     def test_includes_exits(self) -> None:
+        """Build User Message: includes exits."""
         pi = _simple_processed_input()
         wc = _rich_world_context()
         msg = _build_user_message(pi, wc, history=None)
         assert "North Gate" in msg
 
     def test_safety_signal_warning_included(self) -> None:
+        """Build User Message: safety signal warning included."""
         pi = ProcessedInput(
             raw_text="I feel hopeless",
             normalized_text="i feel hopeless",
@@ -145,6 +152,7 @@ class TestBuildUserMessage:
         assert "⚠" in msg or "Safety signal" in msg
 
     def test_history_appended(self) -> None:
+        """Build User Message: history appended."""
         pi = _simple_processed_input()
         wc = _simple_world_context()
         history = ["Turn 1: walked north.", "Turn 2: met the guard."]
@@ -152,6 +160,7 @@ class TestBuildUserMessage:
         assert "walked north" in msg
 
     def test_only_last_three_history_turns_used(self) -> None:
+        """Build User Message: only last three history turns used."""
         pi = _simple_processed_input()
         wc = _simple_world_context()
         history = [f"Turn {i}" for i in range(10)]
@@ -169,6 +178,7 @@ class TestBuildUserMessage:
 class TestNGALLMCall:
     @pytest.mark.asyncio
     async def test_returns_stripped_content(self) -> None:
+        """N G A L L M Call: returns stripped content."""
         llm = _make_llm("  The forest breathes.  ")
         call = _NGALLMCall(llm)
         ctx = WorkflowContext(workflow_id="test")
@@ -180,6 +190,7 @@ class TestNGALLMCall:
 
     @pytest.mark.asyncio
     async def test_raises_on_llm_failure(self) -> None:
+        """N G A L L M Call: raises on llm failure."""
         llm = MagicMock()
         llm.ainvoke = AsyncMock(side_effect=RuntimeError("timeout"))
         call = _NGALLMCall(llm)
@@ -196,6 +207,7 @@ class TestNGALLMCall:
 class TestNGAFallback:
     @pytest.mark.asyncio
     async def test_returns_safe_fallback_string(self) -> None:
+        """N G A Fallback: returns safe fallback string."""
         fallback = _NGAFallback()
         ctx = WorkflowContext(workflow_id="test")
         result = await fallback.execute({}, ctx)
@@ -211,6 +223,7 @@ class TestNGAFallback:
 class TestNGAAgent:
     @pytest.mark.asyncio
     async def test_generate_returns_narrative_string(self) -> None:
+        """N G A Agent: generate returns narrative string."""
         agent = NGAAgent(llm=_make_llm("The sun sets over the valley."))
         pi = _simple_processed_input()
         wc = _simple_world_context()
@@ -219,6 +232,7 @@ class TestNGAAgent:
 
     @pytest.mark.asyncio
     async def test_generate_with_rich_context(self) -> None:
+        """N G A Agent: generate with rich context."""
         narrative = "The merchant waves at you warmly."
         agent = NGAAgent(llm=_make_llm(narrative))
         pi = _simple_processed_input(intent=Intent.INTERACT)
@@ -240,6 +254,7 @@ class TestNGAAgent:
 
     @pytest.mark.asyncio
     async def test_history_passed_through(self) -> None:
+        """N G A Agent: history passed through."""
         captured: list[Any] = []
 
         async def capture(messages: list) -> AIMessage:

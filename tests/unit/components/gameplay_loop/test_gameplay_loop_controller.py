@@ -167,6 +167,7 @@ def mock_controller():
 
 class TestControllerInit:
     def test_default_construction_succeeds(self):
+        """Controller Init: default construction succeeds."""
         with (
             patch("src.components.gameplay_loop.controller.get_llm", return_value=None),
             patch(
@@ -195,6 +196,7 @@ class TestControllerInit:
             assert ctrl.response_time_target == 2.0
 
     def test_custom_config(self):
+        """Controller Init: custom config."""
         with (
             patch("src.components.gameplay_loop.controller.get_llm", return_value=None),
             patch(
@@ -223,10 +225,12 @@ class TestControllerInit:
             assert ctrl.response_time_target == 3.0
 
     async def test_initialize_returns_true(self, mock_controller):
+        """Controller Init: initialize returns true."""
         result = await mock_controller.initialize()
         assert result is True
 
     async def test_initialize_calls_all_subsystems(self, mock_controller):
+        """Controller Init: initialize calls all subsystems."""
         await mock_controller.initialize()
         mock_controller.database_manager.initialize.assert_called_once()
         mock_controller.narrative_engine.initialize.assert_called_once()
@@ -234,6 +238,7 @@ class TestControllerInit:
         mock_controller.consequence_system.initialize.assert_called_once()
 
     async def test_initialize_returns_false_on_exception(self, mock_controller):
+        """Controller Init: initialize returns false on exception."""
         mock_controller.database_manager.initialize = AsyncMock(
             side_effect=RuntimeError("db error")
         )
@@ -248,31 +253,38 @@ class TestControllerInit:
 
 class TestStartSession:
     async def test_start_session_returns_gameplay_session(self, mock_controller):
+        """Start Session: start session returns gameplay session."""
         session = await mock_controller.start_session("user-1")
         assert isinstance(session, GameplaySession)
         assert session.user_id == "user-1"
 
     async def test_start_session_is_active(self, mock_controller):
+        """Start Session: start session is active."""
         session = await mock_controller.start_session("user-1")
         assert session.is_active is True
 
     async def test_start_session_stores_in_active_sessions(self, mock_controller):
+        """Start Session: start session stores in active sessions."""
         session = await mock_controller.start_session("user-1")
         assert session.session_id in mock_controller.active_sessions
 
     async def test_start_session_has_scene(self, mock_controller):
+        """Start Session: start session has scene."""
         session = await mock_controller.start_session("user-1")
         assert session.current_scene is not None
 
     async def test_start_session_has_choices(self, mock_controller):
+        """Start Session: start session has choices."""
         session = await mock_controller.start_session("user-1")
         assert len(session.available_choices) > 0
 
     async def test_start_session_calls_create_session(self, mock_controller):
+        """Start Session: start session calls create session."""
         await mock_controller.start_session("user-1")
         mock_controller.database_manager.create_session.assert_called_once()
 
     async def test_start_session_no_scene_generates_no_choices(self, mock_controller):
+        """Start Session: start session no scene generates no choices."""
         mock_controller.narrative_engine.generate_opening_scene = AsyncMock(
             return_value=None
         )
@@ -280,6 +292,7 @@ class TestStartSession:
         assert session.available_choices == []
 
     async def test_start_session_raises_on_db_error(self, mock_controller):
+        """Start Session: start session raises on db error."""
         mock_controller.database_manager.create_session = AsyncMock(
             side_effect=RuntimeError("db failure")
         )
@@ -294,24 +307,28 @@ class TestStartSession:
 
 class TestResumeSession:
     async def test_resume_existing_active_session(self, mock_controller):
+        """Resume Session: resume existing active session."""
         session = await mock_controller.start_session("user-1")
         resumed = await mock_controller.resume_session(session.session_id)
         assert resumed is not None
         assert resumed.session_id == session.session_id
 
     async def test_resume_updates_last_activity_time(self, mock_controller):
+        """Resume Session: resume updates last activity time."""
         session = await mock_controller.start_session("user-1")
         old_time = session.last_activity_time
         resumed = await mock_controller.resume_session(session.session_id)
         assert resumed.last_activity_time >= old_time
 
     async def test_resume_not_found_returns_none(self, mock_controller):
+        """Resume Session: resume not found returns none."""
         mock_controller.database_manager.get_session = AsyncMock(return_value=None)
         result = await mock_controller.resume_session("nonexistent-session")
         assert result is None
 
     async def test_resume_from_db_creates_active_session(self, mock_controller):
         # Simulate session that was paused (not in active_sessions) but in DB
+        """Resume Session: resume from db creates active session."""
         db_state = SessionState(user_id="user-db")
         db_state.current_scene = _make_scene()
         mock_controller.database_manager.get_session = AsyncMock(return_value=db_state)
@@ -320,6 +337,7 @@ class TestResumeSession:
         assert result.session_id == db_state.session_id
 
     async def test_resume_from_db_with_no_scene_generates_scene(self, mock_controller):
+        """Resume Session: resume from db with no scene generates scene."""
         db_state = SessionState(user_id="user-db")
         db_state.current_scene = None
         mock_controller.database_manager.get_session = AsyncMock(return_value=db_state)
@@ -327,6 +345,7 @@ class TestResumeSession:
         assert result is not None
 
     async def test_resume_generates_recap(self, mock_controller):
+        """Resume Session: resume generates recap."""
         db_state = SessionState(user_id="user-db")
         db_state.current_scene = _make_scene()
         mock_controller.database_manager.get_session = AsyncMock(return_value=db_state)
@@ -334,6 +353,7 @@ class TestResumeSession:
         assert result.session_recap is not None
 
     async def test_resume_returns_none_on_error(self, mock_controller):
+        """Resume Session: resume returns none on error."""
         mock_controller.database_manager.get_session = AsyncMock(
             side_effect=RuntimeError("db crash")
         )
@@ -348,25 +368,30 @@ class TestResumeSession:
 
 class TestPauseSession:
     async def test_pause_returns_true(self, mock_controller):
+        """Pause Session: pause returns true."""
         session = await mock_controller.start_session("user-1")
         result = await mock_controller.pause_session(session.session_id)
         assert result is True
 
     async def test_pause_removes_from_active_sessions(self, mock_controller):
+        """Pause Session: pause removes from active sessions."""
         session = await mock_controller.start_session("user-1")
         await mock_controller.pause_session(session.session_id)
         assert session.session_id not in mock_controller.active_sessions
 
     async def test_pause_nonexistent_returns_false(self, mock_controller):
+        """Pause Session: pause nonexistent returns false."""
         result = await mock_controller.pause_session("does-not-exist")
         assert result is False
 
     async def test_pause_saves_to_database(self, mock_controller):
+        """Pause Session: pause saves to database."""
         session = await mock_controller.start_session("user-1")
         await mock_controller.pause_session(session.session_id)
         mock_controller.database_manager.update_session.assert_called()
 
     async def test_pause_returns_false_on_exception(self, mock_controller):
+        """Pause Session: pause returns false on exception."""
         session = await mock_controller.start_session("user-1")
         mock_controller.database_manager.update_session = AsyncMock(
             side_effect=RuntimeError("db error")
@@ -382,25 +407,30 @@ class TestPauseSession:
 
 class TestEndSession:
     async def test_end_session_returns_true(self, mock_controller):
+        """End Session: end session returns true."""
         session = await mock_controller.start_session("user-1")
         result = await mock_controller.end_session(session.session_id)
         assert result is True
 
     async def test_end_session_removes_from_active_sessions(self, mock_controller):
+        """End Session: end session removes from active sessions."""
         session = await mock_controller.start_session("user-1")
         await mock_controller.end_session(session.session_id)
         assert session.session_id not in mock_controller.active_sessions
 
     async def test_end_session_saves_summary(self, mock_controller):
+        """End Session: end session saves summary."""
         session = await mock_controller.start_session("user-1")
         await mock_controller.end_session(session.session_id)
         mock_controller.database_manager.save_session_summary.assert_called_once()
 
     async def test_end_nonexistent_session_returns_true(self, mock_controller):
+        """End Session: end nonexistent session returns true."""
         result = await mock_controller.end_session("nonexistent")
         assert result is True
 
     async def test_end_session_returns_false_on_error(self, mock_controller):
+        """End Session: end session returns false on error."""
         session = await mock_controller.start_session("user-1")
         mock_controller.database_manager.update_session = AsyncMock(
             side_effect=RuntimeError("error")
@@ -416,6 +446,7 @@ class TestEndSession:
 
 class TestProcessUserChoice:
     async def test_process_choice_returns_tuple(self, mock_controller):
+        """Process User Choice: process choice returns tuple."""
         session = await mock_controller.start_session("user-1")
         choice_id = session.available_choices[0].choice_id
         (
@@ -427,6 +458,7 @@ class TestProcessUserChoice:
         assert isinstance(new_choices, list)
 
     async def test_process_choice_returns_consequences(self, mock_controller):
+        """Process User Choice: process choice returns consequences."""
         session = await mock_controller.start_session("user-1")
         choice_id = session.available_choices[0].choice_id
         _, _, consequences = await mock_controller.process_user_choice(
@@ -436,6 +468,7 @@ class TestProcessUserChoice:
         assert isinstance(consequences, ConsequenceSet)
 
     async def test_process_choice_adds_to_history(self, mock_controller):
+        """Process User Choice: process choice adds to history."""
         session = await mock_controller.start_session("user-1")
         choice_id = session.available_choices[0].choice_id
         await mock_controller.process_user_choice(session.session_id, choice_id)
@@ -443,10 +476,12 @@ class TestProcessUserChoice:
         assert len(session_state.choice_history) == 1
 
     async def test_process_nonexistent_session_returns_empty(self, mock_controller):
+        """Process User Choice: process nonexistent session returns empty."""
         result = await mock_controller.process_user_choice("bad-session", "c1")
         assert result == (None, [], None)
 
     async def test_process_nonexistent_choice_returns_empty(self, mock_controller):
+        """Process User Choice: process nonexistent choice returns empty."""
         session = await mock_controller.start_session("user-1")
         result = await mock_controller.process_user_choice(
             session.session_id, "nonexistent-choice"
@@ -456,6 +491,7 @@ class TestProcessUserChoice:
     async def test_process_choice_updates_session_available_choices(
         self, mock_controller
     ):
+        """Process User Choice: process choice updates session available choices."""
         session = await mock_controller.start_session("user-1")
         choice_id = session.available_choices[0].choice_id
         _, new_choices, _ = await mock_controller.process_user_choice(
@@ -467,6 +503,7 @@ class TestProcessUserChoice:
         self, mock_controller
     ):
         # Make consequences return a valid emotional state change
+        """Process User Choice: process choice updates emotional state from consequences."""
         mock_controller.consequence_system.generate_consequences = AsyncMock(
             return_value=ConsequenceSet(
                 choice_id="choice-1",
@@ -482,6 +519,7 @@ class TestProcessUserChoice:
     async def test_process_choice_ignores_invalid_emotional_state_in_consequences(
         self, mock_controller
     ):
+        """Process User Choice: process choice ignores invalid emotional state in consequences."""
         mock_controller.consequence_system.generate_consequences = AsyncMock(
             return_value=ConsequenceSet(
                 choice_id="choice-1",
@@ -495,6 +533,7 @@ class TestProcessUserChoice:
         assert session.session_state.emotional_state == original_state
 
     async def test_process_choice_returns_empty_on_exception(self, mock_controller):
+        """Process User Choice: process choice returns empty on exception."""
         mock_controller.consequence_system.generate_consequences = AsyncMock(
             side_effect=RuntimeError("generation error")
         )
@@ -513,10 +552,12 @@ class TestProcessUserChoice:
 
 class TestGetSessionStatus:
     async def test_returns_none_for_unknown_session(self, mock_controller):
+        """Get Session Status: returns none for unknown session."""
         result = await mock_controller.get_session_status("unknown")
         assert result is None
 
     async def test_returns_status_dict(self, mock_controller):
+        """Get Session Status: returns status dict."""
         session = await mock_controller.start_session("user-1")
         status = await mock_controller.get_session_status(session.session_id)
         assert status is not None
@@ -525,6 +566,7 @@ class TestGetSessionStatus:
         assert status["is_active"] is True
 
     async def test_status_has_required_keys(self, mock_controller):
+        """Get Session Status: status has required keys."""
         session = await mock_controller.start_session("user-1")
         status = await mock_controller.get_session_status(session.session_id)
         expected_keys = {
@@ -543,6 +585,7 @@ class TestGetSessionStatus:
     async def test_therapeutic_engagement_calculated_after_choices(
         self, mock_controller
     ):
+        """Get Session Status: therapeutic engagement calculated after choices."""
         session = await mock_controller.start_session("user-1")
         choice_id = session.available_choices[0].choice_id
         await mock_controller.process_user_choice(session.session_id, choice_id)
@@ -550,6 +593,7 @@ class TestGetSessionStatus:
         assert status["total_choices"] == 1
 
     async def test_returns_none_on_exception(self, mock_controller):
+        """Get Session Status: returns none on exception."""
         session = await mock_controller.start_session("user-1")
         # Corrupt the session to force an exception
         mock_controller.active_sessions[session.session_id] = None  # type: ignore
@@ -564,16 +608,19 @@ class TestGetSessionStatus:
 
 class TestCleanupInactiveSessions:
     async def test_no_sessions_returns_zero(self, mock_controller):
+        """Cleanup Inactive Sessions: no sessions returns zero."""
         result = await mock_controller.cleanup_inactive_sessions()
         assert result == 0
 
     async def test_active_session_not_cleaned_up(self, mock_controller):
+        """Cleanup Inactive Sessions: active session not cleaned up."""
         await mock_controller.start_session("user-1")
         result = await mock_controller.cleanup_inactive_sessions()
         assert result == 0
         assert len(mock_controller.active_sessions) == 1
 
     async def test_expired_session_is_cleaned_up(self, mock_controller):
+        """Cleanup Inactive Sessions: expired session is cleaned up."""
         session = await mock_controller.start_session("user-1")
         # Set last activity to well beyond timeout
         session.last_activity_time = datetime.now(UTC) - timedelta(hours=2)
@@ -581,6 +628,7 @@ class TestCleanupInactiveSessions:
         assert result == 1
 
     async def test_multiple_expired_sessions_all_cleaned_up(self, mock_controller):
+        """Cleanup Inactive Sessions: multiple expired sessions all cleaned up."""
         for uid in ["u1", "u2", "u3"]:
             sess = await mock_controller.start_session(uid)
             sess.last_activity_time = datetime.now(UTC) - timedelta(hours=2)
@@ -593,6 +641,7 @@ class TestCleanupInactiveSessions:
     ):
         # cleanup_inactive_sessions returns len(sessions_to_remove) regardless
         # of whether individual pause_session calls succeed or fail.
+        """Cleanup Inactive Sessions: cleanup counts attempted removals even if pause fails."""
         session = await mock_controller.start_session("u1")
         session.last_activity_time = datetime.now(UTC) - timedelta(hours=2)
         mock_controller.database_manager.update_session = AsyncMock(
@@ -610,11 +659,13 @@ class TestCleanupInactiveSessions:
 
 class TestGenerateSessionRecap:
     async def test_no_choices_gives_welcome_back_message(self, mock_controller):
+        """Generate Session Recap: no choices gives welcome back message."""
         session_state = SessionState(user_id="u1")
         recap = await mock_controller._generate_session_recap(session_state)
         assert "Welcome back" in recap
 
     async def test_with_choices_includes_themes(self, mock_controller):
+        """Generate Session Recap: with choices includes themes."""
         session_state = SessionState(user_id="u1")
         session_state.choice_history = [
             {"therapeutic_tags": ["mindfulness"], "choice_text": "Breathe"},
@@ -625,6 +676,7 @@ class TestGenerateSessionRecap:
         assert "Welcome back" in recap
 
     async def test_with_current_scene_includes_description(self, mock_controller):
+        """Generate Session Recap: with current scene includes description."""
         session_state = SessionState(user_id="u1")
         session_state.current_scene = _make_scene()
         session_state.choice_history = [{"therapeutic_tags": ["mindfulness"]}]
@@ -639,6 +691,7 @@ class TestGenerateSessionRecap:
 
 class TestGenerateSessionSummary:
     async def test_returns_dict_with_basic_fields(self, mock_controller):
+        """Generate Session Summary: returns dict with basic fields."""
         session = await mock_controller.start_session("user-1")
         session.session_start_time = datetime.now(UTC) - timedelta(minutes=15)
         session.session_end_time = datetime.now(UTC)
@@ -649,6 +702,7 @@ class TestGenerateSessionSummary:
         assert "therapeutic_engagement" in summary
 
     async def test_duration_calculated(self, mock_controller):
+        """Generate Session Summary: duration calculated."""
         session = await mock_controller.start_session("user-1")
         session.session_start_time = datetime.now(UTC) - timedelta(minutes=10)
         session.session_end_time = datetime.now(UTC)
@@ -656,6 +710,7 @@ class TestGenerateSessionSummary:
         assert summary["duration_minutes"] > 0
 
     async def test_skills_practiced_collected_from_history(self, mock_controller):
+        """Generate Session Summary: skills practiced collected from history."""
         session = await mock_controller.start_session("user-1")
         session.session_state.choice_history = [
             {
@@ -669,6 +724,7 @@ class TestGenerateSessionSummary:
         assert "resilience" in summary["skills_practiced"]
 
     async def test_key_insights_high_engagement(self, mock_controller):
+        """Generate Session Summary: key insights high engagement."""
         session = await mock_controller.start_session("user-1")
         session.session_state.choice_history = [
             {"therapeutic_tags": [], "therapeutic_value": 0.9}
@@ -677,6 +733,7 @@ class TestGenerateSessionSummary:
         assert "strong therapeutic engagement" in " ".join(summary["key_insights"])
 
     async def test_key_insights_many_skills(self, mock_controller):
+        """Generate Session Summary: key insights many skills."""
         session = await mock_controller.start_session("user-1")
         session.session_state.choice_history = [
             {"therapeutic_tags": ["a", "b", "c"], "therapeutic_value": 0.5}
@@ -685,6 +742,7 @@ class TestGenerateSessionSummary:
         assert "multiple therapeutic approaches" in " ".join(summary["key_insights"])
 
     async def test_key_insights_sustained_participation(self, mock_controller):
+        """Generate Session Summary: key insights sustained participation."""
         session = await mock_controller.start_session("user-1")
         session.session_state.choice_history = [
             {"therapeutic_tags": [], "therapeutic_value": 0.5}
@@ -693,6 +751,7 @@ class TestGenerateSessionSummary:
         assert "Sustained participation" in " ".join(summary["key_insights"])
 
     async def test_returns_error_summary_on_exception(self, mock_controller):
+        """Generate Session Summary: returns error summary on exception."""
         session = await mock_controller.start_session("user-1")
         # Force exception by corrupting session_state
         session.session_state = None  # type: ignore

@@ -16,6 +16,8 @@ pytest.importorskip("tta_ai")
 from tta_ai.models.models import PerformanceMetrics
 from tta_ai.models.services import PerformanceMonitor
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.mark.unit
 class TestPerformanceMonitorConcrete:

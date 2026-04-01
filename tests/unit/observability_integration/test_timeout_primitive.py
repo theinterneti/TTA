@@ -12,6 +12,8 @@ from src.observability_integration.primitives.timeout import (
     TimeoutPrimitive,
 )
 
+pytestmark = pytest.mark.unit
+
 
 # Mock WorkflowPrimitive for testing
 class MockPrimitive:

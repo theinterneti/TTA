@@ -1,3 +1,4 @@
+import pytest
 # Logseq: [[TTA.dev/Tests/Test_player_experience_manager]]
 
 import asyncio
@@ -22,6 +23,8 @@ from src.player_experience.models.session import (
     Recommendation,
     SessionSummary,
 )
+
+pytestmark = pytest.mark.unit
 
 
 class MockSessionRepository(SessionRepository):
@@ -151,6 +154,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         self.player_id = "playerA"
 
     def test_dashboard_aggregation(self):
+        """Player Experience Manager: dashboard aggregation."""
         async def run():
             dashboard = await self.mgr.get_player_dashboard(self.player_id)
             assert dashboard.player_id == self.player_id
@@ -160,6 +164,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_recommendations_combined(self):
+        """Player Experience Manager: recommendations combined."""
         async def run():
             recs = await self.mgr.get_recommendations(self.player_id)
             titles = [r.title for r in recs]
@@ -169,6 +174,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_feedback_processing(self):
+        """Player Experience Manager: feedback processing."""
         async def run():
             fb = PlayerFeedback(
                 feedback_id="f1",
@@ -184,6 +190,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_crisis_detection_integration(self):
+        """Player Experience Manager: crisis detection integration."""
         async def run():
             from src.player_experience.models.enums import CrisisType
 
@@ -216,6 +223,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_dashboard_api_payload_includes_narrative_summary(self):
+        """Player Experience Manager: dashboard api payload includes narrative summary."""
         async def run():
             session_store = MockSessionStore(
                 [{"session_id": "session-1", "updated_at": "2026-03-24T05:00:00+00:00"}]
@@ -263,6 +271,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_dashboard_api_payload_gracefully_handles_enrichment_failure(self):
+        """Player Experience Manager: dashboard api payload gracefully handles enrichment failure."""
         async def run():
             session_store = MockSessionStore([{"session_id": "session-1"}])
             character_manager = MockCharacterManager(["char-1"])
@@ -288,6 +297,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_session_list_api_payload_without_narrative(self):
+        """Player Experience Manager: session list api payload without narrative."""
         async def run():
             session_store = MockSessionStore(
                 [
@@ -309,6 +319,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_session_list_api_payload_with_narrative_summary(self):
+        """Player Experience Manager: session list api payload with narrative summary."""
         async def run():
             session_store = MockSessionStore([{"session_id": "session-1"}])
 
@@ -346,6 +357,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
         asyncio.run(run())
 
     def test_progress_api_payload_uses_real_summary_data(self):
+        """Player Experience Manager: progress api payload uses real summary data."""
         async def run():
             payload = await self.mgr.get_progress_api_payload(self.player_id)
 

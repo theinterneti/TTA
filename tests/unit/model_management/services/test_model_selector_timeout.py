@@ -25,12 +25,11 @@ from tta_ai.models.services.model_selector import (  # noqa: E402
 try:
     from ttadev.primitives import WorkflowContext
 except ImportError:
-    try:
-        from tta_dev_primitives import WorkflowContext  # type: ignore[no-redef]
-    except ImportError:
-        pytest.skip("ttadev.primitives not available", allow_module_level=True)
+    pytest.skip("ttadev.primitives not available", allow_module_level=True)
 
 from tta_ai.models import ModelInfo, ModelRequirements, ProviderType, TaskType  # noqa: E402
+
+pytestmark = pytest.mark.unit
 
 
 # ---------------------------------------------------------------------------
@@ -71,10 +70,12 @@ def _make_requirements() -> ModelRequirements:
 
 class TestModelSelectionCriteriaTimeout:
     def test_default_timeout_is_30s(self) -> None:
+        """Model Selection Criteria Timeout: default timeout is 30s."""
         criteria = ModelSelectionCriteria()
         assert criteria.selection_timeout_seconds == 30.0
 
     def test_custom_timeout_stored(self) -> None:
+        """Model Selection Criteria Timeout: custom timeout stored."""
         criteria = ModelSelectionCriteria(selection_timeout_seconds=10.0)
         assert criteria.selection_timeout_seconds == 10.0
 
@@ -92,6 +93,7 @@ class TestModelSelectionCriteriaTimeout:
 class TestModelSelectCall:
     @pytest.mark.asyncio
     async def test_execute_calls_run_selection(self) -> None:
+        """Model Select Call: execute calls run selection."""
         selector = _make_selector()
         expected_model = _make_model()
         selector._run_selection = AsyncMock(return_value=expected_model)  # type: ignore[method-assign]
@@ -108,6 +110,7 @@ class TestModelSelectCall:
 
     @pytest.mark.asyncio
     async def test_execute_returns_none_when_no_model(self) -> None:
+        """Model Select Call: execute returns none when no model."""
         selector = _make_selector()
         selector._run_selection = AsyncMock(return_value=None)  # type: ignore[method-assign]
 
@@ -120,6 +123,7 @@ class TestModelSelectCall:
 
     @pytest.mark.asyncio
     async def test_execute_propagates_exception(self) -> None:
+        """Model Select Call: execute propagates exception."""
         selector = _make_selector()
         selector._run_selection = AsyncMock(side_effect=RuntimeError("db error"))  # type: ignore[method-assign]
 
@@ -139,6 +143,7 @@ class TestModelSelectCall:
 class TestModelSelectFallback:
     @pytest.mark.asyncio
     async def test_returns_none_model(self) -> None:
+        """Model Select Fallback: returns none model."""
         ctx = WorkflowContext(workflow_id="s")
         primitive = _ModelSelectFallback()
         result = await primitive.execute({}, ctx)
@@ -146,6 +151,7 @@ class TestModelSelectFallback:
 
     @pytest.mark.asyncio
     async def test_always_returns_dict_with_model_key(self) -> None:
+        """Model Select Fallback: always returns dict with model key."""
         ctx = WorkflowContext(workflow_id="s")
         result = await _ModelSelectFallback().execute({"any": "data"}, ctx)
         assert "model" in result
@@ -159,6 +165,7 @@ class TestModelSelectFallback:
 class TestModelSelectorSelectModelTimeout:
     @pytest.mark.asyncio
     async def test_returns_model_on_success(self) -> None:
+        """Model Selector Select Model Timeout: returns model on success."""
         selector = _make_selector()
         model = _make_model()
         selector._run_selection = AsyncMock(return_value=model)  # type: ignore[method-assign]
@@ -168,6 +175,7 @@ class TestModelSelectorSelectModelTimeout:
 
     @pytest.mark.asyncio
     async def test_returns_none_when_no_models(self) -> None:
+        """Model Selector Select Model Timeout: returns none when no models."""
         selector = _make_selector()
         selector._run_selection = AsyncMock(return_value=None)  # type: ignore[method-assign]
 
@@ -212,7 +220,7 @@ class TestModelSelectorSelectModelTimeout:
         try:
             from ttadev.primitives import TimeoutPrimitive
         except ImportError:
-            from tta_dev_primitives import TimeoutPrimitive  # type: ignore[no-redef]
+            pytest.skip("ttadev.primitives not available")
 
         selector = _make_selector(timeout_seconds=15.0)
         model = _make_model()
@@ -260,6 +268,7 @@ class TestRunSelectionPipeline:
 
     @pytest.mark.asyncio
     async def test_run_selection_returns_none_when_no_providers(self) -> None:
+        """Run Selection Pipeline: run selection returns none when no providers."""
         selector = ModelSelector(
             providers={},
             hardware_detector=MagicMock(),

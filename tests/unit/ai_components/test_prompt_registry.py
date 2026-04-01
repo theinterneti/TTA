@@ -13,6 +13,8 @@ import yaml
 pytest.importorskip("tta_ai")
 from tta_ai.prompts import PromptMetrics, PromptRegistry, PromptTemplate
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def temp_prompts_dir():

@@ -18,7 +18,7 @@ import pytest
 try:
     from ttadev.primitives.core.base import WorkflowContext  # type: ignore[import]
 except ImportError:
-    from tta_dev_primitives.core.base import WorkflowContext  # type: ignore[no-redef]
+    pytest.skip("ttadev not available", allow_module_level=True)
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector

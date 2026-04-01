@@ -37,6 +37,8 @@ from src.common.database import (
     session_context,
 )
 
+pytestmark = pytest.mark.unit
+
 # ---------------------------------------------------------------------------
 # Helpers — in-process SQLite engine for fast, dependency-free tests
 # ---------------------------------------------------------------------------
@@ -67,20 +69,24 @@ class Player(Base):
 
 class TestMakeEngine:
     def test_returns_async_engine(self):
+        """Make Engine: returns async engine."""
         engine = _make_test_engine()
         assert isinstance(engine, AsyncEngine)
 
     def test_sqlite_url_accepted(self):
+        """Make Engine: sqlite url accepted."""
         engine = make_engine(SQLITE_URL)
         assert "sqlite" in str(engine.url)
 
     def test_echo_parameter_stored(self):
+        """Make Engine: echo parameter stored."""
         engine = make_engine(SQLITE_URL, echo=True)
         assert engine.echo is True
 
     def test_non_sqlite_passes_pool_args(self):
         # We just verify make_engine doesn't raise for a postgres-style URL;
         # we don't actually connect.
+        """Make Engine: non sqlite passes pool args."""
         pytest.importorskip("asyncpg", reason="asyncpg not installed")
         engine = make_engine(
             "postgresql+asyncpg://user:pass@localhost/db",
@@ -113,6 +119,7 @@ class TestMakeEngine:
 
 class TestMakeSessionFactory:
     def test_returns_async_sessionmaker(self):
+        """Make Session Factory: returns async sessionmaker."""
         from sqlalchemy.ext.asyncio import async_sessionmaker
 
         engine = _make_test_engine()
@@ -120,12 +127,14 @@ class TestMakeSessionFactory:
         assert isinstance(factory, async_sessionmaker)
 
     def test_expire_on_commit_default_false(self):
+        """Make Session Factory: expire on commit default false."""
         engine = _make_test_engine()
         factory = make_session_factory(engine)
         # The kw_args dict stores the init kwargs for each new session.
         assert factory.kw.get("expire_on_commit") is False
 
     def test_expire_on_commit_can_be_overridden(self):
+        """Make Session Factory: expire on commit can be overridden."""
         engine = _make_test_engine()
         factory = make_session_factory(engine, expire_on_commit=True)
         assert factory.kw.get("expire_on_commit") is True
@@ -138,6 +147,7 @@ class TestMakeSessionFactory:
 
 class TestSessionContext:
     async def test_add_and_query_row(self):
+        """Session Context: add and query row."""
         engine = _make_test_engine()
         await init_db(engine)
         factory = make_session_factory(engine)
@@ -158,6 +168,7 @@ class TestSessionContext:
         await engine.dispose()
 
     async def test_rollback_on_exception(self):
+        """Session Context: rollback on exception."""
         engine = _make_test_engine()
         await init_db(engine)
         factory = make_session_factory(engine)
@@ -185,6 +196,7 @@ class TestSessionContext:
 
 class TestReadonlySessionContext:
     async def test_yields_session(self):
+        """Readonly Session Context: yields session."""
         engine = _make_test_engine()
         await init_db(engine)
         factory = make_session_factory(engine)
@@ -220,6 +232,7 @@ class TestReadonlySessionContext:
 
 class TestGatherQueries:
     async def test_returns_results_in_order(self):
+        """Gather Queries: returns results in order."""
         async def coro_a():
             return "a"
 
@@ -247,6 +260,7 @@ class TestGatherQueries:
         assert set(events) == {"slow", "fast"}
 
     async def test_return_exceptions_false_propagates(self):
+        """Gather Queries: return exceptions false propagates."""
         async def boom():
             raise RuntimeError("bang")
 
@@ -254,6 +268,7 @@ class TestGatherQueries:
             await gather_queries(boom())
 
     async def test_return_exceptions_true_captures(self):
+        """Gather Queries: return exceptions true captures."""
         async def boom():
             raise RuntimeError("bang")
 
@@ -294,16 +309,20 @@ class TestGatherQueries:
 
 class TestFreezeResult:
     def test_converts_list_to_tuple(self):
+        """Freeze Result: converts list to tuple."""
         assert freeze_result([1, 2, 3]) == (1, 2, 3)
 
     def test_empty_sequence(self):
+        """Freeze Result: empty sequence."""
         assert freeze_result([]) == ()
 
     def test_returns_tuple_type(self):
+        """Freeze Result: returns tuple type."""
         result = freeze_result(["a", "b"])
         assert isinstance(result, tuple)
 
     def test_preserves_orm_objects(self):
+        """Freeze Result: preserves orm objects."""
         p1 = Player(name="A", score=10)
         p2 = Player(name="B", score=20)
         frozen = freeze_result([p1, p2])
@@ -318,6 +337,7 @@ class TestFreezeResult:
 
 class TestConnectionContext:
     async def test_raw_sql_via_connection(self):
+        """Connection Context: raw sql via connection."""
         engine = _make_test_engine()
         await init_db(engine)
         factory = make_session_factory(engine)
@@ -342,6 +362,7 @@ class TestConnectionContext:
 
 class TestInitDropDb:
     async def test_init_creates_tables(self):
+        """Init Drop Db: init creates tables."""
         engine = _make_test_engine()
         await init_db(engine)
 
@@ -353,6 +374,7 @@ class TestInitDropDb:
         await engine.dispose()
 
     async def test_drop_removes_tables(self):
+        """Init Drop Db: drop removes tables."""
         engine = _make_test_engine()
         await init_db(engine)
         await drop_db(engine)
@@ -371,6 +393,7 @@ class TestInitDropDb:
 
 class TestCheckDatabaseHealth:
     async def test_healthy_database(self):
+        """Check Database Health: healthy database."""
         engine = _make_test_engine()
         result = await check_database_health(engine)
         assert result["healthy"] is True
@@ -410,9 +433,11 @@ class TestCheckDatabaseHealth:
 
 class TestMakeDoltEngine:
     def test_default_url_constant(self) -> None:
+        """Make Dolt Engine: default url constant."""
         assert DOLT_DEFAULT_URL.startswith("mysql+aiomysql://")
 
     def test_explicit_url_accepted(self) -> None:
+        """Make Dolt Engine: explicit url accepted."""
         from unittest.mock import MagicMock, patch
 
         with patch("src.common.database.create_async_engine") as mock_cae:
@@ -426,6 +451,7 @@ class TestMakeDoltEngine:
         assert "mysql+aiomysql" in call_url
 
     def test_env_var_used_when_url_not_given(self, monkeypatch) -> None:
+        """Make Dolt Engine: env var used when url not given."""
         from unittest.mock import MagicMock, patch
 
         monkeypatch.setenv(
@@ -438,6 +464,7 @@ class TestMakeDoltEngine:
         assert "dolt:3306" in call_url
 
     def test_default_url_used_when_no_env_no_arg(self, monkeypatch) -> None:
+        """Make Dolt Engine: default url used when no env no arg."""
         from unittest.mock import MagicMock, patch
 
         monkeypatch.delenv("DOLT_DATABASE_URL", raising=False)
@@ -448,6 +475,7 @@ class TestMakeDoltEngine:
         assert call_url == DOLT_DEFAULT_URL
 
     def test_pool_size_and_max_overflow_forwarded(self) -> None:
+        """Make Dolt Engine: pool size and max overflow forwarded."""
         from unittest.mock import MagicMock, patch
 
         with patch("src.common.database.create_async_engine") as mock_cae:
@@ -462,6 +490,7 @@ class TestMakeDoltEngine:
         assert kwargs["max_overflow"] == 15
 
     def test_default_pool_size_5_max_overflow_10(self) -> None:
+        """Make Dolt Engine: default pool size 5 max overflow 10."""
         from unittest.mock import MagicMock, patch
 
         with patch("src.common.database.create_async_engine") as mock_cae:
@@ -472,14 +501,17 @@ class TestMakeDoltEngine:
         assert kwargs["max_overflow"] == 10
 
     def test_wrong_scheme_raises_value_error(self) -> None:
+        """Make Dolt Engine: wrong scheme raises value error."""
         with pytest.raises(ValueError, match="mysql\\+aiomysql"):
             make_dolt_engine("postgresql+asyncpg://user:pass@localhost/db")
 
     def test_sqlite_scheme_raises_value_error(self) -> None:
+        """Make Dolt Engine: sqlite scheme raises value error."""
         with pytest.raises(ValueError, match="mysql\\+aiomysql"):
             make_dolt_engine("sqlite+aiosqlite:///:memory:")
 
     def test_echo_forwarded(self) -> None:
+        """Make Dolt Engine: echo forwarded."""
         from unittest.mock import MagicMock, patch
 
         with patch("src.common.database.create_async_engine") as mock_cae:
@@ -489,6 +521,7 @@ class TestMakeDoltEngine:
         assert kwargs["echo"] is True
 
     def test_pool_pre_ping_true_by_default(self) -> None:
+        """Make Dolt Engine: pool pre ping true by default."""
         from unittest.mock import MagicMock, patch
 
         with patch("src.common.database.create_async_engine") as mock_cae:
@@ -505,6 +538,7 @@ class TestMakeDoltEngine:
 
 class TestMakeDoltSessionFactory:
     def test_returns_async_sessionmaker(self) -> None:
+        """Make Dolt Session Factory: returns async sessionmaker."""
         from unittest.mock import MagicMock, patch
         from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -516,6 +550,7 @@ class TestMakeDoltSessionFactory:
         mock_sm.assert_called_once_with(mock_engine, expire_on_commit=False)
 
     def test_expire_on_commit_forwarded(self) -> None:
+        """Make Dolt Session Factory: expire on commit forwarded."""
         from unittest.mock import MagicMock, patch
         from sqlalchemy.ext.asyncio import async_sessionmaker
 

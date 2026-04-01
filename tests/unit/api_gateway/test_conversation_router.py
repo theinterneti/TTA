@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import pytest
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.auth import TokenData, get_current_active_player
 from src.player_experience.api.routers import conversation
+
+pytestmark = pytest.mark.unit
 
 
 def _make_client() -> TestClient:
@@ -35,6 +39,7 @@ class TestConversationRouterNarrativeIntegration:
     def test_send_message_includes_narrative_orchestration_metadata(
         self, monkeypatch
     ) -> None:
+        """Conversation Router Narrative Integration: send message includes narrative orchestration metadata."""
         client = _make_client()
 
         async def fake_generate_response(_message: str, _context: dict[str, object]):
@@ -87,6 +92,7 @@ class TestConversationRouterNarrativeIntegration:
     def test_get_session_state_surfaces_narrative_orchestration(
         self, monkeypatch
     ) -> None:
+        """Conversation Router Narrative Integration: get session state surfaces narrative orchestration."""
         client = _make_client()
 
         async def fake_generate_response(_message: str, _context: dict[str, object]):

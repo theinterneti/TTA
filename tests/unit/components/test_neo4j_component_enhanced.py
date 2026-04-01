@@ -20,6 +20,8 @@ import pytest
 from src.components.neo4j_component import Neo4jComponent
 from src.orchestration import TTAConfig
 
+pytestmark = pytest.mark.unit
+
 
 class TestNeo4jComponentEnhanced:
     """Enhanced tests for Neo4j component with better code coverage."""

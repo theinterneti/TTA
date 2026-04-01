@@ -24,6 +24,8 @@ from src.components.nga.agent import NGAAgent
 from src.components.wba.agent import WBAAgent
 from src.components.world_context.models import LocationFact, NPCState, WorldContext
 
+pytestmark = pytest.mark.unit
+
 
 # ---------------------------------------------------------------------------
 # Helpers

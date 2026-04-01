@@ -34,6 +34,8 @@ from src.components.genesis.session_state import (
     GenesisSessionState,
 )
 
+pytestmark = pytest.mark.unit
+
 # ── WorldSeed ─────────────────────────────────────────────────────────────────
 
 
@@ -41,6 +43,7 @@ class TestWorldSeedMinimumViable:
     """A 4-field seed is valid and complete."""
 
     def test_minimum_viable_seed_is_valid(self):
+        """World Seed Minimum Viable: minimum viable seed is valid."""
         seed = WorldSeed(
             tone=WorldTone.GETTING_WORSE,
             power_source=PowerSource.MAGIC,
@@ -50,6 +53,7 @@ class TestWorldSeedMinimumViable:
         assert seed.is_minimum_viable()
 
     def test_minimum_viable_reports_no_missing_fields(self):
+        """World Seed Minimum Viable: minimum viable reports no missing fields."""
         seed = WorldSeed(
             tone=WorldTone.CYCLICAL,
             power_source=PowerSource.POLITICS,
@@ -61,6 +65,7 @@ class TestWorldSeedMinimumViable:
     def test_missing_fields_identified(self):
         # Pydantic won't allow construction without required fields,
         # so we test the logic by checking a complete seed has none missing
+        """World Seed Minimum Viable: missing fields identified."""
         seed = WorldSeed(
             tone=WorldTone.GETTING_BETTER,
             power_source=PowerSource.TECHNOLOGY,
@@ -77,6 +82,7 @@ class TestWorldSeedHash:
     """Seed hash is deterministic from the same minimum viable fields."""
 
     def test_same_inputs_produce_same_hash(self):
+        """World Seed Hash: same inputs produce same hash."""
         seed_a = WorldSeed(
             tone=WorldTone.GETTING_WORSE,
             power_source=PowerSource.MAGIC,
@@ -92,6 +98,7 @@ class TestWorldSeedHash:
         assert seed_a.seed_hash == seed_b.seed_hash
 
     def test_different_inputs_produce_different_hash(self):
+        """World Seed Hash: different inputs produce different hash."""
         seed_a = WorldSeed(
             tone=WorldTone.GETTING_WORSE,
             power_source=PowerSource.MAGIC,
@@ -107,6 +114,7 @@ class TestWorldSeedHash:
         assert seed_a.seed_hash != seed_b.seed_hash
 
     def test_hash_is_16_hex_chars(self):
+        """World Seed Hash: hash is 16 hex chars."""
         seed = WorldSeed(
             tone=WorldTone.HOLDING_ON,
             power_source=PowerSource.BELIEF,
@@ -122,6 +130,7 @@ class TestWorldSeedOptionalFields:
     """Optional fields can be added after minimum viable seed is set."""
 
     def test_full_seed_with_all_optional_fields(self):
+        """World Seed Optional Fields: full seed with all optional fields."""
         seed = WorldSeed(
             tone=WorldTone.GETTING_WORSE,
             power_source=PowerSource.MAGIC,
@@ -145,6 +154,7 @@ class TestWorldSeedOptionalFields:
         assert seed.is_minimum_viable()
 
     def test_character_incomplete_without_name_and_motivation(self):
+        """World Seed Optional Fields: character incomplete without name and motivation."""
         seed = WorldSeed(
             tone=WorldTone.CYCLICAL,
             power_source=PowerSource.NATURE,
@@ -154,6 +164,7 @@ class TestWorldSeedOptionalFields:
         assert not seed.character_is_complete()
 
     def test_guide_character_can_be_set(self):
+        """World Seed Optional Fields: guide character can be set."""
         guide = GuideCharacter(
             name="Sable",
             entity_type="unofficial archivist",
@@ -178,6 +189,7 @@ class TestWorldSeedEnumCoverage:
 
     @pytest.mark.parametrize("tone", list(WorldTone))
     def test_all_tones_valid(self, tone: WorldTone):
+        """World Seed Enum Coverage: all tones valid."""
         seed = WorldSeed(
             tone=tone,
             power_source=PowerSource.MAGIC,
@@ -188,6 +200,7 @@ class TestWorldSeedEnumCoverage:
 
     @pytest.mark.parametrize("power", list(PowerSource))
     def test_all_power_sources_valid(self, power: PowerSource):
+        """World Seed Enum Coverage: all power sources valid."""
         seed = WorldSeed(
             tone=WorldTone.HOLDING_ON,
             power_source=power,
@@ -198,6 +211,7 @@ class TestWorldSeedEnumCoverage:
 
     @pytest.mark.parametrize("motivation", list(Motivation))
     def test_all_motivations_valid(self, motivation: Motivation):
+        """World Seed Enum Coverage: all motivations valid."""
         seed = WorldSeed(
             tone=WorldTone.CYCLICAL,
             power_source=PowerSource.BELIEF,
@@ -216,15 +230,18 @@ class TestGenesisSessionStateTransitions:
     """Act transitions follow the defined state machine."""
 
     def test_initial_act_is_void(self):
+        """Genesis Session State Transitions: initial act is void."""
         state = GenesisSessionState(session_id="test-001")
         assert state.act == Act.VOID
 
     def test_valid_transition_void_to_building_world(self):
+        """Genesis Session State Transitions: valid transition void to building world."""
         state = GenesisSessionState(session_id="test-002")
         state.transition_to(Act.BUILDING_WORLD)
         assert state.act == Act.BUILDING_WORLD
 
     def test_invalid_transition_raises(self):
+        """Genesis Session State Transitions: invalid transition raises."""
         state = GenesisSessionState(session_id="test-003")
         with pytest.raises(ValueError, match="Invalid act transition"):
             state.transition_to(
@@ -232,6 +249,7 @@ class TestGenesisSessionStateTransitions:
             )  # can't jump from VOID to SESSION_BEGUN
 
     def test_full_happy_path_transitions(self):
+        """Genesis Session State Transitions: full happy path transitions."""
         state = GenesisSessionState(session_id="test-004")
         path = [
             Act.BUILDING_WORLD,
@@ -269,6 +287,7 @@ class TestGenesisSessionStateTurnTracking:
     """Turn recording and seed field accumulation."""
 
     def test_turn_recorded_correctly(self):
+        """Genesis Session State Turn Tracking: turn recorded correctly."""
         state = GenesisSessionState(session_id="test-010")
         state.transition_to(Act.BUILDING_WORLD)
         turn = state.record_turn(
@@ -282,6 +301,7 @@ class TestGenesisSessionStateTurnTracking:
         assert state.seed_fields["tone"] == WorldTone.GETTING_WORSE
 
     def test_turns_in_current_act_counted(self):
+        """Genesis Session State Turn Tracking: turns in current act counted."""
         state = GenesisSessionState(session_id="test-011")
         state.transition_to(Act.BUILDING_WORLD)
         for i in range(4):
@@ -292,6 +312,7 @@ class TestGenesisSessionStateTurnTracking:
         assert state.turns_in_current_act == 4
 
     def test_slip_count_increments(self):
+        """Genesis Session State Turn Tracking: slip count increments."""
         state = GenesisSessionState(session_id="test-012")
         state.transition_to(Act.BUILDING_WORLD)
         state.transition_to(Act.SLIP_PHASE)
@@ -304,6 +325,7 @@ class TestGenesisSessionStateTurnTracking:
         assert state.slips_delivered == 1
 
     def test_slip_capped_at_two(self):
+        """Genesis Session State Turn Tracking: slip capped at two."""
         state = GenesisSessionState(session_id="test-013")
         state.transition_to(Act.BUILDING_WORLD)
         state.transition_to(Act.SLIP_PHASE)
@@ -318,6 +340,7 @@ class TestGenesisSessionStateTurnTracking:
         assert not state.can_slip  # cap reached
 
     def test_minimum_viable_seed_detection(self):
+        """Genesis Session State Turn Tracking: minimum viable seed detection."""
         state = GenesisSessionState(session_id="test-014")
         state.transition_to(Act.BUILDING_WORLD)
         assert not state.minimum_viable_seed_complete
@@ -344,18 +367,21 @@ class TestNarratorVoice:
     """Voice profiles are defined for all relevant acts."""
 
     def test_voice_profile_exists_for_each_non_session_begun_act(self):
+        """Narrator Voice: voice profile exists for each non session begun act."""
         for act in Act:
             if act == Act.SESSION_BEGUN:
                 continue
             assert act in NARRATOR_VOICES, f"Missing voice profile for {act}"
 
     def test_all_profiles_have_example_phrases(self):
+        """Narrator Voice: all profiles have example phrases."""
         for act, profile in NARRATOR_VOICES.items():
             assert len(profile.example_phrases) >= 2, (
                 f"Act {act} needs at least 2 example phrases"
             )
 
     def test_get_system_prompt_returns_string(self):
+        """Narrator Voice: get system prompt returns string."""
         for act in Act:
             if act == Act.SESSION_BEGUN:
                 continue  # terminal state — no LLM prompt needed
@@ -364,11 +390,13 @@ class TestNarratorVoice:
             assert len(prompt) > 100
 
     def test_system_prompt_includes_world_context(self):
+        """Narrator Voice: system prompt includes world context."""
         context = {"tone": "getting_worse", "power_source": "magic"}
         prompt = get_system_prompt(Act.BUILDING_CHARACTER, world_context=context)
         assert "getting_worse" in prompt or "tone" in prompt
 
     def test_system_prompt_never_contains_technical_terms(self):
+        """Narrator Voice: system prompt never contains technical terms."""
         for act in Act:
             if act == Act.SESSION_BEGUN:
                 continue  # terminal state — no LLM prompt needed

@@ -31,6 +31,8 @@ from src.player_experience.models.player import (
     TherapeuticPreferences,
 )
 
+pytestmark = pytest.mark.unit
+
 
 class TestPlayerManagementAPI:
     """Test suite for Player Management API endpoints."""
