@@ -1,0 +1,39 @@
+{
+  "model": "qwen2.5:3b",
+  "mode": "state-extraction",
+  "cases_completed": 5,
+  "accuracy_pct": 80.0,
+  "avg_latency_s": 6.39,
+  "cases": [
+    {
+      "case": 1,
+      "score": 3,
+      "latency_s": 11.55,
+      "output": "[STATE]location=Archive entrance|inventory=empty|npcs=custodian[/STATE]"
+    },
+    {
+      "case": 2,
+      "score": 2,
+      "latency_s": 4.88,
+      "output": "[STATE]location=Archive interior|inventory=empty|npcs=Mira[/STATE]"
+    },
+    {
+      "case": 3,
+      "score": 2,
+      "latency_s": 5.17,
+      "output": "[STATE]location=restricted section|inventory=driftwood quill|npcs=Mira[/STATE]"
+    },
+    {
+      "case": 4,
+      "score": 3,
+      "latency_s": 4.93,
+      "output": "[STATE]location=restricted section|inventory=forged document|npcs=Mira none[/STATE]"
+    },
+    {
+      "case": 5,
+      "score": 2,
+      "latency_s": 5.41,
+      "output": "[STATE]location=Pier 7|inventory=quill,document|npcs=Renu[/STATE]"
+    }
+  ]
+}

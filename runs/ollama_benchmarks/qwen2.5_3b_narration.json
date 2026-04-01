@@ -1,0 +1,76 @@
+{
+  "model": "qwen2.5:3b",
+  "mode": "narration",
+  "turns_completed": 5,
+  "avg_words": 38.6,
+  "avg_latency_s": 39.55,
+  "avg_tps": 3.2,
+  "state_block_pct": 80.0,
+  "coherence_pct": 20.0,
+  "in_word_range_pct": 0.0,
+  "turns": [
+    {
+      "turn": 1,
+      "words": 27,
+      "latency_s": 82.14,
+      "tps": 0.9,
+      "has_state": true,
+      "location": "Archive entrance",
+      "inventory": [
+        "none"
+      ],
+      "npcs": [],
+      "coherence_callback": false
+    },
+    {
+      "turn": 2,
+      "words": 29,
+      "latency_s": 56.8,
+      "tps": 1.0,
+      "has_state": true,
+      "location": "Archive entrance",
+      "inventory": [],
+      "npcs": [],
+      "coherence_callback": false
+    },
+    {
+      "turn": 3,
+      "words": 34,
+      "latency_s": 12.13,
+      "tps": 6.3,
+      "has_state": true,
+      "location": "Archive entrance",
+      "inventory": [],
+      "npcs": [
+        "archivist"
+      ],
+      "coherence_callback": false
+    },
+    {
+      "turn": 4,
+      "words": 34,
+      "latency_s": 23.07,
+      "tps": 3.2,
+      "has_state": true,
+      "location": "Archive entrance",
+      "inventory": [
+        "quill"
+      ],
+      "npcs": [
+        "elderly archivist"
+      ],
+      "coherence_callback": false
+    },
+    {
+      "turn": 5,
+      "words": 69,
+      "latency_s": 23.62,
+      "tps": 4.6,
+      "has_state": false,
+      "location": "",
+      "inventory": [],
+      "npcs": [],
+      "coherence_callback": true
+    }
+  ]
+}
