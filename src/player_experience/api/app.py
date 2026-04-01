@@ -258,6 +258,13 @@ def create_app() -> FastAPI:
     # WebSocket endpoints (mounted under /ws)
     app.include_router(chat.router, prefix="/ws", tags=["chat"])
 
+    # SSE streaming endpoint — IPA → WBA → NGA pipeline (#318)
+    from src.api_gateway.endpoints.session_turn import (  # noqa: PLC0415
+        router as session_turn_router,
+    )
+
+    app.include_router(session_turn_router)
+
     # Register exception handlers
     register_exception_handlers(app)
 
