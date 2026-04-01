@@ -14,16 +14,27 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import dataclasses
+import json
 import logging
 import os
 import socket
 import sys
 import warnings
+from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
 # ── Path setup ────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Auto-load .env so users don't need to `source .env` before running
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed; user must export env vars manually
 
 # Suppress noisy upstream library warnings before any imports trigger them
 warnings.filterwarnings("ignore", category=UserWarning, module="langchain")
@@ -62,7 +73,7 @@ from rich.text import Text  # noqa: E402
 console = Console()
 
 # ── Game imports (deferred until after path setup) ────────────────────────────
-from langchain_core.messages import HumanMessage, SystemMessage  # noqa: E402
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage  # noqa: E402
 
 from src.ai_components.llm_factory import get_llm  # noqa: E402
 from src.components.gameplay_loop.models.world_seed import (  # noqa: E402
@@ -86,9 +97,17 @@ GENESIS_PANEL_STYLE = "magenta"
 GENESIS_PANEL_TITLE = "✨ The Void"
 GAMEPLAY_PANEL_STYLE = "blue"
 QUIT_COMMANDS = {"quit", "exit", "q", ":q", "/quit"}
+SAVES_DIR = Path.home() / ".tta" / "saves"
+MAX_HISTORY_TURNS = 20  # H/A pairs to keep verbatim in context
+SUMMARIZE_TRIGGER = 30  # summarize when raw history exceeds this many H/A pairs
+AUTOSAVE_EVERY = 10  # auto-save every N turns
 HELP_TEXT = """\
 **Commands:**
-- `help`         — show this message
+- `help`            — show this message
+- `look`            — re-describe the current scene
+- `status`          — show turn, location, and inventory
+- `journal`         — show the story-so-far summary
+- `save`            — save your session to disk
 - `quit` / `exit` / `q` — end the session
 - *(anything else)* — your action in the world
 
@@ -96,10 +115,74 @@ Press **Ctrl-C** at any time to exit.\
 """
 
 
+# ── Game State ────────────────────────────────────────────────────────────────
+
+
+@dataclasses.dataclass
+class GameState:
+    """Persistent game state for one session."""
+
+    session_id: str
+    world_seed_data: dict  # WorldSeed.model_dump(mode="json")
+    turn: int = 0
+    location: str = "unknown"
+    inventory: list[str] = dataclasses.field(default_factory=list)
+    known_npcs: list[str] = dataclasses.field(default_factory=list)
+    summary: str = ""  # rolling summary of summarized turns
+    raw_history: list[dict] = dataclasses.field(
+        default_factory=list
+    )  # {"role": "human"|"ai", "content": str}
+
+
+def save_game(state: GameState) -> Path:
+    """Save game state to ~/.tta/saves/."""
+    SAVES_DIR.mkdir(parents=True, exist_ok=True)
+    filename = f"{state.session_id[:8]}_{datetime.now():%Y%m%d_%H%M%S}.json"
+    path = SAVES_DIR / filename
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(dataclasses.asdict(state), f, indent=2, ensure_ascii=False)
+    return path
+
+
+def load_game(path: Path) -> GameState:
+    """Load game state from a JSON save file."""
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+    return GameState(**data)
+
+
+async def _summarize_turns(llm, turns: list[dict]) -> str:
+    """Ask the LLM to compress a list of {role, content} turns into a concise paragraph."""
+    turns_text = "\n\n".join(
+        f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
+        for t in turns
+    )
+    msgs = [
+        SystemMessage(
+            content=(
+                "You are a story archivist. Summarize the following story events into "
+                "3-5 sentences, preserving all important facts: character names, items found, "
+                "locations visited, decisions made, and any unresolved plot threads. "
+                "Write in past tense. Be concrete — names and specifics matter."
+            )
+        ),
+        HumanMessage(content=turns_text),
+    ]
+    try:
+        result = await llm.ainvoke(msgs)
+        return result.content if hasattr(result, "content") else str(result)
+    except Exception:
+        # Fallback: just grab narrator lines
+        narrator_lines = [t["content"][:150] for t in turns if t["role"] == "ai"]
+        return " … ".join(narrator_lines[:3])
+
+
 # ── System prompt builder ─────────────────────────────────────────────────────
 
 
-def _build_game_system_prompt(world_seed: WorldSeed) -> str:
+def _build_game_system_prompt(
+    world_seed: WorldSeed, summary: str = "", game_state: GameState | None = None
+) -> str:
     """Build a rich narrative GM system prompt grounded in the WorldSeed."""
 
     tone_map = {
@@ -204,6 +287,23 @@ def _build_game_system_prompt(world_seed: WorldSeed) -> str:
             f"a {world_seed.guide.entity_type} who occupies a {world_seed.guide.social_position} position."
         )
 
+    story_so_far = ""
+    if summary:
+        story_so_far = f"\n\nSTORY SO FAR:\n{summary}"
+
+    current_state_section = ""
+    if game_state:
+        loc = game_state.location
+        inv = ", ".join(game_state.inventory) if game_state.inventory else "nothing"
+        npcs = ", ".join(game_state.known_npcs) if game_state.known_npcs else "none yet"
+        current_state_section = f"""
+
+CURRENT STATE (keep consistent across turns):
+- Current location: {loc}
+- Inventory: {inv}
+- NPCs the player has met: {npcs}
+- Turn: {game_state.turn}"""
+
     return f"""\
 You are the narrator and game master of a therapeutic text adventure.
 
@@ -234,6 +334,13 @@ NARRATION RULES:
 - Never break the fourth wall. Stay fully in the world.
 - This is a therapeutic space — hold the player's choices with care and curiosity.
 - End each response with a subtle opening for the next action (a question, a scene, a choice).
+{story_so_far}{current_state_section}
+
+CONSISTENCY RULES:
+- The player's inventory and location must stay consistent across turns.
+- NPCs the player has met should remember previous interactions.
+- The world should feel like it continues between turns — consequences persist.
+- When the player gains or loses an item, acknowledge it explicitly.
 """
 
 
@@ -383,11 +490,21 @@ async def run_first_scene(world_seed: WorldSeed, session_id: str) -> None:
 # ── Phase 3: Gameplay Loop ────────────────────────────────────────────────────
 
 
-async def run_gameplay(world_seed: WorldSeed, args: argparse.Namespace) -> None:
-    """Run the main gameplay loop."""
+async def run_gameplay(  # noqa: PLR0912, PLR0915
+    world_seed: WorldSeed,
+    args: argparse.Namespace,
+    session_id: str,
+    game_state: GameState | None = None,
+) -> None:
+    """Run the main gameplay loop with state management and context windowing."""
+
+    if game_state is None:
+        game_state = GameState(
+            session_id=session_id,
+            world_seed_data=world_seed.model_dump(mode="json"),
+        )
 
     world_title = f"🌍 {world_seed.character_name or 'The World'}"
-    system_prompt = _build_game_system_prompt(world_seed)
 
     try:
         llm = get_llm(
@@ -401,16 +518,62 @@ async def run_gameplay(world_seed: WorldSeed, args: argparse.Namespace) -> None:
         console.print(f"[red]LLM initialisation failed: {exc}[/red]")
         raise SystemExit(1) from exc
 
-    history: list = [SystemMessage(content=system_prompt)]
+    def _build_history() -> list:
+        """Rebuild langchain message list from raw_history + summary."""
+        sys_msg = SystemMessage(
+            content=_build_game_system_prompt(
+                world_seed,
+                summary=game_state.summary,
+                game_state=game_state,
+            )
+        )
+        messages = [sys_msg]
+        # Use last MAX_HISTORY_TURNS H/A pairs
+        recent = game_state.raw_history[-(MAX_HISTORY_TURNS * 2) :]
+        for entry in recent:
+            if entry["role"] == "human":
+                messages.append(HumanMessage(content=entry["content"]))
+            else:
+                messages.append(AIMessage(content=entry["content"]))
+        return messages
+
+    async def _maybe_summarize() -> None:
+        """If raw_history is too long, summarize the oldest turns."""
+        if len(game_state.raw_history) > SUMMARIZE_TRIGGER * 2:
+            oldest = game_state.raw_history[: -(MAX_HISTORY_TURNS * 2)]
+            if oldest:
+                console.print("[dim]📖 Archiving older chapters…[/dim]")
+                new_chunk_summary = await _summarize_turns(llm, oldest)
+                if game_state.summary:
+                    game_state.summary += "\n\n" + new_chunk_summary
+                else:
+                    game_state.summary = new_chunk_summary
+                # Trim history to last MAX_HISTORY_TURNS pairs
+                game_state.raw_history = game_state.raw_history[
+                    -(MAX_HISTORY_TURNS * 2) :
+                ]
+
+    def _do_save() -> None:
+        path = save_game(game_state)
+        console.print(f"[dim]💾 Saved to {path}[/dim]")
 
     console.print()
-    console.print("[dim]The world awaits. Type [bold]help[/bold] for commands.[/dim]")
+    console.print(
+        "[dim]The world awaits. Type [bold]help[/bold] for commands. "
+        "[bold]save[/bold] to preserve your progress.[/dim]"
+    )
     console.print()
+
+    # Brief pause to avoid rate-limiting first gameplay call immediately after first-scene synthesis
+    await asyncio.sleep(3)
+
+    # Track the last narrator response for `look` command
+    last_narrator_text: str = ""
 
     while True:
         _print_separator()
         try:
-            player_input = Prompt.ask("[cyan]> [/cyan]")
+            player_input = Prompt.ask(f"[cyan][T{game_state.turn}]>[/cyan]")
         except (EOFError, KeyboardInterrupt):
             console.print("\n[dim]Until next time.[/dim]")
             break
@@ -419,32 +582,113 @@ async def run_gameplay(world_seed: WorldSeed, args: argparse.Namespace) -> None:
         if not stripped:
             continue
 
-        if stripped.lower() in QUIT_COMMANDS:
+        cmd = stripped.lower()
+
+        # ── Built-in commands ──────────────────────────────────────────────
+        if cmd in QUIT_COMMANDS:
             console.print("[dim]The story pauses here. Farewell.[/dim]")
             break
 
-        if stripped.lower() == "help":
+        if cmd == "help":
             _print_help()
             continue
 
-        history.append(HumanMessage(content=stripped))
-
-        try:
-            ai_response = await llm.ainvoke(history)
-            response_text = (
-                ai_response.content
-                if hasattr(ai_response, "content")
-                else str(ai_response)
-            )
-        except Exception as exc:
-            logger.error("LLM invoke error: %s", exc)
-            console.print(f"[red]The narrator pauses… ({exc})[/red]")
-            history.pop()  # remove failed message
+        if cmd == "save":
+            _do_save()
             continue
 
-        history.append(ai_response)
+        if cmd in ("status", "stats"):
+            loc = game_state.location or "unknown"
+            inv = ", ".join(game_state.inventory) if game_state.inventory else "nothing"
+            npcs = (
+                ", ".join(game_state.known_npcs)
+                if game_state.known_npcs
+                else "none yet"
+            )
+            console.print(
+                Panel(
+                    f"[bold]Turn:[/bold] {game_state.turn}\n"
+                    f"[bold]Location:[/bold] {loc}\n"
+                    f"[bold]Inventory:[/bold] {inv}\n"
+                    f"[bold]Known NPCs:[/bold] {npcs}",
+                    title="📊 Status",
+                    border_style="cyan",
+                    padding=(1, 2),
+                )
+            )
+            continue
+
+        if cmd in ("journal", "story so far", "recap"):
+            if game_state.summary:
+                _print_narrator(game_state.summary, title="📜 Journal", style="yellow")
+            else:
+                console.print("[dim]No journal entries yet.[/dim]")
+            continue
+
+        if cmd in ("look", "l", "examine surroundings"):
+            if last_narrator_text:
+                _print_narrator(
+                    last_narrator_text, title=world_title, style=GAMEPLAY_PANEL_STYLE
+                )
+            else:
+                console.print("[dim]Nothing to look at yet.[/dim]")
+            continue
+
+        # ── Normal player action ───────────────────────────────────────────
+        game_state.raw_history.append({"role": "human", "content": stripped})
+
+        history_msgs = _build_history()
+
+        # Invoke LLM with retry/backoff for transient 429 rate-limits
+        response_text = ""
+        _retry_waits = [10, 30, 65]  # seconds — covers the 1-minute window
+        for _attempt, _wait in enumerate([-1, *_retry_waits]):
+            if _wait >= 0:
+                console.print(
+                    f"[dim]⏳ Rate limited — retrying in {_wait}s…[/dim]"
+                )
+                await asyncio.sleep(_wait)
+            try:
+                ai_response = await llm.ainvoke(history_msgs)
+                response_text = (
+                    ai_response.content
+                    if hasattr(ai_response, "content")
+                    else str(ai_response)
+                )
+                break
+            except Exception as exc:
+                exc_str = str(exc)
+                is_rate_limit = "429" in exc_str
+                if is_rate_limit and _attempt < len(_retry_waits):
+                    continue  # retry with next wait
+                logger.error("LLM invoke error: %s", exc)
+                console.print(f"[red]The narrator pauses… ({exc})[/red]")
+                response_text = ""
+                break
+
+        if not response_text:
+            game_state.raw_history.pop()  # remove failed human message
+            continue
+
+        game_state.raw_history.append({"role": "ai", "content": response_text})
+        game_state.turn += 1
+        last_narrator_text = response_text
 
         _print_narrator(response_text, title=world_title, style=GAMEPLAY_PANEL_STYLE)
+
+        # Auto-save
+        if game_state.turn % AUTOSAVE_EVERY == 0:
+            SAVES_DIR.mkdir(parents=True, exist_ok=True)
+            autosave_path = SAVES_DIR / f"{game_state.session_id[:8]}_autosave.json"
+            with autosave_path.open("w", encoding="utf-8") as _f:
+                json.dump(
+                    dataclasses.asdict(game_state), _f, indent=2, ensure_ascii=False
+                )
+            console.print(f"[dim]💾 Auto-saved (turn {game_state.turn})[/dim]")
+
+        # Manage context window
+        if len(game_state.raw_history) > SUMMARIZE_TRIGGER * 2:
+            await _maybe_summarize()
 
 
 # ── LLM availability check ────────────────────────────────────────────────────
@@ -518,20 +762,55 @@ def _build_parser() -> argparse.ArgumentParser:
         choices=["ollama", "openrouter"],
         help="LLM provider: 'ollama' (local) or 'openrouter' (cloud, needs OPENROUTER_API_KEY)",
     )
+    parser.add_argument(
+        "--load",
+        metavar="FILE",
+        default=None,
+        help="Resume a saved session from a JSON save file (e.g. ~/.tta/saves/abc12345_20260401_1230.json)",
+    )
     return parser
 
 
 async def main(args: argparse.Namespace) -> None:
     _print_welcome()
 
-    # Phase 1: Genesis
-    world_seed, state = await run_genesis(args)
+    loaded_state: GameState | None = None
 
-    # Phase 2: First Scene
-    await run_first_scene(world_seed, state.session_id)
+    # Handle --load: skip genesis and first scene, go straight to gameplay
+    if args.load:
+        load_path = Path(args.load).expanduser()
+        if not load_path.exists():
+            # Try relative to SAVES_DIR
+            load_path = SAVES_DIR / args.load
+        if not load_path.exists():
+            console.print(f"[red]Save file not found: {args.load}[/red]")
+            raise SystemExit(1)
+        try:
+            loaded_state = load_game(load_path)
+            world_seed = WorldSeed(**loaded_state.world_seed_data)
+            console.print(
+                f"[dim]📂 Loaded save — resuming at turn {loaded_state.turn}[/dim]"
+            )
+        except Exception as exc:
+            console.print(f"[red]Failed to load save: {exc}[/red]")
+            raise SystemExit(1) from exc
 
-    # Phase 3: Gameplay
-    await run_gameplay(world_seed, args)
+        await run_gameplay(
+            world_seed,
+            args,
+            session_id=loaded_state.session_id,
+            game_state=loaded_state,
+        )
+    else:
+        # Phase 1: Genesis
+        world_seed, genesis_state = await run_genesis(args)
+        session_id = genesis_state.session_id
+
+        # Phase 2: First Scene
+        await run_first_scene(world_seed, session_id)
+
+        # Phase 3: Gameplay
+        await run_gameplay(world_seed, args, session_id=session_id)
 
     console.print()
     console.print("[dim]Thank you for playing.[/dim]")

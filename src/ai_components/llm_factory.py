@@ -29,7 +29,7 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Default free models
 _DEFAULT_OLLAMA_MODEL = "llama3.2"
-_DEFAULT_OPENROUTER_MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+_DEFAULT_OPENROUTER_MODEL = "openrouter/free"
 
 # Keep the client import lazy for runtime compatibility, but expose a patchable
 # module attribute so unit tests can replace it without importing the provider.
