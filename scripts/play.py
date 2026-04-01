@@ -22,6 +22,8 @@ import re as _re
 import socket
 import sys
 import warnings
+
+import httpx
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
@@ -206,21 +208,75 @@ def _parse_state_block(text: str) -> tuple[str, dict]:
         if key == "location" and val and val.lower() not in ("unknown", "none", ""):
             state["location"] = val
         elif key == "inventory":
-            items = [
-                i.strip()
-                for i in val.split(",")
-                if i.strip() and i.strip().lower() not in ("empty", "none", "")
-            ]
+            items = []
+            for i in val.split(","):
+                clean_i = i.strip().strip("[]")
+                if clean_i and clean_i.lower() not in ("empty", "none", ""):
+                    items.append(clean_i)
             state["inventory"] = items
         elif key == "npcs":
-            npcs = [
-                n.strip()
-                for n in val.split(",")
-                if n.strip() and n.strip().lower() not in ("none", "empty", "")
-            ]
+            npcs = []
+            for n in val.split(","):
+                clean_n = n.strip().strip("[]")
+                if clean_n and clean_n.lower() not in ("none", "empty", ""):
+                    npcs.append(clean_n)
             state["npcs"] = npcs
 
     return clean, state
+
+
+# ── Ollama helpers ────────────────────────────────────────────────────────────
+
+_OLLAMA_BASE = "http://localhost:11434"
+_OLLAMA_TIMEOUT = 120.0
+
+
+async def _call_ollama(messages: list[dict], model: str) -> str:
+    """Call Ollama /api/chat and return the response content string."""
+    async with httpx.AsyncClient(timeout=_OLLAMA_TIMEOUT) as client:
+        resp = await client.post(
+            f"{_OLLAMA_BASE}/api/chat",
+            json={"model": model, "messages": messages, "stream": False},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["message"]["content"]
+
+
+async def _extract_state_ollama(narrative_text: str) -> dict:
+    """Use qwen2.5:3b to extract a [STATE] block from narrative when gemma3:4b omits it."""
+    extraction_prompt = (
+        "Given this game narrative, extract the current game state. "
+        "Reply ONLY with a state block in EXACTLY this format (no other text):\n"
+        "[STATE]location=<current location>|inventory=<item1,item2 or empty>|npcs=<npc1,npc2 or empty>[/STATE]\n\n"
+        f"Narrative:\n{narrative_text}"
+    )
+    messages = [{"role": "user", "content": extraction_prompt}]
+    try:
+        raw = await _call_ollama(messages, "qwen2.5:3b")
+        _, state = _parse_state_block(raw)
+        return state
+    except Exception:
+        return {}
+
+
+def _lc_to_dicts(messages: list) -> list[dict]:
+    """Convert langchain message objects to Ollama-style role/content dicts."""
+    from langchain_core.messages import AIMessage as _AI
+    from langchain_core.messages import HumanMessage as _Human
+    from langchain_core.messages import SystemMessage as _System
+
+    result = []
+    for m in messages:
+        if isinstance(m, _System):
+            result.append({"role": "system", "content": m.content})
+        elif isinstance(m, _Human):
+            result.append({"role": "user", "content": m.content})
+        elif isinstance(m, _AI):
+            result.append({"role": "assistant", "content": m.content})
+        elif isinstance(m, dict):
+            result.append(m)
+    return result
 
 
 # ── System prompt builder ─────────────────────────────────────────────────────
@@ -556,19 +612,22 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
             world_seed_data=world_seed.model_dump(mode="json"),
         )
 
+    mode = getattr(args, "mode", "openrouter")
     world_title = f"🌍 {world_seed.character_name or 'The World'}"
 
-    try:
-        llm = get_llm(
-            provider=args.provider or None,
-            model=args.model or None,
-            temperature=0.8,
-            max_tokens=800,
-        )
-    except Exception as exc:
-        logger.error("Failed to initialise LLM: %s", exc)
-        console.print(f"[red]LLM initialisation failed: {exc}[/red]")
-        raise SystemExit(1) from exc
+    llm = None
+    if mode == "openrouter":
+        try:
+            llm = get_llm(
+                provider=args.provider or None,
+                model=args.model or None,
+                temperature=0.8,
+                max_tokens=800,
+            )
+        except Exception as exc:
+            logger.error("Failed to initialise LLM: %s", exc)
+            console.print(f"[red]LLM initialisation failed: {exc}[/red]")
+            raise SystemExit(1) from exc
 
     def _build_history() -> list:
         """Rebuild langchain message list from raw_history + summary."""
@@ -595,7 +654,32 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
             oldest = game_state.raw_history[: -(MAX_HISTORY_TURNS * 2)]
             if oldest:
                 console.print("[dim]📖 Archiving older chapters…[/dim]")
-                new_chunk_summary = await _summarize_turns(llm, oldest)
+                if mode == "openrouter" and llm is not None:
+                    new_chunk_summary = await _summarize_turns(llm, oldest)
+                else:
+                    turns_text = "\n\n".join(
+                        f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
+                        for t in oldest
+                    )
+                    summarize_msgs = [
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are a story archivist. Summarize the following story events into "
+                                "3-5 sentences, preserving all important facts: character names, items found, "
+                                "locations visited, decisions made, and any unresolved plot threads. "
+                                "Write in past tense. Be concrete — names and specifics matter."
+                            ),
+                        },
+                        {"role": "user", "content": turns_text},
+                    ]
+                    try:
+                        new_chunk_summary = await _call_ollama(summarize_msgs, "gemma3:4b")
+                    except Exception:
+                        narrator_lines = [
+                            t["content"][:150] for t in oldest if t["role"] == "ai"
+                        ]
+                        new_chunk_summary = " … ".join(narrator_lines[:3])
                 if game_state.summary:
                     game_state.summary += "\n\n" + new_chunk_summary
                 else:
@@ -701,12 +785,16 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
             elif _wait == 0:
                 console.print("[dim]⟳ Retrying…[/dim]")
             try:
-                ai_response = await llm.ainvoke(history_msgs)
-                response_text = (
-                    ai_response.content
-                    if hasattr(ai_response, "content")
-                    else str(ai_response)
-                )
+                if mode == "openrouter":
+                    ai_response = await llm.ainvoke(history_msgs)
+                    response_text = (
+                        ai_response.content
+                        if hasattr(ai_response, "content")
+                        else str(ai_response)
+                    )
+                else:  # ollama or blended — call gemma3:4b via Ollama
+                    msgs_dicts = _lc_to_dicts(history_msgs)
+                    response_text = await _call_ollama(msgs_dicts, "gemma3:4b")
                 break
             except Exception as exc:
                 exc_str = str(exc)
@@ -729,6 +817,10 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
 
         # Strip [STATE] block before storing/displaying, then update structured state
         response_text, extracted_state = _parse_state_block(response_text)
+
+        # Blended mode: if [STATE] is missing, ask qwen2.5:3b to extract it
+        if mode == "blended" and not extracted_state and response_text:
+            extracted_state = await _extract_state_ollama(response_text)
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
@@ -786,9 +878,20 @@ To play, you need one of:
 def _check_llm_available(args: argparse.Namespace) -> None:
     """Verify an LLM provider is reachable; print helpful error and exit if not."""
     provider = args.provider
+    mode = getattr(args, "mode", "openrouter")
     has_openrouter_key = bool(os.environ.get("OPENROUTER_API_KEY"))
 
-    # Determine effective provider (mirrors llm_factory logic)
+    # --mode=ollama or --mode=blended: both require a running Ollama instance
+    if mode in ("ollama", "blended"):
+        try:
+            with socket.create_connection(("localhost", 11434), timeout=1):
+                pass  # reachable
+        except OSError:
+            console.print(Panel(_LLM_SETUP_HELP, border_style="yellow", padding=(1, 2)))
+            raise SystemExit(1) from None
+        return
+
+    # mode == "openrouter": fall back to existing provider/key checks
     if provider is None:
         provider = "openrouter" if has_openrouter_key else "ollama"
 
@@ -832,6 +935,17 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         choices=["ollama", "openrouter"],
         help="LLM provider: 'ollama' (local) or 'openrouter' (cloud, needs OPENROUTER_API_KEY)",
+    )
+    parser.add_argument(
+        "--mode",
+        metavar="MODE",
+        default="openrouter",
+        choices=["openrouter", "ollama", "blended"],
+        help=(
+            "LLM mode: 'openrouter' (cloud, default), "
+            "'ollama' (local gemma3:4b for everything), "
+            "'blended' (gemma3:4b narration + qwen2.5:3b state-extraction fallback)"
+        ),
     )
     parser.add_argument(
         "--load",

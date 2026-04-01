@@ -24,6 +24,8 @@ import warnings
 from pathlib import Path
 from uuid import uuid4
 
+import httpx
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
@@ -60,6 +62,21 @@ AUTOSAVE_EVERY = 10
 
 _STATE_RE_SIM = re.compile(r"\[STATE\](.*?)\[/STATE\]", re.DOTALL)
 
+_OLLAMA_BASE = "http://localhost:11434"
+_OLLAMA_TIMEOUT = 120.0
+
+
+async def _call_ollama_sim(messages: list[dict], model: str) -> str:
+    """Call Ollama /api/chat and return the response content string."""
+    async with httpx.AsyncClient(timeout=_OLLAMA_TIMEOUT) as client:
+        resp = await client.post(
+            f"{_OLLAMA_BASE}/api/chat",
+            json={"model": model, "messages": messages, "stream": False},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["message"]["content"]
+
 
 def _strip_state_block(text: str) -> tuple[str, dict]:
     match = _STATE_RE_SIM.search(text)
@@ -77,17 +94,19 @@ def _strip_state_block(text: str) -> tuple[str, dict]:
         if key == "location" and val.lower() not in ("unknown", "none", ""):
             state["location"] = val
         elif key == "inventory":
-            state["inventory"] = [
-                i.strip()
-                for i in val.split(",")
-                if i.strip() and i.strip().lower() not in ("empty", "none", "")
-            ]
+            items = []
+            for i in val.split(","):
+                clean_i = i.strip().strip("[]")
+                if clean_i and clean_i.lower() not in ("empty", "none", ""):
+                    items.append(clean_i)
+            state["inventory"] = items
         elif key == "npcs":
-            state["npcs"] = [
-                n.strip()
-                for n in val.split(",")
-                if n.strip() and n.strip().lower() not in ("none", "empty", "")
-            ]
+            npcs = []
+            for n in val.split(","):
+                clean_n = n.strip().strip("[]")
+                if clean_n and clean_n.lower() not in ("none", "empty", ""):
+                    npcs.append(clean_n)
+            state["npcs"] = npcs
     return clean, state
 
 
@@ -320,6 +339,7 @@ async def run_simulation(
     dry_run: bool = False,
     provider: str | None = None,
     model: str | None = None,
+    mode: str = "openrouter",
 ) -> None:
     world_seed = _make_sable_world_seed()
     session_id = uuid4().hex
@@ -342,7 +362,7 @@ async def run_simulation(
         scripted = scripted[:n_turns]
 
     llm = None
-    if not dry_run:
+    if not dry_run and mode == "openrouter":
         llm = get_llm(provider=provider, model=model, temperature=0.8, max_tokens=800)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -352,7 +372,7 @@ async def run_simulation(
     print(f"\n{'=' * 60}")
     print(f"TTA Simulation Run — {n_turns} turns")
     print(f"Session: {session_id[:8]}")
-    print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else 'LIVE'}")
+    print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else mode.upper()}")
     print(f"Output: {out_path}")
     print(f"{'=' * 60}\n")
 
@@ -389,12 +409,23 @@ async def run_simulation(
             response_text = ""
             for _sim_attempt in range(3):
                 try:
-                    ai_response = await llm.ainvoke(messages)
-                    response_text = (
-                        ai_response.content
-                        if hasattr(ai_response, "content")
-                        else str(ai_response)
-                    )
+                    if mode == "openrouter":
+                        ai_response = await llm.ainvoke(messages)
+                        response_text = (
+                            ai_response.content
+                            if hasattr(ai_response, "content")
+                            else str(ai_response)
+                        )
+                    else:  # ollama or blended — use gemma3:4b
+                        msgs_dicts = []
+                        for m in messages:
+                            if isinstance(m, SystemMessage):
+                                msgs_dicts.append({"role": "system", "content": m.content})
+                            elif isinstance(m, HumanMessage):
+                                msgs_dicts.append({"role": "user", "content": m.content})
+                            elif isinstance(m, AIMessage):
+                                msgs_dicts.append({"role": "assistant", "content": m.content})
+                        response_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
                     break
                 except Exception as exc:
                     exc_str = str(exc)
@@ -419,6 +450,22 @@ async def run_simulation(
 
         # Update game state — strip [STATE] block first, then update structured fields
         response_text, extracted_state = _strip_state_block(response_text)
+
+        # Blended mode: if [STATE] missing, use qwen2.5:3b to extract state
+        if mode == "blended" and not extracted_state and response_text and not dry_run:
+            extraction_prompt = (
+                "Given this game narrative, extract the current game state. "
+                "Reply ONLY with a state block in EXACTLY this format (no other text):\n"
+                "[STATE]location=<current location>|inventory=<item1,item2 or empty>|npcs=<npc1,npc2 or empty>[/STATE]\n\n"
+                f"Narrative:\n{response_text}"
+            )
+            try:
+                raw_extraction = await _call_ollama_sim(
+                    [{"role": "user", "content": extraction_prompt}], "qwen2.5:3b"
+                )
+                _, extracted_state = _strip_state_block(raw_extraction)
+            except Exception:
+                pass
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
@@ -506,26 +553,35 @@ async def run_simulation(
             oldest = game_state.raw_history[: -(MAX_HISTORY_TURNS * 2)]
             if oldest:
                 print("[dim] 📖 Triggering summarization…")
-                from langchain_core.messages import SystemMessage as SM
-
-                summarize_msgs = [
-                    SM(
-                        content="You are a story archivist. Summarize the following story events into 3-5 sentences, preserving all important facts: character names, items found, locations visited, decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
-                    ),
-                    HumanMessage(
-                        content="\n\n".join(
-                            f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
-                            for t in oldest
-                        )
-                    ),
-                ]
+                turns_text = "\n\n".join(
+                    f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
+                    for t in oldest
+                )
+                summarize_system = (
+                    "You are a story archivist. Summarize the following story events into 3-5 sentences, "
+                    "preserving all important facts: character names, items found, locations visited, "
+                    "decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
+                )
                 try:
-                    summary_result = await llm.ainvoke(summarize_msgs)
-                    new_summary = (
-                        summary_result.content
-                        if hasattr(summary_result, "content")
-                        else str(summary_result)
-                    )
+                    if mode == "openrouter":
+                        from langchain_core.messages import SystemMessage as SM
+
+                        summary_result = await llm.ainvoke(
+                            [SM(content=summarize_system), HumanMessage(content=turns_text)]
+                        )
+                        new_summary = (
+                            summary_result.content
+                            if hasattr(summary_result, "content")
+                            else str(summary_result)
+                        )
+                    else:
+                        new_summary = await _call_ollama_sim(
+                            [
+                                {"role": "system", "content": summarize_system},
+                                {"role": "user", "content": turns_text},
+                            ],
+                            "gemma3:4b",
+                        )
                     game_state.summary = (
                         (game_state.summary + "\n\n" + new_summary).strip()
                         if game_state.summary
@@ -635,10 +691,16 @@ def main() -> None:
         "--provider", default=None, help="LLM provider (openrouter/ollama)"
     )
     parser.add_argument("--model", default=None, help="LLM model override")
+    parser.add_argument(
+        "--mode",
+        default="openrouter",
+        choices=["openrouter", "ollama", "blended"],
+        help="LLM mode: openrouter (default), ollama (gemma3:4b local), blended (gemma narrates + qwen extracts state)",
+    )
     args = parser.parse_args()
 
     if args.out is None:
-        args.out = Path("runs") / f"run_{args.turns}.jsonl"
+        args.out = Path("runs") / f"run_{args.turns}_{args.mode}.jsonl"
 
     asyncio.run(
         run_simulation(
@@ -647,6 +709,7 @@ def main() -> None:
             dry_run=args.dry_run,
             provider=args.provider,
             model=args.model,
+            mode=args.mode,
         )
     )
 
