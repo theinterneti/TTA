@@ -14,9 +14,9 @@ from langchain_core.messages import AIMessage
 from src.components.ipa.models import EmotionalTone, Intent, ProcessedInput
 from src.components.nga.agent import (
     NGAAgent,
+    _build_user_message,
     _NGAFallback,
     _NGALLMCall,
-    _build_user_message,
 )
 from src.components.world_context.models import (
     ConnectedLocation,
@@ -29,11 +29,7 @@ from src.components.world_context.models import (
 
 pytestmark = pytest.mark.unit
 
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
-
+from ttadev.primitives import WorkflowContext
 
 # ---------------------------------------------------------------------------
 # Helpers

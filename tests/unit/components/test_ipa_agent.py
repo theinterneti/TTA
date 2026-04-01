@@ -22,11 +22,7 @@ from src.components.ipa.models import (
 
 pytestmark = pytest.mark.unit
 
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
-
+from ttadev.primitives import WorkflowContext
 
 # ---------------------------------------------------------------------------
 # Helpers

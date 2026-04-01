@@ -15,19 +15,19 @@ import pytest
 
 pytest.importorskip("tta_ai")
 
+from tta_ai.models import (  # noqa: E402
+    ModelInfo,
+    ModelRequirements,
+    ProviderType,
+    TaskType,
+)
 from tta_ai.models.models import ModelSelectionCriteria  # noqa: E402
 from tta_ai.models.services.model_selector import (  # noqa: E402
     ModelSelector,
     _ModelSelectCall,
     _ModelSelectFallback,
 )
-
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
-
-from tta_ai.models import ModelInfo, ModelRequirements, ProviderType, TaskType  # noqa: E402
+from ttadev.primitives import WorkflowContext
 
 pytestmark = pytest.mark.unit
 
@@ -217,10 +217,7 @@ class TestModelSelectorSelectModelTimeout:
     @pytest.mark.asyncio
     async def test_select_model_uses_timeout_primitive(self) -> None:
         """TimeoutPrimitive.execute is called with correct timeout."""
-        try:
-            from ttadev.primitives import TimeoutPrimitive
-        except ImportError:
-            pytest.skip("ttadev.primitives not available")
+        from ttadev.primitives import TimeoutPrimitive
 
         selector = _make_selector(timeout_seconds=15.0)
         model = _make_model()

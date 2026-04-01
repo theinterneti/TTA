@@ -10,11 +10,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
+from ttadev.primitives import WorkflowContext
 
 from src.agent_orchestration.adapters import (
     RetryConfig,
@@ -24,19 +20,18 @@ from src.agent_orchestration.adapters import (
 )
 from src.components.ipa.models import ExtractedEntity, Intent, ProcessedInput
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 
 def _make_processed_input(**kwargs) -> ProcessedInput:  # type: ignore[no-untyped-def]
-    defaults: dict = dict(
-        raw_text="go north",
-        normalized_text="go north",
-        intent=Intent.EXPLORE,
-        intent_confidence=0.9,
-    )
+    defaults: dict = {
+        "raw_text": "go north",
+        "normalized_text": "go north",
+        "intent": Intent.EXPLORE,
+        "intent_confidence": 0.9,
+    }
     defaults.update(kwargs)
     return ProcessedInput(**defaults)
 

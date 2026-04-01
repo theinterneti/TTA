@@ -8,26 +8,22 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.components.genesis.first_scene_synthesis import (
-    FirstScene,
-    FirstSceneSynthesisService,
-    _SynthesisCall,
-    _SynthesisFallback,
-)
 from src.components.gameplay_loop.models.world_seed import (
     PlayerPosition,
     PowerSource,
     WorldSeed,
     WorldTone,
 )
+from src.components.genesis.first_scene_synthesis import (
+    FirstScene,
+    FirstSceneSynthesisService,
+    _SynthesisCall,
+    _SynthesisFallback,
+)
 
 pytestmark = pytest.mark.unit
 
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
-
+from ttadev.primitives import WorkflowContext
 
 # ---------------------------------------------------------------------------
 # Fixtures

@@ -15,11 +15,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
+from ttadev.primitives import WorkflowContext
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerError,
@@ -36,7 +32,6 @@ from src.agent_orchestration.adapters import (
     _NGACall,
     _WBACall,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

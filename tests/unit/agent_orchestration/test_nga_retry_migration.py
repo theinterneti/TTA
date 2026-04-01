@@ -11,11 +11,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
-try:
-    from ttadev.primitives import WorkflowContext
-except ImportError:
-    pytest.skip("ttadev.primitives not available", allow_module_level=True)
+from ttadev.primitives import WorkflowContext
 
 from src.agent_orchestration.adapters import (
     RetryConfig,
@@ -25,7 +21,6 @@ from src.agent_orchestration.adapters import (
 )
 from src.components.ipa.models import ProcessedInput
 from src.components.world_context.models import LocationFact, WorldContext
-
 
 # ---------------------------------------------------------------------------
 # Helpers
