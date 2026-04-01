@@ -243,16 +243,24 @@ async def _call_ollama(messages: list[dict], model: str) -> str:
         return data["message"]["content"]
 
 
-async def _extract_state_ollama(narrative_text: str) -> dict:
+async def _extract_state_ollama(narrative_text: str, prior_inventory: list[str] | None = None) -> dict:
     """Use qwen3:1.7b to extract a [STATE] block from narrative when gemma3:4b omits it."""
+    prior_inv = ", ".join(prior_inventory) if prior_inventory else "empty"
     extraction_prompt = (
-        "Extract game state from this narrative. "
-        "Rules: location = 2-4 word place name (snake_case). "
-        "inventory = only tangible physical items the character is holding or carrying (max 5, comma-separated, title case, no duplicates). "
-        "npcs = only named characters or creatures present (max 3, title case, no duplicates). "
-        "Use 'empty' if none.\n"
-        "Reply with ONLY this exact format, nothing else:\n"
-        "[STATE]location=<location>|inventory=<items or empty>|npcs=<names or empty>[/STATE]\n\n"
+        f"Player inventory BEFORE this turn: [{prior_inv}]\n\n"
+        "Based on the narrative below, output the player's state AFTER this turn.\n"
+        "Rules:\n"
+        "  location: 2-4 word place name (snake_case)\n"
+        "  inventory: items the player is ACTIVELY CARRYING right now.\n"
+        "    - Keep prior inventory items unless explicitly dropped/used/lost\n"
+        "    - Add items the player EXPLICITLY picked up or was given this turn\n"
+        "    - EXCLUDE: items on tables/desks/shelves not touched; scene objects;\n"
+        "      liquids; materials; abstract concepts; atmospheric words\n"
+        "    - Max 5 items, title case, comma-separated\n"
+        "  npcs: named characters/creatures present in this scene (max 3, title case)\n"
+        "    - Only proper names (e.g. Maren, not 'the archivist')\n"
+        "Use 'empty' if none. Reply with ONLY:\n"
+        "[STATE]location=<place>|inventory=<items or empty>|npcs=<names or empty>[/STATE]\n\n"
         f"Narrative:\n{narrative_text}"
     )
     messages = [{"role": "user", "content": extraction_prompt}]
@@ -272,35 +280,41 @@ def _normalize_state(state: dict) -> dict:
     if state.get("location"):
         normalized["location"] = state["location"].replace("_", " ").strip()
 
-    # Inventory: normalize and deduplicate case-insensitively, filter garbage
+    # Inventory: normalize, deduplicate case-insensitively, filter garbage, cap at 5
     if state.get("inventory") is not None:
         seen: set[str] = set()
         clean_items: list[str] = []
         for item in state["inventory"]:
             item = item.replace("_", " ").strip()
-            # Filter: skip if >40 chars (phrases, not items), or empty
-            if not item or len(item) > 40:
+            # Filter: >35 chars, empty, or common false positives
+            if not item or len(item) > 35:
                 continue
-            key = item.lower()
-            if key not in seen:
-                seen.add(key)
+            _low = item.lower()
+            if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
+                        "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
+                        "crates", "signature", "ink", "ledger"}:
+                continue
+            if _low not in seen:
+                seen.add(_low)
                 clean_items.append(item.title())
-        normalized["inventory"] = clean_items
+        normalized["inventory"] = clean_items[:5]  # hard cap
 
-    # NPCs: normalize and deduplicate case-insensitively, filter garbage
+    # NPCs: normalize, deduplicate case-insensitively, filter garbage, cap at 5
     if state.get("npcs") is not None:
         seen_npcs: set[str] = set()
         clean_npcs: list[str] = []
         for npc in state["npcs"]:
             npc = npc.replace("_", " ").strip()
-            # Filter: skip if >30 chars (phrases, not names), or contains digits
             if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
                 continue
-            key = npc.lower()
-            if key not in seen_npcs:
-                seen_npcs.add(key)
+            _low_npc = npc.lower()
+            if _low_npc in {"the man", "dockhand", "clerk", "worker", "guard",
+                            "merchant", "stranger", "figure", "person"}:
+                continue
+            if _low_npc not in seen_npcs:
+                seen_npcs.add(_low_npc)
                 clean_npcs.append(npc.title())
-        normalized["npcs"] = clean_npcs
+        normalized["npcs"] = clean_npcs[:5]
 
     return normalized
 
@@ -880,15 +894,22 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
             or mode == "hybrid"
         )
         if use_qwen:
-            extracted_state = await _extract_state_ollama(response_text)
+            extracted_state = await _extract_state_ollama(
+                response_text, prior_inventory=list(game_state.inventory)
+            )
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
-            # Merge: add new items, never remove (LLM might omit items)
-            for item in extracted_state.get("inventory", []):
-                if item.lower() not in [i.lower() for i in game_state.inventory]:
-                    game_state.inventory.append(item)
+            if mode == "hybrid":
+                # qwen is authoritative — replace inventory each turn
+                game_state.inventory = extracted_state["inventory"]
+            else:
+                # blended/ollama — accumulate conservatively
+                for item in extracted_state.get("inventory", []):
+                    if item.lower() not in [i.lower() for i in game_state.inventory]:
+                        game_state.inventory.append(item)
         if extracted_state.get("npcs") is not None:
+            # NPCs accumulate (known_npcs = everyone ever met)
             for npc in extracted_state.get("npcs", []):
                 if npc.lower() not in [n.lower() for n in game_state.known_npcs]:
                     game_state.known_npcs.append(npc)

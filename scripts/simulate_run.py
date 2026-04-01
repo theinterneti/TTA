@@ -118,35 +118,43 @@ def _normalize_state(state: dict) -> dict:
     if state.get("location"):
         normalized["location"] = state["location"].replace("_", " ").strip()
 
-    # Inventory: normalize and deduplicate case-insensitively, filter garbage
+    # Inventory: normalize, deduplicate case-insensitively, filter garbage, cap at 5
     if state.get("inventory") is not None:
         seen: set[str] = set()
         clean_items: list[str] = []
         for item in state["inventory"]:
             item = item.replace("_", " ").strip()
-            # Filter: skip if >40 chars (phrases, not items), or empty
-            if not item or len(item) > 40:
+            # Filter: skip if >35 chars (phrases), empty, or looks like atmosphere/material
+            if not item or len(item) > 35:
                 continue
-            key = item.lower()
-            if key not in seen:
-                seen.add(key)
+            # Filter common false positives: single-word abstract nouns / liquids
+            _low = item.lower()
+            if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
+                        "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
+                        "crates", "signature", "ink", "ledger"}:
+                continue
+            if _low not in seen:
+                seen.add(_low)
                 clean_items.append(item.title())
-        normalized["inventory"] = clean_items
+        normalized["inventory"] = clean_items[:5]  # hard cap
 
-    # NPCs: normalize and deduplicate case-insensitively, filter garbage
+    # NPCs: normalize, deduplicate case-insensitively, filter garbage, cap at 5
     if state.get("npcs") is not None:
         seen_npcs: set[str] = set()
         clean_npcs: list[str] = []
         for npc in state["npcs"]:
             npc = npc.replace("_", " ").strip()
-            # Filter: skip if >30 chars (phrases, not names), or contains digits
+            # Filter: >30 chars, contains digits, generic role words without proper name
             if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
                 continue
-            key = npc.lower()
-            if key not in seen_npcs:
-                seen_npcs.add(key)
+            _low_npc = npc.lower()
+            if _low_npc in {"the man", "dockhand", "clerk", "worker", "guard",
+                            "merchant", "stranger", "figure", "person"}:
+                continue
+            if _low_npc not in seen_npcs:
+                seen_npcs.add(_low_npc)
                 clean_npcs.append(npc.title())
-        normalized["npcs"] = clean_npcs
+        normalized["npcs"] = clean_npcs[:5]
 
     return normalized
 
@@ -505,6 +513,27 @@ async def run_simulation(
             if not response_text:
                 continue
 
+            # Short-response guard: retry once if narration is suspiciously short
+            if _count_words(response_text) < 25 and not dry_run:
+                print(
+                    f"  ⟳ Response too short ({_count_words(response_text)}w) — retrying…"
+                )
+                try:
+                    if mode in ("openrouter", "hybrid"):
+                        ai_retry = await llm.ainvoke(messages)
+                        retry_text = (
+                            ai_retry.content
+                            if hasattr(ai_retry, "content")
+                            else str(ai_retry)
+                        )
+                    else:
+                        retry_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
+                    if _count_words(retry_text) > _count_words(response_text):
+                        response_text = retry_text
+                        latency_ms = (time.time() - t0) * 1000
+                except Exception:
+                    pass  # keep original short response
+
         # Update game state — strip [STATE] block first, then update structured fields
         response_text, extracted_state = _strip_state_block(response_text)
         extracted_state = _normalize_state(extracted_state)
@@ -520,14 +549,24 @@ async def run_simulation(
             )
         )
         if use_qwen_extraction:
+            prior_inv = (
+                ", ".join(game_state.inventory) if game_state.inventory else "empty"
+            )
             extraction_prompt = (
-                "Extract game state from this narrative. "
-                "Rules: location = 2-4 word place name (snake_case). "
-                "inventory = only tangible physical items the character is holding or carrying (max 5, comma-separated, title case, no duplicates). "
-                "npcs = only named characters or creatures present (max 3, title case, no duplicates). "
-                "Use 'empty' if none.\n"
-                "Reply with ONLY this exact format, nothing else:\n"
-                "[STATE]location=<location>|inventory=<items or empty>|npcs=<names or empty>[/STATE]\n\n"
+                f"Player inventory BEFORE this turn: [{prior_inv}]\n\n"
+                "Based on the narrative below, output the player's state AFTER this turn.\n"
+                "Rules:\n"
+                "  location: 2-4 word place name (snake_case)\n"
+                "  inventory: items the player is ACTIVELY CARRYING right now.\n"
+                "    - Keep prior inventory items unless explicitly dropped/used/lost\n"
+                "    - Add items the player EXPLICITLY picked up or was given this turn\n"
+                "    - EXCLUDE: items on tables/desks/shelves not touched; scene objects;\n"
+                "      liquids; materials; abstract concepts; atmospheric words\n"
+                "    - Max 5 items, title case, comma-separated\n"
+                "  npcs: named characters/creatures present in this scene (max 3, title case)\n"
+                "    - Only proper names (e.g. Maren, not 'the archivist')\n"
+                "Use 'empty' if none. Reply with ONLY:\n"
+                "[STATE]location=<place>|inventory=<items or empty>|npcs=<names or empty>[/STATE]\n\n"
                 f"Narrative:\n{response_text}"
             )
             try:
@@ -536,7 +575,7 @@ async def run_simulation(
                 )
                 _, qwen_state = _strip_state_block(raw_extraction)
                 qwen_state = _normalize_state(qwen_state)
-                # In hybrid mode, qwen is always authoritative; in blended it's fallback
+                # qwen is authoritative in hybrid — replace state, don't accumulate
                 if qwen_state:
                     extracted_state = qwen_state
             except Exception:
@@ -544,10 +583,16 @@ async def run_simulation(
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
-            for item in extracted_state.get("inventory", []):
-                if item.lower() not in [i.lower() for i in game_state.inventory]:
-                    game_state.inventory.append(item)
+            if mode == "hybrid":
+                # qwen output = authoritative current state — replace entire inventory
+                game_state.inventory = extracted_state["inventory"]
+            else:
+                # blended fallback — accumulate (conservative)
+                for item in extracted_state.get("inventory", []):
+                    if item.lower() not in [i.lower() for i in game_state.inventory]:
+                        game_state.inventory.append(item)
         if extracted_state.get("npcs") is not None:
+            # NPCs accumulate (known_npcs = everyone met so far)
             for npc in extracted_state.get("npcs", []):
                 if npc.lower() not in [n.lower() for n in game_state.known_npcs]:
                     game_state.known_npcs.append(npc)
