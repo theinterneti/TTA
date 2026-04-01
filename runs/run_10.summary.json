@@ -1,0 +1,78 @@
+{
+  "session_id": "49eb83b5",
+  "n_turns": 10,
+  "turns_completed": 10,
+  "avg_response_words": 259.0,
+  "avg_latency_ms": 19515.1,
+  "coherence_callback_turns": 5,
+  "coherence_callback_rate": 0.5,
+  "entity_first_appearance": {
+    "archive": 1,
+    "brass_handles": 2,
+    "archivist": 4,
+    "contracts": 1,
+    "quill": 4,
+    "document": 1,
+    "restricted": 10,
+    "ships_log": 1,
+    "inn": 10
+  },
+  "entity_recurrence": {
+    "archive": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "brass_handles": [
+      2,
+      3
+    ],
+    "archivist": [
+      4,
+      5,
+      6,
+      7,
+      10
+    ],
+    "contracts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10
+    ],
+    "quill": [
+      4,
+      5,
+      8,
+      9,
+      10
+    ],
+    "document": [
+      1,
+      6,
+      8,
+      9
+    ]
+  },
+  "final_context_messages": 21,
+  "final_context_chars": 16879,
+  "summarization_triggered": false,
+  "final_summary": "",
+  "structured_state_gap": {
+    "location_tracked": false,
+    "inventory_tracked": false,
+    "npcs_tracked": false
+  }
+}
