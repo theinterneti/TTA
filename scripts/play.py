@@ -36,10 +36,20 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     stream=sys.stderr,
 )
-# Silence structlog and noisy library loggers that print at INFO level
-for _noisy in ("structlog", "httpx", "httpcore", "openai", "src"):
+# Silence noisy library loggers
+for _noisy in ("httpx", "httpcore", "openai", "src", "langchain", "langchain_core"):
     logging.getLogger(_noisy).setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
+
+# Silence structlog (uses its own output pipeline, bypasses stdlib logging)
+try:
+    import structlog as _structlog
+
+    _structlog.configure(
+        wrapper_class=_structlog.make_filtering_bound_logger(logging.ERROR),
+    )
+except Exception:  # noqa: BLE001, S110
+    pass
 
 # ── Rich imports ──────────────────────────────────────────────────────────────
 from rich.console import Console  # noqa: E402
