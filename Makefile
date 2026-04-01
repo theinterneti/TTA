@@ -1,6 +1,6 @@
 # Test tiers
 
-.PHONY: test test-neo4j test-redis test-integration test-status test-quick test-coverage watch watch-unit watch-all
+.PHONY: test test-neo4j test-redis test-integration test-status test-quick test-coverage watch watch-unit watch-all play
 
 # Unit tests only (fast, no services required — matches quality gate)
 test:
@@ -60,3 +60,13 @@ watch-unit:
 # Continuous full testing — requires Neo4j + Redis services running
 watch-all:
 	watchexec -r -e py,toml --clear -- ./scripts/watch-all.sh
+
+# ── Game ──────────────────────────────────────────────────────────────────────
+
+# Play the game in the terminal (no services required, just an LLM API key or local Ollama)
+play:
+	uv run python scripts/play.py
+
+# Skip genesis sequence and jump straight to the gameplay demo
+play-demo:
+	uv run python scripts/play.py --skip-genesis
