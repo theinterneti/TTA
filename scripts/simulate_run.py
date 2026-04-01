@@ -127,11 +127,12 @@ def _normalize_state(state: dict) -> dict:
             # Filter: skip if >35 chars (phrases), empty, or looks like atmosphere/material
             if not item or len(item) > 35:
                 continue
-            # Filter common false positives: single-word abstract nouns / liquids
+            # Filter common false positives: scene objects / liquids / materials
             _low = item.lower()
             if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
                         "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
-                        "crates", "signature", "ink", "ledger"}:
+                        "crates", "signature", "ink", "ledger", "paper", "vellum",
+                        "parchment", "scroll", "tome", "candle", "coin", "coins"}:
                 continue
             if _low not in seen:
                 seen.add(_low)
@@ -151,8 +152,10 @@ def _normalize_state(state: dict) -> dict:
             if _low_npc in {"the man", "dockhand", "clerk", "worker", "guard",
                             "merchant", "stranger", "figure", "person"}:
                 continue
-            if _low_npc not in seen_npcs:
-                seen_npcs.add(_low_npc)
+            # Canonical key: strip leading articles so "The Archivist" == "Archivist"
+            _canon = _low_npc.removeprefix("the ").removeprefix("a ").removeprefix("an ").strip()
+            if _canon not in seen_npcs:
+                seen_npcs.add(_canon)
                 clean_npcs.append(npc.title())
         normalized["npcs"] = clean_npcs[:5]
 
@@ -564,7 +567,8 @@ async def run_simulation(
                 "      liquids; materials; abstract concepts; atmospheric words\n"
                 "    - Max 5 items, title case, comma-separated\n"
                 "  npcs: named characters/creatures present in this scene (max 3, title case)\n"
-                "    - Only proper names (e.g. Maren, not 'the archivist')\n"
+                "    - Only proper names without articles (e.g. 'Maren', not 'The Archivist')\n"
+                "    - If only title known, use just the title (e.g. 'Archivist', 'Captain')\n"
                 "Use 'empty' if none. Reply with ONLY:\n"
                 "[STATE]location=<place>|inventory=<items or empty>|npcs=<names or empty>[/STATE]\n\n"
                 f"Narrative:\n{response_text}"
