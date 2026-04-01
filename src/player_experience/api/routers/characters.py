@@ -828,3 +828,188 @@ async def update_character_therapeutic_profile(
                 "detail": "Internal server error occurred while updating therapeutic profile"
             },
         )
+
+
+# ── Character Creation Endpoint ────────────────────────────────────────────
+import json  # noqa: E402
+import logging  # noqa: E402
+import os  # noqa: E402
+from typing import Any  # noqa: E402
+
+from fastapi import HTTPException  # noqa: E402
+
+logger = logging.getLogger(__name__)
+
+
+class CharacterCreateRequest(BaseModel):
+    """Request body for POST /create."""
+
+    world_id: str = Field(..., description="ID of the world to seed the character from")
+    player_prefs: dict[str, Any] | None = Field(
+        default=None, description="Optional player preference hints"
+    )
+
+
+class CharacterCreateResponse(BaseModel):
+    """Response body for POST /create."""
+
+    character_id: str
+    character_summary: dict[str, Any]
+
+
+async def get_neo4j_driver():  # type: ignore[return]
+    """Yield an async Neo4j driver; closes after the request."""
+    driver = None
+    try:
+        from neo4j import AsyncGraphDatabase  # noqa: PLC0415
+
+        uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        user = os.getenv("NEO4J_USERNAME", "neo4j")
+        password = os.getenv("NEO4J_PASSWORD", "password")
+        driver = AsyncGraphDatabase.driver(uri, auth=(user, password))
+    except Exception as exc:
+        logger.warning("Neo4j driver unavailable: %s", exc)
+    yield driver
+    if driver is not None:
+        await driver.close()
+
+
+async def get_redis_client():  # type: ignore[return]
+    """Yield an async Redis client; closes after the request."""
+    client = None
+    try:
+        import redis.asyncio as aioredis  # noqa: PLC0415
+
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        client = aioredis.from_url(redis_url, decode_responses=True)
+    except Exception as exc:
+        logger.warning("Redis client unavailable: %s", exc)
+    yield client
+    if client is not None:
+        await client.aclose()
+
+
+def get_player_character_service():
+    """Instantiate a PlayerCharacterService (import deferred to avoid heavy deps)."""
+    from src.components.player_character.service import (  # noqa: PLC0415
+        PlayerCharacterService,
+    )
+
+    return PlayerCharacterService()
+
+
+def get_player_character_service_dep():
+    """FastAPI dependency that resolves the PlayerCharacterService."""
+    return get_player_character_service()
+
+
+@router.post(
+    "/create",
+    response_model=CharacterCreateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a world-seeded player character",
+    description=(
+        "Generate a PlayerCharacter from a world seed, persist it to Neo4j, "
+        "and initialise Redis session state."
+    ),
+)
+async def create_player_character(
+    request: CharacterCreateRequest,
+    current_player: TokenData = Depends(get_current_active_player),
+    neo4j_driver=Depends(get_neo4j_driver),
+    redis_client=Depends(get_redis_client),
+    character_service=Depends(get_player_character_service_dep),
+) -> CharacterCreateResponse:
+    """POST /create — generate and persist a player character."""
+    world_seed: dict[str, Any] = {"id": request.world_id, "world_id": request.world_id}
+
+    # 1. Optionally enrich seed from Neo4j
+    if neo4j_driver is not None:
+        try:
+            async with neo4j_driver.session() as session:
+                # Check world exists
+                world_result = await session.run(
+                    "MATCH (w:World {id: $world_id}) RETURN w",
+                    world_id=request.world_id,
+                )
+                world_record = await world_result.single()
+                if world_record is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"World '{request.world_id}' not found",
+                    )
+                world_props = dict(world_record["w"])
+                world_seed.update(world_props)
+
+                # Try to fetch WorldSeed node if it exists
+                seed_result = await session.run(
+                    "MATCH (ws:WorldSeed {world_id: $world_id}) RETURN ws LIMIT 1",
+                    world_id=request.world_id,
+                )
+                seed_record = await seed_result.single()
+                if seed_record is not None:
+                    world_seed.update(dict(seed_record["ws"]))
+        except HTTPException:
+            raise
+        except Exception as exc:
+            logger.warning("Neo4j world fetch failed: %s", exc)
+
+    # 2. Generate character via service
+    try:
+        character = await character_service.create_from_seed(
+            world_seed,
+            player_prefs=request.player_prefs,
+            player_id=current_player.player_id,
+        )
+    except Exception as exc:
+        logger.error("Character generation failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Character generation failed",
+        ) from exc
+
+    # 3. Persist to Neo4j
+    if neo4j_driver is not None:
+        try:
+            async with neo4j_driver.session() as session:
+                await session.run(
+                    "CREATE (pc:PlayerCharacter $props) "
+                    "WITH pc MATCH (w:World {id: $world_id}) "
+                    "CREATE (pc)-[:IN_WORLD]->(w)",
+                    props=character.to_neo4j_properties(),
+                    world_id=request.world_id,
+                )
+        except Exception as exc:
+            logger.warning("Neo4j persist failed (non-fatal): %s", exc)
+
+    # 4. Initialise Redis session state
+    if redis_client is not None:
+        try:
+            session_state = {
+                "player_id": current_player.player_id,
+                "world_id": request.world_id,
+                "character_id": character.id,
+                "character_name": character.name,
+                "tension_level": 0.0,
+                "crisis_level": "low",
+                "turn_count": 0,
+            }
+            await redis_client.set(
+                f"session:init:{character.id}",
+                json.dumps(session_state),
+                ex=3600,
+            )
+        except Exception as exc:
+            logger.warning("Redis session init failed (non-fatal): %s", exc)
+
+    summary: dict[str, Any] = {
+        "name": character.name,
+        "background": character.background,
+        "traits": character.traits,
+        "skills": character.skills,
+        "starting_location": character.starting_location,
+    }
+    return CharacterCreateResponse(
+        character_id=character.id,
+        character_summary=summary,
+    )
