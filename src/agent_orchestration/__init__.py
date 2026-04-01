@@ -7,6 +7,17 @@ This package provides the foundational data models and interfaces used by the
 Agent Orchestration Component to coordinate specialized AI agents.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .proxies import (
+        InputProcessorAgentProxy,
+        NarrativeGeneratorAgentProxy,
+        WorldBuilderAgentProxy,
+    )
+
 from .agents import Agent, AgentRegistry
 from .interfaces import AgentProxy, MessageCoordinator
 from .messaging import (
@@ -35,11 +46,31 @@ from .models import (  # Capability system models
     OrchestrationResponse,
 )
 from .performance import get_step_aggregator
-from .proxies import (
-    InputProcessorAgentProxy,
-    NarrativeGeneratorAgentProxy,
-    WorldBuilderAgentProxy,
-)
+
+# Proxy imports are deferred via __getattr__ to avoid circular imports with
+# src.components.ipa / wba / nga which are referenced by adapters.py.
+_PROXY_NAMES = {
+    "InputProcessorAgentProxy",
+    "NarrativeGeneratorAgentProxy",
+    "WorldBuilderAgentProxy",
+}
+
+
+def __getattr__(name: str) -> object:  # noqa: ANN001
+    if name in _PROXY_NAMES:
+        from .proxies import (  # noqa: PLC0415
+            InputProcessorAgentProxy,
+            NarrativeGeneratorAgentProxy,
+            WorldBuilderAgentProxy,
+        )
+
+        mapping = {
+            "InputProcessorAgentProxy": InputProcessorAgentProxy,
+            "NarrativeGeneratorAgentProxy": NarrativeGeneratorAgentProxy,
+            "WorldBuilderAgentProxy": WorldBuilderAgentProxy,
+        }
+        return mapping[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 from .resource_exhaustion_detector import (
     ResourceExhaustionDetector,
     ResourceExhaustionEvent,

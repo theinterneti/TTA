@@ -11,6 +11,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from src.agent_orchestration.crisis_detection.enums import CrisisLevel
+
 
 class Intent(StrEnum):
     """Player intent classifications."""
@@ -57,6 +59,8 @@ class ProcessedInput(BaseModel):
     player_id: str = ""
     location_id: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
+    crisis_level: CrisisLevel = CrisisLevel.LOW
+    crisis_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
 
     @property
     def npc_names(self) -> list[str]:

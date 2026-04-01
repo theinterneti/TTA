@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -42,6 +42,9 @@ except ImportError:
         def __init__(self, **kwargs: object) -> None: ...
     class WorkflowPrimitive:  # type: ignore[no-redef]
         async def execute(self, data: object, ctx: object) -> object: ...
+
+if TYPE_CHECKING:
+    from src.agent_orchestration.crisis_detection.detector import CrisisDetector
 
 from src.ai_components.llm_factory import get_llm
 
@@ -160,11 +163,15 @@ class IPAAgent:
         # result.npc_names == ["blacksmith"]
     """
 
-    def __init__(self, llm: Any | None = None) -> None:
+    def __init__(
+        self, llm: Any | None = None, crisis_detector: CrisisDetector | None = None
+    ) -> None:
         """
         Args:
             llm: LLM instance for intent classification. Defaults to
                  a low-temperature model via ``get_llm()``.
+            crisis_detector: Crisis detector instance. Defaults to
+                             ``CrisisDetector()`` with built-in patterns.
         """
         _llm = llm or get_llm(temperature=0.1, max_tokens=400)
         self._primitive = FallbackPrimitive(
@@ -174,6 +181,12 @@ class IPAAgent:
             ),
             fallback=_IPAFallback(),
         )
+        if crisis_detector is None:
+            from src.agent_orchestration.crisis_detection.detector import (
+                CrisisDetector as _CD,
+            )
+            crisis_detector = _CD()
+        self._crisis_detector = crisis_detector
 
     async def process(
         self,
@@ -238,6 +251,28 @@ class IPAAgent:
             tone.safety_signal,
         )
 
+        # Run crisis detection (synchronous, non-blocking)
+        from src.agent_orchestration.crisis_detection.enums import (
+            CrisisLevel as _CL,
+        )
+
+        crisis = self._crisis_detector.assess(raw_text)
+
+        # If LLM detected safety_signal=True but crisis detector returned LOW,
+        # bump to MODERATE — the LLM has broader context for distress cues.
+        if tone.safety_signal and crisis.crisis_level == _CL.LOW:
+            crisis_level = _CL.MODERATE
+        else:
+            crisis_level = crisis.crisis_level
+
+        if crisis_level != _CL.LOW:
+            logger.warning(
+                "ipa: crisis_level=%s confidence=%.2f session=%s",
+                crisis_level,
+                crisis.confidence,
+                session_id,
+            )
+
         return ProcessedInput(
             raw_text=raw_text,
             normalized_text=normalized_text,
@@ -248,4 +283,6 @@ class IPAAgent:
             session_id=session_id,
             player_id=player_id,
             location_id=location_id,
+            crisis_level=crisis_level,
+            crisis_confidence=crisis.confidence,
         )
