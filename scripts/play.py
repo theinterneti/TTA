@@ -18,6 +18,7 @@ import dataclasses
 import json
 import logging
 import os
+import re as _re
 import socket
 import sys
 import warnings
@@ -177,6 +178,51 @@ async def _summarize_turns(llm, turns: list[dict]) -> str:
         return " … ".join(narrator_lines[:3])
 
 
+_STATE_RE = _re.compile(r"\[STATE\](.*?)\[/STATE\]", _re.DOTALL)
+
+
+def _parse_state_block(text: str) -> tuple[str, dict]:
+    """Extract [STATE]...[/STATE] block from LLM response text.
+
+    Returns (clean_text, state_dict) where clean_text has the block stripped
+    and state_dict has keys: location, inventory (list), npcs (list).
+    Returns empty dict if no block found.
+    """
+    match = _STATE_RE.search(text)
+    if not match:
+        return text.strip(), {}
+
+    clean = (text[: match.start()] + text[match.end() :]).strip()
+    raw = match.group(1).strip()
+
+    state: dict = {}
+    for raw_part in raw.split("|"):
+        part = raw_part.strip()
+        if "=" not in part:
+            continue
+        key, _, val = part.partition("=")
+        key = key.strip().lower()
+        val = val.strip()
+        if key == "location" and val and val.lower() not in ("unknown", "none", ""):
+            state["location"] = val
+        elif key == "inventory":
+            items = [
+                i.strip()
+                for i in val.split(",")
+                if i.strip() and i.strip().lower() not in ("empty", "none", "")
+            ]
+            state["inventory"] = items
+        elif key == "npcs":
+            npcs = [
+                n.strip()
+                for n in val.split(",")
+                if n.strip() and n.strip().lower() not in ("none", "empty", "")
+            ]
+            state["npcs"] = npcs
+
+    return clean, state
+
+
 # ── System prompt builder ─────────────────────────────────────────────────────
 
 
@@ -330,10 +376,16 @@ NARRATION RULES:
 - Match the world's tone at all times — do not break it.
 - Keep responses evocative and grounded in the world's specific detail.
 - Respond to player actions with meaningful consequences.
-- Each response should be 2-4 paragraphs unless brevity is dramatically appropriate.
+- Each response must be at least 120 words. Even simple actions (picking up an object, writing a name) deserve a full, evocative paragraph.
+- Keep responses under 350 words. Be precise; do not pad or repeat.
 - Never break the fourth wall. Stay fully in the world.
 - This is a therapeutic space — hold the player's choices with care and curiosity.
 - End each response with a subtle opening for the next action (a question, a scene, a choice).
+- After EVERY response, append a state update block on its own line:
+  [STATE]location=<current location>|inventory=<item1,item2 or empty>|npcs=<npc1,npc2 or empty>[/STATE]
+  Keep location brief (e.g. "Archive entrance", "restricted section", "pier 7").
+  List only items the player currently holds. List only NPCs met this scene or recalled.
+  This block will be stripped before display — write it for the game engine, not the player.
 {story_so_far}{current_state_section}
 
 CONSISTENCY RULES:
@@ -639,15 +691,15 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
 
         history_msgs = _build_history()
 
-        # Invoke LLM with retry/backoff for transient 429 rate-limits
+        # Invoke LLM with retry/backoff for transient provider errors
         response_text = ""
         _retry_waits = [10, 30, 65]  # seconds — covers the 1-minute window
         for _attempt, _wait in enumerate([-1, *_retry_waits]):
-            if _wait >= 0:
-                console.print(
-                    f"[dim]⏳ Rate limited — retrying in {_wait}s…[/dim]"
-                )
+            if _wait > 0:
+                console.print(f"[dim]⏳ Provider hiccup — retrying in {_wait}s…[/dim]")
                 await asyncio.sleep(_wait)
+            elif _wait == 0:
+                console.print("[dim]⟳ Retrying…[/dim]")
             try:
                 ai_response = await llm.ainvoke(history_msgs)
                 response_text = (
@@ -658,8 +710,13 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                 break
             except Exception as exc:
                 exc_str = str(exc)
-                is_rate_limit = "429" in exc_str
-                if is_rate_limit and _attempt < len(_retry_waits):
+                is_retryable = (
+                    "429" in exc_str
+                    or "404" in exc_str
+                    or "502" in exc_str
+                    or "503" in exc_str
+                )
+                if is_retryable and _attempt < len(_retry_waits):
                     continue  # retry with next wait
                 logger.error("LLM invoke error: %s", exc)
                 console.print(f"[red]The narrator pauses… ({exc})[/red]")
@@ -669,6 +726,20 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
         if not response_text:
             game_state.raw_history.pop()  # remove failed human message
             continue
+
+        # Strip [STATE] block before storing/displaying, then update structured state
+        response_text, extracted_state = _parse_state_block(response_text)
+        if extracted_state.get("location"):
+            game_state.location = extracted_state["location"]
+        if extracted_state.get("inventory") is not None:
+            # Merge: add new items, never remove (LLM might omit items)
+            for item in extracted_state.get("inventory", []):
+                if item not in game_state.inventory:
+                    game_state.inventory.append(item)
+        if extracted_state.get("npcs") is not None:
+            for npc in extracted_state.get("npcs", []):
+                if npc not in game_state.known_npcs:
+                    game_state.known_npcs.append(npc)
 
         game_state.raw_history.append({"role": "ai", "content": response_text})
         game_state.turn += 1

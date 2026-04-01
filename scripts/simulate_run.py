@@ -28,6 +28,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -39,8 +40,14 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage  # no
 
 from src.ai_components.llm_factory import get_llm  # noqa: E402
 from src.components.gameplay_loop.models.world_seed import (  # noqa: E402
-    MagicPresence, Motivation, PlayerPosition, PowerSource,
-    TechLevel, WorldScale, WorldSeed, WorldTone,
+    MagicPresence,
+    Motivation,
+    PlayerPosition,
+    PowerSource,
+    TechLevel,
+    WorldScale,
+    WorldSeed,
+    WorldTone,
 )
 
 # ── Reuse GameState / helpers from play.py ─────────────────────────────────────
@@ -50,6 +57,39 @@ from src.components.gameplay_loop.models.world_seed import (  # noqa: E402
 MAX_HISTORY_TURNS = 20
 SUMMARIZE_TRIGGER = 30
 AUTOSAVE_EVERY = 10
+
+_STATE_RE_SIM = re.compile(r"\[STATE\](.*?)\[/STATE\]", re.DOTALL)
+
+
+def _strip_state_block(text: str) -> tuple[str, dict]:
+    match = _STATE_RE_SIM.search(text)
+    if not match:
+        return text.strip(), {}
+    clean = (text[: match.start()] + text[match.end() :]).strip()
+    raw = match.group(1).strip()
+    state: dict = {}
+    for part in raw.split("|"):
+        if "=" not in part:
+            continue
+        key, _, val = part.partition("=")
+        key = key.strip().lower()
+        val = val.strip()
+        if key == "location" and val.lower() not in ("unknown", "none", ""):
+            state["location"] = val
+        elif key == "inventory":
+            state["inventory"] = [
+                i.strip()
+                for i in val.split(",")
+                if i.strip() and i.strip().lower() not in ("empty", "none", "")
+            ]
+        elif key == "npcs":
+            state["npcs"] = [
+                n.strip()
+                for n in val.split(",")
+                if n.strip() and n.strip().lower() not in ("none", "empty", "")
+            ]
+    return clean, state
+
 
 @dataclasses.dataclass
 class GameState:
@@ -63,7 +103,9 @@ class GameState:
     raw_history: list[dict] = dataclasses.field(default_factory=list)
 
 
-def _build_game_system_prompt(world_seed: WorldSeed, summary: str = "", game_state: GameState | None = None) -> str:
+def _build_game_system_prompt(
+    world_seed: WorldSeed, summary: str = "", game_state: GameState | None = None
+) -> str:
     """Minimal reproduction of play.py's system prompt builder."""
     tone_map = {
         WorldTone.GETTING_BETTER: "hopeful and slowly brightening",
@@ -97,9 +139,9 @@ WORLD:
 - Tone: {tone_desc}
 - Power flows through: {world_seed.power_source}
 - Scale: {world_seed.scale}; geography: {world_seed.geography_archetype}
-- Magic: {world_seed.magic_presence} — {world_seed.magic_source or ''}
-- Culture: "{world_seed.culture_base}". {world_seed.culture_tone or ''}
-- Tension: {world_seed.cultural_tension or 'unspoken'}
+- Magic: {world_seed.magic_presence} — {world_seed.magic_source or ""}
+- Culture: "{world_seed.culture_base}". {world_seed.culture_tone or ""}
+- Tension: {world_seed.cultural_tension or "unspoken"}
 - Detail: {world_seed.one_specific_detail}
 
 PLAYER CHARACTER:
@@ -111,7 +153,7 @@ PLAYER CHARACTER:
 
 NARRATION RULES:
 - Write in second-person present tense.
-- Match the world's tone. Keep responses 2-4 paragraphs.
+- Match the world's tone. Each response must be 120–350 words.
 - Each response should end with a subtle opening for the next action.
 - Never break the fourth wall.
 - Therapeutic space — hold the player's choices with care.
@@ -207,10 +249,13 @@ TRACKED_ENTITIES = {
     "inn": ["inn", "room", "room at"],
 }
 
+
 def _detect_entities(text: str) -> list[str]:
     """Return which tracked entity keys are mentioned in the text."""
     lower = text.lower()
-    return [key for key, terms in TRACKED_ENTITIES.items() if any(t in lower for t in terms)]
+    return [
+        key for key, terms in TRACKED_ENTITIES.items() if any(t in lower for t in terms)
+    ]
 
 
 def _estimate_tokens(text: str) -> int:
@@ -224,16 +269,45 @@ def _count_words(text: str) -> int:
 
 def _extract_proper_nouns(text: str) -> list[str]:
     """Very rough proper noun detection (capitalized words not at sentence start)."""
-    words = re.findall(r'(?<=[.!?…]\s)([A-Z][a-z]+)|(?<=\s)([A-Z][a-z]{2,})', text)
+    words = re.findall(r"(?<=[.!?…]\s)([A-Z][a-z]+)|(?<=\s)([A-Z][a-z]{2,})", text)
     found = [w for pair in words for w in pair if w]
     # Filter common false positives
-    stopwords = {"The", "A", "An", "In", "You", "Your", "She", "He", "They", "It",
-                 "Her", "His", "Their", "As", "At", "To", "Of", "And", "But", "Or",
-                 "With", "From", "Is", "Are", "Was", "Were", "Be", "Have", "Has"}
+    stopwords = {
+        "The",
+        "A",
+        "An",
+        "In",
+        "You",
+        "Your",
+        "She",
+        "He",
+        "They",
+        "It",
+        "Her",
+        "His",
+        "Their",
+        "As",
+        "At",
+        "To",
+        "Of",
+        "And",
+        "But",
+        "Or",
+        "With",
+        "From",
+        "Is",
+        "Are",
+        "Was",
+        "Were",
+        "Be",
+        "Have",
+        "Has",
+    }
     return sorted(set(w for w in found if w not in stopwords))
 
 
 # ── Simulation core ────────────────────────────────────────────────────────────
+
 
 async def run_simulation(
     n_turns: int,
@@ -244,7 +318,9 @@ async def run_simulation(
 ) -> None:
     world_seed = _make_sable_world_seed()
     session_id = uuid4().hex
-    game_state = GameState(session_id=session_id, world_seed_data=world_seed.model_dump(mode="json"))
+    game_state = GameState(
+        session_id=session_id, world_seed_data=world_seed.model_dump(mode="json")
+    )
 
     scripted = SCRIPTED_INPUTS[:n_turns]
     if len(scripted) < n_turns:
@@ -268,27 +344,33 @@ async def run_simulation(
     metrics_records: list[dict] = []
     all_entity_appearances: dict[str, list[int]] = {k: [] for k in TRACKED_ENTITIES}
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"TTA Simulation Run — {n_turns} turns")
     print(f"Session: {session_id[:8]}")
     print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else 'LIVE'}")
     print(f"Output: {out_path}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     for i, player_input in enumerate(scripted):
         turn_num = i + 1
-        print(f"[T{turn_num:02d}] > {player_input[:70]}{'...' if len(player_input)>70 else ''}")
+        print(
+            f"[T{turn_num:02d}] > {player_input[:70]}{'...' if len(player_input) > 70 else ''}"
+        )
 
         if dry_run:
-            response_text = f"[DRY RUN] Turn {turn_num} — would respond to: {player_input}"
+            response_text = (
+                f"[DRY RUN] Turn {turn_num} — would respond to: {player_input}"
+            )
             latency_ms = 0.0
         else:
             # Build context
             sys_msg = SystemMessage(
-                content=_build_game_system_prompt(world_seed, summary=game_state.summary, game_state=game_state)
+                content=_build_game_system_prompt(
+                    world_seed, summary=game_state.summary, game_state=game_state
+                )
             )
             messages = [sys_msg]
-            recent = game_state.raw_history[-(MAX_HISTORY_TURNS * 2):]
+            recent = game_state.raw_history[-(MAX_HISTORY_TURNS * 2) :]
             for entry in recent:
                 if entry["role"] == "human":
                     messages.append(HumanMessage(content=entry["content"]))
@@ -299,26 +381,69 @@ async def run_simulation(
             context_chars = sum(len(m.content) for m in messages)
 
             t0 = time.time()
-            try:
-                ai_response = await llm.ainvoke(messages)
-                response_text = ai_response.content if hasattr(ai_response, "content") else str(ai_response)
-            except Exception as exc:
-                print(f"  ⚠️  LLM error: {exc}")
-                response_text = ""
+            response_text = ""
+            for _sim_attempt in range(3):
+                try:
+                    ai_response = await llm.ainvoke(messages)
+                    response_text = (
+                        ai_response.content
+                        if hasattr(ai_response, "content")
+                        else str(ai_response)
+                    )
+                    break
+                except Exception as exc:
+                    exc_str = str(exc)
+                    is_retryable = (
+                        "429" in exc_str
+                        or "404" in exc_str
+                        or "502" in exc_str
+                        or "503" in exc_str
+                    )
+                    if is_retryable and _sim_attempt < 2:
+                        print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in 10s…")
+                        await asyncio.sleep(10)
+                    else:
+                        print(
+                            f"  ⚠️  LLM error after {_sim_attempt + 1} attempts: {exc}"
+                        )
+                        break
             latency_ms = (time.time() - t0) * 1000
 
             if not response_text:
                 continue
 
-        # Update game state
+        # Update game state — strip [STATE] block first, then update structured fields
+        response_text, extracted_state = _strip_state_block(response_text)
+        if extracted_state.get("location"):
+            game_state.location = extracted_state["location"]
+        if extracted_state.get("inventory") is not None:
+            for item in extracted_state.get("inventory", []):
+                if item not in game_state.inventory:
+                    game_state.inventory.append(item)
+        if extracted_state.get("npcs") is not None:
+            for npc in extracted_state.get("npcs", []):
+                if npc not in game_state.known_npcs:
+                    game_state.known_npcs.append(npc)
+
         game_state.raw_history.append({"role": "human", "content": player_input})
         game_state.raw_history.append({"role": "ai", "content": response_text})
         game_state.turn = turn_num
 
         # Compute metrics
-        sys_msg_temp = SystemMessage(content=_build_game_system_prompt(world_seed, summary=game_state.summary, game_state=game_state))
-        all_msgs = [sys_msg_temp] + game_state.raw_history[-(MAX_HISTORY_TURNS * 2):]
-        context_chars = sum(len(m if isinstance(m, str) else (m.content if hasattr(m, 'content') else m.get('content', ''))) for m in all_msgs)
+        sys_msg_temp = SystemMessage(
+            content=_build_game_system_prompt(
+                world_seed, summary=game_state.summary, game_state=game_state
+            )
+        )
+        all_msgs = [sys_msg_temp] + game_state.raw_history[-(MAX_HISTORY_TURNS * 2) :]
+        context_chars = sum(
+            len(
+                m
+                if isinstance(m, str)
+                else (m.content if hasattr(m, "content") else m.get("content", ""))
+            )
+            for m in all_msgs
+        )
 
         entities_in_response = _detect_entities(response_text)
         for ent in entities_in_response:
@@ -332,8 +457,11 @@ async def run_simulation(
         context_tokens_est = _estimate_tokens(str(context_chars))
 
         # Coherence: does response reference any entity introduced >5 turns ago?
-        old_entities = [e for e, turns in all_entity_appearances.items()
-                        if turns and turns[0] <= turn_num - 5 and e in entities_in_response]
+        old_entities = [
+            e
+            for e, turns in all_entity_appearances.items()
+            if turns and turns[0] <= turn_num - 5 and e in entities_in_response
+        ]
 
         record = {
             "session_id": session_id[:8],
@@ -353,33 +481,54 @@ async def run_simulation(
             "coherence_callback": len(old_entities) > 0,
             "location_structured": game_state.location,
             "inventory_structured": game_state.inventory,
+            "npcs_structured": game_state.known_npcs,
+            "location_after": extracted_state.get("location", ""),
+            "inventory_after": extracted_state.get("inventory", []),
+            "npcs_after": extracted_state.get("npcs", []),
             "history_len": len(game_state.raw_history),
             "summary_len": len(game_state.summary),
         }
         metrics_records.append(record)
 
-        print(f"       words={words:3d} | latency={latency_ms/1000:.1f}s | ctx_msgs={context_msgs:2d} | entities={entities_in_response}")
+        print(
+            f"       words={words:3d} | latency={latency_ms / 1000:.1f}s | ctx_msgs={context_msgs:2d} | entities={entities_in_response}"
+        )
         print(f"       response: {response_text[:120]}...")
         print()
 
         # Summarization check (mirrors play.py logic)
         if len(game_state.raw_history) > SUMMARIZE_TRIGGER * 2 and not dry_run:
-            oldest = game_state.raw_history[:-(MAX_HISTORY_TURNS * 2)]
+            oldest = game_state.raw_history[: -(MAX_HISTORY_TURNS * 2)]
             if oldest:
                 print("[dim] 📖 Triggering summarization…")
                 from langchain_core.messages import SystemMessage as SM
+
                 summarize_msgs = [
-                    SM(content="You are a story archivist. Summarize the following story events into 3-5 sentences, preserving all important facts: character names, items found, locations visited, decisions made, and any unresolved plot threads. Write in past tense. Be concrete."),
-                    HumanMessage(content="\n\n".join(
-                        f"{'PLAYER' if t['role']=='human' else 'NARRATOR'}: {t['content']}"
-                        for t in oldest
-                    )),
+                    SM(
+                        content="You are a story archivist. Summarize the following story events into 3-5 sentences, preserving all important facts: character names, items found, locations visited, decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
+                    ),
+                    HumanMessage(
+                        content="\n\n".join(
+                            f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
+                            for t in oldest
+                        )
+                    ),
                 ]
                 try:
                     summary_result = await llm.ainvoke(summarize_msgs)
-                    new_summary = summary_result.content if hasattr(summary_result, "content") else str(summary_result)
-                    game_state.summary = (game_state.summary + "\n\n" + new_summary).strip() if game_state.summary else new_summary
-                    game_state.raw_history = game_state.raw_history[-(MAX_HISTORY_TURNS * 2):]
+                    new_summary = (
+                        summary_result.content
+                        if hasattr(summary_result, "content")
+                        else str(summary_result)
+                    )
+                    game_state.summary = (
+                        (game_state.summary + "\n\n" + new_summary).strip()
+                        if game_state.summary
+                        else new_summary
+                    )
+                    game_state.raw_history = game_state.raw_history[
+                        -(MAX_HISTORY_TURNS * 2) :
+                    ]
                     print(f"  📖 Summary: {new_summary[:200]}...")
                 except Exception as exc:
                     print(f"  ⚠️  Summarization failed: {exc}")
@@ -392,62 +541,109 @@ async def run_simulation(
     # Write summary JSON alongside
     summary_path = out_path.with_suffix(".summary.json")
     entity_summary = {k: v for k, v in all_entity_appearances.items() if v}
-    avg_words = sum(r["response_words"] for r in metrics_records) / len(metrics_records) if metrics_records else 0
-    avg_latency = sum(r["latency_ms"] for r in metrics_records) / len(metrics_records) if metrics_records else 0
+    avg_words = (
+        sum(r["response_words"] for r in metrics_records) / len(metrics_records)
+        if metrics_records
+        else 0
+    )
+    avg_latency = (
+        sum(r["latency_ms"] for r in metrics_records) / len(metrics_records)
+        if metrics_records
+        else 0
+    )
     coherence_turns = sum(1 for r in metrics_records if r["coherence_callback"])
 
     with summary_path.open("w", encoding="utf-8") as f:
-        json.dump({
-            "session_id": session_id[:8],
-            "n_turns": n_turns,
-            "turns_completed": len(metrics_records),
-            "avg_response_words": round(avg_words, 1),
-            "avg_latency_ms": round(avg_latency, 1),
-            "coherence_callback_turns": coherence_turns,
-            "coherence_callback_rate": round(coherence_turns / len(metrics_records), 3) if metrics_records else 0,
-            "entity_first_appearance": {k: v[0] for k, v in entity_summary.items()},
-            "entity_recurrence": {k: v for k, v in entity_summary.items() if len(v) > 1},
-            "final_context_messages": metrics_records[-1]["context_messages"] if metrics_records else 0,
-            "final_context_chars": metrics_records[-1]["context_chars"] if metrics_records else 0,
-            "summarization_triggered": game_state.summary != "",
-            "final_summary": game_state.summary,
-            "structured_state_gap": {
-                "location_tracked": game_state.location != "unknown",
-                "inventory_tracked": len(game_state.inventory) > 0,
-                "npcs_tracked": len(game_state.known_npcs) > 0,
+        json.dump(
+            {
+                "session_id": session_id[:8],
+                "n_turns": n_turns,
+                "turns_completed": len(metrics_records),
+                "avg_response_words": round(avg_words, 1),
+                "avg_latency_ms": round(avg_latency, 1),
+                "coherence_callback_turns": coherence_turns,
+                "coherence_callback_rate": round(
+                    coherence_turns / len(metrics_records), 3
+                )
+                if metrics_records
+                else 0,
+                "entity_first_appearance": {k: v[0] for k, v in entity_summary.items()},
+                "entity_recurrence": {
+                    k: v for k, v in entity_summary.items() if len(v) > 1
+                },
+                "final_context_messages": metrics_records[-1]["context_messages"]
+                if metrics_records
+                else 0,
+                "final_context_chars": metrics_records[-1]["context_chars"]
+                if metrics_records
+                else 0,
+                "summarization_triggered": game_state.summary != "",
+                "final_summary": game_state.summary,
+                "structured_state_gap": {
+                    "location_tracked": game_state.location != "unknown",
+                    "inventory_tracked": len(game_state.inventory) > 0,
+                    "npcs_tracked": len(game_state.known_npcs) > 0,
+                },
             },
-        }, f, indent=2, ensure_ascii=False)
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Run complete: {len(metrics_records)} turns")
-    print(f"Avg response: {avg_words:.0f} words | Avg latency: {avg_latency/1000:.1f}s")
-    print(f"Coherence callbacks: {coherence_turns}/{len(metrics_records)} turns ({coherence_turns/len(metrics_records)*100:.0f}%)")
-    print(f"Entity recurrence: {sum(1 for v in entity_summary.values() if len(v)>1)} entities mentioned >1 turn")
-    print(f"Structured state gaps: location={game_state.location}, inventory={game_state.inventory}, npcs={game_state.known_npcs}")
+    print(
+        f"Avg response: {avg_words:.0f} words | Avg latency: {avg_latency / 1000:.1f}s"
+    )
+    print(
+        f"Coherence callbacks: {coherence_turns}/{len(metrics_records)} turns ({coherence_turns / len(metrics_records) * 100:.0f}%)"
+    )
+    print(
+        f"Entity recurrence: {sum(1 for v in entity_summary.values() if len(v) > 1)} entities mentioned >1 turn"
+    )
+    print(
+        f"Structured state gaps: location={game_state.location}, inventory={game_state.inventory}, npcs={game_state.known_npcs}"
+    )
     print(f"\nMetrics → {out_path}")
     print(f"Summary → {summary_path}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="TTA Simulation Harness")
-    parser.add_argument("--turns", type=int, default=10, help="Number of turns to simulate (default: 10)")
-    parser.add_argument("--out", type=Path, default=None, help="Output JSONL path (default: runs/run_N.jsonl)")
-    parser.add_argument("--dry-run", action="store_true", help="Skip LLM calls — just test the harness")
-    parser.add_argument("--provider", default=None, help="LLM provider (openrouter/ollama)")
+    parser.add_argument(
+        "--turns",
+        type=int,
+        default=10,
+        help="Number of turns to simulate (default: 10)",
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="Output JSONL path (default: runs/run_N.jsonl)",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Skip LLM calls — just test the harness"
+    )
+    parser.add_argument(
+        "--provider", default=None, help="LLM provider (openrouter/ollama)"
+    )
     parser.add_argument("--model", default=None, help="LLM model override")
     args = parser.parse_args()
 
     if args.out is None:
         args.out = Path("runs") / f"run_{args.turns}.jsonl"
 
-    asyncio.run(run_simulation(
-        n_turns=args.turns,
-        out_path=args.out,
-        dry_run=args.dry_run,
-        provider=args.provider,
-        model=args.model,
-    ))
+    asyncio.run(
+        run_simulation(
+            n_turns=args.turns,
+            out_path=args.out,
+            dry_run=args.dry_run,
+            provider=args.provider,
+            model=args.model,
+        )
+    )
 
 
 if __name__ == "__main__":
