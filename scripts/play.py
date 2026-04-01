@@ -294,7 +294,8 @@ def _normalize_state(state: dict) -> dict:
             if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
                         "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
                         "crates", "signature", "ink", "ledger", "paper", "vellum",
-                        "parchment", "scroll", "tome", "candle", "coin", "coins"}:
+                        "parchment", "scroll", "tome", "candle", "coin", "coins",
+                        "bargain", "key", "map", "note", "notes", "letter"}:
                 continue
             if _low not in seen:
                 seen.add(_low)
@@ -310,8 +311,9 @@ def _normalize_state(state: dict) -> dict:
             if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
                 continue
             _low_npc = npc.lower()
-            if _low_npc in {"the man", "dockhand", "clerk", "worker", "guard",
-                            "merchant", "stranger", "figure", "person"}:
+            if _low_npc in {"the man", "dockhand", "dockworker", "clerk", "worker", "guard",
+                            "merchant", "stranger", "figure", "person", "crew",
+                            "mysterious crew", "unknown figure", "passerby"}:
                 continue
             # Canonical key: strip leading articles so "The Archivist" == "Archivist"
             _canon = _low_npc.removeprefix("the ").removeprefix("a ").removeprefix("an ").strip()
@@ -883,6 +885,13 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                 response_text = ""
                 break
 
+        if not response_text:
+            # Empty response guard: retry once with gemma3:4b before giving up
+            try:
+                msgs_dicts = _lc_to_dicts(messages)
+                response_text = await _call_ollama("gemma3:4b", msgs_dicts)
+            except Exception:
+                pass
         if not response_text:
             game_state.raw_history.pop()  # remove failed human message
             continue

@@ -132,7 +132,8 @@ def _normalize_state(state: dict) -> dict:
             if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
                         "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
                         "crates", "signature", "ink", "ledger", "paper", "vellum",
-                        "parchment", "scroll", "tome", "candle", "coin", "coins"}:
+                        "parchment", "scroll", "tome", "candle", "coin", "coins",
+                        "bargain", "key", "map", "note", "notes", "letter"}:
                 continue
             if _low not in seen:
                 seen.add(_low)
@@ -149,8 +150,9 @@ def _normalize_state(state: dict) -> dict:
             if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
                 continue
             _low_npc = npc.lower()
-            if _low_npc in {"the man", "dockhand", "clerk", "worker", "guard",
-                            "merchant", "stranger", "figure", "person"}:
+            if _low_npc in {"the man", "dockhand", "dockworker", "clerk", "worker", "guard",
+                            "merchant", "stranger", "figure", "person", "crew",
+                            "mysterious crew", "unknown figure", "passerby"}:
                 continue
             # Canonical key: strip leading articles so "The Archivist" == "Archivist"
             _canon = _low_npc.removeprefix("the ").removeprefix("a ").removeprefix("an ").strip()
@@ -513,6 +515,22 @@ async def run_simulation(
                         break
             latency_ms = (time.time() - t0) * 1000
 
+            # Empty response guard: retry once with gemma fallback
+            if not response_text and not dry_run:
+                print("  ⟳ Empty response — retrying with gemma3:4b…")
+                try:
+                    msgs_dicts = []
+                    for m in messages:
+                        if isinstance(m, SystemMessage):
+                            msgs_dicts.append({"role": "system", "content": m.content})
+                        elif isinstance(m, HumanMessage):
+                            msgs_dicts.append({"role": "user", "content": m.content})
+                        elif isinstance(m, AIMessage):
+                            msgs_dicts.append({"role": "assistant", "content": m.content})
+                    response_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
+                    latency_ms = (time.time() - t0) * 1000
+                except Exception:
+                    pass
             if not response_text:
                 continue
 
@@ -656,8 +674,8 @@ async def run_simulation(
             "old_entities_referenced": old_entities,
             "coherence_callback": len(old_entities) > 0,
             "location_structured": game_state.location,
-            "inventory_structured": game_state.inventory,
-            "npcs_structured": game_state.known_npcs,
+            "inventory_structured": list(game_state.inventory),
+            "npcs_structured": list(game_state.known_npcs),
             "location_after": extracted_state.get("location", ""),
             "inventory_after": extracted_state.get("inventory", []),
             "npcs_after": extracted_state.get("npcs", []),
