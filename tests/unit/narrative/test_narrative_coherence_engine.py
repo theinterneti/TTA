@@ -1,208 +1,617 @@
+"""Unit tests for src/components/narrative_coherence_engine.py.
+
+This module had 0% unit-gate coverage. Tests cover:
+- All dataclass models and enums
+- CoherenceValidator (with empty lore/character databases)
+- ContradictionDetector
+- CausalValidator
+- NarrativeCoherenceEngine lifecycle and public API
 """
 
-# Logseq: [[TTA.dev/Tests/Test_narrative_coherence_engine]]
-Unit tests for the Narrative Coherence Engine component.
+from __future__ import annotations
 
-This module contains comprehensive tests for the narrative coherence engine
-including validation, contradiction detection, and conflict resolution.
-"""
-
-# Import test data classes
-from dataclasses import dataclass, field
-from enum import Enum
+import uuid
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from src.components.narrative_coherence_engine import (
+    CausalValidator,
+    CoherenceValidator,
+    ConsistencyIssue,
+    ConsistencyIssueType,
+    Contradiction,
+    ContradictionDetector,
+    ConvergenceValidation,
+    CreativeSolution,
+    LoreEntry,
+    NarrativeCoherenceEngine,
+    NarrativeContent,
+    NarrativeResolution,
+    RetroactiveChange,
+    StorylineThread,
+    ValidationResult,
+    ValidationSeverity,
+)
 
-class ValidationSeverity(Enum):
-    """Severity levels for validation issues."""
-
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
-    CRITICAL = "critical"
-
-
-@dataclass
-class NarrativeContent:
-    """Test narrative content."""
-
-    content_id: str
-    content_type: str
-    text: str
-    characters: list[str] = field(default_factory=list)
-    locations: list[str] = field(default_factory=list)
-    themes: list[str] = field(default_factory=list)
-
-
-@dataclass
-class Contradiction:
-    """Test contradiction."""
-
-    contradiction_id: str
-    type: str
-    severity: ValidationSeverity
-    description: str
-    conflicting_elements: list[str] = field(default_factory=list)
-    confidence_score: float = 0.0
+# The engine re-exports CoherenceValidator/ContradictionDetector/CausalValidator
+# from src.components.narrative_coherence.*, which return their own ValidationResult.
+# Import the extracted ValidationResult for isinstance checks on those classes.
+try:
+    from src.components.narrative_coherence.models import (
+        ValidationResult as _ExtractedValidationResult,
+    )
+except ImportError:
+    _ExtractedValidationResult = ValidationResult  # type: ignore[assignment,misc]
 
 
-def test_narrative_coherence_engine_imports():
-    """Test that the narrative coherence engine can be imported."""
-    try:
-        from tta_narrative.coherence_engine import (  # noqa: F401
-            ConsistencyIssue,
-            Contradiction,
-            NarrativeContent,
-            ValidationResult,
-            ValidationSeverity,
-        )
-
-        assert True, "Successfully imported coherence engine components"
-    except ImportError:
-        # If import fails, the local ValidationSeverity stub is used for other tests
-        assert True, "Basic validation severity enum works"
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 
-def test_validation_severity_enum():
-    """Test validation severity enumeration."""
+def _config() -> dict:
+    """Minimal config dict accepted by NarrativeCoherenceEngine."""
+    return {}
+
+
+def _content(
+    content_id: str = "c-1",
+    content_type: str = "scene",
+    text: str = "The hero walks into the forest.",
+) -> NarrativeContent:
+    return NarrativeContent(
+        content_id=content_id,
+        content_type=content_type,
+        text=text,
+    )
+
+
+def _contradiction(cid: str = "cx-1", ctype: str = "direct") -> Contradiction:
+    return Contradiction(
+        contradiction_id=cid,
+        type=ctype,
+        severity=ValidationSeverity.WARNING,
+        description="Test contradiction",
+        conflicting_elements=["e1", "e2"],
+        confidence_score=0.75,
+    )
+
+
+def _engine() -> NarrativeCoherenceEngine:
+    return NarrativeCoherenceEngine(config=_config())
+
+
+# ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+
+
+def test_validation_severity_values():
     assert ValidationSeverity.INFO.value == "info"
     assert ValidationSeverity.WARNING.value == "warning"
     assert ValidationSeverity.ERROR.value == "error"
     assert ValidationSeverity.CRITICAL.value == "critical"
 
 
-def test_narrative_content_creation():
-    """Test narrative content data structure."""
-    content = NarrativeContent(
-        content_id="test_content_1",
-        content_type="dialogue",
-        text="Hello, world!",
-        characters=["alice", "bob"],
-        locations=["garden"],
-        themes=["friendship"],
+def test_consistency_issue_type_values():
+    assert ConsistencyIssueType.LORE_VIOLATION.value == "lore_violation"
+    assert (
+        ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT.value
+        == "therapeutic_misalignment"
     )
 
-    assert content.content_id == "test_content_1"
-    assert content.content_type == "dialogue"
-    assert content.text == "Hello, world!"
-    assert "alice" in content.characters
-    assert "garden" in content.locations
-    assert "friendship" in content.themes
+
+# ---------------------------------------------------------------------------
+# Dataclass models
+# ---------------------------------------------------------------------------
 
 
-def test_contradiction_creation():
-    """Test contradiction data structure."""
-    contradiction = Contradiction(
-        contradiction_id="test_contradiction_1",
-        type="direct",
-        severity=ValidationSeverity.WARNING,
-        description="Test contradiction",
-        conflicting_elements=["element1", "element2"],
-        confidence_score=0.8,
+def test_consistency_issue_defaults():
+    issue = ConsistencyIssue(
+        issue_id="i-1",
+        issue_type=ConsistencyIssueType.LORE_VIOLATION,
+        severity=ValidationSeverity.ERROR,
+        description="Missing lore reference",
     )
+    assert issue.affected_elements == []
+    assert issue.confidence_score == 0.0
+    assert issue.suggested_fix is None
+    assert isinstance(issue.metadata, dict)
 
-    assert contradiction.contradiction_id == "test_contradiction_1"
-    assert contradiction.type == "direct"
-    assert contradiction.severity == ValidationSeverity.WARNING
-    assert contradiction.confidence_score == 0.8
+
+def test_validation_result_defaults():
+    vr = ValidationResult(is_valid=True, consistency_score=0.9)
+    assert vr.detected_issues == []
+    assert vr.lore_compliance == 0.0
+    assert vr.character_consistency == 0.0
+    assert vr.causal_consistency == 0.0
+    assert vr.therapeutic_alignment == 0.0
+
+
+def test_narrative_content_defaults():
+    c = _content()
+    assert c.characters == []
+    assert c.locations == []
+    assert c.themes == []
+    assert isinstance(c.timestamp, datetime)
+
+
+def test_lore_entry_defaults():
+    le = LoreEntry(
+        lore_id="l-1",
+        category="location",
+        title="The Dark Forest",
+        description="A mysterious forest.",
+    )
+    assert le.constraints == []
+    assert le.importance_weight == 1.0
+
+
+def test_contradiction_defaults():
+    c = _contradiction()
+    assert c.evidence == []
+    assert c.resolution_suggestions == []
+    assert isinstance(c.detected_at, datetime)
+
+
+def test_creative_solution_defaults():
+    cs = CreativeSolution(
+        solution_id="s-1",
+        solution_type="character_driven",
+        description="Character admits mistake",
+    )
+    assert cs.effectiveness_score == 0.0
+    assert cs.narrative_cost == 0.0
+    assert cs.player_impact == 0.0
+    assert cs.required_changes == []
+
+
+def test_narrative_resolution_defaults():
+    solution = CreativeSolution(
+        solution_id="s-1", solution_type="character_driven", description="desc"
+    )
+    nr = NarrativeResolution(
+        resolution_id="r-1",
+        conflict_id="c-1",
+        solution_used=solution,
+        implementation_success=True,
+    )
+    assert nr.narrative_changes == []
+    assert nr.effectiveness_rating == 0.0
+
+
+def test_retroactive_change_fields():
+    rc = RetroactiveChange(
+        change_id="rc-1",
+        target_content_id="c-1",
+        change_type="modification",
+        original_content="original",
+        modified_content="modified",
+        justification="fix",
+    )
+    assert rc.in_world_explanation == ""
+    assert rc.impact_scope == []
+
+
+def test_storyline_thread_defaults():
+    st = StorylineThread(thread_id="t-1", title="Main Quest")
+    assert st.participants == []
+    assert st.current_tension == 0.0
+    assert st.resolution_target is None
+
+
+def test_convergence_validation_fields():
+    cv = ConvergenceValidation(
+        session_id="s-1",
+        storyline_count=3,
+        is_convergent=True,
+        convergence_score=0.8,
+    )
+    assert cv.integration_issues == []
+    assert cv.convergence_points == []
+    assert isinstance(cv.validation_timestamp, datetime)
+
+
+# ---------------------------------------------------------------------------
+# CoherenceValidator
+# ---------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
-async def test_conflict_resolution_mechanisms():
-    """Test that conflict resolution mechanisms are implemented."""
-    # This test verifies that the conflict resolution mechanisms
-    # from Task 4.2 are properly structured
-
-    # Test creative solutions structure
-    solution_types = [
-        "character_driven",
-        "perspective_based",
-        "temporal",
-        "memory_based",
-        "causal_bridge",
-        "hidden_factor",
-        "recontextualization",
-        "subtext",
-        "universal",
-    ]
-
-    for solution_type in solution_types:
-        assert isinstance(solution_type, str)
-        assert len(solution_type) > 0
-
-    # Test retroactive change types
-    change_types = ["modification", "addition", "recontextualization"]
-
-    for change_type in change_types:
-        assert isinstance(change_type, str)
-        assert len(change_type) > 0
-
-    # Test convergence validation components
-    convergence_components = [
-        "convergence_points",
-        "integration_issues",
-        "recommended_adjustments",
-        "convergence_score",
-    ]
-
-    for component in convergence_components:
-        assert isinstance(component, str)
-        assert len(component) > 0
+async def test_coherence_validator_valid_content():
+    validator = CoherenceValidator(config={})
+    content = _content()
+    result = await validator.validate_narrative_consistency(content)
+    assert isinstance(result, _ExtractedValidationResult)
+    assert result.is_valid is True
+    assert 0.0 <= result.consistency_score <= 1.0
 
 
-def test_task_4_2_completion():
-    """Test that Task 4.2 requirements are met."""
-    # Verify the three main requirements of Task 4.2:
+@pytest.mark.asyncio
+async def test_coherence_validator_empty_text():
+    validator = CoherenceValidator(config={})
+    content = _content(text="")
+    result = await validator.validate_narrative_consistency(content)
+    assert isinstance(result, _ExtractedValidationResult)
 
-    # 1. Creative narrative solutions for contradictions
-    creative_solution_methods = [
-        "generate_creative_solutions",
-        "_generate_character_driven_solutions",
-        "_generate_perspective_based_solutions",
-        "_generate_temporal_solutions",
-        "_generate_memory_based_solutions",
-        "_generate_causal_bridge_solutions",
-        "_generate_hidden_factor_solutions",
-        "_generate_recontextualization_solutions",
-        "_generate_subtext_solutions",
-        "_generate_universal_solutions",
-    ]
 
-    # 2. Retroactive change management with in-world explanations
-    retroactive_change_methods = [
-        "manage_retroactive_changes",
-        "_validate_retroactive_changes",
-        "_generate_in_world_explanation",
-        "_apply_retroactive_change",
-        "_update_content_history_with_changes",
-    ]
+@pytest.mark.asyncio
+async def test_coherence_validator_with_characters():
+    validator = CoherenceValidator(config={})
+    content = NarrativeContent(
+        content_id="c-2",
+        content_type="dialogue",
+        text="Alice talks to Bob.",
+        characters=["Alice", "Bob"],
+    )
+    result = await validator.validate_narrative_consistency(content)
+    assert result is not None
 
-    # 3. Storyline convergence validation and integration
-    convergence_methods = [
-        "validate_storyline_convergence",
-        "_detect_convergence_conflicts",
-        "_identify_convergence_points",
-        "_validate_cross_storyline_character_consistency",
-        "_validate_thematic_coherence_across_storylines",
-        "_validate_convergence_pacing",
-        "_calculate_convergence_score",
-        "_generate_convergence_recommendations",
-    ]
 
-    all_methods = (
-        creative_solution_methods + retroactive_change_methods + convergence_methods
+@pytest.mark.asyncio
+async def test_coherence_validator_with_lore_constraint_violation():
+    """A character lore constraint 'must not contain X' that the content violates."""
+    from src.components.narrative_coherence.models import LoreEntry as ExtLoreEntry
+
+    validator = CoherenceValidator(config={})
+    # Key must match the lookup pattern: "character_{character_name}"
+    validator.lore_database["character_Wizard"] = ExtLoreEntry(
+        lore_id="l-1",
+        category="character",
+        title="Wizard",
+        description="The wizard.",
+        constraints=["must not contain evil"],
+    )
+    content = NarrativeContent(
+        content_id="c-x",
+        content_type="scene",
+        text="The wizard performed an evil ritual.",
+        characters=["Wizard"],
+    )
+    result = await validator.validate_narrative_consistency(content)
+    assert any(i.issue_type.value == "lore_violation" for i in result.detected_issues)
+
+
+@pytest.mark.asyncio
+async def test_coherence_validator_with_lore_positive_constraint():
+    """A theme lore constraint 'must have X' that the content satisfies."""
+    from src.components.narrative_coherence.models import LoreEntry as ExtLoreEntry
+
+    validator = CoherenceValidator(config={})
+    # Key must match "theme_{theme_name}"
+    validator.lore_database["theme_Nature"] = ExtLoreEntry(
+        lore_id="l-2",
+        category="theme",
+        title="Nature Theme",
+        description="Must be about nature.",
+        constraints=["must have forest"],
+    )
+    content = NarrativeContent(
+        content_id="c-y",
+        content_type="scene",
+        text="They walked through the dense forest canopy.",
+        themes=["Nature"],
+    )
+    result = await validator.validate_narrative_consistency(content)
+    assert not any(
+        i.issue_type.value == "lore_violation" for i in result.detected_issues
     )
 
-    # Verify all method names are properly structured
-    for method in all_methods:
-        assert isinstance(method, str)
-        assert len(method) > 0
-        assert (
-            method.replace("_", "")
-            .replace("generate", "")
-            .replace("validate", "")
-            .replace("calculate", "")
-        )
 
-    assert len(all_methods) == 23, f"Expected 23 methods, found {len(all_methods)}"
+@pytest.mark.asyncio
+async def test_coherence_validator_consistency_threshold_config():
+    validator = CoherenceValidator(config={"consistency_threshold": 0.5})
+    assert validator.consistency_threshold == 0.5
+
+
+# ---------------------------------------------------------------------------
+# ContradictionDetector
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_contradiction_detector_empty_history():
+    detector = ContradictionDetector(config={})
+    result = await detector.detect_contradictions([])
+    assert result == []
+
+
+@pytest.mark.asyncio
+async def test_contradiction_detector_single_item():
+    detector = ContradictionDetector(config={})
+    result = await detector.detect_contradictions([_content()])
+    assert isinstance(result, list)
+
+
+@pytest.mark.asyncio
+async def test_contradiction_detector_two_items():
+    detector = ContradictionDetector(config={})
+    c1 = _content("c1", text="The sky is blue.")
+    c2 = _content("c2", text="The sky is green.")
+    result = await detector.detect_contradictions([c1, c2])
+    assert isinstance(result, list)
+
+
+@pytest.mark.asyncio
+async def test_contradiction_detector_returns_contradiction_objects():
+    detector = ContradictionDetector(config={})
+    c1 = _content("c1")
+    c2 = _content("c2")
+    result = await detector.detect_contradictions([c1, c2])
+    for item in result:
+        assert isinstance(item, Contradiction)
+
+
+# ---------------------------------------------------------------------------
+# CausalValidator
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_causal_validator_empty_branch():
+    validator = CausalValidator(config={})
+    result = await validator.validate_causal_logic([])
+    assert isinstance(result, _ExtractedValidationResult)
+
+
+@pytest.mark.asyncio
+async def test_causal_validator_single_item():
+    validator = CausalValidator(config={})
+    result = await validator.validate_causal_logic([_content()])
+    assert isinstance(result, _ExtractedValidationResult)
+    assert 0.0 <= result.causal_consistency <= 1.0
+
+
+@pytest.mark.asyncio
+async def test_causal_validator_multiple_items():
+    validator = CausalValidator(config={})
+    branch = [_content(f"c-{i}", text=f"Event {i} occurred.") for i in range(3)]
+    result = await validator.validate_causal_logic(branch)
+    assert isinstance(result, _ExtractedValidationResult)
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – construction and lifecycle
+# ---------------------------------------------------------------------------
+
+
+def test_engine_construction():
+    engine = _engine()
+    assert engine.coherence_validator is not None
+    assert engine.contradiction_detector is not None
+    assert engine.causal_validator is not None
+    assert engine.content_history == {}
+    assert engine.validation_cache == {}
+
+
+def test_engine_start_stop():
+    engine = _engine()
+    assert engine.start() is True
+    assert engine.stop() is True
+    assert engine.content_history == {}
+    assert engine.validation_cache == {}
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – validate_narrative_consistency
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_narrative_consistency_happy_path():
+    engine = _engine()
+    content = _content()
+    result = await engine.validate_narrative_consistency(content, "session-1")
+    # Use duck-typing: the engine may return extracted or local ValidationResult
+    assert hasattr(result, "is_valid")
+    assert hasattr(result, "consistency_score")
+    assert "session-1" in engine.content_history
+    assert len(engine.content_history["session-1"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_caches_result():
+    engine = _engine()
+    content = _content()
+    await engine.validate_narrative_consistency(content, "session-1")
+    cache_key = f"session-1_{content.content_id}"
+    assert cache_key in engine.validation_cache
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_returns_cached_result():
+    engine = _engine()
+    content = _content()
+    result1 = await engine.validate_narrative_consistency(content, "session-1")
+    result2 = await engine.validate_narrative_consistency(content, "session-1")
+    assert result1 is result2  # same object returned from cache
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_multiple_sessions_are_independent():
+    engine = _engine()
+    c1 = _content("c1")
+    c2 = _content("c2")
+    await engine.validate_narrative_consistency(c1, "session-A")
+    await engine.validate_narrative_consistency(c2, "session-B")
+    assert len(engine.content_history["session-A"]) == 1
+    assert len(engine.content_history["session-B"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_error_returns_invalid_result():
+    engine = _engine()
+    # Mock coherence_validator to raise
+    engine.coherence_validator.validate_narrative_consistency = AsyncMock(
+        side_effect=RuntimeError("validator down")
+    )
+    result = await engine.validate_narrative_consistency(_content(), "session-err")
+    assert hasattr(result, "is_valid")
+    assert result.is_valid is False
+    assert len(result.detected_issues) >= 1
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – detect_contradictions
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_engine_detect_contradictions_empty_history():
+    engine = _engine()
+    result = await engine.detect_contradictions("no-history")
+    assert result == []
+
+
+@pytest.mark.asyncio
+async def test_engine_detect_contradictions_single_item_history():
+    engine = _engine()
+    engine.content_history["s-1"] = [_content()]
+    result = await engine.detect_contradictions("s-1")
+    assert result == []
+
+
+@pytest.mark.asyncio
+async def test_engine_detect_contradictions_two_item_history():
+    engine = _engine()
+    engine.content_history["s-1"] = [_content("c1"), _content("c2")]
+    result = await engine.detect_contradictions("s-1")
+    assert isinstance(result, list)
+
+
+@pytest.mark.asyncio
+async def test_engine_detect_contradictions_error_returns_empty():
+    engine = _engine()
+    engine.content_history["s-1"] = [_content("c1"), _content("c2")]
+    engine.contradiction_detector.detect_contradictions = AsyncMock(
+        side_effect=RuntimeError("detector down")
+    )
+    result = await engine.detect_contradictions("s-1")
+    assert result == []
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – validate_causal_logic
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_causal_logic():
+    engine = _engine()
+    branch = [_content(f"c{i}") for i in range(3)]
+    result = await engine.validate_causal_logic(branch)
+    assert hasattr(result, "is_valid")
+    assert hasattr(result, "consistency_score")
+
+
+@pytest.mark.asyncio
+async def test_engine_validate_causal_logic_error_returns_invalid():
+    engine = _engine()
+    engine.causal_validator.validate_causal_logic = AsyncMock(
+        side_effect=RuntimeError("causal down")
+    )
+    result = await engine.validate_causal_logic([_content()])
+    assert hasattr(result, "is_valid")
+    assert result.is_valid is False
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – get_coherence_status
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_engine_get_coherence_status_no_history():
+    engine = _engine()
+    status = await engine.get_coherence_status("empty-session")
+    assert status["content_count"] == 0
+    assert status["overall_coherence"] == 1.0
+    assert status["contradiction_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_engine_get_coherence_status_with_content():
+    engine = _engine()
+    content = _content()
+    await engine.validate_narrative_consistency(content, "s-1")
+    status = await engine.get_coherence_status("s-1")
+    assert status["content_count"] == 1
+    assert "overall_coherence" in status
+
+
+@pytest.mark.asyncio
+async def test_engine_get_coherence_status_validation_error_handled():
+    """When coherence_validator raises, engine wraps error in ValidationResult.
+    get_coherence_status still returns a valid status dict (error is absorbed)."""
+    engine = _engine()
+    engine.content_history["s-err"] = [_content()]
+    engine.coherence_validator.validate_narrative_consistency = AsyncMock(
+        side_effect=RuntimeError("crash")
+    )
+    status = await engine.get_coherence_status("s-err")
+    # Either the error is propagated to the status dict or absorbed —
+    # either way the session_id must be present
+    assert "session_id" in status
+    assert status["session_id"] == "s-err"
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – resolve_narrative_conflicts
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_engine_resolve_conflicts_empty_list():
+    engine = _engine()
+    result = await engine.resolve_narrative_conflicts([], "s-1")
+    assert result == []
+
+
+@pytest.mark.asyncio
+async def test_engine_resolve_conflicts_returns_list():
+    engine = _engine()
+    contradiction = _contradiction()
+    result = await engine.resolve_narrative_conflicts([contradiction], "s-1")
+    assert isinstance(result, list)
+
+
+# ---------------------------------------------------------------------------
+# NarrativeCoherenceEngine – cache management
+# ---------------------------------------------------------------------------
+
+
+def test_engine_cache_miss_returns_none():
+    engine = _engine()
+    assert engine._get_cached_validation("missing_key") is None
+
+
+def test_engine_cache_store_and_retrieve():
+    engine = _engine()
+    vr = ValidationResult(is_valid=True, consistency_score=0.9)
+    vr.validation_timestamp = datetime.now()
+    engine._cache_validation_result("key1", vr)
+    assert engine._get_cached_validation("key1") is vr
+
+
+def test_engine_cache_expired_returns_none():
+    engine = _engine()
+    engine.cache_ttl = 0  # immediate expiry
+    vr = ValidationResult(is_valid=True, consistency_score=0.9)
+    import time
+
+    time.sleep(0.01)
+    vr.validation_timestamp = datetime(2000, 1, 1)  # old timestamp
+    engine.validation_cache["key"] = vr
+    assert engine._get_cached_validation("key") is None
+
+
+def test_engine_cleanup_cache_removes_expired():
+    engine = _engine()
+    engine.cache_ttl = 0
+    vr = ValidationResult(is_valid=True, consistency_score=0.9)
+    vr.validation_timestamp = datetime(2000, 1, 1)
+    engine.validation_cache["old"] = vr
+    engine._cleanup_cache()
+    assert "old" not in engine.validation_cache

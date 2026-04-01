@@ -16,7 +16,7 @@ from unittest.mock import patch
 import pytest
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
 
 from agent_orchestration.capability_matcher import (
     CapabilityMatcher,
