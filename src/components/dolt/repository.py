@@ -77,19 +77,46 @@ class DoltWorldRepository:
         try:
             async with self._pool.acquire() as conn:
                 async with conn.cursor() as cur:
-                    # Create the Dolt branch (Dolt-specific SQL)
-                    await cur.execute("CALL DOLT_CHECKOUT('-b', %s)", (branch_name,))
-                    # Record the branch mapping
-                    await cur.execute(
-                        """INSERT INTO player_branches
-                           (id, player_id, session_id, world_id, branch_name)
-                           VALUES (%s, %s, %s, %s, %s)
-                           ON DUPLICATE KEY UPDATE
-                             branch_name=VALUES(branch_name),
-                             updated_at=CURRENT_TIMESTAMP""",
-                        (record_id, player_id, session_id, world_id, branch_name),
-                    )
-                await conn.commit()
+                    # Capture current branch so we can restore it after checkout,
+                    # preventing branch-state leakage in the shared connection pool.
+                    previous_branch: str | None = None
+                    try:
+                        await cur.execute("SELECT active_branch()")
+                        row = await cur.fetchone()
+                        if row:
+                            previous_branch = row[0]
+                    except Exception:
+                        previous_branch = None
+
+                    try:
+                        # Create the Dolt branch (Dolt-specific SQL)
+                        await cur.execute("CALL DOLT_CHECKOUT('-b', %s)", (branch_name,))
+                        # Record the branch mapping
+                        await cur.execute(
+                            """INSERT INTO player_branches
+                               (id, player_id, session_id, world_id, branch_name)
+                               VALUES (%s, %s, %s, %s, %s)
+                               ON DUPLICATE KEY UPDATE
+                                 branch_name=VALUES(branch_name),
+                                 updated_at=CURRENT_TIMESTAMP""",
+                            (record_id, player_id, session_id, world_id, branch_name),
+                        )
+                        await conn.commit()
+                    finally:
+                        # Restore the previous branch to avoid leaking branch state
+                        # into subsequent pool users.
+                        if previous_branch and previous_branch != branch_name:
+                            try:
+                                await cur.execute(
+                                    "CALL DOLT_CHECKOUT(%s)", (previous_branch,)
+                                )
+                                await conn.commit()
+                            except Exception as restore_exc:
+                                logger.warning(
+                                    "dolt: failed to restore previous branch %s: %s",
+                                    previous_branch,
+                                    restore_exc,
+                                )
             logger.info("dolt: created branch=%s for player=%s", branch_name, player_id)
             return branch_name
         except Exception as exc:
@@ -152,8 +179,15 @@ class DoltWorldRepository:
                             turn_number,
                         ),
                     )
-                    # Dolt commit
+                    # Dolt commit — returns a result set with the new commit hash
                     await cur.execute("CALL DOLT_COMMIT('-Am', %s)", (msg,))
+                    commit_row = await cur.fetchone()
+                    dolt_commit_hash = commit_row[0] if commit_row else None
+                    if dolt_commit_hash:
+                        await cur.execute(
+                            "UPDATE session_snapshots SET dolt_commit=%s WHERE id=%s",
+                            (dolt_commit_hash, snapshot_id),
+                        )
                 await conn.commit()
             logger.info(
                 "dolt: snapshot id=%s session=%s turn=%d",
