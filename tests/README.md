@@ -26,52 +26,62 @@ CI runs unit tests on every push/PR and uploads coverage to Codecov. Integration
 
 ```
 tests/
-├── unit/                      # Fast, no services required
-│   ├── agent_orchestration/   # src/agent_orchestration adapters, circuit breaker, protocol bridge
-│   ├── ai_components/         # LLM clients, prompt registry
-│   ├── api_gateway/           # FastAPI route handlers (mocked)
-│   ├── choice_detector/       # ChoiceSignificanceDetector
-│   ├── common/                # Shared utilities, config, time_utils
-│   ├── components/            # Gameplay loop, models, narrative engine
-│   ├── dolt/                  # Dolt schema & repository (mocked)
-│   ├── first_scene/           # FirstSceneSpec and builder
-│   ├── genesis/               # Genesis agent seed/guide extraction
-│   ├── guide/                 # Guide persona
-│   ├── model_management/      # ModelSelector, FallbackHandler, providers
+├── unit/                          # Fast, no services required
+│   ├── agent_orchestration/       # src/agent_orchestration — adapters, CB, protocol bridge
+│   │   └── safety_validation/     # Crisis detection, therapeutic safety validators
+│   ├── ai_components/             # LLM clients, prompt registry
+│   ├── api_gateway/               # FastAPI route handlers (mocked)
+│   ├── choice_detector/           # ChoiceSignificanceDetector
+│   ├── common/                    # Shared utilities, config, time_utils, retry
+│   ├── components/                # Narrative arc, coherence, world seed, therapeutic modules
+│   │   └── gameplay_loop/         # Gameplay loop controller, models, validator, generator
+│   ├── dolt/                      # Dolt schema & repository (mocked)
+│   ├── first_scene/               # FirstSceneSpec and builder
+│   ├── genesis/                   # Genesis agent seed/guide extraction
+│   ├── guide/                     # Guide persona
+│   ├── model_management/          # ModelSelector, FallbackHandler, providers
+│   │   ├── providers/             # Provider-specific model tests
+│   │   └── services/              # Model selection and fallback services
+│   ├── narrative/                 # Narrative coherence engine, validators
 │   ├── observability_integration/ # APM, caching, routing, timeout primitives
-│   ├── player_character/      # PlayerCharacter model and service
-│   ├── player_experience/     # Player profile, session, privacy
-│   ├── tools/                 # Tool-calling helpers
-│   └── world_context/         # World context builder
+│   ├── orchestration/             # ComponentRegistry, orchestrator config, lifecycle
+│   ├── player_character/          # PlayerCharacter model and service
+│   ├── player_experience/         # Player profile, session, privacy, therapeutic
+│   │   └── api/                   # Player-facing API integration (mocked)
+│   ├── tools/                     # Tool-calling helpers
+│   └── world_context/             # World context builder
 │
-├── integration/               # Requires --neo4j / --redis flags
-│   ├── model_management/      # ModelSelector with real DB
-│   ├── openhands/             # OpenHands integration
-│   └── openhands_integration/ # Openhands agent integration
+├── integration/                   # Requires --neo4j / --redis flags
+│   ├── agent_orchestration/       # tta-ai-framework IPA/WBA/NGA — needs TTA.dev + Redis
+│   │   ├── openhands_integration/ # OpenHands agent wiring
+│   │   └── tools/                 # Agent tool surface integration
+│   ├── cli/                       # CLI admin commands (Redis required)
+│   ├── framework/                 # Comprehensive framework integration
+│   ├── model_management/          # ModelSelector with real DB
+│   ├── neo4j/                     # Neo4j graph persistence tests
+│   ├── openhands/                 # OpenHands integration
+│   ├── openhands_integration/     # Openhands agent integration
+│   ├── player_experience/         # Player API + session with real Redis/Neo4j
+│   └── redis/                     # Redis messaging, session store
 │
-├── agent_orchestration/       # tta-ai-framework package tests (IPA/WBA/NGA)
-│   ├── openhands_integration/ # OpenHands agent wiring
-│   ├── safety_validation/     # Crisis detection, therapeutic safety
-│   └── tools/                 # Agent tool surface
-│
-├── player_experience/         # Player API, services, models (fast tests)
-├── fakes/                     # Reusable in-process fakes (Redis, Neo4j, LLM)
-├── helpers/                   # Test utilities shared across tiers
-├── security/                  # Security and OWASP tests
-├── monitoring/                # Metrics and Grafana tests
-├── workflow/                  # Workflow primitive tests
-├── contract/                  # Contract tests (pact)
+├── fakes/                         # Reusable in-process fakes (Redis, Neo4j, LLM)
+├── helpers/                       # Test utilities shared across tiers
+├── security/                      # Security and OWASP tests
+├── monitoring/                    # Metrics and Grafana tests
+├── workflow/                      # Workflow primitive tests
+├── contract/                      # Contract tests (pact)
 │
 │   ─── Excluded from normal pytest runs (norecursedirs) ───
-├── e2e/                       # Playwright end-to-end (TypeScript + Python)
-├── e2e-staging/               # Staging-environment E2E
-├── comprehensive_battery/     # Production-like load/adversarial scenarios
-├── performance/               # Benchmarks (pytest-benchmark)
-├── mutation/                  # Mutation testing (cosmic-ray)
-└── post_deployment/           # Smoke tests after deploy
+├── e2e/                           # Playwright end-to-end (TypeScript + Python)
+├── e2e-staging/                   # Staging-environment E2E
+├── comprehensive_battery/         # Production-like load/adversarial scenarios
+├── performance/                   # Benchmarks (pytest-benchmark)
+├── mutation/                      # Mutation testing (cosmic-ray)
+└── post_deployment/               # Smoke tests after deploy
 ```
 
-> **`tests/agent_orchestration/`** tests the `tta-ai-framework` workspace package (`packages/tta-ai-framework`). It is distinct from `tests/unit/agent_orchestration/`, which tests `src/agent_orchestration/`.
+> **`tests/unit/agent_orchestration/`** tests `src/agent_orchestration/` (the TTA runtime).
+> **`tests/integration/agent_orchestration/`** tests `tta-ai-framework` (`packages/tta-ai-framework`) — requires TTA.dev cloned as a sibling and Redis running. Both directories are in `norecursedirs` so they are excluded from the default `make test` run.
 
 ---
 
