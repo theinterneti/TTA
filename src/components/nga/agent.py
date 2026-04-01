@@ -43,6 +43,8 @@ except ImportError:
         async def execute(self, data: object, ctx: object) -> object: ...
 
 from src.ai_components.llm_factory import get_llm
+from src.components.guide.intervention import InterventionType
+from src.components.guide.prompt import GuidePromptBuilder
 from src.components.ipa.models import ProcessedInput
 from src.components.world_context.models import WorldContext
 
@@ -216,6 +218,8 @@ class NGAAgent:
         processed_input: ProcessedInput,
         world_context: WorldContext,
         history: list[str] | None = None,
+        guide_voice_params: dict | None = None,
+        intervention_type: InterventionType | None = None,
     ) -> str:
         """Generate a narrative response for the player.
 
@@ -223,6 +227,12 @@ class NGAAgent:
             processed_input: Structured IPA output (intent, entities, tone).
             world_context:   WBA-assembled world context (location, NPCs, etc.).
             history:         Optional list of recent turn strings for continuity.
+            guide_voice_params: Optional Guide voice config dict (tone, formality,
+                intervention_style, reflection_frequency).  When provided, Guide
+                voice instructions are prepended to the system prompt.
+            intervention_type: Optional intervention type from
+                GuideInterventionDecider.  Defaults to NONE when guide params
+                are supplied without an explicit type.
 
         Returns:
             Narrative text (2–4 paragraphs) ready to stream to the player.
@@ -232,20 +242,35 @@ class NGAAgent:
 
         user_message = _build_user_message(processed_input, world_context, history)
 
+        # Build system prompt, optionally prepending Guide voice instructions
+        system_prompt = _SYSTEM_PROMPT
+        if guide_voice_params is not None:
+            _builder = GuidePromptBuilder()
+            _itype = (
+                intervention_type
+                if intervention_type is not None
+                else InterventionType.NONE
+            )
+            guide_addition = _builder.build_full_system_addition(
+                guide_voice_params, _itype
+            )
+            system_prompt = guide_addition + "\n\n" + _SYSTEM_PROMPT
+
         narrative = await self._primitive.execute(
             {
-                "system_prompt": _SYSTEM_PROMPT,
+                "system_prompt": system_prompt,
                 "user_message": user_message,
             },
             ctx,  # type: ignore[arg-type]
         )
 
         logger.info(
-            "nga: session=%s intent=%s location=%s chars=%d",
+            "nga: session=%s intent=%s location=%s chars=%d guide=%s",
             session_id,
             processed_input.intent,
             world_context.location_id,
             len(narrative),
+            intervention_type.value if intervention_type else "none",
         )
 
         return narrative
