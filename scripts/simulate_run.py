@@ -157,6 +157,11 @@ NARRATION RULES:
 - Each response should end with a subtle opening for the next action.
 - Never break the fourth wall.
 - Therapeutic space — hold the player's choices with care.
+- After EVERY response, append a state update block on its own line:
+  [STATE]location=<current location>|inventory=<item1,item2 or empty>|npcs=<npc1,npc2 or empty>[/STATE]
+  Keep location brief (e.g. "Archive entrance", "restricted section", "pier 7").
+  List only items the player currently holds. List only NPCs met this scene or recalled.
+  This block will be stripped before display — write it for the game engine, not the player.
 {story_so_far}{current_state_section}
 
 CONSISTENCY RULES:
