@@ -14,13 +14,14 @@ Genesis agent.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-try:
+if TYPE_CHECKING:
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -28,8 +29,15 @@ try:
         WorkflowContext,
         WorkflowPrimitive,
     )
-except ImportError:
-    pass  # ttadev not available — real types provided by try branch above
+
+with contextlib.suppress(ImportError):
+    from ttadev.primitives import (
+        FallbackPrimitive,
+        RetryPrimitive,
+        RetryStrategy,
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
 
 from src.agent_orchestration.crisis_detection.detector import CrisisDetector
 from src.agent_orchestration.crisis_detection.enums import CrisisLevel

@@ -10,6 +10,7 @@ error handling, and persistence.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import uuid
@@ -21,24 +22,10 @@ from typing import TYPE_CHECKING, Any
 import redis.asyncio as aioredis
 
 if TYPE_CHECKING:
-    from ttadev.primitives import (
-        LambdaPrimitive,
-        SequentialPrimitive,
-        WorkflowContext,
-    )
-
-try:
     from ttadev.primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext
-except ImportError:
-    # ttadev not available — minimal stubs for type checking
-    class LambdaPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class SequentialPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class WorkflowContext:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
+
+with contextlib.suppress(ImportError):
+    from ttadev.primitives import LambdaPrimitive, SequentialPrimitive, WorkflowContext
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

@@ -9,6 +9,7 @@ in ``src.components.ipa``, ``src.components.wba``, and ``src.components.nga``.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
     from src.components.nga.agent import NGAAgent as _NativeNGA
     from src.components.wba.agent import WBAAgent as _NativeWBA
 
-try:
+with contextlib.suppress(ImportError):
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -35,22 +36,6 @@ try:
         WorkflowPrimitive,
     )
     from ttadev.primitives.observability import ObservablePrimitive
-except ImportError:
-    # ttadev not available — minimal stubs for type checking
-    class FallbackPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class RetryPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class RetryStrategy:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowContext:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowPrimitive:  # type: ignore[no-redef]
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class ObservablePrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

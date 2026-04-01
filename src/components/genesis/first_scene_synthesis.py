@@ -12,6 +12,7 @@ Issue: #287
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 from dataclasses import dataclass, field
@@ -21,6 +22,7 @@ from uuid import uuid4
 from langchain_core.messages import HumanMessage, SystemMessage
 
 if TYPE_CHECKING:
+    from neo4j import AsyncDriver
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
         WorkflowPrimitive,
     )
 
-try:
+with contextlib.suppress(ImportError):
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -37,20 +39,6 @@ try:
         WorkflowContext,
         WorkflowPrimitive,
     )
-except ImportError:
-    # ttadev not available — minimal stubs for type checking
-    class FallbackPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class RetryPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class RetryStrategy:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowContext:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowPrimitive:  # type: ignore[no-redef]
-        async def execute(self, data: object, ctx: object) -> object: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,
@@ -58,9 +46,6 @@ from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import WorldSeed
-
-if TYPE_CHECKING:
-    from neo4j import AsyncDriver
 
 logger = logging.getLogger(__name__)
 

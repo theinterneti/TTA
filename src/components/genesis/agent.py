@@ -21,6 +21,7 @@ See: docs/design/genesis-session.md
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
         WorkflowPrimitive,
     )
 
-try:
+with contextlib.suppress(ImportError):
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -44,20 +45,6 @@ try:
         WorkflowContext,
         WorkflowPrimitive,
     )
-except ImportError:
-    # ttadev not available — minimal stubs for type checking
-    class FallbackPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class RetryPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class RetryStrategy:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowContext:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowPrimitive:  # type: ignore[no-redef]
-        async def execute(self, data: object, ctx: object) -> object: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,

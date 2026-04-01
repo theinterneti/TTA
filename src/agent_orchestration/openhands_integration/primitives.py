@@ -38,19 +38,24 @@ Example:
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
-try:
+if TYPE_CHECKING:
+    from ttadev.primitives.core.base import (
+        WorkflowContext,
+        WorkflowPrimitive,
+    )
+
+with contextlib.suppress(ImportError):
     from ttadev.primitives.core.base import (  # type: ignore[import]
         WorkflowContext,
         WorkflowPrimitive,
     )
-except ImportError:
-    pass  # ttadev not available — real types provided by try branch above
 
 from .adapter import OpenHandsAdapter
 from .metrics_collector import ExecutionMetrics, MetricsCollector

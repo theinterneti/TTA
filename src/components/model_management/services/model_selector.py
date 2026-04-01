@@ -7,6 +7,7 @@ This module provides intelligent model selection based on task requirements,
 system capabilities, and performance metrics.
 """
 
+import contextlib
 import logging
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
@@ -18,21 +19,12 @@ if TYPE_CHECKING:
         WorkflowPrimitive,
     )
 
-try:
+with contextlib.suppress(ImportError):
     from ttadev.primitives import (
         TimeoutPrimitive,
         WorkflowContext,
         WorkflowPrimitive,
     )
-except ImportError:
-    # ttadev not available — minimal stubs for type checking
-    class TimeoutPrimitive:  # type: ignore[no-redef]
-        def __init__(self, *args: object, **kwargs: object) -> None: ...
-        async def execute(self, data: object, ctx: object) -> object: ...
-    class WorkflowContext:  # type: ignore[no-redef]
-        def __init__(self, **kwargs: object) -> None: ...
-    class WorkflowPrimitive:  # type: ignore[no-redef]
-        async def execute(self, data: object, ctx: object) -> object: ...
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,
