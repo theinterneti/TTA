@@ -78,7 +78,6 @@ console = Console()
 # ── Game imports (deferred until after path setup) ────────────────────────────
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage  # noqa: E402
 
-from src.ai_components.llm_factory import get_llm  # noqa: E402
 from src.components.gameplay_loop.models.world_seed import (  # noqa: E402
     MagicPresence,
     Motivation,
@@ -94,6 +93,7 @@ from src.components.genesis.first_scene_synthesis import (  # noqa: E402
     FirstSceneSynthesisService,
 )
 from src.components.genesis.session_state import Act, GenesisSessionState  # noqa: E402
+from src.components.model_management.mode_runner import ModeRunner  # noqa: E402
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 GENESIS_PANEL_STYLE = "magenta"
@@ -152,32 +152,6 @@ def load_game(path: Path) -> GameState:
     with path.open(encoding="utf-8") as f:
         data = json.load(f)
     return GameState(**data)
-
-
-async def _summarize_turns(llm, turns: list[dict]) -> str:
-    """Ask the LLM to compress a list of {role, content} turns into a concise paragraph."""
-    turns_text = "\n\n".join(
-        f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
-        for t in turns
-    )
-    msgs = [
-        SystemMessage(
-            content=(
-                "You are a story archivist. Summarize the following story events into "
-                "3-5 sentences, preserving all important facts: character names, items found, "
-                "locations visited, decisions made, and any unresolved plot threads. "
-                "Write in past tense. Be concrete — names and specifics matter."
-            )
-        ),
-        HumanMessage(content=turns_text),
-    ]
-    try:
-        result = await llm.ainvoke(msgs)
-        return result.content if hasattr(result, "content") else str(result)
-    except Exception:
-        # Fallback: just grab narrator lines
-        narrator_lines = [t["content"][:150] for t in turns if t["role"] == "ai"]
-        return " … ".join(narrator_lines[:3])
 
 
 _STATE_RE = _re.compile(r"\[STATE\](.*?)(?:\[/STATE\]|$)", _re.DOTALL)
@@ -727,22 +701,21 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
             world_seed_data=world_seed.model_dump(mode="json"),
         )
 
-    mode = getattr(args, "mode", "openrouter")
+    mode = getattr(args, "mode", "cascade")
     world_title = f"🌍 {world_seed.character_name or 'The World'}"
+    local_only = mode in ("ollama", "blended", "local-fast")
+    local_narrator_model = "gemma3:4b"
+    _narrator_runner = ModeRunner()
 
-    llm = None
-    if mode in ("openrouter", "hybrid"):
-        try:
-            llm = get_llm(
-                provider=args.provider or None,
-                model=args.model or None,
-                temperature=0.8,
-                max_tokens=800,
-            )
-        except Exception as exc:
-            logger.error("Failed to initialise LLM: %s", exc)
-            console.print(f"[red]LLM initialisation failed: {exc}[/red]")
-            raise SystemExit(1) from exc
+    def _flatten_history(messages: list) -> str:
+        """Flatten LangChain message history (excl. SystemMessage) to labelled prose."""
+        lines: list[str] = []
+        for m in messages:
+            if isinstance(m, SystemMessage):
+                continue
+            role = "Player" if isinstance(m, HumanMessage) else "Narrator"
+            lines.append(f"{role}: {m.content}")
+        return "\n\n".join(lines)
 
     def _build_history() -> list:
         """Rebuild langchain message list from raw_history + summary."""
@@ -753,7 +726,7 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                 game_state=game_state,
             )
         )
-        messages = [sys_msg]
+        messages: list = [sys_msg]
         # Use last MAX_HISTORY_TURNS H/A pairs
         recent = game_state.raw_history[-(MAX_HISTORY_TURNS * 2) :]
         for entry in recent:
@@ -763,40 +736,53 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                 messages.append(AIMessage(content=entry["content"]))
         return messages
 
+    async def _narrate(messages: list) -> str:
+        """Invoke the narrator — cascade or local depending on mode."""
+        sys_content = str(messages[0].content) if isinstance(messages[0], SystemMessage) else None
+        if local_only:
+            return await _call_ollama(_lc_to_dicts(messages), local_narrator_model)
+        return await _narrator_runner.call(
+            "narration",
+            prompt=_flatten_history(messages),
+            system=sys_content,
+        )
+
     async def _maybe_summarize() -> None:
         """If raw_history is too long, summarize the oldest turns."""
         if len(game_state.raw_history) > SUMMARIZE_TRIGGER * 2:
             oldest = game_state.raw_history[: -(MAX_HISTORY_TURNS * 2)]
             if oldest:
                 console.print("[dim]📖 Archiving older chapters…[/dim]")
-                if mode in ("openrouter", "hybrid") and llm is not None:
-                    new_chunk_summary = await _summarize_turns(llm, oldest)
-                else:
-                    turns_text = "\n\n".join(
-                        f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
-                        for t in oldest
-                    )
-                    summarize_msgs = [
-                        {
-                            "role": "system",
-                            "content": (
-                                "You are a story archivist. Summarize the following story events into "
-                                "3-5 sentences, preserving all important facts: character names, items found, "
-                                "locations visited, decisions made, and any unresolved plot threads. "
-                                "Write in past tense. Be concrete — names and specifics matter."
-                            ),
-                        },
-                        {"role": "user", "content": turns_text},
-                    ]
-                    try:
+                turns_text = "\n\n".join(
+                    f"{'PLAYER' if t['role'] == 'human' else 'NARRATOR'}: {t['content']}"
+                    for t in oldest
+                )
+                summarize_system = (
+                    "You are a story archivist. Summarize the following story events into "
+                    "3-5 sentences, preserving all important facts: character names, items found, "
+                    "locations visited, decisions made, and any unresolved plot threads. "
+                    "Write in past tense. Be concrete — names and specifics matter."
+                )
+                try:
+                    if local_only:
                         new_chunk_summary = await _call_ollama(
-                            summarize_msgs, "gemma3:4b"
+                            [
+                                {"role": "system", "content": summarize_system},
+                                {"role": "user", "content": turns_text},
+                            ],
+                            local_narrator_model,
                         )
-                    except Exception:
-                        narrator_lines = [
-                            t["content"][:150] for t in oldest if t["role"] == "ai"
-                        ]
-                        new_chunk_summary = " … ".join(narrator_lines[:3])
+                    else:
+                        new_chunk_summary = await _narrator_runner.call(
+                            "narration",
+                            prompt=turns_text,
+                            system=summarize_system,
+                        )
+                except Exception:
+                    narrator_lines = [
+                        t["content"][:150] for t in oldest if t["role"] == "ai"
+                    ]
+                    new_chunk_summary = " … ".join(narrator_lines[:3])
                 if game_state.summary:
                     game_state.summary += "\n\n" + new_chunk_summary
                 else:
@@ -902,16 +888,7 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
             elif _wait == 0:
                 console.print("[dim]⟳ Retrying…[/dim]")
             try:
-                if mode in ("openrouter", "hybrid"):
-                    ai_response = await llm.ainvoke(history_msgs)
-                    response_text = (
-                        ai_response.content
-                        if hasattr(ai_response, "content")
-                        else str(ai_response)
-                    )
-                else:  # ollama or blended — call gemma3:4b via Ollama
-                    msgs_dicts = _lc_to_dicts(history_msgs)
-                    response_text = await _call_ollama(msgs_dicts, "gemma3:4b")
+                response_text = await _narrate(history_msgs)
                 break
             except Exception as exc:
                 exc_str = str(exc)
@@ -923,27 +900,24 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                 )
                 if is_retryable and _attempt < len(_retry_waits):
                     continue  # retry with next wait
-                if mode == "hybrid":
-                    # hybrid: OpenRouter failed — fall back to local gemma3:4b narration
-                    console.print(
-                        "[dim]🔀 OpenRouter error — falling back to local gemma3:4b…[/dim]"
+                # Final fallback: local Ollama
+                console.print("[dim]🔀 All tiers failed — falling back to local Ollama…[/dim]")
+                try:
+                    response_text = await _call_ollama(
+                        _lc_to_dicts(history_msgs), local_narrator_model
                     )
-                    try:
-                        msgs_dicts = _lc_to_dicts(history_msgs)
-                        response_text = await _call_ollama(msgs_dicts, "gemma3:4b")
-                        break
-                    except Exception as fallback_exc:
-                        logger.error("Ollama fallback error: %s", fallback_exc)
-                logger.error("LLM invoke error: %s", exc)
+                    break
+                except Exception as fallback_exc:
+                    logger.error("Ollama fallback error: %s", fallback_exc)
+                logger.error("Narrator invoke error: %s", exc)
                 console.print(f"[red]The narrator pauses… ({exc})[/red]")
                 response_text = ""
                 break
 
         if not response_text:
-            # Empty response guard: retry once with gemma3:4b before giving up
+            # Empty response guard: retry once with local Ollama before giving up
             try:
-                msgs_dicts = _lc_to_dicts(messages)
-                response_text = await _call_ollama("gemma3:4b", msgs_dicts)
+                response_text = await _call_ollama(_lc_to_dicts(history_msgs), local_narrator_model)
             except Exception:
                 pass
         if not response_text:

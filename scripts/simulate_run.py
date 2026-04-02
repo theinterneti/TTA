@@ -40,7 +40,6 @@ warnings.filterwarnings("ignore", message=".*[Pp]ydantic.*")
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage  # noqa: E402
 
-from src.ai_components.llm_factory import get_llm  # noqa: E402
 from src.components.gameplay_loop.models.world_seed import (  # noqa: E402
     MagicPresence,
     Motivation,
@@ -67,82 +66,38 @@ _THINK_RE_SIM = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 _OLLAMA_BASE = "http://localhost:11434"
 _OLLAMA_TIMEOUT = 120.0
 
-# ── ModeRunner (extraction) ────────────────────────────────────────────────────
-# Phase 3 migration: extraction now goes through ModeRunner tier routing.
-# Tier order: local tta-extractor-qwen3 (Ollama) → Groq → OpenRouter → auto.
-# Narrator migration is deferred — narrator calls still use LangChain / direct
-# Ollama HTTP because they require multi-turn message history, which ModeRunner
-# does not yet support. See: https://github.com/theinterneti/TTA/issues/XXX
+# ── ModeRunner — shared for extraction + narration ────────────────────────────
+# Both narration and extraction now route through ModeRunner → ModelRouterPrimitive.
+# Cascade order (narration): Groq → OR pinned → OR auto (FreeModelTracker)
+# Cascade order (extraction): local Ollama → Groq → OR pinned → OR auto
+# Multi-turn history is flattened into a single prompt string for ModeRunner;
+# if ALL cloud tiers fail, _call_ollama_sim provides the local Ollama fallback.
 _mode_runner = ModeRunner()
 
-# ── Narrator config (hardcoded — replaces config/model_modes.yaml old format) ──
-# These control which narrator backend/model each --mode selects.
-# Extractor config is no longer here: ModeRunner handles extraction routing.
-_NARRATOR_CFG: dict[str, dict] = {
-    "openrouter": {
-        "backend": "openrouter",
-        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
-        "fallback": [
-            "meta-llama/llama-3.3-70b-instruct:free",
-            "qwen/qwen3-next-80b-a3b-instruct:free",
-        ],
-        "think": False,
-    },
-    "hybrid": {
-        "backend": "openrouter",
-        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
-        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
-        "think": False,
-    },
-    "qwen35-hybrid": {
-        "backend": "openrouter",
-        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
-        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
-        "think": False,
-    },
-    "qwen08b-hybrid": {
-        "backend": "openrouter",
-        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
-        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
-        "think": False,
-    },
-    "blended": {
-        "backend": "ollama",
-        "primary": "gemma3:4b",
-        "think": False,
-    },
-    "ollama": {
-        "backend": "ollama",
-        "primary": "gemma3:4b",
-        "think": False,
-    },
-    "tta-extractor-hybrid": {
-        "backend": "openrouter",
-        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
-        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
-        "think": False,
-    },
-    "local-fast": {
-        "backend": "ollama",
-        "primary": "gemma3:4b",
-        "think": False,
-    },
-    "groq": {
-        "backend": "groq",
-        "primary": "llama-3.3-70b-versatile",
-        "think": False,
-    },
-    "qwen35-local": {
-        "backend": "ollama",
-        "primary": "qwen3.5:2b",
-        "think": False,
-    },
-}
+# Local-only mode names (bypass ModeRunner, call Ollama directly)
+_LOCAL_ONLY_MODES = {"ollama", "blended", "local-fast", "qwen35-local"}
 
 
 def _available_modes() -> list[str]:
     """Return available simulation mode names."""
-    return sorted(_NARRATOR_CFG.keys())
+    return sorted(
+        [*_LOCAL_ONLY_MODES, "cascade", "openrouter", "hybrid", "groq", "tta-extractor-hybrid"]
+    )
+
+
+def _flatten_to_prompt(messages: list) -> str:
+    """Flatten a LangChain message list (excluding SystemMessage) into a prose prompt.
+
+    ModeRunner accepts a single prompt string; multi-turn history is represented
+    as labelled turns so the model understands conversational context.
+    """
+    lines: list[str] = []
+    for m in messages:
+        if isinstance(m, SystemMessage):
+            continue
+        role = "Player" if isinstance(m, HumanMessage) else "Narrator"
+        lines.append(f"{role}: {m.content}")
+    return "\n\n".join(lines)
 
 
 def _msgs_to_dicts(messages: list) -> list[dict]:
@@ -567,16 +522,10 @@ async def run_simulation(
         else SUMMARIZE_TRIGGER
     )
 
-    # Narrator config — from hardcoded _NARRATOR_CFG (replaces old YAML narrator section).
-    # Extractor routing is fully delegated to _mode_runner (ModeRunner → ModelRouterPrimitive).
-    narrator_cfg = _NARRATOR_CFG[mode]
-    narrator_backend = narrator_cfg["backend"]  # "openrouter" | "ollama"
-    narrator_think = narrator_cfg.get(
-        "think", False
-    )  # always False for narrators; safety net
-    # Explicit model override takes priority over cfg primary
-    narrator_model_id = model or narrator_cfg.get("primary")
-    narrator_fallbacks: list[str] = narrator_cfg.get("fallback", [])
+    # Narrator routing: local-only modes use Ollama directly; all others cascade
+    # through ModeRunner (Groq → OR pinned → OR auto → local fallback).
+    local_only = mode in _LOCAL_ONLY_MODES
+    local_narrator_model = "gemma3:4b"  # Ollama fallback / local-only model
 
     world_seed = _make_sable_world_seed()
     session_id = uuid4().hex
@@ -598,13 +547,6 @@ async def run_simulation(
             scripted.extend(extras)
         scripted = scripted[:n_turns]
 
-    llm = None
-    if not dry_run and narrator_backend in ("openrouter", "groq"):
-        effective_provider = provider or narrator_backend
-        llm = get_llm(
-            provider=effective_provider, model=narrator_model_id, temperature=0.8, max_tokens=800
-        )
-
     out_path.parent.mkdir(parents=True, exist_ok=True)
     metrics_records: list[dict] = []
     all_entity_appearances: dict[str, list[int]] = {k: [] for k in scenario_entities}
@@ -616,7 +558,7 @@ async def run_simulation(
     if scenario_chains:
         for chain_id, desc in scenario_chains.items():
             print(f"  Chain {chain_id}: {desc}")
-    print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else mode.upper()}")
+    print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else ('LOCAL:' + local_narrator_model) if local_only else 'CASCADE (Groq→OR→auto)'}")
     print(
         f"Summarize trigger: {summarize_trigger} H/A pairs (~turn {summarize_trigger})"
     )
@@ -641,7 +583,7 @@ async def run_simulation(
                     world_seed, summary=game_state.summary, game_state=game_state
                 )
             )
-            messages = [sys_msg]
+            messages: list = [sys_msg]
             recent = game_state.raw_history[-(MAX_HISTORY_TURNS * 2) :]
             for entry in recent:
                 if entry["role"] == "human":
@@ -650,28 +592,26 @@ async def run_simulation(
                     messages.append(AIMessage(content=entry["content"]))
             messages.append(HumanMessage(content=player_input))
 
-            context_chars = sum(len(m.content) for m in messages)
+            context_chars = sum(len(str(m.content)) for m in messages if hasattr(m, "content"))
 
             t0 = time.time()
             response_text = ""
             for _sim_attempt in range(3):
                 try:
-                    if narrator_backend in ("openrouter", "groq"):
-                        ai_response = await llm.ainvoke(messages)
-                        response_text = (
-                            ai_response.content
-                            if hasattr(ai_response, "content")
-                            else str(ai_response)
-                        )
-                    else:  # ollama narrator
+                    if local_only:
                         response_text = await _call_ollama_sim(
                             _msgs_to_dicts(messages),
-                            narrator_cfg["primary"],
-                            think=narrator_think,
+                            local_narrator_model,
                         )
-                        # Strip any <think>...</think> blocks from narrator output (safety net
-                        # for reasoning models — think=False should prevent them, but just in case)
                         response_text = _THINK_RE_SIM.sub("", response_text).strip()
+                    else:
+                        # Cascade: Groq → OR pinned → OR auto via ModeRunner
+                        sys_content = str(messages[0].content) if isinstance(messages[0], SystemMessage) else None
+                        response_text = await _mode_runner.call(
+                            "narration",
+                            prompt=_flatten_to_prompt(messages),
+                            system=sys_content,
+                        )
                     break
                 except Exception as exc:
                     exc_str = str(exc)
@@ -681,50 +621,31 @@ async def run_simulation(
                     if is_retryable and _sim_attempt < 2:
                         print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in 10s…")
                         await asyncio.sleep(10)
-                    elif narrator_backend in ("openrouter", "groq") and _sim_attempt == 2:
-                        # Exhausted retries — walk YAML fallback chain
-                        print("  🔀 Primary narrator failed — trying fallback chain…")
-                        for fb_model in narrator_fallbacks:
-                            try:
-                                if "/" in fb_model:  # OpenRouter model
-                                    fb_llm = get_llm(
-                                        provider="openrouter",
-                                        model=fb_model,
-                                        temperature=0.8,
-                                        max_tokens=800,
-                                    )
-                                    fb_resp = await fb_llm.ainvoke(messages)
-                                    response_text = (
-                                        fb_resp.content
-                                        if hasattr(fb_resp, "content")
-                                        else str(fb_resp)
-                                    )
-                                else:  # Local Ollama model
-                                    response_text = await _call_ollama_sim(
-                                        _msgs_to_dicts(messages), fb_model
-                                    )
-                                if response_text:
-                                    print(f"  ✓ Fallback succeeded: {fb_model}")
-                                    break
-                            except Exception as fb_exc:
-                                print(f"  ⚠️  Fallback {fb_model} failed: {fb_exc}")
+                    elif not local_only and _sim_attempt == 2:
+                        # All cascade tiers exhausted — final local Ollama fallback
+                        print("  🔀 All cascade tiers failed — falling back to local Ollama…")
+                        try:
+                            response_text = await _call_ollama_sim(
+                                _msgs_to_dicts(messages), local_narrator_model
+                            )
+                            if response_text:
+                                print(f"  ✓ Local fallback succeeded: {local_narrator_model}")
+                        except Exception as fb_exc:
+                            print(f"  ⚠️  Local fallback failed: {fb_exc}")
                         break
                     else:
                         print(
-                            f"  ⚠️  LLM error after {_sim_attempt + 1} attempts: {exc}"
+                            f"  ⚠️  Narrator error after {_sim_attempt + 1} attempts: {exc}"
                         )
                         break
             latency_ms = (time.time() - t0) * 1000
 
-            # Empty response guard: retry once with ollama fallback
+            # Empty response guard: retry once with local Ollama
             if not response_text and not dry_run:
-                ollama_fallback = next(
-                    (m for m in narrator_fallbacks if "/" not in m), "gemma3:4b"
-                )
-                print(f"  ⟳ Empty response — retrying with {ollama_fallback}…")
+                print(f"  ⟳ Empty response — retrying with {local_narrator_model}…")
                 try:
                     response_text = await _call_ollama_sim(
-                        _msgs_to_dicts(messages), ollama_fallback
+                        _msgs_to_dicts(messages), local_narrator_model
                     )
                     latency_ms = (time.time() - t0) * 1000
                 except Exception:
@@ -738,16 +659,16 @@ async def run_simulation(
                     f"  ⟳ Response too short ({_count_words(response_text)}w) — retrying…"
                 )
                 try:
-                    if narrator_backend in ("openrouter", "groq"):
-                        ai_retry = await llm.ainvoke(messages)
-                        retry_text = (
-                            ai_retry.content
-                            if hasattr(ai_retry, "content")
-                            else str(ai_retry)
+                    if local_only:
+                        retry_text = await _call_ollama_sim(
+                            _msgs_to_dicts(messages), local_narrator_model
                         )
                     else:
-                        retry_text = await _call_ollama_sim(
-                            _msgs_to_dicts(messages), narrator_cfg["primary"]
+                        sys_content = str(messages[0].content) if isinstance(messages[0], SystemMessage) else None
+                        retry_text = await _mode_runner.call(
+                            "narration",
+                            prompt=_flatten_to_prompt(messages),
+                            system=sys_content,
                         )
                     if _count_words(retry_text) > _count_words(response_text):
                         response_text = retry_text
@@ -818,11 +739,7 @@ async def run_simulation(
         )
         all_msgs = [sys_msg_temp] + game_state.raw_history[-(MAX_HISTORY_TURNS * 2) :]
         context_chars = sum(
-            len(
-                m
-                if isinstance(m, str)
-                else (m.content if hasattr(m, "content") else m.get("content", ""))
-            )
+            len(str(m.get("content", "")) if isinstance(m, dict) else str(getattr(m, "content", "")))
             for m in all_msgs
         )
 
@@ -836,8 +753,6 @@ async def run_simulation(
         chars = len(response_text)
         context_msgs = len(all_msgs)
         tokens_est = _estimate_tokens(response_text)
-        context_tokens_est = _estimate_tokens(str(context_chars))
-
         # Coherence: does response reference any entity introduced >5 turns ago?
         old_entities = [
             e
@@ -893,27 +808,19 @@ async def run_simulation(
                     "decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
                 )
                 try:
-                    if narrator_backend in ("openrouter", "groq"):
-                        from langchain_core.messages import SystemMessage as SM
-
-                        summary_result = await llm.ainvoke(
-                            [
-                                SM(content=summarize_system),
-                                HumanMessage(content=turns_text),
-                            ]
-                        )
-                        new_summary = (
-                            summary_result.content
-                            if hasattr(summary_result, "content")
-                            else str(summary_result)
-                        )
-                    else:
+                    if local_only:
                         new_summary = await _call_ollama_sim(
                             [
                                 {"role": "system", "content": summarize_system},
                                 {"role": "user", "content": turns_text},
                             ],
-                            narrator_cfg["primary"],
+                            local_narrator_model,
+                        )
+                    else:
+                        new_summary = await _mode_runner.call(
+                            "narration",
+                            prompt=turns_text,
+                            system=summarize_system,
                         )
                     game_state.summary = (
                         (game_state.summary + "\n\n" + new_summary).strip()
