@@ -49,7 +49,10 @@ modes:
         max_tokens: 512
     tier3:
       provider: gemini
-      model: "gemini-2.0-flash"
+      # Gemini OpenAI-compat endpoint requires the "models/" prefix.
+      # Without it the API returns 429 "quota exceeded" (misleading error).
+      # Upgraded to 2.5 Flash — better quality, same free tier, same endpoint.
+      model: "models/gemini-2.5-flash"
       params:
         temperature: 0.8
         max_tokens: 512
