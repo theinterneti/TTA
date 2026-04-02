@@ -979,12 +979,13 @@ def main() -> None:
     parser.add_argument("--model", default=None, help="LLM model override")
     parser.add_argument(
         "--mode",
-        default="openrouter",
+        default="cascade",
         choices=_available_modes(),
         help=(
-            f"LLM mode — loaded from config/model_modes.yaml. "
-            f"Available: {', '.join(_available_modes())}. "
-            "Add new modes by editing config/model_modes.yaml."
+            f"Narrator mode. 'cascade' (default) routes through ModeRunner: "
+            f"Groq → OR pinned → OR auto → local Ollama fallback. "
+            f"Local-only modes: {', '.join(sorted(_LOCAL_ONLY_MODES))}. "
+            "Cascade routing config: src/components/model_management/model_modes.yaml."
         ),
     )
     parser.add_argument(
