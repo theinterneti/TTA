@@ -22,11 +22,11 @@ import re as _re
 import socket
 import sys
 import warnings
-
-import httpx
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
+
+import httpx
 
 # ── Path setup ────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -243,7 +243,9 @@ async def _call_ollama(messages: list[dict], model: str) -> str:
         return data["message"]["content"]
 
 
-async def _extract_state_ollama(narrative_text: str, prior_inventory: list[str] | None = None) -> dict:
+async def _extract_state_ollama(
+    narrative_text: str, prior_inventory: list[str] | None = None
+) -> dict:
     """Use qwen3:1.7b to extract a [STATE] block from narrative when gemma3:4b omits it."""
     prior_inv = ", ".join(prior_inventory) if prior_inventory else "empty"
     extraction_prompt = (
@@ -291,11 +293,41 @@ def _normalize_state(state: dict) -> dict:
             if not item or len(item) > 35:
                 continue
             _low = item.lower()
-            if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
-                        "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
-                        "crates", "signature", "ink", "ledger", "paper", "vellum",
-                        "parchment", "scroll", "tome", "candle", "coin", "coins",
-                        "bargain", "key", "map", "note", "notes", "letter"}:
+            if _low in {
+                "blood",
+                "mist",
+                "fog",
+                "light",
+                "shadow",
+                "dust",
+                "air",
+                "water",
+                "fire",
+                "smoke",
+                "nothing",
+                "empty",
+                "none",
+                "bottle",
+                "crate",
+                "crates",
+                "signature",
+                "ink",
+                "ledger",
+                "paper",
+                "vellum",
+                "parchment",
+                "scroll",
+                "tome",
+                "candle",
+                "coin",
+                "coins",
+                "bargain",
+                "key",
+                "map",
+                "note",
+                "notes",
+                "letter",
+            }:
                 continue
             if _low not in seen:
                 seen.add(_low)
@@ -311,12 +343,30 @@ def _normalize_state(state: dict) -> dict:
             if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
                 continue
             _low_npc = npc.lower()
-            if _low_npc in {"the man", "dockhand", "dockworker", "clerk", "worker", "guard",
-                            "merchant", "stranger", "figure", "person", "crew",
-                            "mysterious crew", "unknown figure", "passerby"}:
+            if _low_npc in {
+                "the man",
+                "dockhand",
+                "dockworker",
+                "clerk",
+                "worker",
+                "guard",
+                "merchant",
+                "stranger",
+                "figure",
+                "person",
+                "crew",
+                "mysterious crew",
+                "unknown figure",
+                "passerby",
+            }:
                 continue
             # Canonical key: strip leading articles so "The Archivist" == "Archivist"
-            _canon = _low_npc.removeprefix("the ").removeprefix("a ").removeprefix("an ").strip()
+            _canon = (
+                _low_npc.removeprefix("the ")
+                .removeprefix("a ")
+                .removeprefix("an ")
+                .strip()
+            )
             if _canon not in seen_npcs:
                 seen_npcs.add(_canon)
                 clean_npcs.append(npc.title())
@@ -739,7 +789,9 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                         {"role": "user", "content": turns_text},
                     ]
                     try:
-                        new_chunk_summary = await _call_ollama(summarize_msgs, "gemma3:4b")
+                        new_chunk_summary = await _call_ollama(
+                            summarize_msgs, "gemma3:4b"
+                        )
                     except Exception:
                         narrator_lines = [
                             t["content"][:150] for t in oldest if t["role"] == "ai"
@@ -873,7 +925,9 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
                     continue  # retry with next wait
                 if mode == "hybrid":
                     # hybrid: OpenRouter failed — fall back to local gemma3:4b narration
-                    console.print("[dim]🔀 OpenRouter error — falling back to local gemma3:4b…[/dim]")
+                    console.print(
+                        "[dim]🔀 OpenRouter error — falling back to local gemma3:4b…[/dim]"
+                    )
                     try:
                         msgs_dicts = _lc_to_dicts(history_msgs)
                         response_text = await _call_ollama(msgs_dicts, "gemma3:4b")
@@ -903,8 +957,7 @@ async def run_gameplay(  # noqa: PLR0912, PLR0915
         # Blended: qwen fallback only if [STATE] missing.
         # Hybrid: qwen ALWAYS extracts state (don't rely on OpenRouter including [STATE]).
         use_qwen = response_text and (
-            (mode == "blended" and not extracted_state)
-            or mode == "hybrid"
+            (mode == "blended" and not extracted_state) or mode == "hybrid"
         )
         if use_qwen:
             extracted_state = await _extract_state_ollama(

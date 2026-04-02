@@ -2,17 +2,18 @@
 Logseq: [[TTA.dev/Ai_components/Llm_factory]]
 Factory for creating free or local LLM clients.
 
-Supports two providers (both free):
+Supports three providers (all free):
 - Ollama: fully local, no API key required
 - OpenRouter: cloud gateway with a free-tier of open-source models
+- Groq: fast cloud inference with a generous free tier (GROQ_API_KEY required)
 
 Provider selection order (first match wins):
 1. Explicit ``provider`` argument or ``TTA_LLM_PROVIDER`` env var
 2. ``OPENROUTER_API_KEY`` present → openrouter
 3. Default → ollama (http://localhost:11434/v1)
 
-Both providers are accessed via ``langchain-openai``'s ``ChatOpenAI``
-because they both expose an OpenAI-compatible API endpoint.
+All providers are accessed via ``langchain-openai``'s ``ChatOpenAI``
+because they all expose an OpenAI-compatible API endpoint.
 """
 
 from __future__ import annotations
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 # Provider base URLs
 _OLLAMA_BASE_URL = "http://localhost:11434/v1"
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+_GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 # Default free models
 _DEFAULT_OLLAMA_MODEL = "llama3.2"
@@ -33,6 +35,8 @@ _DEFAULT_OLLAMA_MODEL = "llama3.2"
 # Override via OR_NARRATOR_MODEL env var or --model CLI flag.
 # Fallback chain: hermes-3-405b → llama-3.3-70b → local:gemma3:4b
 _DEFAULT_OPENROUTER_MODEL = "nousresearch/hermes-3-llama-3.1-405b:free"
+# Best free Groq model for narration (70B, fast inference, generous quota).
+_DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
 
 # Keep the client import lazy for runtime compatibility, but expose a patchable
 # module attribute so unit tests can replace it without importing the provider.
@@ -58,6 +62,7 @@ def get_llm(
 
     Raises:
         ValueError: If OpenRouter is selected but ``OPENROUTER_API_KEY`` is unset.
+        ValueError: If Groq is selected but ``GROQ_API_KEY`` is unset.
     """
 
     effective_provider = (
@@ -68,6 +73,8 @@ def get_llm(
 
     if effective_provider == "openrouter":
         return _make_openrouter_llm(model, temperature, max_tokens)
+    if effective_provider == "groq":
+        return _make_groq_llm(model, temperature, max_tokens)
     return _make_ollama_llm(model, temperature, max_tokens)
 
 
@@ -121,6 +128,21 @@ def _make_openrouter_llm(model: str | None, temperature: float, max_tokens: int)
     return _get_chat_openai()(
         api_key=api_key,
         base_url=_OPENROUTER_BASE_URL,
+        model=model_name,
+        temperature=temperature,
+        max_tokens=max_tokens,  # type: ignore[call-arg]
+    )
+
+
+def _make_groq_llm(model: str | None, temperature: float, max_tokens: int):
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY environment variable is required for the groq provider")
+    model_name = model or os.environ.get("GROQ_MODEL", _DEFAULT_GROQ_MODEL)
+    logger.info("LLM: Groq %s", model_name)
+    return _get_chat_openai()(
+        api_key=api_key,
+        base_url=_GROQ_BASE_URL,
         model=model_name,
         temperature=temperature,
         max_tokens=max_tokens,  # type: ignore[call-arg]

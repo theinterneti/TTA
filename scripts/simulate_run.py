@@ -127,6 +127,11 @@ _NARRATOR_CFG: dict[str, dict] = {
         "primary": "gemma3:4b",
         "think": False,
     },
+    "groq": {
+        "backend": "groq",
+        "primary": "llama-3.3-70b-versatile",
+        "think": False,
+    },
     "qwen35-local": {
         "backend": "ollama",
         "primary": "qwen3.5:2b",
@@ -593,9 +598,10 @@ async def run_simulation(
         scripted = scripted[:n_turns]
 
     llm = None
-    if not dry_run and narrator_backend == "openrouter":
+    if not dry_run and narrator_backend in ("openrouter", "groq"):
+        effective_provider = provider or narrator_backend
         llm = get_llm(
-            provider=provider, model=narrator_model_id, temperature=0.8, max_tokens=800
+            provider=effective_provider, model=narrator_model_id, temperature=0.8, max_tokens=800
         )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -649,7 +655,7 @@ async def run_simulation(
             response_text = ""
             for _sim_attempt in range(3):
                 try:
-                    if narrator_backend == "openrouter":
+                    if narrator_backend in ("openrouter", "groq"):
                         ai_response = await llm.ainvoke(messages)
                         response_text = (
                             ai_response.content
@@ -674,7 +680,7 @@ async def run_simulation(
                     if is_retryable and _sim_attempt < 2:
                         print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in 10s…")
                         await asyncio.sleep(10)
-                    elif narrator_backend == "openrouter" and _sim_attempt == 2:
+                    elif narrator_backend in ("openrouter", "groq") and _sim_attempt == 2:
                         # Exhausted retries — walk YAML fallback chain
                         print("  🔀 Primary narrator failed — trying fallback chain…")
                         for fb_model in narrator_fallbacks:
@@ -731,7 +737,7 @@ async def run_simulation(
                     f"  ⟳ Response too short ({_count_words(response_text)}w) — retrying…"
                 )
                 try:
-                    if narrator_backend == "openrouter":
+                    if narrator_backend in ("openrouter", "groq"):
                         ai_retry = await llm.ainvoke(messages)
                         retry_text = (
                             ai_retry.content
@@ -886,7 +892,7 @@ async def run_simulation(
                     "decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
                 )
                 try:
-                    if narrator_backend == "openrouter":
+                    if narrator_backend in ("openrouter", "groq"):
                         from langchain_core.messages import SystemMessage as SM
 
                         summary_result = await llm.ainvoke(
