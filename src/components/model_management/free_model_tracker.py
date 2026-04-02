@@ -14,6 +14,8 @@ sync callers must be updated separately.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from ttadev.primitives.llm import (
     FreeModelTracker,
     ORModel,
@@ -33,21 +35,25 @@ from ttadev.primitives.llm.free_model_tracker import (
 #: Public alias for the cache TTL constant (used by tests and callers).
 CACHE_TTL_SECONDS: float = _DEFAULT_CACHE_TTL
 
+#: Public alias for the cache path (can be patched in tests).
+CACHE_PATH: Path = _DEFAULT_CACHE_PATH
+
 #: Alias kept for callers that used ``recommend_for_role`` (renamed upstream).
 recommend_for_role = rank_models_for_role
 
 
-def load_cached_models() -> tuple[list[ORModel], float]:
-    """Compatibility shim — load cached free models from the default cache path."""
-    return _load_cache(_DEFAULT_CACHE_PATH)
+def load_cached_models(cache_path: Path | None = None) -> tuple[list[ORModel], float]:
+    """Compatibility shim — load cached free models from the given or default cache path."""
+    return _load_cache(cache_path if cache_path is not None else CACHE_PATH)
 
 
-def save_cache(models: list[ORModel]) -> None:
-    """Compatibility shim — persist free models to the default cache path."""
-    _save_cache(models, _DEFAULT_CACHE_PATH)
+def save_cache(models: list[ORModel], cache_path: Path | None = None) -> None:
+    """Compatibility shim — persist free models to the given or default cache path."""
+    _save_cache(models, cache_path if cache_path is not None else CACHE_PATH)
 
 
 __all__ = [
+    "CACHE_PATH",
     "CACHE_TTL_SECONDS",
     "FreeModelTracker",
     "ORModel",
