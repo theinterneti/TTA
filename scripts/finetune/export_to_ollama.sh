@@ -53,6 +53,13 @@ echo "=== Step 3: Write Ollama Modelfile ==="
 cat > "$MODELFILE" << MODELFILE_EOF
 FROM $GGUF_PATH
 
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""
+
 SYSTEM """You are a game state extractor. Given a narrative paragraph, extract the current game state in the exact format: [STATE]location=...|inventory=...|npcs=...[/STATE]
 Use 'unknown' for any field not mentioned. List multiple NPCs as Name1,Name2. List inventory items as item1,item2. Do not add explanations — output only the [STATE]...[/STATE] block."""
 
