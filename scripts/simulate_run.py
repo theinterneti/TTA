@@ -546,6 +546,7 @@ async def run_simulation(
     mode: str = "openrouter",
     scenario_path: Path | None = None,
     summarize_trigger_override: int | None = None,
+    turn_delay: float = 0.0,
 ) -> None:
     # Load scenario (file overrides built-in SCRIPTED_INPUTS)
     scenario_inputs = SCRIPTED_INPUTS
@@ -926,6 +927,9 @@ async def run_simulation(
                 except Exception as exc:
                     print(f"  ⚠️  Summarization failed: {exc}")
 
+        if turn_delay > 0 and turn_num < n_turns:
+            await asyncio.sleep(turn_delay)
+
     # Write JSONL output
     with out_path.open("w", encoding="utf-8") as f:
         for rec in metrics_records:
@@ -1090,6 +1094,13 @@ def main() -> None:
         help="Override SUMMARIZE_TRIGGER (H/A pairs before rolling summary fires). "
         "Default: 30. Use 15 to test mid-run summarization.",
     )
+    parser.add_argument(
+        "--turn-delay",
+        type=float,
+        default=0.0,
+        help="Seconds to sleep between turns (default: 0). "
+        "Use 10-20 with --mode groq to respect free-tier TPM limits.",
+    )
     args = parser.parse_args()
 
     if args.out is None:
@@ -1105,6 +1116,7 @@ def main() -> None:
             mode=args.mode,
             scenario_path=args.scenario,
             summarize_trigger_override=args.summarize_trigger,
+            turn_delay=args.turn_delay,
         )
     )
 
