@@ -32,11 +32,11 @@ RESULTS_DIR = Path("runs/ollama_benchmarks")
 
 # Entities introduced turn-by-turn — T5 references T1 entity to test coherence
 BENCHMARK_PROMPTS = [
-    "I walk toward the large Archive building through the fog.",           # T1: scene entry
-    "I examine the brass door handles closely, looking for markings.",    # T2: object detail
-    "I speak to the elderly archivist standing near the shelves.",        # T3: NPC voice
-    "I pick up the quill from the desk and pocket it carefully.",         # T4: item + STATE
-    "I ask the archivist if the fog ever lifts near the Archive.",        # T5: coherence callback
+    "I walk toward the large Archive building through the fog.",  # T1: scene entry
+    "I examine the brass door handles closely, looking for markings.",  # T2: object detail
+    "I speak to the elderly archivist standing near the shelves.",  # T3: NPC voice
+    "I pick up the quill from the desk and pocket it carefully.",  # T4: item + STATE
+    "I ask the archivist if the fog ever lifts near the Archive.",  # T5: coherence callback
 ]
 
 NARRATION_SYSTEM = """\
@@ -63,7 +63,15 @@ Output ONLY the [STATE] line. No explanation, no other text."""
 _STATE_RE = re.compile(r"\[STATE\](.*?)\[/STATE\]", re.DOTALL)
 _PROPER_NOUN_RE = re.compile(r"\b[A-Z][a-z]{2,}\b")
 
-ARCHIVE_ENTITIES = {"archive", "brass", "handles", "archivist", "quill", "fog", "document"}
+ARCHIVE_ENTITIES = {
+    "archive",
+    "brass",
+    "handles",
+    "archivist",
+    "quill",
+    "fog",
+    "document",
+}
 
 
 def _parse_state(text: str) -> dict[str, str | list[str]]:
@@ -75,8 +83,12 @@ def _parse_state(text: str) -> dict[str, str | list[str]]:
     npcs_raw = parts.get("npcs", "")
     return {
         "location": parts.get("location", "").strip(),
-        "inventory": [i.strip() for i in inv_raw.split(",") if i.strip() not in ("", "empty")],
-        "npcs": [n.strip() for n in npcs_raw.split(",") if n.strip() not in ("", "none")],
+        "inventory": [
+            i.strip() for i in inv_raw.split(",") if i.strip() not in ("", "empty")
+        ],
+        "npcs": [
+            n.strip() for n in npcs_raw.split(",") if n.strip() not in ("", "none")
+        ],
     }
 
 
@@ -91,13 +103,16 @@ def _entities_in(text: str) -> set[str]:
 
 # ── Ollama API ─────────────────────────────────────────────────────────────────
 
+
 def list_models() -> list[str]:
     r = httpx.get(f"{OLLAMA_BASE}/api/tags", timeout=5)
     r.raise_for_status()
     return [m["name"] for m in r.json().get("models", [])]
 
 
-def generate(model: str, system: str, messages: list[dict], timeout: float = 90.0) -> dict:
+def generate(
+    model: str, system: str, messages: list[dict], timeout: float = 90.0
+) -> dict:
     """Call ollama /api/chat and return timing + text."""
     payload = {
         "model": model,
@@ -118,6 +133,7 @@ def generate(model: str, system: str, messages: list[dict], timeout: float = 90.
 
 
 # ── Benchmark ─────────────────────────────────────────────────────────────────
+
 
 def benchmark_narration(model: str) -> dict:
     """Run 5-prompt narration benchmark."""
@@ -154,33 +170,49 @@ def benchmark_narration(model: str) -> dict:
 
         state_flag = "✅" if has_state else "❌"
         word_flag = "⚠️ " if words < 120 else ("⚠️ " if words > 350 else "✅")
-        print(f"       {word_flag} {words}w | {result['latency_s']:.1f}s | {result['tps']:.0f}t/s | STATE:{state_flag}")
+        print(
+            f"       {word_flag} {words}w | {result['latency_s']:.1f}s | {result['tps']:.0f}t/s | STATE:{state_flag}"
+        )
         if state["location"]:
-            print(f"       loc={state['location']!r} inv={state['inventory']} npcs={state['npcs']}")
+            print(
+                f"       loc={state['location']!r} inv={state['inventory']} npcs={state['npcs']}"
+            )
         if old_refs:
             print(f"       🔗 coherence callback: {old_refs}")
         print(f"       {clean[:100]}...")
 
         history.append({"role": "assistant", "content": clean})
-        turn_results.append({
-            "turn": i,
-            "words": words,
-            "latency_s": round(result["latency_s"], 2),
-            "tps": round(result["tps"], 1),
-            "has_state": has_state,
-            "location": state["location"],
-            "inventory": state["inventory"],
-            "npcs": state["npcs"],
-            "coherence_callback": bool(old_refs),
-        })
+        turn_results.append(
+            {
+                "turn": i,
+                "words": words,
+                "latency_s": round(result["latency_s"], 2),
+                "tps": round(result["tps"], 1),
+                "has_state": has_state,
+                "location": state["location"],
+                "inventory": state["inventory"],
+                "npcs": state["npcs"],
+                "coherence_callback": bool(old_refs),
+            }
+        )
 
     # Summary
     completed = [t for t in turn_results if "error" not in t]
     avg_words = sum(t["words"] for t in completed) / len(completed) if completed else 0
-    avg_lat = sum(t["latency_s"] for t in completed) / len(completed) if completed else 0
+    avg_lat = (
+        sum(t["latency_s"] for t in completed) / len(completed) if completed else 0
+    )
     avg_tps = sum(t["tps"] for t in completed) / len(completed) if completed else 0
-    state_pct = sum(1 for t in completed if t["has_state"]) / len(completed) * 100 if completed else 0
-    coherence_pct = sum(1 for t in completed if t["coherence_callback"]) / len(completed) * 100 if completed else 0
+    state_pct = (
+        sum(1 for t in completed if t["has_state"]) / len(completed) * 100
+        if completed
+        else 0
+    )
+    coherence_pct = (
+        sum(1 for t in completed if t["coherence_callback"]) / len(completed) * 100
+        if completed
+        else 0
+    )
     in_range = sum(1 for t in completed if 120 <= t["words"] <= 350)
 
     summary = {
@@ -192,14 +224,20 @@ def benchmark_narration(model: str) -> dict:
         "avg_tps": round(avg_tps, 1),
         "state_block_pct": round(state_pct, 1),
         "coherence_pct": round(coherence_pct, 1),
-        "in_word_range_pct": round(in_range / len(completed) * 100, 1) if completed else 0,
+        "in_word_range_pct": round(in_range / len(completed) * 100, 1)
+        if completed
+        else 0,
         "turns": turn_results,
     }
 
     print(f"\n{'─' * 60}")
     print(f"  RESULT: {model}")
-    print(f"  Avg words: {avg_words:.0f}  |  Avg latency: {avg_lat:.1f}s  |  Avg t/s: {avg_tps:.0f}")
-    print(f"  [STATE] compliance: {state_pct:.0f}%  |  Word range: {in_range}/{len(completed)}  |  Coherence: {coherence_pct:.0f}%")
+    print(
+        f"  Avg words: {avg_words:.0f}  |  Avg latency: {avg_lat:.1f}s  |  Avg t/s: {avg_tps:.0f}"
+    )
+    print(
+        f"  [STATE] compliance: {state_pct:.0f}%  |  Word range: {in_range}/{len(completed)}  |  Coherence: {coherence_pct:.0f}%"
+    )
     print(f"{'─' * 60}")
 
     return summary
@@ -215,23 +253,43 @@ def benchmark_state_extraction(model: str) -> dict:
     test_cases = [
         {
             "narrative": "The fog parts as you reach the Archive entrance. The brass handles are cold beneath your fingers. A custodian watches from within.",
-            "expected": {"location": "Archive entrance", "inventory": [], "npcs": ["custodian"]},
+            "expected": {
+                "location": "Archive entrance",
+                "inventory": [],
+                "npcs": ["custodian"],
+            },
         },
         {
             "narrative": "You step inside. The Archive interior smells of old ink and sea salt. The archivist Mira looks up from her ledger.",
-            "expected": {"location": "Archive interior", "inventory": [], "npcs": ["archivist Mira"]},
+            "expected": {
+                "location": "Archive interior",
+                "inventory": [],
+                "npcs": ["archivist Mira"],
+            },
         },
         {
             "narrative": "You pick up the driftwood quill from the desk. It's heavier than it looks. Mira raises an eyebrow.",
-            "expected": {"location": "Archive interior", "inventory": ["quill"], "npcs": ["archivist Mira"]},
+            "expected": {
+                "location": "Archive interior",
+                "inventory": ["quill"],
+                "npcs": ["archivist Mira"],
+            },
         },
         {
             "narrative": "The restricted section door is locked. You finger the forged document in your coat pocket. Mira has not followed you.",
-            "expected": {"location": "restricted section entrance", "inventory": ["quill", "forged document"], "npcs": []},
+            "expected": {
+                "location": "restricted section entrance",
+                "inventory": ["quill", "forged document"],
+                "npcs": [],
+            },
         },
         {
             "narrative": "You slip through a side exit onto Pier 7. The dockworker Renu gives you a nod. The quill and document are still on you.",
-            "expected": {"location": "Pier 7", "inventory": ["quill", "forged document"], "npcs": ["dockworker Renu"]},
+            "expected": {
+                "location": "Pier 7",
+                "inventory": ["quill", "forged document"],
+                "npcs": ["dockworker Renu"],
+            },
         },
     ]
 
@@ -251,17 +309,46 @@ def benchmark_state_extraction(model: str) -> dict:
         exp = case["expected"]
 
         loc_ok = bool(parsed["location"])
-        inv_ok = any(item.lower() in " ".join(parsed["inventory"]).lower() for item in exp["inventory"]) if exp["inventory"] else parsed["inventory"] == []
-        npcs_ok = any(npc.split()[0].lower() in " ".join(parsed["npcs"]).lower() for npc in exp["npcs"]) if exp["npcs"] else True
+        inv_ok = (
+            any(
+                item.lower() in " ".join(parsed["inventory"]).lower()
+                for item in exp["inventory"]
+            )
+            if exp["inventory"]
+            else parsed["inventory"] == []
+        )
+        npcs_ok = (
+            any(
+                npc.split()[0].lower() in " ".join(parsed["npcs"]).lower()
+                for npc in exp["npcs"]
+            )
+            if exp["npcs"]
+            else True
+        )
 
         score = sum([loc_ok, inv_ok, npcs_ok])
         print(f"       Output: {text[:80]}")
-        print(f"       Score: {score}/3 | loc:{'✅' if loc_ok else '❌'} inv:{'✅' if inv_ok else '❌'} npcs:{'✅' if npcs_ok else '❌'} | {result['latency_s']:.1f}s")
-        results.append({"case": i, "score": score, "latency_s": round(result["latency_s"], 2), "output": text})
+        print(
+            f"       Score: {score}/3 | loc:{'✅' if loc_ok else '❌'} inv:{'✅' if inv_ok else '❌'} npcs:{'✅' if npcs_ok else '❌'} | {result['latency_s']:.1f}s"
+        )
+        results.append(
+            {
+                "case": i,
+                "score": score,
+                "latency_s": round(result["latency_s"], 2),
+                "output": text,
+            }
+        )
 
     completed = [r for r in results if "error" not in r]
-    avg_score = sum(r["score"] for r in completed) / (3 * len(completed)) * 100 if completed else 0
-    avg_lat = sum(r["latency_s"] for r in completed) / len(completed) if completed else 0
+    avg_score = (
+        sum(r["score"] for r in completed) / (3 * len(completed)) * 100
+        if completed
+        else 0
+    )
+    avg_lat = (
+        sum(r["latency_s"] for r in completed) / len(completed) if completed else 0
+    )
 
     summary = {
         "model": model,
@@ -280,6 +367,7 @@ def benchmark_state_extraction(model: str) -> dict:
 
 # ── Compare ────────────────────────────────────────────────────────────────────
 
+
 def print_comparison(summaries: list[dict]) -> None:
     narr = [s for s in summaries if s["mode"] == "narration"]
     extr = [s for s in summaries if s["mode"] == "state-extraction"]
@@ -292,7 +380,9 @@ def print_comparison(summaries: list[dict]) -> None:
         print(hdr)
         print("─" * 80)
         for s in sorted(narr, key=lambda x: -x["state_block_pct"]):
-            print(f"{s['model']:<22} {s['avg_words']:>6.0f} {s['avg_latency_s']:>6.1f} {s['avg_tps']:>5.0f} {s['state_block_pct']:>7.0f} {s['in_word_range_pct']:>7.0f} {s['coherence_pct']:>6.0f}")
+            print(
+                f"{s['model']:<22} {s['avg_words']:>6.0f} {s['avg_latency_s']:>6.1f} {s['avg_tps']:>5.0f} {s['state_block_pct']:>7.0f} {s['in_word_range_pct']:>7.0f} {s['coherence_pct']:>6.0f}"
+            )
 
     if extr:
         print(f"\n{'═' * 80}")
@@ -302,18 +392,29 @@ def print_comparison(summaries: list[dict]) -> None:
         print(hdr)
         print("─" * 80)
         for s in sorted(extr, key=lambda x: -x["accuracy_pct"]):
-            print(f"{s['model']:<22} {s['accuracy_pct']:>10.0f} {s['avg_latency_s']:>8.1f}")
+            print(
+                f"{s['model']:<22} {s['accuracy_pct']:>10.0f} {s['avg_latency_s']:>8.1f}"
+            )
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Benchmark Ollama models for TTA")
     parser.add_argument("--model", help="Single model to benchmark")
-    parser.add_argument("--all", action="store_true", help="Benchmark all pulled models")
-    parser.add_argument("--compare", nargs="+", metavar="MODEL", help="Compare specific models")
-    parser.add_argument("--role", choices=["narration", "state", "both"], default="both",
-                        help="Which benchmark to run (default: both)")
+    parser.add_argument(
+        "--all", action="store_true", help="Benchmark all pulled models"
+    )
+    parser.add_argument(
+        "--compare", nargs="+", metavar="MODEL", help="Compare specific models"
+    )
+    parser.add_argument(
+        "--role",
+        choices=["narration", "state", "both"],
+        default="both",
+        help="Which benchmark to run (default: both)",
+    )
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

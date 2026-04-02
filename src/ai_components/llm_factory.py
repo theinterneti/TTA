@@ -137,7 +137,9 @@ def _make_openrouter_llm(model: str | None, temperature: float, max_tokens: int)
 def _make_groq_llm(model: str | None, temperature: float, max_tokens: int):
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise ValueError("GROQ_API_KEY environment variable is required for the groq provider")
+        raise ValueError(
+            "GROQ_API_KEY environment variable is required for the groq provider"
+        )
     model_name = model or os.environ.get("GROQ_MODEL", _DEFAULT_GROQ_MODEL)
     logger.info("LLM: Groq %s", model_name)
     return _get_chat_openai()(

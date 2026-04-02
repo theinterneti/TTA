@@ -59,7 +59,9 @@ def find_undocumented(file_path: Path) -> list[dict[str, any]]:
             if is_public_api(node.name) and not ast.get_docstring(node):
                 undocumented.append(
                     {
-                        "type": "function" if isinstance(node, ast.FunctionDef) else "async_function",
+                        "type": "function"
+                        if isinstance(node, ast.FunctionDef)
+                        else "async_function",
                         "name": node.name,
                         "line": node.lineno,
                         "file": str(file_path),

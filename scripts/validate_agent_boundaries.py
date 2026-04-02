@@ -85,9 +85,7 @@ def validate_boundaries(agent_name: str, config: dict) -> bool:
 
     # Check agent name matches
     if config.get("agent_name") != agent_name:
-        print(
-            f"❌ agent_name mismatch: {config.get('agent_name')} != {agent_name}"
-        )
+        print(f"❌ agent_name mismatch: {config.get('agent_name')} != {agent_name}")
         all_valid = False
 
     return all_valid

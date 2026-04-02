@@ -52,7 +52,9 @@ def extract_docstrings(file_path: Path) -> dict[str, Any]:
                     "bases": [ast.unparse(base) for base in node.bases],
                 }
 
-        elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.AsyncFunctionDef):
+        elif isinstance(node, ast.FunctionDef) or isinstance(
+            node, ast.AsyncFunctionDef
+        ):
             docstring = ast.get_docstring(node)
             if docstring:
                 # Extract function signature
@@ -158,9 +160,7 @@ def generate_markdown(docstrings: dict[str, Any], file_path: Path) -> str:
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Extract docstrings from Python files"
-    )
+    parser = argparse.ArgumentParser(description="Extract docstrings from Python files")
     parser.add_argument("path", help="Python file or directory to process")
     parser.add_argument(
         "--output", help="Output file or directory for generated docs", default=None
@@ -212,7 +212,7 @@ def main():
                     output_file.write_text(markdown)
                     print(f"✅ {py_file.stem}.md")
                 else:
-                    print(f"\n{'='*60}\n{py_file}\n{'='*60}\n")
+                    print(f"\n{'=' * 60}\n{py_file}\n{'=' * 60}\n")
                     print(markdown)
 
     else:

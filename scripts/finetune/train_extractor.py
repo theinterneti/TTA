@@ -25,6 +25,7 @@ from pathlib import Path
 # which lacks FP8BackendType → NameError at training time. We save the original
 # (proper Python method with correct scope) and restore it after unsloth patches.
 import accelerate.accelerator as _acc_mod
+
 _original_accelerator_prepare = _acc_mod.Accelerator.prepare
 
 
@@ -35,7 +36,9 @@ try:
 except ImportError:
     print("ERROR: unsloth not installed. Activate the fine-tune venv first:")
     print("  source ~/venvs/tta-finetune/bin/activate")
-    print("  pip install 'unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git'")
+    print(
+        "  pip install 'unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git'"
+    )
     sys.exit(1)
 
 # Restore the original prepare (unsloth's exec'd version breaks on FP8BackendType)
@@ -44,7 +47,6 @@ _acc_mod.Accelerator.prepare = _original_accelerator_prepare
 from datasets import load_dataset
 from trl import SFTConfig, SFTTrainer
 
-
 DEFAULT_BASE_MODEL = "unsloth/Qwen2.5-1.5B-Instruct"  # Instruct: has ChatML template; supported by unsloth 2025.3.x + transformers 4.51.x
 DEFAULT_DATA = "data/training_pairs.jsonl"
 DEFAULT_OUTPUT = "./tta-extractor-lora"
@@ -52,17 +54,40 @@ DEFAULT_GGUF_OUTPUT = "./tta-extractor-gguf"
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Fine-tune Qwen3.5-0.8B for TTA [STATE] extraction")
-    p.add_argument("--base-model", default=DEFAULT_BASE_MODEL, help="HuggingFace model ID or path")
-    p.add_argument("--data", default=DEFAULT_DATA, help="Path to training_pairs.jsonl (ChatML format)")
-    p.add_argument("--output", default=DEFAULT_OUTPUT, help="Where to save LoRA adapters")
-    p.add_argument("--gguf-output", default=DEFAULT_GGUF_OUTPUT, help="Where to save GGUF export")
+    p = argparse.ArgumentParser(
+        description="Fine-tune Qwen3.5-0.8B for TTA [STATE] extraction"
+    )
+    p.add_argument(
+        "--base-model", default=DEFAULT_BASE_MODEL, help="HuggingFace model ID or path"
+    )
+    p.add_argument(
+        "--data",
+        default=DEFAULT_DATA,
+        help="Path to training_pairs.jsonl (ChatML format)",
+    )
+    p.add_argument(
+        "--output", default=DEFAULT_OUTPUT, help="Where to save LoRA adapters"
+    )
+    p.add_argument(
+        "--gguf-output", default=DEFAULT_GGUF_OUTPUT, help="Where to save GGUF export"
+    )
     p.add_argument("--epochs", type=int, default=3, help="Training epochs (default: 3)")
     p.add_argument("--lora-r", type=int, default=16, help="LoRA rank (default: 16)")
-    p.add_argument("--max-seq-len", type=int, default=512, help="Max sequence length (default: 512)")
-    p.add_argument("--load-in-4bit", action="store_true", help="Load base model in 4-bit (needed for 2B on 4GB VRAM)")
+    p.add_argument(
+        "--max-seq-len",
+        type=int,
+        default=512,
+        help="Max sequence length (default: 512)",
+    )
+    p.add_argument(
+        "--load-in-4bit",
+        action="store_true",
+        help="Load base model in 4-bit (needed for 2B on 4GB VRAM)",
+    )
     p.add_argument("--skip-gguf", action="store_true", help="Skip GGUF export step")
-    p.add_argument("--dry-run", action="store_true", help="Print config and exit without training")
+    p.add_argument(
+        "--dry-run", action="store_true", help="Print config and exit without training"
+    )
     return p.parse_args()
 
 
@@ -85,15 +110,22 @@ def validate_data(data_path: Path) -> int:
                 msgs = row["messages"]
                 assert len(msgs) == 3
                 assistant_content = msgs[2]["content"]
-                if "npcs=" in assistant_content and "none" not in assistant_content.split("npcs=")[1].split("|")[0]:
+                if (
+                    "npcs=" in assistant_content
+                    and "none" not in assistant_content.split("npcs=")[1].split("|")[0]
+                ):
                     npc_rich += 1
                 count += 1
             except (json.JSONDecodeError, KeyError, AssertionError) as e:
-                print(f"WARNING: Malformed record at line {count+1}: {e}")
+                print(f"WARNING: Malformed record at line {count + 1}: {e}")
 
-    print(f"✓ Training data: {count} samples ({npc_rich} NPC-rich, {100*npc_rich//count}%)")
+    print(
+        f"✓ Training data: {count} samples ({npc_rich} NPC-rich, {100 * npc_rich // count}%)"
+    )
     if count < 50:
-        print(f"WARNING: Only {count} samples — recommend ≥100 for reliable NPC tracking")
+        print(
+            f"WARNING: Only {count} samples — recommend ≥100 for reliable NPC tracking"
+        )
     return count
 
 
@@ -106,13 +138,15 @@ def main() -> None:
     # Auto-enable 4-bit for larger models on constrained VRAM (GTX 1650 = 4GB)
     # Auto-enable 4-bit for models >= 1B on GTX 1650 (4GB VRAM)
     large_model_keywords = ["1.5B", "1.7B", "2B", "3B", "7B"]
-    if not args.load_in_4bit and any(kw in args.base_model for kw in large_model_keywords):
+    if not args.load_in_4bit and any(
+        kw in args.base_model for kw in large_model_keywords
+    ):
         print("Note: Auto-enabling 4-bit loading for large model on 4GB VRAM.")
         args.load_in_4bit = True
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TTA Extractor Fine-Tune")
-    print("="*60)
+    print("=" * 60)
     print(f"Base model:   {args.base_model}")
     print(f"Data:         {data_path}")
     print(f"Output:       {output_path}")
@@ -134,8 +168,8 @@ def main() -> None:
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=args.base_model,
         max_seq_length=args.max_seq_len,
-        load_in_4bit=args.load_in_4bit,   # True only for 2B on 4GB VRAM
-        dtype=None,                        # Auto-detect: FP16 on GTX 1650 (no BF16)
+        load_in_4bit=args.load_in_4bit,  # True only for 2B on 4GB VRAM
+        dtype=None,  # Auto-detect: FP16 on GTX 1650 (no BF16)
     )
 
     # ── Add LoRA adapters ──────────────────────────────────────────────────
@@ -144,11 +178,16 @@ def main() -> None:
         model,
         r=args.lora_r,
         target_modules=[
-            "q_proj", "k_proj", "v_proj", "o_proj",
-            "gate_proj", "up_proj", "down_proj",
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
         ],
-        lora_alpha=args.lora_r,       # alpha = rank is standard
-        lora_dropout=0,               # 0 enables unsloth's fast kernel patching (~2x speedup)
+        lora_alpha=args.lora_r,  # alpha = rank is standard
+        lora_dropout=0,  # 0 enables unsloth's fast kernel patching (~2x speedup)
         bias="none",
         use_gradient_checkpointing="unsloth",  # Saves ~30% VRAM
         random_state=42,
@@ -186,17 +225,17 @@ def main() -> None:
             gradient_accumulation_steps=grad_accum,
             num_train_epochs=args.epochs,
             learning_rate=2e-4,
-            fp16=False,                   # Unsloth auto-handles precision for Qwen3.5
+            fp16=False,  # Unsloth auto-handles precision for Qwen3.5
             bf16=False,
             logging_steps=10,
             save_strategy="epoch",
             output_dir=str(output_path / "checkpoints"),
-            optim="paged_adamw_8bit",     # Lower VRAM optimizer states
+            optim="paged_adamw_8bit",  # Lower VRAM optimizer states
             warmup_ratio=0.1,
             lr_scheduler_type="cosine",
             max_seq_length=args.max_seq_len,
             packing=False,
-            report_to="none",             # No wandb/tensorboard dependency
+            report_to="none",  # No wandb/tensorboard dependency
         ),
     )
 
@@ -219,7 +258,7 @@ def main() -> None:
         model.save_pretrained_gguf(
             str(gguf_path),
             tokenizer,
-            quantization_method="q4_k_m",   # Best quality/size for 0.8B
+            quantization_method="q4_k_m",  # Best quality/size for 0.8B
         )
         gguf_file = next(gguf_path.glob("*.gguf"), None)
         if gguf_file:
@@ -227,16 +266,16 @@ def main() -> None:
             print(f"✓ GGUF exported: {gguf_file.name} ({size_mb:.0f} MB)")
             print()
             print("Next step — register with Ollama:")
-            print(f"  ollama create tta-extractor -f models/Modelfile.tta-extractor")
+            print("  ollama create tta-extractor -f models/Modelfile.tta-extractor")
             print(f"  # (Modelfile points to: {gguf_file})")
         else:
             print("WARNING: GGUF file not found after export — check logs above")
     else:
         print("Skipping GGUF export (--skip-gguf)")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Fine-tune complete!")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":
