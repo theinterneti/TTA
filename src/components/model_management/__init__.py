@@ -55,6 +55,23 @@ from .interfaces import (
 from .model_management_component import ModelManagementComponent
 from .models import ModelConfiguration, ModelStatus, PerformanceMetrics, SystemResources
 
+# New model routing
+try:
+    from .free_model_tracker import (
+        FreeModelTracker,
+        ORModel,
+        fetch_free_models,
+        get_free_models,
+        load_cached_models,
+        recommend_for_role,
+        save_cache,
+    )
+    from .mode_runner import ModeRunner
+
+    _new_routing_available = True
+except ImportError:  # pragma: no cover
+    _new_routing_available = False
+
 __all__ = [
     "ModelManagementComponent",
     "IModelProvider",
@@ -68,4 +85,13 @@ __all__ = [
     "PerformanceMetrics",
     "SystemResources",
     "ModelStatus",
+    # New model routing
+    "FreeModelTracker",
+    "ModeRunner",
+    "ORModel",
+    "fetch_free_models",
+    "get_free_models",
+    "load_cached_models",
+    "recommend_for_role",
+    "save_cache",
 ]

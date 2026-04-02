@@ -29,7 +29,10 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Default free models
 _DEFAULT_OLLAMA_MODEL = "llama3.2"
-_DEFAULT_OPENROUTER_MODEL = "openrouter/free"
+# Pinned to best free narration model (405B, no moderation, top prose quality).
+# Override via OR_NARRATOR_MODEL env var or --model CLI flag.
+# Fallback chain: hermes-3-405b → llama-3.3-70b → local:gemma3:4b
+_DEFAULT_OPENROUTER_MODEL = "nousresearch/hermes-3-llama-3.1-405b:free"
 
 # Keep the client import lazy for runtime compatibility, but expose a patchable
 # module attribute so unit tests can replace it without importing the provider.
@@ -107,9 +110,10 @@ def _make_openrouter_llm(model: str | None, temperature: float, max_tokens: int)
             "OPENROUTER_API_KEY environment variable is required"
             " for the openrouter provider"
         )
-    # Check TTA_LLM_MODEL first, then OPENROUTER_MODEL (existing convention), then default
+    # Priority: explicit arg → OR_NARRATOR_MODEL → TTA_LLM_MODEL → OPENROUTER_MODEL → default
     model_name = (
         model
+        or os.environ.get("OR_NARRATOR_MODEL")
         or os.environ.get("TTA_LLM_MODEL")
         or os.environ.get("OPENROUTER_MODEL", _DEFAULT_OPENROUTER_MODEL)
     )

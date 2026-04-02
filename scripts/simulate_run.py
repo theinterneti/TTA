@@ -25,6 +25,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import httpx
+import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -61,17 +62,70 @@ SUMMARIZE_TRIGGER = 30
 AUTOSAVE_EVERY = 10
 
 _STATE_RE_SIM = re.compile(r"\[STATE\](.*?)\[/STATE\]", re.DOTALL)
+_THINK_RE_SIM = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 
 _OLLAMA_BASE = "http://localhost:11434"
 _OLLAMA_TIMEOUT = 120.0
 
+_MODE_CONFIG_PATH = Path(__file__).parent.parent / "config" / "model_modes.yaml"
 
-async def _call_ollama_sim(messages: list[dict], model: str) -> str:
-    """Call Ollama /api/chat and return the response content string."""
+
+def _load_mode_config(mode: str) -> dict:
+    """Load a single mode's config from model_modes.yaml.
+
+    Returns a dict with keys: description, narrator (dict), extractor (dict).
+    Falls back to a minimal hardcoded default if the YAML is missing.
+    """
+    try:
+        with open(_MODE_CONFIG_PATH) as fh:
+            data = yaml.safe_load(fh)
+        modes = data.get("modes", {})
+        if mode not in modes:
+            raise ValueError(f"Unknown mode '{mode}'. Available: {sorted(modes)}")
+        return modes[mode]
+    except FileNotFoundError:
+        # Minimal fallback — keeps script working if YAML is missing
+        return {
+            "narrator": {"backend": "openrouter", "primary": None, "fallback": []},
+            "extractor": {"backend": "openrouter", "primary": None},
+        }
+
+
+def _available_modes() -> list[str]:
+    """Return mode names from model_modes.yaml, falling back to a hardcoded list."""
+    try:
+        with open(_MODE_CONFIG_PATH) as fh:
+            data = yaml.safe_load(fh)
+        return sorted(data.get("modes", {}).keys())
+    except FileNotFoundError:
+        return ["openrouter", "ollama", "blended", "hybrid", "qwen35-hybrid", "qwen08b-hybrid"]
+
+
+def _msgs_to_dicts(messages: list) -> list[dict]:
+    """Convert LangChain message objects to plain role/content dicts for Ollama."""
+    result = []
+    for m in messages:
+        if isinstance(m, SystemMessage):
+            result.append({"role": "system", "content": m.content})
+        elif isinstance(m, HumanMessage):
+            result.append({"role": "user", "content": m.content})
+        elif isinstance(m, AIMessage):
+            result.append({"role": "assistant", "content": m.content})
+    return result
+
+
+async def _call_ollama_sim(
+    messages: list[dict], model: str, think: bool = False
+) -> str:
+    """Call Ollama /api/chat and return the response content string.
+
+    ``think=False`` (default) disables chain-of-thought for qwen3/qwen3.5
+    thinking models, keeping extraction fast and the content field populated.
+    """
     async with httpx.AsyncClient(timeout=_OLLAMA_TIMEOUT) as client:
         resp = await client.post(
             f"{_OLLAMA_BASE}/api/chat",
-            json={"model": model, "messages": messages, "stream": False},
+            json={"model": model, "messages": messages, "stream": False, "think": think},
         )
         resp.raise_for_status()
         data = resp.json()
@@ -328,12 +382,11 @@ TRACKED_ENTITIES = {
 }
 
 
-def _detect_entities(text: str) -> list[str]:
+def _detect_entities(text: str, entity_map: dict | None = None) -> list[str]:
     """Return which tracked entity keys are mentioned in the text."""
     lower = text.lower()
-    return [
-        key for key, terms in TRACKED_ENTITIES.items() if any(t in lower for t in terms)
-    ]
+    emap = entity_map if entity_map is not None else TRACKED_ENTITIES
+    return [key for key, terms in emap.items() if any(t in lower for t in terms)]
 
 
 def _estimate_tokens(text: str) -> int:
@@ -394,14 +447,44 @@ async def run_simulation(
     provider: str | None = None,
     model: str | None = None,
     mode: str = "openrouter",
+    scenario_path: Path | None = None,
+    summarize_trigger_override: int | None = None,
 ) -> None:
+    # Load scenario (file overrides built-in SCRIPTED_INPUTS)
+    scenario_inputs = SCRIPTED_INPUTS
+    scenario_entities = TRACKED_ENTITIES
+    scenario_name = "default"
+    scenario_chains: dict[str, str] = {}
+    if scenario_path is not None:
+        raw = json.loads(scenario_path.read_text())
+        scenario_inputs = raw["inputs"]
+        scenario_entities = raw.get("tracked_entities", TRACKED_ENTITIES)
+        scenario_name = raw.get("name", scenario_path.stem)
+        scenario_chains = raw.get("chains", {})
+
+    # Apply summarize trigger override
+    summarize_trigger = summarize_trigger_override if summarize_trigger_override is not None else SUMMARIZE_TRIGGER
+
+    # Load YAML-driven mode config (narrator + extractor backends/models/fallbacks)
+    mode_cfg = _load_mode_config(mode)
+    narrator_cfg = mode_cfg["narrator"]
+    extractor_cfg = mode_cfg["extractor"]
+    narrator_backend = narrator_cfg["backend"]      # "openrouter" | "ollama"
+    extractor_backend = extractor_cfg["backend"]    # "openrouter" | "ollama"
+    extractor_model = extractor_cfg["primary"]      # model ID string
+    extractor_think = extractor_cfg.get("think", False)
+    narrator_think = narrator_cfg.get("think", False)  # always False for narrators; safety net
+    # Explicit model override takes priority over YAML primary
+    narrator_model_id = model or narrator_cfg.get("primary")
+    narrator_fallbacks: list[str] = narrator_cfg.get("fallback", [])
+
     world_seed = _make_sable_world_seed()
     session_id = uuid4().hex
     game_state = GameState(
         session_id=session_id, world_seed_data=world_seed.model_dump(mode="json")
     )
 
-    scripted = SCRIPTED_INPUTS[:n_turns]
+    scripted = scenario_inputs[:n_turns]
     if len(scripted) < n_turns:
         # Pad with generic exploration inputs
         extras = [
@@ -416,17 +499,22 @@ async def run_simulation(
         scripted = scripted[:n_turns]
 
     llm = None
-    if not dry_run and mode in ("openrouter", "hybrid"):
-        llm = get_llm(provider=provider, model=model, temperature=0.8, max_tokens=800)
+    if not dry_run and narrator_backend == "openrouter":
+        llm = get_llm(provider=provider, model=narrator_model_id, temperature=0.8, max_tokens=800)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     metrics_records: list[dict] = []
-    all_entity_appearances: dict[str, list[int]] = {k: [] for k in TRACKED_ENTITIES}
+    all_entity_appearances: dict[str, list[int]] = {k: [] for k in scenario_entities}
 
     print(f"\n{'=' * 60}")
     print(f"TTA Simulation Run — {n_turns} turns")
     print(f"Session: {session_id[:8]}")
+    print(f"Scenario: {scenario_name}")
+    if scenario_chains:
+        for chain_id, desc in scenario_chains.items():
+            print(f"  Chain {chain_id}: {desc}")
     print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else mode.upper()}")
+    print(f"Summarize trigger: {summarize_trigger} H/A pairs (~turn {summarize_trigger})")
     print(f"Output: {out_path}")
     print(f"{'=' * 60}\n")
 
@@ -463,50 +551,57 @@ async def run_simulation(
             response_text = ""
             for _sim_attempt in range(3):
                 try:
-                    if mode in ("openrouter", "hybrid"):
+                    if narrator_backend == "openrouter":
                         ai_response = await llm.ainvoke(messages)
                         response_text = (
                             ai_response.content
                             if hasattr(ai_response, "content")
                             else str(ai_response)
                         )
-                    else:  # ollama or blended — use gemma3:4b
-                        msgs_dicts = []
-                        for m in messages:
-                            if isinstance(m, SystemMessage):
-                                msgs_dicts.append({"role": "system", "content": m.content})
-                            elif isinstance(m, HumanMessage):
-                                msgs_dicts.append({"role": "user", "content": m.content})
-                            elif isinstance(m, AIMessage):
-                                msgs_dicts.append({"role": "assistant", "content": m.content})
-                        response_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
+                    else:  # ollama narrator
+                        response_text = await _call_ollama_sim(
+                            _msgs_to_dicts(messages), narrator_cfg["primary"],
+                            think=narrator_think,
+                        )
+                        # Strip any <think>...</think> blocks from narrator output (safety net
+                        # for reasoning models — think=False should prevent them, but just in case)
+                        response_text = _THINK_RE_SIM.sub("", response_text).strip()
                     break
                 except Exception as exc:
                     exc_str = str(exc)
-                    is_retryable = (
-                        "429" in exc_str
-                        or "404" in exc_str
-                        or "502" in exc_str
-                        or "503" in exc_str
+                    is_retryable = any(
+                        code in exc_str for code in ("429", "404", "502", "503")
                     )
                     if is_retryable and _sim_attempt < 2:
                         print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in 10s…")
                         await asyncio.sleep(10)
-                    elif mode == "hybrid" and _sim_attempt == 2:
-                        # hybrid: OpenRouter failed — fall back to local gemma3:4b narration
-                        print("  🔀 OpenRouter failed — falling back to gemma3:4b local narration")
-                        msgs_dicts = []
-                        for m in messages:
-                            if isinstance(m, SystemMessage):
-                                msgs_dicts.append({"role": "system", "content": m.content})
-                            elif isinstance(m, HumanMessage):
-                                msgs_dicts.append({"role": "user", "content": m.content})
-                            elif isinstance(m, AIMessage):
-                                msgs_dicts.append({"role": "assistant", "content": m.content})
-                        try:
-                            response_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
-                        except Exception as fallback_exc:
-                            print(f"  ⚠️  Fallback also failed: {fallback_exc}")
+                    elif narrator_backend == "openrouter" and _sim_attempt == 2:
+                        # Exhausted retries — walk YAML fallback chain
+                        print("  🔀 Primary narrator failed — trying fallback chain…")
+                        for fb_model in narrator_fallbacks:
+                            try:
+                                if "/" in fb_model:  # OpenRouter model
+                                    fb_llm = get_llm(
+                                        provider="openrouter",
+                                        model=fb_model,
+                                        temperature=0.8,
+                                        max_tokens=800,
+                                    )
+                                    fb_resp = await fb_llm.ainvoke(messages)
+                                    response_text = (
+                                        fb_resp.content
+                                        if hasattr(fb_resp, "content")
+                                        else str(fb_resp)
+                                    )
+                                else:  # Local Ollama model
+                                    response_text = await _call_ollama_sim(
+                                        _msgs_to_dicts(messages), fb_model
+                                    )
+                                if response_text:
+                                    print(f"  ✓ Fallback succeeded: {fb_model}")
+                                    break
+                            except Exception as fb_exc:
+                                print(f"  ⚠️  Fallback {fb_model} failed: {fb_exc}")
                         break
                     else:
                         print(
@@ -515,19 +610,16 @@ async def run_simulation(
                         break
             latency_ms = (time.time() - t0) * 1000
 
-            # Empty response guard: retry once with gemma fallback
+            # Empty response guard: retry once with ollama fallback
             if not response_text and not dry_run:
-                print("  ⟳ Empty response — retrying with gemma3:4b…")
+                ollama_fallback = next(
+                    (m for m in narrator_fallbacks if "/" not in m), "gemma3:4b"
+                )
+                print(f"  ⟳ Empty response — retrying with {ollama_fallback}…")
                 try:
-                    msgs_dicts = []
-                    for m in messages:
-                        if isinstance(m, SystemMessage):
-                            msgs_dicts.append({"role": "system", "content": m.content})
-                        elif isinstance(m, HumanMessage):
-                            msgs_dicts.append({"role": "user", "content": m.content})
-                        elif isinstance(m, AIMessage):
-                            msgs_dicts.append({"role": "assistant", "content": m.content})
-                    response_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
+                    response_text = await _call_ollama_sim(
+                        _msgs_to_dicts(messages), ollama_fallback
+                    )
                     latency_ms = (time.time() - t0) * 1000
                 except Exception:
                     pass
@@ -540,7 +632,7 @@ async def run_simulation(
                     f"  ⟳ Response too short ({_count_words(response_text)}w) — retrying…"
                 )
                 try:
-                    if mode in ("openrouter", "hybrid"):
+                    if narrator_backend == "openrouter":
                         ai_retry = await llm.ainvoke(messages)
                         retry_text = (
                             ai_retry.content
@@ -548,7 +640,9 @@ async def run_simulation(
                             else str(ai_retry)
                         )
                     else:
-                        retry_text = await _call_ollama_sim(msgs_dicts, "gemma3:4b")
+                        retry_text = await _call_ollama_sim(
+                            _msgs_to_dicts(messages), narrator_cfg["primary"]
+                        )
                     if _count_words(retry_text) > _count_words(response_text):
                         response_text = retry_text
                         latency_ms = (time.time() - t0) * 1000
@@ -560,16 +654,14 @@ async def run_simulation(
         extracted_state = _normalize_state(extracted_state)
 
         # Blended: qwen fallback only if [STATE] missing.
-        # Hybrid: qwen ALWAYS extracts state (don't rely on OpenRouter to include [STATE]).
-        use_qwen_extraction = (
+        # Ollama-extractor modes: always extract (don't trust narrator to include [STATE]).
+        use_ollama_extraction = (
             not dry_run
             and response_text
-            and (
-                (mode == "blended" and not extracted_state)
-                or mode == "hybrid"
-            )
+            and extractor_backend == "ollama"
+            and (extractor_cfg.get("always", True) or not extracted_state)
         )
-        if use_qwen_extraction:
+        if use_ollama_extraction:
             prior_inv = (
                 ", ".join(game_state.inventory) if game_state.inventory else "empty"
             )
@@ -593,11 +685,13 @@ async def run_simulation(
             )
             try:
                 raw_extraction = await _call_ollama_sim(
-                    [{"role": "user", "content": extraction_prompt}], "qwen3:1.7b"
+                    [{"role": "user", "content": extraction_prompt}],
+                    extractor_model,
+                    think=extractor_think,
                 )
                 _, qwen_state = _strip_state_block(raw_extraction)
                 qwen_state = _normalize_state(qwen_state)
-                # qwen is authoritative in hybrid — replace state, don't accumulate
+                # qwen is authoritative in hybrid modes — replace state, don't accumulate
                 if qwen_state:
                     extracted_state = qwen_state
             except Exception:
@@ -605,8 +699,8 @@ async def run_simulation(
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
-            if mode == "hybrid":
-                # qwen output = authoritative current state — replace entire inventory
+            if extractor_backend == "ollama" and extractor_cfg.get("always", True):
+                # Dedicated extractor output = authoritative current state → replace inventory
                 game_state.inventory = extracted_state["inventory"]
             else:
                 # blended fallback — accumulate (conservative)
@@ -639,9 +733,10 @@ async def run_simulation(
             for m in all_msgs
         )
 
-        entities_in_response = _detect_entities(response_text)
+        entities_in_response = _detect_entities(response_text, scenario_entities)
         for ent in entities_in_response:
-            all_entity_appearances[ent].append(turn_num)
+            if ent in all_entity_appearances:
+                all_entity_appearances[ent].append(turn_num)
 
         proper_nouns = _extract_proper_nouns(response_text)
         words = _count_words(response_text)
@@ -691,7 +786,7 @@ async def run_simulation(
         print()
 
         # Summarization check (mirrors play.py logic)
-        if len(game_state.raw_history) > SUMMARIZE_TRIGGER * 2 and not dry_run:
+        if len(game_state.raw_history) > summarize_trigger * 2 and not dry_run:
             oldest = game_state.raw_history[: -(MAX_HISTORY_TURNS * 2)]
             if oldest:
                 print("[dim] 📖 Triggering summarization…")
@@ -705,7 +800,7 @@ async def run_simulation(
                     "decisions made, and any unresolved plot threads. Write in past tense. Be concrete."
                 )
                 try:
-                    if mode in ("openrouter", "hybrid"):
+                    if narrator_backend == "openrouter":
                         from langchain_core.messages import SystemMessage as SM
 
                         summary_result = await llm.ainvoke(
@@ -722,7 +817,7 @@ async def run_simulation(
                                 {"role": "system", "content": summarize_system},
                                 {"role": "user", "content": turns_text},
                             ],
-                            "gemma3:4b",
+                            narrator_cfg["primary"],
                         )
                     game_state.summary = (
                         (game_state.summary + "\n\n" + new_summary).strip()
@@ -756,6 +851,20 @@ async def run_simulation(
     )
     coherence_turns = sum(1 for r in metrics_records if r["coherence_callback"])
 
+    # Cross-chain callback: entities that appear in turns outside their "home" chain range
+    # Entity first appearance → chain it belongs to → did it get referenced later?
+    entity_longevity = {
+        k: {"first": v[0], "last": v[-1], "count": len(v), "span": v[-1] - v[0]}
+        for k, v in entity_summary.items()
+        if len(v) > 1
+    }
+    long_lived = [k for k, s in entity_longevity.items() if s["span"] >= 10]
+    item_usage_turns = [
+        r["turn"] for r in metrics_records
+        if any(w in r["player_input"].lower()
+               for w in ["use", "show", "compare", "rubbing", "pocket", "sign", "write", "read"])
+    ]
+
     with summary_path.open("w", encoding="utf-8") as f:
         json.dump(
             {
@@ -781,7 +890,13 @@ async def run_simulation(
                 if metrics_records
                 else 0,
                 "summarization_triggered": game_state.summary != "",
+                "summarization_trigger_used": summarize_trigger,
                 "final_summary": game_state.summary,
+                "scenario_name": scenario_name,
+                "scenario_chains": scenario_chains,
+                "entity_longevity": entity_longevity,
+                "long_lived_entities": long_lived,
+                "item_usage_turns": item_usage_turns,
                 "structured_state_gap": {
                     "location_tracked": game_state.location != "unknown",
                     "inventory_tracked": len(game_state.inventory) > 0,
@@ -800,12 +915,22 @@ async def run_simulation(
     )
     print(
         f"Coherence callbacks: {coherence_turns}/{len(metrics_records)} turns ({coherence_turns / len(metrics_records) * 100:.0f}%)"
+        if metrics_records else "Coherence: 0 turns"
     )
     print(
         f"Entity recurrence: {sum(1 for v in entity_summary.values() if len(v) > 1)} entities mentioned >1 turn"
     )
+    if long_lived:
+        print(f"Long-lived entities (span ≥10 turns): {long_lived}")
+    if item_usage_turns:
+        print(f"Item usage turns: {item_usage_turns}")
+    if game_state.summary:
+        print(f"Summarization: TRIGGERED ✅ ({len(game_state.summary)} chars)")
+        print(f"  Summary: {game_state.summary[:200]}…")
+    else:
+        print(f"Summarization: not triggered (trigger={summarize_trigger})")
     print(
-        f"Structured state gaps: location={game_state.location}, inventory={game_state.inventory}, npcs={game_state.known_npcs}"
+        f"Final state: location={game_state.location}, inventory={game_state.inventory}, npcs={game_state.known_npcs}"
     )
     print(f"\nMetrics → {out_path}")
     print(f"Summary → {summary_path}")
@@ -836,12 +961,26 @@ def main() -> None:
     parser.add_argument(
         "--mode",
         default="openrouter",
-        choices=["openrouter", "ollama", "blended", "hybrid"],
+        choices=_available_modes(),
         help=(
-            "LLM mode: openrouter (default), ollama (gemma3:4b local), "
-            "blended (gemma narrates + qwen extracts state), "
-            "hybrid (OpenRouter narrates fast + qwen always extracts state, gemma fallback)"
+            f"LLM mode — loaded from config/model_modes.yaml. "
+            f"Available: {', '.join(_available_modes())}. "
+            "Add new modes by editing config/model_modes.yaml."
         ),
+    )
+    parser.add_argument(
+        "--scenario",
+        type=Path,
+        default=None,
+        help="Path to a scenario JSON file (inputs + tracked_entities). "
+             "Overrides built-in SCRIPTED_INPUTS.",
+    )
+    parser.add_argument(
+        "--summarize-trigger",
+        type=int,
+        default=None,
+        help="Override SUMMARIZE_TRIGGER (H/A pairs before rolling summary fires). "
+             "Default: 30. Use 15 to test mid-run summarization.",
     )
     args = parser.parse_args()
 
@@ -856,6 +995,8 @@ def main() -> None:
             provider=args.provider,
             model=args.model,
             mode=args.mode,
+            scenario_path=args.scenario,
+            summarize_trigger_override=args.summarize_trigger,
         )
     )
 

@@ -1,0 +1,144 @@
+# TTA Model Modes Configuration
+#
+# Each mode defines how narration and extraction are handled.
+# - narrator.primary: model ID for story generation
+# - narrator.fallback: ordered list of fallback models
+# - extractor.primary: model ID for [STATE] extraction
+# - extractor.backend: "openrouter" | "ollama"
+# - extractor.think: whether to enable chain-of-thought (ollama models)
+#
+# Override via env vars:
+#   OR_NARRATOR_MODEL  — overrides narrator.primary for openrouter modes
+#   OR_EXTRACTOR_MODEL — overrides extractor.primary for openrouter extraction
+#
+# Phase 3 will add: tta-extractor-hybrid (custom fine-tuned local extractor)
+
+modes:
+
+  # --- OpenRouter-only modes ---
+
+  openrouter:
+    description: "Pinned OR narrator + OR extractor (all cloud, no local GPU)"
+    narrator:
+      backend: openrouter
+      primary: "nousresearch/hermes-3-llama-3.1-405b:free"
+      fallback:
+        - "meta-llama/llama-3.3-70b-instruct:free"
+        - "qwen/qwen3-next-80b-a3b-instruct:free"
+        - "openrouter/free"
+    extractor:
+      backend: openrouter
+      primary: "meta-llama/llama-3.2-3b-instruct:free"
+      fallback:
+        - "liquid/lfm-2.5-1.2b-thinking:free"
+        - "openrouter/free"
+
+  # --- Hybrid modes (OR narrator + local extractor) ---
+
+  hybrid:
+    description: "OR narrator + qwen3:1.7b local extractor (fast extraction, may miss NPCs)"
+    narrator:
+      backend: openrouter
+      primary: "nousresearch/hermes-3-llama-3.1-405b:free"
+      fallback:
+        - "meta-llama/llama-3.3-70b-instruct:free"
+        - "openrouter/free"
+    extractor:
+      backend: ollama
+      primary: "qwen3:1.7b"
+      think: false
+      latency_target_ms: 500
+
+  qwen35-hybrid:
+    description: "OR narrator + qwen3.5:2b local extractor (best NPC tracking, ~3s extraction)"
+    narrator:
+      backend: openrouter
+      primary: "nousresearch/hermes-3-llama-3.1-405b:free"
+      fallback:
+        - "meta-llama/llama-3.3-70b-instruct:free"
+        - "openrouter/free"
+    extractor:
+      backend: ollama
+      primary: "qwen3.5:2b"
+      think: false
+      latency_target_ms: 5000
+
+  qwen08b-hybrid:
+    description: "OR narrator + qwen3.5:0.8b local extractor (fast, needs fine-tuning for NPCs)"
+    narrator:
+      backend: openrouter
+      primary: "nousresearch/hermes-3-llama-3.1-405b:free"
+      fallback:
+        - "meta-llama/llama-3.3-70b-instruct:free"
+        - "openrouter/free"
+    extractor:
+      backend: ollama
+      primary: "qwen3.5:0.8b"
+      think: false
+      latency_target_ms: 2000
+
+  # --- Local-only modes (no internet required) ---
+
+  blended:
+    description: "gemma3:4b local narrator + qwen3:1.7b local extractor (fully offline)"
+    narrator:
+      backend: ollama
+      primary: "gemma3:4b"
+    extractor:
+      backend: ollama
+      primary: "qwen3:1.7b"
+      think: false
+      always: false          # Only extract if narrator didn't include [STATE]
+      latency_target_ms: 500
+
+  ollama:
+    description: "gemma3:4b local for everything (fully offline, slower extraction)"
+    narrator:
+      backend: ollama
+      primary: "gemma3:4b"
+    extractor:
+      backend: ollama
+      primary: "gemma3:4b"
+
+  # --- Fine-tuned extractor (activated! tta_extractor registered in Ollama) ---
+
+  tta-extractor-hybrid:
+    description: "OR narrator + custom fine-tuned tta-extractor (<500ms, 100% format compliance)"
+    narrator:
+      backend: openrouter
+      primary: "nousresearch/hermes-3-llama-3.1-405b:free"
+      fallback:
+        - "meta-llama/llama-3.3-70b-instruct:free"
+        - "openrouter/free"
+    extractor:
+      backend: ollama
+      primary: "tta_extractor"   # fine-tuned Qwen3.5-0.8B, trained 3 epochs 135 pairs, loss 2.69→1.96
+      think: false
+      latency_target_ms: 300
+
+  # --- Fully local: gemma3:4b narrator + fine-tuned tta_extractor (no internet required) ---
+  local-fast:
+    description: "gemma3:4b narrator + fine-tuned tta_extractor (fully offline, ~25s narration + <1s extraction)"
+    narrator:
+      backend: ollama
+      primary: "gemma3:4b"
+    extractor:
+      backend: ollama
+      primary: "tta_extractor"
+      think: false
+      latency_target_ms: 300
+
+  # --- qwen3.5:2b narrator + fine-tuned tta_extractor (quality local, GPU recommended) ---
+  # NOTE: qwen3.5:2b is a reasoning model; think=False suppresses <think> blocks in content.
+  # CPU-only latency: ~2-4 min/turn. GPU latency (when available): ~15-30s/turn.
+  qwen35-local:
+    description: "qwen3.5:2b narrator + fine-tuned tta_extractor (fully offline, better narrative quality than gemma3:4b)"
+    narrator:
+      backend: ollama
+      primary: "qwen3.5:2b"
+      think: false          # suppresses <think> blocks — do not enable for narrator
+    extractor:
+      backend: ollama
+      primary: "tta_extractor"
+      think: false
+      latency_target_ms: 300

@@ -1,0 +1,42 @@
+### Model
+model_name_or_path: Qwen/Qwen3-0.6B
+template: qwen3_nothink
+
+### Fine-tuning method
+finetuning_type: lora
+lora_rank: 16
+lora_alpha: 16
+lora_dropout: 0
+lora_target: all
+
+### QLoRA - 4-bit for GTX 1650 (4GB VRAM)
+quantization_method: bitsandbytes
+quantization_bit: 4
+
+### Dataset - registered in data/llamafactory/dataset_info.json
+dataset: tta_extractor
+dataset_dir: /home/theinterneti/Repos/TTA/data/llamafactory
+cutoff_len: 512
+overwrite_cache: true
+preprocessing_num_workers: 4
+
+### Training
+stage: sft
+do_train: true
+output_dir: /home/theinterneti/Repos/TTA/tta-extractor-lora-qwen3-5
+
+num_train_epochs: 4
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-4
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+max_grad_norm: 1.0
+
+fp16: true
+logging_steps: 5
+save_steps: 10
+plot_loss: false
+
+### Efficiency
+dataloader_num_workers: 0
