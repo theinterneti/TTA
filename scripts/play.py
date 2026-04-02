@@ -180,7 +180,7 @@ async def _summarize_turns(llm, turns: list[dict]) -> str:
         return " … ".join(narrator_lines[:3])
 
 
-_STATE_RE = _re.compile(r"\[STATE\](.*?)\[/STATE\]", _re.DOTALL)
+_STATE_RE = _re.compile(r"\[STATE\](.*?)(?:\[/STATE\]|$)", _re.DOTALL)
 
 
 def _parse_state_block(text: str) -> tuple[str, dict]:

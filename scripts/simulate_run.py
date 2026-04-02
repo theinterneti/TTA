@@ -61,7 +61,7 @@ MAX_HISTORY_TURNS = 20
 SUMMARIZE_TRIGGER = 30
 AUTOSAVE_EVERY = 10
 
-_STATE_RE_SIM = re.compile(r"\[STATE\](.*?)\[/STATE\]", re.DOTALL)
+_STATE_RE_SIM = re.compile(r"\[STATE\](.*?)(?:\[/STATE\]|$)", re.DOTALL)
 _THINK_RE_SIM = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 
 _OLLAMA_BASE = "http://localhost:11434"
