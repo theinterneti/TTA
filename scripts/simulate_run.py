@@ -615,15 +615,21 @@ async def run_simulation(
                     break
                 except Exception as exc:
                     exc_str = str(exc)
+                    # 429 = rate limit; 404/502/503 = transient provider errors.
+                    # Note: ModelRouterPrimitive raises RuntimeError("All N tiers failed")
+                    # after exhausting its internal cascade — that message won't contain
+                    # "429", so we must also trigger local fallback on non-retryable errors.
                     is_retryable = any(
                         code in exc_str for code in ("429", "404", "502", "503")
                     )
                     if is_retryable and _sim_attempt < 2:
-                        print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in 10s…")
-                        await asyncio.sleep(10)
-                    elif not local_only and _sim_attempt == 2:
-                        # All cascade tiers exhausted — final local Ollama fallback
-                        print("  🔀 All cascade tiers failed — falling back to local Ollama…")
+                        wait = 15 if "429" in exc_str else 5
+                        print(f"  ⟳ Provider error ({exc_str[:60]}) — retrying in {wait}s…")
+                        await asyncio.sleep(wait)
+                    elif not local_only:
+                        # Any cascade failure (rate limit exhausted, all tiers failed,
+                        # etc.) → always fall back to local Ollama.
+                        print(f"  🔀 Cascade failed ({exc_str[:80]}) — falling back to local Ollama…")
                         try:
                             response_text = await _call_ollama_sim(
                                 _msgs_to_dicts(messages), local_narrator_model
