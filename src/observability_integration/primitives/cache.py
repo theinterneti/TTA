@@ -23,20 +23,20 @@ try:
     )
 except ImportError:
     # Fallback stubs for development/testing
-        from typing import Protocol, TypeVar
+    from typing import Protocol, TypeVar
 
-        _T = TypeVar("_T")
-        _U = TypeVar("_U")
+    _T = TypeVar("_T")
+    _U = TypeVar("_U")
 
-        class WorkflowContext:  # type: ignore
-            """Mock WorkflowContext for testing."""
+    class WorkflowContext:  # type: ignore
+        """Mock WorkflowContext for testing."""
 
-            pass
+        pass
 
-        class WorkflowPrimitive(Protocol[_T, _U]):  # type: ignore
-            """Minimal WorkflowPrimitive protocol for testing."""
+    class WorkflowPrimitive(Protocol[_T, _U]):  # type: ignore
+        """Minimal WorkflowPrimitive protocol for testing."""
 
-            pass
+        pass
 
 
 from ..apm_setup import get_meter

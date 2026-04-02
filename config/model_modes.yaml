@@ -14,7 +14,11 @@
 modes:
   narration:
     description: "Generate narrative prose for the therapeutic text adventure"
-    # NOTE: when TTA.dev adds provider: gemini, migrate tier2 to native Gemini provider.
+    # Tier order: Groq (fast, stable free) → pinned OR model → FreeModelTracker auto
+    # FreeModelTracker (tier3) fetches the live free model list from OpenRouter and
+    # ranks by quality, so it naturally picks up whatever free Gemini/Llama/etc. is
+    # currently available — no need to hardcode volatile model slugs here.
+    # When a local narration model exists, add: tier0: provider: ollama, model: <id>
     tier1:
       provider: groq
       model: "llama-3.3-70b-versatile"
@@ -22,19 +26,13 @@ modes:
         temperature: 0.8
         max_tokens: 512
     tier2:
-      # Gemini 2.0 Flash via OpenRouter — 1M context window, strong creative prose
-      provider: openrouter
-      model: "google/gemini-2.0-flash-exp:free"
-      params:
-        temperature: 0.8
-        max_tokens: 512
-    tier3:
       provider: openrouter
       model: "nousresearch/hermes-3-llama-3.1-405b:free"
       params:
         temperature: 0.8
         max_tokens: 512
-    tier4:
+        top_p: 0.95
+    tier3:
       provider: auto
       params:
         temperature: 0.8

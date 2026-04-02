@@ -227,7 +227,8 @@ class PlayerCharacterService:
 
         ctx = WorkflowContext(workflow_id=f"char-creation-{world_id}")
         llm_result = await self._primitive.execute(  # type: ignore[arg-type]
-            {"world_desc": world_desc, "player_prefs": prefs}, ctx  # type: ignore[arg-type]
+            {"world_desc": world_desc, "player_prefs": prefs},
+            ctx,  # type: ignore[arg-type]
         )
 
         skills = _derive_skills(seed_dict)

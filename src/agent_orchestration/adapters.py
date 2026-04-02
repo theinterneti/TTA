@@ -148,6 +148,7 @@ class IPAAdapter:
         self._cb_config = cb_config or CircuitBreakerConfig()
         if ipa_agent is None:
             from src.components.ipa.agent import IPAAgent
+
             ipa_agent = IPAAgent()
         self._agent = ipa_agent
 
@@ -290,6 +291,7 @@ class WBAAdapter:
         self._cb_config = cb_config or CircuitBreakerConfig()
         if wba_agent is None:
             from src.components.wba.agent import WBAAgent
+
             wba_agent = WBAAgent(builder=world_context_builder)
         self._agent = wba_agent
 
@@ -441,6 +443,7 @@ class NGAAdapter:
         self._cb_config = cb_config or CircuitBreakerConfig()
         if nga_agent is None:
             from src.components.nga.agent import NGAAgent
+
             nga_agent = NGAAgent()
         self._agent = nga_agent
 

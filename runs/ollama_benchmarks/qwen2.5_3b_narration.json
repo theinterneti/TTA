@@ -2,18 +2,29 @@
   "model": "qwen2.5:3b",
   "mode": "narration",
   "turns_completed": 5,
-  "avg_words": 38.6,
-  "avg_latency_s": 39.55,
-  "avg_tps": 3.2,
+  "avg_words": 52.8,
+  "avg_latency_s": 3.1,
+  "avg_tps": 33.1,
   "state_block_pct": 80.0,
   "coherence_pct": 20.0,
   "in_word_range_pct": 0.0,
   "turns": [
     {
       "turn": 1,
-      "words": 27,
-      "latency_s": 82.14,
-      "tps": 0.9,
+      "words": 40,
+      "latency_s": 3.14,
+      "tps": 31.2,
+      "has_state": true,
+      "location": "Archive entrance",
+      "inventory": [],
+      "npcs": [],
+      "coherence_callback": false
+    },
+    {
+      "turn": 2,
+      "words": 54,
+      "latency_s": 2.96,
+      "tps": 33.5,
       "has_state": true,
       "location": "Archive entrance",
       "inventory": [
@@ -23,34 +34,23 @@
       "coherence_callback": false
     },
     {
-      "turn": 2,
-      "words": 29,
-      "latency_s": 56.8,
-      "tps": 1.0,
-      "has_state": true,
-      "location": "Archive entrance",
-      "inventory": [],
-      "npcs": [],
-      "coherence_callback": false
-    },
-    {
       "turn": 3,
-      "words": 34,
-      "latency_s": 12.13,
-      "tps": 6.3,
+      "words": 54,
+      "latency_s": 3.38,
+      "tps": 33.0,
       "has_state": true,
       "location": "Archive entrance",
       "inventory": [],
       "npcs": [
-        "archivist"
+        "elderly archivist"
       ],
       "coherence_callback": false
     },
     {
       "turn": 4,
-      "words": 34,
-      "latency_s": 23.07,
-      "tps": 3.2,
+      "words": 50,
+      "latency_s": 2.93,
+      "tps": 34.3,
       "has_state": true,
       "location": "Archive entrance",
       "inventory": [
@@ -59,18 +59,18 @@
       "npcs": [
         "elderly archivist"
       ],
-      "coherence_callback": false
+      "coherence_callback": true
     },
     {
       "turn": 5,
-      "words": 69,
-      "latency_s": 23.62,
-      "tps": 4.6,
+      "words": 66,
+      "latency_s": 3.1,
+      "tps": 33.7,
       "has_state": false,
       "location": "",
       "inventory": [],
       "npcs": [],
-      "coherence_callback": true
+      "coherence_callback": false
     }
   ]
 }
