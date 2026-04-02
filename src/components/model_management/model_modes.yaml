@@ -20,7 +20,9 @@ modes:
   narration:
     description: "Generate narrative prose — story beats, NPC dialogue, scene descriptions"
     # No fine-tuned local narration model yet → start at Groq for speed,
-    # fall through to pinned OpenRouter free model, then FreeModelTracker.
+    # fall through to Gemini Flash (huge context, excellent prose via OpenRouter),
+    # then pinned free model, then FreeModelTracker.
+    # NOTE: when TTA.dev adds provider: gemini, migrate tier2 to native Gemini provider.
     tier1:
       provider: groq
       model: "llama-3.3-70b-versatile"
@@ -28,13 +30,20 @@ modes:
         temperature: 0.8
         max_tokens: 512
     tier2:
+      # Gemini 2.0 Flash via OpenRouter — 1M context window, strong creative prose
+      provider: openrouter
+      model: "google/gemini-2.0-flash-exp:free"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier3:
       provider: openrouter
       model: "nousresearch/hermes-3-llama-3.1-405b:free"
       params:
         temperature: 0.8
         max_tokens: 512
         top_p: 0.95
-    tier3:
+    tier4:
       provider: auto
       params:
         temperature: 0.8
