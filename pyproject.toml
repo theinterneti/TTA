@@ -295,7 +295,7 @@ members = [
 [tool.uv.sources]
 tta-ai-framework = { workspace = true }
 tta-narrative-engine = { workspace = true }
-ttadev = { git = "https://github.com/theinterneti/TTA.dev.git", rev = "main" }
+ttadev = { path = "../TTA.dev", editable = true }
 
 # Black and isort removed - functionality replaced by Ruff formatter and import sorting
 

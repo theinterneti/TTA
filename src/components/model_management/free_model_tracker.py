@@ -23,11 +23,15 @@ from ttadev.primitives.llm import (
 )
 from ttadev.primitives.llm.free_model_tracker import (
     _DEFAULT_CACHE_PATH,
+    _DEFAULT_CACHE_TTL,
     _load_cache,
     _save_cache,
 )
 
 # ── Backwards-compatible aliases ──────────────────────────────────────────────
+
+#: Public alias for the cache TTL constant (used by tests and callers).
+CACHE_TTL_SECONDS: float = _DEFAULT_CACHE_TTL
 
 #: Alias kept for callers that used ``recommend_for_role`` (renamed upstream).
 recommend_for_role = rank_models_for_role
@@ -44,6 +48,7 @@ def save_cache(models: list[ORModel]) -> None:
 
 
 __all__ = [
+    "CACHE_TTL_SECONDS",
     "FreeModelTracker",
     "ORModel",
     "fetch_free_models",

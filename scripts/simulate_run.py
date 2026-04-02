@@ -25,7 +25,6 @@ from pathlib import Path
 from uuid import uuid4
 
 import httpx
-import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -52,6 +51,7 @@ from src.components.gameplay_loop.models.world_seed import (  # noqa: E402
     WorldSeed,
     WorldTone,
 )
+from src.components.model_management.mode_runner import ModeRunner  # noqa: E402
 
 # ── Reuse GameState / helpers from play.py ─────────────────────────────────────
 # We import the relevant pieces directly rather than exec-importing play.py
@@ -67,38 +67,77 @@ _THINK_RE_SIM = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 _OLLAMA_BASE = "http://localhost:11434"
 _OLLAMA_TIMEOUT = 120.0
 
-_MODE_CONFIG_PATH = Path(__file__).parent.parent / "config" / "model_modes.yaml"
+# ── ModeRunner (extraction) ────────────────────────────────────────────────────
+# Phase 3 migration: extraction now goes through ModeRunner tier routing.
+# Tier order: local tta-extractor-qwen3 (Ollama) → Groq → OpenRouter → auto.
+# Narrator migration is deferred — narrator calls still use LangChain / direct
+# Ollama HTTP because they require multi-turn message history, which ModeRunner
+# does not yet support. See: https://github.com/theinterneti/TTA/issues/XXX
+_mode_runner = ModeRunner()
 
-
-def _load_mode_config(mode: str) -> dict:
-    """Load a single mode's config from model_modes.yaml.
-
-    Returns a dict with keys: description, narrator (dict), extractor (dict).
-    Falls back to a minimal hardcoded default if the YAML is missing.
-    """
-    try:
-        with open(_MODE_CONFIG_PATH) as fh:
-            data = yaml.safe_load(fh)
-        modes = data.get("modes", {})
-        if mode not in modes:
-            raise ValueError(f"Unknown mode '{mode}'. Available: {sorted(modes)}")
-        return modes[mode]
-    except FileNotFoundError:
-        # Minimal fallback — keeps script working if YAML is missing
-        return {
-            "narrator": {"backend": "openrouter", "primary": None, "fallback": []},
-            "extractor": {"backend": "openrouter", "primary": None},
-        }
+# ── Narrator config (hardcoded — replaces config/model_modes.yaml old format) ──
+# These control which narrator backend/model each --mode selects.
+# Extractor config is no longer here: ModeRunner handles extraction routing.
+_NARRATOR_CFG: dict[str, dict] = {
+    "openrouter": {
+        "backend": "openrouter",
+        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "fallback": [
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "qwen/qwen3-next-80b-a3b-instruct:free",
+        ],
+        "think": False,
+    },
+    "hybrid": {
+        "backend": "openrouter",
+        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
+        "think": False,
+    },
+    "qwen35-hybrid": {
+        "backend": "openrouter",
+        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
+        "think": False,
+    },
+    "qwen08b-hybrid": {
+        "backend": "openrouter",
+        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
+        "think": False,
+    },
+    "blended": {
+        "backend": "ollama",
+        "primary": "gemma3:4b",
+        "think": False,
+    },
+    "ollama": {
+        "backend": "ollama",
+        "primary": "gemma3:4b",
+        "think": False,
+    },
+    "tta-extractor-hybrid": {
+        "backend": "openrouter",
+        "primary": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "fallback": ["meta-llama/llama-3.3-70b-instruct:free"],
+        "think": False,
+    },
+    "local-fast": {
+        "backend": "ollama",
+        "primary": "gemma3:4b",
+        "think": False,
+    },
+    "qwen35-local": {
+        "backend": "ollama",
+        "primary": "qwen3.5:2b",
+        "think": False,
+    },
+}
 
 
 def _available_modes() -> list[str]:
-    """Return mode names from model_modes.yaml, falling back to a hardcoded list."""
-    try:
-        with open(_MODE_CONFIG_PATH) as fh:
-            data = yaml.safe_load(fh)
-        return sorted(data.get("modes", {}).keys())
-    except FileNotFoundError:
-        return ["openrouter", "ollama", "blended", "hybrid", "qwen35-hybrid", "qwen08b-hybrid"]
+    """Return available simulation mode names."""
+    return sorted(_NARRATOR_CFG.keys())
 
 
 def _msgs_to_dicts(messages: list) -> list[dict]:
@@ -125,7 +164,12 @@ async def _call_ollama_sim(
     async with httpx.AsyncClient(timeout=_OLLAMA_TIMEOUT) as client:
         resp = await client.post(
             f"{_OLLAMA_BASE}/api/chat",
-            json={"model": model, "messages": messages, "stream": False, "think": think},
+            json={
+                "model": model,
+                "messages": messages,
+                "stream": False,
+                "think": think,
+            },
         )
         resp.raise_for_status()
         data = resp.json()
@@ -183,11 +227,41 @@ def _normalize_state(state: dict) -> dict:
                 continue
             # Filter common false positives: scene objects / liquids / materials
             _low = item.lower()
-            if _low in {"blood", "mist", "fog", "light", "shadow", "dust", "air", "water",
-                        "fire", "smoke", "nothing", "empty", "none", "bottle", "crate",
-                        "crates", "signature", "ink", "ledger", "paper", "vellum",
-                        "parchment", "scroll", "tome", "candle", "coin", "coins",
-                        "bargain", "key", "map", "note", "notes", "letter"}:
+            if _low in {
+                "blood",
+                "mist",
+                "fog",
+                "light",
+                "shadow",
+                "dust",
+                "air",
+                "water",
+                "fire",
+                "smoke",
+                "nothing",
+                "empty",
+                "none",
+                "bottle",
+                "crate",
+                "crates",
+                "signature",
+                "ink",
+                "ledger",
+                "paper",
+                "vellum",
+                "parchment",
+                "scroll",
+                "tome",
+                "candle",
+                "coin",
+                "coins",
+                "bargain",
+                "key",
+                "map",
+                "note",
+                "notes",
+                "letter",
+            }:
                 continue
             if _low not in seen:
                 seen.add(_low)
@@ -204,12 +278,30 @@ def _normalize_state(state: dict) -> dict:
             if not npc or len(npc) > 30 or any(c.isdigit() for c in npc):
                 continue
             _low_npc = npc.lower()
-            if _low_npc in {"the man", "dockhand", "dockworker", "clerk", "worker", "guard",
-                            "merchant", "stranger", "figure", "person", "crew",
-                            "mysterious crew", "unknown figure", "passerby"}:
+            if _low_npc in {
+                "the man",
+                "dockhand",
+                "dockworker",
+                "clerk",
+                "worker",
+                "guard",
+                "merchant",
+                "stranger",
+                "figure",
+                "person",
+                "crew",
+                "mysterious crew",
+                "unknown figure",
+                "passerby",
+            }:
                 continue
             # Canonical key: strip leading articles so "The Archivist" == "Archivist"
-            _canon = _low_npc.removeprefix("the ").removeprefix("a ").removeprefix("an ").strip()
+            _canon = (
+                _low_npc.removeprefix("the ")
+                .removeprefix("a ")
+                .removeprefix("an ")
+                .strip()
+            )
             if _canon not in seen_npcs:
                 seen_npcs.add(_canon)
                 clean_npcs.append(npc.title())
@@ -463,18 +555,20 @@ async def run_simulation(
         scenario_chains = raw.get("chains", {})
 
     # Apply summarize trigger override
-    summarize_trigger = summarize_trigger_override if summarize_trigger_override is not None else SUMMARIZE_TRIGGER
+    summarize_trigger = (
+        summarize_trigger_override
+        if summarize_trigger_override is not None
+        else SUMMARIZE_TRIGGER
+    )
 
-    # Load YAML-driven mode config (narrator + extractor backends/models/fallbacks)
-    mode_cfg = _load_mode_config(mode)
-    narrator_cfg = mode_cfg["narrator"]
-    extractor_cfg = mode_cfg["extractor"]
-    narrator_backend = narrator_cfg["backend"]      # "openrouter" | "ollama"
-    extractor_backend = extractor_cfg["backend"]    # "openrouter" | "ollama"
-    extractor_model = extractor_cfg["primary"]      # model ID string
-    extractor_think = extractor_cfg.get("think", False)
-    narrator_think = narrator_cfg.get("think", False)  # always False for narrators; safety net
-    # Explicit model override takes priority over YAML primary
+    # Narrator config — from hardcoded _NARRATOR_CFG (replaces old YAML narrator section).
+    # Extractor routing is fully delegated to _mode_runner (ModeRunner → ModelRouterPrimitive).
+    narrator_cfg = _NARRATOR_CFG[mode]
+    narrator_backend = narrator_cfg["backend"]  # "openrouter" | "ollama"
+    narrator_think = narrator_cfg.get(
+        "think", False
+    )  # always False for narrators; safety net
+    # Explicit model override takes priority over cfg primary
     narrator_model_id = model or narrator_cfg.get("primary")
     narrator_fallbacks: list[str] = narrator_cfg.get("fallback", [])
 
@@ -500,7 +594,9 @@ async def run_simulation(
 
     llm = None
     if not dry_run and narrator_backend == "openrouter":
-        llm = get_llm(provider=provider, model=narrator_model_id, temperature=0.8, max_tokens=800)
+        llm = get_llm(
+            provider=provider, model=narrator_model_id, temperature=0.8, max_tokens=800
+        )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     metrics_records: list[dict] = []
@@ -514,7 +610,9 @@ async def run_simulation(
         for chain_id, desc in scenario_chains.items():
             print(f"  Chain {chain_id}: {desc}")
     print(f"Mode: {'DRY RUN (no LLM calls)' if dry_run else mode.upper()}")
-    print(f"Summarize trigger: {summarize_trigger} H/A pairs (~turn {summarize_trigger})")
+    print(
+        f"Summarize trigger: {summarize_trigger} H/A pairs (~turn {summarize_trigger})"
+    )
     print(f"Output: {out_path}")
     print(f"{'=' * 60}\n")
 
@@ -560,7 +658,8 @@ async def run_simulation(
                         )
                     else:  # ollama narrator
                         response_text = await _call_ollama_sim(
-                            _msgs_to_dicts(messages), narrator_cfg["primary"],
+                            _msgs_to_dicts(messages),
+                            narrator_cfg["primary"],
                             think=narrator_think,
                         )
                         # Strip any <think>...</think> blocks from narrator output (safety net
@@ -653,15 +752,10 @@ async def run_simulation(
         response_text, extracted_state = _strip_state_block(response_text)
         extracted_state = _normalize_state(extracted_state)
 
-        # Blended: qwen fallback only if [STATE] missing.
-        # Ollama-extractor modes: always extract (don't trust narrator to include [STATE]).
-        use_ollama_extraction = (
-            not dry_run
-            and response_text
-            and extractor_backend == "ollama"
-            and (extractor_cfg.get("always", True) or not extracted_state)
-        )
-        if use_ollama_extraction:
+        # Extraction: use ModeRunner to run the dedicated extraction pipeline.
+        # Tier order: local Ollama extractor → Groq → OpenRouter → auto.
+        use_extraction = not dry_run and bool(response_text)
+        if use_extraction:
             prior_inv = (
                 ", ".join(game_state.inventory) if game_state.inventory else "empty"
             )
@@ -684,14 +778,12 @@ async def run_simulation(
                 f"Narrative:\n{response_text}"
             )
             try:
-                raw_extraction = await _call_ollama_sim(
-                    [{"role": "user", "content": extraction_prompt}],
-                    extractor_model,
-                    think=extractor_think,
+                raw_extraction = await _mode_runner.call(
+                    "extraction", prompt=extraction_prompt
                 )
                 _, qwen_state = _strip_state_block(raw_extraction)
                 qwen_state = _normalize_state(qwen_state)
-                # qwen is authoritative in hybrid modes — replace state, don't accumulate
+                # ModeRunner extractor is authoritative — replace state, don't accumulate
                 if qwen_state:
                     extracted_state = qwen_state
             except Exception:
@@ -699,14 +791,8 @@ async def run_simulation(
         if extracted_state.get("location"):
             game_state.location = extracted_state["location"]
         if extracted_state.get("inventory") is not None:
-            if extractor_backend == "ollama" and extractor_cfg.get("always", True):
-                # Dedicated extractor output = authoritative current state → replace inventory
-                game_state.inventory = extracted_state["inventory"]
-            else:
-                # blended fallback — accumulate (conservative)
-                for item in extracted_state.get("inventory", []):
-                    if item.lower() not in [i.lower() for i in game_state.inventory]:
-                        game_state.inventory.append(item)
+            # Dedicated extractor output = authoritative current state → replace inventory
+            game_state.inventory = extracted_state["inventory"]
         if extracted_state.get("npcs") is not None:
             # NPCs accumulate (known_npcs = everyone met so far)
             for npc in extracted_state.get("npcs", []):
@@ -804,7 +890,10 @@ async def run_simulation(
                         from langchain_core.messages import SystemMessage as SM
 
                         summary_result = await llm.ainvoke(
-                            [SM(content=summarize_system), HumanMessage(content=turns_text)]
+                            [
+                                SM(content=summarize_system),
+                                HumanMessage(content=turns_text),
+                            ]
                         )
                         new_summary = (
                             summary_result.content
@@ -860,9 +949,21 @@ async def run_simulation(
     }
     long_lived = [k for k, s in entity_longevity.items() if s["span"] >= 10]
     item_usage_turns = [
-        r["turn"] for r in metrics_records
-        if any(w in r["player_input"].lower()
-               for w in ["use", "show", "compare", "rubbing", "pocket", "sign", "write", "read"])
+        r["turn"]
+        for r in metrics_records
+        if any(
+            w in r["player_input"].lower()
+            for w in [
+                "use",
+                "show",
+                "compare",
+                "rubbing",
+                "pocket",
+                "sign",
+                "write",
+                "read",
+            ]
+        )
     ]
 
     with summary_path.open("w", encoding="utf-8") as f:
@@ -915,7 +1016,8 @@ async def run_simulation(
     )
     print(
         f"Coherence callbacks: {coherence_turns}/{len(metrics_records)} turns ({coherence_turns / len(metrics_records) * 100:.0f}%)"
-        if metrics_records else "Coherence: 0 turns"
+        if metrics_records
+        else "Coherence: 0 turns"
     )
     print(
         f"Entity recurrence: {sum(1 for v in entity_summary.values() if len(v) > 1)} entities mentioned >1 turn"
@@ -973,14 +1075,14 @@ def main() -> None:
         type=Path,
         default=None,
         help="Path to a scenario JSON file (inputs + tracked_entities). "
-             "Overrides built-in SCRIPTED_INPUTS.",
+        "Overrides built-in SCRIPTED_INPUTS.",
     )
     parser.add_argument(
         "--summarize-trigger",
         type=int,
         default=None,
         help="Override SUMMARIZE_TRIGGER (H/A pairs before rolling summary fires). "
-             "Default: 30. Use 15 to test mid-run summarization.",
+        "Default: 30. Use 15 to test mid-run summarization.",
     )
     args = parser.parse_args()
 

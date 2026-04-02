@@ -4245,7 +4245,7 @@ requires-dist = [
     { name = "tqdm", marker = "extra == 'minimal'", specifier = ">=4.65.0" },
     { name = "tta-ai-framework", editable = "packages/tta-ai-framework" },
     { name = "tta-narrative-engine", editable = "packages/tta-narrative-engine" },
-    { name = "ttadev", git = "https://github.com/theinterneti/TTA.dev.git?rev=main" },
+    { name = "ttadev", editable = "../TTA.dev" },
     { name = "typer", specifier = ">=0.15.0" },
     { name = "urllib3", specifier = ">=2.6.3" },
     { name = "uvicorn", specifier = ">=0.32.0" },
@@ -4351,7 +4351,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "redis", specifier = ">=7.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.13.0" },
-    { name = "ttadev", marker = "extra == 'tta-control-plane'", git = "https://github.com/theinterneti/TTA.dev.git?rev=main" },
+    { name = "ttadev", marker = "extra == 'tta-control-plane'", editable = "../TTA.dev" },
 ]
 provides-extras = ["dev", "tta-control-plane"]
 
@@ -4390,7 +4390,7 @@ provides-extras = ["dev"]
 [[package]]
 name = "ttadev"
 version = "0.1.0"
-source = { git = "https://github.com/theinterneti/TTA.dev.git?rev=main#69cbd5a2971cdb66b51705627ddbb5ebdd4f3241" }
+source = { editable = "../TTA.dev" }
 dependencies = [
     { name = "aiofiles", marker = "sys_platform == 'linux'" },
     { name = "aiohttp", marker = "sys_platform == 'linux'" },
@@ -4401,6 +4401,42 @@ dependencies = [
     { name = "opentelemetry-api", marker = "sys_platform == 'linux'" },
     { name = "opentelemetry-sdk", marker = "sys_platform == 'linux'" },
     { name = "structlog", marker = "sys_platform == 'linux'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofiles", specifier = ">=25.1.0" },
+    { name = "aiohttp", specifier = ">=3.9.0" },
+    { name = "aiohttp-cors", specifier = ">=0.8.1" },
+    { name = "anthropic", marker = "extra == 'llm-all'", specifier = ">=0.40.0" },
+    { name = "codegraphcontext", marker = "extra == 'cgc'", specifier = ">=0.3.1" },
+    { name = "e2b-code-interpreter", specifier = ">=2.5.0" },
+    { name = "google-generativeai", marker = "extra == 'gemini'", specifier = ">=0.8.0" },
+    { name = "google-generativeai", marker = "extra == 'llm-all'", specifier = ">=0.8.0" },
+    { name = "groq", marker = "extra == 'llm-all'", specifier = ">=0.11.0" },
+    { name = "mcp", specifier = ">=1.26.0" },
+    { name = "openai", specifier = ">=2.30.0" },
+    { name = "opentelemetry-api", specifier = ">=1.20.0" },
+    { name = "opentelemetry-sdk", specifier = ">=1.20.0" },
+    { name = "redis", extras = ["asyncio"], marker = "extra == 'coordination'", specifier = ">=5.0" },
+    { name = "redis", extras = ["asyncio"], marker = "extra == 'redis'", specifier = ">=5.0" },
+    { name = "structlog", specifier = ">=25.5.0" },
+]
+provides-extras = ["cgc", "coordination", "redis", "gemini", "llm-all"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "cchooks", specifier = ">=0.1.0" },
+    { name = "fakeredis", specifier = ">=2.26" },
+    { name = "pip-audit", specifier = ">=2.7.0" },
+    { name = "playwright", specifier = ">=1.40.0" },
+    { name = "pyright", specifier = ">=1.1.0" },
+    { name = "pytest", specifier = ">=7.4.0" },
+    { name = "pytest-asyncio", specifier = ">=0.21.0" },
+    { name = "pytest-cov", specifier = ">=4.1.0" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "ruff", specifier = ">=0.1.0" },
+    { name = "tdd-guard-pytest", specifier = ">=0.1.0" },
 ]
 
 [[package]]
