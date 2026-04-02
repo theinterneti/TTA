@@ -483,3 +483,14 @@ platform/dev/agentic/*/runtime/
 platform/dev/agentic/*/state/
 .worktrees/
 tests/tests/
+
+# Fine-tune artifacts (large model files, run logs)
+runs/
+*.gguf
+tta-extractor-lora*/
+tta-extractor-gguf/
+unsloth_compiled_cache/
+models/Modelfile.tta-extractor
+scripts/scenarios/
+scripts/augment_npc_pairs.py
+scripts/collect_training_pairs.py
