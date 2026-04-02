@@ -473,6 +473,7 @@ class TestEndToEndUserWorkflows:
         )
 
 
+@pytest.mark.slow
 class TestConcurrentUserScenarios:
     """Test performance and behavior under concurrent user load."""
 

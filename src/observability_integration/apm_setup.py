@@ -20,7 +20,9 @@ if TYPE_CHECKING:
 # Import OpenTelemetry components with graceful fallback
 try:
     from opentelemetry import metrics, trace
-    from opentelemetry.exporter.prometheus import PrometheusMetricReader
+    from opentelemetry.exporter.prometheus import (  # type: ignore[import-untyped]
+        PrometheusMetricReader,
+    )
     from opentelemetry.sdk.metrics import MeterProvider
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.sdk.trace import TracerProvider

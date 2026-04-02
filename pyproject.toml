@@ -476,6 +476,7 @@ filterwarnings = [
     "ignore:.*'crypt' is deprecated.*:DeprecationWarning",
     "ignore:.*pythonjsonlogger\\.jsonlogger has been moved.*:DeprecationWarning",
     "ignore:There is no current event loop:DeprecationWarning",
+    "ignore::pytest.PytestCollectionWarning",
 ]
 markers = [
     "unit: Unit tests",

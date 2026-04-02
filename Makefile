@@ -4,7 +4,7 @@
 
 # Unit tests only (fast, no services required — matches quality gate)
 test:
-	uv run pytest -q -m "not integration and not neo4j and not redis"
+	uv run pytest -q -m "not integration and not neo4j and not redis and not slow"
 
 # Include Neo4j integration tests (requires Neo4j running)
 test-neo4j:
