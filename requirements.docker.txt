@@ -3,7 +3,7 @@
 -e ./packages/tta-narrative-engine ; sys_platform == 'linux'
 aiofile==3.9.0 ; sys_platform == 'linux'
 aiohappyeyeballs==2.6.1 ; sys_platform == 'linux'
-aiohttp==3.13.3 ; sys_platform == 'linux'
+aiohttp==3.13.4 ; sys_platform == 'linux'
 aiosignal==1.4.0 ; sys_platform == 'linux'
 annotated-doc==0.0.4 ; sys_platform == 'linux'
 annotated-types==0.7.0 ; sys_platform == 'linux'
