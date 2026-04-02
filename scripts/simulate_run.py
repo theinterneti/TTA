@@ -68,8 +68,9 @@ _OLLAMA_TIMEOUT = 120.0
 
 # ── ModeRunner — shared for extraction + narration ────────────────────────────
 # Both narration and extraction now route through ModeRunner → ModelRouterPrimitive.
-# Cascade order (narration): Groq → OR pinned → OR auto (FreeModelTracker)
-# Cascade order (extraction): local Ollama → Groq → OR pinned → OR auto
+# Narration cascade (9 tiers): Groq 70B → Kimi-K2 → Gemini → GPT-OSS-120B →
+#   Llama-4-Scout → Groq-8B → OR Hermes-405B → OR Llama-3.3-70B → OR auto
+# Extraction cascade: local Ollama → Groq-8B → OR pinned → OR auto
 # Multi-turn history is flattened into a single prompt string for ModeRunner;
 # if ALL cloud tiers fail, _call_ollama_sim provides the local Ollama fallback.
 _mode_runner = ModeRunner()
@@ -605,13 +606,15 @@ async def run_simulation(
                         )
                         response_text = _THINK_RE_SIM.sub("", response_text).strip()
                     else:
-                        # Cascade: Groq → OR pinned → OR auto via ModeRunner
+                        # Cascade: 9-tier rotation (Groq→Kimi→Gemini→GPT-OSS→…→OR auto)
                         sys_content = str(messages[0].content) if isinstance(messages[0], SystemMessage) else None
                         response_text = await _mode_runner.call(
                             "narration",
                             prompt=_flatten_to_prompt(messages),
                             system=sys_content,
                         )
+                        # Strip thinking tags if any model emits them (e.g. qwen3)
+                        response_text = _THINK_RE_SIM.sub("", response_text).strip()
                     break
                 except Exception as exc:
                     exc_str = str(exc)

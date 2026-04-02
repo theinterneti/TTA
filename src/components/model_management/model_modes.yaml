@@ -19,11 +19,22 @@
 modes:
   narration:
     description: "Generate narrative prose — story beats, NPC dialogue, scene descriptions"
-    # Tier order: Groq (fast, stable free) → pinned OR model → FreeModelTracker auto
-    # FreeModelTracker (tier3) fetches the live free model list from OpenRouter and
-    # ranks by quality, so it naturally picks up whatever free Gemini/Llama/etc. is
-    # currently available — no need to hardcode volatile model slugs here.
-    # When a local narration model exists, add: tier0: provider: ollama, model: <id>
+    # Rotation cascade — each Groq model has its own independent quota bucket, so
+    # exhausting one tier (429) falls through to the next with fresh capacity.
+    # Effective narration budget: ~63 cloud turns/min across all Groq tiers alone.
+    #
+    # Tier order (quality + quota diversity):
+    #   tier1–tier2: Primary Groq 70B-class models  (6K TPM each, ~7 turns/min each)
+    #   tier3:       Gemini 2.0 Flash               (1M TPM, 15 RPM — when available)
+    #   tier4:       Groq 120B GPT-OSS              (6K TPM, separate bucket)
+    #   tier5:       Groq Llama 4 Scout 17B         (separate bucket, good quality)
+    #   tier6:       Groq 8B fallback               (30K TPM — rarely exhausted)
+    #   tier7–tier8: Pinned OpenRouter free models  (variable availability)
+    #   tier9:       FreeModelTracker auto-pick      (dynamic best-available)
+    #   (final):     Local Ollama — wired in simulate_run.py / play.py
+    #
+    # Skip qwen/qwen3-32b here — it emits <think>…</think> blocks by default
+    # (thinking mode) which break narrative output format.
     tier1:
       provider: groq
       model: "llama-3.3-70b-versatile"
@@ -31,13 +42,49 @@ modes:
         temperature: 0.8
         max_tokens: 512
     tier2:
+      provider: groq
+      model: "moonshotai/kimi-k2-instruct"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier3:
+      provider: gemini
+      model: "gemini-2.0-flash"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier4:
+      provider: groq
+      model: "openai/gpt-oss-120b"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier5:
+      provider: groq
+      model: "meta-llama/llama-4-scout-17b-16e-instruct"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier6:
+      provider: groq
+      model: "llama-3.1-8b-instant"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier7:
       provider: openrouter
       model: "nousresearch/hermes-3-llama-3.1-405b:free"
       params:
         temperature: 0.8
         max_tokens: 512
         top_p: 0.95
-    tier3:
+    tier8:
+      provider: openrouter
+      model: "meta-llama/llama-3.3-70b-instruct:free"
+      params:
+        temperature: 0.8
+        max_tokens: 512
+    tier9:
       provider: auto
       params:
         temperature: 0.8
