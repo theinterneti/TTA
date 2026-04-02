@@ -1,26 +1,41 @@
-# TTA Model Mode Configuration
-# Controls which model/params are used for each role at runtime.
-# Tier 1 = local (fast, always available)
-# Tier 2 = pinned free OR model (1-3s, predictable)  
-# Tier 3 = openrouter/free catch-all (last resort)
+# model_modes.yaml — migrated to explicit provider format for TTA.dev ModelRouterPrimitive
+#
+# Migration notes (old → new)
+# ────────────────────────────
+# Old format: tier number implied provider (1=ollama, 2=openrouter-pinned,
+#             3=openrouter/free catch-all).  Null model in tier1 caused that
+#             tier to be skipped at runtime via an if-None guard in ModeRunner.
+#
+# New format: explicit `provider:` key on every tier; null/skipped tiers are
+#             simply omitted.  `provider: auto` lets FreeModelTracker pick the
+#             best available free OpenRouter model dynamically.
+#
+# Tier semantics:
+#   provider: ollama      — local Ollama (requires model:)
+#   provider: groq        — Groq API (fast inference, GROQ_API_KEY)
+#   provider: openrouter  — pinned OpenRouter model (requires model:)
+#   provider: auto        — FreeModelTracker → best free OpenRouter model
 
 modes:
   narration:
     description: "Generate narrative prose — story beats, NPC dialogue, scene descriptions"
+    # No fine-tuned local narration model yet → start at Groq for speed,
+    # fall through to pinned OpenRouter free model, then FreeModelTracker.
     tier1:
-      model: null  # No fine-tuned narration model yet
+      provider: groq
+      model: "llama-3.3-70b-versatile"
+      params:
+        temperature: 0.8
+        max_tokens: 512
     tier2:
+      provider: openrouter
       model: "nousresearch/hermes-3-llama-3.1-405b:free"
       params:
         temperature: 0.8
         max_tokens: 512
         top_p: 0.95
-    tier2_alt:
-      - "qwen/qwen3.6-plus-preview:free"          # 1M ctx, great for long narrative
-      - "nvidia/nemotron-3-super-120b-a12b:free"  # 120B, high quality
-      - "meta-llama/llama-3.3-70b-instruct:free"  # reliable 70B
     tier3:
-      model: "openrouter/free"
+      provider: auto
       params:
         temperature: 0.8
         max_tokens: 512
@@ -28,36 +43,48 @@ modes:
   extraction:
     description: "Extract structured [STATE]...[/STATE] from narrative text"
     tier1:
-      model: "tta-extractor-qwen3"  # Local Ollama model (post fine-tune)
+      provider: ollama
+      model: "tta-extractor-qwen3"
       params:
         temperature: 0.0
         top_k: 1
         num_predict: 128
     tier2:
-      model: "qwen/qwen3.6-plus-preview:free"   # Qwen family, best at structured output
+      provider: groq
+      model: "llama-3.1-8b-instant"
       params:
         temperature: 0.0
         max_tokens: 128
-    tier2_alt:
-      - "nvidia/nemotron-nano-9b-v2:free"
-      - "meta-llama/llama-3.3-70b-instruct:free"
     tier3:
-      model: "openrouter/free"
+      provider: openrouter
+      model: "meta-llama/llama-3.2-3b-instruct:free"
+      params:
+        temperature: 0.0
+        max_tokens: 128
+    tier4:
+      provider: auto
       params:
         temperature: 0.0
         max_tokens: 128
 
   crisis_detection:
     description: "Classify player input for crisis/safety signals"
+    # Priority: Groq (fast, deterministic) → pinned free cloud → FreeModelTracker
     tier1:
-      model: null  # Use rule-based fast-path (no LLM needed for high-confidence)
+      provider: groq
+      model: "llama-3.3-70b-versatile"
+      params:
+        temperature: 0.0
+        max_tokens: 64
     tier2:
+      provider: openrouter
       model: "meta-llama/llama-3.3-70b-instruct:free"
       params:
         temperature: 0.0
         max_tokens: 64
     tier3:
-      model: "openrouter/free"
+      provider: auto
       params:
         temperature: 0.0
         max_tokens: 64
+
