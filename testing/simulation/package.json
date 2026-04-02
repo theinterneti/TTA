@@ -40,7 +40,8 @@
   "author": "TTA Development Team",
   "license": "MIT",
   "dependencies": {
-    "events": "^3.3.0"
+    "events": "^3.3.0",
+    "minimatch": "^9.0.7"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
