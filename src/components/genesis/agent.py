@@ -26,7 +26,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 if TYPE_CHECKING:
     from ttadev.primitives import (
@@ -113,20 +113,28 @@ class AgentResponse:
 class _NarratorCall(WorkflowPrimitive):  # type: ignore[misc]
     """One LLM narrator call — wrapped in retry/fallback by the agent."""
 
-    def __init__(self, llm: Any) -> None:
-        self._llm = llm
+    def __init__(self, adapter: Any) -> None:
+        self._adapter = adapter
 
     async def execute(self, input_data: dict, context: WorkflowContext) -> str:
         system_prompt: str = input_data["system_prompt"]
         history: list = input_data["history"]
         player_input: str = input_data["player_input"]
 
-        messages = [SystemMessage(content=system_prompt), *history]
+        messages: list[dict[str, str]] = [
+            {
+                "role": "assistant"
+                if msg.__class__.__name__ == "AIMessage"
+                else "user",
+                "content": msg.content,
+            }
+            for msg in history
+        ]
         if player_input:
-            messages.append(HumanMessage(content=player_input))
+            messages.append({"role": "user", "content": player_input})
 
-        response = await self._llm.ainvoke(messages)
-        return response.content.strip()
+        content = await self._adapter.chat(messages, system_prompt, context)
+        return content.strip()
 
 
 class _NarratorFallback(WorkflowPrimitive):  # type: ignore[misc]
