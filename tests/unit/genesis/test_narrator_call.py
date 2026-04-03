@@ -101,15 +101,15 @@ async def test_narrator_call_strips_whitespace():
     assert result == "hello"
 
 
-def test_narrator_call_adapter_type_is_chat_primitive():
-    """_NarratorCall.__init__ must be annotated with ChatPrimitive, not Any."""
-    import typing
-    from ttadev.agents.protocol import ChatPrimitive
-    hints = typing.get_type_hints(_NarratorCall.__init__)
-    annotation = hints["adapter"]
-    assert annotation is ChatPrimitive, (
-        f"Expected ChatPrimitive annotation, got {annotation!r}"
-    )
+@pytest.mark.asyncio
+async def test_narrator_call_adapter_is_called_with_context():
+    """execute() must pass the WorkflowContext to adapter.chat()."""
+    adapter = _MockAdapter()
+    call = _NarratorCall(adapter)
+    ctx = WorkflowContext(workflow_id="check-ctx")
+    await call.execute({"system_prompt": "s", "history": [], "player_input": "hi"}, ctx)
+    _, _, received_ctx = adapter.calls[0]
+    assert received_ctx is ctx
 
 
 def test_agent_module_imports_chat_primitives():

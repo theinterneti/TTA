@@ -122,15 +122,13 @@ class _NarratorCall(WorkflowPrimitive):  # type: ignore[misc]
 
     async def execute(self, input_data: dict, context: WorkflowContext) -> str:
         system_prompt: str = input_data["system_prompt"]
-        history: list = input_data["history"]
+        history: list[AIMessage | HumanMessage] = input_data["history"]
         player_input: str = input_data["player_input"]
 
         messages: list[ChatMessage] = [
             {
-                "role": "assistant"
-                if msg.__class__.__name__ == "AIMessage"
-                else "user",
-                "content": msg.content,
+                "role": "assistant" if isinstance(msg, AIMessage) else "user",
+                "content": str(msg.content),
             }
             for msg in history
         ]
