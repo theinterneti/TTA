@@ -377,6 +377,7 @@ class TestGenesisAgent:
             )
         )
         agent = GenesisAgent(router=surprise_router)
+        agent._extractor = SeedExtractor(llm=_make_llm("{}"))  # bridge until Task 3 migrates SeedExtractor
         state = _fresh_state()
         await agent.respond(state, "surprise me")
         assert state.surprise_me is True
