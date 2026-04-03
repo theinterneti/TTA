@@ -42,7 +42,6 @@ from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerPrimitive,
 )
 
-from src.ai_components.llm_factory import get_llm
 from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
 
 from .session_state import Act
@@ -256,18 +255,48 @@ class SeedExtractor:
     extraction failures never block the main narrator response.
     """
 
-    def __init__(self, llm: Any | None = None) -> None:
-        _llm = llm or get_llm(temperature=0.1, max_tokens=300)
+    def __init__(
+        self,
+        adapter: ChatPrimitive | None = None,
+        llm: Any | None = None,
+    ) -> None:
+        if adapter is None:
+            # Build a ModelRouterChatAdapter from the configured modes if no adapter given.
+            # Falls back to legacy llm path while Task 5 is pending.
+            if llm is not None:
+                # Legacy shim: wrap a raw LLM in a simple adapter for backward compat.
+                _raw_llm = llm
+
+                class _LegacyAdapter:
+                    async def chat(self, messages: Any, system: Any, ctx: Any) -> str:
+                        from langchain_core.messages import (
+                            BaseMessage,
+                            HumanMessage,
+                            SystemMessage,
+                        )
+
+                        lc_messages: list[BaseMessage] = [SystemMessage(content=system)]
+                        for m in messages:
+                            lc_messages.append(HumanMessage(content=m["content"]))
+                        resp = await _raw_llm.ainvoke(lc_messages)
+                        return resp.content  # type: ignore[no-any-return]
+
+                adapter = _LegacyAdapter()  # type: ignore[assignment]
+            else:
+                _router = ModelRouterPrimitive.from_yaml(MODES_PATH)  # type: ignore[union-attr]
+                adapter = ModelRouterChatAdapter(  # type: ignore[assignment]
+                    _router, mode="extraction"
+                )
         self._extractor = FallbackPrimitive(  # type: ignore[arg-type]
             primary=RetryPrimitive(  # type: ignore[arg-type]
-                _ExtractionCall(_llm),
+                _ExtractionCall(adapter),
                 strategy=RetryStrategy(max_retries=2, backoff_base=1.0),  # type: ignore[arg-type]
             ),
             fallback=_ExtractionFallback(),
         )
         self._surprise = FallbackPrimitive(  # type: ignore[arg-type]
             primary=RetryPrimitive(  # type: ignore[arg-type]
-                _SurpriseCall(_llm),
+                _SurpriseCall(adapter),
                 strategy=RetryStrategy(max_retries=2, backoff_base=1.0),  # type: ignore[arg-type]
             ),
             fallback=_ExtractionFallback(),

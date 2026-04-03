@@ -36,6 +36,16 @@ def _make_llm(response: str = "A voice in the dark...") -> Any:
     return llm
 
 
+def _make_adapter(response: str = "{}") -> Any:
+    """Return a mock ChatPrimitive adapter that returns `response` from chat()."""
+
+    class _MockAdapter:
+        async def chat(self, messages: Any, system: Any, ctx: Any) -> str:
+            return response
+
+    return _MockAdapter()
+
+
 def _fresh_state(session_id: str = "test-session") -> GenesisSessionState:
     return GenesisSessionState(session_id=session_id)
 
