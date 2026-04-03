@@ -42,9 +42,8 @@ from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerPrimitive,
 )
 
-from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
-
 from src.ai_components.llm_factory import get_llm
+from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
 
 from .session_state import Act
 
@@ -125,7 +124,7 @@ RULES:
 class _ExtractionCall(WorkflowPrimitive):  # type: ignore[misc]
     """Single LLM extraction call — wrapped by RetryPrimitive."""
 
-    def __init__(self, adapter: "ChatPrimitive") -> None:
+    def __init__(self, adapter: ChatPrimitive) -> None:
         self._adapter = adapter
 
     async def execute(
@@ -143,8 +142,11 @@ class _ExtractionCall(WorkflowPrimitive):  # type: ignore[misc]
                 f"\nAlready established: {established}\nDo NOT re-extract these."
             )
 
-        messages: list["ChatMessage"] = [
-            {"role": "user", "content": f'Player said: "{player_input}"\n\nJSON output:'},
+        messages: list[ChatMessage] = [
+            {
+                "role": "user",
+                "content": f'Player said: "{player_input}"\n\nJSON output:',
+            },
         ]
         raw = await self._adapter.chat(
             messages, _EXTRACTION_SYSTEM + context_note, context
@@ -189,18 +191,17 @@ Make it feel like it belongs to a real, lived-in world — not a genre template.
 No markdown fences. Only JSON.
 """
 
-    def __init__(self, llm: Any) -> None:
-        self._llm = llm
+    def __init__(self, adapter: ChatPrimitive) -> None:
+        self._adapter = adapter
 
     async def execute(
         self, input_data: dict, context: WorkflowContext
     ) -> dict[str, Any]:
-        messages = [
-            SystemMessage(content=self._SURPRISE_SYSTEM),
-            HumanMessage(content="Generate a surprising WorldSeed now."),
+        messages: list[ChatMessage] = [
+            {"role": "user", "content": "Generate a surprising WorldSeed now."},
         ]
-        response = await self._llm.ainvoke(messages)
-        raw = response.content.strip()
+        raw = await self._adapter.chat(messages, self._SURPRISE_SYSTEM, context)
+        raw = raw.strip()
         raw = re.sub(r"^```[a-z]*\n?", "", raw).rstrip("`").strip()
         try:
             return json.loads(raw)

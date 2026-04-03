@@ -54,3 +54,34 @@ async def test_extraction_call_returns_empty_dict_on_bad_json():
     ctx = WorkflowContext(workflow_id="test")
     result = await call.execute({"player_input": "hi", "current_fields": {}}, ctx)
     assert result == {}
+
+
+@pytest.mark.asyncio
+async def test_surprise_call_routes_to_extraction_adapter():
+    """_SurpriseCall must call adapter.chat() — same extraction adapter."""
+    valid_seed = json.dumps({
+        "tone": "cyclical", "power_source": "magic",
+        "player_position": "outsider", "one_specific_detail": "A floating market",
+        "scale": "city", "era_tech_level": "medieval", "magic_presence": "common",
+    })
+    adapter = _MockAdapter(response=valid_seed)
+    call = _SurpriseCall(adapter)
+    ctx = WorkflowContext(workflow_id="test")
+    result = await call.execute({}, ctx)
+    assert result["tone"] == "cyclical"
+    assert len(adapter.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_surprise_call_passes_system_as_kwarg():
+    """_SurpriseCall must pass system prompt via system= position, not in messages."""
+    adapter = _MockAdapter(response='{"tone":"cyclical","power_source":"magic",'
+                           '"player_position":"outsider","one_specific_detail":"x",'
+                           '"scale":"city","era_tech_level":"medieval","magic_presence":"none"}')
+    call = _SurpriseCall(adapter)
+    ctx = WorkflowContext(workflow_id="test")
+    await call.execute({}, ctx)
+    sent_messages, sent_system, _ = adapter.calls[0]
+    for msg in sent_messages:
+        assert msg.get("role") != "system"
+    assert "WorldSeed" in sent_system
