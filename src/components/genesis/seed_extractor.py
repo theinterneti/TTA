@@ -16,9 +16,8 @@ import logging
 import re
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.messages import HumanMessage, SystemMessage
-
 if TYPE_CHECKING:
+    from ttadev.agents.protocol import ChatMessage, ChatPrimitive
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -28,6 +27,8 @@ if TYPE_CHECKING:
     )
 
 with contextlib.suppress(ImportError):
+    from ttadev.agents import ModelRouterChatAdapter  # noqa: F401
+    from ttadev.agents.protocol import ChatMessage, ChatPrimitive
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -35,10 +36,13 @@ with contextlib.suppress(ImportError):
         WorkflowContext,
         WorkflowPrimitive,
     )
+    from ttadev.primitives.llm import ModelRouterPrimitive  # noqa: F401
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,
 )
+
+from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
 
 from src.ai_components.llm_factory import get_llm
 
@@ -121,8 +125,8 @@ RULES:
 class _ExtractionCall(WorkflowPrimitive):  # type: ignore[misc]
     """Single LLM extraction call — wrapped by RetryPrimitive."""
 
-    def __init__(self, llm: Any) -> None:
-        self._llm = llm
+    def __init__(self, adapter: "ChatPrimitive") -> None:
+        self._adapter = adapter
 
     async def execute(
         self, input_data: dict, context: WorkflowContext
@@ -139,14 +143,13 @@ class _ExtractionCall(WorkflowPrimitive):  # type: ignore[misc]
                 f"\nAlready established: {established}\nDo NOT re-extract these."
             )
 
-        messages = [
-            SystemMessage(content=_EXTRACTION_SYSTEM + context_note),
-            HumanMessage(content=f'Player said: "{player_input}"\n\nJSON output:'),
+        messages: list["ChatMessage"] = [
+            {"role": "user", "content": f'Player said: "{player_input}"\n\nJSON output:'},
         ]
-        response = await self._llm.ainvoke(messages)
-        raw = response.content.strip()
-
-        # Strip any accidental markdown fences
+        raw = await self._adapter.chat(
+            messages, _EXTRACTION_SYSTEM + context_note, context
+        )
+        raw = raw.strip()
         raw = re.sub(r"^```[a-z]*\n?", "", raw).rstrip("`").strip()
 
         try:
