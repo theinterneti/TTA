@@ -361,7 +361,8 @@ class TestGenesisAgent:
         agent = self._make_agent()
         state = _fresh_state()
         # Need 3 turns in VOID to advance
-        for i in range(3):
+        response = await agent.respond(state, "turn 0")
+        for i in range(1, 3):
             response = await agent.respond(state, f"turn {i}")
         assert response.act == Act.BUILDING_WORLD
         assert response.act_changed is True
@@ -442,7 +443,7 @@ class TestGenesisAgent:
         assert agent._guide is None
 
 
-def test_genesis_agent_constructs_two_adapters_by_default():
+def test_genesis_agent_constructs_two_adapters_by_default() -> None:
     """GenesisAgent must create narrator_adapter (narration) and extraction_adapter (extraction)
     from a shared ModelRouterPrimitive when no router is passed."""
     from unittest.mock import patch, MagicMock
@@ -451,12 +452,8 @@ def test_genesis_agent_constructs_two_adapters_by_default():
         "src.components.genesis.agent.ModelRouterPrimitive.from_yaml",
         return_value=mock_router,
     ) as mock_from_yaml:
-        from src.components.genesis.agent import GenesisAgent
-        import importlib
-        import src.components.genesis.agent as agent_mod
-        importlib.reload(agent_mod)
-        agent = agent_mod.GenesisAgent()
+        agent = GenesisAgent()
 
     mock_from_yaml.assert_called_once()
-    assert agent._narrator_adapter.mode == "narration"
-    assert agent._extraction_adapter.mode == "extraction"
+    assert agent._narrator_adapter.mode == "narration"  # type: ignore[attr-defined]
+    assert agent._extraction_adapter.mode == "extraction"  # type: ignore[attr-defined]
