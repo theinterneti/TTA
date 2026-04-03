@@ -294,19 +294,37 @@ class TestHelpers:
 
 
 class TestGenesisAgent:
+    def _make_router(
+        self,
+        narrator_response: str = "Darkness stretches in every direction...",
+        extractor_json: str = "{}",
+    ) -> Any:
+        """Build a mock ModelRouterPrimitive that returns mode-appropriate responses."""
+        from unittest.mock import MagicMock, AsyncMock
+
+        mock_router = MagicMock()
+
+        async def _execute(req: Any, ctx: Any) -> Any:
+            resp = MagicMock()
+            if req.mode == "extraction":
+                resp.content = extractor_json
+            else:
+                resp.content = narrator_response
+            return resp
+
+        mock_router.execute = _execute
+        return mock_router
+
     def _make_agent(
         self,
         narrator_response: str = "Darkness stretches in every direction...",
         extractor_json: str = "{}",
     ) -> GenesisAgent:
-        narrator_llm = _make_llm(narrator_response)
-        extractor_llm = _make_llm(extractor_json)
-        guide_llm = _make_llm('{"name":"Veyra","intro_line":"Come, there is little time."}')
-        return GenesisAgent(
-            narrator_llm=narrator_llm,
-            extractor_llm=extractor_llm,
-            guide_llm=guide_llm,
-        )
+        agent = GenesisAgent(router=self._make_router(narrator_response, extractor_json))
+        # Inject a SeedExtractor backed by a plain mock LLM until Task 3
+        # migrates _ExtractionCall to the ChatPrimitive interface.
+        agent._extractor = SeedExtractor(llm=_make_llm(extractor_json))
+        return agent
 
     @pytest.mark.asyncio
     async def test_returns_agent_response(self) -> None:
@@ -351,12 +369,13 @@ class TestGenesisAgent:
     @pytest.mark.asyncio
     async def test_surprise_me_sets_flag(self) -> None:
         """Genesis Agent: surprise me sets flag."""
-        extractor_llm = _make_llm(
-            '{"tone":"getting_worse","power_source":"magic",'
-            '"player_position":"outsider","one_specific_detail":"a tower"}'
+        surprise_router = self._make_router(
+            extractor_json=(
+                '{"tone":"getting_worse","power_source":"magic",'
+                '"player_position":"outsider","one_specific_detail":"a tower"}'
+            )
         )
-        agent = self._make_agent()
-        agent._extractor = SeedExtractor(llm=extractor_llm)
+        agent = GenesisAgent(router=surprise_router)
         state = _fresh_state()
         await agent.respond(state, "surprise me")
         assert state.surprise_me is True
@@ -375,7 +394,6 @@ class TestGenesisAgent:
         """Genesis Agent: guide character generated in becoming."""
         guide_llm = _make_llm('{"name":"Veyra","intro_line":"You were not expected."}')
         agent = self._make_agent()
-        agent._guide_llm = guide_llm
 
         state = _fresh_state()
         state.act = Act.THE_BECOMING
@@ -388,23 +406,28 @@ class TestGenesisAgent:
             "magic_presence": "common",
         }
 
-        response = await agent.respond(state, "I'm ready")
+        guide_mock = MagicMock()
+        guide_mock.name = "Veyra"
+        guide_mock.intro_line = "You were not expected."
+        guide_mock.entity_type = "ancient mage"
+        with patch(
+            "src.components.genesis.agent.derive_guide_character",
+            new=AsyncMock(return_value=guide_mock),
+        ):
+            response = await agent.respond(state, "I'm ready")
+
         assert response.guide is not None
         assert response.guide.name == "Veyra"
 
     @pytest.mark.asyncio
     async def test_narrator_fallback_on_llm_failure(self) -> None:
         """Agent must never raise — it returns the safe fallback message."""
-        narrator_llm = MagicMock()
-        narrator_llm.ainvoke = AsyncMock(side_effect=Exception("LLM down"))
-        extractor_llm = _make_llm("{}")
-        guide_llm = _make_llm('{"name":"X","intro_line":"..."}')
+        from unittest.mock import MagicMock, AsyncMock
 
-        agent = GenesisAgent(
-            narrator_llm=narrator_llm,
-            extractor_llm=extractor_llm,
-            guide_llm=guide_llm,
-        )
+        failing_router = MagicMock()
+        failing_router.execute = AsyncMock(side_effect=Exception("LLM down"))
+
+        agent = GenesisAgent(router=failing_router)
         state = _fresh_state()
         response = await agent.respond(state, "Hello")
         assert isinstance(response.text, str)
@@ -417,3 +440,23 @@ class TestGenesisAgent:
         agent._guide = MagicMock()  # simulate guide already generated
         await agent.reset()
         assert agent._guide is None
+
+
+def test_genesis_agent_constructs_two_adapters_by_default():
+    """GenesisAgent must create narrator_adapter (narration) and extraction_adapter (extraction)
+    from a shared ModelRouterPrimitive when no router is passed."""
+    from unittest.mock import patch, MagicMock
+    mock_router = MagicMock()
+    with patch(
+        "src.components.genesis.agent.ModelRouterPrimitive.from_yaml",
+        return_value=mock_router,
+    ) as mock_from_yaml:
+        from src.components.genesis.agent import GenesisAgent
+        import importlib
+        import src.components.genesis.agent as agent_mod
+        importlib.reload(agent_mod)
+        agent = agent_mod.GenesisAgent()
+
+    mock_from_yaml.assert_called_once()
+    assert agent._narrator_adapter.mode == "narration"
+    assert agent._extraction_adapter.mode == "extraction"

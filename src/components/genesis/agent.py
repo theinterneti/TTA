@@ -12,8 +12,7 @@ Architecture:
           wrapped in FallbackPrimitive(RetryPrimitive(...))
 
 All LLM calls use TTA.dev's RetryPrimitive + FallbackPrimitive from
-ttadev.primitives, with get_llm() from src.ai_components.llm_factory for
-provider selection.
+ttadev.primitives for provider selection.
 
 See: docs/design/genesis-session.md
 """
@@ -53,7 +52,6 @@ from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerPrimitive,
 )
 
-from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import GuideCharacter, WorldSeed
 from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
 
@@ -335,29 +333,29 @@ class GenesisAgent:
 
     def __init__(
         self,
-        narrator_llm: Any | None = None,
-        extractor_llm: Any | None = None,
-        guide_llm: Any | None = None,
+        router: ModelRouterPrimitive | None = None,
     ) -> None:
         """
         Args:
-            narrator_llm:  LLM for the main narrator voice (creative, warm).
-            extractor_llm: LLM for seed extraction (low temp, structured output).
-            guide_llm:     LLM for guide character generation (evocative).
+            router: Pre-built ModelRouterPrimitive. Created from model_modes.yaml if None.
         """
-        self._narrator_llm = narrator_llm or get_llm(temperature=0.85, max_tokens=600)
-        _extractor_llm = extractor_llm or get_llm(temperature=0.1, max_tokens=300)
-        self._guide_llm = guide_llm or get_llm(temperature=0.8, max_tokens=200)
+        _router = router or ModelRouterPrimitive.from_yaml(MODES_PATH)
+        self._narrator_adapter: ChatPrimitive = ModelRouterChatAdapter(
+            _router, mode="narration"
+        )
+        self._extraction_adapter: ChatPrimitive = ModelRouterChatAdapter(
+            _router, mode="extraction"
+        )
 
         # Resilient narrator call — retry twice, then fallback to safe message
         self._narrator = FallbackPrimitive(  # type: ignore[arg-type]
             primary=RetryPrimitive(  # type: ignore[arg-type]
-                _NarratorCall(self._narrator_llm),
+                _NarratorCall(self._narrator_adapter),
                 strategy=RetryStrategy(max_retries=2, backoff_base=1.5),  # type: ignore[arg-type]
             ),
             fallback=_NarratorFallback(),
         )
-        self._extractor = SeedExtractor(llm=_extractor_llm)
+        self._extractor = SeedExtractor(llm=self._extraction_adapter)
 
         # Cached guide character once generated
         self._guide: GuideCharacter | None = None
@@ -430,9 +428,7 @@ class GenesisAgent:
         # ── 5. Generate guide character before THE_BECOMING response ──────
         if state.act == Act.THE_BECOMING and self._guide is None:
             merged = {**state.seed_fields, **new_fields}
-            self._guide = await derive_guide_character(
-                merged, llm=self._guide_llm, session_id=session_id
-            )
+            self._guide = await derive_guide_character(merged, session_id=session_id)
             state.guide_character = self._guide  # persist across requests
             logger.info(
                 "genesis_agent[%s]: guide character generated: %s",
