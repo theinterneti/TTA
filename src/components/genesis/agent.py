@@ -355,7 +355,7 @@ class GenesisAgent:
             ),
             fallback=_NarratorFallback(),
         )
-        self._extractor = SeedExtractor(llm=self._extraction_adapter)
+        self._extractor = SeedExtractor(adapter=self._extraction_adapter)
 
         # Cached guide character once generated
         self._guide: GuideCharacter | None = None

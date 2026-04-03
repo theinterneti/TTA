@@ -85,3 +85,15 @@ async def test_surprise_call_passes_system_as_kwarg():
     for msg in sent_messages:
         assert msg.get("role") != "system"
     assert "WorldSeed" in sent_system
+
+
+def test_seed_extractor_passes_same_adapter_to_both_calls():
+    """SeedExtractor must pass the same ChatPrimitive adapter to both
+    _ExtractionCall and _SurpriseCall — they share one extraction adapter."""
+    adapter = _MockAdapter()
+    extractor = SeedExtractor(adapter=adapter)
+    # FallbackPrimitive.primary and RetryPrimitive.primitive are public attributes
+    extraction_inner = extractor._extractor.primary.primitive
+    surprise_inner = extractor._surprise.primary.primitive
+    assert extraction_inner._adapter is adapter
+    assert surprise_inner._adapter is adapter

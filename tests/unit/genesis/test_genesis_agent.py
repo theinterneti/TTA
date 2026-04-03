@@ -57,8 +57,7 @@ class TestSeedExtractor:
     @pytest.mark.asyncio
     async def test_extracts_clean_fields(self) -> None:
         """Seed Extractor: extracts clean fields."""
-        llm = _make_llm('{"tone": "getting_worse", "power_source": "magic"}')
-        extractor = SeedExtractor(llm=llm)
+        extractor = SeedExtractor(adapter=_make_adapter('{"tone": "getting_worse", "power_source": "magic"}'))
         result = await extractor.extract("A dying world of wizards", {}, Act.BUILDING_WORLD)
         assert result["tone"] == "getting_worse"
         assert result["power_source"] == "magic"
@@ -66,8 +65,7 @@ class TestSeedExtractor:
     @pytest.mark.asyncio
     async def test_skips_already_established_fields(self) -> None:
         """Seed Extractor: skips already established fields."""
-        llm = _make_llm('{"tone": "getting_better", "power_source": "magic"}')
-        extractor = SeedExtractor(llm=llm)
+        extractor = SeedExtractor(adapter=_make_adapter('{"tone": "getting_better", "power_source": "magic"}'))
         result = await extractor.extract(
             "A world of ancient magic",
             {"tone": "getting_worse"},  # already set
@@ -79,17 +77,17 @@ class TestSeedExtractor:
     @pytest.mark.asyncio
     async def test_returns_empty_on_vague_input(self) -> None:
         """Seed Extractor: returns empty on vague input."""
-        llm = _make_llm("{}")
-        extractor = SeedExtractor(llm=llm)
+        extractor = SeedExtractor(adapter=_make_adapter("{}"))
         result = await extractor.extract("I don't know", {}, Act.BUILDING_WORLD)
         assert result == {}
 
     @pytest.mark.asyncio
     async def test_handles_llm_failure_gracefully(self) -> None:
         """Seed Extractor: handles llm failure gracefully."""
-        llm = MagicMock()
-        llm.ainvoke = AsyncMock(side_effect=Exception("network error"))
-        extractor = SeedExtractor(llm=llm)
+        class _FailAdapter:
+            async def chat(self, messages, system, ctx) -> str:
+                raise Exception("network error")
+        extractor = SeedExtractor(adapter=_FailAdapter())
         # Should NOT raise — fallback returns {}
         result = await extractor.extract("Some input", {}, Act.BUILDING_WORLD)
         assert result == {}
@@ -97,8 +95,7 @@ class TestSeedExtractor:
     @pytest.mark.asyncio
     async def test_handles_malformed_json(self) -> None:
         """Seed Extractor: handles malformed json."""
-        llm = _make_llm("not json at all")
-        extractor = SeedExtractor(llm=llm)
+        extractor = SeedExtractor(adapter=_make_adapter("not json at all"))
         result = await extractor.extract("Some input", {}, Act.BUILDING_WORLD)
         assert result == {}
 
@@ -110,8 +107,7 @@ class TestSeedExtractor:
             '"one_specific_detail":"a burning library","scale":"city",'
             '"era_tech_level":"renaissance","magic_presence":"rare"}'
         )
-        llm = _make_llm(surprise_data)
-        extractor = SeedExtractor(llm=llm)
+        extractor = SeedExtractor(adapter=_make_adapter(surprise_data))
         result = await extractor.generate_surprise_seed()
         assert result["tone"] == "getting_worse"
         assert result["one_specific_detail"] == "a burning library"
@@ -333,7 +329,7 @@ class TestGenesisAgent:
         agent = GenesisAgent(router=self._make_router(narrator_response, extractor_json))
         # Inject a SeedExtractor backed by a plain mock LLM until Task 3
         # migrates _ExtractionCall to the ChatPrimitive interface.
-        agent._extractor = SeedExtractor(llm=_make_llm(extractor_json))
+        agent._extractor = SeedExtractor(adapter=_make_adapter(extractor_json))
         return agent
 
     @pytest.mark.asyncio
@@ -387,7 +383,7 @@ class TestGenesisAgent:
             )
         )
         agent = GenesisAgent(router=surprise_router)
-        agent._extractor = SeedExtractor(llm=_make_llm("{}"))  # bridge until Task 3 migrates SeedExtractor
+        agent._extractor = SeedExtractor(adapter=_make_adapter("{}"))  # bridge until Task 5 migrates SeedExtractor
         state = _fresh_state()
         await agent.respond(state, "surprise me")
         assert state.surprise_me is True
