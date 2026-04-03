@@ -45,6 +45,9 @@ with contextlib.suppress(ImportError):
         WorkflowContext,
         WorkflowPrimitive,
     )
+from ttadev.agents import ModelRouterChatAdapter  # noqa: F401
+from ttadev.agents.protocol import ChatMessage, ChatPrimitive
+from ttadev.primitives.llm import ModelRouterPrimitive  # noqa: F401
 from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
     CircuitBreakerConfig,
     CircuitBreakerPrimitive,
@@ -52,6 +55,7 @@ from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
 
 from src.ai_components.llm_factory import get_llm
 from src.components.gameplay_loop.models.world_seed import GuideCharacter, WorldSeed
+from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
 
 from .guide_generator import derive_guide_character
 from .narrator_voice import get_system_prompt
@@ -113,7 +117,7 @@ class AgentResponse:
 class _NarratorCall(WorkflowPrimitive):  # type: ignore[misc]
     """One LLM narrator call — wrapped in retry/fallback by the agent."""
 
-    def __init__(self, adapter: Any) -> None:
+    def __init__(self, adapter: ChatPrimitive) -> None:
         self._adapter = adapter
 
     async def execute(self, input_data: dict, context: WorkflowContext) -> str:
@@ -121,7 +125,7 @@ class _NarratorCall(WorkflowPrimitive):  # type: ignore[misc]
         history: list = input_data["history"]
         player_input: str = input_data["player_input"]
 
-        messages: list[dict[str, str]] = [
+        messages: list[ChatMessage] = [
             {
                 "role": "assistant"
                 if msg.__class__.__name__ == "AIMessage"

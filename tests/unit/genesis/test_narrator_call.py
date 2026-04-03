@@ -99,3 +99,29 @@ async def test_narrator_call_strips_whitespace():
         ctx,
     )
     assert result == "hello"
+
+
+def test_narrator_call_adapter_type_is_chat_primitive():
+    """_NarratorCall.__init__ must be annotated with ChatPrimitive, not Any."""
+    import typing
+    from ttadev.agents.protocol import ChatPrimitive
+    hints = typing.get_type_hints(_NarratorCall.__init__)
+    annotation = hints["adapter"]
+    assert annotation is ChatPrimitive, (
+        f"Expected ChatPrimitive annotation, got {annotation!r}"
+    )
+
+
+def test_agent_module_imports_chat_primitives():
+    """agent.py must export ChatMessage and ChatPrimitive (imported at module level)."""
+    import src.components.genesis.agent as agent_module
+    assert hasattr(agent_module, "ChatPrimitive"), "ChatPrimitive not imported in agent.py"
+    assert hasattr(agent_module, "ChatMessage"), "ChatMessage not imported in agent.py"
+
+
+def test_agent_module_imports_model_router_and_modes_path():
+    """agent.py must import ModelRouterChatAdapter, ModelRouterPrimitive, MODES_PATH."""
+    import src.components.genesis.agent as agent_module
+    assert hasattr(agent_module, "ModelRouterChatAdapter"), "ModelRouterChatAdapter not imported"
+    assert hasattr(agent_module, "ModelRouterPrimitive"), "ModelRouterPrimitive not imported"
+    assert hasattr(agent_module, "MODES_PATH"), "MODES_PATH not imported"
