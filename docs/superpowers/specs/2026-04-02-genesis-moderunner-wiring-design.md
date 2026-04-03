@@ -1,8 +1,8 @@
-# Genesis → ModeRunner Wiring Design
+# Genesis → ModelRouterChatAdapter Wiring Design
 
 **Date:** 2026-04-02
 **Status:** Approved
-**Scope:** Wire the three Genesis LLM calls to TTA.dev's `ModelRouterChatAdapter` (Approach A — direct injection)
+**Scope:** Wire the three Genesis LLM call sites to TTA.dev's `ModelRouterChatAdapter` (Approach A — direct injection)
 
 ---
 
@@ -28,11 +28,8 @@ preserved unchanged.
 |---|---|---|
 | `ModelRouterPrimitive` | `ttadev.primitives.llm` | YAML-configured cascade router |
 | `ModelRouterChatAdapter` | `ttadev.agents` | Bridges router to `chat(messages, system, ctx) → str` |
-| `ChatMessage` | `ttadev.agents.protocol` | Typed dict `{"role": "user"/"assistant", "content": str}` |
+| `ChatMessage` | `ttadev.agents.protocol` | TypedDict `{"role": "user"/"assistant"/"system", "content": str}` |
 | `ChatPrimitive` | `ttadev.agents.protocol` | Protocol type hint for the adapter |
-
-`ModelRouterChatAdapter` already handles message flattening and system prompt injection
-internally — no custom flatten helper is needed.
 
 ---
 
@@ -41,19 +38,42 @@ internally — no custom flatten helper is needed.
 ```
 Before:
   GenesisAgent.__init__ → get_llm(temp=0.85) → _NarratorCall._llm.ainvoke(messages)
-  SeedExtractor.__init__ → get_llm(temp=0.1)  → _ExtractorCall._llm.ainvoke(messages)
+  SeedExtractor.__init__ → get_llm(temp=0.1)  → _ExtractionCall._llm.ainvoke(messages)
+                                               → _SurpriseCall._llm.ainvoke(messages)
   guide_generator()      → get_llm(temp=0.8)  → _GuideCall._llm.ainvoke(messages)
 
 After:
-  GenesisAgent.__init__ → ModelRouterChatAdapter(router, mode="narration")
-                            → _NarratorCall.adapter.chat(messages, system, ctx)
-  SeedExtractor.__init__ → ModelRouterChatAdapter(router, mode="extraction")
-                            → _ExtractorCall.adapter.chat(messages, system, ctx)
-  guide_generator()      → ModelRouterChatAdapter(router, mode="narration")
-                            → adapter.chat(messages, system, ctx)
+  GenesisAgent.__init__ → router: ModelRouterPrimitive
+                            → narrator_adapter = ModelRouterChatAdapter(router, mode="narration")
+                            → _NarratorCall(narrator_adapter).chat(messages, system, ctx)
+  SeedExtractor.__init__ → extraction_adapter = ModelRouterChatAdapter(router, mode="extraction")
+                            → _ExtractionCall(extraction_adapter).chat(messages, system, ctx)
+                            → _SurpriseCall(extraction_adapter).chat(messages, system, ctx)
+  derive_guide_character() → narrator_adapter passed in from GenesisAgent
+                            → _GuideCall(narrator_adapter).chat(messages, system, ctx)
 ```
 
 `first_scene_synthesis.py` is out of scope — it is post-genesis and has distinct ownership.
+
+---
+
+## Message Flattening Tradeoff
+
+`ModelRouterChatAdapter.chat()` collapses the full message list into a single flat prompt string
+(system prompt + messages joined with `\n\n`, assistant turns prefixed with `[assistant]:`).
+This is the same pattern already used in `simulate_run.py`, which achieves 80% coherence on
+30-turn runs. **Multi-turn structure is not preserved as a proper chat array** — this is an
+accepted tradeoff for moving off LangChain. Genesis sessions are short enough (7 acts, ≤ ~15
+turns per session) that flat-prompt coherence is acceptable.
+
+`SystemMessage` objects are **never** present in the `history` list passed to `_NarratorCall`.
+The system prompt travels separately via the `system=` argument to `adapter.chat()`. Role
+conversion therefore handles exactly two types: `AIMessage` → `"assistant"`, everything else →
+`"user"`.
+
+**Adapter limitation:** `ModelRouterChatAdapter.chat()` silently ignores any `ChatMessage` with
+`role="system"` in the `messages` list. The system prompt must always travel via the `system=`
+kwarg — never as a message in the list.
 
 ---
 
@@ -62,7 +82,7 @@ After:
 ### 1. `_NarratorCall` (`agent.py:113`)
 
 Replace `_llm: Any` with `_adapter: ChatPrimitive`. Convert LangChain message objects to
-`ChatMessage` typed dicts and delegate to `adapter.chat()`:
+`ChatMessage` typed dicts (two roles only — see tradeoff note above):
 
 ```python
 class _NarratorCall(WorkflowPrimitive):
@@ -74,10 +94,13 @@ class _NarratorCall(WorkflowPrimitive):
         history: list = input_data["history"]
         player_input: str = input_data["player_input"]
 
-        messages: list[ChatMessage] = []
-        for msg in history:
-            role = "assistant" if msg.__class__.__name__ == "AIMessage" else "user"
-            messages.append({"role": role, "content": msg.content})
+        messages: list[ChatMessage] = [
+            {
+                "role": "assistant" if msg.__class__.__name__ == "AIMessage" else "user",
+                "content": msg.content,
+            }
+            for msg in history
+        ]
         if player_input:
             messages.append({"role": "user", "content": player_input})
 
@@ -87,62 +110,83 @@ class _NarratorCall(WorkflowPrimitive):
 
 ### 2. `GenesisAgent.__init__` (`agent.py:338`)
 
-Replace `narrator_llm`, `extractor_llm`, `guide_llm` parameters (raw LLM objects) with a single
-`chat_adapter: ChatPrimitive | None = None`. When `None`, construct a
-`ModelRouterChatAdapter(ModelRouterPrimitive.from_yaml(...), mode="narration")` internally.
-Pass the adapter into `_NarratorCall` and `SeedExtractor`.
+Replace `narrator_llm`, `extractor_llm`, `guide_llm` parameters with a single
+`router: ModelRouterPrimitive | None = None`. When `None`, construct using `MODES_PATH`:
+
+```python
+from src.components.model_management.mode_runner import MODES_PATH
+from ttadev.agents import ModelRouterChatAdapter
+from ttadev.primitives.llm import ModelRouterPrimitive
+
+_router = router or ModelRouterPrimitive.from_yaml(MODES_PATH)
+self._narrator_adapter = ModelRouterChatAdapter(_router, mode="narration")
+self._extraction_adapter = ModelRouterChatAdapter(_router, mode="extraction")
+```
+
+Pass `self._narrator_adapter` into `_NarratorCall` and store `self._extraction_adapter` for
+`SeedExtractor`. Store `self._narrator_adapter` for passing into `derive_guide_character()`.
+
+**Two distinct adapters are needed** — narrator/guide use `mode="narration"`, extraction uses
+`mode="extraction"`. Both share the same underlying `ModelRouterPrimitive` instance.
 
 ### 3. `SeedExtractor.__init__` (`seed_extractor.py:255`)
 
-Replace `llm` parameter with `chat_adapter: ChatPrimitive | None = None`. Construct a
-`ModelRouterChatAdapter(..., mode="extraction")` when `None`. The inner `_ExtractorCall.execute()`
-calls `adapter.chat(messages, system, ctx)`.
+Replace `llm` parameter with `adapter: ChatPrimitive | None = None`. When `None`, construct an
+extraction adapter using `MODES_PATH`. Pass the **same** adapter to **both** `_ExtractionCall`
+and `_SurpriseCall` — both primitive classes perform extraction-class tasks and must use the
+`extraction` mode.
 
-### 4. `derive_guide_character()` (`guide_generator.py:238`)
+```python
+from src.components.model_management.mode_runner import MODES_PATH
+from ttadev.agents import ModelRouterChatAdapter
+from ttadev.primitives.llm import ModelRouterPrimitive
 
-Replace the `llm` kwarg with `chat_adapter: ChatPrimitive | None = None`. Construct a
-`ModelRouterChatAdapter(..., mode="narration")` when `None`. Guide shares the `narration`
-cascade — narration models produce better prose than a separate guide-specific mode would.
-
----
-
-## Data Flow
-
+_adapter = adapter or ModelRouterChatAdapter(
+    ModelRouterPrimitive.from_yaml(MODES_PATH), mode="extraction"
+)
+# pass _adapter into both _ExtractionCall(_adapter) and _SurpriseCall(_adapter)
 ```
-GenesisAgent.process_turn(player_input)
-  → build system_prompt (get_system_prompt(act, world_context))
-  → FallbackPrimitive.execute({system_prompt, history, player_input})
-      → RetryPrimitive (max 2 retries, 1.5x backoff)
-          → _NarratorCall.execute()
-              → convert LangChain msgs → list[ChatMessage]
-              → ModelRouterChatAdapter.chat(messages, system_prompt, ctx)
-                  → ModelRouterPrimitive → cascade tier selection
-              → returns content str
-              → returns content.strip()
-      → on exhaustion → _NarratorFallback returns _SAFE_FALLBACK
+
+### 4. `_ExtractionCall` and `_SurpriseCall` (`seed_extractor.py`)
+
+Both replace `_llm: Any` with `_adapter: ChatPrimitive`. Their `execute()` methods convert
+messages and call `adapter.chat(messages, system, ctx)`.
+
+### 5. `derive_guide_character()` (`guide_generator.py:238`)
+
+Replace the `llm` kwarg with `adapter: ChatPrimitive | None = None`. When `None`, construct
+`ModelRouterChatAdapter(ModelRouterPrimitive.from_yaml(MODES_PATH), mode="narration")`.
+
+**Caller responsibility:** `GenesisAgent` already owns `self._narrator_adapter` — it should
+pass this in rather than letting `derive_guide_character` construct its own adapter (avoids a
+`from_yaml` file read per guide call). The `GenesisAgent.respond()` call site should become:
+
+```python
+guide = await derive_guide_character(seed_fields, adapter=self._narrator_adapter, ...)
 ```
 
 ---
 
 ## Error Handling
 
-- **Resilience stack unchanged.** `call_with_meta()` raises on failure identically to `ainvoke()`.
-  `RetryPrimitive` catches and retries; `FallbackPrimitive` catches and invokes `_NarratorFallback`.
-- **Cascade exhaustion.** `ModeRunner` raises before returning if all tiers fail — this surfaces
-  to `RetryPrimitive` as a normal exception.
-- **Parallel extraction.** `SeedExtractor` runs concurrently per turn. `ModeRunner` is stateless;
-  sharing a single instance across concurrent calls is safe.
+- **`model_modes.yaml` not found.** `ModelRouterPrimitive.from_yaml(MODES_PATH)` raises
+  `FileNotFoundError` at construction time. `MODES_PATH` is an absolute path constant derived
+  from the module file location — the same path already used by `ModeRunner` in the existing
+  codebase, so this is not a new failure mode.
+- **Cascade exhaustion.** `ModelRouterPrimitive` raises `RuntimeError("All N tiers failed")`
+  when every tier fails. This surfaces to `RetryPrimitive` → `FallbackPrimitive` → fallback
+  primitive as normal. No changes to error handling are needed.
+- **Parallel extraction.** `SeedExtractor` runs concurrently per turn. `ModelRouterPrimitive`
+  and `ModelRouterChatAdapter` are both stateless for concurrent use (the internal cooldown lock
+  is not awaited in practice). Sharing one adapter instance is safe.
 
 ---
 
 ## Out of Scope
 
 - `first_scene_synthesis.py` — post-genesis, separate ownership, separate PR.
-- Temperature / max_tokens per-call overrides — these are baked into `model_modes.yaml` per mode.
-  The per-call values that `get_llm()` accepted are dropped; `narration` and `extraction` modes
-  already have appropriate defaults.
-- Adding a `genesis_narration` mode to `model_modes.yaml` — deferred until there is evidence
-  that per-act token tuning is needed.
+- Temperature / max_tokens per-call overrides — baked into `model_modes.yaml` per mode.
+- Adding a `genesis_narration` mode — deferred until evidence of per-act token tuning need.
 
 ---
 
@@ -153,10 +197,14 @@ Follow strict TDD: one failing test → implementation → pass → next test.
 | Test | Location | What it verifies |
 |---|---|---|
 | `_NarratorCall` accepts `ChatPrimitive`, not raw LLM | `tests/unit/genesis/test_narrator_call.py` | Constructor signature changed |
-| LangChain `AIMessage` → `{"role": "assistant", ...}` conversion | same file | Message conversion logic |
-| LangChain `HumanMessage` → `{"role": "user", ...}` conversion | same file | Message conversion logic |
-| `GenesisAgent` constructs `ModelRouterChatAdapter` when none provided | `tests/unit/genesis/test_genesis_agent.py` | Default injection |
-| `SeedExtractor` routes to `"extraction"` mode | `tests/unit/genesis/test_seed_extractor.py` | Mode string passed to adapter |
-| `derive_guide_character` routes to `"narration"` mode | `tests/unit/genesis/test_guide_generator.py` | Shared cascade decision |
+| `AIMessage` → `{"role": "assistant", ...}` conversion | same | Message conversion (assistant) |
+| `HumanMessage` → `{"role": "user", ...}` conversion | same | Message conversion (user) |
+| `GenesisAgent` constructs two adapters (narration + extraction) when no router provided | `tests/unit/genesis/test_genesis_agent.py` | Default injection, two modes |
+| `SeedExtractor._ExtractionCall` routes to `"extraction"` mode | `tests/unit/genesis/test_seed_extractor.py` | Mode string passed to adapter |
+| `SeedExtractor._SurpriseCall` routes to `"extraction"` mode | same | `_SurpriseCall` also migrated |
+| `derive_guide_character` uses passed-in adapter (no new `from_yaml` call) | `tests/unit/genesis/test_guide_generator.py` | Caller-injected adapter |
+| `derive_guide_character` constructs narration adapter when `adapter=None` | same | Default injection fallback |
 
-All new tests use a mock `ChatPrimitive` (stub with a `chat()` coroutine) — no network calls.
+All new tests use a mock `ChatPrimitive` (stub with an async `chat()` coroutine) — no network
+calls. `ModelRouterPrimitive.from_yaml` is mocked at the module level where the default
+construction path is tested.
