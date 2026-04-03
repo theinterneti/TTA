@@ -37,12 +37,8 @@ with contextlib.suppress(ImportError):
         WorkflowPrimitive,
     )
     from ttadev.primitives.llm import ModelRouterPrimitive  # noqa: F401
-from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
-    CircuitBreakerConfig,
-    CircuitBreakerPrimitive,
-)
 
-from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
+    from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
 
 from .session_state import Act
 
@@ -169,6 +165,17 @@ class _ExtractionFallback(WorkflowPrimitive):  # type: ignore[misc]
         return {}
 
 
+_SURPRISE_FALLBACK: dict[str, Any] = {
+    "tone": "getting_worse",
+    "power_source": "magic",
+    "player_position": "outsider",
+    "one_specific_detail": "A library that burns every book it receives, yet the ash tells fortunes",
+    "scale": "city",
+    "era_tech_level": "renaissance",
+    "magic_presence": "rare",
+}
+
+
 class _SurpriseCall(WorkflowPrimitive):  # type: ignore[misc]
     """Generates a complete WorldSeed for 'surprise me' requests."""
 
@@ -208,16 +215,6 @@ No markdown fences. Only JSON.
             logger.warning("seed_extractor: surprise JSON parse failed: %r", raw[:200])
             return _SURPRISE_FALLBACK
 
-
-_SURPRISE_FALLBACK: dict[str, Any] = {
-    "tone": "getting_worse",
-    "power_source": "magic",
-    "player_position": "outsider",
-    "one_specific_detail": "A library that burns every book it receives, yet the ash tells fortunes",
-    "scale": "city",
-    "era_tech_level": "renaissance",
-    "magic_presence": "rare",
-}
 
 _ENUM_VALIDATORS: dict[str, set[str]] = {
     "tone": _TONES,
