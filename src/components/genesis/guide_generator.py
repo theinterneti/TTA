@@ -19,9 +19,8 @@ import logging
 import re
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.messages import HumanMessage, SystemMessage
-
 if TYPE_CHECKING:
+    from ttadev.agents.protocol import ChatMessage, ChatPrimitive
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -31,6 +30,8 @@ if TYPE_CHECKING:
     )
 
 with contextlib.suppress(ImportError):
+    from ttadev.agents import ModelRouterChatAdapter  # noqa: F401
+    from ttadev.agents.protocol import ChatMessage, ChatPrimitive  # noqa: F401
     from ttadev.primitives import (
         FallbackPrimitive,
         RetryPrimitive,
@@ -38,12 +39,10 @@ with contextlib.suppress(ImportError):
         WorkflowContext,
         WorkflowPrimitive,
     )
-from ttadev.primitives.recovery.circuit_breaker_primitive import (  # noqa: F401
-    CircuitBreakerConfig,
-    CircuitBreakerPrimitive,
-)
+    from ttadev.primitives.llm import ModelRouterPrimitive  # noqa: F401
 
-from src.ai_components.llm_factory import get_llm
+    from src.components.model_management.mode_runner import MODES_PATH  # noqa: F401
+
 from src.components.gameplay_loop.models.world_seed import (
     GuideCharacter,
     MagicPresence,
@@ -136,9 +135,7 @@ def _derive_structural(fields: dict[str, Any]) -> dict[str, str]:
 
 # ── LLM call for evocative elements ──────────────────────────────────────────
 
-_GUIDE_SYSTEM = """\
-You are crafting an in-world guide character for a text adventure. Given world context, \
-generate a name and first spoken line that feel rooted in that specific world.
+_GUIDE_SYSTEM = """You are crafting an in-world guide character for a text adventure. Given world context, generate a name and first spoken line that feel rooted in that specific world.
 
 Output ONLY valid JSON, no markdown fences:
 {
@@ -158,8 +155,8 @@ Rules:
 class _GuideNameCall(WorkflowPrimitive):  # type: ignore[misc]
     """LLM call to generate guide name + intro line."""
 
-    def __init__(self, llm: Any) -> None:
-        self._llm = llm
+    def __init__(self, adapter: ChatPrimitive) -> None:
+        self._adapter = adapter
 
     async def execute(
         self, input_data: dict, context: WorkflowContext
@@ -183,12 +180,11 @@ class _GuideNameCall(WorkflowPrimitive):  # type: ignore[misc]
             f"JSON output:"
         )
 
-        messages = [
-            SystemMessage(content=_GUIDE_SYSTEM),
-            HumanMessage(content=prompt),
+        messages: list[ChatMessage] = [
+            {"role": "user", "content": prompt},
         ]
-        response = await self._llm.ainvoke(messages)
-        raw = response.content.strip()
+        raw = await self._adapter.chat(messages, _GUIDE_SYSTEM, context)
+        raw = raw.strip()
         raw = re.sub(r"^```[a-z]*\n?", "", raw).rstrip("`").strip()
 
         try:
@@ -225,36 +221,37 @@ class _GuideFallback(WorkflowPrimitive):  # type: ignore[misc]
 
 async def derive_guide_character(
     seed_fields: dict[str, Any],
-    llm: Any | None = None,
+    adapter: ChatPrimitive | None = None,
     session_id: str = "genesis",
 ) -> GuideCharacter:
     """
     Derive a GuideCharacter from the accumulated WorldSeed fields.
 
-    Structural properties (entity_type, social_position, relationship) are
-    determined by rule tables.  Name and intro_line come from a single LLM call
-    wrapped in RetryPrimitive + FallbackPrimitive.
-
     Args:
         seed_fields: Dict of extracted WorldSeed fields (may include enums as strings).
-        llm: Optional pre-built LLM client; created with get_llm() if None.
+        adapter: ChatPrimitive for the name/intro call. Constructed from model_modes.yaml
+                 in narration mode if None. Callers should pass their narrator_adapter
+                 to avoid repeated YAML reads.
         session_id: Session ID for WorkflowContext tracing.
 
     Returns:
         A fully populated GuideCharacter instance.
     """
-    _llm = llm or get_llm(temperature=0.8, max_tokens=200)
+    _adapter = adapter or ModelRouterChatAdapter(  # type: ignore[possibly-unbound,assignment]
+        ModelRouterPrimitive.from_yaml(MODES_PATH),  # type: ignore[possibly-unbound]
+        mode="narration",  # type: ignore[possibly-unbound,union-attr]
+    )
     structural = _derive_structural(seed_fields)
 
     name_gen = FallbackPrimitive(  # type: ignore[arg-type]
         primary=RetryPrimitive(  # type: ignore[arg-type]
-            _GuideNameCall(_llm),
+            _GuideNameCall(_adapter),
             strategy=RetryStrategy(max_retries=2, backoff_base=1.0),  # type: ignore[arg-type]
         ),
         fallback=_GuideFallback(),
     )
 
-    context = WorkflowContext(workflow_id=session_id)
+    context = WorkflowContext(workflow_id=session_id)  # type: ignore[possibly-unbound]
     evocative = await name_gen.execute(  # type: ignore[arg-type]
         {"structural": structural, "fields": seed_fields},
         context,  # type: ignore[arg-type]

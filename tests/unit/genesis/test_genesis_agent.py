@@ -173,7 +173,7 @@ class TestGuideGenerator:
     @pytest.mark.asyncio
     async def test_derive_guide_character_returns_object(self) -> None:
         """Guide Generator: derive guide character returns object."""
-        llm = _make_llm('{"name": "Veyra", "intro_line": "You arrived earlier than expected."}')
+        adapter = _make_adapter('{"name": "Veyra", "intro_line": "You arrived earlier than expected."}')
         fields = {
             "tone": "getting_worse",
             "power_source": "magic",
@@ -181,7 +181,7 @@ class TestGuideGenerator:
             "era_tech_level": "medieval",
             "magic_presence": "common",
         }
-        guide = await derive_guide_character(fields, llm=llm)
+        guide = await derive_guide_character(fields, adapter=adapter)
         assert guide.name == "Veyra"
         assert guide.intro_line == "You arrived earlier than expected."
         assert guide.entity_type is not None
@@ -189,9 +189,12 @@ class TestGuideGenerator:
     @pytest.mark.asyncio
     async def test_guide_uses_fallback_on_llm_failure(self) -> None:
         """Guide Generator: guide uses fallback on llm failure."""
-        llm = MagicMock()
-        llm.ainvoke = AsyncMock(side_effect=RuntimeError("LLM down"))
-        guide = await derive_guide_character({}, llm=llm)
+
+        class _FailAdapter:
+            async def chat(self, messages: Any, system: Any, ctx: Any) -> str:
+                raise RuntimeError("LLM down")
+
+        guide = await derive_guide_character({}, adapter=_FailAdapter())
         # Fallback name is "Meridian"
         assert guide.name == "Meridian"
         assert len(guide.intro_line) > 10
