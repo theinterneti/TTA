@@ -1,7 +1,10 @@
 """Unit tests for guide_generator after ChatPrimitive migration."""
 from __future__ import annotations
+
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from src.components.genesis.guide_generator import derive_guide_character
 
 
@@ -47,8 +50,5 @@ async def test_derive_guide_character_constructs_adapter_when_none():
         "src.components.genesis.guide_generator.ModelRouterPrimitive.from_yaml",
         return_value=mock_router,
     ) as mock_from_yaml:
-        try:
-            await derive_guide_character(seed_fields={}, adapter=None)
-        except Exception:
-            pass
+        await derive_guide_character(seed_fields={}, adapter=None)
     mock_from_yaml.assert_called_once()
