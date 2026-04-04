@@ -93,7 +93,7 @@ def test_seed_extractor_passes_same_adapter_to_both_calls():
     adapter = _MockAdapter()
     extractor = SeedExtractor(adapter=adapter)
     # FallbackPrimitive.primary and RetryPrimitive.primitive are public attributes
-    extraction_inner = extractor._extractor.primary.primitive
-    surprise_inner = extractor._surprise.primary.primitive
+    extraction_inner = extractor._extractor.primary.primitive  # type: ignore[attr-defined]
+    surprise_inner = extractor._surprise.primary.primitive  # type: ignore[attr-defined]
     assert extraction_inner._adapter is adapter
     assert surprise_inner._adapter is adapter
