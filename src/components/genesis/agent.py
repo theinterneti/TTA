@@ -428,7 +428,7 @@ class GenesisAgent:
         # ── 5. Generate guide character before THE_BECOMING response ──────
         if state.act == Act.THE_BECOMING and self._guide is None:
             merged = {**state.seed_fields, **new_fields}
-            self._guide = await derive_guide_character(merged, session_id=session_id)
+            self._guide = await derive_guide_character(merged, adapter=self._narrator_adapter, session_id=session_id)
             state.guide_character = self._guide  # persist across requests
             logger.info(
                 "genesis_agent[%s]: guide character generated: %s",
