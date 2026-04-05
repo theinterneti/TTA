@@ -6,8 +6,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 
 SCRIPT = Path(__file__).parents[3] / "scripts" / "check_agent_docs.py"
 
