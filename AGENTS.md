@@ -1,80 +1,59 @@
+<!--
+  MAINTENANCE PROTOCOL — read before editing this file
+  Budget: 100 lines hard limit. Add content to docs/agents/dev/, not here.
+  Run: make check-agent-docs
+-->
+
 # AGENTS.md — Universal Agent Context
 
-This file is the shared entry point for all AI agents operating in the TTA
-repository. Read this before acting.
+Shared entry point for all AI agents in the TTA repository. Read this before acting.
 
-## What This Repo Is
+## What this repo is
 
-**Therapeutic Text Adventure (TTA)** — An AI-powered narrative game for mental
-health support. Players make choices that branch the story; a therapist/editorial
-layer curates which paths are safe and effective.
+**Therapeutic Text Adventure (TTA)** — AI-powered narrative game for mental health support.
+Players make choices that branch the story; a therapist/editorial layer curates safe paths.
 
-**TTA.dev** (`/home/thein/repos/TTA.dev`) provides reusable platform primitives.
+Multi-agent pipeline: `User Input → IPA → WBA → NGA → SSE Stream → Player`
 
-## Agent Roster
+**TTA.dev** provides reusable platform primitives. It owns the L0 developer control plane.
+
+## Agent roster
 
 | Agent | Role | Config |
 |---|---|---|
-| **Claude Code** | Main agent — primary decision maker | `CLAUDE.md` |
-| GitHub Copilot | IDE suggestions | `.github/copilot-instructions.md` |
+| **Claude Code** | Primary — main decision maker | `CLAUDE.md` |
+| GitHub Copilot | AI coding assistant | `.github/copilot-instructions.md` |
 | Augment | Code intelligence | `.augment/instructions.md` |
 | Cline | AI coding assistant | `.cline/instructions.md` |
-| Gemini | Secondary review | `GEMINI.md` |
+| Gemini | Secondary reviewer | `GEMINI.md` |
 
-## Memory Access (MANDATORY)
+## Non-negotiables
 
-Before any non-trivial task, recall context from Hindsight:
-1. `mcp__hindsight__recall` — query `adam-global` for durable directives and cross-project patterns
-2. `mcp__hindsight__recall` — query the current derived `project-*` or `workspace-*` bank for TTA-specific context
+- Python 3.12+ | `uv` only (never `pip`) | 88-char lines | Pyright `standard`
+- Conventional Commits | AAA tests | 100% coverage for new code
 
-After completing a significant task (architecture decision, bug root-cause, resolved TODO):
-- Cross-project patterns → retain to `adam-global`
-- TTA-specific decisions, commands, failures → retain to current derived `project-*`/`workspace-*` bank
-
-Hindsight MCP: `http://localhost:8888/mcp/` | Start: `uvx --from hindsight-api hindsight-local-mcp`
-
-## Non-Negotiable Standards
-
-- **Python**: 3.12+ only
-- **Package manager**: `uv` — never `pip install`
-- **Type hints**: `str | None` not `Optional[str]`
-- **Line length**: 88 chars (Ruff)
-- **Type checking**: Pyright `standard` mode
-- **Commits**: Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`)
-- **Tests**: pytest `asyncio_mode = "auto"`; integration tests use `@pytest.mark.integration`
-
-## Quality Gate (run before committing)
+## Quality gate (run before committing)
 
 ```bash
-uv run ruff check src/ --fix
-uv run ruff format src/
+uv run ruff check src/ --fix && uv run ruff format src/
 uv run pyright src/
 make test
 ```
 
-## Continuous Testing
+## Domain guidance
 
-```bash
-make watch        # Reruns unit tests on every .py/.toml save (cancels in-progress run)
-make watch-all    # Same, but includes integration tests (requires Neo4j + Redis)
-```
+For detailed context on any topic, read the relevant file before starting:
 
-## L0 / TTA.dev Interaction Rule
+| Topic | File |
+|---|---|
+| Architecture, pipeline, key classes | `docs/agents/dev/architecture.md` |
+| Testing patterns, markers, coverage | `docs/agents/dev/testing.md` |
+| Safety systems | `docs/agents/dev/safety.md` |
+| Genesis / onboarding | `docs/agents/dev/genesis.md` |
+| L0 / TTA.dev boundary | `docs/agents/dev/l0-boundary.md` |
 
-`TTA.dev` owns the emerging **developer-agent L0 control plane**.
+## Memory (Hindsight)
 
-TTA does **not** own that layer. In this repo, L0-related work should focus on
-**integrating with TTA.dev**, not recreating a second developer control plane
-inside `src/agent_orchestration/`.
-
-### What TTA agents should do next for L0
-
-1. keep runtime/player-session orchestration separate from developer-agent orchestration
-2. define how TTA build/test/release work should be represented as TTA.dev L0 tasks and runs
-3. add adapters or scripts that let TTA.dev-managed agents safely operate on this repo
-4. surface enough project/workflow metadata that TTA.dev can coordinate work without touching therapeutic runtime state
-
-### Anti-goal
-
-Do not treat IPA/WBA/NGA runtime coordination as the same problem as Claude/Copilot
-developer coordination. Those are different control planes.
+Before non-trivial tasks: recall `adam-global` then `tta` from Hindsight.
+After significant tasks: retain to the appropriate bank.
+MCP: `http://localhost:8888/mcp/`
