@@ -1,6 +1,6 @@
 # Test tiers
 
-.PHONY: test test-neo4j test-redis test-integration test-status test-quick test-coverage watch watch-unit watch-all play
+.PHONY: test test-neo4j test-redis test-integration test-status test-quick test-coverage watch watch-unit watch-all play check-agent-docs
 
 # Unit tests only (fast, no services required — matches quality gate)
 test:
@@ -70,3 +70,7 @@ play:
 # Skip genesis sequence and jump straight to the gameplay demo
 play-demo:
 	uv run python scripts/play.py --skip-genesis
+
+# Check that root agent instruction files stay within the 100-line budget
+check-agent-docs:
+	uv run python scripts/check_agent_docs.py
