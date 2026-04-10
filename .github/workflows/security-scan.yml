@@ -517,7 +517,7 @@ jobs:
       - name: Comment PR with security results
         if: github.event_name == 'pull_request'
         continue-on-error: true  # Requires pull-requests:write; informational only
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
