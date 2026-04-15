@@ -17,7 +17,7 @@ sentry-sdk[fastapi]==1.45.1
 # Security
 python-jose[cryptography]==3.4.0
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.22
+python-multipart==0.0.26
 
 # HTTP client for health checks
 httpx==0.25.2
