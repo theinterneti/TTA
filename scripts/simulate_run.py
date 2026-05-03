@@ -597,6 +597,8 @@ async def run_simulation(
 
             t0 = time.time()
             response_text = ""
+            narrator_model = local_narrator_model if local_only else ""
+            narrator_provider = "ollama" if local_only else ""
             for _sim_attempt in range(3):
                 try:
                     if local_only:
@@ -608,7 +610,7 @@ async def run_simulation(
                     else:
                         # Cascade: 9-tier rotation (Groq→Kimi→Gemini→GPT-OSS→…→OR auto)
                         sys_content = str(messages[0].content) if isinstance(messages[0], SystemMessage) else None
-                        response_text = await _mode_runner.call(
+                        response_text, narrator_model, narrator_provider = await _mode_runner.call_with_meta(
                             "narration",
                             prompt=_flatten_to_prompt(messages),
                             system=sys_content,
@@ -662,8 +664,11 @@ async def run_simulation(
             if not response_text:
                 continue
 
-            # Short-response guard: retry once if narration is suspiciously short
-            if _count_words(response_text) < 25 and not dry_run:
+            # Short-response guard: retry once if narration is suspiciously short.
+            # 80w threshold: the system prompt requires 120–350w per turn; anything
+            # below 80w is likely a truncated tier-fallthrough response (observed
+            # T9/T20/T21/T24/T25 in run_30_cascade slipping through the old 25w guard).
+            if _count_words(response_text) < 80 and not dry_run:
                 print(
                     f"  ⟳ Response too short ({_count_words(response_text)}w) — retrying…"
                 )
@@ -793,6 +798,8 @@ async def run_simulation(
             "npcs_after": extracted_state.get("npcs", []),
             "history_len": len(game_state.raw_history),
             "summary_len": len(game_state.summary),
+            "narrator_model": narrator_model,
+            "narrator_provider": narrator_provider,
         }
         metrics_records.append(record)
 

@@ -494,3 +494,4 @@ models/Modelfile.tta-extractor
 scripts/scenarios/
 scripts/augment_npc_pairs.py
 scripts/collect_training_pairs.py
+.gitnexus

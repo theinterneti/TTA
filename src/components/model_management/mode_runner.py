@@ -53,3 +53,23 @@ class ModeRunner:
             ctx,
         )
         return result.content
+
+    async def call_with_meta(
+        self,
+        mode: str,
+        prompt: str,
+        system: str | None = None,
+        tier_override: int | None = None,
+    ) -> tuple[str, str, str]:
+        """Like call(), but also returns (content, model, provider)."""
+        ctx = WorkflowContext(workflow_id=f"mode-runner-{mode}")
+        result = await self._router.execute(
+            ModelRouterRequest(
+                mode=mode,
+                prompt=prompt,
+                system=system,
+                tier_override=tier_override,
+            ),
+            ctx,
+        )
+        return result.content, result.model or "", result.provider or ""
