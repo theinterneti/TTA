@@ -14,7 +14,7 @@ python-jose[cryptography]==3.4.0
 # Authentication and password hashing
 passlib==1.7.4
 bcrypt==3.2.2  # Compatible with passlib 1.7.4 - provides __about__ module
-python-multipart==0.0.22
+python-multipart==0.0.31
 
 # HTTP client
 httpx==0.25.2
