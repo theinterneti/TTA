@@ -47,7 +47,7 @@ pytz==2023.3
 click==8.1.7
 
 # Email and notifications
-aiosmtplib==3.0.1
+aiosmtplib==5.1.1
 
 # PDF generation (for reports)
 weasyprint>=68.0
