@@ -64,24 +64,25 @@ MCP: `http://localhost:8888/mcp/`
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **TTA** (77054 symbols, 114439 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **TTA** (59526 symbols, 85464 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
-> If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
+> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
 ## Always Do
 
-- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `gitnexus_impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
-- **MUST run `gitnexus_detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows.
+- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
+- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "main"})`.
 - **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `gitnexus_query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
-- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `gitnexus_context({name: "symbolName"})`.
+- When exploring unfamiliar code, use `query({search_query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
+- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
+- For security review, `explain({target: "fileOrSymbol"})` lists taint findings (source→sink flows; needs `analyze --pdg`).
 
 ## Never Do
 
-- NEVER edit a function, class, or method without first running `gitnexus_impact` on it.
+- NEVER edit a function, class, or method without first running `impact` on it.
 - NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
-- NEVER rename symbols with find-and-replace — use `gitnexus_rename` which understands the call graph.
-- NEVER commit changes without running `gitnexus_detect_changes()` to check affected scope.
+- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
+- NEVER commit changes without running `detect_changes()` to check affected scope.
 
 ## Resources
 
@@ -102,25 +103,25 @@ This project is indexed by GitNexus as **TTA** (77054 symbols, 114439 relationsh
 | Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
 | Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
-| Work in the Agent_orchestration area (302 symbols) | `.claude/skills/generated/agent-orchestration/SKILL.md` |
-| Work in the Services area (242 symbols) | `.claude/skills/generated/services/SKILL.md` |
-| Work in the Orchestration area (242 symbols) | `.claude/skills/generated/orchestration/SKILL.md` |
-| Work in the Scripts area (236 symbols) | `.claude/skills/generated/scripts/SKILL.md` |
-| Work in the Page-objects area (231 symbols) | `.claude/skills/generated/page-objects/SKILL.md` |
-| Work in the Gameplay_loop area (220 symbols) | `.claude/skills/generated/gameplay-loop/SKILL.md` |
-| Work in the Realtime area (196 symbols) | `.claude/skills/generated/realtime/SKILL.md` |
-| Work in the Components area (191 symbols) | `.claude/skills/generated/components/SKILL.md` |
-| Work in the Api_gateway area (151 symbols) | `.claude/skills/generated/api-gateway/SKILL.md` |
-| Work in the Tools area (84 symbols) | `.claude/skills/generated/tools/SKILL.md` |
+| Work in the Components area (366 symbols) | `.claude/skills/generated/components/SKILL.md` |
+| Work in the Agent_orchestration area (360 symbols) | `.claude/skills/generated/agent-orchestration/SKILL.md` |
+| Work in the Services area (311 symbols) | `.claude/skills/generated/services/SKILL.md` |
+| Work in the Gameplay_loop area (280 symbols) | `.claude/skills/generated/gameplay-loop/SKILL.md` |
+| Work in the Orchestration area (269 symbols) | `.claude/skills/generated/orchestration/SKILL.md` |
+| Work in the Scripts area (265 symbols) | `.claude/skills/generated/scripts/SKILL.md` |
+| Work in the Realtime area (244 symbols) | `.claude/skills/generated/realtime/SKILL.md` |
+| Work in the Page-objects area (221 symbols) | `.claude/skills/generated/page-objects/SKILL.md` |
+| Work in the Routers area (141 symbols) | `.claude/skills/generated/routers/SKILL.md` |
+| Work in the Api_gateway area (139 symbols) | `.claude/skills/generated/api-gateway/SKILL.md` |
+| Work in the Narrative area (97 symbols) | `.claude/skills/generated/narrative/SKILL.md` |
+| Work in the Tools area (86 symbols) | `.claude/skills/generated/tools/SKILL.md` |
+| Work in the Openhands_integration area (83 symbols) | `.claude/skills/generated/openhands-integration/SKILL.md` |
 | Work in the Genesis area (81 symbols) | `.claude/skills/generated/genesis/SKILL.md` |
-| Work in the Openhands_integration area (79 symbols) | `.claude/skills/generated/openhands-integration/SKILL.md` |
-| Work in the Player_experience area (71 symbols) | `.claude/skills/generated/player-experience/SKILL.md` |
-| Work in the Performance area (68 symbols) | `.claude/skills/generated/performance/SKILL.md` |
-| Work in the Api area (65 symbols) | `.claude/skills/generated/api/SKILL.md` |
-| Work in the Integration area (61 symbols) | `.claude/skills/generated/integration/SKILL.md` |
-| Work in the Monitoring area (59 symbols) | `.claude/skills/generated/monitoring/SKILL.md` |
-| Work in the Database area (55 symbols) | `.claude/skills/generated/database/SKILL.md` |
-| Work in the Extended_evaluation area (54 symbols) | `.claude/skills/generated/extended-evaluation/SKILL.md` |
-| Work in the Optimization area (50 symbols) | `.claude/skills/generated/optimization/SKILL.md` |
+| Work in the Player_experience area (81 symbols) | `.claude/skills/generated/player-experience/SKILL.md` |
+| Work in the Api area (77 symbols) | `.claude/skills/generated/api/SKILL.md` |
+| Work in the Narrative_coherence area (76 symbols) | `.claude/skills/generated/narrative-coherence/SKILL.md` |
+| Work in the Extended_evaluation area (75 symbols) | `.claude/skills/generated/extended-evaluation/SKILL.md` |
+| Work in the Performance area (74 symbols) | `.claude/skills/generated/performance/SKILL.md` |
+| Work in the Database area (71 symbols) | `.claude/skills/generated/database/SKILL.md` |
 
 <!-- gitnexus:end -->

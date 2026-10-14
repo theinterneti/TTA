@@ -1,59 +1,53 @@
 ---
 name: services
-description: "Skill for the Services area of TTA. 242 symbols across 41 files."
+description: "Skill for the Services area of TTA. 311 symbols across 46 files."
 ---
 
 # Services
 
-242 symbols | 41 files | Cohesion: 82%
+311 symbols | 46 files | Cohesion: 83%
 
 ## When to Use
 
 - Working with code in `src/`
-- Understanding how test_returns_true_for_compatible_model, test_rejects_model_exceeding_cost, test_rejects_model_below_quality work
+- Understanding how get_session_store, create_session, get_session_messages work
 - Modifying services-related functionality
 
 ## Key Files
 
 | File | Symbols |
 |------|---------|
+| `tests/unit/model_management/services/test_services_additional.py` | _make_model, _make_requirements, test_get_fallback_model_returns_none_when_no_healthy_providers, test_get_fallback_model_excludes_failed_model_from_results, test_get_fallback_model_returns_none_when_all_filtered (+29) |
 | `tests/unit/model_management/services/test_model_selector_additional.py` | _make_model, _make_requirements, test_returns_true_for_compatible_model, test_rejects_model_exceeding_cost, test_rejects_model_below_quality (+15) |
-| `src/player_experience/frontend/src/services/progressTrackingService.ts` | analyzeGoalProgress, calculateProgressTrend, calculateVelocityScore, calculateConsistencyScore, calculateTherapeuticEffectiveness (+14) |
-| `src/player_experience/frontend/src/services/personalizedRecommendationEngine.ts` | generatePersonalizedRecommendations, generateGoalRecommendations, generateApproachRecommendations, generateIntegrationRecommendations, analyzePersonalizationProfile (+14) |
+| `src/player_experience/frontend/src/services/personalizedRecommendationEngine.ts` | generateProgressRecommendations, createGoalRecommendation, createProgressBoostRecommendation, formatGoalTitle, generateGoalDescription (+15) |
+| `src/player_experience/frontend/src/services/progressTrackingService.ts` | generateProgressAnalytics, recordProgress, recordOutcomeMeasurement, generateTherapeuticInsights, generateProgressRecommendations (+15) |
+| `src/player_experience/frontend/src/services/websocket.ts` | setupEventListeners, startHeartbeat, stopHeartbeat, handleCrisisAlert, disconnect (+9) |
 | `tests/unit/model_management/services/test_model_selector_timeout.py` | _make_model, _make_requirements, test_execute_calls_run_selection, test_returns_model_on_success, test_timeout_value_from_criteria (+8) |
-| `src/player_experience/frontend/src/services/websocket.ts` | validateConnectionPrerequisites, isConnected, getConnectionStatus, handleVisibilityChange, initializeVisibilityListener (+8) |
-| `src/player_experience/services/privacy_service.py` | decrypt_therapeutic_content, delete_user_data, anonymize_user_data, _delete_therapeutic_content, _get_user_therapeutic_content (+7) |
-| `src/player_experience/frontend/src/services/realAnalyticsService.ts` | setAuthToken, getSessionHistory, getRecommendationHistory, fetchApi, generatePredictiveAnalytics (+6) |
+| `src/components/model_management/services/performance_monitor.py` | record_metrics, get_model_performance, get_system_performance, _calculate_aggregated_stats, _percentile (+6) |
+| `src/player_experience/frontend/src/services/realAnalyticsService.ts` | fetchApi, generatePredictiveAnalytics, getSessionHistory, getEmotionalHistory, getRecommendationHistory (+6) |
+| `src/player_experience/services/session_store.py` | _connect, _now, create_session, get_session, _touch_session (+5) |
 | `tests/player_experience/services/test_narrative_session_enrichment.py` | _make_orchestrator, test_sessions_without_session_id_are_passed_through, test_stable_coherence_is_counted_and_attached, test_strained_coherence_is_counted, test_unknown_coherence_status_not_counted (+5) |
-| `src/player_experience/services/session_store.py` | _connect, _now, create_session, _touch_session, save_message (+5) |
-| `src/player_experience/frontend/src/services/predictiveAnalyticsService.ts` | generatePredictiveAnalytics, generateRiskPredictions, analyzePlateauRisk, generateOutcomePredictions, predictGoalOutcome (+5) |
 
 ## Entry Points
 
 Start here when exploring this area:
 
-- **`test_returns_true_for_compatible_model`** (Function) — `tests/unit/model_management/services/test_model_selector_additional.py:89`
-- **`test_rejects_model_exceeding_cost`** (Function) — `tests/unit/model_management/services/test_model_selector_additional.py:96`
-- **`test_rejects_model_below_quality`** (Function) — `tests/unit/model_management/services/test_model_selector_additional.py:103`
-- **`test_rejects_model_with_insufficient_context`** (Function) — `tests/unit/model_management/services/test_model_selector_additional.py:110`
-- **`test_rejects_model_missing_capabilities`** (Function) — `tests/unit/model_management/services/test_model_selector_additional.py:117`
+- **`get_session_store`** (Function) — `src/player_experience/api/routers/sessions.py:30`
+- **`create_session`** (Function) — `src/player_experience/api/routers/sessions.py:114`
+- **`get_session_messages`** (Function) — `src/player_experience/api/routers/sessions.py:252`
+- **`copy_session`** (Function) — `src/player_experience/api/routers/sessions.py:278`
+- **`clear_session_messages`** (Function) — `src/player_experience/api/routers/sessions.py:304`
 
 ## Key Symbols
 
 | Symbol | Type | File | Line |
 |--------|------|------|------|
-| `test_returns_true_for_compatible_model` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 89 |
-| `test_rejects_model_exceeding_cost` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 96 |
-| `test_rejects_model_below_quality` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 103 |
-| `test_rejects_model_with_insufficient_context` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 110 |
-| `test_rejects_model_missing_capabilities` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 117 |
-| `test_accepts_model_with_all_required_capabilities` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 124 |
-| `test_therapeutic_safety_unknown_score_openrouter_allowed` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 131 |
-| `test_therapeutic_safety_unknown_score_custom_api_allowed` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 141 |
-| `test_therapeutic_safety_unknown_score_local_rejected` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 151 |
-| `test_therapeutic_safety_below_threshold_rejected` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 161 |
-| `test_latency_constraint_rejects_slow_model` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 174 |
-| `test_latency_constraint_accepts_fast_model` | Function | `tests/unit/model_management/services/test_model_selector_additional.py` | 182 |
+| `get_session_store` | Function | `src/player_experience/api/routers/sessions.py` | 30 |
+| `create_session` | Function | `src/player_experience/api/routers/sessions.py` | 114 |
+| `get_session_messages` | Function | `src/player_experience/api/routers/sessions.py` | 252 |
+| `copy_session` | Function | `src/player_experience/api/routers/sessions.py` | 278 |
+| `clear_session_messages` | Function | `src/player_experience/api/routers/sessions.py` | 304 |
+| `enrich_session_payloads` | Function | `src/player_experience/services/narrative_session_enrichment.py` | 17 |
 | `test_sessions_without_session_id_are_passed_through` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 40 |
 | `test_stable_coherence_is_counted_and_attached` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 65 |
 | `test_strained_coherence_is_counted` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 94 |
@@ -62,37 +56,44 @@ Start here when exploring this area:
 | `test_empty_state_does_not_add_narrative_orchestration` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 163 |
 | `test_non_dict_state_does_not_add_narrative_orchestration` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 184 |
 | `test_non_dict_player_signals_not_counted` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 205 |
+| `test_original_session_keys_are_preserved` | Function | `tests/player_experience/services/test_narrative_session_enrichment.py` | 263 |
+| `process_choice` | Function | `src/player_experience/api/routers/gameplay.py` | 241 |
+| `end_session` | Function | `src/player_experience/api/routers/gameplay.py` | 328 |
+| `pause_session` | Function | `src/player_experience/api/routers/gameplay.py` | 407 |
+| `resume_session` | Function | `src/player_experience/api/routers/gameplay.py` | 448 |
+| `generateGoalSuggestions` | Function | `src/player_experience/frontend/src/services/goalSuggestionEngine.ts` | 200 |
 
 ## Execution Flows
 
 | Flow | Type | Steps |
 |------|------|-------|
-| `Chat → ClearToken` | cross_community | 8 |
-| `Chat → StopHeartbeat` | cross_community | 8 |
+| `Create_session → _key` | cross_community | 7 |
+| `Get_session_messages → _key` | cross_community | 7 |
+| `Clear_session_messages → _key` | cross_community | 7 |
 | `Send_gameplay_message → _get_chat_openai` | cross_community | 7 |
-| `Chat → FlushMessageQueue` | cross_community | 7 |
 | `Send_gameplay_message → _auto_detect_provider` | cross_community | 6 |
+| `List_sessions → _get_narrative_orchestrator` | cross_community | 5 |
 | `GeneratePredictiveAnalytics → CalculateVariance` | cross_community | 5 |
-| `SessionManagementInterface → CalculateOverallProgress` | cross_community | 5 |
-| `GeneratePredictiveAnalytics → CalculateLinearRegression` | cross_community | 4 |
-| `GeneratePredictiveAnalytics → CalculateCorrelation` | cross_community | 4 |
-| `GeneratePredictiveAnalytics → ProjectOutcome` | cross_community | 4 |
+| `Export_user_data → Decrypt_therapeutic_content` | cross_community | 5 |
+| `Create_session → _deserialize_token_data` | cross_community | 4 |
+| `Get_player_dashboard → _connect` | cross_community | 4 |
 
 ## Connected Areas
 
 | Area | Connections |
 |------|-------------|
-| Slices | 3 calls |
-| Settings | 2 calls |
-| Cluster_354 | 2 calls |
-| Cluster_355 | 2 calls |
-| PlayerPreferences | 1 calls |
-| Cluster_1016 | 1 calls |
+| Routers | 15 calls |
+| Api_gateway | 5 calls |
+| Cluster_1225 | 2 calls |
+| Cluster_1226 | 2 calls |
+| Managers | 1 calls |
 | Ai_components | 1 calls |
+| Monitoring | 1 calls |
 | Integration | 1 calls |
 
 ## How to Explore
 
-1. `gitnexus_context({name: "test_returns_true_for_compatible_model"})` — see callers and callees
-2. `gitnexus_query({query: "services"})` — find related execution flows
+1. `context({name: "get_session_store"})` — see callers and callees
+2. `query({search_query: "services"})` — find related execution flows
 3. Read key files listed above for implementation details
+4. `explain({target: "<file or symbol>"})` — persisted taint findings (source→sink data flows), when indexed with `--pdg`

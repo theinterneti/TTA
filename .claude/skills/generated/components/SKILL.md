@@ -1,93 +1,97 @@
 ---
 name: components
-description: "Skill for the Components area of TTA. 191 symbols across 32 files."
+description: "Skill for the Components area of TTA. 366 symbols across 51 files."
 ---
 
 # Components
 
-191 symbols | 32 files | Cohesion: 74%
+366 symbols | 51 files | Cohesion: 70%
 
 ## When to Use
 
 - Working with code in `tests/`
-- Understanding how test_returns_ollama_response, test_ollama_called_with_correct_model, test_system_message_included_when_provided work
+- Understanding how client_factory, set_session_goals, health_check work
 - Modifying components-related functionality
 
 ## Key Files
 
 | File | Symbols |
 |------|---------|
+| `src/components/narrative_arc_orchestrator_component.py` | _normalize_session_state, _coerce_datetime, _resolve_current_scale, _update_current_scale_from_response, initialize_session (+54) |
+| `tests/unit/components/test_therapeutic_narrative_modules.py` | test_set_therapeutic_goals, test_set_therapeutic_goals_empty_list, test_track_goal_progress, test_log_therapeutic_evidence, test_generate_progress_report (+45) |
 | `tests/unit/components/test_mode_runner.py` | _mock_ollama_response, _mock_openrouter_response, _async_client_ctx, test_returns_ollama_response, test_ollama_called_with_correct_model (+17) |
 | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | _event, test_detect_therapeutic_conflicts_skips_same_scale_events, test_detect_therapeutic_conflicts_no_conflict_when_gap_small, test_detect_therapeutic_conflicts_single_event_no_pairs, test_detect_therapeutic_conflicts_unsafe_via_low_alignment (+16) |
-| `tests/unit/components/test_nga_agent.py` | _rich_world_context, _simple_processed_input, test_includes_location_name, test_includes_npc_names, test_includes_events (+11) |
+| `tests/unit/components/test_nga_agent.py` | _make_llm, _simple_world_context, _rich_world_context, _simple_processed_input, test_includes_location_name (+11) |
 | `tests/unit/components/test_default_character_world_service.py` | _make_service, test_skips_when_player_has_existing_characters, test_returns_none_triple_when_character_creation_fails, test_returns_char_and_none_when_world_not_found, test_full_success_returns_all_three_ids (+9) |
-| `tests/unit/components/test_ipa_agent.py` | _make_llm, test_interact_intent_with_npc, test_unknown_intent_on_bad_value, test_malformed_entity_skipped, _ipa_json (+6) |
+| `src/components/character_arc_manager.py` | initialize_character_arc, initialize_integrated_character_arc, get_integrated_character_summary, __init__, resolve_character_arc_milestone (+9) |
+| `src/components/narrative_coherence_engine.py` | resolve_narrative_conflicts, generate_creative_solutions, _implement_conflict_resolution, manage_retroactive_changes, _validate_retroactive_changes (+6) |
+| `tests/unit/components/test_ipa_agent.py` | test_parses_clean_json, test_strips_markdown_fences, test_raises_on_invalid_json, _make_llm, test_interact_intent_with_npc (+6) |
 | `tests/unit/components/test_wba_agent.py` | _make_processed_input, _make_world_context, _make_builder, test_returns_stub_when_no_builder, test_returns_stub_when_no_location_id (+5) |
-| `src/components/docker_component.py` | _start_impl, _check_docker_installed, ensure_consistency, _copy_template_files, _standardize_container_names (+5) |
-| `src/components/player_experience_component.py` | PlayerExperienceComponent, _start_impl, _stop_impl, _run_docker_compose, _check_dependencies_health (+4) |
-| `tests/unit/components/test_free_model_tracker.py` | _or_api_payload, test_returns_only_free_models, test_force_refresh_ignores_fresh_cache, _make_mock_client, test_sends_auth_header_when_api_key_provided (+4) |
-| `src/components/narrative_arc_orchestrator/conflict_detection.py` | detect_therapeutic_conflicts, _shares_therapeutic_context, _get_therapeutic_topics, _get_therapeutic_alignment, _is_unsafe (+3) |
 
 ## Entry Points
 
 Start here when exploring this area:
 
-- **`test_returns_ollama_response`** (Function) — `tests/unit/components/test_mode_runner.py:131`
-- **`test_ollama_called_with_correct_model`** (Function) — `tests/unit/components/test_mode_runner.py:140`
-- **`test_system_message_included_when_provided`** (Function) — `tests/unit/components/test_mode_runner.py:152`
-- **`test_no_system_message_when_not_provided`** (Function) — `tests/unit/components/test_mode_runner.py:167`
-- **`test_falls_back_to_tier2_on_ollama_error`** (Function) — `tests/unit/components/test_mode_runner.py:188`
+- **`client_factory`** (Function) — `tests/unit/components/test_mode_runner.py:195`
+- **`set_session_goals`** (Function) — `src/player_experience/api/routers/conversation.py:1122`
+- **`health_check`** (Function) — `scripts/health_check_carbon.py:9`
+- **`test_start_uses_injected_dependency_adapters_and_stop_closes_them`** (Function) — `tests/unit/components/test_narrative_arc_orchestrator_component.py:242`
+- **`test_engine_start_stop`** (Function) — `tests/unit/narrative/test_narrative_coherence_engine.py:414`
 
 ## Key Symbols
 
 | Symbol | Type | File | Line |
 |--------|------|------|------|
-| `Neo4jComponent` | Class | `src/components/neo4j_component.py` | 49 |
-| `GameplayLoopComponent` | Class | `src/components/gameplay_loop_component.py` | 26 |
-| `AppComponent` | Class | `src/components/app_component.py` | 49 |
-| `Component` | Class | `src/orchestration/component.py` | 60 |
-| `PlayerExperienceComponent` | Class | `src/components/player_experience_component.py` | 53 |
-| `LLMComponent` | Class | `src/components/llm_component.py` | 52 |
-| `DockerComponent` | Class | `src/components/docker_component.py` | 60 |
-| `test_returns_ollama_response` | Function | `tests/unit/components/test_mode_runner.py` | 131 |
-| `test_ollama_called_with_correct_model` | Function | `tests/unit/components/test_mode_runner.py` | 140 |
-| `test_system_message_included_when_provided` | Function | `tests/unit/components/test_mode_runner.py` | 152 |
-| `test_no_system_message_when_not_provided` | Function | `tests/unit/components/test_mode_runner.py` | 167 |
-| `test_falls_back_to_tier2_on_ollama_error` | Function | `tests/unit/components/test_mode_runner.py` | 188 |
 | `client_factory` | Function | `tests/unit/components/test_mode_runner.py` | 195 |
-| `test_extraction_skips_null_tier1_and_calls_tier2` | Function | `tests/unit/components/test_mode_runner.py` | 212 |
-| `test_tier2_called_with_correct_model` | Function | `tests/unit/components/test_mode_runner.py` | 224 |
-| `test_falls_back_to_tier3_when_tier2_fails` | Function | `tests/unit/components/test_mode_runner.py` | 258 |
-| `test_tier_override_1_calls_ollama` | Function | `tests/unit/components/test_mode_runner.py` | 319 |
-| `test_tier_override_2_calls_openrouter` | Function | `tests/unit/components/test_mode_runner.py` | 328 |
-| `test_tier_override_skips_other_tiers` | Function | `tests/unit/components/test_mode_runner.py` | 337 |
-| `test_ollama_503_falls_back_to_tier2` | Function | `tests/unit/components/test_mode_runner.py` | 376 |
+| `set_session_goals` | Function | `src/player_experience/api/routers/conversation.py` | 1122 |
+| `health_check` | Function | `scripts/health_check_carbon.py` | 9 |
+| `test_start_uses_injected_dependency_adapters_and_stop_closes_them` | Function | `tests/unit/components/test_narrative_arc_orchestrator_component.py` | 242 |
+| `test_engine_start_stop` | Function | `tests/unit/narrative/test_narrative_coherence_engine.py` | 414 |
+| `detect_therapeutic_conflicts` | Function | `src/components/narrative_arc_orchestrator/conflict_detection.py` | 31 |
+| `test_detect_therapeutic_conflicts_skips_same_scale_events` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 123 |
+| `test_detect_therapeutic_conflicts_no_conflict_when_gap_small` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 147 |
+| `test_detect_therapeutic_conflicts_single_event_no_pairs` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 169 |
+| `test_detect_therapeutic_conflicts_unsafe_via_low_alignment` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 174 |
+| `test_detect_therapeutic_conflicts_therapeutic_reframe_when_no_safety` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 200 |
+| `test_detect_therapeutic_conflicts_shared_topic_via_therapeutic_theme` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 226 |
+| `test_detect_therapeutic_conflicts_severity_clamped_to_one` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 250 |
+| `test_get_narrative_status_loads_persisted_session` | Function | `tests/unit/components/test_narrative_arc_orchestrator_component.py` | 60 |
+| `test_trigger_emergent_event_loads_and_persists_session` | Function | `tests/unit/components/test_narrative_arc_orchestrator_component.py` | 146 |
+| `test_calculate_emergent_probability_uses_context_and_cooldown` | Function | `tests/unit/components/test_narrative_arc_orchestrator_component.py` | 483 |
+| `build_simple_resolution` | Function | `src/components/narrative_arc_orchestrator/resolution_engine.py` | 14 |
+| `apply_resolution` | Function | `src/components/narrative_arc_orchestrator/resolution_engine.py` | 57 |
+| `test_build_simple_resolution_non_therapeutic` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 279 |
+| `test_build_simple_resolution_therapeutic_reframe` | Function | `tests/unit/components/test_narrative_arc_orchestrator_helpers.py` | 296 |
 
 ## Execution Flows
 
 | Flow | Type | Steps |
 |------|------|-------|
-| `Session_turn → Build_voice_fragment` | cross_community | 5 |
-| `Session_turn → Build_intervention_fragment` | cross_community | 5 |
-| `Session_turn → _minimal_world_context` | cross_community | 4 |
-| `Session_turn → _build_user_message` | cross_community | 4 |
-| `Ensure_consistency → _get_env_var_default` | intra_community | 4 |
-| `Respond_to_genesis → Transition_to` | cross_community | 3 |
-| `Respond_to_genesis → Record_turn` | cross_community | 3 |
-| `Start_genesis_session → Transition_to` | cross_community | 3 |
-| `Start_genesis_session → Record_turn` | cross_community | 3 |
-| `Ensure_consistency → _create_env_example` | intra_community | 3 |
+| `Set_session_goals → _coerce_datetime` | intra_community | 5 |
+| `Get_session_state → _coerce_datetime` | cross_community | 5 |
+| `Get_session_state → _resolve_current_scale` | cross_community | 5 |
+| `Set_session_goals → _get_session_persistence_adapter` | cross_community | 4 |
+| `Set_session_goals → _invoke_async_adapter_method` | cross_community | 4 |
+| `Set_session_goals → _merge_persisted_session_state` | cross_community | 4 |
+| `Set_session_goals → _resolve_current_scale` | intra_community | 4 |
+| `Set_session_goals → _deserialize_token_data` | cross_community | 4 |
+| `Get_session_state → _get_session_persistence_adapter` | cross_community | 4 |
+| `Get_session_state → _invoke_async_adapter_method` | cross_community | 4 |
 
 ## Connected Areas
 
 | Area | Connections |
 |------|-------------|
-| Agent_orchestration | 10 calls |
-| Orchestration | 4 calls |
+| Narrative | 35 calls |
+| Agent_orchestration | 13 calls |
+| Orchestration | 8 calls |
+| Routers | 3 calls |
+| Narrative_arc_orchestrator | 2 calls |
 | Guide | 1 calls |
 
 ## How to Explore
 
-1. `gitnexus_context({name: "test_returns_ollama_response"})` — see callers and callees
-2. `gitnexus_query({query: "components"})` — find related execution flows
+1. `context({name: "client_factory"})` — see callers and callees
+2. `query({search_query: "components"})` — find related execution flows
 3. Read key files listed above for implementation details
+4. `explain({target: "<file or symbol>"})` — persisted taint findings (source→sink data flows), when indexed with `--pdg`
